@@ -6234,14 +6234,13 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: http
-    port: 88
-    protocol: TCP
-    targetPort: 8088
-  - name: grpc
-    port: 89
-    protocol: TCP
-    targetPort: 8089
+    - name: http-metrics
+      protocol: TCP
+      port: 10254
+    - name: grpc
+      port: 89
+      protocol: TCP
+      targetPort: 8089
   selector: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte

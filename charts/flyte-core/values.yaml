@@ -281,6 +281,16 @@ datacatalog:
     type: NodePort
     # -- Appends additional ports to the service spec.
     additionalPorts: []
+  serviceMonitor:
+    # -- If enabled create the Datacatalog service monitor
+    enabled: false
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scraping the metrics
+    labels: {}
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog
@@ -944,7 +954,7 @@ configmap:
   datacatalogServer:
     datacatalog:
       storage-prefix: metadata/datacatalog
-      metrics-scope: datacatalog
+      metrics-scope: flyte
       profiler-port: 10254
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s

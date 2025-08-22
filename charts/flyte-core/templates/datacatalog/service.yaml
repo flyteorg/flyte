@@ -12,15 +12,17 @@ spec:
   {{- with .Values.datacatalog.service.type}}
   type: {{ . }}
   {{- end }}
+  {{- with .Values.datacatalog.service.clusterIP}}
+  clusterIP: {{ . }}
+  {{- end }}
   ports:
-  - name: http
-    port: 88
-    protocol: TCP
-    targetPort: 8088
-  - name: grpc
-    port: 89
-    protocol: TCP
-    targetPort: 8089
+    - name: http-metrics
+      protocol: TCP
+      port: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
+    - name: grpc
+      port: 89
+      protocol: TCP
+      targetPort: {{ .Values.configmap.datacatalogServer.application.grpcPort }}
   {{- with .Values.datacatalog.service.additionalPorts -}}
   {{ tpl (toYaml .) $ | nindent 2 }}
   {{- end }}
