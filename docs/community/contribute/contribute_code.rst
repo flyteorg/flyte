@@ -539,7 +539,7 @@ Look for the `Args:` section in the container specification and copy all the arg
      --input
      s3://my-bucket/metadata/...
 
-**Step 4: Set up environment variables**
+**4. Set up environment variables**
 
 Export the necessary Minio environment variables to access the object store if you are using demo cluster:
 
@@ -549,7 +549,7 @@ Export the necessary Minio environment variables to access the object store if y
    export FLYTE_AWS_ACCESS_KEY_ID="minio" 
    export FLYTE_AWS_SECRET_ACCESS_KEY="miniostorage"
 
-**Step 5: Run the container arguments locally**
+**5. Run the container arguments locally**
 
 Take the container arguments from step 3, combine them into a single line, and execute
 them in your terminal. This will run the task locally with the same configuration as the
