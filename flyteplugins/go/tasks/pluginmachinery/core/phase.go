@@ -208,15 +208,8 @@ func PhaseInfoNotReady(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-// Deprecated: Please use PhaseInfoWaitingForResourcesInfo instead
-func PhaseInfoWaitingForResources(t time.Time, version uint32, reason string) PhaseInfo {
-	pi := phaseInfo(PhaseWaitingForResources, version, nil, &TaskInfo{OccurredAt: &t}, false)
-	pi.reason = reason
-	return pi
-}
-
 // PhaseInfoWaitingForResourcesInfo represents the case the plugin is not ready to start
-func PhaseInfoWaitingForResourcesInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoWaitingForResourcesInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseWaitingForResources, version, nil, info, false)
 	pi.reason = reason
 	return pi
@@ -228,13 +221,13 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-func PhaseInfoQueuedWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseQueued, version, nil, info, false)
 	pi.reason = reason
 	return pi
 }
 
-func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoInitializing(version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseInitializing, version, nil, info, false)
 	pi.reason = reason
 	return pi

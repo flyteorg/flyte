@@ -315,11 +315,11 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 
 	switch status {
 	case "":
-		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "unknown", &info)
 	case daskAPI.DaskJobCreated:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job created", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "job created", &info)
 	case daskAPI.DaskJobClusterCreated:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "cluster created", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "cluster created", &info)
 	case daskAPI.DaskJobFailed:
 		reason := "Dask Job failed"
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, &info)

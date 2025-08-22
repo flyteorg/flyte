@@ -62,10 +62,9 @@ func (a tokenAllocator) allocateToken(ctx context.Context, p webapi.AsyncPlugin,
 		}
 
 		return &State{
-				AllocationTokenRequestStartTime: startTime,
-				Phase:                           PhaseNotStarted,
-			}, core.PhaseInfoWaitingForResourcesInfo(
-				a.clock.Now(), 0, "Quota for task has exceeded. Waiting for the resource.", nil), nil
+			AllocationTokenRequestStartTime: startTime,
+			Phase:                           PhaseNotStarted,
+		}, core.PhaseInfoWaitingForResourcesInfo(0, "Quota for task has exceeded. Waiting for the resource.", nil), nil
 	}
 
 	return nil, core.PhaseInfo{}, fmt.Errorf("allocation status undefined [%v]", allocationStatus)

@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-var DefaultPodTemplateStore PodTemplateStore = NewPodTemplateStore()
+var DefaultPodTemplateStore = NewPodTemplateStore()
 
 // PodTemplateStore maintains a thread-safe mapping of active PodTemplates with their associated
 // namespaces.

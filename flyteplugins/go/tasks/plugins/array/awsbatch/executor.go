@@ -153,7 +153,7 @@ func NewExecutor(ctx context.Context, awsClient aws.Client, cfg *batchConfig.Con
 		Updated: func(ctx context.Context, event Event) {
 			err := enqueueOwner(event.NewJob.OwnerReference)
 			if err != nil {
-				logger.Warnf(ctx, "Failed to enqueue owner [%v] of job [%v]. Error: %v", event.NewJob.OwnerReference, event.NewJob.ID)
+				logger.Warnf(ctx, "Failed to enqueue owner [%v] of job [%v]. Error: %v", event.NewJob.OwnerReference, event.NewJob.ID, err)
 			}
 		},
 	}, scope)

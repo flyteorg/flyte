@@ -377,8 +377,8 @@ func TestToK8sContainer(t *testing.T) {
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
 
 	inputReader := &mocks2.InputReader{}
-	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference-prefix")
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 
 	outputWriter := &mocks2.OutputWriter{}

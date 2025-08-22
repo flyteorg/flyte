@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -769,19 +768,9 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 		},
 	}
 
-	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
-	phaseInfoQueuedVersion1 := pluginsCore.PhaseInfoQueuedWithTaskInfo(
-		time.Now(),
-		pluginStateQueuedVersion1.K8sPluginState.PhaseVersion,
-		pluginStateQueuedVersion1.K8sPluginState.Reason,
-		nil,
-	)
-	phaseInfoQueuedReasonBar := pluginsCore.PhaseInfoQueuedWithTaskInfo(
-		time.Now(),
-		pluginStateQueuedReasonBar.K8sPluginState.PhaseVersion,
-		pluginStateQueuedReasonBar.K8sPluginState.Reason,
-		nil,
-	)
+	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
+	phaseInfoQueuedVersion1 := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginStateQueuedVersion1.K8sPluginState.PhaseVersion, pluginStateQueuedVersion1.K8sPluginState.Reason, nil)
+	phaseInfoQueuedReasonBar := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginStateQueuedReasonBar.K8sPluginState.PhaseVersion, pluginStateQueuedReasonBar.K8sPluginState.Reason, nil)
 	phaseInfoRunning := pluginsCore.PhaseInfoRunning(0, nil)
 
 	tests := []struct {

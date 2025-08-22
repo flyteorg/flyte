@@ -266,7 +266,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case "QUEUED":
 		return core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, message), nil
 	case "PENDING":
-		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
+		return core.PhaseInfoInitializing(core.DefaultPhaseVersion, message, taskInfo), nil
 	case "RUNNING":
 		fallthrough
 	case "BLOCKED":
