@@ -16,14 +16,14 @@ from common import identifier_pb2 as common_dot_identifier__pb2
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x63ommon/policy.proto\x12\x0f\x66lyteidl.common\x1a\x1a\x63ommon/authorization.proto\x1a\x17\x63ommon/identifier.proto\x1a\x17validate/validate.proto\"\xa3\x01\n\x06Policy\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.common.PolicyIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12:\n\x08\x62indings\x18\x02 \x03(\x0b\x32\x1e.flyteidl.common.PolicyBindingR\x08\x62indings\x12 \n\x0b\x64\x65scription\x18\x03 \x01(\tR\x0b\x64\x65scription\"\x94\x01\n\rPolicyBinding\x12\x42\n\x07role_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl.common.RoleIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06roleId\x12?\n\x08resource\x18\x02 \x01(\x0b\x32\x19.flyteidl.common.ResourceB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08resourceB\xaa\x01\n\x13\x63om.flyteidl.commonB\x0bPolicyProtoH\x02P\x01Z\'github.com/flyteorg/flyte/gen/go/common\xa2\x02\x03\x46\x43X\xaa\x02\x0f\x46lyteidl.Common\xca\x02\x0f\x46lyteidl\\Common\xe2\x02\x1b\x46lyteidl\\Common\\GPBMetadata\xea\x02\x10\x46lyteidl::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x63ommon/policy.proto\x12\x0f\x66lyteidl.common\x1a\x1a\x63ommon/authorization.proto\x1a\x17\x63ommon/identifier.proto\x1a\x17validate/validate.proto\"\xa3\x01\n\x06Policy\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.common.PolicyIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12:\n\x08\x62indings\x18\x02 \x03(\x0b\x32\x1e.flyteidl.common.PolicyBindingR\x08\x62indings\x12 \n\x0b\x64\x65scription\x18\x03 \x01(\tR\x0b\x64\x65scription\"\x94\x01\n\rPolicyBinding\x12\x42\n\x07role_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl.common.RoleIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06roleId\x12?\n\x08resource\x18\x02 \x01(\x0b\x32\x19.flyteidl.common.ResourceB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08resourceB\xad\x01\n\x13\x63om.flyteidl.commonB\x0bPolicyProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/common\xa2\x02\x03\x46\x43X\xaa\x02\x0f\x46lyteidl.Common\xca\x02\x0f\x46lyteidl\\Common\xe2\x02\x1b\x46lyteidl\\Common\\GPBMetadata\xea\x02\x10\x46lyteidl::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'common.policy_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.commonB\013PolicyProtoH\002P\001Z\'github.com/flyteorg/flyte/gen/go/common\242\002\003FCX\252\002\017Flyteidl.Common\312\002\017Flyteidl\\Common\342\002\033Flyteidl\\Common\\GPBMetadata\352\002\020Flyteidl::Common'
+  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.commonB\013PolicyProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/common\242\002\003FCX\252\002\017Flyteidl.Common\312\002\017Flyteidl\\Common\342\002\033Flyteidl\\Common\\GPBMetadata\352\002\020Flyteidl::Common'
   _POLICY.fields_by_name['id']._options = None
   _POLICY.fields_by_name['id']._serialized_options = b'\372B\005\212\001\002\020\001'
   _POLICYBINDING.fields_by_name['role_id']._options = None

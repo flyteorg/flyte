@@ -5,7 +5,7 @@ package flyteidl.common;
 import "common/identifier.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
 
 message Organization {
   string name = 1 [(validate.rules).string.min_len = 1];

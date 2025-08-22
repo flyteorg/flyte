@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.core;
 
-option go_package = "github.com/flyteorg/flyte/gen/go/core";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/core";
 
 import "google/protobuf/struct.proto";
 

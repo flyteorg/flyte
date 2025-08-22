@@ -6,7 +6,7 @@ import "common/identifier.proto";
 import "logs/dataplane/payload.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // RunLogsService provides an interface for streaming logs.
 service RunLogsService {

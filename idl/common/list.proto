@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.common;
 
-option go_package = "github.com/flyteorg/flyte/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
 
 // Specifies sort ordering in a list request.
 message Sort {

@@ -5,7 +5,7 @@ package flyteidl.logs.dataplane;
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/logs/dataplane";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/logs/dataplane";
 
 message PodResource {
   // The namespace of the pod.

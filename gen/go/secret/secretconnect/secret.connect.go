@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	secret "github.com/flyteorg/flyte/gen/go/secret"
+	secret "github.com/flyteorg/flyte/v2/gen/go/secret"
 	http "net/http"
 	strings "strings"
 )

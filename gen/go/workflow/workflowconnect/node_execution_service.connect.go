@@ -6,7 +6,7 @@ package workflowconnect
 
 import (
 	connect "connectrpc.com/connect"
-	workflow "github.com/flyteorg/flyte/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
 	http "net/http"
 )
 

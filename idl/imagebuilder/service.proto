@@ -4,7 +4,7 @@ package flyteidl.imagebuilder;
 
 import "imagebuilder/payload.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/imagebuilder";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/imagebuilder";
 
 service ImageService {
   rpc GetImage(GetImageRequest) returns (GetImageResponse) {

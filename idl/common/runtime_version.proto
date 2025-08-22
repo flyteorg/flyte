@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.common;
 
-option go_package = "github.com/flyteorg/flyte/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
 
 // Runtime information. This is loosely defined to allow for extensibility.
 message RuntimeMetadata {

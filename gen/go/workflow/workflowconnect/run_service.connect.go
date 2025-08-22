@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	workflow "github.com/flyteorg/flyte/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
 	http "net/http"
 	strings "strings"
 )

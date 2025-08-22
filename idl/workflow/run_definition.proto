@@ -12,7 +12,7 @@ import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // Label values to be applied to an execution resource.
 // In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined

@@ -7,7 +7,7 @@ import "common/policy.proto";
 import "common/role.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
 
 // Encapsulates user profile details for a member of an organization.
 message User {
