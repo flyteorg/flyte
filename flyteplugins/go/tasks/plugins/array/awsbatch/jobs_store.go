@@ -254,7 +254,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 		res := make([]cache.ItemSyncResponse, 0, len(jobIds))
 		startIdx, endIdx := toRanges(len(jobIds), batchChunkSize)
 		for i := 0; i < len(startIdx); i++ {
-			logger.Debugf(ctx, "Syncing chunk [%v, %v) out of [%v] job ids.", startIdx[i], endIdx[i], len(startIdx))
+			logger.Debugf(ctx, "Syncing chunk [%v, %v) out of [%v] job ids.", startIdx[i], endIdx[i], len(jobIds))
 			response, err := client.GetJobDetailsBatch(ctx, jobIds[startIdx[i]:endIdx[i]])
 			if err != nil {
 				logger.Errorf(ctx, "Failed to get job details from AWS. Error: %v", err)
