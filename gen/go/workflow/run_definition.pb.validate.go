@@ -18,7 +18,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/anypb"
 
-	core "github.com/flyteorg/flyte/gen/go/core"
+	core "github.com/flyteorg/flyte/v2/gen/go/core"
 )
 
 // ensure the imports are used

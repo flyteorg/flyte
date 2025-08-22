@@ -8,7 +8,7 @@ import "google/rpc/status.proto";
 import "validate/validate.proto";
 import "workflow/run_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // provides an interface for managing the state of actions.
 service StateService {

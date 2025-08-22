@@ -13,14 +13,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%workflow/node_execution_service.proto\x12\x11\x66lyteidl.workflow2\x16\n\x14NodeExecutionServiceB\xc4\x01\n\x15\x63om.flyteidl.workflowB\x19NodeExecutionServiceProtoH\x02P\x01Z)github.com/flyteorg/flyte/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%workflow/node_execution_service.proto\x12\x11\x66lyteidl.workflow2\x16\n\x14NodeExecutionServiceB\xc7\x01\n\x15\x63om.flyteidl.workflowB\x19NodeExecutionServiceProtoH\x02P\x01Z,github.com/flyteorg/flyte/v2/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'workflow.node_execution_service_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\031NodeExecutionServiceProtoH\002P\001Z)github.com/flyteorg/flyte/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
+  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\031NodeExecutionServiceProtoH\002P\001Z,github.com/flyteorg/flyte/v2/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
   _globals['_NODEEXECUTIONSERVICE']._serialized_start=60
   _globals['_NODEEXECUTIONSERVICE']._serialized_end=82
 # @@protoc_insertion_point(module_scope)

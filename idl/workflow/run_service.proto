@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "workflow/run_definition.proto";
 import "workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // RunService provides an interface for managing runs.
 service RunService {
