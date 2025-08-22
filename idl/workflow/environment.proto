@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package flyteidl.workflow;
+
+import "validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+
+// Environment for a task.
+message Environment {
+  // Name of the environment.
+  string name = 1 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+}

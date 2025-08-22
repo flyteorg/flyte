@@ -1,0 +1,42 @@
+name: Regenerate and Push
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  regenerate:
+    if: github.event.issue.pull_request && (contains(github.event.comment.body, '/regen') || contains(github.event.comment.body, ':repeat:'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set fallback version
+        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0" >> $GITHUB_ENV
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: '3.10'
+          working-directory: './gen/python'
+      - name: Setup Buf CLI
+        uses: bufbuild/buf-setup-action@v1 # Install the Buf CLI
+        with:
+          version: 'latest' # Or specify a precise version like '1.56.0'
+      - name: Run make generate
+        run: make generate
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: regenerate files via workflow"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
+
