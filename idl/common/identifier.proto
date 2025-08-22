@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package flyteidl.common;
+
+import "validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/common";
+
+message ProjectIdentifier {
+  string organization = 1 [(validate.rules).string.min_len = 1];
+  string domain = 2 [(validate.rules).string.min_len = 1];
+  string name = 3 [(validate.rules).string.min_len = 1];
+}
+
+message ClusterIdentifier {
+  string organization = 1;
+  string name = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ClusterPoolIdentifier {
+  string organization = 1;
+  string name = 2;
+}
+
+message ClusterConfigIdentifier {
+  string organization = 1 [(validate.rules).string.min_len = 1];
+  string id = 2 [(validate.rules).string.min_len = 1];
+}
+
+message ClusterNodepoolIdentifier {
+  string organization = 1;
+  string cluster_name = 2 [(validate.rules).string.min_len = 1];
+  string name = 3 [(validate.rules).string.min_len = 1];
+}
+
+message UserIdentifier {
+  string subject = 1 [(validate.rules).string.min_len = 1];
+}
+
+message ApplicationIdentifier {
+  string subject = 1 [(validate.rules).string.min_len = 1];
+}
+
+message RoleIdentifier {
+  string organization = 1;
+
+  // Unique name for this role within the organization
+  string name = 2 [(validate.rules).string.min_len = 1];
+}
+
+message OrgIdentifier {
+  string name = 1 [(validate.rules).string = {
+    min_len: 1,
+    max_len: 63,
+    pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" // matches k8s.io/apimachinery/pkg/util/validation.IsDNS1123Label() regex
+  }];
+}
+
+message ManagedClusterIdentifier {
+  reserved 1;
+  string name = 2 [(validate.rules).string.min_len = 1];
+  OrgIdentifier org = 3 [(validate.rules).message.required = true];
+}
+
+message PolicyIdentifier {
+  string organization = 1;
+
+  // Unique name for this policy within the organization
+  string name = 2 [(validate.rules).string.min_len = 1];
+}
+
+// Unique identifier of a run.
+message RunIdentifier {
+  // Org this run belongs to.
+  string org = 1 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Project this run belongs to.
+  string project = 2 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Domain this run belongs to.
+  string domain = 3 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Name of the run. Must be unique across all runs in this org, project, and domain pairing.
+  string name = 4 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 30
+  ];
+}
+
+// Unique identifier of an action.
+message ActionIdentifier {
+  // Identifier for the run.
+  RunIdentifier run = 1 [(validate.rules).message.required = true];
+
+  // Name of the action. Must be unique within the run.
+  string name = 2 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 30
+  ];
+}
+
+// Unique identifier of a single action attempt
+message ActionAttemptIdentifier {
+  ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+
+  uint32 attempt = 2 [(validate.rules).uint32.gt = 0];
+}

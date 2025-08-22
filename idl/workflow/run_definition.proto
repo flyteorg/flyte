@@ -1,0 +1,383 @@
+syntax = "proto3";
+
+package flyteidl.workflow;
+
+import "common/identifier.proto";
+import "common/identity.proto";
+import "core/catalog.proto";
+import "core/execution.proto";
+import "core/literals.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+import "workflow/task_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+
+// Label values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge labels defined at registration and execution time.
+message Labels {
+  // Map of custom labels to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Annotation values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge annotations defined at registration and execution time.
+message Annotations {
+  // Map of custom annotations to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Environment variable values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge environment variables defined at registration and execution time.
+message Envs {
+  // Map of custom environment variables to be applied to the execution resource.
+  repeated flyteidl.core.KeyValuePair values = 1;
+}
+
+message RunSpec {
+  // Labels to apply to the run.
+  Labels labels = 1;
+
+  // Annotations to apply to the run.
+  Annotations annotations = 2;
+
+  // Envs to apply to the run.
+  Envs envs = 3;
+
+  // Explicit override for executing this run as interruptible or not. If not set, use the default.
+  google.protobuf.BoolValue interruptible = 4;
+
+  // If true, recompute outputs for this run and overwrite any existing cache.
+  bool overwrite_cache = 5;
+
+  // Future: service account, security context, execution env, etc.
+
+  // the specific cluster that this action should be executed on. this value will be used as the
+  // default for all actions in the run unless overridden.
+  string cluster = 6;
+}
+
+message Run {
+  // Lightweight information about the root action.
+  Action action = 1;
+}
+
+message RunDetails {
+  // Run spec.
+  RunSpec run_spec = 1;
+
+  // Detailed information about the root action.
+  ActionDetails action = 2;
+}
+
+message TaskActionMetadata {
+  // Id of the task this action is associated with.
+  TaskIdentifier id = 1;
+
+  // Extensible task type.
+  string task_type = 2;
+
+  // The short name for this task.
+  string short_name = 3;
+}
+
+message TraceActionMetadata {
+  string name = 1;
+}
+
+message ConditionActionMetadata {
+  string name = 1;
+  oneof scope {
+    option (validate.required) = true;
+    // RunId is the unique identifier for the run this action is associated with.
+    string run_id = 2 [(validate.rules).string.min_len = 1];
+
+    // ActionId is the unique identifier for the action this action is associated with.
+    string action_id = 3 [(validate.rules).string.min_len = 1];
+
+    // Global indicates the condition is global and can be used across all runs and actions.
+    bool global = 4;
+  }
+}
+
+// Static, lightweight metadata about an action.
+message ActionMetadata {
+  // Parent action if not the root.
+  string parent = 3;
+
+  // Group this action belongs to, if applicable.
+  string group = 5;
+
+  // Identity that executed this run.
+  common.EnrichedIdentity executed_by = 6;
+
+  oneof spec {
+    // Task action.
+    TaskActionMetadata task = 7 [(validate.rules).message.required = true];
+
+    // Trace action.
+    TraceActionMetadata trace = 8 [(validate.rules).message.required = true];
+
+    // Condition action.
+    ConditionActionMetadata condition = 9 [(validate.rules).message.required = true];
+  }
+}
+
+// TODO: define phase transitions
+enum Phase {
+  PHASE_UNSPECIFIED = 0;
+  PHASE_QUEUED = 1;
+  PHASE_WAITING_FOR_RESOURCES = 2;
+  PHASE_INITIALIZING = 3;
+  PHASE_RUNNING = 4;
+  PHASE_SUCCEEDED = 5;
+  PHASE_FAILED = 6;
+  PHASE_ABORTED = 7;
+  PHASE_TIMED_OUT = 8;
+}
+
+// Lightweight status of an action. For more detailed status see ActionDetails.
+message ActionStatus {
+  // Last known phase.
+  Phase phase = 1;
+
+  // Time the action started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time the action ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 3;
+
+  // Number of action attempts.
+  uint32 attempts = 4 [(validate.rules).uint32.gt = 0];
+
+  // cache status of the action's latest attempt
+  flyteidl.core.CatalogCacheStatus cache_status = 5;
+}
+
+// Lightweight representation of an action.
+message Action {
+  // Id for this action.
+  common.ActionIdentifier id = 1;
+
+  // Metadata for this action.
+  ActionMetadata metadata = 2;
+
+  // Last known status.
+  ActionStatus status = 3;
+}
+
+// EnrichedAction is a wrapper around Action that contains additional information
+message EnrichedAction {
+  // The action itself.
+  Action action = 1;
+
+  // Whether this action meets specified filters of the request or not.
+  // If an action that was previously meeting the filter but no longer does, will be sent with this flag set to false
+  bool meets_filter = 2;
+
+  // Child phase info for this action (Map of phase to counts of children in given phase)
+  map<int32, int32> children_phase_counts = 3;
+}
+
+// ErrorInfo captures details of an error.
+message ErrorInfo {
+  // Error message.
+  string message = 1;
+
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_USER = 1;
+    KIND_SYSTEM = 2;
+  }
+
+  // Error kind.
+  Kind kind = 2;
+}
+
+// AbortInfo captures details of an aborted run.
+message AbortInfo {
+  // Reason provided for the abort.
+  string reason = 1;
+
+  // Identity that aborted the run.
+  common.EnrichedIdentity aborted_by = 2;
+}
+
+// ActionDetails is the full details of an action.
+message ActionDetails {
+  // Id for this action.
+  common.ActionIdentifier id = 1;
+
+  // Metadata for this action.
+  ActionMetadata metadata = 2;
+
+  // Last known status.
+  ActionStatus status = 3;
+
+  oneof result {
+    // Error info for the action, if failed.
+    ErrorInfo error_info = 4;
+    // Abort info for the action, if aborted.
+    AbortInfo abort_info = 5;
+  }
+
+  // Fully resolved spec. Merges user submitted task spec with platform defaults.
+  TaskSpec resolved_task_spec = 6;
+
+  // List of action attempts.
+  repeated ActionAttempt attempts = 7;
+}
+
+// ActionAttempt is a single attempt of an action.
+message ActionAttempt {
+  // Last known phase.
+  Phase phase = 1;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 3;
+
+  // Error info for the attempt, if failed.
+  optional ErrorInfo error_info = 4;
+
+  // The attempt number, starting with 1.
+  uint32 attempt = 5 [(validate.rules).uint32.gt = 0];
+
+  // Log references.
+  repeated flyteidl.core.TaskLog log_info = 6;
+
+  // Output references.
+  OutputReferences outputs = 7;
+
+  // Indicates whether logs are available for tailing. It doesn't necessarily indicate the logs are present, but that
+  // we have the info we need to look them up.
+  bool logs_available = 8;
+
+  // cache status of the action attempt
+  flyteidl.core.CatalogCacheStatus cache_status = 9;
+
+  // Cluster events like k8s events in a human-readable form.
+  repeated ClusterEvent cluster_events = 10;
+
+  // History of phase transitions.
+  repeated PhaseTransition phase_transitions = 11;
+
+  // The cluster this attempt is assigned to.
+  string cluster = 12;
+
+  // Contains corresponding k8s pods and containers information for this action attempt.
+  flyteidl.core.LogContext log_context = 13;
+}
+
+message ClusterEvent {
+  // occurred_at is the timestamp indicating the instant that this reason happened.
+  google.protobuf.Timestamp occurred_at = 1;
+
+  // message is the explanation for the most recent phase transition or status update.
+  string message = 2;
+
+  // TODO add event_kind or event_type with a fixed set of classification values like "ScaleUp, OutOfResources... etc."
+}
+
+message PhaseTransition {
+  // The phase.
+  Phase phase = 1;
+
+  // Time this phase started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time this phase ended, if applicable. For terminal phases, start time will equal end time.
+  optional google.protobuf.Timestamp end_time = 3;
+}
+
+// Event payload for an action
+message ActionEvent {
+  // The action id.
+  common.ActionIdentifier id = 1 [(validate.rules).message.required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(validate.rules).uint32.gt = 0];
+
+  // The phase for this attempt.
+  Phase phase = 3;
+
+  // The version of this attempt and phase.
+  uint32 version = 4;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 5 [deprecated = true];
+
+  // Timestamp when the event occurred, as recorded by the underlying platform (e.g. Kubernetes).
+  google.protobuf.Timestamp updated_time = 6;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 7 [deprecated = true];
+
+  // Error info for the attempt, if failed.
+  optional ErrorInfo error_info = 8;
+
+  // Log references.
+  repeated flyteidl.core.TaskLog log_info = 9;
+
+  // Metadata to associate containers with logs.
+  flyteidl.core.LogContext log_context = 10;
+
+  // The cluster this attempt is running on.
+  string cluster = 11;
+
+  // Output references.
+  OutputReferences outputs = 12;
+
+  // cache status of the action attempt
+  flyteidl.core.CatalogCacheStatus cache_status = 13;
+
+  // Cluster events like k8s events in a human-readable form.
+  repeated ClusterEvent cluster_events = 14;
+
+  // Timestamp when the event was observed and reported by the executor
+  google.protobuf.Timestamp reported_time = 15;
+}
+
+// Named literal value.
+message NamedLiteral {
+  // Name of the literal.
+  string name = 1;
+
+  // Literal value.
+  flyteidl.core.Literal value = 2;
+}
+
+// Output references.
+message OutputReferences {
+  // The output uri.
+  string output_uri = 1;
+
+  // Native URI to HTML report
+  string report_uri = 2;
+}
+
+// Input payload for an action.
+message Inputs {
+  // Ordered inputs.
+  repeated NamedLiteral literals = 1;
+
+  // Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
+  // Context will not be used for cache key computation.
+  // Examples for context include:
+  //  - User-provided metadata that is not part of the action's inputs.
+  //  - Information about the environment the action is running in (e.g. cluster, region, etc.)
+  //  - Tracing information about the action
+  repeated flyteidl.core.KeyValuePair context = 2;
+}
+
+// Output payload for an action.
+message Outputs {
+  // Ordered outputs.
+  repeated NamedLiteral literals = 1;
+}

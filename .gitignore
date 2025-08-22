@@ -39,3 +39,7 @@ docs/_src
 docs/_projects
 docs/tests
 empty-config.yaml
+
+**/rust/target
+**/flyteidl_new.egg-info
+**/flyteidl.egg-info

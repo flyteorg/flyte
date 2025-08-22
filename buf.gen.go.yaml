@@ -1,0 +1,22 @@
+version: v1
+managed:
+  enabled: true
+  optimize_for: CODE_SIZE
+plugins:
+  - plugin: buf.build/protocolbuffers/go:v1.30.0
+    out: gen/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc/go:v1.3.0
+    out: gen/go
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
+  - plugin: buf.build/connectrpc/go:v1.16.2
+    out: gen/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/bufbuild/validate-go:v1.0.1
+    out: gen/go
+    opt:
+      - paths=source_relative

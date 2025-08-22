@@ -1,0 +1,11 @@
+version: v1
+managed:
+  enabled: true
+  optimize_for: CODE_SIZE
+plugins:
+  - plugin: buf.build/protocolbuffers/python:v24.1
+    out: gen/python
+  - plugin: buf.build/protocolbuffers/pyi:v24.1
+    out: gen/python
+  - plugin: buf.build/grpc/python:v1.58.1
+    out: gen/python
