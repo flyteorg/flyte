@@ -402,39 +402,39 @@ locally. To run the workflow in the sandbox with the newest modification, you ca
 Create a workflow file that uses `ImageSpec` to define the image with your custom flytekit version:
 
 .. code:: python
-    from flytekit import ImageSpec, task, workflow
+   from flytekit import ImageSpec, task, workflow
 
-    # Define your custom flytekit version - replace with your own repo and commit hash
-    # You need to push your modifications to your fork and get the commit hash first
-    new_flytekit = "git+https://github.com/your-github-username/flytekit.git@your-commit-hash"
+   # Define your custom flytekit version - replace with your own repo and commit hash
+   # You need to push your modifications to your fork and get the commit hash first
+   new_flytekit = "git+https://github.com/your-github-username/flytekit.git@your-commit-hash"
 
-    # To install your modified plugins, use following:
-    # new_deck_plugin = git+https://github.com/your-github-username/flytekit.git@your-commit-hash#subdirectory=plugins/flytekit-kf-pytorch
+   # To install your modified plugins, use following:
+   # new_deck_plugin = git+https://github.com/your-github-username/flytekit.git@your-commit-hash#subdirectory=plugins/flytekit-kf-pytorch
 
-    # Create ImageSpec with your custom flytekit
-    image_spec = ImageSpec(
-        registry="localhost:30000",
-        packages=[
-            new_flytekit,
-        ],
-        apt_packages=["git"],
-    )
+   # Create ImageSpec with your custom flytekit
+   image_spec = ImageSpec(
+       registry="localhost:30000",
+       packages=[
+           new_flytekit,
+       ],
+       apt_packages=["git"],
+   )
 
-    @task(container_image=image_spec)
-    def hello_world_task(name: str) -> str:
-        return f"Hello {name}!"
+   @task(container_image=image_spec)
+   def hello_world_task(name: str) -> str:
+       return f"Hello {name}!"
 
-    @workflow
-    def wf(name: str = "World") -> str:
-        return hello_world_task(name=name)
+   @workflow
+   def wf(name: str = "World") -> str:
+       return hello_world_task(name=name)
 
 
 Then submit the workflow to the Flyte cluster:
 
 .. code:: shell
-    # ImageSpec will automatically build and push the image to the local registry
-    pyflyte run --remote custom_workflow.py wf
-    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution-id> to see execution in the console.
+   # ImageSpec will automatically build and push the image to the local registry
+   pyflyte run --remote custom_workflow.py wf
+   # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution-id> to see execution in the console.
 
 
 **3-2. Run workflow in sandbox - with `Dockerfile`**
@@ -500,47 +500,47 @@ debugging changes you've made to flytekit's core functionality:
 Execute your workflow using the remote flag:
 
 .. code:: shell
-    pyflyte run --remote custom_workflow.py wf
+   pyflyte run --remote custom_workflow.py wf
 
 **3. Describe the pod to get container arguments**
 
 First, find the pod name from your execution. You can get this from the Flyte UI execution page or by listing pods:
 
 .. code:: shell
-    # List pods to find your execution pod
-    kubectl get pods -n flytesnacks-development
+   # List pods to find your execution pod
+   kubectl get pods -n flytesnacks-development
 
-    # Look for pods with names matching your execution ID
-    # Example output:
-    # NAME                           READY   STATUS    RESTARTS   AGE
-    # ab5mg9lzgth62h82qprp-n0-0     1/1     Running   0          2m
+   # Look for pods with names matching your execution ID
+   # Example output:
+   # NAME                           READY   STATUS    RESTARTS   AGE
+   # ab5mg9lzgth62h82qprp-n0-0     1/1     Running   0          2m
 
 Then describe the pod to get the container arguments:
 
 .. code:: shell
-    # Replace with your actual pod name from the execution
-    kubectl describe pod -n flytesnacks-development ab5mg9lzgth62h82qprp-n0-0
+   # Replace with your actual pod name from the execution
+   kubectl describe pod -n flytesnacks-development ab5mg9lzgth62h82qprp-n0-0
 
 Look for the `Args:` section in the container specification and copy all the arguments. Example output:
 
 .. code:: shell
-    Args:
-      pyflyte-fast-execute
-      --additional-distribution
-      /opt/venv
-      --dest-dir
-      /tmp/flyte
-      --input
-      s3://my-bucket/metadata/...
+   Args:
+     pyflyte-fast-execute
+     --additional-distribution
+     /opt/venv
+     --dest-dir
+     /tmp/flyte
+     --input
+     s3://my-bucket/metadata/...
 
 **Step 4: Set up environment variables**
 
 Export the necessary Minio environment variables to access the object store if you are using demo cluster:
 
 .. code:: shell
-    export FLYTE_AWS_ENDPOINT="http://localhost:30002"
-    export FLYTE_AWS_ACCESS_KEY_ID="minio" 
-    export FLYTE_AWS_SECRET_ACCESS_KEY="miniostorage"
+   export FLYTE_AWS_ENDPOINT="http://localhost:30002"
+   export FLYTE_AWS_ACCESS_KEY_ID="minio" 
+   export FLYTE_AWS_SECRET_ACCESS_KEY="miniostorage"
 
 **Step 5: Run the container arguments locally**
 
@@ -549,8 +549,8 @@ them in your terminal. This will run the task locally with the same configuratio
 remote execution, allowing you to hit your breakpoints and inspect variables.
 
 .. code:: shell
-    # Example: Convert the multi-line args to a single command
-    pyflyte-fast-execute --additional-distribution /opt/venv --dest-dir /tmp/flyte --input s3://my-bucket/metadata/... --output-prefix s3://my-bucket/data/...
+   # Example: Convert the multi-line args to a single command
+   pyflyte-fast-execute --additional-distribution /opt/venv --dest-dir /tmp/flyte --input s3://my-bucket/metadata/... --output-prefix s3://my-bucket/data/...
 
 This approach allows you to debug your flytekit changes in a remote workflow execution
 locally while maintaining the same execution context and data access patterns. This is
