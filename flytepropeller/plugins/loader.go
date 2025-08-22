@@ -3,7 +3,6 @@ package plugins
 
 import (
 	// Common place to import all plugins, so that it can be imported by Singlebinary (flytelite) or by propeller main
-	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/k8s"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/dask"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/mpi"
