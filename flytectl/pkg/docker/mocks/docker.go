@@ -3,9 +3,10 @@
 package mocks
 
 import (
-	context "context"
-
+	common "github.com/docker/docker/api/types/common"
 	container "github.com/docker/docker/api/types/container"
+
+	context "context"
 
 	image "github.com/docker/docker/api/types/image"
 
@@ -97,7 +98,7 @@ func (_c *Docker_ContainerCreate_Call) RunAndReturn(run func(context.Context, *c
 }
 
 // ContainerExecAttach provides a mock function with given fields: ctx, execID, config
-func (_m *Docker) ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error) {
+func (_m *Docker) ContainerExecAttach(ctx context.Context, execID string, config container.ExecStartOptions) (types.HijackedResponse, error) {
 	ret := _m.Called(ctx, execID, config)
 
 	if len(ret) == 0 {
@@ -106,16 +107,16 @@ func (_m *Docker) ContainerExecAttach(ctx context.Context, execID string, config
 
 	var r0 types.HijackedResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecStartCheck) (types.HijackedResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.ExecStartOptions) (types.HijackedResponse, error)); ok {
 		return rf(ctx, execID, config)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecStartCheck) types.HijackedResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.ExecStartOptions) types.HijackedResponse); ok {
 		r0 = rf(ctx, execID, config)
 	} else {
 		r0 = ret.Get(0).(types.HijackedResponse)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, types.ExecStartCheck) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, container.ExecStartOptions) error); ok {
 		r1 = rf(ctx, execID, config)
 	} else {
 		r1 = ret.Error(1)
@@ -132,14 +133,14 @@ type Docker_ContainerExecAttach_Call struct {
 // ContainerExecAttach is a helper method to define mock.On call
 //   - ctx context.Context
 //   - execID string
-//   - config types.ExecStartCheck
+//   - config container.ExecStartOptions
 func (_e *Docker_Expecter) ContainerExecAttach(ctx interface{}, execID interface{}, config interface{}) *Docker_ContainerExecAttach_Call {
 	return &Docker_ContainerExecAttach_Call{Call: _e.mock.On("ContainerExecAttach", ctx, execID, config)}
 }
 
-func (_c *Docker_ContainerExecAttach_Call) Run(run func(ctx context.Context, execID string, config types.ExecStartCheck)) *Docker_ContainerExecAttach_Call {
+func (_c *Docker_ContainerExecAttach_Call) Run(run func(ctx context.Context, execID string, config container.ExecStartOptions)) *Docker_ContainerExecAttach_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(types.ExecStartCheck))
+		run(args[0].(context.Context), args[1].(string), args[2].(container.ExecStartOptions))
 	})
 	return _c
 }
@@ -149,31 +150,31 @@ func (_c *Docker_ContainerExecAttach_Call) Return(_a0 types.HijackedResponse, _a
 	return _c
 }
 
-func (_c *Docker_ContainerExecAttach_Call) RunAndReturn(run func(context.Context, string, types.ExecStartCheck) (types.HijackedResponse, error)) *Docker_ContainerExecAttach_Call {
+func (_c *Docker_ContainerExecAttach_Call) RunAndReturn(run func(context.Context, string, container.ExecStartOptions) (types.HijackedResponse, error)) *Docker_ContainerExecAttach_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ContainerExecCreate provides a mock function with given fields: ctx, _a1, config
-func (_m *Docker) ContainerExecCreate(ctx context.Context, _a1 string, config types.ExecConfig) (types.IDResponse, error) {
+func (_m *Docker) ContainerExecCreate(ctx context.Context, _a1 string, config container.ExecOptions) (common.IDResponse, error) {
 	ret := _m.Called(ctx, _a1, config)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ContainerExecCreate")
 	}
 
-	var r0 types.IDResponse
+	var r0 common.IDResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecConfig) (types.IDResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.ExecOptions) (common.IDResponse, error)); ok {
 		return rf(ctx, _a1, config)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecConfig) types.IDResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.ExecOptions) common.IDResponse); ok {
 		r0 = rf(ctx, _a1, config)
 	} else {
-		r0 = ret.Get(0).(types.IDResponse)
+		r0 = ret.Get(0).(common.IDResponse)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, types.ExecConfig) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, container.ExecOptions) error); ok {
 		r1 = rf(ctx, _a1, config)
 	} else {
 		r1 = ret.Error(1)
@@ -190,45 +191,45 @@ type Docker_ContainerExecCreate_Call struct {
 // ContainerExecCreate is a helper method to define mock.On call
 //   - ctx context.Context
 //   - _a1 string
-//   - config types.ExecConfig
+//   - config container.ExecOptions
 func (_e *Docker_Expecter) ContainerExecCreate(ctx interface{}, _a1 interface{}, config interface{}) *Docker_ContainerExecCreate_Call {
 	return &Docker_ContainerExecCreate_Call{Call: _e.mock.On("ContainerExecCreate", ctx, _a1, config)}
 }
 
-func (_c *Docker_ContainerExecCreate_Call) Run(run func(ctx context.Context, _a1 string, config types.ExecConfig)) *Docker_ContainerExecCreate_Call {
+func (_c *Docker_ContainerExecCreate_Call) Run(run func(ctx context.Context, _a1 string, config container.ExecOptions)) *Docker_ContainerExecCreate_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(types.ExecConfig))
+		run(args[0].(context.Context), args[1].(string), args[2].(container.ExecOptions))
 	})
 	return _c
 }
 
-func (_c *Docker_ContainerExecCreate_Call) Return(_a0 types.IDResponse, _a1 error) *Docker_ContainerExecCreate_Call {
+func (_c *Docker_ContainerExecCreate_Call) Return(_a0 common.IDResponse, _a1 error) *Docker_ContainerExecCreate_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Docker_ContainerExecCreate_Call) RunAndReturn(run func(context.Context, string, types.ExecConfig) (types.IDResponse, error)) *Docker_ContainerExecCreate_Call {
+func (_c *Docker_ContainerExecCreate_Call) RunAndReturn(run func(context.Context, string, container.ExecOptions) (common.IDResponse, error)) *Docker_ContainerExecCreate_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ContainerExecInspect provides a mock function with given fields: ctx, execID
-func (_m *Docker) ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error) {
+func (_m *Docker) ContainerExecInspect(ctx context.Context, execID string) (container.ExecInspect, error) {
 	ret := _m.Called(ctx, execID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ContainerExecInspect")
 	}
 
-	var r0 types.ContainerExecInspect
+	var r0 container.ExecInspect
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (types.ContainerExecInspect, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (container.ExecInspect, error)); ok {
 		return rf(ctx, execID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) types.ContainerExecInspect); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) container.ExecInspect); ok {
 		r0 = rf(ctx, execID)
 	} else {
-		r0 = ret.Get(0).(types.ContainerExecInspect)
+		r0 = ret.Get(0).(container.ExecInspect)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -259,34 +260,34 @@ func (_c *Docker_ContainerExecInspect_Call) Run(run func(ctx context.Context, ex
 	return _c
 }
 
-func (_c *Docker_ContainerExecInspect_Call) Return(_a0 types.ContainerExecInspect, _a1 error) *Docker_ContainerExecInspect_Call {
+func (_c *Docker_ContainerExecInspect_Call) Return(_a0 container.ExecInspect, _a1 error) *Docker_ContainerExecInspect_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Docker_ContainerExecInspect_Call) RunAndReturn(run func(context.Context, string) (types.ContainerExecInspect, error)) *Docker_ContainerExecInspect_Call {
+func (_c *Docker_ContainerExecInspect_Call) RunAndReturn(run func(context.Context, string) (container.ExecInspect, error)) *Docker_ContainerExecInspect_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ContainerList provides a mock function with given fields: ctx, options
-func (_m *Docker) ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
+func (_m *Docker) ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error) {
 	ret := _m.Called(ctx, options)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ContainerList")
 	}
 
-	var r0 []types.Container
+	var r0 []container.Summary
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, container.ListOptions) ([]types.Container, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, container.ListOptions) ([]container.Summary, error)); ok {
 		return rf(ctx, options)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, container.ListOptions) []types.Container); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, container.ListOptions) []container.Summary); ok {
 		r0 = rf(ctx, options)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]types.Container)
+			r0 = ret.Get(0).([]container.Summary)
 		}
 	}
 
@@ -318,12 +319,12 @@ func (_c *Docker_ContainerList_Call) Run(run func(ctx context.Context, options c
 	return _c
 }
 
-func (_c *Docker_ContainerList_Call) Return(_a0 []types.Container, _a1 error) *Docker_ContainerList_Call {
+func (_c *Docker_ContainerList_Call) Return(_a0 []container.Summary, _a1 error) *Docker_ContainerList_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Docker_ContainerList_Call) RunAndReturn(run func(context.Context, container.ListOptions) ([]types.Container, error)) *Docker_ContainerList_Call {
+func (_c *Docker_ContainerList_Call) RunAndReturn(run func(context.Context, container.ListOptions) ([]container.Summary, error)) *Docker_ContainerList_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -485,22 +486,22 @@ func (_c *Docker_ContainerStart_Call) RunAndReturn(run func(context.Context, str
 }
 
 // ContainerStatPath provides a mock function with given fields: ctx, containerID, path
-func (_m *Docker) ContainerStatPath(ctx context.Context, containerID string, path string) (types.ContainerPathStat, error) {
+func (_m *Docker) ContainerStatPath(ctx context.Context, containerID string, path string) (container.PathStat, error) {
 	ret := _m.Called(ctx, containerID, path)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ContainerStatPath")
 	}
 
-	var r0 types.ContainerPathStat
+	var r0 container.PathStat
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (types.ContainerPathStat, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (container.PathStat, error)); ok {
 		return rf(ctx, containerID, path)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) types.ContainerPathStat); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) container.PathStat); ok {
 		r0 = rf(ctx, containerID, path)
 	} else {
-		r0 = ret.Get(0).(types.ContainerPathStat)
+		r0 = ret.Get(0).(container.PathStat)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
@@ -532,12 +533,12 @@ func (_c *Docker_ContainerStatPath_Call) Run(run func(ctx context.Context, conta
 	return _c
 }
 
-func (_c *Docker_ContainerStatPath_Call) Return(_a0 types.ContainerPathStat, _a1 error) *Docker_ContainerStatPath_Call {
+func (_c *Docker_ContainerStatPath_Call) Return(_a0 container.PathStat, _a1 error) *Docker_ContainerStatPath_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Docker_ContainerStatPath_Call) RunAndReturn(run func(context.Context, string, string) (types.ContainerPathStat, error)) *Docker_ContainerStatPath_Call {
+func (_c *Docker_ContainerStatPath_Call) RunAndReturn(run func(context.Context, string, string) (container.PathStat, error)) *Docker_ContainerStatPath_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -605,7 +606,7 @@ func (_c *Docker_ContainerWait_Call) RunAndReturn(run func(context.Context, stri
 }
 
 // CopyFromContainer provides a mock function with given fields: ctx, containerID, srcPath
-func (_m *Docker) CopyFromContainer(ctx context.Context, containerID string, srcPath string) (io.ReadCloser, types.ContainerPathStat, error) {
+func (_m *Docker) CopyFromContainer(ctx context.Context, containerID string, srcPath string) (io.ReadCloser, container.PathStat, error) {
 	ret := _m.Called(ctx, containerID, srcPath)
 
 	if len(ret) == 0 {
@@ -613,9 +614,9 @@ func (_m *Docker) CopyFromContainer(ctx context.Context, containerID string, src
 	}
 
 	var r0 io.ReadCloser
-	var r1 types.ContainerPathStat
+	var r1 container.PathStat
 	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (io.ReadCloser, types.ContainerPathStat, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (io.ReadCloser, container.PathStat, error)); ok {
 		return rf(ctx, containerID, srcPath)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) io.ReadCloser); ok {
@@ -626,10 +627,10 @@ func (_m *Docker) CopyFromContainer(ctx context.Context, containerID string, src
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) types.ContainerPathStat); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) container.PathStat); ok {
 		r1 = rf(ctx, containerID, srcPath)
 	} else {
-		r1 = ret.Get(1).(types.ContainerPathStat)
+		r1 = ret.Get(1).(container.PathStat)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, string, string) error); ok {
@@ -661,12 +662,12 @@ func (_c *Docker_CopyFromContainer_Call) Run(run func(ctx context.Context, conta
 	return _c
 }
 
-func (_c *Docker_CopyFromContainer_Call) Return(_a0 io.ReadCloser, _a1 types.ContainerPathStat, _a2 error) *Docker_CopyFromContainer_Call {
+func (_c *Docker_CopyFromContainer_Call) Return(_a0 io.ReadCloser, _a1 container.PathStat, _a2 error) *Docker_CopyFromContainer_Call {
 	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *Docker_CopyFromContainer_Call) RunAndReturn(run func(context.Context, string, string) (io.ReadCloser, types.ContainerPathStat, error)) *Docker_CopyFromContainer_Call {
+func (_c *Docker_CopyFromContainer_Call) RunAndReturn(run func(context.Context, string, string) (io.ReadCloser, container.PathStat, error)) *Docker_CopyFromContainer_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -52,7 +52,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 	mockDocker.EXPECT().ContainerExecCreate(
 		ctx,
 		docker.FlyteSandboxClusterName,
-		types.ExecConfig{
+		container.ExecOptions{
 			AttachStderr: true,
 			Tty:          true,
 			WorkingDir:   "/",
@@ -60,10 +60,10 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 			Cmd:          []string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapAgent)},
 		},
 	).Return(types.IDResponse{ID: "0"}, nil)
-	mockDocker.EXPECT().ContainerExecAttach(ctx, "0", types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecAttach(ctx, "0", container.ExecStartOptions{}).Return(types.HijackedResponse{
 		Reader: bufio.NewReader(bytes.NewReader([]byte{})),
 	}, nil)
-	mockDocker.EXPECT().ContainerExecInspect(ctx, "0").Return(types.ContainerExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
+	mockDocker.EXPECT().ContainerExecInspect(ctx, "0").Return(container.ExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
 
 	// Register additional mocks for the actual execution of the bootstrap agent
 	// in non-legacy sandboxes
@@ -71,7 +71,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 		mockDocker.EXPECT().ContainerExecCreate(
 			ctx,
 			docker.FlyteSandboxClusterName,
-			types.ExecConfig{
+			container.ExecOptions{
 				AttachStderr: true,
 				Tty:          true,
 				WorkingDir:   "/",
@@ -79,7 +79,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 				Cmd:          []string{internalBootstrapAgent},
 			},
 		).Return(types.IDResponse{ID: "1"}, nil)
-		mockDocker.EXPECT().ContainerExecAttach(ctx, "1", types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecAttach(ctx, "1", container.ExecStartOptions{}).Return(types.HijackedResponse{
 			Reader: bufio.NewReader(bytes.NewReader([]byte{})),
 		}, nil)
 	}

@@ -37,8 +37,8 @@ func TestDemoClusterExec(t *testing.T) {
 	}, nil)
 	docker.ExecConfig.Cmd = []string{"ls -al"}
 	mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
-	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(container.ExecInspect{}, nil)
+	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, container.ExecStartOptions{}).Return(types.HijackedResponse{
 		Reader: reader,
 	}, fmt.Errorf("Test"))
 	docker.Client = mockDocker
@@ -64,8 +64,8 @@ func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	}, nil)
 	docker.ExecConfig.Cmd = []string{}
 	mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
-	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(container.ExecInspect{}, nil)
+	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, container.ExecStartOptions{}).Return(types.HijackedResponse{
 		Reader: reader,
 	}, fmt.Errorf("Test"))
 	docker.Client = mockDocker

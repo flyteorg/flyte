@@ -116,8 +116,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -126,8 +126,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -136,7 +136,7 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("error"))
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), fmt.Errorf("error"))
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.NotNil(t, err)
 	})
@@ -145,8 +145,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -154,7 +154,7 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Success skip existing image with ImagePullPolicyIfNotPresent", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -162,7 +162,7 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Success skip existing image with ImagePullPolicyNever", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -170,9 +170,9 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Error non-existent image with ImagePullPolicyNever", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImageList(ctx, image.ListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
-		assert.ErrorContains(t, err, "Image does not exist, but image pull policy prevents pulling it")
+		assert.ErrorContains(t, err, "Image does not exist, but dockerImage pull policy prevents pulling it: nginx:latest")
 	})
 }
 
@@ -383,8 +383,8 @@ func TestInspectExecResp(t *testing.T) {
 		c.Cmd = []string{"ls"}
 		reader := bufio.NewReader(strings.NewReader("test"))
 
-		mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(container.ExecInspect{}, nil)
+		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, container.ExecStartOptions{}).Return(types.HijackedResponse{
 			Reader: reader,
 		}, fmt.Errorf("err"))
 
@@ -399,7 +399,7 @@ func TestInspectExecResp(t *testing.T) {
 		c.Cmd = []string{"ls"}
 		reader := bufio.NewReader(strings.NewReader("test"))
 
-		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, container.ExecStartOptions{}).Return(types.HijackedResponse{
 			Reader: reader,
 		}, nil)
 
@@ -476,8 +476,8 @@ func TestCopyFile(t *testing.T) {
 		mockDocker.EXPECT().ContainerCreate(
 			ctx, &container.Config{Image: image}, &container.HostConfig{}, mock.Anything, mock.Anything, containerName).Return(
 			container.CreateResponse{ID: containerName}, nil)
-		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, nil)
-		mockDocker.EXPECT().CopyFromContainer(ctx, containerName, "some source").Return(reader, types.ContainerPathStat{}, nil)
+		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(container.PathStat{}, nil)
+		mockDocker.EXPECT().CopyFromContainer(ctx, containerName, "some source").Return(reader, container.PathStat{}, nil)
 		mockDocker.EXPECT().ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
 		assert.Nil(t, err)
 
@@ -499,7 +499,7 @@ func TestCopyFile(t *testing.T) {
 		mockDocker.EXPECT().ContainerCreate(
 			ctx, &container.Config{Image: image}, &container.HostConfig{}, mock.Anything, mock.Anything, containerName).Return(
 			container.CreateResponse{ID: containerName}, nil)
-		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, myErr)
+		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(container.PathStat{}, myErr)
 		mockDocker.EXPECT().ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
 		assert.Nil(t, err)
 
