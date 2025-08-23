@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap
 
-go 1.23
+go 1.23.0
 
 require (
 	github.com/stretchr/testify v1.8.0
@@ -38,9 +38,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
-	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
