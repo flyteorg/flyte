@@ -9,9 +9,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/docker/docker/api/types/image"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/volume"
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
@@ -131,7 +134,7 @@ func TestStartFunc(t *testing.T) {
 	t.Run("Successfully run demo cluster", func(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
@@ -154,7 +157,7 @@ func TestStartFunc(t *testing.T) {
 				},
 			},
 		}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
@@ -172,7 +175,7 @@ func TestStartFunc(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
@@ -188,7 +191,7 @@ func TestStartFunc(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
@@ -202,7 +205,7 @@ func TestStartFunc(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
@@ -231,7 +234,7 @@ func TestStartFunc(t *testing.T) {
 	t.Run("Error in pulling image", func(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("failed to pull"))
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), fmt.Errorf("failed to pull"))
 		sandboxCmdConfig.DefaultConfig.Image = ""
 		tag := "v0.15.0"
 		githubMock.EXPECT().GetReleaseByTag(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
@@ -253,7 +256,7 @@ func TestStartFunc(t *testing.T) {
 				},
 			},
 		}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(fmt.Errorf("failed to remove container"))
 		_, err := startSandbox(ctx, mockDocker, githubMock, strings.NewReader("y"), sandboxCmdConfig.DefaultConfig, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.NotNil(t, err)
@@ -262,7 +265,7 @@ func TestStartFunc(t *testing.T) {
 	t.Run("Error in start container", func(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(fmt.Errorf("failed to run container"))
 		_, err := startSandbox(ctx, mockDocker, githubMock, dummyReader(), sandboxCmdConfig.DefaultConfig, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.NotNil(t, err)
@@ -271,7 +274,7 @@ func TestStartFunc(t *testing.T) {
 	t.Run("Error in reading logs", func(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
@@ -286,7 +289,7 @@ func TestStartFunc(t *testing.T) {
 	t.Run("Error in list container", func(t *testing.T) {
 		sandboxSetup()
 		mockDocker.EXPECT().ContainerList(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
@@ -341,7 +344,7 @@ func TestStartFunc(t *testing.T) {
 		sandboxSetup()
 		docker.Client = mockDocker
 		mockDocker.EXPECT().ContainerList(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
-		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, image.PullOptions{}).Return(dummyReader(), nil)
 		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,

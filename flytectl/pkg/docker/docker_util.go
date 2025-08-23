@@ -9,9 +9,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/docker/docker/api/types/image"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
@@ -47,7 +50,7 @@ var (
 			Target: K3sDir,
 		},
 	}
-	ExecConfig = types.ExecConfig{
+	ExecConfig = container.ExecOptions{
 		AttachStderr: true,
 		Tty:          true,
 		WorkingDir:   "/",
@@ -146,11 +149,11 @@ func GetDemoPorts(k8sPort string) (map[nat.Port]struct{}, map[nat.Port][]nat.Por
 }
 
 // PullDockerImage will Pull docker image
-func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy ImagePullPolicy,
+func PullDockerImage(ctx context.Context, cli Docker, dockerImage string, pullPolicy ImagePullPolicy,
 	imagePullOptions ImagePullOptions, dryRun bool) error {
 
 	if dryRun {
-		PrintPullImage(image, imagePullOptions)
+		PrintPullImage(dockerImage, imagePullOptions)
 		return nil
 	}
 
@@ -158,14 +161,14 @@ func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy I
 	if pullPolicy == ImagePullPolicyAlways {
 		needsPull = true
 	} else {
-		imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
+		imageSummary, err := cli.ImageList(ctx, image.ListOptions{})
 		if err != nil {
 			return err
 		}
 		found := false
 		for _, img := range imageSummary {
 			for _, tags := range img.RepoTags {
-				if image == tags {
+				if dockerImage == tags {
 					found = true
 					break
 				}
@@ -184,11 +187,11 @@ func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy I
 
 	// Image needs to be pulled but pull policy prevents it
 	if pullPolicy == ImagePullPolicyNever {
-		return fmt.Errorf("Image does not exist, but image pull policy prevents pulling it: %s", image)
+		return fmt.Errorf("Image does not exist, but dockerImage pull policy prevents pulling it: %s", dockerImage)
 	}
 
-	fmt.Printf("%v Pulling image %s\n", emoji.Whale, image)
-	r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{
+	fmt.Printf("%v Pulling dockerImage %s\n", emoji.Whale, dockerImage)
+	r, err := cli.ImagePull(ctx, dockerImage, image.PullOptions{
 		RegistryAuth: imagePullOptions.RegistryAuth,
 		Platform:     imagePullOptions.Platform,
 	})
@@ -354,7 +357,7 @@ func ExecCommend(ctx context.Context, cli Docker, containerID string, command []
 }
 
 func InspectExecResp(ctx context.Context, cli Docker, containerID string) error {
-	resp, err := cli.ContainerExecAttach(ctx, containerID, types.ExecStartCheck{})
+	resp, err := cli.ContainerExecAttach(ctx, containerID, container.ExecStartOptions{})
 	if err != nil {
 		return err
 	}
