@@ -31,6 +31,7 @@ const (
 	RunService_ListActions_FullMethodName        = "/flyteidl.workflow.RunService/ListActions"
 	RunService_WatchActions_FullMethodName       = "/flyteidl.workflow.RunService/WatchActions"
 	RunService_WatchClusterEvents_FullMethodName = "/flyteidl.workflow.RunService/WatchClusterEvents"
+	RunService_AbortAction_FullMethodName        = "/flyteidl.workflow.RunService/AbortAction"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -63,6 +64,8 @@ type RunServiceClient interface {
 	WatchActions(ctx context.Context, in *WatchActionsRequest, opts ...grpc.CallOption) (RunService_WatchActionsClient, error)
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error)
+	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+	AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error)
 }
 
 type runServiceClient struct {
@@ -296,6 +299,15 @@ func (x *runServiceWatchClusterEventsClient) Recv() (*WatchClusterEventsResponse
 	return m, nil
 }
 
+func (c *runServiceClient) AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error) {
+	out := new(AbortActionResponse)
+	err := c.cc.Invoke(ctx, RunService_AbortAction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RunServiceServer is the server API for RunService service.
 // All implementations should embed UnimplementedRunServiceServer
 // for forward compatibility
@@ -326,6 +338,8 @@ type RunServiceServer interface {
 	WatchActions(*WatchActionsRequest, RunService_WatchActionsServer) error
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error
+	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+	AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error)
 }
 
 // UnimplementedRunServiceServer should be embedded to have forward compatible implementations.
@@ -367,6 +381,9 @@ func (UnimplementedRunServiceServer) WatchActions(*WatchActionsRequest, RunServi
 }
 func (UnimplementedRunServiceServer) WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchClusterEvents not implemented")
+}
+func (UnimplementedRunServiceServer) AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AbortAction not implemented")
 }
 
 // UnsafeRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -611,6 +628,24 @@ func (x *runServiceWatchClusterEventsServer) Send(m *WatchClusterEventsResponse)
 	return x.ServerStream.SendMsg(m)
 }
 
+func _RunService_AbortAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbortActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunServiceServer).AbortAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RunService_AbortAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunServiceServer).AbortAction(ctx, req.(*AbortActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RunService_ServiceDesc is the grpc.ServiceDesc for RunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -645,6 +680,10 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListActions",
 			Handler:    _RunService_ListActions_Handler,
+		},
+		{
+			MethodName: "AbortAction",
+			Handler:    _RunService_AbortAction_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
