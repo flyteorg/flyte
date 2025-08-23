@@ -33,10 +33,12 @@ class CreateRunResponse(_message.Message):
     def __init__(self, run: _Optional[_Union[_run_definition_pb2.Run, _Mapping]] = ...) -> None: ...
 
 class AbortRunRequest(_message.Message):
-    __slots__ = ["run_id"]
+    __slots__ = ["run_id", "reason"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ...) -> None: ...
+    reason: str
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., reason: _Optional[str] = ...) -> None: ...
 
 class AbortRunResponse(_message.Message):
     __slots__ = []
@@ -183,3 +185,15 @@ class WatchClusterEventsResponse(_message.Message):
     CLUSTER_EVENTS_FIELD_NUMBER: _ClassVar[int]
     cluster_events: _containers.RepeatedCompositeFieldContainer[_run_definition_pb2.ClusterEvent]
     def __init__(self, cluster_events: _Optional[_Iterable[_Union[_run_definition_pb2.ClusterEvent, _Mapping]]] = ...) -> None: ...
+
+class AbortActionRequest(_message.Message):
+    __slots__ = ["action_id", "reason"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    reason: str
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., reason: _Optional[str] = ...) -> None: ...
+
+class AbortActionResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...

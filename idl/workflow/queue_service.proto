@@ -19,6 +19,9 @@ service QueueService {
 
   // abort a queued run.
   rpc AbortQueuedRun(AbortQueuedRunRequest) returns (AbortQueuedRunResponse) {}
+
+  // AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+  rpc AbortQueuedAction(AbortQueuedActionRequest) returns (AbortQueuedActionResponse) {}
 }
 
 message WorkerIdentifier {
@@ -138,7 +141,20 @@ message EnqueueActionResponse {}
 message AbortQueuedRunRequest {
   // the unique identifier for the run to be aborted.
   common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+
+  // Reason for aborting the action, if applicable.
+  optional string reason = 2;
 }
 
 // response message for aborting a run.
 message AbortQueuedRunResponse {}
+
+message AbortQueuedActionRequest {
+  // ActionId is the unique identifier for the action to be aborted
+  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+
+  // Reason for aborting the action, if applicable.
+  optional string reason = 2;
+}
+
+message AbortQueuedActionResponse {}

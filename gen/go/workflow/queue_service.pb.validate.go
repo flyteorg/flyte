@@ -1317,6 +1317,10 @@ func (m *AbortQueuedRunRequest) validate(all bool) error {
 		}
 	}
 
+	if m.Reason != nil {
+		// no validation rules for Reason
+	}
+
 	if len(errors) > 0 {
 		return AbortQueuedRunRequestMultiError(errors)
 	}
@@ -1498,3 +1502,251 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AbortQueuedRunResponseValidationError{}
+
+// Validate checks the field values on AbortQueuedActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AbortQueuedActionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AbortQueuedActionRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AbortQueuedActionRequestMultiError, or nil if none found.
+func (m *AbortQueuedActionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AbortQueuedActionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetActionId() == nil {
+		err := AbortQueuedActionRequestValidationError{
+			field:  "ActionId",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AbortQueuedActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AbortQueuedActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AbortQueuedActionRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.Reason != nil {
+		// no validation rules for Reason
+	}
+
+	if len(errors) > 0 {
+		return AbortQueuedActionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AbortQueuedActionRequestMultiError is an error wrapping multiple validation
+// errors returned by AbortQueuedActionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AbortQueuedActionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AbortQueuedActionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AbortQueuedActionRequestMultiError) AllErrors() []error { return m }
+
+// AbortQueuedActionRequestValidationError is the validation error returned by
+// AbortQueuedActionRequest.Validate if the designated constraints aren't met.
+type AbortQueuedActionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AbortQueuedActionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AbortQueuedActionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AbortQueuedActionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AbortQueuedActionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AbortQueuedActionRequestValidationError) ErrorName() string {
+	return "AbortQueuedActionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AbortQueuedActionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAbortQueuedActionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AbortQueuedActionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AbortQueuedActionRequestValidationError{}
+
+// Validate checks the field values on AbortQueuedActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AbortQueuedActionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AbortQueuedActionResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AbortQueuedActionResponseMultiError, or nil if none found.
+func (m *AbortQueuedActionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AbortQueuedActionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return AbortQueuedActionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AbortQueuedActionResponseMultiError is an error wrapping multiple validation
+// errors returned by AbortQueuedActionResponse.ValidateAll() if the
+// designated constraints aren't met.
+type AbortQueuedActionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AbortQueuedActionResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AbortQueuedActionResponseMultiError) AllErrors() []error { return m }
+
+// AbortQueuedActionResponseValidationError is the validation error returned by
+// AbortQueuedActionResponse.Validate if the designated constraints aren't met.
+type AbortQueuedActionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AbortQueuedActionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AbortQueuedActionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AbortQueuedActionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AbortQueuedActionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AbortQueuedActionResponseValidationError) ErrorName() string {
+	return "AbortQueuedActionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AbortQueuedActionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAbortQueuedActionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AbortQueuedActionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AbortQueuedActionResponseValidationError{}

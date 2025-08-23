@@ -344,6 +344,36 @@ pub mod queue_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn abort_queued_action(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AbortQueuedActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.workflow.QueueService/AbortQueuedAction",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl.workflow.QueueService",
+                        "AbortQueuedAction",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -365,6 +395,13 @@ pub mod queue_service_server {
             request: tonic::Request<super::AbortQueuedRunRequest>,
         ) -> std::result::Result<
             tonic::Response<super::AbortQueuedRunResponse>,
+            tonic::Status,
+        >;
+        async fn abort_queued_action(
+            &self,
+            request: tonic::Request<super::AbortQueuedActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedActionResponse>,
             tonic::Status,
         >;
     }
@@ -519,6 +556,52 @@ pub mod queue_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = AbortQueuedRunSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl.workflow.QueueService/AbortQueuedAction" => {
+                    #[allow(non_camel_case_types)]
+                    struct AbortQueuedActionSvc<T: QueueService>(pub Arc<T>);
+                    impl<
+                        T: QueueService,
+                    > tonic::server::UnaryService<super::AbortQueuedActionRequest>
+                    for AbortQueuedActionSvc<T> {
+                        type Response = super::AbortQueuedActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AbortQueuedActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as QueueService>::abort_queued_action(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = AbortQueuedActionSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1251,6 +1334,31 @@ pub mod run_service_client {
                 );
             self.inner.server_streaming(req, path, codec).await
         }
+        pub async fn abort_action(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AbortActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.workflow.RunService/AbortAction",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl.workflow.RunService", "AbortAction"));
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1375,6 +1483,13 @@ pub mod run_service_server {
             request: tonic::Request<super::WatchClusterEventsRequest>,
         ) -> std::result::Result<
             tonic::Response<Self::WatchClusterEventsStream>,
+            tonic::Status,
+        >;
+        async fn abort_action(
+            &self,
+            request: tonic::Request<super::AbortActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortActionResponse>,
             tonic::Status,
         >;
     }
@@ -2000,6 +2115,51 @@ pub mod run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl.workflow.RunService/AbortAction" => {
+                    #[allow(non_camel_case_types)]
+                    struct AbortActionSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::UnaryService<super::AbortActionRequest>
+                    for AbortActionSvc<T> {
+                        type Response = super::AbortActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AbortActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::abort_action(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = AbortActionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

@@ -21,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file workflow/queue_service.proto.
  */
 export const file_workflow_queue_service: GenFile = /*@__PURE__*/
-  fileDesc("Chx3b3JrZmxvdy9xdWV1ZV9zZXJ2aWNlLnByb3RvEhFmbHl0ZWlkbC53b3JrZmxvdyJiChBXb3JrZXJJZGVudGlmaWVyEh0KDG9yZ2FuaXphdGlvbhgBIAEoCUIH+kIEcgIQARIYCgdjbHVzdGVyGAIgASgJQgf6QgRyAhABEhUKBG5hbWUYAyABKAlCB/pCBHICEAEi2QMKFEVucXVldWVBY3Rpb25SZXF1ZXN0Ej4KCWFjdGlvbl9pZBgBIAEoCzIhLmZseXRlaWRsLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQgj6QgWKAQIQARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIsCghydW5fc3BlYxgDIAEoCzIaLmZseXRlaWRsLndvcmtmbG93LlJ1blNwZWMSGgoJaW5wdXRfdXJpGAYgASgJQgf6QgRyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgHIAEoCUIH+kIEcgIQARINCgVncm91cBgIIAEoCRIPCgdzdWJqZWN0GAkgASgJEjcKBHRhc2sYCiABKAsyHS5mbHl0ZWlkbC53b3JrZmxvdy5UYXNrQWN0aW9uQgj6QgWKAQIQAUgAEjkKBXRyYWNlGAsgASgLMh4uZmx5dGVpZGwud29ya2Zsb3cuVHJhY2VBY3Rpb25CCPpCBYoBAhABSAASQQoJY29uZGl0aW9uGAwgASgLMiIuZmx5dGVpZGwud29ya2Zsb3cuQ29uZGl0aW9uQWN0aW9uQgj6QgWKAQIQAUgAQgYKBHNwZWNCFQoTX3BhcmVudF9hY3Rpb25fbmFtZSKyAQoKVGFza0FjdGlvbhItCgJpZBgBIAEoCzIhLmZseXRlaWRsLndvcmtmbG93LlRhc2tJZGVudGlmaWVyEjMKBHNwZWMYAiABKAsyGy5mbHl0ZWlkbC53b3JrZmxvdy5UYXNrU3BlY0II+kIFigECEAESLwoJY2FjaGVfa2V5GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEg8KB2NsdXN0ZXIYBCABKAki8wEKC1RyYWNlQWN0aW9uEhUKBG5hbWUYASABKAlCB/pCBHICEAESJwoFcGhhc2UYAiABKA4yGC5mbHl0ZWlkbC53b3JrZmxvdy5QaGFzZRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARI0CgdvdXRwdXRzGAUgASgLMiMuZmx5dGVpZGwud29ya2Zsb3cuT3V0cHV0UmVmZXJlbmNlc0ILCglfZW5kX3RpbWUi0AEKD0NvbmRpdGlvbkFjdGlvbhIVCgRuYW1lGAEgASgJQgf6QgRyAhABEhkKBnJ1bl9pZBgCIAEoCUIH+kIEcgIQAUgAEhwKCWFjdGlvbl9pZBgDIAEoCUIH+kIEcgIQAUgAEhAKBmdsb2JhbBgEIAEoCEgAEigKBHR5cGUYBiABKAsyGi5mbHl0ZWlkbC5jb3JlLkxpdGVyYWxUeXBlEg4KBnByb21wdBgHIAEoCRITCgtkZXNjcmlwdGlvbhgIIAEoCUIMCgVzY29wZRID+EIBIhcKFUVucXVldWVBY3Rpb25SZXNwb25zZSJRChVBYm9ydFF1ZXVlZFJ1blJlcXVlc3QSOAoGcnVuX2lkGAEgASgLMh4uZmx5dGVpZGwuY29tbW9uLlJ1bklkZW50aWZpZXJCCPpCBYoBAhABIhgKFkFib3J0UXVldWVkUnVuUmVzcG9uc2Uy3QEKDFF1ZXVlU2VydmljZRJkCg1FbnF1ZXVlQWN0aW9uEicuZmx5dGVpZGwud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlcXVlc3QaKC5mbHl0ZWlkbC53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVzcG9uc2UiABJnCg5BYm9ydFF1ZXVlZFJ1bhIoLmZseXRlaWRsLndvcmtmbG93LkFib3J0UXVldWVkUnVuUmVxdWVzdBopLmZseXRlaWRsLndvcmtmbG93LkFib3J0UXVldWVkUnVuUmVzcG9uc2UiAEK8AQoVY29tLmZseXRlaWRsLndvcmtmbG93QhFRdWV1ZVNlcnZpY2VQcm90b0gCUAFaKWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvZ2VuL2dvL3dvcmtmbG93ogIDRldYqgIRRmx5dGVpZGwuV29ya2Zsb3fKAhFGbHl0ZWlkbFxXb3JrZmxvd+ICHUZseXRlaWRsXFdvcmtmbG93XEdQQk1ldGFkYXRh6gISRmx5dGVpZGw6OldvcmtmbG93YgZwcm90bzM", [file_common_identifier, file_core_types, file_google_protobuf_timestamp, file_google_protobuf_wrappers, file_validate_validate, file_workflow_run_definition, file_workflow_task_definition]);
+  fileDesc("Chx3b3JrZmxvdy9xdWV1ZV9zZXJ2aWNlLnByb3RvEhFmbHl0ZWlkbC53b3JrZmxvdyJiChBXb3JrZXJJZGVudGlmaWVyEh0KDG9yZ2FuaXphdGlvbhgBIAEoCUIH+kIEcgIQARIYCgdjbHVzdGVyGAIgASgJQgf6QgRyAhABEhUKBG5hbWUYAyABKAlCB/pCBHICEAEi2QMKFEVucXVldWVBY3Rpb25SZXF1ZXN0Ej4KCWFjdGlvbl9pZBgBIAEoCzIhLmZseXRlaWRsLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQgj6QgWKAQIQARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIsCghydW5fc3BlYxgDIAEoCzIaLmZseXRlaWRsLndvcmtmbG93LlJ1blNwZWMSGgoJaW5wdXRfdXJpGAYgASgJQgf6QgRyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgHIAEoCUIH+kIEcgIQARINCgVncm91cBgIIAEoCRIPCgdzdWJqZWN0GAkgASgJEjcKBHRhc2sYCiABKAsyHS5mbHl0ZWlkbC53b3JrZmxvdy5UYXNrQWN0aW9uQgj6QgWKAQIQAUgAEjkKBXRyYWNlGAsgASgLMh4uZmx5dGVpZGwud29ya2Zsb3cuVHJhY2VBY3Rpb25CCPpCBYoBAhABSAASQQoJY29uZGl0aW9uGAwgASgLMiIuZmx5dGVpZGwud29ya2Zsb3cuQ29uZGl0aW9uQWN0aW9uQgj6QgWKAQIQAUgAQgYKBHNwZWNCFQoTX3BhcmVudF9hY3Rpb25fbmFtZSKyAQoKVGFza0FjdGlvbhItCgJpZBgBIAEoCzIhLmZseXRlaWRsLndvcmtmbG93LlRhc2tJZGVudGlmaWVyEjMKBHNwZWMYAiABKAsyGy5mbHl0ZWlkbC53b3JrZmxvdy5UYXNrU3BlY0II+kIFigECEAESLwoJY2FjaGVfa2V5GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEg8KB2NsdXN0ZXIYBCABKAki8wEKC1RyYWNlQWN0aW9uEhUKBG5hbWUYASABKAlCB/pCBHICEAESJwoFcGhhc2UYAiABKA4yGC5mbHl0ZWlkbC53b3JrZmxvdy5QaGFzZRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARI0CgdvdXRwdXRzGAUgASgLMiMuZmx5dGVpZGwud29ya2Zsb3cuT3V0cHV0UmVmZXJlbmNlc0ILCglfZW5kX3RpbWUi0AEKD0NvbmRpdGlvbkFjdGlvbhIVCgRuYW1lGAEgASgJQgf6QgRyAhABEhkKBnJ1bl9pZBgCIAEoCUIH+kIEcgIQAUgAEhwKCWFjdGlvbl9pZBgDIAEoCUIH+kIEcgIQAUgAEhAKBmdsb2JhbBgEIAEoCEgAEigKBHR5cGUYBiABKAsyGi5mbHl0ZWlkbC5jb3JlLkxpdGVyYWxUeXBlEg4KBnByb21wdBgHIAEoCRITCgtkZXNjcmlwdGlvbhgIIAEoCUIMCgVzY29wZRID+EIBIhcKFUVucXVldWVBY3Rpb25SZXNwb25zZSJxChVBYm9ydFF1ZXVlZFJ1blJlcXVlc3QSOAoGcnVuX2lkGAEgASgLMh4uZmx5dGVpZGwuY29tbW9uLlJ1bklkZW50aWZpZXJCCPpCBYoBAhABEhMKBnJlYXNvbhgCIAEoCUgAiAEBQgkKB19yZWFzb24iGAoWQWJvcnRRdWV1ZWRSdW5SZXNwb25zZSJ6ChhBYm9ydFF1ZXVlZEFjdGlvblJlcXVlc3QSPgoJYWN0aW9uX2lkGAEgASgLMiEuZmx5dGVpZGwuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCCPpCBYoBAhABEhMKBnJlYXNvbhgCIAEoCUgAiAEBQgkKB19yZWFzb24iGwoZQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZTLPAgoMUXVldWVTZXJ2aWNlEmQKDUVucXVldWVBY3Rpb24SJy5mbHl0ZWlkbC53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVxdWVzdBooLmZseXRlaWRsLndvcmtmbG93LkVucXVldWVBY3Rpb25SZXNwb25zZSIAEmcKDkFib3J0UXVldWVkUnVuEiguZmx5dGVpZGwud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXF1ZXN0GikuZmx5dGVpZGwud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXNwb25zZSIAEnAKEUFib3J0UXVldWVkQWN0aW9uEisuZmx5dGVpZGwud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXF1ZXN0GiwuZmx5dGVpZGwud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZSIAQrwBChVjb20uZmx5dGVpZGwud29ya2Zsb3dCEVF1ZXVlU2VydmljZVByb3RvSAJQAVopZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS9nZW4vZ28vd29ya2Zsb3eiAgNGV1iqAhFGbHl0ZWlkbC5Xb3JrZmxvd8oCEUZseXRlaWRsXFdvcmtmbG934gIdRmx5dGVpZGxcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDo6V29ya2Zsb3diBnByb3RvMw", [file_common_identifier, file_core_types, file_google_protobuf_timestamp, file_google_protobuf_wrappers, file_validate_validate, file_workflow_run_definition, file_workflow_task_definition]);
 
 /**
  * @generated from message flyteidl.workflow.WorkerIdentifier
@@ -339,6 +339,13 @@ export type AbortQueuedRunRequest = Message<"flyteidl.workflow.AbortQueuedRunReq
    * @generated from field: flyteidl.common.RunIdentifier run_id = 1;
    */
   runId?: RunIdentifier;
+
+  /**
+   * Reason for aborting the action, if applicable.
+   *
+   * @generated from field: optional string reason = 2;
+   */
+  reason?: string;
 };
 
 /**
@@ -362,6 +369,45 @@ export type AbortQueuedRunResponse = Message<"flyteidl.workflow.AbortQueuedRunRe
  */
 export const AbortQueuedRunResponseSchema: GenMessage<AbortQueuedRunResponse> = /*@__PURE__*/
   messageDesc(file_workflow_queue_service, 7);
+
+/**
+ * @generated from message flyteidl.workflow.AbortQueuedActionRequest
+ */
+export type AbortQueuedActionRequest = Message<"flyteidl.workflow.AbortQueuedActionRequest"> & {
+  /**
+   * ActionId is the unique identifier for the action to be aborted
+   *
+   * @generated from field: flyteidl.common.ActionIdentifier action_id = 1;
+   */
+  actionId?: ActionIdentifier;
+
+  /**
+   * Reason for aborting the action, if applicable.
+   *
+   * @generated from field: optional string reason = 2;
+   */
+  reason?: string;
+};
+
+/**
+ * Describes the message flyteidl.workflow.AbortQueuedActionRequest.
+ * Use `create(AbortQueuedActionRequestSchema)` to create a new message.
+ */
+export const AbortQueuedActionRequestSchema: GenMessage<AbortQueuedActionRequest> = /*@__PURE__*/
+  messageDesc(file_workflow_queue_service, 8);
+
+/**
+ * @generated from message flyteidl.workflow.AbortQueuedActionResponse
+ */
+export type AbortQueuedActionResponse = Message<"flyteidl.workflow.AbortQueuedActionResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl.workflow.AbortQueuedActionResponse.
+ * Use `create(AbortQueuedActionResponseSchema)` to create a new message.
+ */
+export const AbortQueuedActionResponseSchema: GenMessage<AbortQueuedActionResponse> = /*@__PURE__*/
+  messageDesc(file_workflow_queue_service, 9);
 
 /**
  * provides an interface for managing execution of runs over a collection of workers.
@@ -388,6 +434,16 @@ export const QueueService: GenService<{
     methodKind: "unary";
     input: typeof AbortQueuedRunRequestSchema;
     output: typeof AbortQueuedRunResponseSchema;
+  },
+  /**
+   * AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+   *
+   * @generated from rpc flyteidl.workflow.QueueService.AbortQueuedAction
+   */
+  abortQueuedAction: {
+    methodKind: "unary";
+    input: typeof AbortQueuedActionRequestSchema;
+    output: typeof AbortQueuedActionResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_workflow_queue_service, 0);
