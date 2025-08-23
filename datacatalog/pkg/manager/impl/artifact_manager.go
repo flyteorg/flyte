@@ -208,6 +208,7 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 				m.systemMetrics.doesNotExistCounter.Inc(ctx)
 			} else {
 				logger.Errorf(ctx, "Unable to retrieve Artifact by tag %v, err: %v", key, err)
+				m.systemMetrics.getFailureCounter.Inc(ctx)
 			}
 			return models.Artifact{}, err
 		}
