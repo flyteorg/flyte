@@ -393,7 +393,30 @@ If not, we can start backends with a single command.
    pyflyte run https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Running hello_world_wf() hello world
 
-**3-1. Run workflow in sandbox - with ImageSpec**
+
+**3. Run integration test**
+
+- Step 1: Build the dev container
+
+.. code:: shell
+
+   make build-dev
+
+- Step 2: Run integration test
+
+.. code:: shell
+
+   # Run integration test
+   make integration_test
+
+   # Run integration test with code coverage report
+   make integration_test_codecov
+
+   # Run integration test with higher verbosity
+   make integration_test PYTEST_OPTS="-n auto --dist=loadfile -vv"
+
+
+**4-1. Run workflow in sandbox - with ImageSpec**
 
 Before running your workflow in the sandbox, make sure you're able to successfully run it
 locally. To run the workflow in the sandbox with the newest modification, you can use
@@ -439,7 +462,7 @@ Then submit the workflow to the Flyte cluster:
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution-id> to see execution in the console.
 
 
-**3-2. Run workflow in sandbox - with Dockerfile**
+**4-2. Run workflow in sandbox - with Dockerfile**
 
 Before running your workflow in the sandbox, make sure you're able to successfully run it locally.
 To deploy the workflow in the sandbox, you'll need to build a Flytekit image.
