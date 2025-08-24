@@ -433,13 +433,14 @@ Create a workflow file that uses `ImageSpec` to define the image with your custo
    new_flytekit = "git+https://github.com/your-github-username/flytekit.git@your-commit-hash"
 
    # To install your modified plugins, use following:
-   # new_deck_plugin = git+https://github.com/your-github-username/flytekit.git@your-commit-hash#subdirectory=plugins/flytekit-kf-pytorch
+   # new_deck_plugin = "git+https://github.com/your-github-username/flytekit.git@your-commit-hash#subdirectory=plugins/flytekit-kf-pytorch"
 
    # Create ImageSpec with your custom flytekit
    image_spec = ImageSpec(
        registry="localhost:30000",
        packages=[
            new_flytekit,
+           # new_deck_plugin
        ],
        apt_packages=["git"],
    )
