@@ -221,6 +221,7 @@ require (
 	k8s.io/component-base v0.29.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
+	volcano.sh/apis v1.8.2 // indirect
 )
 
 require (
