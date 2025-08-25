@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"testing"
 
@@ -1724,6 +1725,51 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 				t.Fatalf("Test case %d: %+v %+v Expected %+v, but got %+v", i, reflect.TypeOf(expectedValue), reflect.TypeOf(actualValue), expectedValue, actualValue)
 			}
 		}
+	}
+}
+
+func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
+	// Read the binary file containing serialized core.Binary message
+	binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/pydantic_v2_binary_literal.msgpack"
+	protoBytes, err := os.ReadFile(binaryFilePath)
+	assert.NoError(t, err)
+
+	// Deserialize the protobuf to get the core.Binary object
+	binaryData := &core.Binary{}
+	err = proto.Unmarshal(protoBytes, binaryData)
+	assert.NoError(t, err)
+
+	// Define attribute path to access 'dt1' field
+	attrPath := []*core.PromiseAttribute{
+		{
+			Value: &core.PromiseAttribute_StringValue{
+				StringValue: "dt1",
+			},
+		},
+	}
+
+	// Call resolveAttrPathInBinary function
+	result, err := resolveAttrPathInBinary("test-node", binaryData, attrPath)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+
+	// The result should be a scalar literal with the dt1 value
+	// Based on the binary file content, dt1 appears to be a datetime string "2020-01-01T12:00:00"
+	assert.IsType(t, &core.Literal_Scalar{}, result.Value)
+	scalar := result.Value.(*core.Literal_Scalar)
+	
+	// Check if it's a primitive (string) or binary value
+	if primitive, ok := scalar.Scalar.Value.(*core.Scalar_Primitive); ok {
+		// If it's a primitive string
+		if strVal, ok := primitive.Primitive.Value.(*core.Primitive_StringValue); ok {
+			assert.Equal(t, "2020-01-01T12:00:00", strVal.StringValue)
+		}
+	} else if binary, ok := scalar.Scalar.Value.(*core.Scalar_Binary); ok {
+		// If it's still binary, unmarshal and check
+		var resultData interface{}
+		err = msgpack.Unmarshal(binary.Binary.Value, &resultData)
+		assert.NoError(t, err)
+		assert.Equal(t, "2020-01-01T12:00:00", resultData)
 	}
 }
 
