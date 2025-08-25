@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	QueueService_EnqueueAction_FullMethodName  = "/flyteidl.workflow.QueueService/EnqueueAction"
-	QueueService_AbortQueuedRun_FullMethodName = "/flyteidl.workflow.QueueService/AbortQueuedRun"
+	QueueService_EnqueueAction_FullMethodName     = "/flyteidl.workflow.QueueService/EnqueueAction"
+	QueueService_AbortQueuedRun_FullMethodName    = "/flyteidl.workflow.QueueService/AbortQueuedRun"
+	QueueService_AbortQueuedAction_FullMethodName = "/flyteidl.workflow.QueueService/AbortQueuedAction"
 )
 
 // QueueServiceClient is the client API for QueueService service.
@@ -31,6 +32,8 @@ type QueueServiceClient interface {
 	EnqueueAction(ctx context.Context, in *EnqueueActionRequest, opts ...grpc.CallOption) (*EnqueueActionResponse, error)
 	// abort a queued run.
 	AbortQueuedRun(ctx context.Context, in *AbortQueuedRunRequest, opts ...grpc.CallOption) (*AbortQueuedRunResponse, error)
+	// AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+	AbortQueuedAction(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error)
 }
 
 type queueServiceClient struct {
@@ -59,6 +62,15 @@ func (c *queueServiceClient) AbortQueuedRun(ctx context.Context, in *AbortQueued
 	return out, nil
 }
 
+func (c *queueServiceClient) AbortQueuedAction(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error) {
+	out := new(AbortQueuedActionResponse)
+	err := c.cc.Invoke(ctx, QueueService_AbortQueuedAction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueueServiceServer is the server API for QueueService service.
 // All implementations should embed UnimplementedQueueServiceServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type QueueServiceServer interface {
 	EnqueueAction(context.Context, *EnqueueActionRequest) (*EnqueueActionResponse, error)
 	// abort a queued run.
 	AbortQueuedRun(context.Context, *AbortQueuedRunRequest) (*AbortQueuedRunResponse, error)
+	// AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+	AbortQueuedAction(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error)
 }
 
 // UnimplementedQueueServiceServer should be embedded to have forward compatible implementations.
@@ -78,6 +92,9 @@ func (UnimplementedQueueServiceServer) EnqueueAction(context.Context, *EnqueueAc
 }
 func (UnimplementedQueueServiceServer) AbortQueuedRun(context.Context, *AbortQueuedRunRequest) (*AbortQueuedRunResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbortQueuedRun not implemented")
+}
+func (UnimplementedQueueServiceServer) AbortQueuedAction(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AbortQueuedAction not implemented")
 }
 
 // UnsafeQueueServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -127,6 +144,24 @@ func _QueueService_AbortQueuedRun_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _QueueService_AbortQueuedAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbortQueuedActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueueServiceServer).AbortQueuedAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QueueService_AbortQueuedAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueueServiceServer).AbortQueuedAction(ctx, req.(*AbortQueuedActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // QueueService_ServiceDesc is the grpc.ServiceDesc for QueueService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +176,10 @@ var QueueService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AbortQueuedRun",
 			Handler:    _QueueService_AbortQueuedRun_Handler,
+		},
+		{
+			MethodName: "AbortQueuedAction",
+			Handler:    _QueueService_AbortQueuedAction_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

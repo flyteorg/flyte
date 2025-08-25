@@ -59,6 +59,9 @@ service RunService {
 
   // Stream of k8s cluster events in human readable form
   rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {}
+
+  // AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+  rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {}
 }
 
 // Request message for creating a run.
@@ -100,6 +103,9 @@ message CreateRunResponse {
 message AbortRunRequest {
   // Run to abort.
   common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+
+  // Reason for aborting the run. if applicable.
+  optional string reason = 2;
 }
 
 // Response message for aborting a run.
@@ -264,3 +270,13 @@ message WatchClusterEventsRequest {
 message WatchClusterEventsResponse {
   repeated ClusterEvent cluster_events = 1;
 }
+
+message AbortActionRequest {
+  // Action to abort.
+  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+
+  // Optional reason for aborting the action.
+  string reason = 2;
+}
+
+message AbortActionResponse {}

@@ -39,13 +39,17 @@ const (
 	// QueueServiceAbortQueuedRunProcedure is the fully-qualified name of the QueueService's
 	// AbortQueuedRun RPC.
 	QueueServiceAbortQueuedRunProcedure = "/flyteidl.workflow.QueueService/AbortQueuedRun"
+	// QueueServiceAbortQueuedActionProcedure is the fully-qualified name of the QueueService's
+	// AbortQueuedAction RPC.
+	QueueServiceAbortQueuedActionProcedure = "/flyteidl.workflow.QueueService/AbortQueuedAction"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	queueServiceServiceDescriptor              = workflow.File_workflow_queue_service_proto.Services().ByName("QueueService")
-	queueServiceEnqueueActionMethodDescriptor  = queueServiceServiceDescriptor.Methods().ByName("EnqueueAction")
-	queueServiceAbortQueuedRunMethodDescriptor = queueServiceServiceDescriptor.Methods().ByName("AbortQueuedRun")
+	queueServiceServiceDescriptor                 = workflow.File_workflow_queue_service_proto.Services().ByName("QueueService")
+	queueServiceEnqueueActionMethodDescriptor     = queueServiceServiceDescriptor.Methods().ByName("EnqueueAction")
+	queueServiceAbortQueuedRunMethodDescriptor    = queueServiceServiceDescriptor.Methods().ByName("AbortQueuedRun")
+	queueServiceAbortQueuedActionMethodDescriptor = queueServiceServiceDescriptor.Methods().ByName("AbortQueuedAction")
 )
 
 // QueueServiceClient is a client for the flyteidl.workflow.QueueService service.
@@ -54,6 +58,8 @@ type QueueServiceClient interface {
 	EnqueueAction(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
 	// abort a queued run.
 	AbortQueuedRun(context.Context, *connect.Request[workflow.AbortQueuedRunRequest]) (*connect.Response[workflow.AbortQueuedRunResponse], error)
+	// AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+	AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
 }
 
 // NewQueueServiceClient constructs a client for the flyteidl.workflow.QueueService service. By
@@ -78,13 +84,20 @@ func NewQueueServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(queueServiceAbortQueuedRunMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		abortQueuedAction: connect.NewClient[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse](
+			httpClient,
+			baseURL+QueueServiceAbortQueuedActionProcedure,
+			connect.WithSchema(queueServiceAbortQueuedActionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // queueServiceClient implements QueueServiceClient.
 type queueServiceClient struct {
-	enqueueAction  *connect.Client[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse]
-	abortQueuedRun *connect.Client[workflow.AbortQueuedRunRequest, workflow.AbortQueuedRunResponse]
+	enqueueAction     *connect.Client[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse]
+	abortQueuedRun    *connect.Client[workflow.AbortQueuedRunRequest, workflow.AbortQueuedRunResponse]
+	abortQueuedAction *connect.Client[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse]
 }
 
 // EnqueueAction calls flyteidl.workflow.QueueService.EnqueueAction.
@@ -97,12 +110,19 @@ func (c *queueServiceClient) AbortQueuedRun(ctx context.Context, req *connect.Re
 	return c.abortQueuedRun.CallUnary(ctx, req)
 }
 
+// AbortQueuedAction calls flyteidl.workflow.QueueService.AbortQueuedAction.
+func (c *queueServiceClient) AbortQueuedAction(ctx context.Context, req *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
+	return c.abortQueuedAction.CallUnary(ctx, req)
+}
+
 // QueueServiceHandler is an implementation of the flyteidl.workflow.QueueService service.
 type QueueServiceHandler interface {
 	// queue a new action for execution.
 	EnqueueAction(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
 	// abort a queued run.
 	AbortQueuedRun(context.Context, *connect.Request[workflow.AbortQueuedRunRequest]) (*connect.Response[workflow.AbortQueuedRunResponse], error)
+	// AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+	AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
 }
 
 // NewQueueServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -123,12 +143,20 @@ func NewQueueServiceHandler(svc QueueServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(queueServiceAbortQueuedRunMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	queueServiceAbortQueuedActionHandler := connect.NewUnaryHandler(
+		QueueServiceAbortQueuedActionProcedure,
+		svc.AbortQueuedAction,
+		connect.WithSchema(queueServiceAbortQueuedActionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl.workflow.QueueService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case QueueServiceEnqueueActionProcedure:
 			queueServiceEnqueueActionHandler.ServeHTTP(w, r)
 		case QueueServiceAbortQueuedRunProcedure:
 			queueServiceAbortQueuedRunHandler.ServeHTTP(w, r)
+		case QueueServiceAbortQueuedActionProcedure:
+			queueServiceAbortQueuedActionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -144,4 +172,8 @@ func (UnimplementedQueueServiceHandler) EnqueueAction(context.Context, *connect.
 
 func (UnimplementedQueueServiceHandler) AbortQueuedRun(context.Context, *connect.Request[workflow.AbortQueuedRunRequest]) (*connect.Response[workflow.AbortQueuedRunResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.QueueService.AbortQueuedRun is not implemented"))
+}
+
+func (UnimplementedQueueServiceHandler) AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.QueueService.AbortQueuedAction is not implemented"))
 }
