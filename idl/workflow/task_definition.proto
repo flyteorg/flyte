@@ -10,7 +10,7 @@ import "validate/validate.proto";
 import "workflow/common.proto";
 import "workflow/environment.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // Name of a task. It may have multiple versions deployed.
 message TaskName {

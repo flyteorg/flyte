@@ -6,7 +6,7 @@ import "common/authorization.proto";
 import "common/identifier.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
 
 // A policy is a collection of roles bound to a resource.
 message Policy {

@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flyteidl"
+name = "flyteidl2"
 dynamic = ["version"]
 authors = [{ name = "Union Eng", email = "support@union.ai" }]
 description = "IDL for Flyte"

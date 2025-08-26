@@ -10,7 +10,7 @@ import "validate/validate.proto";
 import "workflow/run_definition.proto";
 import "workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
 
 // provides an interface for managing execution of runs over a collection of workers.
 service QueueService {
