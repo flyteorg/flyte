@@ -629,6 +629,10 @@ func (m *AbortRunRequest) validate(all bool) error {
 		}
 	}
 
+	if m.Reason != nil {
+		// no validation rules for Reason
+	}
+
 	if len(errors) > 0 {
 		return AbortRunRequestMultiError(errors)
 	}
@@ -3903,3 +3907,249 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WatchClusterEventsResponseValidationError{}
+
+// Validate checks the field values on AbortActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AbortActionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AbortActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AbortActionRequestMultiError, or nil if none found.
+func (m *AbortActionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AbortActionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetActionId() == nil {
+		err := AbortActionRequestValidationError{
+			field:  "ActionId",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AbortActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AbortActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AbortActionRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Reason
+
+	if len(errors) > 0 {
+		return AbortActionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AbortActionRequestMultiError is an error wrapping multiple validation errors
+// returned by AbortActionRequest.ValidateAll() if the designated constraints
+// aren't met.
+type AbortActionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AbortActionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AbortActionRequestMultiError) AllErrors() []error { return m }
+
+// AbortActionRequestValidationError is the validation error returned by
+// AbortActionRequest.Validate if the designated constraints aren't met.
+type AbortActionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AbortActionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AbortActionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AbortActionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AbortActionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AbortActionRequestValidationError) ErrorName() string {
+	return "AbortActionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AbortActionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAbortActionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AbortActionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AbortActionRequestValidationError{}
+
+// Validate checks the field values on AbortActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AbortActionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AbortActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AbortActionResponseMultiError, or nil if none found.
+func (m *AbortActionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AbortActionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return AbortActionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AbortActionResponseMultiError is an error wrapping multiple validation
+// errors returned by AbortActionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type AbortActionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AbortActionResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AbortActionResponseMultiError) AllErrors() []error { return m }
+
+// AbortActionResponseValidationError is the validation error returned by
+// AbortActionResponse.Validate if the designated constraints aren't met.
+type AbortActionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AbortActionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AbortActionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AbortActionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AbortActionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AbortActionResponseValidationError) ErrorName() string {
+	return "AbortActionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AbortActionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAbortActionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AbortActionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AbortActionResponseValidationError{}

@@ -63,6 +63,8 @@ const (
 	// RunServiceWatchClusterEventsProcedure is the fully-qualified name of the RunService's
 	// WatchClusterEvents RPC.
 	RunServiceWatchClusterEventsProcedure = "/flyteidl.workflow.RunService/WatchClusterEvents"
+	// RunServiceAbortActionProcedure is the fully-qualified name of the RunService's AbortAction RPC.
+	RunServiceAbortActionProcedure = "/flyteidl.workflow.RunService/AbortAction"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -80,6 +82,7 @@ var (
 	runServiceListActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("ListActions")
 	runServiceWatchActionsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("WatchActions")
 	runServiceWatchClusterEventsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
+	runServiceAbortActionMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("AbortAction")
 )
 
 // RunServiceClient is a client for the flyteidl.workflow.RunService service.
@@ -110,6 +113,8 @@ type RunServiceClient interface {
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
+	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
 }
 
 // NewRunServiceClient constructs a client for the flyteidl.workflow.RunService service. By default,
@@ -199,6 +204,12 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		abortAction: connect.NewClient[workflow.AbortActionRequest, workflow.AbortActionResponse](
+			httpClient,
+			baseURL+RunServiceAbortActionProcedure,
+			connect.WithSchema(runServiceAbortActionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -216,6 +227,7 @@ type runServiceClient struct {
 	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
 	watchClusterEvents *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
+	abortAction        *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
 }
 
 // CreateRun calls flyteidl.workflow.RunService.CreateRun.
@@ -278,6 +290,11 @@ func (c *runServiceClient) WatchClusterEvents(ctx context.Context, req *connect.
 	return c.watchClusterEvents.CallServerStream(ctx, req)
 }
 
+// AbortAction calls flyteidl.workflow.RunService.AbortAction.
+func (c *runServiceClient) AbortAction(ctx context.Context, req *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
+	return c.abortAction.CallUnary(ctx, req)
+}
+
 // RunServiceHandler is an implementation of the flyteidl.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
@@ -306,6 +323,8 @@ type RunServiceHandler interface {
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
+	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
 }
 
 // NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -391,6 +410,12 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceAbortActionHandler := connect.NewUnaryHandler(
+		RunServiceAbortActionProcedure,
+		svc.AbortAction,
+		connect.WithSchema(runServiceAbortActionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunServiceCreateRunProcedure:
@@ -417,6 +442,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceWatchActionsHandler.ServeHTTP(w, r)
 		case RunServiceWatchClusterEventsProcedure:
 			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
+		case RunServiceAbortActionProcedure:
+			runServiceAbortActionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -472,4 +499,8 @@ func (UnimplementedRunServiceHandler) WatchActions(context.Context, *connect.Req
 
 func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.RunService.WatchClusterEvents is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.RunService.AbortAction is not implemented"))
 }

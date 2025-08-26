@@ -75,6 +75,11 @@ class RunServiceStub(object):
                 request_serializer=workflow_dot_run__service__pb2.WatchClusterEventsRequest.SerializeToString,
                 response_deserializer=workflow_dot_run__service__pb2.WatchClusterEventsResponse.FromString,
                 )
+        self.AbortAction = channel.unary_unary(
+                '/flyteidl.workflow.RunService/AbortAction',
+                request_serializer=workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
+                response_deserializer=workflow_dot_run__service__pb2.AbortActionResponse.FromString,
+                )
 
 
 class RunServiceServicer(object):
@@ -167,6 +172,13 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AbortAction(self, request, context):
+        """AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -229,6 +241,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.WatchClusterEvents,
                     request_deserializer=workflow_dot_run__service__pb2.WatchClusterEventsRequest.FromString,
                     response_serializer=workflow_dot_run__service__pb2.WatchClusterEventsResponse.SerializeToString,
+            ),
+            'AbortAction': grpc.unary_unary_rpc_method_handler(
+                    servicer.AbortAction,
+                    request_deserializer=workflow_dot_run__service__pb2.AbortActionRequest.FromString,
+                    response_serializer=workflow_dot_run__service__pb2.AbortActionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -442,5 +459,22 @@ class RunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchClusterEvents',
             workflow_dot_run__service__pb2.WatchClusterEventsRequest.SerializeToString,
             workflow_dot_run__service__pb2.WatchClusterEventsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AbortAction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/AbortAction',
+            workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
+            workflow_dot_run__service__pb2.AbortActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
