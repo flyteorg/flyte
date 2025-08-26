@@ -236,7 +236,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 						logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
 						newErr := MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
 						if newErr != nil {
-							return errors.New(fmt.Sprintf("authentication error! Original Error: %v, Auth Error: %v", err, newErr))
+							return fmt.Errorf("authentication error! Original Error: %w, Auth Error: %w", err, newErr)
 						}
 
 						tokenCache.CondBroadcast()
