@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.10"
 
 [[package]]
-name = "flyteidl"
+name = "flyteidl2"
 source = { editable = "." }
 dependencies = [
     { name = "googleapis-common-protos" },

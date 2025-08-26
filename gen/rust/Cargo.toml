@@ -1,5 +1,5 @@
 [package]
-name = "flyteidl"
+name = "flyteidl2"
 version = "0.1.0"
 edition = "2021"
 description = "Rust bindings and utilities for FlyteIDL protobufs."
@@ -30,7 +30,7 @@ prettyplease = "0.2"
 regex = "1.11.1"
 
 [lib]
-name = "flyteidl"
+name = "flyteidl2"
 path = "src/lib.rs"
 #crate-type = ["cdylib"]
 
