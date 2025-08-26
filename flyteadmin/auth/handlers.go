@@ -139,7 +139,12 @@ func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.Authenticatio
 // provider, it saves a cookie that contains the redirect url for after the authentication flow is done.
 func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		csrfCookie := NewCsrfCookie()
+		csrfCookie, err := NewCsrfCookie()
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create CSRF cookie. Error: %s", err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		csrfToken := csrfCookie.Value
 		http.SetCookie(writer, &csrfCookie)
 
