@@ -1730,7 +1730,7 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 
 func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
 	// Read the binary file containing serialized core.Binary message
-	binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/pydantic_v2_binary_literal.msgpack"
+	binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/pydantic_v2_scalar_binary.msgpack.pb"
 	protoBytes, err := os.ReadFile(binaryFilePath)
 	assert.NoError(t, err)
 
@@ -1743,7 +1743,7 @@ func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
 	attrPath := []*core.PromiseAttribute{
 		{
 			Value: &core.PromiseAttribute_StringValue{
-				StringValue: "dt1",
+				StringValue: "df",
 			},
 		},
 	}
@@ -1757,7 +1757,7 @@ func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
 	// Based on the binary file content, dt1 appears to be a datetime string "2020-01-01T12:00:00"
 	assert.IsType(t, &core.Literal_Scalar{}, result.Value)
 	scalar := result.Value.(*core.Literal_Scalar)
-	
+
 	// Check if it's a primitive (string) or binary value
 	if primitive, ok := scalar.Scalar.Value.(*core.Scalar_Primitive); ok {
 		// If it's a primitive string
