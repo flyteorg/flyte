@@ -1730,7 +1730,8 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 
 func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
 	// Read the binary file containing serialized core.Binary message
-	binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/pydantic_v2_scalar_binary.msgpack.pb"
+	binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/pydantic_v2_scalar_binary.msgpack.pb" // pydantic
+	//binaryFilePath := "/Users/ytong/go/src/github.com/flyteorg/flyte/plain_dataclass_scalar_binary.msgpack.pb" // plain dataclass
 	protoBytes, err := os.ReadFile(binaryFilePath)
 	assert.NoError(t, err)
 
@@ -1743,7 +1744,7 @@ func TestResolveAttrPathInBinaryIntegration(t *testing.T) {
 	attrPath := []*core.PromiseAttribute{
 		{
 			Value: &core.PromiseAttribute_StringValue{
-				StringValue: "df",
+				StringValue: "dt1",
 			},
 		},
 	}
