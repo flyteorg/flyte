@@ -16,7 +16,7 @@ class RunLogsServiceStub(object):
             channel: A grpc.Channel.
         """
         self.TailLogs = channel.unary_stream(
-                '/flyteidl.workflow.RunLogsService/TailLogs',
+                '/flyteidl2.workflow.RunLogsService/TailLogs',
                 request_serializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
                 )
@@ -42,7 +42,7 @@ def add_RunLogsServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.RunLogsService', rpc_method_handlers)
+            'flyteidl2.workflow.RunLogsService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -62,7 +62,7 @@ class RunLogsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunLogsService/TailLogs',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunLogsService/TailLogs',
             idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
             options, channel_credentials,

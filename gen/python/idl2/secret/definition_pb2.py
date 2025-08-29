@@ -16,34 +16,34 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1cidl2/secret/definition.proto\x12\x0f\x66lyteidl.secret\x1a\x1cidl2/common/identifier.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\x95\x01\n\nSecretSpec\x12#\n\x0cstring_value\x18\x01 \x01(\tH\x00R\x0bstringValue\x12#\n\x0c\x62inary_value\x18\x02 \x01(\x0cH\x00R\x0b\x62inaryValue\x12/\n\x04type\x18\x03 \x01(\x0e\x32\x1b.flyteidl.secret.SecretTypeR\x04typeB\x0c\n\x05value\x12\x03\xf8\x42\x01\"\x97\x01\n\x10SecretIdentifier\x12-\n\x04name\x18\x01 \x01(\tB\x19\xfa\x42\x16r\x14\x10\x01\x32\x10^[-a-zA-Z0-9_]+$R\x04name\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x04 \x01(\tR\x07project\"\xc4\x01\n\x0eSecretMetadata\x12=\n\x0c\x63reated_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0b\x63reatedTime\x12\x42\n\rsecret_status\x18\x02 \x01(\x0b\x32\x1d.flyteidl.secret.SecretStatusR\x0csecretStatus\x12/\n\x04type\x18\x03 \x01(\x0e\x32\x1b.flyteidl.secret.SecretTypeR\x04type\"\xa2\x01\n\x0cSecretStatus\x12\x45\n\x0eoverall_status\x18\x01 \x01(\x0e\x32\x1e.flyteidl.secret.OverallStatusR\roverallStatus\x12K\n\x0e\x63luster_status\x18\x02 \x03(\x0b\x32$.flyteidl.secret.ClusterSecretStatusR\rclusterStatus\"\xa3\x01\n\x13\x43lusterSecretStatus\x12<\n\x07\x63luster\x18\x01 \x01(\x0b\x32\".flyteidl.common.ClusterIdentifierR\x07\x63luster\x12N\n\x0fpresence_status\x18\x02 \x01(\x0e\x32%.flyteidl.secret.SecretPresenceStatusR\x0epresenceStatus\"\x85\x01\n\x06Secret\x12\x31\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.secret.SecretIdentifierR\x02id\x12H\n\x0fsecret_metadata\x18\x02 \x01(\x0b\x32\x1f.flyteidl.secret.SecretMetadataR\x0esecretMetadata*H\n\nSecretType\x12\x17\n\x13SECRET_TYPE_GENERIC\x10\x00\x12!\n\x1dSECRET_TYPE_IMAGE_PULL_SECRET\x10\x01*^\n\rOverallStatus\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x15\n\x11PARTIALLY_PRESENT\x10\x01\x12\x11\n\rFULLY_PRESENT\x10\x02\x12\x12\n\x0eUNKNOWN_STATUS\x10\x03*=\n\x14SecretPresenceStatus\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07MISSING\x10\x01\x12\x0b\n\x07PRESENT\x10\x02\x42\xb1\x01\n\x13\x63om.flyteidl.secretB\x0f\x44\x65\x66initionProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/secret\xa2\x02\x03\x46SX\xaa\x02\x0f\x46lyteidl.Secret\xca\x02\x0f\x46lyteidl\\Secret\xe2\x02\x1b\x46lyteidl\\Secret\\GPBMetadata\xea\x02\x10\x46lyteidl::Secretb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1cidl2/secret/definition.proto\x12\x10\x66lyteidl2.secret\x1a\x1cidl2/common/identifier.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\x96\x01\n\nSecretSpec\x12#\n\x0cstring_value\x18\x01 \x01(\tH\x00R\x0bstringValue\x12#\n\x0c\x62inary_value\x18\x02 \x01(\x0cH\x00R\x0b\x62inaryValue\x12\x30\n\x04type\x18\x03 \x01(\x0e\x32\x1c.flyteidl2.secret.SecretTypeR\x04typeB\x0c\n\x05value\x12\x03\xf8\x42\x01\"\x97\x01\n\x10SecretIdentifier\x12-\n\x04name\x18\x01 \x01(\tB\x19\xfa\x42\x16r\x14\x10\x01\x32\x10^[-a-zA-Z0-9_]+$R\x04name\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x04 \x01(\tR\x07project\"\xc6\x01\n\x0eSecretMetadata\x12=\n\x0c\x63reated_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0b\x63reatedTime\x12\x43\n\rsecret_status\x18\x02 \x01(\x0b\x32\x1e.flyteidl2.secret.SecretStatusR\x0csecretStatus\x12\x30\n\x04type\x18\x03 \x01(\x0e\x32\x1c.flyteidl2.secret.SecretTypeR\x04type\"\xa4\x01\n\x0cSecretStatus\x12\x46\n\x0eoverall_status\x18\x01 \x01(\x0e\x32\x1f.flyteidl2.secret.OverallStatusR\roverallStatus\x12L\n\x0e\x63luster_status\x18\x02 \x03(\x0b\x32%.flyteidl2.secret.ClusterSecretStatusR\rclusterStatus\"\xa5\x01\n\x13\x43lusterSecretStatus\x12=\n\x07\x63luster\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierR\x07\x63luster\x12O\n\x0fpresence_status\x18\x02 \x01(\x0e\x32&.flyteidl2.secret.SecretPresenceStatusR\x0epresenceStatus\"\x87\x01\n\x06Secret\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.secret.SecretIdentifierR\x02id\x12I\n\x0fsecret_metadata\x18\x02 \x01(\x0b\x32 .flyteidl2.secret.SecretMetadataR\x0esecretMetadata*H\n\nSecretType\x12\x17\n\x13SECRET_TYPE_GENERIC\x10\x00\x12!\n\x1dSECRET_TYPE_IMAGE_PULL_SECRET\x10\x01*^\n\rOverallStatus\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x15\n\x11PARTIALLY_PRESENT\x10\x01\x12\x11\n\rFULLY_PRESENT\x10\x02\x12\x12\n\x0eUNKNOWN_STATUS\x10\x03*=\n\x14SecretPresenceStatus\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07MISSING\x10\x01\x12\x0b\n\x07PRESENT\x10\x02\x42\xbb\x01\n\x14\x63om.flyteidl2.secretB\x0f\x44\x65\x66initionProtoH\x02P\x01Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl2.Secret\xca\x02\x10\x46lyteidl2\\Secret\xe2\x02\x1c\x46lyteidl2\\Secret\\GPBMetadata\xea\x02\x11\x46lyteidl2::Secretb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.secret.definition_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.secretB\017DefinitionProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/secret\242\002\003FSX\252\002\017Flyteidl.Secret\312\002\017Flyteidl\\Secret\342\002\033Flyteidl\\Secret\\GPBMetadata\352\002\020Flyteidl::Secret'
+  DESCRIPTOR._serialized_options = b'\n\024com.flyteidl2.secretB\017DefinitionProtoH\002P\001Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\242\002\003FSX\252\002\020Flyteidl2.Secret\312\002\020Flyteidl2\\Secret\342\002\034Flyteidl2\\Secret\\GPBMetadata\352\002\021Flyteidl2::Secret'
   _SECRETSPEC.oneofs_by_name['value']._options = None
   _SECRETSPEC.oneofs_by_name['value']._serialized_options = b'\370B\001'
   _SECRETIDENTIFIER.fields_by_name['name']._options = None
   _SECRETIDENTIFIER.fields_by_name['name']._serialized_options = b'\372B\026r\024\020\0012\020^[-a-zA-Z0-9_]+$'
-  _globals['_SECRETTYPE']._serialized_start=1109
-  _globals['_SECRETTYPE']._serialized_end=1181
-  _globals['_OVERALLSTATUS']._serialized_start=1183
-  _globals['_OVERALLSTATUS']._serialized_end=1277
-  _globals['_SECRETPRESENCESTATUS']._serialized_start=1279
-  _globals['_SECRETPRESENCESTATUS']._serialized_end=1340
-  _globals['_SECRETSPEC']._serialized_start=138
-  _globals['_SECRETSPEC']._serialized_end=287
-  _globals['_SECRETIDENTIFIER']._serialized_start=290
-  _globals['_SECRETIDENTIFIER']._serialized_end=441
-  _globals['_SECRETMETADATA']._serialized_start=444
-  _globals['_SECRETMETADATA']._serialized_end=640
-  _globals['_SECRETSTATUS']._serialized_start=643
-  _globals['_SECRETSTATUS']._serialized_end=805
-  _globals['_CLUSTERSECRETSTATUS']._serialized_start=808
-  _globals['_CLUSTERSECRETSTATUS']._serialized_end=971
-  _globals['_SECRET']._serialized_start=974
-  _globals['_SECRET']._serialized_end=1107
+  _globals['_SECRETTYPE']._serialized_start=1119
+  _globals['_SECRETTYPE']._serialized_end=1191
+  _globals['_OVERALLSTATUS']._serialized_start=1193
+  _globals['_OVERALLSTATUS']._serialized_end=1287
+  _globals['_SECRETPRESENCESTATUS']._serialized_start=1289
+  _globals['_SECRETPRESENCESTATUS']._serialized_end=1350
+  _globals['_SECRETSPEC']._serialized_start=139
+  _globals['_SECRETSPEC']._serialized_end=289
+  _globals['_SECRETIDENTIFIER']._serialized_start=292
+  _globals['_SECRETIDENTIFIER']._serialized_end=443
+  _globals['_SECRETMETADATA']._serialized_start=446
+  _globals['_SECRETMETADATA']._serialized_end=644
+  _globals['_SECRETSTATUS']._serialized_start=647
+  _globals['_SECRETSTATUS']._serialized_end=811
+  _globals['_CLUSTERSECRETSTATUS']._serialized_start=814
+  _globals['_CLUSTERSECRETSTATUS']._serialized_end=979
+  _globals['_SECRET']._serialized_start=982
+  _globals['_SECRET']._serialized_end=1117
 # @@protoc_insertion_point(module_scope)

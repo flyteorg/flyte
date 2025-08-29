@@ -14,16 +14,16 @@ _sym_db = _symbol_database.Default()
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fidl2/workflow/environment.proto\x12\x11\x66lyteidl.workflow\x1a\x17validate/validate.proto\",\n\x0b\x45nvironment\x12\x1d\n\x04name\x18\x01 \x01(\tB\t\xfa\x42\x06r\x04\x10\x01\x18?R\x04nameB\xbe\x01\n\x15\x63om.flyteidl.workflowB\x10\x45nvironmentProtoH\x02P\x01Z,github.com/flyteorg/flyte/v2/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fidl2/workflow/environment.proto\x12\x12\x66lyteidl2.workflow\x1a\x17validate/validate.proto\",\n\x0b\x45nvironment\x12\x1d\n\x04name\x18\x01 \x01(\tB\t\xfa\x42\x06r\x04\x10\x01\x18?R\x04nameB\xc8\x01\n\x16\x63om.flyteidl2.workflowB\x10\x45nvironmentProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.workflow.environment_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\020EnvironmentProtoH\002P\001Z,github.com/flyteorg/flyte/v2/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
+  DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\020EnvironmentProtoH\002P\001Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
   _ENVIRONMENT.fields_by_name['name']._options = None
   _ENVIRONMENT.fields_by_name['name']._serialized_options = b'\372B\006r\004\020\001\030?'
-  _globals['_ENVIRONMENT']._serialized_start=79
-  _globals['_ENVIRONMENT']._serialized_end=123
+  _globals['_ENVIRONMENT']._serialized_start=80
+  _globals['_ENVIRONMENT']._serialized_end=124
 # @@protoc_insertion_point(module_scope)

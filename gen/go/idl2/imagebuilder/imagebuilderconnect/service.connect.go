@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	imagebuilder "github.com/flyteorg/flyte/v2/gen/go/imagebuilder"
+	imagebuilder "github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder"
 	http "net/http"
 	strings "strings"
 )
@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// ImageServiceName is the fully-qualified name of the ImageService service.
-	ImageServiceName = "flyteidl.imagebuilder.ImageService"
+	ImageServiceName = "flyteidl2.imagebuilder.ImageService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,7 +34,7 @@ const (
 // period.
 const (
 	// ImageServiceGetImageProcedure is the fully-qualified name of the ImageService's GetImage RPC.
-	ImageServiceGetImageProcedure = "/flyteidl.imagebuilder.ImageService/GetImage"
+	ImageServiceGetImageProcedure = "/flyteidl2.imagebuilder.ImageService/GetImage"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -43,12 +43,12 @@ var (
 	imageServiceGetImageMethodDescriptor = imageServiceServiceDescriptor.Methods().ByName("GetImage")
 )
 
-// ImageServiceClient is a client for the flyteidl.imagebuilder.ImageService service.
+// ImageServiceClient is a client for the flyteidl2.imagebuilder.ImageService service.
 type ImageServiceClient interface {
 	GetImage(context.Context, *connect.Request[imagebuilder.GetImageRequest]) (*connect.Response[imagebuilder.GetImageResponse], error)
 }
 
-// NewImageServiceClient constructs a client for the flyteidl.imagebuilder.ImageService service. By
+// NewImageServiceClient constructs a client for the flyteidl2.imagebuilder.ImageService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -73,12 +73,12 @@ type imageServiceClient struct {
 	getImage *connect.Client[imagebuilder.GetImageRequest, imagebuilder.GetImageResponse]
 }
 
-// GetImage calls flyteidl.imagebuilder.ImageService.GetImage.
+// GetImage calls flyteidl2.imagebuilder.ImageService.GetImage.
 func (c *imageServiceClient) GetImage(ctx context.Context, req *connect.Request[imagebuilder.GetImageRequest]) (*connect.Response[imagebuilder.GetImageResponse], error) {
 	return c.getImage.CallUnary(ctx, req)
 }
 
-// ImageServiceHandler is an implementation of the flyteidl.imagebuilder.ImageService service.
+// ImageServiceHandler is an implementation of the flyteidl2.imagebuilder.ImageService service.
 type ImageServiceHandler interface {
 	GetImage(context.Context, *connect.Request[imagebuilder.GetImageRequest]) (*connect.Response[imagebuilder.GetImageResponse], error)
 }
@@ -96,7 +96,7 @@ func NewImageServiceHandler(svc ImageServiceHandler, opts ...connect.HandlerOpti
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl.imagebuilder.ImageService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.imagebuilder.ImageService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ImageServiceGetImageProcedure:
 			imageServiceGetImageHandler.ServeHTTP(w, r)
@@ -110,5 +110,5 @@ func NewImageServiceHandler(svc ImageServiceHandler, opts ...connect.HandlerOpti
 type UnimplementedImageServiceHandler struct{}
 
 func (UnimplementedImageServiceHandler) GetImage(context.Context, *connect.Request[imagebuilder.GetImageRequest]) (*connect.Response[imagebuilder.GetImageResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.imagebuilder.ImageService.GetImage is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.imagebuilder.ImageService.GetImage is not implemented"))
 }

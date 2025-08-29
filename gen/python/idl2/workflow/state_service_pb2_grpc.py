@@ -16,17 +16,17 @@ class StateServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Put = channel.stream_stream(
-                '/flyteidl.workflow.StateService/Put',
+                '/flyteidl2.workflow.StateService/Put',
                 request_serializer=idl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
                 )
         self.Get = channel.stream_stream(
-                '/flyteidl.workflow.StateService/Get',
+                '/flyteidl2.workflow.StateService/Get',
                 request_serializer=idl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
                 )
         self.Watch = channel.unary_stream(
-                '/flyteidl.workflow.StateService/Watch',
+                '/flyteidl2.workflow.StateService/Watch',
                 request_serializer=idl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
                 )
@@ -77,7 +77,7 @@ def add_StateServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.StateService', rpc_method_handlers)
+            'flyteidl2.workflow.StateService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -97,7 +97,7 @@ class StateService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl.workflow.StateService/Put',
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Put',
             idl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
             idl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
             options, channel_credentials,
@@ -114,7 +114,7 @@ class StateService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl.workflow.StateService/Get',
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Get',
             idl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
             idl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
             options, channel_credentials,
@@ -131,7 +131,7 @@ class StateService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.StateService/Watch',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.StateService/Watch',
             idl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
             idl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
             options, channel_credentials,

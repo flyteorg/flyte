@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// RunLogsServiceName is the fully-qualified name of the RunLogsService service.
-	RunLogsServiceName = "flyteidl.workflow.RunLogsService"
+	RunLogsServiceName = "flyteidl2.workflow.RunLogsService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,7 +34,7 @@ const (
 // period.
 const (
 	// RunLogsServiceTailLogsProcedure is the fully-qualified name of the RunLogsService's TailLogs RPC.
-	RunLogsServiceTailLogsProcedure = "/flyteidl.workflow.RunLogsService/TailLogs"
+	RunLogsServiceTailLogsProcedure = "/flyteidl2.workflow.RunLogsService/TailLogs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -43,12 +43,12 @@ var (
 	runLogsServiceTailLogsMethodDescriptor = runLogsServiceServiceDescriptor.Methods().ByName("TailLogs")
 )
 
-// RunLogsServiceClient is a client for the flyteidl.workflow.RunLogsService service.
+// RunLogsServiceClient is a client for the flyteidl2.workflow.RunLogsService service.
 type RunLogsServiceClient interface {
 	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error)
 }
 
-// NewRunLogsServiceClient constructs a client for the flyteidl.workflow.RunLogsService service. By
+// NewRunLogsServiceClient constructs a client for the flyteidl2.workflow.RunLogsService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -73,12 +73,12 @@ type runLogsServiceClient struct {
 	tailLogs *connect.Client[workflow.TailLogsRequest, workflow.TailLogsResponse]
 }
 
-// TailLogs calls flyteidl.workflow.RunLogsService.TailLogs.
+// TailLogs calls flyteidl2.workflow.RunLogsService.TailLogs.
 func (c *runLogsServiceClient) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error) {
 	return c.tailLogs.CallServerStream(ctx, req)
 }
 
-// RunLogsServiceHandler is an implementation of the flyteidl.workflow.RunLogsService service.
+// RunLogsServiceHandler is an implementation of the flyteidl2.workflow.RunLogsService service.
 type RunLogsServiceHandler interface {
 	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error
 }
@@ -96,7 +96,7 @@ func NewRunLogsServiceHandler(svc RunLogsServiceHandler, opts ...connect.Handler
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl.workflow.RunLogsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.workflow.RunLogsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunLogsServiceTailLogsProcedure:
 			runLogsServiceTailLogsHandler.ServeHTTP(w, r)
@@ -110,5 +110,5 @@ func NewRunLogsServiceHandler(svc RunLogsServiceHandler, opts ...connect.Handler
 type UnimplementedRunLogsServiceHandler struct{}
 
 func (UnimplementedRunLogsServiceHandler) TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.RunLogsService.TailLogs is not implemented"))
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunLogsService.TailLogs is not implemented"))
 }

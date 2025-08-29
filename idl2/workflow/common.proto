@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/core/interface.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 message NamedParameter {
   string name = 1;
 
-  flyteidl.core.Parameter parameter = 2;
+  flyteidl2.core.Parameter parameter = 2;
 }

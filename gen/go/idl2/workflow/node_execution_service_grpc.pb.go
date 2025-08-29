@@ -56,7 +56,7 @@ func RegisterNodeExecutionServiceServer(s grpc.ServiceRegistrar, srv NodeExecuti
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var NodeExecutionService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.NodeExecutionService",
+	ServiceName: "flyteidl2.workflow.NodeExecutionService",
 	HandlerType: (*NodeExecutionServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams:     []grpc.StreamDesc{},

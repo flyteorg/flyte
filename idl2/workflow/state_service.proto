@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/core/execution.proto";
@@ -8,7 +8,7 @@ import "google/rpc/status.proto";
 import "validate/validate.proto";
 import "idl2/workflow/run_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // provides an interface for managing the state of actions.
 service StateService {
@@ -100,7 +100,7 @@ message ActionUpdate {
   Phase phase = 2;
 
   // the error associated with the action (if exists).
-  optional flyteidl.core.ExecutionError error = 3;
+  optional flyteidl2.core.ExecutionError error = 3;
 
   // the output uri for the action
   string output_uri = 4;

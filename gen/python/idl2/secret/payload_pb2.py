@@ -15,14 +15,14 @@ from idl2.secret import definition_pb2 as idl2_dot_secret_dot_definition__pb2
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19idl2/secret/payload.proto\x12\x0f\x66lyteidl.secret\x1a\x1cidl2/secret/definition.proto\x1a\x17validate/validate.proto\"\x90\x01\n\x13\x43reateSecretRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12<\n\x0bsecret_spec\x18\x02 \x01(\x0b\x32\x1b.flyteidl.secret.SecretSpecR\nsecretSpec\"\x16\n\x14\x43reateSecretResponse\"\x90\x01\n\x13UpdateSecretRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12<\n\x0bsecret_spec\x18\x02 \x01(\x0b\x32\x1b.flyteidl.secret.SecretSpecR\nsecretSpec\"\x16\n\x14UpdateSecretResponse\"O\n\x10GetSecretRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\"D\n\x11GetSecretResponse\x12/\n\x06secret\x18\x01 \x01(\x0b\x32\x17.flyteidl.secret.SecretR\x06secret\"R\n\x13\x44\x65leteSecretRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32!.flyteidl.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\"\x16\n\x14\x44\x65leteSecretResponse\"\xc4\x02\n\x12ListSecretsRequest\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x03 \x01(\tR\x07project\x12\x14\n\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x14\n\x05token\x18\x05 \x01(\tR\x05token\x12g\n\x12per_cluster_tokens\x18\x06 \x03(\x0b\x32\x39.flyteidl.secret.ListSecretsRequest.PerClusterTokensEntryR\x10perClusterTokens\x1a\x43\n\x15PerClusterTokensEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x8d\x02\n\x13ListSecretsResponse\x12\x31\n\x07secrets\x18\x01 \x03(\x0b\x32\x17.flyteidl.secret.SecretR\x07secrets\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12h\n\x12per_cluster_tokens\x18\x03 \x03(\x0b\x32:.flyteidl.secret.ListSecretsResponse.PerClusterTokensEntryR\x10perClusterTokens\x1a\x43\n\x15PerClusterTokensEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\xae\x01\n\x13\x63om.flyteidl.secretB\x0cPayloadProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/secret\xa2\x02\x03\x46SX\xaa\x02\x0f\x46lyteidl.Secret\xca\x02\x0f\x46lyteidl\\Secret\xe2\x02\x1b\x46lyteidl\\Secret\\GPBMetadata\xea\x02\x10\x46lyteidl::Secretb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19idl2/secret/payload.proto\x12\x10\x66lyteidl2.secret\x1a\x1cidl2/secret/definition.proto\x1a\x17validate/validate.proto\"\x92\x01\n\x13\x43reateSecretRequest\x12<\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12=\n\x0bsecret_spec\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.secret.SecretSpecR\nsecretSpec\"\x16\n\x14\x43reateSecretResponse\"\x92\x01\n\x13UpdateSecretRequest\x12<\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\x12=\n\x0bsecret_spec\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.secret.SecretSpecR\nsecretSpec\"\x16\n\x14UpdateSecretResponse\"P\n\x10GetSecretRequest\x12<\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\"E\n\x11GetSecretResponse\x12\x30\n\x06secret\x18\x01 \x01(\x0b\x32\x18.flyteidl2.secret.SecretR\x06secret\"S\n\x13\x44\x65leteSecretRequest\x12<\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.secret.SecretIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x02id\"\x16\n\x14\x44\x65leteSecretResponse\"\xc5\x02\n\x12ListSecretsRequest\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x03 \x01(\tR\x07project\x12\x14\n\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x14\n\x05token\x18\x05 \x01(\tR\x05token\x12h\n\x12per_cluster_tokens\x18\x06 \x03(\x0b\x32:.flyteidl2.secret.ListSecretsRequest.PerClusterTokensEntryR\x10perClusterTokens\x1a\x43\n\x15PerClusterTokensEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x8f\x02\n\x13ListSecretsResponse\x12\x32\n\x07secrets\x18\x01 \x03(\x0b\x32\x18.flyteidl2.secret.SecretR\x07secrets\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12i\n\x12per_cluster_tokens\x18\x03 \x03(\x0b\x32;.flyteidl2.secret.ListSecretsResponse.PerClusterTokensEntryR\x10perClusterTokens\x1a\x43\n\x15PerClusterTokensEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\xb8\x01\n\x14\x63om.flyteidl2.secretB\x0cPayloadProtoH\x02P\x01Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl2.Secret\xca\x02\x10\x46lyteidl2\\Secret\xe2\x02\x1c\x46lyteidl2\\Secret\\GPBMetadata\xea\x02\x11\x46lyteidl2::Secretb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.secret.payload_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.secretB\014PayloadProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/secret\242\002\003FSX\252\002\017Flyteidl.Secret\312\002\017Flyteidl\\Secret\342\002\033Flyteidl\\Secret\\GPBMetadata\352\002\020Flyteidl::Secret'
+  DESCRIPTOR._serialized_options = b'\n\024com.flyteidl2.secretB\014PayloadProtoH\002P\001Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\242\002\003FSX\252\002\020Flyteidl2.Secret\312\002\020Flyteidl2\\Secret\342\002\034Flyteidl2\\Secret\\GPBMetadata\352\002\021Flyteidl2::Secret'
   _CREATESECRETREQUEST.fields_by_name['id']._options = None
   _CREATESECRETREQUEST.fields_by_name['id']._serialized_options = b'\372B\005\212\001\002\020\001'
   _UPDATESECRETREQUEST.fields_by_name['id']._options = None
@@ -35,28 +35,28 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _LISTSECRETSREQUEST_PERCLUSTERTOKENSENTRY._serialized_options = b'8\001'
   _LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY._options = None
   _LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY._serialized_options = b'8\001'
-  _globals['_CREATESECRETREQUEST']._serialized_start=102
-  _globals['_CREATESECRETREQUEST']._serialized_end=246
-  _globals['_CREATESECRETRESPONSE']._serialized_start=248
-  _globals['_CREATESECRETRESPONSE']._serialized_end=270
-  _globals['_UPDATESECRETREQUEST']._serialized_start=273
-  _globals['_UPDATESECRETREQUEST']._serialized_end=417
-  _globals['_UPDATESECRETRESPONSE']._serialized_start=419
-  _globals['_UPDATESECRETRESPONSE']._serialized_end=441
-  _globals['_GETSECRETREQUEST']._serialized_start=443
-  _globals['_GETSECRETREQUEST']._serialized_end=522
-  _globals['_GETSECRETRESPONSE']._serialized_start=524
-  _globals['_GETSECRETRESPONSE']._serialized_end=592
-  _globals['_DELETESECRETREQUEST']._serialized_start=594
-  _globals['_DELETESECRETREQUEST']._serialized_end=676
-  _globals['_DELETESECRETRESPONSE']._serialized_start=678
-  _globals['_DELETESECRETRESPONSE']._serialized_end=700
-  _globals['_LISTSECRETSREQUEST']._serialized_start=703
-  _globals['_LISTSECRETSREQUEST']._serialized_end=1027
-  _globals['_LISTSECRETSREQUEST_PERCLUSTERTOKENSENTRY']._serialized_start=960
-  _globals['_LISTSECRETSREQUEST_PERCLUSTERTOKENSENTRY']._serialized_end=1027
-  _globals['_LISTSECRETSRESPONSE']._serialized_start=1030
-  _globals['_LISTSECRETSRESPONSE']._serialized_end=1299
-  _globals['_LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY']._serialized_start=960
-  _globals['_LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY']._serialized_end=1027
+  _globals['_CREATESECRETREQUEST']._serialized_start=103
+  _globals['_CREATESECRETREQUEST']._serialized_end=249
+  _globals['_CREATESECRETRESPONSE']._serialized_start=251
+  _globals['_CREATESECRETRESPONSE']._serialized_end=273
+  _globals['_UPDATESECRETREQUEST']._serialized_start=276
+  _globals['_UPDATESECRETREQUEST']._serialized_end=422
+  _globals['_UPDATESECRETRESPONSE']._serialized_start=424
+  _globals['_UPDATESECRETRESPONSE']._serialized_end=446
+  _globals['_GETSECRETREQUEST']._serialized_start=448
+  _globals['_GETSECRETREQUEST']._serialized_end=528
+  _globals['_GETSECRETRESPONSE']._serialized_start=530
+  _globals['_GETSECRETRESPONSE']._serialized_end=599
+  _globals['_DELETESECRETREQUEST']._serialized_start=601
+  _globals['_DELETESECRETREQUEST']._serialized_end=684
+  _globals['_DELETESECRETRESPONSE']._serialized_start=686
+  _globals['_DELETESECRETRESPONSE']._serialized_end=708
+  _globals['_LISTSECRETSREQUEST']._serialized_start=711
+  _globals['_LISTSECRETSREQUEST']._serialized_end=1036
+  _globals['_LISTSECRETSREQUEST_PERCLUSTERTOKENSENTRY']._serialized_start=969
+  _globals['_LISTSECRETSREQUEST_PERCLUSTERTOKENSENTRY']._serialized_end=1036
+  _globals['_LISTSECRETSRESPONSE']._serialized_start=1039
+  _globals['_LISTSECRETSRESPONSE']._serialized_end=1310
+  _globals['_LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY']._serialized_start=969
+  _globals['_LISTSECRETSRESPONSE_PERCLUSTERTOKENSENTRY']._serialized_end=1036
 # @@protoc_insertion_point(module_scope)

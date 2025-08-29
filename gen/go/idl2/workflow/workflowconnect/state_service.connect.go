@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// StateServiceName is the fully-qualified name of the StateService service.
-	StateServiceName = "flyteidl.workflow.StateService"
+	StateServiceName = "flyteidl2.workflow.StateService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,11 +34,11 @@ const (
 // period.
 const (
 	// StateServicePutProcedure is the fully-qualified name of the StateService's Put RPC.
-	StateServicePutProcedure = "/flyteidl.workflow.StateService/Put"
+	StateServicePutProcedure = "/flyteidl2.workflow.StateService/Put"
 	// StateServiceGetProcedure is the fully-qualified name of the StateService's Get RPC.
-	StateServiceGetProcedure = "/flyteidl.workflow.StateService/Get"
+	StateServiceGetProcedure = "/flyteidl2.workflow.StateService/Get"
 	// StateServiceWatchProcedure is the fully-qualified name of the StateService's Watch RPC.
-	StateServiceWatchProcedure = "/flyteidl.workflow.StateService/Watch"
+	StateServiceWatchProcedure = "/flyteidl2.workflow.StateService/Watch"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -49,7 +49,7 @@ var (
 	stateServiceWatchMethodDescriptor = stateServiceServiceDescriptor.Methods().ByName("Watch")
 )
 
-// StateServiceClient is a client for the flyteidl.workflow.StateService service.
+// StateServiceClient is a client for the flyteidl2.workflow.StateService service.
 type StateServiceClient interface {
 	// put the state of an action.
 	Put(context.Context) *connect.BidiStreamForClient[workflow.PutRequest, workflow.PutResponse]
@@ -59,7 +59,7 @@ type StateServiceClient interface {
 	Watch(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)
 }
 
-// NewStateServiceClient constructs a client for the flyteidl.workflow.StateService service. By
+// NewStateServiceClient constructs a client for the flyteidl2.workflow.StateService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -97,22 +97,22 @@ type stateServiceClient struct {
 	watch *connect.Client[workflow.WatchRequest, workflow.WatchResponse]
 }
 
-// Put calls flyteidl.workflow.StateService.Put.
+// Put calls flyteidl2.workflow.StateService.Put.
 func (c *stateServiceClient) Put(ctx context.Context) *connect.BidiStreamForClient[workflow.PutRequest, workflow.PutResponse] {
 	return c.put.CallBidiStream(ctx)
 }
 
-// Get calls flyteidl.workflow.StateService.Get.
+// Get calls flyteidl2.workflow.StateService.Get.
 func (c *stateServiceClient) Get(ctx context.Context) *connect.BidiStreamForClient[workflow.GetRequest, workflow.GetResponse] {
 	return c.get.CallBidiStream(ctx)
 }
 
-// Watch calls flyteidl.workflow.StateService.Watch.
+// Watch calls flyteidl2.workflow.StateService.Watch.
 func (c *stateServiceClient) Watch(ctx context.Context, req *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error) {
 	return c.watch.CallServerStream(ctx, req)
 }
 
-// StateServiceHandler is an implementation of the flyteidl.workflow.StateService service.
+// StateServiceHandler is an implementation of the flyteidl2.workflow.StateService service.
 type StateServiceHandler interface {
 	// put the state of an action.
 	Put(context.Context, *connect.BidiStream[workflow.PutRequest, workflow.PutResponse]) error
@@ -146,7 +146,7 @@ func NewStateServiceHandler(svc StateServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(stateServiceWatchMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl.workflow.StateService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.workflow.StateService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case StateServicePutProcedure:
 			stateServicePutHandler.ServeHTTP(w, r)
@@ -164,13 +164,13 @@ func NewStateServiceHandler(svc StateServiceHandler, opts ...connect.HandlerOpti
 type UnimplementedStateServiceHandler struct{}
 
 func (UnimplementedStateServiceHandler) Put(context.Context, *connect.BidiStream[workflow.PutRequest, workflow.PutResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.StateService.Put is not implemented"))
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Put is not implemented"))
 }
 
 func (UnimplementedStateServiceHandler) Get(context.Context, *connect.BidiStream[workflow.GetRequest, workflow.GetResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.StateService.Get is not implemented"))
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Get is not implemented"))
 }
 
 func (UnimplementedStateServiceHandler) Watch(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.StateService.Watch is not implemented"))
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Watch is not implemented"))
 }

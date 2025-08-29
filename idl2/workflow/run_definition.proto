@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/common/identity.proto";
@@ -12,7 +12,7 @@ import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "idl2/workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // Label values to be applied to an execution resource.
 // In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
@@ -35,7 +35,7 @@ message Annotations {
 // to specify how to merge environment variables defined at registration and execution time.
 message Envs {
   // Map of custom environment variables to be applied to the execution resource.
-  repeated flyteidl.core.KeyValuePair values = 1;
+  repeated flyteidl2.core.KeyValuePair values = 1;
 }
 
 message RunSpec {
@@ -155,7 +155,7 @@ message ActionStatus {
   uint32 attempts = 4 [(validate.rules).uint32.gt = 0];
 
   // cache status of the action's latest attempt
-  flyteidl.core.CatalogCacheStatus cache_status = 5;
+  flyteidl2.core.CatalogCacheStatus cache_status = 5;
 }
 
 // Lightweight representation of an action.
@@ -250,7 +250,7 @@ message ActionAttempt {
   uint32 attempt = 5 [(validate.rules).uint32.gt = 0];
 
   // Log references.
-  repeated flyteidl.core.TaskLog log_info = 6;
+  repeated flyteidl2.core.TaskLog log_info = 6;
 
   // Output references.
   OutputReferences outputs = 7;
@@ -260,7 +260,7 @@ message ActionAttempt {
   bool logs_available = 8;
 
   // cache status of the action attempt
-  flyteidl.core.CatalogCacheStatus cache_status = 9;
+  flyteidl2.core.CatalogCacheStatus cache_status = 9;
 
   // Cluster events like k8s events in a human-readable form.
   repeated ClusterEvent cluster_events = 10;
@@ -272,7 +272,7 @@ message ActionAttempt {
   string cluster = 12;
 
   // Contains corresponding k8s pods and containers information for this action attempt.
-  flyteidl.core.LogContext log_context = 13;
+  flyteidl2.core.LogContext log_context = 13;
 }
 
 message ClusterEvent {
@@ -323,10 +323,10 @@ message ActionEvent {
   optional ErrorInfo error_info = 8;
 
   // Log references.
-  repeated flyteidl.core.TaskLog log_info = 9;
+  repeated flyteidl2.core.TaskLog log_info = 9;
 
   // Metadata to associate containers with logs.
-  flyteidl.core.LogContext log_context = 10;
+  flyteidl2.core.LogContext log_context = 10;
 
   // The cluster this attempt is running on.
   string cluster = 11;
@@ -335,7 +335,7 @@ message ActionEvent {
   OutputReferences outputs = 12;
 
   // cache status of the action attempt
-  flyteidl.core.CatalogCacheStatus cache_status = 13;
+  flyteidl2.core.CatalogCacheStatus cache_status = 13;
 
   // Cluster events like k8s events in a human-readable form.
   repeated ClusterEvent cluster_events = 14;
@@ -350,7 +350,7 @@ message NamedLiteral {
   string name = 1;
 
   // Literal value.
-  flyteidl.core.Literal value = 2;
+  flyteidl2.core.Literal value = 2;
 }
 
 // Output references.
@@ -373,7 +373,7 @@ message Inputs {
   //  - User-provided metadata that is not part of the action's inputs.
   //  - Information about the environment the action is running in (e.g. cluster, region, etc.)
   //  - Tracing information about the action
-  repeated flyteidl.core.KeyValuePair context = 2;
+  repeated flyteidl2.core.KeyValuePair context = 2;
 }
 
 // Output payload for an action.

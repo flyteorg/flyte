@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/logs/dataplane/payload.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // RunLogsService provides an interface for streaming logs.
 service RunLogsService {
@@ -29,7 +29,7 @@ message TailLogsResponse {
   // A batch of logs.
   message Logs {
     // Structured log lines.
-    repeated flyteidl.logs.dataplane.LogLine lines = 1;
+    repeated flyteidl2.logs.dataplane.LogLine lines = 1;
   }
 
   // One or more batches of logs.

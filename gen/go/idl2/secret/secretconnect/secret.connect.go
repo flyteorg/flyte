@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	secret "github.com/flyteorg/flyte/v2/gen/go/secret"
+	secret "github.com/flyteorg/flyte/v2/gen/go/idl2/secret"
 	http "net/http"
 	strings "strings"
 )
@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// SecretServiceName is the fully-qualified name of the SecretService service.
-	SecretServiceName = "flyteidl.secret.SecretService"
+	SecretServiceName = "flyteidl2.secret.SecretService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -35,18 +35,18 @@ const (
 const (
 	// SecretServiceCreateSecretProcedure is the fully-qualified name of the SecretService's
 	// CreateSecret RPC.
-	SecretServiceCreateSecretProcedure = "/flyteidl.secret.SecretService/CreateSecret"
+	SecretServiceCreateSecretProcedure = "/flyteidl2.secret.SecretService/CreateSecret"
 	// SecretServiceUpdateSecretProcedure is the fully-qualified name of the SecretService's
 	// UpdateSecret RPC.
-	SecretServiceUpdateSecretProcedure = "/flyteidl.secret.SecretService/UpdateSecret"
+	SecretServiceUpdateSecretProcedure = "/flyteidl2.secret.SecretService/UpdateSecret"
 	// SecretServiceGetSecretProcedure is the fully-qualified name of the SecretService's GetSecret RPC.
-	SecretServiceGetSecretProcedure = "/flyteidl.secret.SecretService/GetSecret"
+	SecretServiceGetSecretProcedure = "/flyteidl2.secret.SecretService/GetSecret"
 	// SecretServiceDeleteSecretProcedure is the fully-qualified name of the SecretService's
 	// DeleteSecret RPC.
-	SecretServiceDeleteSecretProcedure = "/flyteidl.secret.SecretService/DeleteSecret"
+	SecretServiceDeleteSecretProcedure = "/flyteidl2.secret.SecretService/DeleteSecret"
 	// SecretServiceListSecretsProcedure is the fully-qualified name of the SecretService's ListSecrets
 	// RPC.
-	SecretServiceListSecretsProcedure = "/flyteidl.secret.SecretService/ListSecrets"
+	SecretServiceListSecretsProcedure = "/flyteidl2.secret.SecretService/ListSecrets"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -59,7 +59,7 @@ var (
 	secretServiceListSecretsMethodDescriptor  = secretServiceServiceDescriptor.Methods().ByName("ListSecrets")
 )
 
-// SecretServiceClient is a client for the flyteidl.secret.SecretService service.
+// SecretServiceClient is a client for the flyteidl2.secret.SecretService service.
 type SecretServiceClient interface {
 	CreateSecret(context.Context, *connect.Request[secret.CreateSecretRequest]) (*connect.Response[secret.CreateSecretResponse], error)
 	UpdateSecret(context.Context, *connect.Request[secret.UpdateSecretRequest]) (*connect.Response[secret.UpdateSecretResponse], error)
@@ -68,7 +68,7 @@ type SecretServiceClient interface {
 	ListSecrets(context.Context, *connect.Request[secret.ListSecretsRequest]) (*connect.Response[secret.ListSecretsResponse], error)
 }
 
-// NewSecretServiceClient constructs a client for the flyteidl.secret.SecretService service. By
+// NewSecretServiceClient constructs a client for the flyteidl2.secret.SecretService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -120,32 +120,32 @@ type secretServiceClient struct {
 	listSecrets  *connect.Client[secret.ListSecretsRequest, secret.ListSecretsResponse]
 }
 
-// CreateSecret calls flyteidl.secret.SecretService.CreateSecret.
+// CreateSecret calls flyteidl2.secret.SecretService.CreateSecret.
 func (c *secretServiceClient) CreateSecret(ctx context.Context, req *connect.Request[secret.CreateSecretRequest]) (*connect.Response[secret.CreateSecretResponse], error) {
 	return c.createSecret.CallUnary(ctx, req)
 }
 
-// UpdateSecret calls flyteidl.secret.SecretService.UpdateSecret.
+// UpdateSecret calls flyteidl2.secret.SecretService.UpdateSecret.
 func (c *secretServiceClient) UpdateSecret(ctx context.Context, req *connect.Request[secret.UpdateSecretRequest]) (*connect.Response[secret.UpdateSecretResponse], error) {
 	return c.updateSecret.CallUnary(ctx, req)
 }
 
-// GetSecret calls flyteidl.secret.SecretService.GetSecret.
+// GetSecret calls flyteidl2.secret.SecretService.GetSecret.
 func (c *secretServiceClient) GetSecret(ctx context.Context, req *connect.Request[secret.GetSecretRequest]) (*connect.Response[secret.GetSecretResponse], error) {
 	return c.getSecret.CallUnary(ctx, req)
 }
 
-// DeleteSecret calls flyteidl.secret.SecretService.DeleteSecret.
+// DeleteSecret calls flyteidl2.secret.SecretService.DeleteSecret.
 func (c *secretServiceClient) DeleteSecret(ctx context.Context, req *connect.Request[secret.DeleteSecretRequest]) (*connect.Response[secret.DeleteSecretResponse], error) {
 	return c.deleteSecret.CallUnary(ctx, req)
 }
 
-// ListSecrets calls flyteidl.secret.SecretService.ListSecrets.
+// ListSecrets calls flyteidl2.secret.SecretService.ListSecrets.
 func (c *secretServiceClient) ListSecrets(ctx context.Context, req *connect.Request[secret.ListSecretsRequest]) (*connect.Response[secret.ListSecretsResponse], error) {
 	return c.listSecrets.CallUnary(ctx, req)
 }
 
-// SecretServiceHandler is an implementation of the flyteidl.secret.SecretService service.
+// SecretServiceHandler is an implementation of the flyteidl2.secret.SecretService service.
 type SecretServiceHandler interface {
 	CreateSecret(context.Context, *connect.Request[secret.CreateSecretRequest]) (*connect.Response[secret.CreateSecretResponse], error)
 	UpdateSecret(context.Context, *connect.Request[secret.UpdateSecretRequest]) (*connect.Response[secret.UpdateSecretResponse], error)
@@ -190,7 +190,7 @@ func NewSecretServiceHandler(svc SecretServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(secretServiceListSecretsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl.secret.SecretService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.secret.SecretService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SecretServiceCreateSecretProcedure:
 			secretServiceCreateSecretHandler.ServeHTTP(w, r)
@@ -212,21 +212,21 @@ func NewSecretServiceHandler(svc SecretServiceHandler, opts ...connect.HandlerOp
 type UnimplementedSecretServiceHandler struct{}
 
 func (UnimplementedSecretServiceHandler) CreateSecret(context.Context, *connect.Request[secret.CreateSecretRequest]) (*connect.Response[secret.CreateSecretResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.secret.SecretService.CreateSecret is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.secret.SecretService.CreateSecret is not implemented"))
 }
 
 func (UnimplementedSecretServiceHandler) UpdateSecret(context.Context, *connect.Request[secret.UpdateSecretRequest]) (*connect.Response[secret.UpdateSecretResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.secret.SecretService.UpdateSecret is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.secret.SecretService.UpdateSecret is not implemented"))
 }
 
 func (UnimplementedSecretServiceHandler) GetSecret(context.Context, *connect.Request[secret.GetSecretRequest]) (*connect.Response[secret.GetSecretResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.secret.SecretService.GetSecret is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.secret.SecretService.GetSecret is not implemented"))
 }
 
 func (UnimplementedSecretServiceHandler) DeleteSecret(context.Context, *connect.Request[secret.DeleteSecretRequest]) (*connect.Response[secret.DeleteSecretResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.secret.SecretService.DeleteSecret is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.secret.SecretService.DeleteSecret is not implemented"))
 }
 
 func (UnimplementedSecretServiceHandler) ListSecrets(context.Context, *connect.Request[secret.ListSecretsRequest]) (*connect.Response[secret.ListSecretsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.secret.SecretService.ListSecrets is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.secret.SecretService.ListSecrets is not implemented"))
 }

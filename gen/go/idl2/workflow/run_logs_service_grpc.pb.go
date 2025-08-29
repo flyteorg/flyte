@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RunLogsService_TailLogs_FullMethodName = "/flyteidl.workflow.RunLogsService/TailLogs"
+	RunLogsService_TailLogs_FullMethodName = "/flyteidl2.workflow.RunLogsService/TailLogs"
 )
 
 // RunLogsServiceClient is the client API for RunLogsService service.
@@ -120,7 +120,7 @@ func (x *runLogsServiceTailLogsServer) Send(m *TailLogsResponse) error {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RunLogsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.RunLogsService",
+	ServiceName: "flyteidl2.workflow.RunLogsService",
 	HandlerType: (*RunLogsServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{

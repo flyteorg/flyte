@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// TaskServiceName is the fully-qualified name of the TaskService service.
-	TaskServiceName = "flyteidl.workflow.TaskService"
+	TaskServiceName = "flyteidl2.workflow.TaskService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,12 +34,12 @@ const (
 // period.
 const (
 	// TaskServiceDeployTaskProcedure is the fully-qualified name of the TaskService's DeployTask RPC.
-	TaskServiceDeployTaskProcedure = "/flyteidl.workflow.TaskService/DeployTask"
+	TaskServiceDeployTaskProcedure = "/flyteidl2.workflow.TaskService/DeployTask"
 	// TaskServiceGetTaskDetailsProcedure is the fully-qualified name of the TaskService's
 	// GetTaskDetails RPC.
-	TaskServiceGetTaskDetailsProcedure = "/flyteidl.workflow.TaskService/GetTaskDetails"
+	TaskServiceGetTaskDetailsProcedure = "/flyteidl2.workflow.TaskService/GetTaskDetails"
 	// TaskServiceListTasksProcedure is the fully-qualified name of the TaskService's ListTasks RPC.
-	TaskServiceListTasksProcedure = "/flyteidl.workflow.TaskService/ListTasks"
+	TaskServiceListTasksProcedure = "/flyteidl2.workflow.TaskService/ListTasks"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -50,7 +50,7 @@ var (
 	taskServiceListTasksMethodDescriptor      = taskServiceServiceDescriptor.Methods().ByName("ListTasks")
 )
 
-// TaskServiceClient is a client for the flyteidl.workflow.TaskService service.
+// TaskServiceClient is a client for the flyteidl2.workflow.TaskService service.
 type TaskServiceClient interface {
 	// Deploy a task.
 	DeployTask(context.Context, *connect.Request[workflow.DeployTaskRequest]) (*connect.Response[workflow.DeployTaskResponse], error)
@@ -60,7 +60,7 @@ type TaskServiceClient interface {
 	ListTasks(context.Context, *connect.Request[workflow.ListTasksRequest]) (*connect.Response[workflow.ListTasksResponse], error)
 }
 
-// NewTaskServiceClient constructs a client for the flyteidl.workflow.TaskService service. By
+// NewTaskServiceClient constructs a client for the flyteidl2.workflow.TaskService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -100,22 +100,22 @@ type taskServiceClient struct {
 	listTasks      *connect.Client[workflow.ListTasksRequest, workflow.ListTasksResponse]
 }
 
-// DeployTask calls flyteidl.workflow.TaskService.DeployTask.
+// DeployTask calls flyteidl2.workflow.TaskService.DeployTask.
 func (c *taskServiceClient) DeployTask(ctx context.Context, req *connect.Request[workflow.DeployTaskRequest]) (*connect.Response[workflow.DeployTaskResponse], error) {
 	return c.deployTask.CallUnary(ctx, req)
 }
 
-// GetTaskDetails calls flyteidl.workflow.TaskService.GetTaskDetails.
+// GetTaskDetails calls flyteidl2.workflow.TaskService.GetTaskDetails.
 func (c *taskServiceClient) GetTaskDetails(ctx context.Context, req *connect.Request[workflow.GetTaskDetailsRequest]) (*connect.Response[workflow.GetTaskDetailsResponse], error) {
 	return c.getTaskDetails.CallUnary(ctx, req)
 }
 
-// ListTasks calls flyteidl.workflow.TaskService.ListTasks.
+// ListTasks calls flyteidl2.workflow.TaskService.ListTasks.
 func (c *taskServiceClient) ListTasks(ctx context.Context, req *connect.Request[workflow.ListTasksRequest]) (*connect.Response[workflow.ListTasksResponse], error) {
 	return c.listTasks.CallUnary(ctx, req)
 }
 
-// TaskServiceHandler is an implementation of the flyteidl.workflow.TaskService service.
+// TaskServiceHandler is an implementation of the flyteidl2.workflow.TaskService service.
 type TaskServiceHandler interface {
 	// Deploy a task.
 	DeployTask(context.Context, *connect.Request[workflow.DeployTaskRequest]) (*connect.Response[workflow.DeployTaskResponse], error)
@@ -151,7 +151,7 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl.workflow.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.workflow.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TaskServiceDeployTaskProcedure:
 			taskServiceDeployTaskHandler.ServeHTTP(w, r)
@@ -169,13 +169,13 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 type UnimplementedTaskServiceHandler struct{}
 
 func (UnimplementedTaskServiceHandler) DeployTask(context.Context, *connect.Request[workflow.DeployTaskRequest]) (*connect.Response[workflow.DeployTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.TaskService.DeployTask is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TaskService.DeployTask is not implemented"))
 }
 
 func (UnimplementedTaskServiceHandler) GetTaskDetails(context.Context, *connect.Request[workflow.GetTaskDetailsRequest]) (*connect.Response[workflow.GetTaskDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.TaskService.GetTaskDetails is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TaskService.GetTaskDetails is not implemented"))
 }
 
 func (UnimplementedTaskServiceHandler) ListTasks(context.Context, *connect.Request[workflow.ListTasksRequest]) (*connect.Response[workflow.ListTasksResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl.workflow.TaskService.ListTasks is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TaskService.ListTasks is not implemented"))
 }

@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	StateService_Put_FullMethodName   = "/flyteidl.workflow.StateService/Put"
-	StateService_Get_FullMethodName   = "/flyteidl.workflow.StateService/Get"
-	StateService_Watch_FullMethodName = "/flyteidl.workflow.StateService/Watch"
+	StateService_Put_FullMethodName   = "/flyteidl2.workflow.StateService/Put"
+	StateService_Get_FullMethodName   = "/flyteidl2.workflow.StateService/Get"
+	StateService_Watch_FullMethodName = "/flyteidl2.workflow.StateService/Watch"
 )
 
 // StateServiceClient is the client API for StateService service.
@@ -252,7 +252,7 @@ func (x *stateServiceWatchServer) Send(m *WatchResponse) error {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var StateService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.StateService",
+	ServiceName: "flyteidl2.workflow.StateService",
 	HandlerType: (*StateServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{

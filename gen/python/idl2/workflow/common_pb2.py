@@ -14,14 +14,14 @@ _sym_db = _symbol_database.Default()
 from idl2.core import interface_pb2 as idl2_dot_core_dot_interface__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aidl2/workflow/common.proto\x12\x11\x66lyteidl.workflow\x1a\x19idl2/core/interface.proto\"\\\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x36\n\tparameter\x18\x02 \x01(\x0b\x32\x18.flyteidl.core.ParameterR\tparameterB\xb9\x01\n\x15\x63om.flyteidl.workflowB\x0b\x43ommonProtoH\x02P\x01Z,github.com/flyteorg/flyte/v2/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aidl2/workflow/common.proto\x12\x12\x66lyteidl2.workflow\x1a\x19idl2/core/interface.proto\"]\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x37\n\tparameter\x18\x02 \x01(\x0b\x32\x19.flyteidl2.core.ParameterR\tparameterB\xc3\x01\n\x16\x63om.flyteidl2.workflowB\x0b\x43ommonProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.workflow.common_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\013CommonProtoH\002P\001Z,github.com/flyteorg/flyte/v2/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
-  _globals['_NAMEDPARAMETER']._serialized_start=76
-  _globals['_NAMEDPARAMETER']._serialized_end=168
+  DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\013CommonProtoH\002P\001Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
+  _globals['_NAMEDPARAMETER']._serialized_start=77
+  _globals['_NAMEDPARAMETER']._serialized_end=170
 # @@protoc_insertion_point(module_scope)

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package flyteidl.core;
+package flyteidl2.core;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/core";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 
 // Secret encapsulates information about the secret a task needs to proceed. An environment variable
 // FLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if

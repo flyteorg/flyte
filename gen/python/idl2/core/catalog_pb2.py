@@ -14,22 +14,22 @@ _sym_db = _symbol_database.Default()
 from idl2.core import identifier_pb2 as idl2_dot_core_dot_identifier__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17idl2/core/catalog.proto\x12\rflyteidl.core\x1a\x1aidl2/core/identifier.proto\"I\n\x12\x43\x61talogArtifactTag\x12\x1f\n\x0b\x61rtifact_id\x18\x01 \x01(\tR\nartifactId\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"\x83\x02\n\x0f\x43\x61talogMetadata\x12\x38\n\ndataset_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.IdentifierR\tdatasetId\x12\x44\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32!.flyteidl.core.CatalogArtifactTagR\x0b\x61rtifactTag\x12\\\n\x15source_task_execution\x18\x03 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierH\x00R\x13sourceTaskExecutionB\x12\n\x10source_execution\"\x9e\x01\n\x12\x43\x61talogReservation\"\x87\x01\n\x06Status\x12\x18\n\x14RESERVATION_DISABLED\x10\x00\x12\x18\n\x14RESERVATION_ACQUIRED\x10\x01\x12\x16\n\x12RESERVATION_EXISTS\x10\x02\x12\x18\n\x14RESERVATION_RELEASED\x10\x03\x12\x17\n\x13RESERVATION_FAILURE\x10\x04*\xb3\x01\n\x12\x43\x61talogCacheStatus\x12\x12\n\x0e\x43\x41\x43HE_DISABLED\x10\x00\x12\x0e\n\nCACHE_MISS\x10\x01\x12\r\n\tCACHE_HIT\x10\x02\x12\x13\n\x0f\x43\x41\x43HE_POPULATED\x10\x03\x12\x18\n\x14\x43\x41\x43HE_LOOKUP_FAILURE\x10\x04\x12\x15\n\x11\x43\x41\x43HE_PUT_FAILURE\x10\x05\x12\x11\n\rCACHE_SKIPPED\x10\x06\x12\x11\n\rCACHE_EVICTED\x10\x07\x42\xa2\x01\n\x11\x63om.flyteidl.coreB\x0c\x43\x61talogProtoH\x02P\x01Z(github.com/flyteorg/flyte/v2/gen/go/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17idl2/core/catalog.proto\x12\x0e\x66lyteidl2.core\x1a\x1aidl2/core/identifier.proto\"I\n\x12\x43\x61talogArtifactTag\x12\x1f\n\x0b\x61rtifact_id\x18\x01 \x01(\tR\nartifactId\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"\x86\x02\n\x0f\x43\x61talogMetadata\x12\x39\n\ndataset_id\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.core.IdentifierR\tdatasetId\x12\x45\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32\".flyteidl2.core.CatalogArtifactTagR\x0b\x61rtifactTag\x12]\n\x15source_task_execution\x18\x03 \x01(\x0b\x32\'.flyteidl2.core.TaskExecutionIdentifierH\x00R\x13sourceTaskExecutionB\x12\n\x10source_execution\"\x9e\x01\n\x12\x43\x61talogReservation\"\x87\x01\n\x06Status\x12\x18\n\x14RESERVATION_DISABLED\x10\x00\x12\x18\n\x14RESERVATION_ACQUIRED\x10\x01\x12\x16\n\x12RESERVATION_EXISTS\x10\x02\x12\x18\n\x14RESERVATION_RELEASED\x10\x03\x12\x17\n\x13RESERVATION_FAILURE\x10\x04*\xb3\x01\n\x12\x43\x61talogCacheStatus\x12\x12\n\x0e\x43\x41\x43HE_DISABLED\x10\x00\x12\x0e\n\nCACHE_MISS\x10\x01\x12\r\n\tCACHE_HIT\x10\x02\x12\x13\n\x0f\x43\x41\x43HE_POPULATED\x10\x03\x12\x18\n\x14\x43\x41\x43HE_LOOKUP_FAILURE\x10\x04\x12\x15\n\x11\x43\x41\x43HE_PUT_FAILURE\x10\x05\x12\x11\n\rCACHE_SKIPPED\x10\x06\x12\x11\n\rCACHE_EVICTED\x10\x07\x42\xac\x01\n\x12\x63om.flyteidl2.coreB\x0c\x43\x61talogProtoH\x02P\x01Z-github.com/flyteorg/flyte/v2/gen/go/idl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.core.catalog_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\014CatalogProtoH\002P\001Z(github.com/flyteorg/flyte/v2/gen/go/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
-  _globals['_CATALOGCACHESTATUS']._serialized_start=569
-  _globals['_CATALOGCACHESTATUS']._serialized_end=748
-  _globals['_CATALOGARTIFACTTAG']._serialized_start=70
-  _globals['_CATALOGARTIFACTTAG']._serialized_end=143
-  _globals['_CATALOGMETADATA']._serialized_start=146
-  _globals['_CATALOGMETADATA']._serialized_end=405
-  _globals['_CATALOGRESERVATION']._serialized_start=408
-  _globals['_CATALOGRESERVATION']._serialized_end=566
-  _globals['_CATALOGRESERVATION_STATUS']._serialized_start=431
-  _globals['_CATALOGRESERVATION_STATUS']._serialized_end=566
+  DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.coreB\014CatalogProtoH\002P\001Z-github.com/flyteorg/flyte/v2/gen/go/idl2/core\242\002\003FCX\252\002\016Flyteidl2.Core\312\002\016Flyteidl2\\Core\342\002\032Flyteidl2\\Core\\GPBMetadata\352\002\017Flyteidl2::Core'
+  _globals['_CATALOGCACHESTATUS']._serialized_start=573
+  _globals['_CATALOGCACHESTATUS']._serialized_end=752
+  _globals['_CATALOGARTIFACTTAG']._serialized_start=71
+  _globals['_CATALOGARTIFACTTAG']._serialized_end=144
+  _globals['_CATALOGMETADATA']._serialized_start=147
+  _globals['_CATALOGMETADATA']._serialized_end=409
+  _globals['_CATALOGRESERVATION']._serialized_start=412
+  _globals['_CATALOGRESERVATION']._serialized_end=570
+  _globals['_CATALOGRESERVATION_STATUS']._serialized_start=435
+  _globals['_CATALOGRESERVATION_STATUS']._serialized_end=570
 # @@protoc_insertion_point(module_scope)

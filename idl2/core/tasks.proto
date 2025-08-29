@@ -8,9 +8,9 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 
-package flyteidl.core;
+package flyteidl2.core;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/core";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 
 // A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 // container engines.

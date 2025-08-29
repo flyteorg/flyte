@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package flyteidl.common;
+package flyteidl2.common;
 
 import "idl2/common/identifier.proto";
 import "idl2/common/policy.proto";
 import "idl2/common/role.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/common";
 
 // Encapsulates user profile details for a member of an organization.
 message User {

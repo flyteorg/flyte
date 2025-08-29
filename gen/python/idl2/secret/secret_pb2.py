@@ -15,14 +15,14 @@ from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 from idl2.secret import payload_pb2 as idl2_dot_secret_dot_payload__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18idl2/secret/secret.proto\x12\x0f\x66lyteidl.secret\x1a\x1cgoogle/api/annotations.proto\x1a\x19idl2/secret/payload.proto2\x86\x05\n\rSecretService\x12w\n\x0c\x43reateSecret\x12$.flyteidl.secret.CreateSecretRequest\x1a%.flyteidl.secret.CreateSecretResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\"\x0f/secrets/api/v1:\x01*\x12\x86\x01\n\x0cUpdateSecret\x12$.flyteidl.secret.UpdateSecretRequest\x1a%.flyteidl.secret.UpdateSecretResponse\")\x82\xd3\xe4\x93\x02#\x1a\x1e/secrets/api/v1/name/{id.name}:\x01*\x12z\n\tGetSecret\x12!.flyteidl.secret.GetSecretRequest\x1a\".flyteidl.secret.GetSecretResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/secrets/api/v1/name/{id.name}\x12\x83\x01\n\x0c\x44\x65leteSecret\x12$.flyteidl.secret.DeleteSecretRequest\x1a%.flyteidl.secret.DeleteSecretResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/secrets/api/v1/name/{id.name}\x12q\n\x0bListSecrets\x12#.flyteidl.secret.ListSecretsRequest\x1a$.flyteidl.secret.ListSecretsResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/secrets/api/v1B\xad\x01\n\x13\x63om.flyteidl.secretB\x0bSecretProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/secret\xa2\x02\x03\x46SX\xaa\x02\x0f\x46lyteidl.Secret\xca\x02\x0f\x46lyteidl\\Secret\xe2\x02\x1b\x46lyteidl\\Secret\\GPBMetadata\xea\x02\x10\x46lyteidl::Secretb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18idl2/secret/secret.proto\x12\x10\x66lyteidl2.secret\x1a\x1cgoogle/api/annotations.proto\x1a\x19idl2/secret/payload.proto2\x90\x05\n\rSecretService\x12y\n\x0c\x43reateSecret\x12%.flyteidl2.secret.CreateSecretRequest\x1a&.flyteidl2.secret.CreateSecretResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\"\x0f/secrets/api/v1:\x01*\x12\x88\x01\n\x0cUpdateSecret\x12%.flyteidl2.secret.UpdateSecretRequest\x1a&.flyteidl2.secret.UpdateSecretResponse\")\x82\xd3\xe4\x93\x02#\x1a\x1e/secrets/api/v1/name/{id.name}:\x01*\x12|\n\tGetSecret\x12\".flyteidl2.secret.GetSecretRequest\x1a#.flyteidl2.secret.GetSecretResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/secrets/api/v1/name/{id.name}\x12\x85\x01\n\x0c\x44\x65leteSecret\x12%.flyteidl2.secret.DeleteSecretRequest\x1a&.flyteidl2.secret.DeleteSecretResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/secrets/api/v1/name/{id.name}\x12s\n\x0bListSecrets\x12$.flyteidl2.secret.ListSecretsRequest\x1a%.flyteidl2.secret.ListSecretsResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/secrets/api/v1B\xb7\x01\n\x14\x63om.flyteidl2.secretB\x0bSecretProtoH\x02P\x01Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl2.Secret\xca\x02\x10\x46lyteidl2\\Secret\xe2\x02\x1c\x46lyteidl2\\Secret\\GPBMetadata\xea\x02\x11\x46lyteidl2::Secretb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.secret.secret_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.secretB\013SecretProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/secret\242\002\003FSX\252\002\017Flyteidl.Secret\312\002\017Flyteidl\\Secret\342\002\033Flyteidl\\Secret\\GPBMetadata\352\002\020Flyteidl::Secret'
+  DESCRIPTOR._serialized_options = b'\n\024com.flyteidl2.secretB\013SecretProtoH\002P\001Z/github.com/flyteorg/flyte/v2/gen/go/idl2/secret\242\002\003FSX\252\002\020Flyteidl2.Secret\312\002\020Flyteidl2\\Secret\342\002\034Flyteidl2\\Secret\\GPBMetadata\352\002\021Flyteidl2::Secret'
   _SECRETSERVICE.methods_by_name['CreateSecret']._options = None
   _SECRETSERVICE.methods_by_name['CreateSecret']._serialized_options = b'\202\323\344\223\002\024\"\017/secrets/api/v1:\001*'
   _SECRETSERVICE.methods_by_name['UpdateSecret']._options = None
@@ -33,6 +33,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SECRETSERVICE.methods_by_name['DeleteSecret']._serialized_options = b'\202\323\344\223\002 *\036/secrets/api/v1/name/{id.name}'
   _SECRETSERVICE.methods_by_name['ListSecrets']._options = None
   _SECRETSERVICE.methods_by_name['ListSecrets']._serialized_options = b'\202\323\344\223\002\021\022\017/secrets/api/v1'
-  _globals['_SECRETSERVICE']._serialized_start=103
-  _globals['_SECRETSERVICE']._serialized_end=749
+  _globals['_SECRETSERVICE']._serialized_start=104
+  _globals['_SECRETSERVICE']._serialized_end=760
 # @@protoc_insertion_point(module_scope)

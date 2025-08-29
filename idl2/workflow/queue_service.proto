@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/core/types.proto";
@@ -10,7 +10,7 @@ import "validate/validate.proto";
 import "idl2/workflow/run_definition.proto";
 import "idl2/workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // provides an interface for managing execution of runs over a collection of workers.
 service QueueService {
@@ -124,7 +124,7 @@ message ConditionAction {
   // Type is the type of the value the condition is expected. This can be used to properly render
   // a UI element for the condition or validate when a value is received that it is of the expected
   // type.
-  flyteidl.core.LiteralType type = 6;
+  flyteidl2.core.LiteralType type = 6;
 
   // Prompt is the prompt that will be shown to the user when the condition is awaited.
   string prompt = 7;

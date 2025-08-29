@@ -6,7 +6,7 @@ package workflowconnect
 
 import (
 	connect "connectrpc.com/connect"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/workflow"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow"
 	http "net/http"
 )
 
@@ -19,7 +19,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// NodeExecutionServiceName is the fully-qualified name of the NodeExecutionService service.
-	NodeExecutionServiceName = "flyteidl.workflow.NodeExecutionService"
+	NodeExecutionServiceName = "flyteidl2.workflow.NodeExecutionService"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -27,11 +27,11 @@ var (
 	nodeExecutionServiceServiceDescriptor = workflow.File_idl2_workflow_node_execution_service_proto.Services().ByName("NodeExecutionService")
 )
 
-// NodeExecutionServiceClient is a client for the flyteidl.workflow.NodeExecutionService service.
+// NodeExecutionServiceClient is a client for the flyteidl2.workflow.NodeExecutionService service.
 type NodeExecutionServiceClient interface {
 }
 
-// NewNodeExecutionServiceClient constructs a client for the flyteidl.workflow.NodeExecutionService
+// NewNodeExecutionServiceClient constructs a client for the flyteidl2.workflow.NodeExecutionService
 // service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
 // gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
 // the connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -46,7 +46,7 @@ func NewNodeExecutionServiceClient(httpClient connect.HTTPClient, baseURL string
 type nodeExecutionServiceClient struct {
 }
 
-// NodeExecutionServiceHandler is an implementation of the flyteidl.workflow.NodeExecutionService
+// NodeExecutionServiceHandler is an implementation of the flyteidl2.workflow.NodeExecutionService
 // service.
 type NodeExecutionServiceHandler interface {
 }
@@ -57,7 +57,7 @@ type NodeExecutionServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewNodeExecutionServiceHandler(svc NodeExecutionServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	return "/flyteidl.workflow.NodeExecutionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.workflow.NodeExecutionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		default:
 			http.NotFound(w, r)

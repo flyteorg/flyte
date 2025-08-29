@@ -14,16 +14,16 @@ _sym_db = _symbol_database.Default()
 from idl2.imagebuilder import payload_pb2 as idl2_dot_imagebuilder_dot_payload__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fidl2/imagebuilder/service.proto\x12\x15\x66lyteidl.imagebuilder\x1a\x1fidl2/imagebuilder/payload.proto2p\n\x0cImageService\x12`\n\x08GetImage\x12&.flyteidl.imagebuilder.GetImageRequest\x1a\'.flyteidl.imagebuilder.GetImageResponse\"\x03\x90\x02\x01\x42\xd2\x01\n\x19\x63om.flyteidl.imagebuilderB\x0cServiceProtoH\x02P\x01Z0github.com/flyteorg/flyte/v2/gen/go/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x15\x46lyteidl.Imagebuilder\xca\x02\x15\x46lyteidl\\Imagebuilder\xe2\x02!Flyteidl\\Imagebuilder\\GPBMetadata\xea\x02\x16\x46lyteidl::Imagebuilderb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fidl2/imagebuilder/service.proto\x12\x16\x66lyteidl2.imagebuilder\x1a\x1fidl2/imagebuilder/payload.proto2r\n\x0cImageService\x12\x62\n\x08GetImage\x12\'.flyteidl2.imagebuilder.GetImageRequest\x1a(.flyteidl2.imagebuilder.GetImageResponse\"\x03\x90\x02\x01\x42\xdc\x01\n\x1a\x63om.flyteidl2.imagebuilderB\x0cServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x16\x46lyteidl2.Imagebuilder\xca\x02\x16\x46lyteidl2\\Imagebuilder\xe2\x02\"Flyteidl2\\Imagebuilder\\GPBMetadata\xea\x02\x17\x46lyteidl2::Imagebuilderb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.imagebuilder.service_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\031com.flyteidl.imagebuilderB\014ServiceProtoH\002P\001Z0github.com/flyteorg/flyte/v2/gen/go/imagebuilder\242\002\003FIX\252\002\025Flyteidl.Imagebuilder\312\002\025Flyteidl\\Imagebuilder\342\002!Flyteidl\\Imagebuilder\\GPBMetadata\352\002\026Flyteidl::Imagebuilder'
+  DESCRIPTOR._serialized_options = b'\n\032com.flyteidl2.imagebuilderB\014ServiceProtoH\002P\001Z5github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder\242\002\003FIX\252\002\026Flyteidl2.Imagebuilder\312\002\026Flyteidl2\\Imagebuilder\342\002\"Flyteidl2\\Imagebuilder\\GPBMetadata\352\002\027Flyteidl2::Imagebuilder'
   _IMAGESERVICE.methods_by_name['GetImage']._options = None
   _IMAGESERVICE.methods_by_name['GetImage']._serialized_options = b'\220\002\001'
-  _globals['_IMAGESERVICE']._serialized_start=91
-  _globals['_IMAGESERVICE']._serialized_end=203
+  _globals['_IMAGESERVICE']._serialized_start=92
+  _globals['_IMAGESERVICE']._serialized_end=206
 # @@protoc_insertion_point(module_scope)

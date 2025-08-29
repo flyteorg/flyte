@@ -16,67 +16,67 @@ class RunServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateRun = channel.unary_unary(
-                '/flyteidl.workflow.RunService/CreateRun',
+                '/flyteidl2.workflow.RunService/CreateRun',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.CreateRunRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
                 )
         self.AbortRun = channel.unary_unary(
-                '/flyteidl.workflow.RunService/AbortRun',
+                '/flyteidl2.workflow.RunService/AbortRun',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
                 )
         self.GetRunDetails = channel.unary_unary(
-                '/flyteidl.workflow.RunService/GetRunDetails',
+                '/flyteidl2.workflow.RunService/GetRunDetails',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
                 )
         self.WatchRunDetails = channel.unary_stream(
-                '/flyteidl.workflow.RunService/WatchRunDetails',
+                '/flyteidl2.workflow.RunService/WatchRunDetails',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
                 )
         self.GetActionDetails = channel.unary_unary(
-                '/flyteidl.workflow.RunService/GetActionDetails',
+                '/flyteidl2.workflow.RunService/GetActionDetails',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
                 )
         self.WatchActionDetails = channel.unary_stream(
-                '/flyteidl.workflow.RunService/WatchActionDetails',
+                '/flyteidl2.workflow.RunService/WatchActionDetails',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
                 )
         self.GetActionData = channel.unary_unary(
-                '/flyteidl.workflow.RunService/GetActionData',
+                '/flyteidl2.workflow.RunService/GetActionData',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
                 )
         self.ListRuns = channel.unary_unary(
-                '/flyteidl.workflow.RunService/ListRuns',
+                '/flyteidl2.workflow.RunService/ListRuns',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
                 )
         self.WatchRuns = channel.unary_stream(
-                '/flyteidl.workflow.RunService/WatchRuns',
+                '/flyteidl2.workflow.RunService/WatchRuns',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
                 )
         self.ListActions = channel.unary_unary(
-                '/flyteidl.workflow.RunService/ListActions',
+                '/flyteidl2.workflow.RunService/ListActions',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
                 )
         self.WatchActions = channel.unary_stream(
-                '/flyteidl.workflow.RunService/WatchActions',
+                '/flyteidl2.workflow.RunService/WatchActions',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
                 )
         self.WatchClusterEvents = channel.unary_stream(
-                '/flyteidl.workflow.RunService/WatchClusterEvents',
+                '/flyteidl2.workflow.RunService/WatchClusterEvents',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse.FromString,
                 )
         self.AbortAction = channel.unary_unary(
-                '/flyteidl.workflow.RunService/AbortAction',
+                '/flyteidl2.workflow.RunService/AbortAction',
                 request_serializer=idl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
                 )
@@ -249,7 +249,7 @@ def add_RunServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.RunService', rpc_method_handlers)
+            'flyteidl2.workflow.RunService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -269,7 +269,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/CreateRun',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/CreateRun',
             idl2_dot_workflow_dot_run__service__pb2.CreateRunRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
             options, channel_credentials,
@@ -286,7 +286,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/AbortRun',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/AbortRun',
             idl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
             options, channel_credentials,
@@ -303,7 +303,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/GetRunDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetRunDetails',
             idl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -320,7 +320,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchRunDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchRunDetails',
             idl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -337,7 +337,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/GetActionDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionDetails',
             idl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -354,7 +354,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchActionDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchActionDetails',
             idl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -371,7 +371,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/GetActionData',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionData',
             idl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
             options, channel_credentials,
@@ -388,7 +388,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/ListRuns',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/ListRuns',
             idl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
             options, channel_credentials,
@@ -405,7 +405,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchRuns',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchRuns',
             idl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
             options, channel_credentials,
@@ -422,7 +422,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/ListActions',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/ListActions',
             idl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
             options, channel_credentials,
@@ -439,7 +439,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchActions',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchActions',
             idl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
             options, channel_credentials,
@@ -456,7 +456,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl.workflow.RunService/WatchClusterEvents',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchClusterEvents',
             idl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse.FromString,
             options, channel_credentials,
@@ -473,7 +473,7 @@ class RunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.RunService/AbortAction',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/AbortAction',
             idl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
             idl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
             options, channel_credentials,

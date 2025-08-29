@@ -16,17 +16,17 @@ class TaskServiceStub(object):
             channel: A grpc.Channel.
         """
         self.DeployTask = channel.unary_unary(
-                '/flyteidl.workflow.TaskService/DeployTask',
+                '/flyteidl2.workflow.TaskService/DeployTask',
                 request_serializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
                 )
         self.GetTaskDetails = channel.unary_unary(
-                '/flyteidl.workflow.TaskService/GetTaskDetails',
+                '/flyteidl2.workflow.TaskService/GetTaskDetails',
                 request_serializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
                 )
         self.ListTasks = channel.unary_unary(
-                '/flyteidl.workflow.TaskService/ListTasks',
+                '/flyteidl2.workflow.TaskService/ListTasks',
                 request_serializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
                 )
@@ -77,7 +77,7 @@ def add_TaskServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.TaskService', rpc_method_handlers)
+            'flyteidl2.workflow.TaskService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -97,7 +97,7 @@ class TaskService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.TaskService/DeployTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/DeployTask',
             idl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
             idl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
             options, channel_credentials,
@@ -114,7 +114,7 @@ class TaskService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.TaskService/GetTaskDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/GetTaskDetails',
             idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
             idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
             options, channel_credentials,
@@ -131,7 +131,7 @@ class TaskService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.TaskService/ListTasks',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/ListTasks',
             idl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
             idl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
             options, channel_credentials,

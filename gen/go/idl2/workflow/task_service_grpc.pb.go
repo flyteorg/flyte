@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TaskService_DeployTask_FullMethodName     = "/flyteidl.workflow.TaskService/DeployTask"
-	TaskService_GetTaskDetails_FullMethodName = "/flyteidl.workflow.TaskService/GetTaskDetails"
-	TaskService_ListTasks_FullMethodName      = "/flyteidl.workflow.TaskService/ListTasks"
+	TaskService_DeployTask_FullMethodName     = "/flyteidl2.workflow.TaskService/DeployTask"
+	TaskService_GetTaskDetails_FullMethodName = "/flyteidl2.workflow.TaskService/GetTaskDetails"
+	TaskService_ListTasks_FullMethodName      = "/flyteidl2.workflow.TaskService/ListTasks"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -166,7 +166,7 @@ func _TaskService_ListTasks_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TaskService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.TaskService",
+	ServiceName: "flyteidl2.workflow.TaskService",
 	HandlerType: (*TaskServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

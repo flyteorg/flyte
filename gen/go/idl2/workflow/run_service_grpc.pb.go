@@ -19,19 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RunService_CreateRun_FullMethodName          = "/flyteidl.workflow.RunService/CreateRun"
-	RunService_AbortRun_FullMethodName           = "/flyteidl.workflow.RunService/AbortRun"
-	RunService_GetRunDetails_FullMethodName      = "/flyteidl.workflow.RunService/GetRunDetails"
-	RunService_WatchRunDetails_FullMethodName    = "/flyteidl.workflow.RunService/WatchRunDetails"
-	RunService_GetActionDetails_FullMethodName   = "/flyteidl.workflow.RunService/GetActionDetails"
-	RunService_WatchActionDetails_FullMethodName = "/flyteidl.workflow.RunService/WatchActionDetails"
-	RunService_GetActionData_FullMethodName      = "/flyteidl.workflow.RunService/GetActionData"
-	RunService_ListRuns_FullMethodName           = "/flyteidl.workflow.RunService/ListRuns"
-	RunService_WatchRuns_FullMethodName          = "/flyteidl.workflow.RunService/WatchRuns"
-	RunService_ListActions_FullMethodName        = "/flyteidl.workflow.RunService/ListActions"
-	RunService_WatchActions_FullMethodName       = "/flyteidl.workflow.RunService/WatchActions"
-	RunService_WatchClusterEvents_FullMethodName = "/flyteidl.workflow.RunService/WatchClusterEvents"
-	RunService_AbortAction_FullMethodName        = "/flyteidl.workflow.RunService/AbortAction"
+	RunService_CreateRun_FullMethodName          = "/flyteidl2.workflow.RunService/CreateRun"
+	RunService_AbortRun_FullMethodName           = "/flyteidl2.workflow.RunService/AbortRun"
+	RunService_GetRunDetails_FullMethodName      = "/flyteidl2.workflow.RunService/GetRunDetails"
+	RunService_WatchRunDetails_FullMethodName    = "/flyteidl2.workflow.RunService/WatchRunDetails"
+	RunService_GetActionDetails_FullMethodName   = "/flyteidl2.workflow.RunService/GetActionDetails"
+	RunService_WatchActionDetails_FullMethodName = "/flyteidl2.workflow.RunService/WatchActionDetails"
+	RunService_GetActionData_FullMethodName      = "/flyteidl2.workflow.RunService/GetActionData"
+	RunService_ListRuns_FullMethodName           = "/flyteidl2.workflow.RunService/ListRuns"
+	RunService_WatchRuns_FullMethodName          = "/flyteidl2.workflow.RunService/WatchRuns"
+	RunService_ListActions_FullMethodName        = "/flyteidl2.workflow.RunService/ListActions"
+	RunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.RunService/WatchActions"
+	RunService_WatchClusterEvents_FullMethodName = "/flyteidl2.workflow.RunService/WatchClusterEvents"
+	RunService_AbortAction_FullMethodName        = "/flyteidl2.workflow.RunService/AbortAction"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -650,7 +650,7 @@ func _RunService_AbortAction_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RunService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.RunService",
+	ServiceName: "flyteidl2.workflow.RunService",
 	HandlerType: (*RunServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

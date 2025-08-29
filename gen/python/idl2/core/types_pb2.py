@@ -14,48 +14,48 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15idl2/core/types.proto\x12\rflyteidl.core\x1a\x1cgoogle/protobuf/struct.proto\"\xa1\x02\n\nSchemaType\x12@\n\x07\x63olumns\x18\x03 \x03(\x0b\x32&.flyteidl.core.SchemaType.SchemaColumnR\x07\x63olumns\x1a\xd0\x01\n\x0cSchemaColumn\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12K\n\x04type\x18\x02 \x01(\x0e\x32\x37.flyteidl.core.SchemaType.SchemaColumn.SchemaColumnTypeR\x04type\"_\n\x10SchemaColumnType\x12\x0b\n\x07INTEGER\x10\x00\x12\t\n\x05\x46LOAT\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x42OOLEAN\x10\x03\x12\x0c\n\x08\x44\x41TETIME\x10\x04\x12\x0c\n\x08\x44URATION\x10\x05\"\xc7\x02\n\x15StructuredDatasetType\x12L\n\x07\x63olumns\x18\x01 \x03(\x0b\x32\x32.flyteidl.core.StructuredDatasetType.DatasetColumnR\x07\x63olumns\x12\x16\n\x06\x66ormat\x18\x02 \x01(\tR\x06\x66ormat\x12\x30\n\x14\x65xternal_schema_type\x18\x03 \x01(\tR\x12\x65xternalSchemaType\x12\x32\n\x15\x65xternal_schema_bytes\x18\x04 \x01(\x0cR\x13\x65xternalSchemaBytes\x1a\x62\n\rDatasetColumn\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12=\n\x0cliteral_type\x18\x02 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeR\x0bliteralType\"\xa7\x01\n\x08\x42lobType\x12\x16\n\x06\x66ormat\x18\x01 \x01(\tR\x06\x66ormat\x12R\n\x0e\x64imensionality\x18\x02 \x01(\x0e\x32*.flyteidl.core.BlobType.BlobDimensionalityR\x0e\x64imensionality\"/\n\x12\x42lobDimensionality\x12\n\n\x06SINGLE\x10\x00\x12\r\n\tMULTIPART\x10\x01\"\"\n\x08\x45numType\x12\x16\n\x06values\x18\x01 \x03(\tR\x06values\"C\n\tUnionType\x12\x36\n\x08variants\x18\x01 \x03(\x0b\x32\x1a.flyteidl.core.LiteralTypeR\x08variants\"\xd7\x01\n\rTypeStructure\x12\x10\n\x03tag\x18\x01 \x01(\tR\x03tag\x12V\n\x0e\x64\x61taclass_type\x18\x02 \x03(\x0b\x32/.flyteidl.core.TypeStructure.DataclassTypeEntryR\rdataclassType\x1a\\\n\x12\x44\x61taclassTypeEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeR\x05value:\x02\x38\x01\"K\n\x0eTypeAnnotation\x12\x39\n\x0b\x61nnotations\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x61nnotations\"\xbc\x05\n\x0bLiteralType\x12\x33\n\x06simple\x18\x01 \x01(\x0e\x32\x19.flyteidl.core.SimpleTypeH\x00R\x06simple\x12\x33\n\x06schema\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.SchemaTypeH\x00R\x06schema\x12\x45\n\x0f\x63ollection_type\x18\x03 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00R\x0e\x63ollectionType\x12\x42\n\x0emap_value_type\x18\x04 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00R\x0cmapValueType\x12-\n\x04\x62lob\x18\x05 \x01(\x0b\x32\x17.flyteidl.core.BlobTypeH\x00R\x04\x62lob\x12\x36\n\tenum_type\x18\x07 \x01(\x0b\x32\x17.flyteidl.core.EnumTypeH\x00R\x08\x65numType\x12^\n\x17structured_dataset_type\x18\x08 \x01(\x0b\x32$.flyteidl.core.StructuredDatasetTypeH\x00R\x15structuredDatasetType\x12\x39\n\nunion_type\x18\n \x01(\x0b\x32\x18.flyteidl.core.UnionTypeH\x00R\tunionType\x12\x33\n\x08metadata\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructR\x08metadata\x12=\n\nannotation\x18\t \x01(\x0b\x32\x1d.flyteidl.core.TypeAnnotationR\nannotation\x12:\n\tstructure\x18\x0b \x01(\x0b\x32\x1c.flyteidl.core.TypeStructureR\tstructureB\x06\n\x04type\"z\n\x0fOutputReference\x12\x17\n\x07node_id\x18\x01 \x01(\tR\x06nodeId\x12\x10\n\x03var\x18\x02 \x01(\tR\x03var\x12<\n\tattr_path\x18\x03 \x03(\x0b\x32\x1f.flyteidl.core.PromiseAttributeR\x08\x61ttrPath\"_\n\x10PromiseAttribute\x12#\n\x0cstring_value\x18\x01 \x01(\tH\x00R\x0bstringValue\x12\x1d\n\tint_value\x18\x02 \x01(\x05H\x00R\x08intValueB\x07\n\x05value\"G\n\x05\x45rror\x12$\n\x0e\x66\x61iled_node_id\x18\x01 \x01(\tR\x0c\x66\x61iledNodeId\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message*\x86\x01\n\nSimpleType\x12\x08\n\x04NONE\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\t\n\x05\x46LOAT\x10\x02\x12\n\n\x06STRING\x10\x03\x12\x0b\n\x07\x42OOLEAN\x10\x04\x12\x0c\n\x08\x44\x41TETIME\x10\x05\x12\x0c\n\x08\x44URATION\x10\x06\x12\n\n\x06\x42INARY\x10\x07\x12\t\n\x05\x45RROR\x10\x08\x12\n\n\x06STRUCT\x10\tB\xa0\x01\n\x11\x63om.flyteidl.coreB\nTypesProtoH\x02P\x01Z(github.com/flyteorg/flyte/v2/gen/go/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15idl2/core/types.proto\x12\x0e\x66lyteidl2.core\x1a\x1cgoogle/protobuf/struct.proto\"\xa3\x02\n\nSchemaType\x12\x41\n\x07\x63olumns\x18\x03 \x03(\x0b\x32\'.flyteidl2.core.SchemaType.SchemaColumnR\x07\x63olumns\x1a\xd1\x01\n\x0cSchemaColumn\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12L\n\x04type\x18\x02 \x01(\x0e\x32\x38.flyteidl2.core.SchemaType.SchemaColumn.SchemaColumnTypeR\x04type\"_\n\x10SchemaColumnType\x12\x0b\n\x07INTEGER\x10\x00\x12\t\n\x05\x46LOAT\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x42OOLEAN\x10\x03\x12\x0c\n\x08\x44\x41TETIME\x10\x04\x12\x0c\n\x08\x44URATION\x10\x05\"\xc9\x02\n\x15StructuredDatasetType\x12M\n\x07\x63olumns\x18\x01 \x03(\x0b\x32\x33.flyteidl2.core.StructuredDatasetType.DatasetColumnR\x07\x63olumns\x12\x16\n\x06\x66ormat\x18\x02 \x01(\tR\x06\x66ormat\x12\x30\n\x14\x65xternal_schema_type\x18\x03 \x01(\tR\x12\x65xternalSchemaType\x12\x32\n\x15\x65xternal_schema_bytes\x18\x04 \x01(\x0cR\x13\x65xternalSchemaBytes\x1a\x63\n\rDatasetColumn\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12>\n\x0cliteral_type\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeR\x0bliteralType\"\xa8\x01\n\x08\x42lobType\x12\x16\n\x06\x66ormat\x18\x01 \x01(\tR\x06\x66ormat\x12S\n\x0e\x64imensionality\x18\x02 \x01(\x0e\x32+.flyteidl2.core.BlobType.BlobDimensionalityR\x0e\x64imensionality\"/\n\x12\x42lobDimensionality\x12\n\n\x06SINGLE\x10\x00\x12\r\n\tMULTIPART\x10\x01\"\"\n\x08\x45numType\x12\x16\n\x06values\x18\x01 \x03(\tR\x06values\"D\n\tUnionType\x12\x37\n\x08variants\x18\x01 \x03(\x0b\x32\x1b.flyteidl2.core.LiteralTypeR\x08variants\"\xd9\x01\n\rTypeStructure\x12\x10\n\x03tag\x18\x01 \x01(\tR\x03tag\x12W\n\x0e\x64\x61taclass_type\x18\x02 \x03(\x0b\x32\x30.flyteidl2.core.TypeStructure.DataclassTypeEntryR\rdataclassType\x1a]\n\x12\x44\x61taclassTypeEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x31\n\x05value\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeR\x05value:\x02\x38\x01\"K\n\x0eTypeAnnotation\x12\x39\n\x0b\x61nnotations\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x61nnotations\"\xc6\x05\n\x0bLiteralType\x12\x34\n\x06simple\x18\x01 \x01(\x0e\x32\x1a.flyteidl2.core.SimpleTypeH\x00R\x06simple\x12\x34\n\x06schema\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.core.SchemaTypeH\x00R\x06schema\x12\x46\n\x0f\x63ollection_type\x18\x03 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeH\x00R\x0e\x63ollectionType\x12\x43\n\x0emap_value_type\x18\x04 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeH\x00R\x0cmapValueType\x12.\n\x04\x62lob\x18\x05 \x01(\x0b\x32\x18.flyteidl2.core.BlobTypeH\x00R\x04\x62lob\x12\x37\n\tenum_type\x18\x07 \x01(\x0b\x32\x18.flyteidl2.core.EnumTypeH\x00R\x08\x65numType\x12_\n\x17structured_dataset_type\x18\x08 \x01(\x0b\x32%.flyteidl2.core.StructuredDatasetTypeH\x00R\x15structuredDatasetType\x12:\n\nunion_type\x18\n \x01(\x0b\x32\x19.flyteidl2.core.UnionTypeH\x00R\tunionType\x12\x33\n\x08metadata\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructR\x08metadata\x12>\n\nannotation\x18\t \x01(\x0b\x32\x1e.flyteidl2.core.TypeAnnotationR\nannotation\x12;\n\tstructure\x18\x0b \x01(\x0b\x32\x1d.flyteidl2.core.TypeStructureR\tstructureB\x06\n\x04type\"{\n\x0fOutputReference\x12\x17\n\x07node_id\x18\x01 \x01(\tR\x06nodeId\x12\x10\n\x03var\x18\x02 \x01(\tR\x03var\x12=\n\tattr_path\x18\x03 \x03(\x0b\x32 .flyteidl2.core.PromiseAttributeR\x08\x61ttrPath\"_\n\x10PromiseAttribute\x12#\n\x0cstring_value\x18\x01 \x01(\tH\x00R\x0bstringValue\x12\x1d\n\tint_value\x18\x02 \x01(\x05H\x00R\x08intValueB\x07\n\x05value\"G\n\x05\x45rror\x12$\n\x0e\x66\x61iled_node_id\x18\x01 \x01(\tR\x0c\x66\x61iledNodeId\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message*\x86\x01\n\nSimpleType\x12\x08\n\x04NONE\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\t\n\x05\x46LOAT\x10\x02\x12\n\n\x06STRING\x10\x03\x12\x0b\n\x07\x42OOLEAN\x10\x04\x12\x0c\n\x08\x44\x41TETIME\x10\x05\x12\x0c\n\x08\x44URATION\x10\x06\x12\n\n\x06\x42INARY\x10\x07\x12\t\n\x05\x45RROR\x10\x08\x12\n\n\x06STRUCT\x10\tB\xaa\x01\n\x12\x63om.flyteidl2.coreB\nTypesProtoH\x02P\x01Z-github.com/flyteorg/flyte/v2/gen/go/idl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.core.types_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\nTypesProtoH\002P\001Z(github.com/flyteorg/flyte/v2/gen/go/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
+  DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.coreB\nTypesProtoH\002P\001Z-github.com/flyteorg/flyte/v2/gen/go/idl2/core\242\002\003FCX\252\002\016Flyteidl2.Core\312\002\016Flyteidl2\\Core\342\002\032Flyteidl2\\Core\\GPBMetadata\352\002\017Flyteidl2::Core'
   _TYPESTRUCTURE_DATACLASSTYPEENTRY._options = None
   _TYPESTRUCTURE_DATACLASSTYPEENTRY._serialized_options = b'8\001'
-  _globals['_SIMPLETYPE']._serialized_start=2260
-  _globals['_SIMPLETYPE']._serialized_end=2394
-  _globals['_SCHEMATYPE']._serialized_start=71
-  _globals['_SCHEMATYPE']._serialized_end=360
-  _globals['_SCHEMATYPE_SCHEMACOLUMN']._serialized_start=152
-  _globals['_SCHEMATYPE_SCHEMACOLUMN']._serialized_end=360
-  _globals['_SCHEMATYPE_SCHEMACOLUMN_SCHEMACOLUMNTYPE']._serialized_start=265
-  _globals['_SCHEMATYPE_SCHEMACOLUMN_SCHEMACOLUMNTYPE']._serialized_end=360
-  _globals['_STRUCTUREDDATASETTYPE']._serialized_start=363
-  _globals['_STRUCTUREDDATASETTYPE']._serialized_end=690
-  _globals['_STRUCTUREDDATASETTYPE_DATASETCOLUMN']._serialized_start=592
-  _globals['_STRUCTUREDDATASETTYPE_DATASETCOLUMN']._serialized_end=690
-  _globals['_BLOBTYPE']._serialized_start=693
-  _globals['_BLOBTYPE']._serialized_end=860
-  _globals['_BLOBTYPE_BLOBDIMENSIONALITY']._serialized_start=813
-  _globals['_BLOBTYPE_BLOBDIMENSIONALITY']._serialized_end=860
-  _globals['_ENUMTYPE']._serialized_start=862
-  _globals['_ENUMTYPE']._serialized_end=896
-  _globals['_UNIONTYPE']._serialized_start=898
-  _globals['_UNIONTYPE']._serialized_end=965
-  _globals['_TYPESTRUCTURE']._serialized_start=968
-  _globals['_TYPESTRUCTURE']._serialized_end=1183
-  _globals['_TYPESTRUCTURE_DATACLASSTYPEENTRY']._serialized_start=1091
-  _globals['_TYPESTRUCTURE_DATACLASSTYPEENTRY']._serialized_end=1183
-  _globals['_TYPEANNOTATION']._serialized_start=1185
-  _globals['_TYPEANNOTATION']._serialized_end=1260
-  _globals['_LITERALTYPE']._serialized_start=1263
-  _globals['_LITERALTYPE']._serialized_end=1963
-  _globals['_OUTPUTREFERENCE']._serialized_start=1965
-  _globals['_OUTPUTREFERENCE']._serialized_end=2087
-  _globals['_PROMISEATTRIBUTE']._serialized_start=2089
-  _globals['_PROMISEATTRIBUTE']._serialized_end=2184
-  _globals['_ERROR']._serialized_start=2186
-  _globals['_ERROR']._serialized_end=2257
+  _globals['_SIMPLETYPE']._serialized_start=2280
+  _globals['_SIMPLETYPE']._serialized_end=2414
+  _globals['_SCHEMATYPE']._serialized_start=72
+  _globals['_SCHEMATYPE']._serialized_end=363
+  _globals['_SCHEMATYPE_SCHEMACOLUMN']._serialized_start=154
+  _globals['_SCHEMATYPE_SCHEMACOLUMN']._serialized_end=363
+  _globals['_SCHEMATYPE_SCHEMACOLUMN_SCHEMACOLUMNTYPE']._serialized_start=268
+  _globals['_SCHEMATYPE_SCHEMACOLUMN_SCHEMACOLUMNTYPE']._serialized_end=363
+  _globals['_STRUCTUREDDATASETTYPE']._serialized_start=366
+  _globals['_STRUCTUREDDATASETTYPE']._serialized_end=695
+  _globals['_STRUCTUREDDATASETTYPE_DATASETCOLUMN']._serialized_start=596
+  _globals['_STRUCTUREDDATASETTYPE_DATASETCOLUMN']._serialized_end=695
+  _globals['_BLOBTYPE']._serialized_start=698
+  _globals['_BLOBTYPE']._serialized_end=866
+  _globals['_BLOBTYPE_BLOBDIMENSIONALITY']._serialized_start=819
+  _globals['_BLOBTYPE_BLOBDIMENSIONALITY']._serialized_end=866
+  _globals['_ENUMTYPE']._serialized_start=868
+  _globals['_ENUMTYPE']._serialized_end=902
+  _globals['_UNIONTYPE']._serialized_start=904
+  _globals['_UNIONTYPE']._serialized_end=972
+  _globals['_TYPESTRUCTURE']._serialized_start=975
+  _globals['_TYPESTRUCTURE']._serialized_end=1192
+  _globals['_TYPESTRUCTURE_DATACLASSTYPEENTRY']._serialized_start=1099
+  _globals['_TYPESTRUCTURE_DATACLASSTYPEENTRY']._serialized_end=1192
+  _globals['_TYPEANNOTATION']._serialized_start=1194
+  _globals['_TYPEANNOTATION']._serialized_end=1269
+  _globals['_LITERALTYPE']._serialized_start=1272
+  _globals['_LITERALTYPE']._serialized_end=1982
+  _globals['_OUTPUTREFERENCE']._serialized_start=1984
+  _globals['_OUTPUTREFERENCE']._serialized_end=2107
+  _globals['_PROMISEATTRIBUTE']._serialized_start=2109
+  _globals['_PROMISEATTRIBUTE']._serialized_end=2204
+  _globals['_ERROR']._serialized_start=2206
+  _globals['_ERROR']._serialized_end=2277
 # @@protoc_insertion_point(module_scope)

@@ -13,16 +13,16 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!idl2/common/runtime_version.proto\x12\x0f\x66lyteidl.common\"\xbd\x01\n\x0fRuntimeMetadata\x12@\n\x04type\x18\x01 \x01(\x0e\x32,.flyteidl.common.RuntimeMetadata.RuntimeTypeR\x04type\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12\x16\n\x06\x66lavor\x18\x03 \x01(\tR\x06\x66lavor\"6\n\x0bRuntimeType\x12\t\n\x05OTHER\x10\x00\x12\r\n\tFLYTE_SDK\x10\x01\x12\r\n\tUNION_SDK\x10\x02\x42\xb5\x01\n\x13\x63om.flyteidl.commonB\x13RuntimeVersionProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/common\xa2\x02\x03\x46\x43X\xaa\x02\x0f\x46lyteidl.Common\xca\x02\x0f\x46lyteidl\\Common\xe2\x02\x1b\x46lyteidl\\Common\\GPBMetadata\xea\x02\x10\x46lyteidl::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!idl2/common/runtime_version.proto\x12\x10\x66lyteidl2.common\"\xbe\x01\n\x0fRuntimeMetadata\x12\x41\n\x04type\x18\x01 \x01(\x0e\x32-.flyteidl2.common.RuntimeMetadata.RuntimeTypeR\x04type\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12\x16\n\x06\x66lavor\x18\x03 \x01(\tR\x06\x66lavor\"6\n\x0bRuntimeType\x12\t\n\x05OTHER\x10\x00\x12\r\n\tFLYTE_SDK\x10\x01\x12\r\n\tUNION_SDK\x10\x02\x42\xbf\x01\n\x14\x63om.flyteidl2.commonB\x13RuntimeVersionProtoH\x02P\x01Z/github.com/flyteorg/flyte/v2/gen/go/idl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.common.runtime_version_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.commonB\023RuntimeVersionProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/common\242\002\003FCX\252\002\017Flyteidl.Common\312\002\017Flyteidl\\Common\342\002\033Flyteidl\\Common\\GPBMetadata\352\002\020Flyteidl::Common'
-  _globals['_RUNTIMEMETADATA']._serialized_start=55
-  _globals['_RUNTIMEMETADATA']._serialized_end=244
-  _globals['_RUNTIMEMETADATA_RUNTIMETYPE']._serialized_start=190
-  _globals['_RUNTIMEMETADATA_RUNTIMETYPE']._serialized_end=244
+  DESCRIPTOR._serialized_options = b'\n\024com.flyteidl2.commonB\023RuntimeVersionProtoH\002P\001Z/github.com/flyteorg/flyte/v2/gen/go/idl2/common\242\002\003FCX\252\002\020Flyteidl2.Common\312\002\020Flyteidl2\\Common\342\002\034Flyteidl2\\Common\\GPBMetadata\352\002\021Flyteidl2::Common'
+  _globals['_RUNTIMEMETADATA']._serialized_start=56
+  _globals['_RUNTIMEMETADATA']._serialized_end=246
+  _globals['_RUNTIMEMETADATA_RUNTIMETYPE']._serialized_start=192
+  _globals['_RUNTIMEMETADATA_RUNTIMETYPE']._serialized_end=246
 # @@protoc_insertion_point(module_scope)

@@ -14,46 +14,46 @@ _sym_db = _symbol_database.Default()
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"idl2/imagebuilder/definition.proto\x12\x15\x66lyteidl.imagebuilder\x1a\x17validate/validate.proto\".\n\x0fImageIdentifier\x12\x1b\n\x04name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x04name\"S\n\x05Image\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.imagebuilder.ImageIdentifierR\x02id\x12\x12\n\x04\x66qin\x18\x02 \x01(\tR\x04\x66qin\")\n\x0b\x41ptPackages\x12\x1a\n\x08packages\x18\x01 \x03(\tR\x08packages\"\x84\x01\n\nPipOptions\x12\x1b\n\tindex_url\x18\x02 \x01(\tR\x08indexUrl\x12(\n\x10\x65xtra_index_urls\x18\x03 \x03(\tR\x0e\x65xtraIndexUrls\x12\x10\n\x03pre\x18\x04 \x01(\x08R\x03pre\x12\x1d\n\nextra_args\x18\x05 \x01(\tR\textraArgs\"f\n\x0bPipPackages\x12\x1a\n\x08packages\x18\x01 \x03(\tR\x08packages\x12;\n\x07options\x18\x02 \x01(\x0b\x32!.flyteidl.imagebuilder.PipOptionsR\x07options\"_\n\x0cRequirements\x12\x12\n\x04\x66ile\x18\x01 \x01(\tR\x04\x66ile\x12;\n\x07options\x18\x02 \x01(\x0b\x32!.flyteidl.imagebuilder.PipOptionsR\x07options\"]\n\x0cPythonWheels\x12\x10\n\x03\x64ir\x18\x01 \x01(\tR\x03\x64ir\x12;\n\x07options\x18\x02 \x01(\x0b\x32!.flyteidl.imagebuilder.PipOptionsR\x07options\"~\n\tUVProject\x12\x1c\n\tpyproject\x18\x01 \x01(\tR\tpyproject\x12\x16\n\x06uvlock\x18\x02 \x01(\tR\x06uvlock\x12;\n\x07options\x18\x03 \x01(\x0b\x32!.flyteidl.imagebuilder.PipOptionsR\x07options\"\x1c\n\x08\x43ommands\x12\x10\n\x03\x63md\x18\x02 \x03(\tR\x03\x63md\"#\n\x07WorkDir\x12\x18\n\x07workdir\x18\x01 \x01(\tR\x07workdir\"0\n\nCopyConfig\x12\x10\n\x03src\x18\x01 \x01(\tR\x03src\x12\x10\n\x03\x64st\x18\x02 \x01(\tR\x03\x64st\"\x99\x01\n\x03\x45nv\x12Q\n\renv_variables\x18\x01 \x03(\x0b\x32,.flyteidl.imagebuilder.Env.EnvVariablesEntryR\x0c\x65nvVariables\x1a?\n\x11\x45nvVariablesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xed\x04\n\x05Layer\x12G\n\x0c\x61pt_packages\x18\x01 \x01(\x0b\x32\".flyteidl.imagebuilder.AptPackagesH\x00R\x0b\x61ptPackages\x12G\n\x0cpip_packages\x18\x02 \x01(\x0b\x32\".flyteidl.imagebuilder.PipPackagesH\x00R\x0bpipPackages\x12=\n\x08\x63ommands\x18\x03 \x01(\x0b\x32\x1f.flyteidl.imagebuilder.CommandsH\x00R\x08\x63ommands\x12I\n\x0crequirements\x18\x04 \x01(\x0b\x32#.flyteidl.imagebuilder.RequirementsH\x00R\x0crequirements\x12J\n\rpython_wheels\x18\x05 \x01(\x0b\x32#.flyteidl.imagebuilder.PythonWheelsH\x00R\x0cpythonWheels\x12:\n\x07workdir\x18\x06 \x01(\x0b\x32\x1e.flyteidl.imagebuilder.WorkDirH\x00R\x07workdir\x12\x44\n\x0b\x63opy_config\x18\x07 \x01(\x0b\x32!.flyteidl.imagebuilder.CopyConfigH\x00R\ncopyConfig\x12\x41\n\nuv_project\x18\x08 \x01(\x0b\x32 .flyteidl.imagebuilder.UVProjectH\x00R\tuvProject\x12.\n\x03\x65nv\x18\t \x01(\x0b\x32\x1a.flyteidl.imagebuilder.EnvH\x00R\x03\x65nvB\x07\n\x05layer\"\xa3\x01\n\tImageSpec\x12\x1d\n\nbase_image\x18\x01 \x01(\tR\tbaseImage\x12%\n\x0epython_version\x18\x02 \x01(\tR\rpythonVersion\x12\x34\n\x06layers\x18\x03 \x03(\x0b\x32\x1c.flyteidl.imagebuilder.LayerR\x06layers\x12\x1a\n\x08platform\x18\x04 \x03(\tR\x08platformB\xd5\x01\n\x19\x63om.flyteidl.imagebuilderB\x0f\x44\x65\x66initionProtoH\x02P\x01Z0github.com/flyteorg/flyte/v2/gen/go/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x15\x46lyteidl.Imagebuilder\xca\x02\x15\x46lyteidl\\Imagebuilder\xe2\x02!Flyteidl\\Imagebuilder\\GPBMetadata\xea\x02\x16\x46lyteidl::Imagebuilderb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"idl2/imagebuilder/definition.proto\x12\x16\x66lyteidl2.imagebuilder\x1a\x17validate/validate.proto\".\n\x0fImageIdentifier\x12\x1b\n\x04name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x04name\"T\n\x05Image\x12\x37\n\x02id\x18\x01 \x01(\x0b\x32\'.flyteidl2.imagebuilder.ImageIdentifierR\x02id\x12\x12\n\x04\x66qin\x18\x02 \x01(\tR\x04\x66qin\")\n\x0b\x41ptPackages\x12\x1a\n\x08packages\x18\x01 \x03(\tR\x08packages\"\x84\x01\n\nPipOptions\x12\x1b\n\tindex_url\x18\x02 \x01(\tR\x08indexUrl\x12(\n\x10\x65xtra_index_urls\x18\x03 \x03(\tR\x0e\x65xtraIndexUrls\x12\x10\n\x03pre\x18\x04 \x01(\x08R\x03pre\x12\x1d\n\nextra_args\x18\x05 \x01(\tR\textraArgs\"g\n\x0bPipPackages\x12\x1a\n\x08packages\x18\x01 \x03(\tR\x08packages\x12<\n\x07options\x18\x02 \x01(\x0b\x32\".flyteidl2.imagebuilder.PipOptionsR\x07options\"`\n\x0cRequirements\x12\x12\n\x04\x66ile\x18\x01 \x01(\tR\x04\x66ile\x12<\n\x07options\x18\x02 \x01(\x0b\x32\".flyteidl2.imagebuilder.PipOptionsR\x07options\"^\n\x0cPythonWheels\x12\x10\n\x03\x64ir\x18\x01 \x01(\tR\x03\x64ir\x12<\n\x07options\x18\x02 \x01(\x0b\x32\".flyteidl2.imagebuilder.PipOptionsR\x07options\"\x7f\n\tUVProject\x12\x1c\n\tpyproject\x18\x01 \x01(\tR\tpyproject\x12\x16\n\x06uvlock\x18\x02 \x01(\tR\x06uvlock\x12<\n\x07options\x18\x03 \x01(\x0b\x32\".flyteidl2.imagebuilder.PipOptionsR\x07options\"\x1c\n\x08\x43ommands\x12\x10\n\x03\x63md\x18\x02 \x03(\tR\x03\x63md\"#\n\x07WorkDir\x12\x18\n\x07workdir\x18\x01 \x01(\tR\x07workdir\"0\n\nCopyConfig\x12\x10\n\x03src\x18\x01 \x01(\tR\x03src\x12\x10\n\x03\x64st\x18\x02 \x01(\tR\x03\x64st\"\x9a\x01\n\x03\x45nv\x12R\n\renv_variables\x18\x01 \x03(\x0b\x32-.flyteidl2.imagebuilder.Env.EnvVariablesEntryR\x0c\x65nvVariables\x1a?\n\x11\x45nvVariablesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xf6\x04\n\x05Layer\x12H\n\x0c\x61pt_packages\x18\x01 \x01(\x0b\x32#.flyteidl2.imagebuilder.AptPackagesH\x00R\x0b\x61ptPackages\x12H\n\x0cpip_packages\x18\x02 \x01(\x0b\x32#.flyteidl2.imagebuilder.PipPackagesH\x00R\x0bpipPackages\x12>\n\x08\x63ommands\x18\x03 \x01(\x0b\x32 .flyteidl2.imagebuilder.CommandsH\x00R\x08\x63ommands\x12J\n\x0crequirements\x18\x04 \x01(\x0b\x32$.flyteidl2.imagebuilder.RequirementsH\x00R\x0crequirements\x12K\n\rpython_wheels\x18\x05 \x01(\x0b\x32$.flyteidl2.imagebuilder.PythonWheelsH\x00R\x0cpythonWheels\x12;\n\x07workdir\x18\x06 \x01(\x0b\x32\x1f.flyteidl2.imagebuilder.WorkDirH\x00R\x07workdir\x12\x45\n\x0b\x63opy_config\x18\x07 \x01(\x0b\x32\".flyteidl2.imagebuilder.CopyConfigH\x00R\ncopyConfig\x12\x42\n\nuv_project\x18\x08 \x01(\x0b\x32!.flyteidl2.imagebuilder.UVProjectH\x00R\tuvProject\x12/\n\x03\x65nv\x18\t \x01(\x0b\x32\x1b.flyteidl2.imagebuilder.EnvH\x00R\x03\x65nvB\x07\n\x05layer\"\xa4\x01\n\tImageSpec\x12\x1d\n\nbase_image\x18\x01 \x01(\tR\tbaseImage\x12%\n\x0epython_version\x18\x02 \x01(\tR\rpythonVersion\x12\x35\n\x06layers\x18\x03 \x03(\x0b\x32\x1d.flyteidl2.imagebuilder.LayerR\x06layers\x12\x1a\n\x08platform\x18\x04 \x03(\tR\x08platformB\xdf\x01\n\x1a\x63om.flyteidl2.imagebuilderB\x0f\x44\x65\x66initionProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x16\x46lyteidl2.Imagebuilder\xca\x02\x16\x46lyteidl2\\Imagebuilder\xe2\x02\"Flyteidl2\\Imagebuilder\\GPBMetadata\xea\x02\x17\x46lyteidl2::Imagebuilderb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.imagebuilder.definition_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\031com.flyteidl.imagebuilderB\017DefinitionProtoH\002P\001Z0github.com/flyteorg/flyte/v2/gen/go/imagebuilder\242\002\003FIX\252\002\025Flyteidl.Imagebuilder\312\002\025Flyteidl\\Imagebuilder\342\002!Flyteidl\\Imagebuilder\\GPBMetadata\352\002\026Flyteidl::Imagebuilder'
+  DESCRIPTOR._serialized_options = b'\n\032com.flyteidl2.imagebuilderB\017DefinitionProtoH\002P\001Z5github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder\242\002\003FIX\252\002\026Flyteidl2.Imagebuilder\312\002\026Flyteidl2\\Imagebuilder\342\002\"Flyteidl2\\Imagebuilder\\GPBMetadata\352\002\027Flyteidl2::Imagebuilder'
   _IMAGEIDENTIFIER.fields_by_name['name']._options = None
   _IMAGEIDENTIFIER.fields_by_name['name']._serialized_options = b'\372B\004r\002\020\001'
   _ENV_ENVVARIABLESENTRY._options = None
   _ENV_ENVVARIABLESENTRY._serialized_options = b'8\001'
-  _globals['_IMAGEIDENTIFIER']._serialized_start=86
-  _globals['_IMAGEIDENTIFIER']._serialized_end=132
-  _globals['_IMAGE']._serialized_start=134
-  _globals['_IMAGE']._serialized_end=217
-  _globals['_APTPACKAGES']._serialized_start=219
-  _globals['_APTPACKAGES']._serialized_end=260
-  _globals['_PIPOPTIONS']._serialized_start=263
-  _globals['_PIPOPTIONS']._serialized_end=395
-  _globals['_PIPPACKAGES']._serialized_start=397
-  _globals['_PIPPACKAGES']._serialized_end=499
-  _globals['_REQUIREMENTS']._serialized_start=501
-  _globals['_REQUIREMENTS']._serialized_end=596
-  _globals['_PYTHONWHEELS']._serialized_start=598
-  _globals['_PYTHONWHEELS']._serialized_end=691
-  _globals['_UVPROJECT']._serialized_start=693
-  _globals['_UVPROJECT']._serialized_end=819
-  _globals['_COMMANDS']._serialized_start=821
-  _globals['_COMMANDS']._serialized_end=849
-  _globals['_WORKDIR']._serialized_start=851
-  _globals['_WORKDIR']._serialized_end=886
-  _globals['_COPYCONFIG']._serialized_start=888
-  _globals['_COPYCONFIG']._serialized_end=936
-  _globals['_ENV']._serialized_start=939
-  _globals['_ENV']._serialized_end=1092
-  _globals['_ENV_ENVVARIABLESENTRY']._serialized_start=1029
-  _globals['_ENV_ENVVARIABLESENTRY']._serialized_end=1092
-  _globals['_LAYER']._serialized_start=1095
-  _globals['_LAYER']._serialized_end=1716
-  _globals['_IMAGESPEC']._serialized_start=1719
-  _globals['_IMAGESPEC']._serialized_end=1882
+  _globals['_IMAGEIDENTIFIER']._serialized_start=87
+  _globals['_IMAGEIDENTIFIER']._serialized_end=133
+  _globals['_IMAGE']._serialized_start=135
+  _globals['_IMAGE']._serialized_end=219
+  _globals['_APTPACKAGES']._serialized_start=221
+  _globals['_APTPACKAGES']._serialized_end=262
+  _globals['_PIPOPTIONS']._serialized_start=265
+  _globals['_PIPOPTIONS']._serialized_end=397
+  _globals['_PIPPACKAGES']._serialized_start=399
+  _globals['_PIPPACKAGES']._serialized_end=502
+  _globals['_REQUIREMENTS']._serialized_start=504
+  _globals['_REQUIREMENTS']._serialized_end=600
+  _globals['_PYTHONWHEELS']._serialized_start=602
+  _globals['_PYTHONWHEELS']._serialized_end=696
+  _globals['_UVPROJECT']._serialized_start=698
+  _globals['_UVPROJECT']._serialized_end=825
+  _globals['_COMMANDS']._serialized_start=827
+  _globals['_COMMANDS']._serialized_end=855
+  _globals['_WORKDIR']._serialized_start=857
+  _globals['_WORKDIR']._serialized_end=892
+  _globals['_COPYCONFIG']._serialized_start=894
+  _globals['_COPYCONFIG']._serialized_end=942
+  _globals['_ENV']._serialized_start=945
+  _globals['_ENV']._serialized_end=1099
+  _globals['_ENV_ENVVARIABLESENTRY']._serialized_start=1036
+  _globals['_ENV_ENVVARIABLESENTRY']._serialized_end=1099
+  _globals['_LAYER']._serialized_start=1102
+  _globals['_LAYER']._serialized_end=1732
+  _globals['_IMAGESPEC']._serialized_start=1735
+  _globals['_IMAGESPEC']._serialized_end=1899
 # @@protoc_insertion_point(module_scope)

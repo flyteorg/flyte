@@ -17,14 +17,14 @@ from idl2.common import role_pb2 as idl2_dot_common_dot_role__pb2
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aidl2/common/identity.proto\x12\x0f\x66lyteidl.common\x1a\x1cidl2/common/identifier.proto\x1a\x18idl2/common/policy.proto\x1a\x16idl2/common/role.proto\x1a\x17validate/validate.proto\"\xcc\x01\n\x04User\x12/\n\x02id\x18\x01 \x01(\x0b\x32\x1f.flyteidl.common.UserIdentifierR\x02id\x12-\n\x04spec\x18\x02 \x01(\x0b\x32\x19.flyteidl.common.UserSpecR\x04spec\x12/\n\x05roles\x18\x03 \x03(\x0b\x32\x15.flyteidl.common.RoleB\x02\x18\x01R\x05roles\x12\x33\n\x08policies\x18\x04 \x03(\x0b\x32\x17.flyteidl.common.PolicyR\x08policies\"\xd6\x01\n\x08UserSpec\x12\x1d\n\nfirst_name\x18\x01 \x01(\tR\tfirstName\x12\x1b\n\tlast_name\x18\x02 \x01(\tR\x08lastName\x12\x14\n\x05\x65mail\x18\x03 \x01(\tR\x05\x65mail\x12\"\n\x0corganization\x18\x04 \x01(\tR\x0corganization\x12\x1f\n\x0buser_handle\x18\x05 \x01(\tR\nuserHandle\x12\x16\n\x06groups\x18\x06 \x03(\tR\x06groups\x12\x1b\n\tphoto_url\x18\x07 \x01(\tR\x08photoUrl\"s\n\x0b\x41pplication\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32&.flyteidl.common.ApplicationIdentifierR\x02id\x12,\n\x04spec\x18\x02 \x01(\x0b\x32\x18.flyteidl.common.AppSpecR\x04spec\"A\n\x07\x41ppSpec\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\"\xa7\x01\n\x10\x45nrichedIdentity\x12\x35\n\x04user\x18\x01 \x01(\x0b\x32\x15.flyteidl.common.UserB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\x04user\x12J\n\x0b\x61pplication\x18\x02 \x01(\x0b\x32\x1c.flyteidl.common.ApplicationB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\x0b\x61pplicationB\x10\n\tprincipal\x12\x03\xf8\x42\x01\"\xa4\x01\n\x08Identity\x12:\n\x07user_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl.common.UserIdentifierH\x00R\x06userId\x12O\n\x0e\x61pplication_id\x18\x02 \x01(\x0b\x32&.flyteidl.common.ApplicationIdentifierH\x00R\rapplicationIdB\x0b\n\tprincipalB\xaf\x01\n\x13\x63om.flyteidl.commonB\rIdentityProtoH\x02P\x01Z*github.com/flyteorg/flyte/v2/gen/go/common\xa2\x02\x03\x46\x43X\xaa\x02\x0f\x46lyteidl.Common\xca\x02\x0f\x46lyteidl\\Common\xe2\x02\x1b\x46lyteidl\\Common\\GPBMetadata\xea\x02\x10\x46lyteidl::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aidl2/common/identity.proto\x12\x10\x66lyteidl2.common\x1a\x1cidl2/common/identifier.proto\x1a\x18idl2/common/policy.proto\x1a\x16idl2/common/role.proto\x1a\x17validate/validate.proto\"\xd0\x01\n\x04User\x12\x30\n\x02id\x18\x01 \x01(\x0b\x32 .flyteidl2.common.UserIdentifierR\x02id\x12.\n\x04spec\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.common.UserSpecR\x04spec\x12\x30\n\x05roles\x18\x03 \x03(\x0b\x32\x16.flyteidl2.common.RoleB\x02\x18\x01R\x05roles\x12\x34\n\x08policies\x18\x04 \x03(\x0b\x32\x18.flyteidl2.common.PolicyR\x08policies\"\xd6\x01\n\x08UserSpec\x12\x1d\n\nfirst_name\x18\x01 \x01(\tR\tfirstName\x12\x1b\n\tlast_name\x18\x02 \x01(\tR\x08lastName\x12\x14\n\x05\x65mail\x18\x03 \x01(\tR\x05\x65mail\x12\"\n\x0corganization\x18\x04 \x01(\tR\x0corganization\x12\x1f\n\x0buser_handle\x18\x05 \x01(\tR\nuserHandle\x12\x16\n\x06groups\x18\x06 \x03(\tR\x06groups\x12\x1b\n\tphoto_url\x18\x07 \x01(\tR\x08photoUrl\"u\n\x0b\x41pplication\x12\x37\n\x02id\x18\x01 \x01(\x0b\x32\'.flyteidl2.common.ApplicationIdentifierR\x02id\x12-\n\x04spec\x18\x02 \x01(\x0b\x32\x19.flyteidl2.common.AppSpecR\x04spec\"A\n\x07\x41ppSpec\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\"\xa9\x01\n\x10\x45nrichedIdentity\x12\x36\n\x04user\x18\x01 \x01(\x0b\x32\x16.flyteidl2.common.UserB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\x04user\x12K\n\x0b\x61pplication\x18\x02 \x01(\x0b\x32\x1d.flyteidl2.common.ApplicationB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\x0b\x61pplicationB\x10\n\tprincipal\x12\x03\xf8\x42\x01\"\xa6\x01\n\x08Identity\x12;\n\x07user_id\x18\x01 \x01(\x0b\x32 .flyteidl2.common.UserIdentifierH\x00R\x06userId\x12P\n\x0e\x61pplication_id\x18\x02 \x01(\x0b\x32\'.flyteidl2.common.ApplicationIdentifierH\x00R\rapplicationIdB\x0b\n\tprincipalB\xb9\x01\n\x14\x63om.flyteidl2.commonB\rIdentityProtoH\x02P\x01Z/github.com/flyteorg/flyte/v2/gen/go/idl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.common.identity_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\023com.flyteidl.commonB\rIdentityProtoH\002P\001Z*github.com/flyteorg/flyte/v2/gen/go/common\242\002\003FCX\252\002\017Flyteidl.Common\312\002\017Flyteidl\\Common\342\002\033Flyteidl\\Common\\GPBMetadata\352\002\020Flyteidl::Common'
+  DESCRIPTOR._serialized_options = b'\n\024com.flyteidl2.commonB\rIdentityProtoH\002P\001Z/github.com/flyteorg/flyte/v2/gen/go/idl2/common\242\002\003FCX\252\002\020Flyteidl2.Common\312\002\020Flyteidl2\\Common\342\002\034Flyteidl2\\Common\\GPBMetadata\352\002\021Flyteidl2::Common'
   _USER.fields_by_name['roles']._options = None
   _USER.fields_by_name['roles']._serialized_options = b'\030\001'
   _ENRICHEDIDENTITY.oneofs_by_name['principal']._options = None
@@ -33,16 +33,16 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ENRICHEDIDENTITY.fields_by_name['user']._serialized_options = b'\372B\005\212\001\002\020\001'
   _ENRICHEDIDENTITY.fields_by_name['application']._options = None
   _ENRICHEDIDENTITY.fields_by_name['application']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _globals['_USER']._serialized_start=153
-  _globals['_USER']._serialized_end=357
-  _globals['_USERSPEC']._serialized_start=360
-  _globals['_USERSPEC']._serialized_end=574
-  _globals['_APPLICATION']._serialized_start=576
-  _globals['_APPLICATION']._serialized_end=691
-  _globals['_APPSPEC']._serialized_start=693
-  _globals['_APPSPEC']._serialized_end=758
-  _globals['_ENRICHEDIDENTITY']._serialized_start=761
-  _globals['_ENRICHEDIDENTITY']._serialized_end=928
-  _globals['_IDENTITY']._serialized_start=931
-  _globals['_IDENTITY']._serialized_end=1095
+  _globals['_USER']._serialized_start=154
+  _globals['_USER']._serialized_end=362
+  _globals['_USERSPEC']._serialized_start=365
+  _globals['_USERSPEC']._serialized_end=579
+  _globals['_APPLICATION']._serialized_start=581
+  _globals['_APPLICATION']._serialized_end=698
+  _globals['_APPSPEC']._serialized_start=700
+  _globals['_APPSPEC']._serialized_end=765
+  _globals['_ENRICHEDIDENTITY']._serialized_start=768
+  _globals['_ENRICHEDIDENTITY']._serialized_end=937
+  _globals['_IDENTITY']._serialized_start=940
+  _globals['_IDENTITY']._serialized_end=1106
 # @@protoc_insertion_point(module_scope)

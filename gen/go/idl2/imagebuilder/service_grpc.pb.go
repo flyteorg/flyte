@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ImageService_GetImage_FullMethodName = "/flyteidl.imagebuilder.ImageService/GetImage"
+	ImageService_GetImage_FullMethodName = "/flyteidl2.imagebuilder.ImageService/GetImage"
 )
 
 // ImageServiceClient is the client API for ImageService service.
@@ -94,7 +94,7 @@ func _ImageService_GetImage_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ImageService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.imagebuilder.ImageService",
+	ServiceName: "flyteidl2.imagebuilder.ImageService",
 	HandlerType: (*ImageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -16,17 +16,17 @@ class QueueServiceStub(object):
             channel: A grpc.Channel.
         """
         self.EnqueueAction = channel.unary_unary(
-                '/flyteidl.workflow.QueueService/EnqueueAction',
+                '/flyteidl2.workflow.QueueService/EnqueueAction',
                 request_serializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
                 )
         self.AbortQueuedRun = channel.unary_unary(
-                '/flyteidl.workflow.QueueService/AbortQueuedRun',
+                '/flyteidl2.workflow.QueueService/AbortQueuedRun',
                 request_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
                 )
         self.AbortQueuedAction = channel.unary_unary(
-                '/flyteidl.workflow.QueueService/AbortQueuedAction',
+                '/flyteidl2.workflow.QueueService/AbortQueuedAction',
                 request_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
                 response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
                 )
@@ -77,7 +77,7 @@ def add_QueueServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.QueueService', rpc_method_handlers)
+            'flyteidl2.workflow.QueueService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -97,7 +97,7 @@ class QueueService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.QueueService/EnqueueAction',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/EnqueueAction',
             idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
             idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
             options, channel_credentials,
@@ -114,7 +114,7 @@ class QueueService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.QueueService/AbortQueuedRun',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/AbortQueuedRun',
             idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
             idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
             options, channel_credentials,
@@ -131,7 +131,7 @@ class QueueService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.workflow.QueueService/AbortQueuedAction',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/AbortQueuedAction',
             idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
             idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
             options, channel_credentials,

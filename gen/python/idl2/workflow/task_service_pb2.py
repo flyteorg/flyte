@@ -17,14 +17,14 @@ from validate import validate_pb2 as validate_dot_validate__pb2
 from idl2.workflow import task_definition_pb2 as idl2_dot_workflow_dot_task__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n idl2/workflow/task_service.proto\x12\x11\x66lyteidl.workflow\x1a\x1cidl2/common/identifier.proto\x1a\x16idl2/common/list.proto\x1a\x17validate/validate.proto\x1a#idl2/workflow/task_definition.proto\"\x94\x01\n\x11\x44\x65ployTaskRequest\x12\x44\n\x07task_id\x18\x01 \x01(\x0b\x32!.flyteidl.workflow.TaskIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06taskId\x12\x39\n\x04spec\x18\x02 \x01(\x0b\x32\x1b.flyteidl.workflow.TaskSpecB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x04spec\"\x14\n\x12\x44\x65ployTaskResponse\"]\n\x15GetTaskDetailsRequest\x12\x44\n\x07task_id\x18\x01 \x01(\x0b\x32!.flyteidl.workflow.TaskIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06taskId\"R\n\x16GetTaskDetailsResponse\x12\x38\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1e.flyteidl.workflow.TaskDetailsR\x07\x64\x65tails\"\xdc\x02\n\x10ListTasksRequest\x12\x36\n\x07request\x18\x01 \x01(\x0b\x32\x1c.flyteidl.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01H\x00R\x03org\x12M\n\nproject_id\x18\x03 \x01(\x0b\x32\".flyteidl.common.ProjectIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\tprojectId\x12T\n\rknown_filters\x18\x04 \x03(\x0b\x32/.flyteidl.workflow.ListTasksRequest.KnownFilterR\x0cknownFilters\x1a=\n\x0bKnownFilter\x12!\n\x0b\x64\x65ployed_by\x18\x01 \x01(\tH\x00R\ndeployedByB\x0b\n\tfilter_byB\x0f\n\x08scope_by\x12\x03\xf8\x42\x01\"X\n\x11ListTasksResponse\x12-\n\x05tasks\x18\x01 \x03(\x0b\x32\x17.flyteidl.workflow.TaskR\x05tasks\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token2\xb3\x02\n\x0bTaskService\x12[\n\nDeployTask\x12$.flyteidl.workflow.DeployTaskRequest\x1a%.flyteidl.workflow.DeployTaskResponse\"\x00\x12j\n\x0eGetTaskDetails\x12(.flyteidl.workflow.GetTaskDetailsRequest\x1a).flyteidl.workflow.GetTaskDetailsResponse\"\x03\x90\x02\x01\x12[\n\tListTasks\x12#.flyteidl.workflow.ListTasksRequest\x1a$.flyteidl.workflow.ListTasksResponse\"\x03\x90\x02\x01\x42\xbe\x01\n\x15\x63om.flyteidl.workflowB\x10TaskServiceProtoH\x02P\x01Z,github.com/flyteorg/flyte/v2/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n idl2/workflow/task_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1cidl2/common/identifier.proto\x1a\x16idl2/common/list.proto\x1a\x17validate/validate.proto\x1a#idl2/workflow/task_definition.proto\"\x96\x01\n\x11\x44\x65ployTaskRequest\x12\x45\n\x07task_id\x18\x01 \x01(\x0b\x32\".flyteidl2.workflow.TaskIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06taskId\x12:\n\x04spec\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.workflow.TaskSpecB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x04spec\"\x14\n\x12\x44\x65ployTaskResponse\"^\n\x15GetTaskDetailsRequest\x12\x45\n\x07task_id\x18\x01 \x01(\x0b\x32\".flyteidl2.workflow.TaskIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06taskId\"S\n\x16GetTaskDetailsResponse\x12\x39\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.workflow.TaskDetailsR\x07\x64\x65tails\"\xdf\x02\n\x10ListTasksRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01H\x00R\x03org\x12N\n\nproject_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\tprojectId\x12U\n\rknown_filters\x18\x04 \x03(\x0b\x32\x30.flyteidl2.workflow.ListTasksRequest.KnownFilterR\x0cknownFilters\x1a=\n\x0bKnownFilter\x12!\n\x0b\x64\x65ployed_by\x18\x01 \x01(\tH\x00R\ndeployedByB\x0b\n\tfilter_byB\x0f\n\x08scope_by\x12\x03\xf8\x42\x01\"Y\n\x11ListTasksResponse\x12.\n\x05tasks\x18\x01 \x03(\x0b\x32\x18.flyteidl2.workflow.TaskR\x05tasks\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token2\xb9\x02\n\x0bTaskService\x12]\n\nDeployTask\x12%.flyteidl2.workflow.DeployTaskRequest\x1a&.flyteidl2.workflow.DeployTaskResponse\"\x00\x12l\n\x0eGetTaskDetails\x12).flyteidl2.workflow.GetTaskDetailsRequest\x1a*.flyteidl2.workflow.GetTaskDetailsResponse\"\x03\x90\x02\x01\x12]\n\tListTasks\x12$.flyteidl2.workflow.ListTasksRequest\x1a%.flyteidl2.workflow.ListTasksResponse\"\x03\x90\x02\x01\x42\xc8\x01\n\x16\x63om.flyteidl2.workflowB\x10TaskServiceProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.workflow.task_service_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\020TaskServiceProtoH\002P\001Z,github.com/flyteorg/flyte/v2/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
+  DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\020TaskServiceProtoH\002P\001Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
   _DEPLOYTASKREQUEST.fields_by_name['task_id']._options = None
   _DEPLOYTASKREQUEST.fields_by_name['task_id']._serialized_options = b'\372B\005\212\001\002\020\001'
   _DEPLOYTASKREQUEST.fields_by_name['spec']._options = None
@@ -41,20 +41,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TASKSERVICE.methods_by_name['GetTaskDetails']._serialized_options = b'\220\002\001'
   _TASKSERVICE.methods_by_name['ListTasks']._options = None
   _TASKSERVICE.methods_by_name['ListTasks']._serialized_options = b'\220\002\001'
-  _globals['_DEPLOYTASKREQUEST']._serialized_start=172
-  _globals['_DEPLOYTASKREQUEST']._serialized_end=320
-  _globals['_DEPLOYTASKRESPONSE']._serialized_start=322
-  _globals['_DEPLOYTASKRESPONSE']._serialized_end=342
-  _globals['_GETTASKDETAILSREQUEST']._serialized_start=344
-  _globals['_GETTASKDETAILSREQUEST']._serialized_end=437
-  _globals['_GETTASKDETAILSRESPONSE']._serialized_start=439
-  _globals['_GETTASKDETAILSRESPONSE']._serialized_end=521
-  _globals['_LISTTASKSREQUEST']._serialized_start=524
-  _globals['_LISTTASKSREQUEST']._serialized_end=872
-  _globals['_LISTTASKSREQUEST_KNOWNFILTER']._serialized_start=794
-  _globals['_LISTTASKSREQUEST_KNOWNFILTER']._serialized_end=855
-  _globals['_LISTTASKSRESPONSE']._serialized_start=874
-  _globals['_LISTTASKSRESPONSE']._serialized_end=962
-  _globals['_TASKSERVICE']._serialized_start=965
-  _globals['_TASKSERVICE']._serialized_end=1272
+  _globals['_DEPLOYTASKREQUEST']._serialized_start=173
+  _globals['_DEPLOYTASKREQUEST']._serialized_end=323
+  _globals['_DEPLOYTASKRESPONSE']._serialized_start=325
+  _globals['_DEPLOYTASKRESPONSE']._serialized_end=345
+  _globals['_GETTASKDETAILSREQUEST']._serialized_start=347
+  _globals['_GETTASKDETAILSREQUEST']._serialized_end=441
+  _globals['_GETTASKDETAILSRESPONSE']._serialized_start=443
+  _globals['_GETTASKDETAILSRESPONSE']._serialized_end=526
+  _globals['_LISTTASKSREQUEST']._serialized_start=529
+  _globals['_LISTTASKSREQUEST']._serialized_end=880
+  _globals['_LISTTASKSREQUEST_KNOWNFILTER']._serialized_start=802
+  _globals['_LISTTASKSREQUEST_KNOWNFILTER']._serialized_end=863
+  _globals['_LISTTASKSRESPONSE']._serialized_start=882
+  _globals['_LISTTASKSRESPONSE']._serialized_end=971
+  _globals['_TASKSERVICE']._serialized_start=974
+  _globals['_TASKSERVICE']._serialized_end=1287
 # @@protoc_insertion_point(module_scope)

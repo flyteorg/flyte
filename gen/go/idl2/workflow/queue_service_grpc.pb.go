@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	QueueService_EnqueueAction_FullMethodName     = "/flyteidl.workflow.QueueService/EnqueueAction"
-	QueueService_AbortQueuedRun_FullMethodName    = "/flyteidl.workflow.QueueService/AbortQueuedRun"
-	QueueService_AbortQueuedAction_FullMethodName = "/flyteidl.workflow.QueueService/AbortQueuedAction"
+	QueueService_EnqueueAction_FullMethodName     = "/flyteidl2.workflow.QueueService/EnqueueAction"
+	QueueService_AbortQueuedRun_FullMethodName    = "/flyteidl2.workflow.QueueService/AbortQueuedRun"
+	QueueService_AbortQueuedAction_FullMethodName = "/flyteidl2.workflow.QueueService/AbortQueuedAction"
 )
 
 // QueueServiceClient is the client API for QueueService service.
@@ -166,7 +166,7 @@ func _QueueService_AbortQueuedAction_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var QueueService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.workflow.QueueService",
+	ServiceName: "flyteidl2.workflow.QueueService",
 	HandlerType: (*QueueServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

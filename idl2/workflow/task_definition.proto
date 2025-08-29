@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/common/identity.proto";
@@ -10,7 +10,7 @@ import "validate/validate.proto";
 import "idl2/workflow/common.proto";
 import "idl2/workflow/environment.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // Name of a task. It may have multiple versions deployed.
 message TaskName {
@@ -99,11 +99,11 @@ message Task {
 // Specification for a task.
 message TaskSpec {
   // The template for this task.
-  flyteidl.core.TaskTemplate task_template = 1 [(validate.rules).message.required = true];
+  flyteidl2.core.TaskTemplate task_template = 1 [(validate.rules).message.required = true];
 
   // Ordered default inputs.
   // These can be overridden when an run is created.
-  // Client should not send required=true flag in underlying flyteidl.core.Parameter.
+  // Client should not send required=true flag in underlying flyteidl2.core.Parameter.
   repeated NamedParameter default_inputs = 2;
 
   // User facing display name for this task. Not required to be unique.

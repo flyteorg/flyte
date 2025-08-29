@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package flyteidl.workflow;
+package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/common/list.proto";
 import "validate/validate.proto";
 import "idl2/workflow/task_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
 // TaskService provides an interface for managing tasks.
 service TaskService {

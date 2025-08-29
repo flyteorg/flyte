@@ -18,14 +18,14 @@ from validate import validate_pb2 as validate_dot_validate__pb2
 from idl2.workflow import run_definition_pb2 as idl2_dot_workflow_dot_run__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!idl2/workflow/state_service.proto\x12\x11\x66lyteidl.workflow\x1a\x1cidl2/common/identifier.proto\x1a\x19idl2/core/execution.proto\x1a\x17google/rpc/status.proto\x1a\x17validate/validate.proto\x1a\"idl2/workflow/run_definition.proto\"\xbf\x01\n\nPutRequest\x12H\n\taction_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x00R\x10parentActionName\x88\x01\x01\x12\x1d\n\x05state\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x05stateB\x15\n\x13_parent_action_name\"\x8d\x01\n\x0bPutResponse\x12H\n\taction_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x34\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06status\"V\n\nGetRequest\x12H\n\taction_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\"\xac\x01\n\x0bGetResponse\x12H\n\taction_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x34\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06status\x12\x1d\n\x05state\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x05state\"l\n\x0cWatchRequest\x12M\n\x10parent_action_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierH\x00R\x0eparentActionIdB\r\n\x06\x66ilter\x12\x03\xf8\x42\x01\"\xb0\x01\n\rWatchResponse\x12\x46\n\raction_update\x18\x01 \x01(\x0b\x32\x1f.flyteidl.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12L\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32!.flyteidl.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\",\n\x0e\x43ontrolMessage\x12\x1a\n\x08sentinel\x18\x01 \x01(\x08R\x08sentinel\"\xeb\x01\n\x0c\x41\x63tionUpdate\x12H\n\taction_id\x18\x01 \x01(\x0b\x32!.flyteidl.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12.\n\x05phase\x18\x02 \x01(\x0e\x32\x18.flyteidl.workflow.PhaseR\x05phase\x12\x38\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x1d.flyteidl.core.ExecutionErrorH\x00R\x05\x65rror\x88\x01\x01\x12\x1d\n\noutput_uri\x18\x04 \x01(\tR\toutputUriB\x08\n\x06_error2\xf6\x01\n\x0cStateService\x12J\n\x03Put\x12\x1d.flyteidl.workflow.PutRequest\x1a\x1e.flyteidl.workflow.PutResponse\"\x00(\x01\x30\x01\x12J\n\x03Get\x12\x1d.flyteidl.workflow.GetRequest\x1a\x1e.flyteidl.workflow.GetResponse\"\x00(\x01\x30\x01\x12N\n\x05Watch\x12\x1f.flyteidl.workflow.WatchRequest\x1a .flyteidl.workflow.WatchResponse\"\x00\x30\x01\x42\xbf\x01\n\x15\x63om.flyteidl.workflowB\x11StateServiceProtoH\x02P\x01Z,github.com/flyteorg/flyte/v2/gen/go/workflow\xa2\x02\x03\x46WX\xaa\x02\x11\x46lyteidl.Workflow\xca\x02\x11\x46lyteidl\\Workflow\xe2\x02\x1d\x46lyteidl\\Workflow\\GPBMetadata\xea\x02\x12\x46lyteidl::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!idl2/workflow/state_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1cidl2/common/identifier.proto\x1a\x19idl2/core/execution.proto\x1a\x17google/rpc/status.proto\x1a\x17validate/validate.proto\x1a\"idl2/workflow/run_definition.proto\"\xc0\x01\n\nPutRequest\x12I\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x00R\x10parentActionName\x88\x01\x01\x12\x1d\n\x05state\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x05stateB\x15\n\x13_parent_action_name\"\x8e\x01\n\x0bPutResponse\x12I\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x34\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06status\"W\n\nGetRequest\x12I\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\"\xad\x01\n\x0bGetResponse\x12I\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12\x34\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x06status\x12\x1d\n\x05state\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x05state\"m\n\x0cWatchRequest\x12N\n\x10parent_action_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x0eparentActionIdB\r\n\x06\x66ilter\x12\x03\xf8\x42\x01\"\xb2\x01\n\rWatchResponse\x12G\n\raction_update\x18\x01 \x01(\x0b\x32 .flyteidl2.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12M\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\",\n\x0e\x43ontrolMessage\x12\x1a\n\x08sentinel\x18\x01 \x01(\x08R\x08sentinel\"\xee\x01\n\x0c\x41\x63tionUpdate\x12I\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x08\x61\x63tionId\x12/\n\x05phase\x18\x02 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x1e.flyteidl2.core.ExecutionErrorH\x00R\x05\x65rror\x88\x01\x01\x12\x1d\n\noutput_uri\x18\x04 \x01(\tR\toutputUriB\x08\n\x06_error2\xfc\x01\n\x0cStateService\x12L\n\x03Put\x12\x1e.flyteidl2.workflow.PutRequest\x1a\x1f.flyteidl2.workflow.PutResponse\"\x00(\x01\x30\x01\x12L\n\x03Get\x12\x1e.flyteidl2.workflow.GetRequest\x1a\x1f.flyteidl2.workflow.GetResponse\"\x00(\x01\x30\x01\x12P\n\x05Watch\x12 .flyteidl2.workflow.WatchRequest\x1a!.flyteidl2.workflow.WatchResponse\"\x00\x30\x01\x42\xc9\x01\n\x16\x63om.flyteidl2.workflowB\x11StateServiceProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'idl2.workflow.state_service_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\025com.flyteidl.workflowB\021StateServiceProtoH\002P\001Z,github.com/flyteorg/flyte/v2/gen/go/workflow\242\002\003FWX\252\002\021Flyteidl.Workflow\312\002\021Flyteidl\\Workflow\342\002\035Flyteidl\\Workflow\\GPBMetadata\352\002\022Flyteidl::Workflow'
+  DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\021StateServiceProtoH\002P\001Z1github.com/flyteorg/flyte/v2/gen/go/idl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
   _PUTREQUEST.fields_by_name['action_id']._options = None
   _PUTREQUEST.fields_by_name['action_id']._serialized_options = b'\372B\005\212\001\002\020\001'
   _PUTREQUEST.fields_by_name['state']._options = None
@@ -46,22 +46,22 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _WATCHREQUEST.oneofs_by_name['filter']._serialized_options = b'\370B\001'
   _ACTIONUPDATE.fields_by_name['action_id']._options = None
   _ACTIONUPDATE.fields_by_name['action_id']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _globals['_PUTREQUEST']._serialized_start=200
-  _globals['_PUTREQUEST']._serialized_end=391
-  _globals['_PUTRESPONSE']._serialized_start=394
-  _globals['_PUTRESPONSE']._serialized_end=535
-  _globals['_GETREQUEST']._serialized_start=537
-  _globals['_GETREQUEST']._serialized_end=623
-  _globals['_GETRESPONSE']._serialized_start=626
-  _globals['_GETRESPONSE']._serialized_end=798
-  _globals['_WATCHREQUEST']._serialized_start=800
-  _globals['_WATCHREQUEST']._serialized_end=908
-  _globals['_WATCHRESPONSE']._serialized_start=911
-  _globals['_WATCHRESPONSE']._serialized_end=1087
-  _globals['_CONTROLMESSAGE']._serialized_start=1089
-  _globals['_CONTROLMESSAGE']._serialized_end=1133
-  _globals['_ACTIONUPDATE']._serialized_start=1136
-  _globals['_ACTIONUPDATE']._serialized_end=1371
-  _globals['_STATESERVICE']._serialized_start=1374
-  _globals['_STATESERVICE']._serialized_end=1620
+  _globals['_PUTREQUEST']._serialized_start=201
+  _globals['_PUTREQUEST']._serialized_end=393
+  _globals['_PUTRESPONSE']._serialized_start=396
+  _globals['_PUTRESPONSE']._serialized_end=538
+  _globals['_GETREQUEST']._serialized_start=540
+  _globals['_GETREQUEST']._serialized_end=627
+  _globals['_GETRESPONSE']._serialized_start=630
+  _globals['_GETRESPONSE']._serialized_end=803
+  _globals['_WATCHREQUEST']._serialized_start=805
+  _globals['_WATCHREQUEST']._serialized_end=914
+  _globals['_WATCHRESPONSE']._serialized_start=917
+  _globals['_WATCHRESPONSE']._serialized_end=1095
+  _globals['_CONTROLMESSAGE']._serialized_start=1097
+  _globals['_CONTROLMESSAGE']._serialized_end=1141
+  _globals['_ACTIONUPDATE']._serialized_start=1144
+  _globals['_ACTIONUPDATE']._serialized_end=1382
+  _globals['_STATESERVICE']._serialized_start=1385
+  _globals['_STATESERVICE']._serialized_end=1637
 # @@protoc_insertion_point(module_scope)

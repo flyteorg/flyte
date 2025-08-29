@@ -23,7 +23,7 @@ def add_NodeExecutionServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.workflow.NodeExecutionService', rpc_method_handlers)
+            'flyteidl2.workflow.NodeExecutionService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 

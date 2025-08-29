@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SecretService_CreateSecret_FullMethodName = "/flyteidl.secret.SecretService/CreateSecret"
-	SecretService_UpdateSecret_FullMethodName = "/flyteidl.secret.SecretService/UpdateSecret"
-	SecretService_GetSecret_FullMethodName    = "/flyteidl.secret.SecretService/GetSecret"
-	SecretService_DeleteSecret_FullMethodName = "/flyteidl.secret.SecretService/DeleteSecret"
-	SecretService_ListSecrets_FullMethodName  = "/flyteidl.secret.SecretService/ListSecrets"
+	SecretService_CreateSecret_FullMethodName = "/flyteidl2.secret.SecretService/CreateSecret"
+	SecretService_UpdateSecret_FullMethodName = "/flyteidl2.secret.SecretService/UpdateSecret"
+	SecretService_GetSecret_FullMethodName    = "/flyteidl2.secret.SecretService/GetSecret"
+	SecretService_DeleteSecret_FullMethodName = "/flyteidl2.secret.SecretService/DeleteSecret"
+	SecretService_ListSecrets_FullMethodName  = "/flyteidl2.secret.SecretService/ListSecrets"
 )
 
 // SecretServiceClient is the client API for SecretService service.
@@ -226,7 +226,7 @@ func _SecretService_ListSecrets_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var SecretService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl.secret.SecretService",
+	ServiceName: "flyteidl2.secret.SecretService",
 	HandlerType: (*SecretServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

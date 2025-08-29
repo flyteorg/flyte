@@ -15,7 +15,7 @@ class ImageServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetImage = channel.unary_unary(
-                '/flyteidl.imagebuilder.ImageService/GetImage',
+                '/flyteidl2.imagebuilder.ImageService/GetImage',
                 request_serializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
                 response_deserializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
                 )
@@ -40,7 +40,7 @@ def add_ImageServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.imagebuilder.ImageService', rpc_method_handlers)
+            'flyteidl2.imagebuilder.ImageService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -59,7 +59,7 @@ class ImageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.imagebuilder.ImageService/GetImage',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.imagebuilder.ImageService/GetImage',
             idl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
             idl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
             options, channel_credentials,
