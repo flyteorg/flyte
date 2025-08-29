@@ -32,8 +32,8 @@ make build-wheels SETUPTOOLS_SCM_PRETEND_VERSION=0.1.0b0
 ```
 but wheels need to be renamed to this pattern
 ```bash
-mv unionai_reuse-0.1.4b0-cp38-abi3-linux_aarch64.whl unionai_reuse-0.1.4b0-cp38-abi3-manylinux_2_28_aarch64.whl
-mv unionai_reuse-0.1.4b0-cp38-abi3-linux_x86_64.whl unionai_reuse-0.1.4b0-cp38-abi3-manylinux_2_28_x86_64.whl
+mv unionai_reuse-0.1.5b0-cp38-abi3-linux_aarch64.whl unionai_reuse-0.1.5b0-cp38-abi3-manylinux_2_28_aarch64.whl
+mv unionai_reuse-0.1.5b0-cp38-abi3-linux_x86_64.whl unionai_reuse-0.1.5b0-cp38-abi3-manylinux_2_28_x86_64.whl
 ```
 
 Need to figure out how to make this automatic.

@@ -172,12 +172,10 @@ impl V2TaskManager {
 
         let tasks_in_progress = Arc::clone(&self.tasks_in_progress);
 
-        // This is an unbounded channel that the heartbeat timer, and the handler for the messages coming from
-        // the executor, will add messages to. Basically both periodically, and when this bridge receives any
-        // task status changes from the executor, we should fire off a heartbeat request.
-        // But this needs to be debounced (which is done below).
-        // todo: this should probably be a Notify.
+        // Channels for inter-task communication
         let (trigger_heartbeater_tx, trigger_heartbeater_rx) = async_channel::unbounded::<()>();
+        let (heartbeat_tx, heartbeat_rx) = async_channel::bounded(5);
+        let (operation_tx, operation_rx) = async_channel::bounded(self.max_parallelism as usize);
 
         // Spawn task to handle executor responses
         let mut executor_handler = {
@@ -198,164 +196,190 @@ impl V2TaskManager {
             })
         };
 
-        // Start heartbeat and work assignment loop
-        let mut heartbeat_timer = interval(Duration::from_secs(self.heartbeat_interval_seconds));
+        // Build connection runtime and spawn connection handler
         let connection_runtime = connection_builder.get_runtime()?;
+        let connection_cancellation = cancellation_token.clone();
+        let mut connection_task = tokio::spawn(Self::connection_task_with_runtime(
+            connection_runtime,
+            heartbeat_rx,
+            operation_tx,
+            connection_cancellation,
+        ));
 
-        // These two channels related to heartbeating.
-        // This channel will be used to connect the timer to the sending of the heartbeat request.
-        let (heartbeat_tx, heartbeat_rx) = async_channel::bounded(5);
-        // This channel is used to handle heartbeat responses.
-        let (operation_tx, operation_rx) = async_channel::bounded(self.max_parallelism as usize);
+        // Spawn heartbeat timer task
+        let timer_cancellation = cancellation_token.clone();
+        let timer_trigger_tx = trigger_heartbeater_tx.clone();
+        let mut heartbeat_timer_task = tokio::spawn(Self::heartbeat_timer_task(
+            self.heartbeat_interval_seconds,
+            timer_trigger_tx,
+            timer_cancellation,
+        ));
 
-        // Spawn connection handler
-        let connection_cancellation_token = cancellation_token.clone();
-        let mut connection_handler = tokio::spawn(async move {
-            connection_runtime
-                .run(heartbeat_rx, operation_tx, connection_cancellation_token)
-                .await
-        });
+        // Spawn heartbeat processing task
+        let processing_cancellation = cancellation_token.clone();
+        let mut heartbeat_processing_task = tokio::spawn(Self::heartbeat_processing_task(
+            trigger_heartbeater_rx,
+            heartbeat_tx,
+            Arc::clone(&tasks_in_progress),
+            self.worker_id.clone(),
+            self.queue_id.clone(),
+            self.max_parallelism,
+            processing_cancellation,
+        ));
 
         // This channel is used when an assign operation is received, and is used to actually send the Task down the
         // TCP stream. This channel exists because the sending of the Task to the TCP stream can be blocking.
         let (assignment_tx, assignment_rx) = async_channel::bounded(self.max_parallelism as usize);
-        // Spawn a task to pull from the assignment channel and actually pass into the TCP stream
         self.assignment_tx = Some(assignment_tx);
+
+        // Spawn operation handling task
+        let operation_cancellation = cancellation_token.clone();
+        let operation_assignment_tx = self.assignment_tx.as_ref().unwrap().clone();
+        let mut operation_handling_task = tokio::spawn(Self::operation_handling_task(
+            operation_rx,
+            operation_assignment_tx,
+            Arc::clone(&tasks_in_progress),
+            self.max_parallelism,
+            operation_cancellation,
+        ));
+
+        // Spawn a task to pull from the assignment channel and actually pass into the TCP stream
         let stream_writer = self
             .executor_stream_writer
             .take()
             .ok_or_else(|| anyhow!("Executor stream writer not available"))?;
-        let mut assignment_handler = tokio::spawn(async move {
-            Self::read_and_send_assignments(stream_writer, assignment_rx).await
-        });
+        let mut assignment_handler = tokio::spawn(
+            Self::read_and_send_assignments(stream_writer, assignment_rx)
+        );
 
-        let trigger_heartbeat_from_timer_tx = trigger_heartbeater_tx.clone();
-        // Main event loop
-        let loop_result = loop {
-            tokio::select! {
-                _ = heartbeat_timer.tick() => {
-                    // On timer... don't actually send the heartbeat, just notify
-                    trigger_heartbeat_from_timer_tx.send(()).await.unwrap_or_else(|e| {
-                        error!(error = %e, "Failed to send heartbeat tick");
-                    });
-                }
-                _ = trigger_heartbeater_rx.recv() => {
-                    // consume until empty as a crude debounce mechanism
-                    loop {
-                        match trigger_heartbeater_rx.try_recv() {
-                            Ok(_) => {
-                                // Process the message (in this case just a unit type)
-                                // Do whatever you need to do with each message
-                            }
-                            Err(TryRecvError::Empty) => {
-                                // Channel is empty, break out of loop
-                                trace!("Heartbeat channel is empty, breaking out of inner loop");
-                                break;
-                            }
-                            Err(TryRecvError::Closed) => {
-                                // Channel is closed, break out of loop
-                                debug!("Heartbeat channel is empty, breaking out of inner loop");
-                                break;
-                            }
-                        }
+        // Main orchestration - wait for any termination condition
+        let loop_result = tokio::select! {
+            // Handle executor process exit
+            result = &mut executor_handler => {
+                match result {
+                    Ok(Ok(())) => {
+                        warn!("Executor handler completed normally");
                     }
-                    let heartbeat_request = self.create_heartbeat_request();
-                    debug!(
-                        running_tasks = heartbeat_request.capacity.as_ref().map(|c| c.execution_count).unwrap_or(0),
-                        "Sending heartbeat"
-                    );
-                    if let Err(e) = heartbeat_tx.send(heartbeat_request).await {
-                        error!(error = %e, "Failed to send heartbeat");
+                    Ok(Err(e)) => {
+                        error!("Executor handler failed: {}", e);
+                    }
+                    Err(e) => {
+                        error!("Executor handler panicked: {}", e);
                     }
                 }
+                Err(anyhow!("Executor process failed, terminating"))
+            }
 
-                // Handle HeartbeatResponse messages from the fast task service
-                Ok(operation) = operation_rx.recv() => {
-                    if let Err(e) = self.handle_operation(operation).await {
-                        warn!(error = %e, "Failed to handle operation");
+            // Handle connection task failures (should restart automatically)
+            result = &mut connection_task => {
+                match result {
+                    Ok(Ok(())) => {
+                        warn!("Connection task completed normally");
+                    }
+                    Ok(Err(e)) => {
+                        error!("Connection task failed: {}", e);
+                    }
+                    Err(e) => {
+                        error!("Connection task panicked: {}", e);
                     }
                 }
+                Err(anyhow!("Connection task failed permanently, terminating"))
+            }
 
-                // Handle executor process exit
-                result = &mut executor_handler => {
-                    match result {
-                        Ok(Ok(())) => {
-                            warn!("Executor handler completed normally");
-                        }
-                        Ok(Err(e)) => {
-                            error!("Executor handler failed: {}", e);
-                        }
-                        Err(e) => {
-                            error!("Executor handler panicked: {}", e);
-                        }
+            // Handle heartbeat timer task failures
+            result = &mut heartbeat_timer_task => {
+                match result {
+                    Ok(Ok(())) => {
+                        warn!("Heartbeat timer task completed normally");
                     }
-                    break Err(anyhow!("Executor process failed, terminating"));
-                }
-
-                // Handle connection failures
-                result = &mut connection_handler => {
-                    match result {
-                        Ok(Ok(())) => {
-                            warn!("Connection handler completed normally");
-                        }
-                        Ok(Err(e)) => {
-                            error!("Connection handler failed: {}", e);
-                        }
-                        Err(e) => {
-                            error!("Connection handler panicked: {}", e);
-                        }
+                    Ok(Err(e)) => {
+                        error!("Heartbeat timer task failed: {}", e);
                     }
-                    // Connection failures should be retried, but for simplicity we'll exit
-                    break Err(anyhow!("Connection failed, terminating"));
-                }
-
-                // Handle cancellation signal
-                _ = cancellation_token.cancelled() => {
-                    info!("Received cancellation signal, shutting down gracefully");
-                    break Ok(());
-                }
-
-                // Handle assignment worker failures
-                result = &mut assignment_handler => {
-                    match result {
-                        Ok(Ok(())) => {
-                            // Assignment handler should never exit as long as the process is running
-                            error!("Assignment handler exited but without error");
-                        }
-                        Ok(Err(e)) => {
-                            error!("Assignment handler failed: {}", e);
-                        }
-                        Err(e) => {
-                            error!("Assignment handler panicked: {}", e);
-                        }
+                    Err(e) => {
+                        error!("Heartbeat timer task panicked: {}", e);
                     }
-                    // Exit for now, can revisit if we move to sidecar pattern.
-                    break Err(anyhow!("Assignment handler failed, terminating"));
                 }
+                Err(anyhow!("Heartbeat timer task failed, terminating"))
+            }
 
-                // Handle child executor process errors
-                child_result = self.executor_process.as_mut().unwrap().wait() => {
-                    match child_result {
-                        Ok(status) if status.success() => {
-                            error!("Executor process exited but is not supposed to.");
-                        }
-                        Ok(status) => {
-                            error!("Executor process exited with status: {}", status);
-                        }
-                        Err(e) => {
-                            error!("Failed to wait for executor process: {}", e);
-                        }
+            // Handle heartbeat processing task failures
+            result = &mut heartbeat_processing_task => {
+                match result {
+                    Ok(Ok(())) => {
+                        warn!("Heartbeat processing task completed normally");
                     }
-                    break Err(anyhow!("Executor process terminated, exiting"));
+                    Ok(Err(e)) => {
+                        error!("Heartbeat processing task failed: {}", e);
+                    }
+                    Err(e) => {
+                        error!("Heartbeat processing task panicked: {}", e);
+                    }
                 }
+                Err(anyhow!("Heartbeat processing task failed, terminating"))
+            }
+
+            // Handle operation handling task failures
+            result = &mut operation_handling_task => {
+                match result {
+                    Ok(Ok(())) => {
+                        warn!("Operation handling task completed normally");
+                    }
+                    Ok(Err(e)) => {
+                        error!("Operation handling task failed: {}", e);
+                    }
+                    Err(e) => {
+                        error!("Operation handling task panicked: {}", e);
+                    }
+                }
+                Err(anyhow!("Operation handling task failed, terminating"))
+            }
+
+            // Handle assignment worker failures
+            result = &mut assignment_handler => {
+                match result {
+                    Ok(Ok(())) => {
+                        error!("Assignment handler exited but without error");
+                    }
+                    Ok(Err(e)) => {
+                        error!("Assignment handler failed: {}", e);
+                    }
+                    Err(e) => {
+                        error!("Assignment handler panicked: {}", e);
+                    }
+                }
+                Err(anyhow!("Assignment handler failed, terminating"))
+            }
+
+            // Handle child executor process errors
+            child_result = self.executor_process.as_mut().unwrap().wait() => {
+                match child_result {
+                    Ok(status) if status.success() => {
+                        error!("Executor process exited but is not supposed to.");
+                    }
+                    Ok(status) => {
+                        error!("Executor process exited with status: {}", status);
+                    }
+                    Err(e) => {
+                        error!("Failed to wait for executor process: {}", e);
+                    }
+                }
+                Err(anyhow!("Executor process terminated, exiting"))
+            }
+
+            // Handle cancellation signal
+            _ = cancellation_token.cancelled() => {
+                info!("Received cancellation signal, shutting down gracefully");
+                Ok(())
             }
         };
 
-        // If the loop exits with an error,
-        // abort connection handler and assignment handler and executor handler.
+        // Abort all tasks on shutdown
         let handles = [
             &mut executor_handler,
-            &mut connection_handler,
+            &mut connection_task,
+            &mut heartbeat_timer_task,
+            &mut heartbeat_processing_task,
+            &mut operation_handling_task,
             &mut assignment_handler,
         ];
         for h in handles {
@@ -377,6 +401,144 @@ impl V2TaskManager {
                 let reason = e.to_string();
                 self.mark_unfinished_tasks_failed(&reason).await;
                 Err(e)
+            }
+        }
+    }
+
+    async fn connection_task_with_runtime<T: ConnectionRuntime + Send>(
+        connection_runtime: T,
+        heartbeat_rx: Receiver<HeartbeatRequest>,
+        operation_tx: Sender<HeartbeatResponse>,
+        cancellation_token: tokio_util::sync::CancellationToken,
+    ) -> Result<()> {
+        info!("Starting connection task");
+        loop {
+            let ct = cancellation_token.clone();
+            let hb_rx = heartbeat_rx.clone();
+            let op_tx = operation_tx.clone();
+            let connection_result = connection_runtime.run(hb_rx, op_tx, ct).await;
+            match connection_result {
+                Ok(()) => {
+                    info!("Connection runtime stopped, restarting");
+                    if cancellation_token.is_cancelled() {
+                        info!("Connection task detected cancellation, exiting");
+                        return Ok(());
+                    }
+                }
+                Err(e) => {
+                    error!(error = %e, "Connection runtime failed, restarting");
+                    if cancellation_token.is_cancelled() {
+                        info!("Connection task detected cancellation with error, exiting");
+                        return Err(e);
+                    }
+                }
+            }
+            info!("Connection ended, restarting in 1 second");
+            tokio::time::sleep(Duration::from_secs(1)).await;
+        }
+    }
+
+    async fn heartbeat_timer_task(
+        heartbeat_interval_seconds: u64,
+        trigger_tx: Sender<()>,
+        cancellation_token: tokio_util::sync::CancellationToken,
+    ) -> Result<()> {
+        info!("Starting heartbeat timer task");
+        let mut timer = interval(Duration::from_secs(heartbeat_interval_seconds));
+        
+        loop {
+            tokio::select! {
+                _ = timer.tick() => {
+                    if let Err(e) = trigger_tx.send(()).await {
+                        error!(error = %e, "Failed to send heartbeat trigger");
+                    }
+                }
+                _ = cancellation_token.cancelled() => {
+                    info!("Heartbeat timer task cancelled");
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    async fn heartbeat_processing_task(
+        trigger_rx: Receiver<()>,
+        heartbeat_tx: Sender<HeartbeatRequest>,
+        tasks_in_progress: Arc<Mutex<HashMap<String, TaskInfo>>>,
+        worker_id: String,
+        queue_id: String,
+        max_parallelism: i32,
+        cancellation_token: tokio_util::sync::CancellationToken,
+    ) -> Result<()> {
+        info!("Starting heartbeat processing task");
+        
+        loop {
+            tokio::select! {
+                Ok(_) = trigger_rx.recv() => {
+                    // Debounce mechanism - consume all pending triggers
+                    loop {
+                        match trigger_rx.try_recv() {
+                            Ok(_) => continue,
+                            Err(TryRecvError::Empty) => {
+                                trace!("Heartbeat trigger channel is empty, breaking out of debounce loop");
+                                break;
+                            }
+                            Err(TryRecvError::Closed) => {
+                                debug!("Heartbeat trigger channel is closed, breaking out of debounce loop");
+                                break;
+                            }
+                        }
+                    }
+                    
+                    let heartbeat_request = Self::create_heartbeat_request_static(
+                        &tasks_in_progress,
+                        &worker_id,
+                        &queue_id,
+                        max_parallelism,
+                    );
+                    debug!(
+                        running_tasks = heartbeat_request.capacity.as_ref().map(|c| c.execution_count).unwrap_or(0),
+                        "Sending heartbeat"
+                    );
+                    
+                    if let Err(e) = heartbeat_tx.send(heartbeat_request).await {
+                        error!(error = %e, "Failed to send heartbeat");
+                    }
+                }
+                _ = cancellation_token.cancelled() => {
+                    info!("Heartbeat processing task cancelled");
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    /// Task that reads HeartbeatResponse's from the operation_rx channel and handles them
+    async fn operation_handling_task(
+        operation_rx: Receiver<HeartbeatResponse>,
+        assignment_tx: Sender<Task>,
+        tasks_in_progress: Arc<Mutex<HashMap<String, TaskInfo>>>,
+        max_parallelism: i32,
+        cancellation_token: tokio_util::sync::CancellationToken,
+    ) -> Result<()> {
+        info!("Starting operation handling task");
+        
+        loop {
+            tokio::select! {
+                Ok(operation) = operation_rx.recv() => {
+                    if let Err(e) = Self::handle_operation_static(
+                        operation,
+                        &assignment_tx,
+                        &tasks_in_progress,
+                        max_parallelism,
+                    ).await {
+                        warn!(error = %e, "Failed to handle operation");
+                    }
+                }
+                _ = cancellation_token.cancelled() => {
+                    info!("Operation handling task cancelled");
+                    return Ok(());
+                }
             }
         }
     }
@@ -429,7 +591,6 @@ impl V2TaskManager {
                             trigger_heartbeat_tx.send(()).await.unwrap_or_else(|e| {
                                 error!(error = %e, "Failed to trigger heartbeat after task update");
                             });
-                            warn!(task.id = %response.unique_task_id, "removeme - sent trigger heartbeat tx");
                         }
                     } else {
                         error!(
@@ -447,8 +608,13 @@ impl V2TaskManager {
         Ok(())
     }
 
-    fn create_heartbeat_request(&self) -> HeartbeatRequest {
-        let tasks = self.tasks_in_progress.lock().unwrap();
+    fn create_heartbeat_request_static(
+        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
+        worker_id: &str,
+        queue_id: &str,
+        max_parallelism: i32,
+    ) -> HeartbeatRequest {
+        let tasks = tasks_in_progress.lock().unwrap();
         let running_count = tasks
             .values()
             .filter(|task_info| {
@@ -459,11 +625,11 @@ impl V2TaskManager {
             tasks.values().map(|task_info| task_info.into()).collect();
 
         HeartbeatRequest {
-            worker_id: self.worker_id.clone(),
-            queue_id: self.queue_id.clone(),
+            worker_id: worker_id.to_string(),
+            queue_id: queue_id.to_string(),
             capacity: Some(Capacity {
                 execution_count: running_count as i32,
-                execution_limit: self.max_parallelism,
+                execution_limit: max_parallelism,
                 backlog_count: 0,
                 backlog_limit: 0,
             }),
@@ -471,21 +637,26 @@ impl V2TaskManager {
         }
     }
 
-    #[instrument(skip(self, hb_response), fields(operation = hb_response.operation, task.id = %hb_response.task_id
+    #[instrument(fields(operation = hb_response.operation, task.id = %hb_response.task_id
     ))]
-    async fn handle_operation(&mut self, hb_response: HeartbeatResponse) -> Result<()> {
+    async fn handle_operation_static(
+        hb_response: HeartbeatResponse,
+        assignment_tx: &Sender<Task>,
+        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
+        max_parallelism: i32,
+    ) -> Result<()> {
         match Operation::from_i32(hb_response.operation) {
             Some(Operation::Assign) => {
                 trace!("Received task assignment");
-                self.try_assign_task(hb_response).await
+                Self::try_assign_task_static(hb_response, assignment_tx, tasks_in_progress, max_parallelism).await
             }
             Some(Operation::Ack) => {
                 trace!("Received task ACK");
-                self.update_ack_time(hb_response).await
+                Self::update_ack_time_static(hb_response, tasks_in_progress).await
             }
             Some(Operation::Delete) => {
                 trace!("Received task deletion request");
-                self.delete_task(hb_response.task_id).await
+                Self::delete_task_static(hb_response.task_id, tasks_in_progress).await
             }
             None => {
                 warn!(operation_code = hb_response.operation, "Unknown operation");
@@ -494,9 +665,11 @@ impl V2TaskManager {
         }
     }
 
-    async fn update_ack_time(&self, operation: HeartbeatResponse) -> Result<()> {
-        let mut tasks = self
-            .tasks_in_progress
+    async fn update_ack_time_static(
+        operation: HeartbeatResponse,
+        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
+    ) -> Result<()> {
+        let mut tasks = tasks_in_progress
             .lock()
             .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
         if let Some(task_info) = tasks.get_mut(&operation.task_id) {
@@ -508,15 +681,15 @@ impl V2TaskManager {
         Ok(())
     }
 
-    async fn try_assign_task(&mut self, operation: HeartbeatResponse) -> Result<()> {
-        let mut tasks = self
-            .tasks_in_progress
+    async fn try_assign_task_static(
+        operation: HeartbeatResponse,
+        assignment_tx: &Sender<Task>,
+        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
+        max_parallelism: i32,
+    ) -> Result<()> {
+        let mut tasks = tasks_in_progress
             .lock()
             .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
-        let tx = self
-            .assignment_tx
-            .as_ref()
-            .ok_or_else(|| anyhow!("Assignment channel not available"))?;
 
         let running_count = tasks
             .values()
@@ -524,10 +697,10 @@ impl V2TaskManager {
                 task_info.phase != FAILED && task_info.phase != 8 && task_info.phase != SUCCEEDED
             })
             .count();
-        if running_count >= self.max_parallelism as usize {
+        if running_count >= max_parallelism as usize {
             warn!(
                 running_count,
-                max_parallelism = self.max_parallelism,
+                max_parallelism,
                 "Max parallelism reached"
             );
             return Err(anyhow!("Max parallelism reached"));
@@ -561,7 +734,7 @@ impl V2TaskManager {
 
         debug!(exec.name = %exec_id.name, "Submitting task to executor");
         // try_send because we're holding the lock, if the channel is full, fail immediately
-        match tx.try_send(_task) {
+        match assignment_tx.try_send(_task) {
             Ok(()) => {
                 tasks.insert(operation.task_id.clone(), task_info);
                 debug!(
@@ -582,16 +755,18 @@ impl V2TaskManager {
         Ok(())
     }
 
-    #[instrument(skip(self), fields(task.id = %task_id))]
-    async fn delete_task(&mut self, task_id: String) -> Result<()> {
-        let mut tasks = self.tasks_in_progress.lock().unwrap();
+    async fn delete_task_static(
+        task_id: String,
+        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
+    ) -> Result<()> {
+        let mut tasks = tasks_in_progress.lock().unwrap();
 
         // todo: check that the task is done before deleting it. if not done, we'll need to
         //       send a cancelled error to the executor in the future.
         if let Some(task_info) = tasks.remove(&task_id) {
-            info!(phase = task_info.phase, "Task deleted");
+            info!(task.id = %task_id, phase = task_info.phase, "Task deleted");
         } else {
-            warn!("Task not found for deletion");
+            warn!(task.id = %task_id, "Task not found for deletion");
         }
 
         Ok(())
@@ -621,7 +796,12 @@ impl V2TaskManager {
         info!("Sending final heartbeat before shutdown");
 
         // Create final heartbeat request with current task states
-        let heartbeat_request = self.create_heartbeat_request();
+        let heartbeat_request = Self::create_heartbeat_request_static(
+            &self.tasks_in_progress,
+            &self.worker_id,
+            &self.queue_id,
+            self.max_parallelism,
+        );
 
         // Attempt to create a new gRPC connection for the final heartbeat
         match FastTaskClient::connect(fasttask_url.clone()).await {
@@ -725,21 +905,8 @@ mod tests {
         assert!(task_info.last_ack_time.is_none());
         tasks.lock().unwrap().insert(task_id.clone(), task_info);
 
-        let manager = V2TaskManager {
-            max_parallelism: 10,
-            executor_registration_addr: "test-addr".to_string(),
-            worker_id: "test-worker".to_string(),
-            queue_id: "test-queue".to_string(),
-            heartbeat_interval_seconds: 30,
-            tasks_in_progress: tasks.clone(),
-            executor_process: None,
-            executor_stream_reader: None,
-            executor_stream_writer: None,
-            assignment_tx: None,
-        };
-
         let hb_response = create_test_heartbeat_response();
-        let result = manager.update_ack_time(hb_response).await;
+        let result = V2TaskManager::update_ack_time_static(hb_response, &tasks.clone()).await;
 
         assert!(result.is_ok());
 
@@ -751,21 +918,9 @@ mod tests {
     #[tokio::test]
     async fn test_update_ack_time_nonexistent_task() {
         let tasks = Arc::new(Mutex::new(HashMap::new()));
-        let manager = V2TaskManager {
-            max_parallelism: 10,
-            executor_registration_addr: "test-addr".to_string(),
-            worker_id: "test-worker".to_string(),
-            queue_id: "test-queue".to_string(),
-            heartbeat_interval_seconds: 30,
-            tasks_in_progress: tasks.clone(),
-            executor_process: None,
-            executor_stream_reader: None,
-            executor_stream_writer: None,
-            assignment_tx: None,
-        };
 
         let hb_response = create_test_heartbeat_response();
-        let result = manager.update_ack_time(hb_response).await;
+        let result = V2TaskManager::update_ack_time_static(hb_response, &tasks.clone()).await;
 
         // Should succeed even if task doesn't exist (just logs a warning)
         assert!(result.is_ok());
