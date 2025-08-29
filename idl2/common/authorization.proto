@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package flyteidl.common;
+
+import "idl2/common/identifier.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/common";
+
+message Organization {
+  string name = 1 [(validate.rules).string.min_len = 1];
+}
+
+message Domain {
+  string name = 1;
+  Organization organization = 2 [(validate.rules).message.required = true];
+}
+
+message Project {
+  string name = 1 [(validate.rules).string.min_len = 1];
+  Domain domain = 2 [(validate.rules).message.required = true];
+}
+
+message Workflow {
+  string name = 1 [(validate.rules).string.min_len = 1];
+  Project project = 2 [(validate.rules).message.required = true];
+}
+
+message LaunchPlan {
+  string name = 1 [(validate.rules).string.min_len = 1];
+  Project project = 2 [(validate.rules).message.required = true];
+}
+
+message Resource {
+  oneof resource {
+    Organization organization = 1;
+    Domain domain = 2;
+    Project project = 3;
+    Workflow workflow = 4;
+    LaunchPlan launch_plan = 5;
+    ClusterIdentifier cluster = 6;
+  }
+}
+
+enum Action {
+  ACTION_NONE = 0;
+  ACTION_CREATE = 1 [deprecated = true];
+  ACTION_READ = 2 [deprecated = true];
+  ACTION_UPDATE = 3 [deprecated = true];
+  ACTION_DELETE = 4 [deprecated = true];
+
+  // Read Flyte workflows, tasks and launch plans
+  ACTION_VIEW_FLYTE_INVENTORY = 5;
+
+  // View Flyte executions
+  ACTION_VIEW_FLYTE_EXECUTIONS = 6;
+
+  // Register new versions of Flyte workflows, tasks and launch plans
+  ACTION_REGISTER_FLYTE_INVENTORY = 7;
+
+  // Create new Flyte workflow and task executions
+  ACTION_CREATE_FLYTE_EXECUTIONS = 8;
+
+  // Create new projects and update project descriptions
+  ACTION_ADMINISTER_PROJECT = 9;
+
+  // Add users, roles and update role assignments.
+  ACTION_MANAGE_PERMISSIONS = 10;
+
+  // Manage billing, account-wide settings
+  ACTION_ADMINISTER_ACCOUNT = 11;
+
+  // Operations for clusters
+  ACTION_MANAGE_CLUSTER = 12;
+
+  // Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE
+  ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES = 13;
+
+  // Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT
+  ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES = 14;
+
+  // Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE
+  ACTION_EDIT_UNUSED_ATTRIBUTES = 15;
+
+  // View system logs
+  ACTION_SUPPORT_SYSTEM_LOGS = 16;
+}
+
+// Defines a set of allowed actions on a specific authorization resource.
+message Permission {
+  Resource resource = 1;
+
+  repeated Action actions = 2;
+}

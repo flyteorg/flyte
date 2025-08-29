@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package flyteidl.workflow;
+
+import "idl2/common/identifier.proto";
+import "idl2/common/identity.proto";
+import "idl2/core/tasks.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "idl2/workflow/common.proto";
+import "idl2/workflow/environment.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/workflow";
+
+// Name of a task. It may have multiple versions deployed.
+message TaskName {
+  // Org this task belongs to.
+  string org = 1 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Project this task belongs to.
+  string project = 2 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Domain this task belongs to.
+  string domain = 3 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names.
+  string name = 4 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 255
+  ];
+}
+
+// TaskIdentifier is the unique identifier for a task.
+message TaskIdentifier {
+  // Org this task belongs to.
+  string org = 1 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Project this task belongs to.
+  string project = 2 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Domain this task belongs to.
+  string domain = 3 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+
+  // Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names.
+  string name = 4 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 255
+  ];
+
+  // Version of the task.
+  string version = 5 [
+    (validate.rules).string.min_len = 1,
+    (validate.rules).string.max_len = 63
+  ];
+}
+
+// TaskMetadata is static, lightweight metadata about a task.
+message TaskMetadata {
+  // Identity that deployed the task.
+  common.EnrichedIdentity deployed_by = 1 [(validate.rules).message.required = true];
+
+  // The short name for this task
+  string short_name = 2;
+
+  // The time the task was deployed
+  google.protobuf.Timestamp deployed_at = 3 [(validate.rules).timestamp.required = true];
+
+  // The environment name for this task, if present.
+  string environment_name = 4;
+}
+
+// Lightweight representation of a task.
+message Task {
+  // Id for this task.
+  TaskIdentifier task_id = 1 [(validate.rules).message.required = true];
+
+  // Metadata for this task.
+  TaskMetadata metadata = 2 [(validate.rules).message.required = true];
+}
+
+// Specification for a task.
+message TaskSpec {
+  // The template for this task.
+  flyteidl.core.TaskTemplate task_template = 1 [(validate.rules).message.required = true];
+
+  // Ordered default inputs.
+  // These can be overridden when an run is created.
+  // Client should not send required=true flag in underlying flyteidl.core.Parameter.
+  repeated NamedParameter default_inputs = 2;
+
+  // User facing display name for this task. Not required to be unique.
+  string short_name = 3 [(validate.rules).string.max_len = 63];
+
+  // Optional environment for this task. Note, some tasks may not be run in the context of an environment.
+  Environment environment = 4;
+}
+
+// Detailed information about a task.
+message TaskDetails {
+  // Id for this task.
+  TaskIdentifier task_id = 1 [(validate.rules).message.required = true];
+
+  // Metadata for this task.
+  TaskMetadata metadata = 2 [(validate.rules).message.required = true];
+
+  // Specification for this task.
+  TaskSpec spec = 3 [(validate.rules).message.required = true];
+}

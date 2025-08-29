@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package flyteidl.imagebuilder;
+
+import "idl2/imagebuilder/payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/imagebuilder";
+
+service ImageService {
+  rpc GetImage(GetImageRequest) returns (GetImageResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}

@@ -1,0 +1,81 @@
+version: v1
+name: buf.build/flyteorg/flyte
+deps:
+  - buf.build/envoyproxy/protoc-gen-validate
+  - buf.build/googleapis/googleapis:62f35d8aed1149c291d606d958a7ce32
+  - buf.build/bufbuild/protovalidate:5a7b106cbb87462d9a8c9ffecdbd2e38
+lint:
+  # Lints that are not enforced today
+  except:
+    - PACKAGE_DIRECTORY_MATCH
+    - PACKAGE_VERSION_SUFFIX
+  # Lints that are enforced today but used in some existing code. Only add to this list in exceptional cases.
+  ignore_only:
+    ENUM_VALUE_PREFIX:
+      - idl2/authorizer/definition.proto
+      - idl2/cluster/definition.proto
+      - idl2/cluster/managed_definition.proto
+      - idl2/common/deployment.proto
+      - idl2/common/list.proto
+      - idl2/common/runtime_version.proto
+      - idl2/execution/metadata.proto
+      - idl2/execution/payload.proto
+      - idl2/hooks/payload.proto
+      - idl2/identity/enums.proto
+      - idl2/logs/dataplane/payload.proto
+      - idl2/objectstore/definition.proto
+      - idl2/org/org_definition.proto
+      - idl2/secret/definition.proto
+      - idl2/usage/definition.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      - idl2/cluster/definition.proto
+      - idl2/cluster/managed_definition.proto
+      - idl2/common/authorization.proto
+      - idl2/common/deployment.proto
+      - idl2/common/list.proto
+      - idl2/common/role.proto
+      - idl2/common/runtime_version.proto
+      - idl2/execution/metadata.proto
+      - idl2/execution/payload.proto
+      - idl2/hooks/payload.proto
+      - idl2/identity/enums.proto
+      - idl2/logs/dataplane/payload.proto
+      - idl2/objectstore/definition.proto
+      - idl2/org/org_definition.proto
+      - idl2/sandbox/payload.proto
+      - idl2/secret/definition.proto
+      - idl2/usage/definition.proto
+      - idl2/usage/payload.proto
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - idl2/clusterconfig/clusterconfig.proto
+      - idl2/identity/selfserve_service.proto
+      - idl2/objectstore/metadata_service.proto
+      - idl2/objectstore/objectstore_service.proto
+      - idl2/usage/service.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - idl2/authorizer/authorizer.proto
+      - idl2/clouddataproxy/clouddataproxy.proto
+      - idl2/cluster/cluster.proto
+      - idl2/hub-admin/admin.proto
+      - idl2/identity/app_service.proto
+      - idl2/identity/policy_service.proto
+      - idl2/identity/role_service.proto
+      - idl2/identity/selfserve_service.proto
+      - idl2/sandbox/sandbox.proto
+      - idl2/secret/proxy/secretproxy.proto
+      - idl2/usage/service.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - idl2/authorizer/authorizer.proto
+      - idl2/clouddataproxy/clouddataproxy.proto
+      - idl2/cluster/cluster.proto
+      - idl2/clusterconfig/clusterconfig.proto
+      - idl2/hub-admin/admin.proto
+      - idl2/identity/app_service.proto
+      - idl2/identity/policy_service.proto
+      - idl2/identity/role_service.proto
+      - idl2/identity/selfserve_service.proto
+      - idl2/sandbox/sandbox.proto
+      - idl2/secret/proxy/secretproxy.proto
+      - idl2/usage/service.proto
+    SERVICE_SUFFIX:
+      - idl2/identity/selfserve_service.proto
