@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -82,10 +83,10 @@ func TestCreateTask(t *testing.T) {
 		createCalled = true
 		return nil
 	})
-	mockRepository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(
-		func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
-			return models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
-		})
+	descriptionEntityRepo := mockRepository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+	descriptionEntityRepo.EXPECT().
+		Get(mock.Anything, mock.Anything).
+		Return(models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound"))
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
 		mockScope.NewTestScope())
 	request := testutils.GetValidTaskRequest()

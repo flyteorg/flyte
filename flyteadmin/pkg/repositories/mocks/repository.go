@@ -101,7 +101,7 @@ func NewMockRepository() interfaces.Repository {
 		resourceRepo:                  NewMockResourceRepo(),
 		taskExecutionRepo:             NewMockTaskExecutionRepo(),
 		namedEntityRepo:               NewMockNamedEntityRepo(),
-		descriptionEntityRepo:         NewMockDescriptionEntityRepo(),
+		descriptionEntityRepo:         &DescriptionEntityRepoInterface{},
 		ExecutionEventRepoIface:       &ExecutionEventRepoInterface{},
 		NodeExecutionEventRepoIface:   &NodeExecutionEventRepoInterface{},
 		schedulableEntityRepo:         &sMocks.SchedulableEntityRepoInterface{},

@@ -19,6 +19,8 @@ type DescriptionEntityCollectionOutput struct {
 	Entities []models.DescriptionEntity
 }
 
+//go:generate mockery --name=DescriptionEntityRepoInterface --output=../mocks --case=underscore --with-expecter
+
 // DescriptionEntityRepoInterface Defines the interface for interacting with Description models.
 type DescriptionEntityRepoInterface interface {
 	// Get Returns a matching DescriptionEntity if it exists.
