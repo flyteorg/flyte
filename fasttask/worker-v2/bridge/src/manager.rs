@@ -637,8 +637,7 @@ impl V2TaskManager {
         }
     }
 
-    #[instrument(fields(operation = hb_response.operation, task.id = %hb_response.task_id
-    ))]
+    #[instrument(skip(hb_response, assignment_tx, tasks_in_progress), fields(operation = ?hb_response.operation, task_id = %hb_response.task_id))]
     async fn handle_operation_static(
         hb_response: HeartbeatResponse,
         assignment_tx: &Sender<Task>,
