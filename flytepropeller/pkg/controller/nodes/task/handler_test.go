@@ -338,13 +338,13 @@ func Test_task_ResolvePlugin(t *testing.T) {
 					},
 				},
 			}, args{ttype: someID, executionConfig: v1alpha1.ExecutionConfig{
-			TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
-				someID: {
-					PluginIDs:             []string{someID},
-					MissingPluginBehavior: admin.PluginOverride_FAIL,
+				TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
+					someID: {
+						PluginIDs:             []string{someID},
+						MissingPluginBehavior: admin.PluginOverride_FAIL,
+					},
 				},
-			},
-		}}, someID, false},
+			}}, someID, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
