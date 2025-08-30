@@ -11,7 +11,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 )
@@ -20,7 +19,7 @@ func TestValidateInterface(t *testing.T) {
 	t.Run("Happy path", func(t *testing.T) {
 		errs := errors.NewCompileErrors()
 		iface, ok := ValidateInterface(
-			c.NodeID("node1"),
+			"node1",
 			&core.TypedInterface{
 				Inputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{},
@@ -38,7 +37,7 @@ func TestValidateInterface(t *testing.T) {
 	t.Run("Empty Inputs/Outputs", func(t *testing.T) {
 		errs := errors.NewCompileErrors()
 		iface, ok := ValidateInterface(
-			c.NodeID("node1"),
+			"node1",
 			&core.TypedInterface{},
 			errs.NewScope(),
 		)
@@ -49,7 +48,7 @@ func TestValidateInterface(t *testing.T) {
 	t.Run("Empty Interface", func(t *testing.T) {
 		errs := errors.NewCompileErrors()
 		iface, ok := ValidateInterface(
-			c.NodeID("node1"),
+			"node1",
 			nil,
 			errs.NewScope(),
 		)

@@ -561,9 +561,9 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN2Status.EXPECT().GetParentTaskID().Return(nil)
 			mockN2Status.EXPECT().GetPhase().Return(n2Phase)
 			mockN2Status.On("SetDataDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.EXPECT().GetDataDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetDataDir().Return("blah")
 			mockN2Status.On("SetOutputDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.EXPECT().GetOutputDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetOutputDir().Return("blah")
 			mockN2Status.EXPECT().GetWorkflowNodeStatus().Return(nil)
 
 			mockN2Status.EXPECT().GetStoppedAt().Return(nil)
@@ -641,7 +641,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 			})
 			mockWf.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			mockWfStatus.EXPECT().GetDataDir().Return(storage.DataReference("x"))
+			mockWfStatus.EXPECT().GetDataDir().Return("x")
 			mockWfStatus.EXPECT().ConstructNodeDataDir(mock.Anything, mock.Anything).Return("x", nil)
 			return mockWf, mockN2Status
 		}
@@ -1628,7 +1628,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
 		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("s3:/foo"))
+		ns.EXPECT().GetDataDir().Return("s3:/foo")
 		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		nl.EXPECT().GetNode(id).Return(n, true)
 		incompatibleClusterErr := fakeEventRecorder{nodeErr: &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")}}
@@ -2071,7 +2071,7 @@ func TestRecover(t *testing.T) {
 	ir.EXPECT().GetInputPath().Return(inputsPath)
 
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.EXPECT().GetOutputDir().Return(storage.DataReference("out"))
+	ns.EXPECT().GetOutputDir().Return("out")
 
 	nCtx := &nodemocks.NodeExecutionContext{}
 	nCtx.EXPECT().ExecutionContext().Return(execContext)
@@ -2581,11 +2581,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 			},
 			Status: v1alpha1.WorkflowStatus{
 				NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
-					currentNodeID: &v1alpha1.NodeStatus{
+					currentNodeID: {
 						Phase:   currentNodePhase,
 						Message: cacheSerializedReason,
 					},
-					downstreamNodeID: &v1alpha1.NodeStatus{
+					downstreamNodeID: {
 						Phase: downstreamNodePhase,
 					},
 				},
@@ -2594,12 +2594,12 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "wf",
 				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
-					currentNodeID: &v1alpha1.NodeSpec{
+					currentNodeID: {
 						ID:      currentNodeID,
 						TaskRef: &taskID,
 						Kind:    v1alpha1.NodeKindTask,
 					},
-					downstreamNodeID: &v1alpha1.NodeSpec{
+					downstreamNodeID: {
 						ID:      downstreamNodeID,
 						TaskRef: &taskID,
 						Kind:    v1alpha1.NodeKindTask,

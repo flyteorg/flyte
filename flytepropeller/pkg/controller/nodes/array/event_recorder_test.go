@@ -22,12 +22,12 @@ type bufferedEventRecorder struct {
 	nodeExecutionEvents []*event.NodeExecutionEvent
 }
 
-func (b *bufferedEventRecorder) RecordTaskEvent(ctx context.Context, taskExecutionEvent *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+func (b *bufferedEventRecorder) RecordTaskEvent(_ context.Context, taskExecutionEvent *event.TaskExecutionEvent, _ *config.EventConfig) error {
 	b.taskExecutionEvents = append(b.taskExecutionEvents, taskExecutionEvent)
 	return nil
 }
 
-func (b *bufferedEventRecorder) RecordNodeEvent(ctx context.Context, nodeExecutionEvent *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (b *bufferedEventRecorder) RecordNodeEvent(_ context.Context, nodeExecutionEvent *event.NodeExecutionEvent, _ *config.EventConfig) error {
 	b.nodeExecutionEvents = append(b.nodeExecutionEvents, nodeExecutionEvent)
 	return nil
 }
@@ -40,7 +40,7 @@ func TestGetPluginLogs(t *testing.T) {
 	// initialize log plugin
 	logConfig := &logs.LogConfig{
 		Templates: []tasklog.TemplateLogPlugin{
-			tasklog.TemplateLogPlugin{
+			{
 				Name:        "foo",
 				DisplayName: "bar",
 				TemplateURIs: []tasklog.TemplateURI{

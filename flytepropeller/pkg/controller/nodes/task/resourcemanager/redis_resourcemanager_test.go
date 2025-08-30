@@ -19,12 +19,12 @@ func createMockNamespacedResourcesMap(mScope promutils.Scope) map[core.ResourceN
 	mockMetric1 := NewRedisResourceManagerMetrics(mockScope1)
 	mockMetric2 := NewRedisResourceManagerMetrics(mockScope2)
 	mockNamespacedResourcesMap := map[core.ResourceNamespace]*Resource{
-		core.ResourceNamespace("test-resource1"): &Resource{
+		core.ResourceNamespace("test-resource1"): {
 			quota:          BaseResourceConstraint{Value: 3},
 			metrics:        mockMetric1,
 			rejectedTokens: sync.Map{},
 		},
-		core.ResourceNamespace("test-resource2"): &Resource{
+		core.ResourceNamespace("test-resource2"): {
 			quota:          BaseResourceConstraint{Value: 4},
 			metrics:        mockMetric2,
 			rejectedTokens: sync.Map{},

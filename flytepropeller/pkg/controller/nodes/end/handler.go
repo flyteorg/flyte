@@ -18,7 +18,7 @@ func (e endHandler) FinalizeRequired() bool {
 	return false
 }
 
-func (e endHandler) Setup(ctx context.Context, setupContext interfaces.SetupContext) error {
+func (e endHandler) Setup(context.Context, interfaces.SetupContext) error {
 	return nil
 }
 

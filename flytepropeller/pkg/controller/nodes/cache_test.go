@@ -42,7 +42,7 @@ type mockTaskReader struct {
 	taskTemplate *core.TaskTemplate
 }
 
-func (t mockTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
+func (t mockTaskReader) Read(context.Context) (*core.TaskTemplate, error) {
 	return t.taskTemplate, nil
 }
 func (t mockTaskReader) GetTaskType() v1alpha1.TaskType { return "" }

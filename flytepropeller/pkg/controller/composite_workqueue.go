@@ -43,7 +43,7 @@ type SimpleWorkQueue struct {
 	workqueue.RateLimitingInterface
 }
 
-func (s *SimpleWorkQueue) Start(ctx context.Context) {
+func (s *SimpleWorkQueue) Start(context.Context) {
 }
 
 func (s *SimpleWorkQueue) ShutdownAll() {

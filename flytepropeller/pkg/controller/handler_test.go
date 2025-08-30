@@ -31,7 +31,7 @@ type mockExecutor struct {
 	HandleAbortedCb func(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error
 }
 
-func (m *mockExecutor) Initialize(ctx context.Context) error {
+func (m *mockExecutor) Initialize(context.Context) error {
 	return nil
 }
 

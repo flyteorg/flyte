@@ -6,12 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 )
 
 func TestValidateInputs_InvalidLiteralType(t *testing.T) {
-	nodeID := common.NodeID("test-node")
+	nodeID := "test-node"
 
 	iface := &core.TypedInterface{
 		Inputs: &core.VariableMap{

@@ -338,13 +338,13 @@ func Test_task_ResolvePlugin(t *testing.T) {
 					},
 				},
 			}, args{ttype: someID, executionConfig: v1alpha1.ExecutionConfig{
-				TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
-					someID: {
-						PluginIDs:             []string{someID},
-						MissingPluginBehavior: admin.PluginOverride_FAIL,
-					},
+			TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
+				someID: {
+					PluginIDs:             []string{someID},
+					MissingPluginBehavior: admin.PluginOverride_FAIL,
 				},
-			}}, someID, false},
+			},
+		}}, someID, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -371,12 +371,12 @@ type fakeBufferedEventRecorder struct {
 	evs []*event.TaskExecutionEvent
 }
 
-func (f *fakeBufferedEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *controllerConfig.EventConfig) error {
+func (f *fakeBufferedEventRecorder) RecordTaskEvent(_ context.Context, ev *event.TaskExecutionEvent, _ *controllerConfig.EventConfig) error {
 	f.evs = append(f.evs, ev)
 	return nil
 }
 
-func (f *fakeBufferedEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeExecutionEvent, eventConfig *controllerConfig.EventConfig) error {
+func (f *fakeBufferedEventRecorder) RecordNodeEvent(context.Context, *event.NodeExecutionEvent, *controllerConfig.EventConfig) error {
 	return nil
 }
 
@@ -392,23 +392,23 @@ func (t *taskNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
 	return nil
 }
 
-func (t taskNodeStateHolder) PutBranchNode(s handler.BranchNodeState) error {
+func (t taskNodeStateHolder) PutBranchNode(handler.BranchNodeState) error {
 	panic("not implemented")
 }
 
-func (t taskNodeStateHolder) PutWorkflowNodeState(s handler.WorkflowNodeState) error {
+func (t taskNodeStateHolder) PutWorkflowNodeState(handler.WorkflowNodeState) error {
 	panic("not implemented")
 }
 
-func (t taskNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) error {
+func (t taskNodeStateHolder) PutDynamicNodeState(handler.DynamicNodeState) error {
 	panic("not implemented")
 }
 
-func (t taskNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+func (t taskNodeStateHolder) PutGateNodeState(handler.GateNodeState) error {
 	panic("not implemented")
 }
 
-func (t taskNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
+func (t taskNodeStateHolder) PutArrayNodeState(handler.ArrayNodeState) error {
 	panic("not implemented")
 }
 
@@ -808,8 +808,8 @@ func Test_task_Abort(t *testing.T) {
 		tr.EXPECT().GetTaskType().Return("x")
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.EXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -972,8 +972,8 @@ func Test_task_Abort_v1(t *testing.T) {
 		tr.EXPECT().GetTaskType().Return("x")
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.EXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -1154,8 +1154,8 @@ func Test_task_Finalize(t *testing.T) {
 		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.EXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}

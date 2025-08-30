@@ -95,5 +95,5 @@ func (s IdentifierSet) List() []Identifier {
 	}
 
 	sort.Sort(res)
-	return []Identifier(res)
+	return res
 }

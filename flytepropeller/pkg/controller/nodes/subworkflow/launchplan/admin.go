@@ -167,7 +167,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (a *adminLaunchPlanExecutor) GetStatus(_ context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
 	if executionID == nil {
 		return nil, nil, fmt.Errorf("nil executionID")
 	}

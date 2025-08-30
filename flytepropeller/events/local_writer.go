@@ -25,7 +25,7 @@ type FileWriter struct {
 	ioWriter *bufio.Writer
 }
 
-func (fw *FileWriter) Write(ctx context.Context, content string) error {
+func (fw *FileWriter) Write(_ context.Context, content string) error {
 	_, err := fw.ioWriter.WriteString(content)
 	return err
 }
@@ -37,7 +37,7 @@ func (fw *FileWriter) Flush() error {
 // Std Writer is just the default standard if no sink type is provided
 type StdWriter struct{}
 
-func (s *StdWriter) Write(ctx context.Context, content string) error {
+func (s *StdWriter) Write(_ context.Context, content string) error {
 	_, err := fmt.Println(content)
 	return err
 }

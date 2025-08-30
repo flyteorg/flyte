@@ -44,14 +44,14 @@ type extendedFakeClient struct {
 	UpdateError error
 }
 
-func (e extendedFakeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+func (e extendedFakeClient) Create(ctx context.Context, obj client.Object, _ ...client.CreateOption) error {
 	if e.CreateError != nil {
 		return e.CreateError
 	}
 	return e.Client.Create(ctx, obj)
 }
 
-func (e extendedFakeClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+func (e extendedFakeClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object, _ ...client.GetOption) error {
 	if e.GetError != nil {
 		return e.GetError
 	}
@@ -89,15 +89,15 @@ func (k8sSampleHandler) GetProperties() k8s.PluginProperties {
 	panic("implement me")
 }
 
-func (k8sSampleHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+func (k8sSampleHandler) BuildResource(context.Context, pluginsCore.TaskExecutionContext) (client.Object, error) {
 	panic("implement me")
 }
 
-func (k8sSampleHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+func (k8sSampleHandler) BuildIdentityResource(context.Context, pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	panic("implement me")
 }
 
-func (k8sSampleHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (k8sSampleHandler) GetTaskPhase(context.Context, k8s.PluginContext, client.Object) (pluginsCore.PhaseInfo, error) {
 	panic("implement me")
 }
 
@@ -109,7 +109,7 @@ func (p *pluginWithAbortOverride) GetProperties() k8s.PluginProperties {
 	return p.Called().Get(0).(k8s.PluginProperties)
 }
 
-func (p *pluginWithAbortOverride) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+func (p *pluginWithAbortOverride) BuildResource(context.Context, pluginsCore.TaskExecutionContext) (client.Object, error) {
 	panic("implement me")
 }
 
@@ -118,7 +118,7 @@ func (p *pluginWithAbortOverride) BuildIdentityResource(ctx context.Context, tas
 	return args.Get(0).(client.Object), args.Error(1)
 }
 
-func (p *pluginWithAbortOverride) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (p *pluginWithAbortOverride) GetTaskPhase(context.Context, k8s.PluginContext, client.Object) (pluginsCore.PhaseInfo, error) {
 	panic("implement me")
 }
 
@@ -158,7 +158,7 @@ type dummyOutputWriter struct {
 	r io.OutputReader
 }
 
-func (d *dummyOutputWriter) Put(ctx context.Context, reader io.OutputReader) error {
+func (d *dummyOutputWriter) Put(_ context.Context, reader io.OutputReader) error {
 	d.r = reader
 	return nil
 }

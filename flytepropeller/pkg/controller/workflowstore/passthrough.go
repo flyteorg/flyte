@@ -30,7 +30,7 @@ type passthroughWorkflowStore struct {
 	metrics     *workflowstoreMetrics
 }
 
-func (p *passthroughWorkflowStore) Get(ctx context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error) {
+func (p *passthroughWorkflowStore) Get(_ context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error) {
 	w, err := p.wfLister.FlyteWorkflows(namespace).Get(name)
 	if err != nil {
 		// The FlyteWorkflow resource may no longer exist, in which case we stop

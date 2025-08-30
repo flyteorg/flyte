@@ -23,7 +23,7 @@ var (
 			},
 			Scope: apiextensionsv1.NamespaceScoped,
 			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
-				apiextensionsv1.CustomResourceDefinitionVersion{
+				{
 					Name:    "v1alpha1",
 					Served:  true,
 					Storage: true,
