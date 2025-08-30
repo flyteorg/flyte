@@ -569,8 +569,20 @@ func TestGetMatchableResource(t *testing.T) {
 }
 
 func TestGetDescriptionEntityModel(t *testing.T) {
-	repository := repositoryMocks.NewMockRepository()
+
 	t.Run("Get Description Entity model", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+		descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+		descriptionEntityRepo.EXPECT().Get(mock.Anything, mock.Anything).Return(models.DescriptionEntity{
+			DescriptionEntityKey: models.DescriptionEntityKey{
+				ResourceType: core.ResourceType_TASK,
+				Project:      project,
+				Domain:       domain,
+				Name:         name,
+				Version:      version,
+			},
+			ShortDescription: "hello world",
+		}, nil)
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
 			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
@@ -585,10 +597,11 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 	})
 
 	t.Run("Failed to get DescriptionEntity model", func(t *testing.T) {
-		getFunction := func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
-			return models.DescriptionEntity{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
-		}
-		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
+		repository := repositoryMocks.NewMockRepository()
+		descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+		descriptionEntityRepo.EXPECT().
+			Get(mock.Anything, mock.Anything).
+			Return(models.DescriptionEntity{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound"))
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
 			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
@@ -603,8 +616,19 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 }
 
 func TestGetDescriptionEntity(t *testing.T) {
-	repository := repositoryMocks.NewMockRepository()
 	t.Run("Get Description Entity", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+		descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+		descriptionEntityRepo.EXPECT().Get(mock.Anything, mock.Anything).Return(models.DescriptionEntity{
+			DescriptionEntityKey: models.DescriptionEntityKey{
+				ResourceType: core.ResourceType_TASK,
+				Project:      project,
+				Domain:       domain,
+				Name:         name,
+				Version:      version,
+			},
+			ShortDescription: "hello world",
+		}, nil)
 		entity, err := GetDescriptionEntity(context.Background(), repository,
 			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
@@ -619,10 +643,11 @@ func TestGetDescriptionEntity(t *testing.T) {
 	})
 
 	t.Run("Failed to get DescriptionEntity", func(t *testing.T) {
-		getFunction := func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
-			return models.DescriptionEntity{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
-		}
-		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
+		repository := repositoryMocks.NewMockRepository()
+		descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+		descriptionEntityRepo.EXPECT().
+			Get(mock.Anything, mock.Anything).
+			Return(models.DescriptionEntity{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound"))
 		entity, err := GetDescriptionEntity(context.Background(), repository,
 			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
@@ -634,10 +659,11 @@ func TestGetDescriptionEntity(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, entity)
 
-		getFunction = func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
-			return models.DescriptionEntity{LongDescription: []byte("???")}, nil
-		}
-		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
+		// Reset mock
+		descriptionEntityRepo.ExpectedCalls = descriptionEntityRepo.ExpectedCalls[:0]
+		descriptionEntityRepo.EXPECT().
+			Get(mock.Anything, mock.Anything).
+			Return(models.DescriptionEntity{LongDescription: []byte("???")}, nil)
 		entity, err = GetDescriptionEntity(context.Background(), repository,
 			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
