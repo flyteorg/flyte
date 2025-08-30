@@ -4,7 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -32,6 +34,17 @@ var badDescriptionEntityIdentifier = core.Identifier{
 	Version:      version,
 }
 
+var descriptionEntity = models.DescriptionEntity{
+	DescriptionEntityKey: models.DescriptionEntityKey{
+		ResourceType: core.ResourceType_TASK,
+		Project:      project,
+		Domain:       domain,
+		Name:         name,
+		Version:      version,
+	},
+	ShortDescription: "hello world",
+}
+
 func getMockRepositoryForDETest() interfaces.Repository {
 	return repositoryMocks.NewMockRepository()
 }
@@ -44,6 +57,8 @@ func getMockConfigForDETest() runtimeInterfaces.Configuration {
 
 func TestDescriptionEntityManager_Get(t *testing.T) {
 	repository := getMockRepositoryForDETest()
+	descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+	descriptionEntityRepo.EXPECT().Get(mock.Anything, mock.Anything).Return(descriptionEntity, nil)
 	manager := NewDescriptionEntityManager(repository, getMockConfigForDETest(), mockScope.NewTestScope())
 
 	response, err := manager.GetDescriptionEntity(context.Background(), &admin.ObjectGetRequest{
@@ -104,6 +119,11 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("list description entities in the task", func(t *testing.T) {
+		descriptionEntityRepo := repository.DescriptionEntityRepo().(*repositoryMocks.DescriptionEntityRepoInterface)
+		descriptionEntityRepo.EXPECT().List(mock.Anything, mock.Anything).Return(interfaces.DescriptionEntityCollectionOutput{
+			Entities: []models.DescriptionEntity{descriptionEntity},
+		}, nil)
+
 		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_TASK,
 			Id: &admin.NamedEntityIdentifier{
