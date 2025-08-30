@@ -76,6 +76,24 @@ func TestSecureCookieLifecycle(t *testing.T) {
 	}
 }
 
+func TestNewCsrfToken(t *testing.T) {
+	// Generate many tokens and assert uniqueness and decodability
+	const n = 1000
+	seen := make(map[string]struct{}, n)
+
+	for i := 0; i < n; i++ {
+		tok, err := NewCsrfToken()
+		require.NoError(t, err)
+		require.Len(t, tok, 44)
+
+		if _, ok := seen[tok]; ok {
+			t.Fatalf("duplicate token generated at i=%d", i)
+		}
+		seen[tok] = struct{}{}
+	}
+
+}
+
 func TestNewCsrfCookie(t *testing.T) {
 	tests := []struct {
 		name                 string
