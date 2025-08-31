@@ -26,6 +26,8 @@ type NamedEntityCollectionOutput struct {
 	Entities []models.NamedEntity
 }
 
+//go:generate mockery --name=NamedEntityRepoInterface --output=../mocks --case=underscore --with-expecter
+
 // Defines the interface for interacting with NamedEntity models
 type NamedEntityRepoInterface interface {
 	// Returns NamedEntity objects matching the provided query. A limit is
