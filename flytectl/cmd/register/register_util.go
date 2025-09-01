@@ -599,7 +599,12 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 		}
 		// Location to untar. FilePath couldn't be used here due to,
 		// G305: File traversal when extracting zip archive
-		target := tempDir + "/" + header.Name
+		cleanedName := filepath.Clean(header.Name)
+		target := filepath.Join(tempDir, cleanedName)
+		// Ensure the target path is within the tempDir
+		if !strings.HasPrefix(target, tempDir) {
+			return unarchivedFiles, fmt.Errorf("invalid file path: %s", header.Name)
+		}
 		if header.Typeflag == tar.TypeDir {
 			if _, err := os.Stat(target); err != nil {
 				if err := os.MkdirAll(target, 0755); err != nil {
