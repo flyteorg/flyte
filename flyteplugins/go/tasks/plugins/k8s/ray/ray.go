@@ -53,7 +53,7 @@ var logTemplateRegexes = struct {
 type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	return k8s.PluginProperties{GeneratedNameMaxLength: &[]int{47}[0]}
 }
 
 // BuildResource Creates a new ray job resource
