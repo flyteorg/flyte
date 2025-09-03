@@ -24,18 +24,6 @@ service QueueService {
   rpc AbortQueuedAction(AbortQueuedActionRequest) returns (AbortQueuedActionResponse) {}
 }
 
-message WorkerIdentifier {
-  // the organization that this worker is associated with.
-  string organization = 1 [(validate.rules).string.min_len = 1];
-
-  // the cluster this worker is part of.
-  string cluster = 2 [(validate.rules).string.min_len = 1];
-
-  // the name for the worker, when combined with organization, and cluster this will form a unique
-  // identifier for the worker.
-  string name = 3 [(validate.rules).string.min_len = 1];
-}
-
 // request message for queuing an action.
 message EnqueueActionRequest {
   // the unique identifier for the action.

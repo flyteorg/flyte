@@ -1349,6 +1349,8 @@ func (m *ActionMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ActionType
+
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:
 		if v == nil {
@@ -2424,35 +2426,6 @@ func (m *ActionDetails) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetResolvedTaskSpec()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ActionDetailsValidationError{
-					field:  "ResolvedTaskSpec",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, ActionDetailsValidationError{
-					field:  "ResolvedTaskSpec",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetResolvedTaskSpec()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ActionDetailsValidationError{
-				field:  "ResolvedTaskSpec",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	for idx, item := range m.GetAttempts() {
 		_, _ = idx, item
 
@@ -2564,6 +2537,92 @@ func (m *ActionDetails) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ActionDetailsValidationError{
 					field:  "AbortInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+	switch v := m.Spec.(type) {
+	case *ActionDetails_Task:
+		if v == nil {
+			err := ActionDetailsValidationError{
+				field:  "Spec",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTask()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Task",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Task",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTask()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ActionDetailsValidationError{
+					field:  "Task",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ActionDetails_Trace:
+		if v == nil {
+			err := ActionDetailsValidationError{
+				field:  "Spec",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTrace()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Trace",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Trace",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTrace()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ActionDetailsValidationError{
+					field:  "Trace",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

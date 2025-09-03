@@ -878,6 +878,134 @@ var _ interface {
 	ErrorName() string
 } = TaskSpecValidationError{}
 
+// Validate checks the field values on TraceSpec with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TraceSpec) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TraceSpec with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TraceSpecMultiError, or nil
+// if none found.
+func (m *TraceSpec) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TraceSpec) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInterface()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TraceSpecValidationError{
+					field:  "Interface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TraceSpecValidationError{
+					field:  "Interface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInterface()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TraceSpecValidationError{
+				field:  "Interface",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return TraceSpecMultiError(errors)
+	}
+
+	return nil
+}
+
+// TraceSpecMultiError is an error wrapping multiple validation errors returned
+// by TraceSpec.ValidateAll() if the designated constraints aren't met.
+type TraceSpecMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TraceSpecMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TraceSpecMultiError) AllErrors() []error { return m }
+
+// TraceSpecValidationError is the validation error returned by
+// TraceSpec.Validate if the designated constraints aren't met.
+type TraceSpecValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TraceSpecValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TraceSpecValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TraceSpecValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TraceSpecValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TraceSpecValidationError) ErrorName() string { return "TraceSpecValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TraceSpecValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTraceSpec.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TraceSpecValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TraceSpecValidationError{}
+
 // Validate checks the field values on TaskDetails with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

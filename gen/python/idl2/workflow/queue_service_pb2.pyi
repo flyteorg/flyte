@@ -11,16 +11,6 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class WorkerIdentifier(_message.Message):
-    __slots__ = ["organization", "cluster", "name"]
-    ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
-    CLUSTER_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    organization: str
-    cluster: str
-    name: str
-    def __init__(self, organization: _Optional[str] = ..., cluster: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
-
 class EnqueueActionRequest(_message.Message):
     __slots__ = ["action_id", "parent_action_name", "run_spec", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]

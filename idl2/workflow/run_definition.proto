@@ -125,6 +125,9 @@ message ActionMetadata {
     // Condition action.
     ConditionActionMetadata condition = 9 [(validate.rules).message.required = true];
   }
+
+  // Action type.
+  ActionType action_type = 10;
 }
 
 // TODO: define phase transitions
@@ -138,6 +141,13 @@ enum Phase {
   PHASE_FAILED = 6;
   PHASE_ABORTED = 7;
   PHASE_TIMED_OUT = 8;
+}
+
+enum ActionType {
+  ACTION_TYPE_UNSPECIFIED = 0;
+  ACTION_TYPE_TASK = 1;
+  ACTION_TYPE_TRACE = 2;
+  ACTION_TYPE_CONDITION = 3;
 }
 
 // Lightweight status of an action. For more detailed status see ActionDetails.
@@ -225,8 +235,11 @@ message ActionDetails {
     AbortInfo abort_info = 5;
   }
 
-  // Fully resolved spec. Merges user submitted task spec with platform defaults.
-  TaskSpec resolved_task_spec = 6;
+  // Fully resolved spec of the action. Merges user submitted task spec with platform defaults.
+  oneof spec {
+    TaskSpec task = 6;
+    TraceSpec trace = 8;
+  }
 
   // List of action attempts.
   repeated ActionAttempt attempts = 7;

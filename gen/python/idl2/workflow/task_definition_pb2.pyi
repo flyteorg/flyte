@@ -1,5 +1,6 @@
 from idl2.common import identifier_pb2 as _identifier_pb2
 from idl2.common import identity_pb2 as _identity_pb2
+from idl2.core import interface_pb2 as _interface_pb2
 from idl2.core import tasks_pb2 as _tasks_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from validate import validate_pb2 as _validate_pb2
@@ -69,6 +70,12 @@ class TaskSpec(_message.Message):
     short_name: str
     environment: _environment_pb2.Environment
     def __init__(self, task_template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., default_inputs: _Optional[_Iterable[_Union[_common_pb2.NamedParameter, _Mapping]]] = ..., short_name: _Optional[str] = ..., environment: _Optional[_Union[_environment_pb2.Environment, _Mapping]] = ...) -> None: ...
+
+class TraceSpec(_message.Message):
+    __slots__ = ["interface"]
+    INTERFACE_FIELD_NUMBER: _ClassVar[int]
+    interface: _interface_pb2.TypedInterface
+    def __init__(self, interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ...) -> None: ...
 
 class TaskDetails(_message.Message):
     __slots__ = ["task_id", "metadata", "spec"]

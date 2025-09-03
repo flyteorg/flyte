@@ -7,6 +7,8 @@ import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_idl2_common_identifier } from "../common/identifier_pb.ts";
 import type { EnrichedIdentity } from "../common/identity_pb.ts";
 import { file_idl2_common_identity } from "../common/identity_pb.ts";
+import type { TypedInterface } from "../core/interface_pb.ts";
+import { file_idl2_core_interface } from "../core/interface_pb.ts";
 import type { TaskTemplate } from "../core/tasks_pb.ts";
 import { file_idl2_core_tasks } from "../core/tasks_pb.ts";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -22,7 +24,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file idl2/workflow/task_definition.proto.
  */
 export const file_idl2_workflow_task_definition: GenFile = /*@__PURE__*/
-  fileDesc("CiNpZGwyL3dvcmtmbG93L3Rhc2tfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93InMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJ+kIGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCfpCBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCfpCBnIEEAEYPxIYCgRuYW1lGAQgASgJQgr6QgdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCfpCBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgn6QgZyBBABGD8SGQoGZG9tYWluGAMgASgJQgn6QgZyBBABGD8SGAoEbmFtZRgEIAEoCUIK+kIHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgn6QgZyBBABGD8iugEKDFRhc2tNZXRhZGF0YRJBCgtkZXBsb3llZF9ieRgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eUII+kIFigECEAESEgoKc2hvcnRfbmFtZRgCIAEoCRI5CgtkZXBsb3llZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCCPpCBbIBAggBEhgKEGVudmlyb25tZW50X25hbWUYBCABKAkigwEKBFRhc2sSPQoHdGFza19pZBgBIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrSWRlbnRpZmllckII+kIFigECEAESPAoIbWV0YWRhdGEYAiABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza01ldGFkYXRhQgj6QgWKAQIQASLYAQoIVGFza1NwZWMSPQoNdGFza190ZW1wbGF0ZRgBIAEoCzIcLmZseXRlaWRsMi5jb3JlLlRhc2tUZW1wbGF0ZUII+kIFigECEAESOgoOZGVmYXVsdF9pbnB1dHMYAiADKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuTmFtZWRQYXJhbWV0ZXISGwoKc2hvcnRfbmFtZRgDIAEoCUIH+kIEcgIYPxI0CgtlbnZpcm9ubWVudBgEIAEoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5FbnZpcm9ubWVudCLAAQoLVGFza0RldGFpbHMSPQoHdGFza19pZBgBIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrSWRlbnRpZmllckII+kIFigECEAESPAoIbWV0YWRhdGEYAiABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza01ldGFkYXRhQgj6QgWKAQIQARI0CgRzcGVjGAMgASgLMhwuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tTcGVjQgj6QgWKAQIQAULLAQoWY29tLmZseXRlaWRsMi53b3JrZmxvd0ITVGFza0RlZmluaXRpb25Qcm90b0gCUAFaMWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2lkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_idl2_common_identifier, file_idl2_common_identity, file_idl2_core_tasks, file_google_protobuf_timestamp, file_validate_validate, file_idl2_workflow_common, file_idl2_workflow_environment]);
+  fileDesc("CiNpZGwyL3dvcmtmbG93L3Rhc2tfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93InMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJ+kIGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCfpCBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCfpCBnIEEAEYPxIYCgRuYW1lGAQgASgJQgr6QgdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCfpCBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgn6QgZyBBABGD8SGQoGZG9tYWluGAMgASgJQgn6QgZyBBABGD8SGAoEbmFtZRgEIAEoCUIK+kIHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgn6QgZyBBABGD8iugEKDFRhc2tNZXRhZGF0YRJBCgtkZXBsb3llZF9ieRgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eUII+kIFigECEAESEgoKc2hvcnRfbmFtZRgCIAEoCRI5CgtkZXBsb3llZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCCPpCBbIBAggBEhgKEGVudmlyb25tZW50X25hbWUYBCABKAkigwEKBFRhc2sSPQoHdGFza19pZBgBIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrSWRlbnRpZmllckII+kIFigECEAESPAoIbWV0YWRhdGEYAiABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza01ldGFkYXRhQgj6QgWKAQIQASLYAQoIVGFza1NwZWMSPQoNdGFza190ZW1wbGF0ZRgBIAEoCzIcLmZseXRlaWRsMi5jb3JlLlRhc2tUZW1wbGF0ZUII+kIFigECEAESOgoOZGVmYXVsdF9pbnB1dHMYAiADKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuTmFtZWRQYXJhbWV0ZXISGwoKc2hvcnRfbmFtZRgDIAEoCUIH+kIEcgIYPxI0CgtlbnZpcm9ubWVudBgEIAEoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5FbnZpcm9ubWVudCI+CglUcmFjZVNwZWMSMQoJaW50ZXJmYWNlGAEgASgLMh4uZmx5dGVpZGwyLmNvcmUuVHlwZWRJbnRlcmZhY2UiwAEKC1Rhc2tEZXRhaWxzEj0KB3Rhc2tfaWQYASABKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0lkZW50aWZpZXJCCPpCBYoBAhABEjwKCG1ldGFkYXRhGAIgASgLMiAuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tNZXRhZGF0YUII+kIFigECEAESNAoEc3BlYxgDIAEoCzIcLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY0II+kIFigECEAFCywEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCE1Rhc2tEZWZpbml0aW9uUHJvdG9IAlABWjFnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9pZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_idl2_common_identifier, file_idl2_common_identity, file_idl2_core_interface, file_idl2_core_tasks, file_google_protobuf_timestamp, file_validate_validate, file_idl2_workflow_common, file_idl2_workflow_environment]);
 
 /**
  * Name of a task. It may have multiple versions deployed.
@@ -230,6 +232,27 @@ export const TaskSpecSchema: GenMessage<TaskSpec> = /*@__PURE__*/
   messageDesc(file_idl2_workflow_task_definition, 4);
 
 /**
+ * Specification for a trace action.
+ *
+ * @generated from message flyteidl2.workflow.TraceSpec
+ */
+export type TraceSpec = Message<"flyteidl2.workflow.TraceSpec"> & {
+  /**
+   * A strongly typed interface for the trace.
+   *
+   * @generated from field: flyteidl2.core.TypedInterface interface = 1;
+   */
+  interface?: TypedInterface;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TraceSpec.
+ * Use `create(TraceSpecSchema)` to create a new message.
+ */
+export const TraceSpecSchema: GenMessage<TraceSpec> = /*@__PURE__*/
+  messageDesc(file_idl2_workflow_task_definition, 5);
+
+/**
  * Detailed information about a task.
  *
  * @generated from message flyteidl2.workflow.TaskDetails
@@ -262,5 +285,5 @@ export type TaskDetails = Message<"flyteidl2.workflow.TaskDetails"> & {
  * Use `create(TaskDetailsSchema)` to create a new message.
  */
 export const TaskDetailsSchema: GenMessage<TaskDetails> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_task_definition, 5);
+  messageDesc(file_idl2_workflow_task_definition, 6);
 

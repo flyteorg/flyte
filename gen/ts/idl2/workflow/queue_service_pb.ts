@@ -21,41 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file idl2/workflow/queue_service.proto.
  */
 export const file_idl2_workflow_queue_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFpZGwyL3dvcmtmbG93L3F1ZXVlX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyJiChBXb3JrZXJJZGVudGlmaWVyEh0KDG9yZ2FuaXphdGlvbhgBIAEoCUIH+kIEcgIQARIYCgdjbHVzdGVyGAIgASgJQgf6QgRyAhABEhUKBG5hbWUYAyABKAlCB/pCBHICEAEi3gMKFEVucXVldWVBY3Rpb25SZXF1ZXN0Ej8KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckII+kIFigECEAESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESLQoIcnVuX3NwZWMYAyABKAsyGy5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuU3BlYxIaCglpbnB1dF91cmkYBiABKAlCB/pCBHICEAESIAoPcnVuX291dHB1dF9iYXNlGAcgASgJQgf6QgRyAhABEg0KBWdyb3VwGAggASgJEg8KB3N1YmplY3QYCSABKAkSOAoEdGFzaxgKIAEoCzIeLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrQWN0aW9uQgj6QgWKAQIQAUgAEjoKBXRyYWNlGAsgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uQgj6QgWKAQIQAUgAEkIKCWNvbmRpdGlvbhgMIAEoCzIjLmZseXRlaWRsMi53b3JrZmxvdy5Db25kaXRpb25BY3Rpb25CCPpCBYoBAhABSABCBgoEc3BlY0IVChNfcGFyZW50X2FjdGlvbl9uYW1lIrQBCgpUYXNrQWN0aW9uEi4KAmlkGAEgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tJZGVudGlmaWVyEjQKBHNwZWMYAiABKAsyHC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNCCPpCBYoBAhABEi8KCWNhY2hlX2tleRgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIPCgdjbHVzdGVyGAQgASgJIvUBCgtUcmFjZUFjdGlvbhIVCgRuYW1lGAEgASgJQgf6QgRyAhABEigKBXBoYXNlGAIgASgOMhkuZmx5dGVpZGwyLndvcmtmbG93LlBoYXNlEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKCGVuZF90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEjUKB291dHB1dHMYBSABKAsyJC5mbHl0ZWlkbDIud29ya2Zsb3cuT3V0cHV0UmVmZXJlbmNlc0ILCglfZW5kX3RpbWUi0QEKD0NvbmRpdGlvbkFjdGlvbhIVCgRuYW1lGAEgASgJQgf6QgRyAhABEhkKBnJ1bl9pZBgCIAEoCUIH+kIEcgIQAUgAEhwKCWFjdGlvbl9pZBgDIAEoCUIH+kIEcgIQAUgAEhAKBmdsb2JhbBgEIAEoCEgAEikKBHR5cGUYBiABKAsyGy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsVHlwZRIOCgZwcm9tcHQYByABKAkSEwoLZGVzY3JpcHRpb24YCCABKAlCDAoFc2NvcGUSA/hCASIXChVFbnF1ZXVlQWN0aW9uUmVzcG9uc2UicgoVQWJvcnRRdWV1ZWRSdW5SZXF1ZXN0EjkKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckII+kIFigECEAESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIYChZBYm9ydFF1ZXVlZFJ1blJlc3BvbnNlInsKGEFib3J0UXVldWVkQWN0aW9uUmVxdWVzdBI/CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCCPpCBYoBAhABEhMKBnJlYXNvbhgCIAEoCUgAiAEBQgkKB19yZWFzb24iGwoZQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZTLVAgoMUXVldWVTZXJ2aWNlEmYKDUVucXVldWVBY3Rpb24SKC5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlc3BvbnNlIgASaQoOQWJvcnRRdWV1ZWRSdW4SKS5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXF1ZXN0GiouZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UXVldWVkUnVuUmVzcG9uc2UiABJyChFBYm9ydFF1ZXVlZEFjdGlvbhIsLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZEFjdGlvblJlcXVlc3QaLS5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZSIAQskBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhFRdWV1ZVNlcnZpY2VQcm90b0gCUAFaMWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2lkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_idl2_common_identifier, file_idl2_core_types, file_google_protobuf_timestamp, file_google_protobuf_wrappers, file_validate_validate, file_idl2_workflow_run_definition, file_idl2_workflow_task_definition]);
-
-/**
- * @generated from message flyteidl2.workflow.WorkerIdentifier
- */
-export type WorkerIdentifier = Message<"flyteidl2.workflow.WorkerIdentifier"> & {
-  /**
-   * the organization that this worker is associated with.
-   *
-   * @generated from field: string organization = 1;
-   */
-  organization: string;
-
-  /**
-   * the cluster this worker is part of.
-   *
-   * @generated from field: string cluster = 2;
-   */
-  cluster: string;
-
-  /**
-   * the name for the worker, when combined with organization, and cluster this will form a unique
-   * identifier for the worker.
-   *
-   * @generated from field: string name = 3;
-   */
-  name: string;
-};
-
-/**
- * Describes the message flyteidl2.workflow.WorkerIdentifier.
- * Use `create(WorkerIdentifierSchema)` to create a new message.
- */
-export const WorkerIdentifierSchema: GenMessage<WorkerIdentifier> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 0);
+  fileDesc("CiFpZGwyL3dvcmtmbG93L3F1ZXVlX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyLeAwoURW5xdWV1ZUFjdGlvblJlcXVlc3QSPwoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQgj6QgWKAQIQARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARItCghydW5fc3BlYxgDIAEoCzIbLmZseXRlaWRsMi53b3JrZmxvdy5SdW5TcGVjEhoKCWlucHV0X3VyaRgGIAEoCUIH+kIEcgIQARIgCg9ydW5fb3V0cHV0X2Jhc2UYByABKAlCB/pCBHICEAESDQoFZ3JvdXAYCCABKAkSDwoHc3ViamVjdBgJIAEoCRI4CgR0YXNrGAogASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlRhc2tBY3Rpb25CCPpCBYoBAhABSAASOgoFdHJhY2UYCyABKAsyHy5mbHl0ZWlkbDIud29ya2Zsb3cuVHJhY2VBY3Rpb25CCPpCBYoBAhABSAASQgoJY29uZGl0aW9uGAwgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkII+kIFigECEAFIAEIGCgRzcGVjQhUKE19wYXJlbnRfYWN0aW9uX25hbWUitAEKClRhc2tBY3Rpb24SLgoCaWQYASABKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0lkZW50aWZpZXISNAoEc3BlYxgCIAEoCzIcLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY0II+kIFigECEAESLwoJY2FjaGVfa2V5GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEg8KB2NsdXN0ZXIYBCABKAki9QEKC1RyYWNlQWN0aW9uEhUKBG5hbWUYASABKAlCB/pCBHICEAESKAoFcGhhc2UYAiABKA4yGS5mbHl0ZWlkbDIud29ya2Zsb3cuUGhhc2USLgoKc3RhcnRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoIZW5kX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESNQoHb3V0cHV0cxgFIAEoCzIkLmZseXRlaWRsMi53b3JrZmxvdy5PdXRwdXRSZWZlcmVuY2VzQgsKCV9lbmRfdGltZSLRAQoPQ29uZGl0aW9uQWN0aW9uEhUKBG5hbWUYASABKAlCB/pCBHICEAESGQoGcnVuX2lkGAIgASgJQgf6QgRyAhABSAASHAoJYWN0aW9uX2lkGAMgASgJQgf6QgRyAhABSAASEAoGZ2xvYmFsGAQgASgISAASKQoEdHlwZRgGIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlEg4KBnByb21wdBgHIAEoCRITCgtkZXNjcmlwdGlvbhgIIAEoCUIMCgVzY29wZRID+EIBIhcKFUVucXVldWVBY3Rpb25SZXNwb25zZSJyChVBYm9ydFF1ZXVlZFJ1blJlcXVlc3QSOQoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQgj6QgWKAQIQARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIhgKFkFib3J0UXVldWVkUnVuUmVzcG9uc2UiewoYQWJvcnRRdWV1ZWRBY3Rpb25SZXF1ZXN0Ej8KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckII+kIFigECEAESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIbChlBYm9ydFF1ZXVlZEFjdGlvblJlc3BvbnNlMtUCCgxRdWV1ZVNlcnZpY2USZgoNRW5xdWV1ZUFjdGlvbhIoLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVzcG9uc2UiABJpCg5BYm9ydFF1ZXVlZFJ1bhIpLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZFJ1blJlcXVlc3QaKi5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXNwb25zZSIAEnIKEUFib3J0UXVldWVkQWN0aW9uEiwuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UXVldWVkQWN0aW9uUmVxdWVzdBotLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZEFjdGlvblJlc3BvbnNlIgBCyQEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCEVF1ZXVlU2VydmljZVByb3RvSAJQAVoxZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_idl2_common_identifier, file_idl2_core_types, file_google_protobuf_timestamp, file_google_protobuf_wrappers, file_validate_validate, file_idl2_workflow_run_definition, file_idl2_workflow_task_definition]);
 
 /**
  * request message for queuing an action.
@@ -145,7 +111,7 @@ export type EnqueueActionRequest = Message<"flyteidl2.workflow.EnqueueActionRequ
  * Use `create(EnqueueActionRequestSchema)` to create a new message.
  */
 export const EnqueueActionRequestSchema: GenMessage<EnqueueActionRequest> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 1);
+  messageDesc(file_idl2_workflow_queue_service, 0);
 
 /**
  * @generated from message flyteidl2.workflow.TaskAction
@@ -186,7 +152,7 @@ export type TaskAction = Message<"flyteidl2.workflow.TaskAction"> & {
  * Use `create(TaskActionSchema)` to create a new message.
  */
 export const TaskActionSchema: GenMessage<TaskAction> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 2);
+  messageDesc(file_idl2_workflow_queue_service, 1);
 
 /**
  * TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
@@ -235,7 +201,7 @@ export type TraceAction = Message<"flyteidl2.workflow.TraceAction"> & {
  * Use `create(TraceActionSchema)` to create a new message.
  */
 export const TraceActionSchema: GenMessage<TraceAction> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 3);
+  messageDesc(file_idl2_workflow_queue_service, 2);
 
 /**
  * ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
@@ -310,7 +276,7 @@ export type ConditionAction = Message<"flyteidl2.workflow.ConditionAction"> & {
  * Use `create(ConditionActionSchema)` to create a new message.
  */
 export const ConditionActionSchema: GenMessage<ConditionAction> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 4);
+  messageDesc(file_idl2_workflow_queue_service, 3);
 
 /**
  * response message for queuing an action.
@@ -325,7 +291,7 @@ export type EnqueueActionResponse = Message<"flyteidl2.workflow.EnqueueActionRes
  * Use `create(EnqueueActionResponseSchema)` to create a new message.
  */
 export const EnqueueActionResponseSchema: GenMessage<EnqueueActionResponse> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 5);
+  messageDesc(file_idl2_workflow_queue_service, 4);
 
 /**
  * request message for aborting a run.
@@ -353,7 +319,7 @@ export type AbortQueuedRunRequest = Message<"flyteidl2.workflow.AbortQueuedRunRe
  * Use `create(AbortQueuedRunRequestSchema)` to create a new message.
  */
 export const AbortQueuedRunRequestSchema: GenMessage<AbortQueuedRunRequest> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 6);
+  messageDesc(file_idl2_workflow_queue_service, 5);
 
 /**
  * response message for aborting a run.
@@ -368,7 +334,7 @@ export type AbortQueuedRunResponse = Message<"flyteidl2.workflow.AbortQueuedRunR
  * Use `create(AbortQueuedRunResponseSchema)` to create a new message.
  */
 export const AbortQueuedRunResponseSchema: GenMessage<AbortQueuedRunResponse> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 7);
+  messageDesc(file_idl2_workflow_queue_service, 6);
 
 /**
  * @generated from message flyteidl2.workflow.AbortQueuedActionRequest
@@ -394,7 +360,7 @@ export type AbortQueuedActionRequest = Message<"flyteidl2.workflow.AbortQueuedAc
  * Use `create(AbortQueuedActionRequestSchema)` to create a new message.
  */
 export const AbortQueuedActionRequestSchema: GenMessage<AbortQueuedActionRequest> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 8);
+  messageDesc(file_idl2_workflow_queue_service, 7);
 
 /**
  * @generated from message flyteidl2.workflow.AbortQueuedActionResponse
@@ -407,7 +373,7 @@ export type AbortQueuedActionResponse = Message<"flyteidl2.workflow.AbortQueuedA
  * Use `create(AbortQueuedActionResponseSchema)` to create a new message.
  */
 export const AbortQueuedActionResponseSchema: GenMessage<AbortQueuedActionResponse> = /*@__PURE__*/
-  messageDesc(file_idl2_workflow_queue_service, 9);
+  messageDesc(file_idl2_workflow_queue_service, 8);
 
 /**
  * provides an interface for managing execution of runs over a collection of workers.

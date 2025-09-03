@@ -4,6 +4,7 @@ package flyteidl2.workflow;
 
 import "idl2/common/identifier.proto";
 import "idl2/common/identity.proto";
+import "idl2/core/interface.proto";
 import "idl2/core/tasks.proto";
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
@@ -111,6 +112,12 @@ message TaskSpec {
 
   // Optional environment for this task. Note, some tasks may not be run in the context of an environment.
   Environment environment = 4;
+}
+
+// Specification for a trace action.
+message TraceSpec {
+  // A strongly typed interface for the trace.
+  flyteidl2.core.TypedInterface interface = 1;
 }
 
 // Detailed information about a task.
