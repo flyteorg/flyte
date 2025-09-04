@@ -7,7 +7,7 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
-import "idl2/core/types.proto";
+import "flyteidl2/core/types.proto";
 
 // Primitive Types
 message Primitive {

@@ -4,7 +4,7 @@ package flyteidl2.core;
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 
-import "idl2/core/identifier.proto";
+import "flyteidl2/core/identifier.proto";
 
 // Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
 enum CatalogCacheStatus {

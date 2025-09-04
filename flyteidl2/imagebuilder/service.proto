@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.imagebuilder;
 
-import "idl2/imagebuilder/payload.proto";
+import "flyteidl2/imagebuilder/payload.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder";
 

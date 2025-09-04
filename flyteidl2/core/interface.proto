@@ -4,9 +4,9 @@ package flyteidl2.core;
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 
-import "idl2/core/types.proto";
-import "idl2/core/literals.proto";
-import "idl2/core/artifact_id.proto";
+import "flyteidl2/core/types.proto";
+import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/artifact_id.proto";
 
 // Defines a strongly typed variable.
 message Variable {

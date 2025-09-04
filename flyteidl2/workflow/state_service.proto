@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
-import "idl2/common/identifier.proto";
-import "idl2/core/execution.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/core/execution.proto";
 import "google/rpc/status.proto";
 import "validate/validate.proto";
-import "idl2/workflow/run_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 

@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package flyteidl2.common;
 
-import "idl2/common/authorization.proto";
-import "idl2/common/identifier.proto";
+import "flyteidl2/common/authorization.proto";
+import "flyteidl2/common/identifier.proto";
 import "validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/common";

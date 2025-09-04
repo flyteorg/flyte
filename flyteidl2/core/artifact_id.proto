@@ -5,7 +5,7 @@ package flyteidl2.core;
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
 
 import "google/protobuf/timestamp.proto";
-import "idl2/core/identifier.proto";
+import "flyteidl2/core/identifier.proto";
 
 
 message ArtifactKey {

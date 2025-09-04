@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
-import "idl2/common/identifier.proto";
-import "idl2/common/identity.proto";
-import "idl2/core/catalog.proto";
-import "idl2/core/execution.proto";
-import "idl2/core/literals.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/core/catalog.proto";
+import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/literals.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
-import "idl2/workflow/task_definition.proto";
+import "flyteidl2/workflow/task_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
 
