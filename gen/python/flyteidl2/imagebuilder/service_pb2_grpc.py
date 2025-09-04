@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.imagebuilder import payload_pb2 as idl2_dot_imagebuilder_dot_payload__pb2
+from flyteidl2.imagebuilder import payload_pb2 as flyteidl2_dot_imagebuilder_dot_payload__pb2
 
 
 class ImageServiceStub(object):
@@ -16,8 +16,8 @@ class ImageServiceStub(object):
         """
         self.GetImage = channel.unary_unary(
                 '/flyteidl2.imagebuilder.ImageService/GetImage',
-                request_serializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
-                response_deserializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
+                request_serializer=flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_ImageServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetImage': grpc.unary_unary_rpc_method_handler(
                     servicer.GetImage,
-                    request_deserializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.FromString,
-                    response_serializer=idl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.FromString,
+                    response_serializer=flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class ImageService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.imagebuilder.ImageService/GetImage',
-            idl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
-            idl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
+            flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageRequest.SerializeToString,
+            flyteidl2_dot_imagebuilder_dot_payload__pb2.GetImageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

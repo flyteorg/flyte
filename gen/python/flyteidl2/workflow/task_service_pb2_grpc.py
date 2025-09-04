@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.workflow import task_service_pb2 as idl2_dot_workflow_dot_task__service__pb2
+from flyteidl2.workflow import task_service_pb2 as flyteidl2_dot_workflow_dot_task__service__pb2
 
 
 class TaskServiceStub(object):
@@ -17,18 +17,18 @@ class TaskServiceStub(object):
         """
         self.DeployTask = channel.unary_unary(
                 '/flyteidl2.workflow.TaskService/DeployTask',
-                request_serializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
                 )
         self.GetTaskDetails = channel.unary_unary(
                 '/flyteidl2.workflow.TaskService/GetTaskDetails',
-                request_serializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
                 )
         self.ListTasks = channel.unary_unary(
                 '/flyteidl2.workflow.TaskService/ListTasks',
-                request_serializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
                 )
 
 
@@ -62,18 +62,18 @@ def add_TaskServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'DeployTask': grpc.unary_unary_rpc_method_handler(
                     servicer.DeployTask,
-                    request_deserializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.SerializeToString,
             ),
             'GetTaskDetails': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTaskDetails,
-                    request_deserializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.SerializeToString,
             ),
             'ListTasks': grpc.unary_unary_rpc_method_handler(
                     servicer.ListTasks,
-                    request_deserializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -98,8 +98,8 @@ class TaskService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/DeployTask',
-            idl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
-            idl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.DeployTaskResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -115,8 +115,8 @@ class TaskService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/GetTaskDetails',
-            idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
-            idl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.GetTaskDetailsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -132,7 +132,7 @@ class TaskService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TaskService/ListTasks',
-            idl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
-            idl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_task__service__pb2.ListTasksResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

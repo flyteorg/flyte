@@ -1,4 +1,4 @@
-from idl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from validate import validate_pb2 as _validate_pb2
 from google.protobuf.internal import containers as _containers

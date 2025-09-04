@@ -1,8 +1,8 @@
-from idl2.common import identifier_pb2 as _identifier_pb2
-from idl2.common import list_pb2 as _list_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import list_pb2 as _list_pb2
 from validate import validate_pb2 as _validate_pb2
-from idl2.workflow import run_definition_pb2 as _run_definition_pb2
-from idl2.workflow import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
+from flyteidl2.workflow import task_definition_pb2 as _task_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message

@@ -1,7 +1,7 @@
-from idl2.core import identifier_pb2 as _identifier_pb2
-from idl2.core import interface_pb2 as _interface_pb2
-from idl2.core import literals_pb2 as _literals_pb2
-from idl2.core import security_pb2 as _security_pb2
+from flyteidl2.core import identifier_pb2 as _identifier_pb2
+from flyteidl2.core import interface_pb2 as _interface_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
+from flyteidl2.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2

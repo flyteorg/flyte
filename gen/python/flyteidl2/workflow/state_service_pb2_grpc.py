@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.workflow import state_service_pb2 as idl2_dot_workflow_dot_state__service__pb2
+from flyteidl2.workflow import state_service_pb2 as flyteidl2_dot_workflow_dot_state__service__pb2
 
 
 class StateServiceStub(object):
@@ -17,18 +17,18 @@ class StateServiceStub(object):
         """
         self.Put = channel.stream_stream(
                 '/flyteidl2.workflow.StateService/Put',
-                request_serializer=idl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
                 )
         self.Get = channel.stream_stream(
                 '/flyteidl2.workflow.StateService/Get',
-                request_serializer=idl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
                 )
         self.Watch = channel.unary_stream(
                 '/flyteidl2.workflow.StateService/Watch',
-                request_serializer=idl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
                 )
 
 
@@ -62,18 +62,18 @@ def add_StateServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Put': grpc.stream_stream_rpc_method_handler(
                     servicer.Put,
-                    request_deserializer=idl2_dot_workflow_dot_state__service__pb2.PutRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_state__service__pb2.PutResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.SerializeToString,
             ),
             'Get': grpc.stream_stream_rpc_method_handler(
                     servicer.Get,
-                    request_deserializer=idl2_dot_workflow_dot_state__service__pb2.GetRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_state__service__pb2.GetResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.SerializeToString,
             ),
             'Watch': grpc.unary_stream_rpc_method_handler(
                     servicer.Watch,
-                    request_deserializer=idl2_dot_workflow_dot_state__service__pb2.WatchRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_state__service__pb2.WatchResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -98,8 +98,8 @@ class StateService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Put',
-            idl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
-            idl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -115,8 +115,8 @@ class StateService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Get',
-            idl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
-            idl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -132,7 +132,7 @@ class StateService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.StateService/Watch',
-            idl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
-            idl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

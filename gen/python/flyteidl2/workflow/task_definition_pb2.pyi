@@ -1,11 +1,11 @@
-from idl2.common import identifier_pb2 as _identifier_pb2
-from idl2.common import identity_pb2 as _identity_pb2
-from idl2.core import interface_pb2 as _interface_pb2
-from idl2.core import tasks_pb2 as _tasks_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.core import interface_pb2 as _interface_pb2
+from flyteidl2.core import tasks_pb2 as _tasks_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from validate import validate_pb2 as _validate_pb2
-from idl2.workflow import common_pb2 as _common_pb2
-from idl2.workflow import environment_pb2 as _environment_pb2
+from flyteidl2.workflow import common_pb2 as _common_pb2
+from flyteidl2.workflow import environment_pb2 as _environment_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message

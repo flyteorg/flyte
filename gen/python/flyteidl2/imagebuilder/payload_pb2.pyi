@@ -1,4 +1,4 @@
-from idl2.imagebuilder import definition_pb2 as _definition_pb2
+from flyteidl2.imagebuilder import definition_pb2 as _definition_pb2
 from validate import validate_pb2 as _validate_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message

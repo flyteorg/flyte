@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.secret import payload_pb2 as idl2_dot_secret_dot_payload__pb2
+from flyteidl2.secret import payload_pb2 as flyteidl2_dot_secret_dot_payload__pb2
 
 
 class SecretServiceStub(object):
@@ -16,28 +16,28 @@ class SecretServiceStub(object):
         """
         self.CreateSecret = channel.unary_unary(
                 '/flyteidl2.secret.SecretService/CreateSecret',
-                request_serializer=idl2_dot_secret_dot_payload__pb2.CreateSecretRequest.SerializeToString,
-                response_deserializer=idl2_dot_secret_dot_payload__pb2.CreateSecretResponse.FromString,
+                request_serializer=flyteidl2_dot_secret_dot_payload__pb2.CreateSecretRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_secret_dot_payload__pb2.CreateSecretResponse.FromString,
                 )
         self.UpdateSecret = channel.unary_unary(
                 '/flyteidl2.secret.SecretService/UpdateSecret',
-                request_serializer=idl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.SerializeToString,
-                response_deserializer=idl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.FromString,
+                request_serializer=flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.FromString,
                 )
         self.GetSecret = channel.unary_unary(
                 '/flyteidl2.secret.SecretService/GetSecret',
-                request_serializer=idl2_dot_secret_dot_payload__pb2.GetSecretRequest.SerializeToString,
-                response_deserializer=idl2_dot_secret_dot_payload__pb2.GetSecretResponse.FromString,
+                request_serializer=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse.FromString,
                 )
         self.DeleteSecret = channel.unary_unary(
                 '/flyteidl2.secret.SecretService/DeleteSecret',
-                request_serializer=idl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.SerializeToString,
-                response_deserializer=idl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.FromString,
+                request_serializer=flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.FromString,
                 )
         self.ListSecrets = channel.unary_unary(
                 '/flyteidl2.secret.SecretService/ListSecrets',
-                request_serializer=idl2_dot_secret_dot_payload__pb2.ListSecretsRequest.SerializeToString,
-                response_deserializer=idl2_dot_secret_dot_payload__pb2.ListSecretsResponse.FromString,
+                request_serializer=flyteidl2_dot_secret_dot_payload__pb2.ListSecretsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_secret_dot_payload__pb2.ListSecretsResponse.FromString,
                 )
 
 
@@ -79,28 +79,28 @@ def add_SecretServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateSecret': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateSecret,
-                    request_deserializer=idl2_dot_secret_dot_payload__pb2.CreateSecretRequest.FromString,
-                    response_serializer=idl2_dot_secret_dot_payload__pb2.CreateSecretResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_secret_dot_payload__pb2.CreateSecretRequest.FromString,
+                    response_serializer=flyteidl2_dot_secret_dot_payload__pb2.CreateSecretResponse.SerializeToString,
             ),
             'UpdateSecret': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateSecret,
-                    request_deserializer=idl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.FromString,
-                    response_serializer=idl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.FromString,
+                    response_serializer=flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.SerializeToString,
             ),
             'GetSecret': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSecret,
-                    request_deserializer=idl2_dot_secret_dot_payload__pb2.GetSecretRequest.FromString,
-                    response_serializer=idl2_dot_secret_dot_payload__pb2.GetSecretResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest.FromString,
+                    response_serializer=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse.SerializeToString,
             ),
             'DeleteSecret': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteSecret,
-                    request_deserializer=idl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.FromString,
-                    response_serializer=idl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.FromString,
+                    response_serializer=flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.SerializeToString,
             ),
             'ListSecrets': grpc.unary_unary_rpc_method_handler(
                     servicer.ListSecrets,
-                    request_deserializer=idl2_dot_secret_dot_payload__pb2.ListSecretsRequest.FromString,
-                    response_serializer=idl2_dot_secret_dot_payload__pb2.ListSecretsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_secret_dot_payload__pb2.ListSecretsRequest.FromString,
+                    response_serializer=flyteidl2_dot_secret_dot_payload__pb2.ListSecretsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -124,8 +124,8 @@ class SecretService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.secret.SecretService/CreateSecret',
-            idl2_dot_secret_dot_payload__pb2.CreateSecretRequest.SerializeToString,
-            idl2_dot_secret_dot_payload__pb2.CreateSecretResponse.FromString,
+            flyteidl2_dot_secret_dot_payload__pb2.CreateSecretRequest.SerializeToString,
+            flyteidl2_dot_secret_dot_payload__pb2.CreateSecretResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -141,8 +141,8 @@ class SecretService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.secret.SecretService/UpdateSecret',
-            idl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.SerializeToString,
-            idl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.FromString,
+            flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretRequest.SerializeToString,
+            flyteidl2_dot_secret_dot_payload__pb2.UpdateSecretResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -158,8 +158,8 @@ class SecretService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.secret.SecretService/GetSecret',
-            idl2_dot_secret_dot_payload__pb2.GetSecretRequest.SerializeToString,
-            idl2_dot_secret_dot_payload__pb2.GetSecretResponse.FromString,
+            flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest.SerializeToString,
+            flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -175,8 +175,8 @@ class SecretService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.secret.SecretService/DeleteSecret',
-            idl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.SerializeToString,
-            idl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.FromString,
+            flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretRequest.SerializeToString,
+            flyteidl2_dot_secret_dot_payload__pb2.DeleteSecretResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -192,7 +192,7 @@ class SecretService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.secret.SecretService/ListSecrets',
-            idl2_dot_secret_dot_payload__pb2.ListSecretsRequest.SerializeToString,
-            idl2_dot_secret_dot_payload__pb2.ListSecretsResponse.FromString,
+            flyteidl2_dot_secret_dot_payload__pb2.ListSecretsRequest.SerializeToString,
+            flyteidl2_dot_secret_dot_payload__pb2.ListSecretsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.workflow import queue_service_pb2 as idl2_dot_workflow_dot_queue__service__pb2
+from flyteidl2.workflow import queue_service_pb2 as flyteidl2_dot_workflow_dot_queue__service__pb2
 
 
 class QueueServiceStub(object):
@@ -17,18 +17,18 @@ class QueueServiceStub(object):
         """
         self.EnqueueAction = channel.unary_unary(
                 '/flyteidl2.workflow.QueueService/EnqueueAction',
-                request_serializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
                 )
         self.AbortQueuedRun = channel.unary_unary(
                 '/flyteidl2.workflow.QueueService/AbortQueuedRun',
-                request_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
                 )
         self.AbortQueuedAction = channel.unary_unary(
                 '/flyteidl2.workflow.QueueService/AbortQueuedAction',
-                request_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
                 )
 
 
@@ -62,18 +62,18 @@ def add_QueueServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'EnqueueAction': grpc.unary_unary_rpc_method_handler(
                     servicer.EnqueueAction,
-                    request_deserializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.SerializeToString,
             ),
             'AbortQueuedRun': grpc.unary_unary_rpc_method_handler(
                     servicer.AbortQueuedRun,
-                    request_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.SerializeToString,
             ),
             'AbortQueuedAction': grpc.unary_unary_rpc_method_handler(
                     servicer.AbortQueuedAction,
-                    request_deserializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -98,8 +98,8 @@ class QueueService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/EnqueueAction',
-            idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
-            idl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -115,8 +115,8 @@ class QueueService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/AbortQueuedRun',
-            idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
-            idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedRunResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -132,7 +132,7 @@ class QueueService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.QueueService/AbortQueuedAction',
-            idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
-            idl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

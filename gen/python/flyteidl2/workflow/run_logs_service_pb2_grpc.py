@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from idl2.workflow import run_logs_service_pb2 as idl2_dot_workflow_dot_run__logs__service__pb2
+from flyteidl2.workflow import run_logs_service_pb2 as flyteidl2_dot_workflow_dot_run__logs__service__pb2
 
 
 class RunLogsServiceStub(object):
@@ -17,8 +17,8 @@ class RunLogsServiceStub(object):
         """
         self.TailLogs = channel.unary_stream(
                 '/flyteidl2.workflow.RunLogsService/TailLogs',
-                request_serializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
-                response_deserializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
+                request_serializer=flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
                 )
 
 
@@ -37,8 +37,8 @@ def add_RunLogsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'TailLogs': grpc.unary_stream_rpc_method_handler(
                     servicer.TailLogs,
-                    request_deserializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.FromString,
-                    response_serializer=idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -63,7 +63,7 @@ class RunLogsService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunLogsService/TailLogs',
-            idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
-            idl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
+            flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
