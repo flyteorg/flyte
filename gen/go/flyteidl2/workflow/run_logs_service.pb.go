@@ -8,8 +8,8 @@ package workflow
 
 import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	common "github.com/flyteorg/flyte/v2/gen/go/idl2/common"
-	dataplane "github.com/flyteorg/flyte/v2/gen/go/idl2/logs/dataplane"
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	dataplane "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

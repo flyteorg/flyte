@@ -10,7 +10,7 @@ import "google/protobuf/wrappers.proto";
 
 package flyteidl2.core;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/core";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
 
 // A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 // container engines.

@@ -4,7 +4,7 @@ package flyteidl2.imagebuilder;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
 
 // ImageIdentifier is how to identify an image
 message ImageIdentifier {

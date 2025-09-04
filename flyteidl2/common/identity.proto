@@ -7,7 +7,7 @@ import "flyteidl2/common/policy.proto";
 import "flyteidl2/common/role.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
 // Encapsulates user profile details for a member of an organization.
 message User {

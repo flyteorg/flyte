@@ -7,7 +7,7 @@
 package workflow
 
 import (
-	core "github.com/flyteorg/flyte/v2/gen/go/idl2/core"
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"

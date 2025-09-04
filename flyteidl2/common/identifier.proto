@@ -4,7 +4,7 @@ package flyteidl2.common;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/common";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
 message ProjectIdentifier {
   string organization = 1 [(validate.rules).string.min_len = 1];

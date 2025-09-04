@@ -4,7 +4,7 @@ package flyteidl2.workflow;
 
 import "flyteidl2/core/interface.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
 message NamedParameter {
   string name = 1;

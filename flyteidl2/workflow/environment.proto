@@ -4,7 +4,7 @@ package flyteidl2.workflow;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
 // Environment for a task.
 message Environment {

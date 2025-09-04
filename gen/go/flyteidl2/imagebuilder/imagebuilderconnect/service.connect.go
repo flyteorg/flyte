@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	imagebuilder "github.com/flyteorg/flyte/v2/gen/go/idl2/imagebuilder"
+	imagebuilder "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder"
 	http "net/http"
 	strings "strings"
 )
