@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "google/protobuf/struct.proto";
+import "idl2/core/interface.proto";
+import "idl2/workflow/run_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/idl2/workflow";
+
+// TranslatorService provides an interface for all diferent types of translations for the platform.
+service TranslatorService {
+  rpc LiteralsToJson(LiteralsToJsonRequest) returns (LiteralsToJsonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc JsonToLiterals(JsonToLiteralsRequest) returns (JsonToLiteralsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message LiteralsToJsonRequest {
+  // The literals to convert to JSON.
+  repeated flyteidl2.workflow.NamedLiteral literals = 1;
+  flyteidl2.core.VariableMap variables = 2;
+}
+
+message LiteralsToJsonResponse {
+  // The JSON for the literals.
+  repeated google.protobuf.Struct json = 1;
+}
+
+message JsonToLiteralsRequest {
+  // The JSON schema to convert to literals.
+  repeated google.protobuf.Struct json = 1;
+}
+
+message JsonToLiteralsResponse {
+  // The literals generated from the JSON schema.
+  repeated flyteidl2.workflow.NamedLiteral literals = 1;
+}
