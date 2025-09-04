@@ -1718,9 +1718,23 @@
         "outputs": {
           "$ref": "#/definitions/workflowOutputReferences",
           "description": "Output references."
+        },
+        "spec": {
+          "$ref": "#/definitions/workflowTraceSpec",
+          "description": "Task spec for the trace, useful for the typed interface inside."
         }
       },
       "description": "TraceAction is used to define a trace action that can be used to track the execution of an action that's managed\nby the local worker. This can be used to bring determinism to code that's otherwise not deterministic (e.g. current\ntime)."
+    },
+    "workflowTraceSpec": {
+      "type": "object",
+      "properties": {
+        "interface": {
+          "$ref": "#/definitions/coreTypedInterface",
+          "description": "A strongly typed interface for the trace."
+        }
+      },
+      "description": "Specification for a trace action."
     }
   }
 }

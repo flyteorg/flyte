@@ -48,18 +48,20 @@ class TaskAction(_message.Message):
     def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., cache_key: _Optional[_Union[_wrappers_pb2.StringValue, _Mapping]] = ..., cluster: _Optional[str] = ...) -> None: ...
 
 class TraceAction(_message.Message):
-    __slots__ = ["name", "phase", "start_time", "end_time", "outputs"]
+    __slots__ = ["name", "phase", "start_time", "end_time", "outputs", "spec"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    SPEC_FIELD_NUMBER: _ClassVar[int]
     name: str
     phase: _run_definition_pb2.Phase
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     outputs: _run_definition_pb2.OutputReferences
-    def __init__(self, name: _Optional[str] = ..., phase: _Optional[_Union[_run_definition_pb2.Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., outputs: _Optional[_Union[_run_definition_pb2.OutputReferences, _Mapping]] = ...) -> None: ...
+    spec: _task_definition_pb2.TraceSpec
+    def __init__(self, name: _Optional[str] = ..., phase: _Optional[_Union[_run_definition_pb2.Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., outputs: _Optional[_Union[_run_definition_pb2.OutputReferences, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ...) -> None: ...
 
 class ConditionAction(_message.Message):
     __slots__ = ["name", "run_id", "action_id", "type", "prompt", "description"]

@@ -27,7 +27,7 @@ service QueueService {
 // request message for queuing an action.
 message EnqueueActionRequest {
   // the unique identifier for the action.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  flyteidl2.common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
 
   // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
   // project, domain) will be the same as the action_id defined above.
@@ -89,6 +89,9 @@ message TraceAction {
 
   // Output references.
   OutputReferences outputs = 5;
+
+  // Task spec for the trace, useful for the typed interface inside.
+  TraceSpec spec = 6 [(validate.rules).message.required = true];
 }
 
 // ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
@@ -130,7 +133,7 @@ message AbortQueuedRunRequest {
   // the unique identifier for the run to be aborted.
   common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
 
-  // Reason for aborting the action, if applicable.
+  // Reason for aborting the run, if applicable.
   optional string reason = 2;
 }
 
