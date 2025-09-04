@@ -589,4 +589,46 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_tokenEndpointProxyConfig.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("tokenEndpointProxyConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("tokenEndpointProxyConfig.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.TokenEndpointProxyConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_tokenEndpointProxyConfig.publicUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.TokenEndpointProxyConfig.PublicURL.String()
+
+			cmdFlags.Set("tokenEndpointProxyConfig.publicUrl", testValue)
+			if vString, err := cmdFlags.GetString("tokenEndpointProxyConfig.publicUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.TokenEndpointProxyConfig.PublicURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_tokenEndpointProxyConfig.pathPrefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("tokenEndpointProxyConfig.pathPrefix", testValue)
+			if vString, err := cmdFlags.GetString("tokenEndpointProxyConfig.pathPrefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.TokenEndpointProxyConfig.PathPrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

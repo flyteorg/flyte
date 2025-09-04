@@ -96,15 +96,18 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			return nil, err
 		}
 
-		if len(s.cfg.TokenEndpointProxyPath) > 0 {
+		tokenProxyConfig := s.cfg.TokenEndpointProxyConfig
+		if tokenProxyConfig.Enabled {
 			tokenEndpoint, err := url.Parse(resp.TokenEndpoint)
 			if err != nil {
 				return nil, flyteErrors.NewFlyteAdminError(codes.Internal, fmt.Sprintf("Failed to parse token endpoint [%v], err: %v", resp.TokenEndpoint, err))
 			}
-
-			tokenEndpoint.Host = publicURL.Host
-			tokenEndpoint.Path = s.cfg.TokenEndpointProxyPath + tokenEndpoint.Path
-			tokenEndpoint.RawPath = s.cfg.TokenEndpointProxyPath + tokenEndpoint.RawPath
+			if len(tokenProxyConfig.PublicURL.Host) == 0 {
+				return nil, flyteErrors.NewFlyteAdminError(codes.Internal, "Token endpoint proxy public url host is not configured")
+			}
+			tokenEndpoint.Host = tokenProxyConfig.PublicURL.Host
+			tokenEndpoint.Path = tokenProxyConfig.PathPrefix + tokenEndpoint.Path
+			tokenEndpoint.RawPath = tokenProxyConfig.PathPrefix + tokenEndpoint.RawPath
 			resp.TokenEndpoint = tokenEndpoint.String()
 		}
 

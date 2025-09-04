@@ -166,7 +166,20 @@ type Config struct {
 	AppAuth OAuth2Options `json:"appAuth" pflag:",Defines Auth options for apps. UserAuth must be enabled for AppAuth to work."`
 
 	// TokenEndpointProxyPath, if set, configures admin to proxy calls to the TokenURL using this path prefix.
+	// Deprecated: Please use TokenEndpointProxyConfig instead.
 	TokenEndpointProxyPath string `json:"tokenEndpointProxyPath" pflag:",The path used to proxy calls to the TokenURL"`
+
+	// TokenEndpointProxyConfig, if set, configures admin to proxy calls to the TokenURL using this config.
+	TokenEndpointProxyConfig TokenEndpointProxyConfig `json:"tokenEndpointProxyConfig" pflag:",Configuration for proxying token endpoint requests. If set, admin will proxy calls to the TokenURL using this config."`
+}
+
+type TokenEndpointProxyConfig struct {
+	// EnableProxy enables the token endpoint proxy.
+	Enabled bool `json:"enabled" pflag:",Enables the token endpoint proxy."`
+	// The public URL that the token endpoint will be proxied to. This should be the public url of the service.
+	PublicURL config.URL `json:"publicUrl" pflag:",The public URL that the token endpoint will be proxied to. This should be the public url of the service. In case of selfserve environment its the public url of the self serve tenant"`
+	// The path prefix to use when proxying token requests.
+	PathPrefix string `json:"pathPrefix" pflag:",The path prefix to use when proxying token requests. This should match the TokenEndpointProxyPath setting in the main auth config."`
 }
 
 type AuthorizationServer struct {

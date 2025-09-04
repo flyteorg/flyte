@@ -106,6 +106,11 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 				},
 			},
 			TokenEndpointProxyPath: "/my-proxy",
+			TokenEndpointProxyConfig: authConfig.TokenEndpointProxyConfig{
+				Enabled:    true,
+				PublicURL:  config2.URL{URL: *config.MustParseURL("https://issuer")},
+				PathPrefix: "/my-proxy",
+			},
 		})
 
 		ctx := context.Background()

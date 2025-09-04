@@ -85,5 +85,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "appAuth.thirdPartyConfig.flyteClient.scopes"), DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.Scopes, "Recommended scopes for the client to request.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "appAuth.thirdPartyConfig.flyteClient.audience"), DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.Audience, "Audience to use when initiating OAuth2 authorization requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "tokenEndpointProxyPath"), DefaultConfig.TokenEndpointProxyPath, "The path used to proxy calls to the TokenURL")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "tokenEndpointProxyConfig.enabled"), DefaultConfig.TokenEndpointProxyConfig.Enabled, "Enables the token endpoint proxy.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "tokenEndpointProxyConfig.publicUrl"), DefaultConfig.TokenEndpointProxyConfig.PublicURL.String(), "The public URL that the token endpoint will be proxied to. This should be the public url of the service. In case of selfserve environment its the public url of the self serve tenant")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "tokenEndpointProxyConfig.pathPrefix"), DefaultConfig.TokenEndpointProxyConfig.PathPrefix, "The path prefix to use when proxying token requests. This should match the TokenEndpointProxyPath setting in the main auth config.")
 	return cmdFlags
 }
