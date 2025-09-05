@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -43,26 +44,28 @@ func TestNamedEntityManager_Get(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
 
-	getFunction := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
-		return models.NamedEntity{
-			NamedEntityKey: models.NamedEntityKey{
-				ResourceType: input.ResourceType,
-				Project:      input.Project,
-				Domain:       input.Domain,
-				Name:         input.Name,
-			},
-			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
-				Description: description,
-			},
-		}, nil
+	result := models.NamedEntity{
+		NamedEntityKey: models.NamedEntityKey{
+			ResourceType: resourceType,
+			Project:      namedEntityIdentifier.GetProject(),
+			Domain:       namedEntityIdentifier.GetDomain(),
+			Name:         namedEntityIdentifier.GetName(),
+		},
+		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+			Description: description,
+		},
 	}
-	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getFunction)
+
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().Get(mock.Anything, mock.Anything).Return(result, nil)
+
 	response, err := manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
+	namedEntityRepo.AssertExpectations(t)
 }
 
 func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
@@ -105,19 +108,27 @@ func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 func TestNamedEntityManager_Update(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
-	updatedDescription := "updated description"
-	var updateCalled bool
 
-	updateFunction := func(input models.NamedEntity) error {
-		updateCalled = true
-		assert.Equal(t, input.Description, updatedDescription)
-		assert.Equal(t, input.ResourceType, resourceType)
-		assert.Equal(t, input.Project, project)
-		assert.Equal(t, input.Domain, domain)
-		assert.Equal(t, input.Name, name)
-		return nil
+	updatedDescription := "updated description"
+	expectedState := int32(0)
+
+	expectedInput := models.NamedEntity{
+		NamedEntityKey: models.NamedEntityKey{
+			ResourceType: resourceType,
+			Project:      project,
+			Domain:       domain,
+			Name:         name,
+		},
+		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+			Description: updatedDescription,
+			State:       &expectedState,
+		},
 	}
-	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetUpdateCallback(updateFunction)
+
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().Get(mock.Anything, mock.Anything).Return(models.NamedEntity{}, nil)
+	namedEntityRepo.EXPECT().Update(mock.Anything, expectedInput).Return(nil)
+
 	updatedMetadata := admin.NamedEntityMetadata{
 		Description: updatedDescription,
 	}
@@ -126,9 +137,9 @@ func TestNamedEntityManager_Update(t *testing.T) {
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
 	})
-	assert.True(t, updateCalled)
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
+	namedEntityRepo.AssertExpectations(t)
 }
 
 func TestNamedEntityManager_Update_BadRequest(t *testing.T) {

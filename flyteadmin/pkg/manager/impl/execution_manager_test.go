@@ -4802,6 +4802,23 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorage,
 		storagePrefix, mockScope.NewTestScope())
 	namedEntityManager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().
+		Get(mock.Anything, mock.Anything).
+		RunAndReturn(func(ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+			return models.NamedEntity{
+				NamedEntityKey: models.NamedEntityKey{
+					ResourceType: input.ResourceType,
+					Project:      input.Project,
+					Domain:       input.Domain,
+					Name:         input.Name,
+				},
+				NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+					Description: "",
+				},
+			}, nil
+		})
+	namedEntityRepo.EXPECT().Update(mock.Anything, mock.Anything).Return(nil)
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
