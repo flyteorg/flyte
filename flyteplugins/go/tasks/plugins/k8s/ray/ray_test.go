@@ -15,6 +15,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -1430,7 +1431,7 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
-	expected := k8s.PluginProperties{}
+	expected := k8s.PluginProperties{GeneratedNameMaxLength: ptr.To[int](47)}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
 }
 

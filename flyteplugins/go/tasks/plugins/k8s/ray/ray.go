@@ -14,6 +14,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -53,7 +54,7 @@ var logTemplateRegexes = struct {
 type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	return k8s.PluginProperties{GeneratedNameMaxLength: ptr.To[int](47)}
 }
 
 // BuildResource Creates a new ray job resource
