@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,6 +38,7 @@ const unsignedSIGKILL = 247
 const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
+const FlyteEnableVscode = "_F_E_VS"
 
 var retryableStatusReasons = sets.NewString(
 	// Reasons that indicate the node was preempted aggressively.
@@ -540,6 +542,23 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	return podSpec, objectMeta, nil
+}
+
+func IsVscodeEnabled(ctx context.Context, container *v1.Container) bool {
+	for _, env := range container.Env {
+		if env.Name != FlyteEnableVscode {
+			continue
+		}
+		var err error
+		enableVscode, err := strconv.ParseBool(env.Value)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse %s env var [%s] for container [%s]", FlyteEnableVscode, env.Value, container.Name)
+			return false
+		}
+		return enableVscode
+	}
+
+	return false
 }
 
 func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {

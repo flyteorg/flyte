@@ -102,6 +102,7 @@ message TaskLog {
     bool ShowWhilePending = 5;
     bool HideOnceFinished = 6;
     LinkType link_type = 7;
+    bool ready = 8;
 }
 
 // Contains metadata required to identify logs produces by a set of pods

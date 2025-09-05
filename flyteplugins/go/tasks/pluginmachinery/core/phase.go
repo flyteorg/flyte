@@ -178,6 +178,10 @@ func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
 	}
 }
 
+func (p *PhaseInfo) WithReason(reason string) {
+	p.reason = reason
+}
+
 func (p PhaseInfo) String() string {
 	if p.err != nil {
 		return fmt.Sprintf("Phase<%s:%d Error:%s>", p.phase, p.version, p.err)

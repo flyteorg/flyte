@@ -14180,6 +14180,7 @@
                  * @property {boolean|null} [ShowWhilePending] TaskLog ShowWhilePending
                  * @property {boolean|null} [HideOnceFinished] TaskLog HideOnceFinished
                  * @property {flyteidl.core.TaskLog.LinkType|null} [linkType] TaskLog linkType
+                 * @property {boolean|null} [ready] TaskLog ready
                  */
     
                 /**
@@ -14254,6 +14255,14 @@
                 TaskLog.prototype.linkType = 0;
     
                 /**
+                 * TaskLog ready.
+                 * @member {boolean} ready
+                 * @memberof flyteidl.core.TaskLog
+                 * @instance
+                 */
+                TaskLog.prototype.ready = false;
+    
+                /**
                  * Creates a new TaskLog instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskLog
@@ -14291,6 +14300,8 @@
                         writer.uint32(/* id 6, wireType 0 =*/48).bool(message.HideOnceFinished);
                     if (message.linkType != null && message.hasOwnProperty("linkType"))
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.linkType);
+                    if (message.ready != null && message.hasOwnProperty("ready"))
+                        writer.uint32(/* id 8, wireType 0 =*/64).bool(message.ready);
                     return writer;
                 };
     
@@ -14332,6 +14343,9 @@
                             break;
                         case 7:
                             message.linkType = reader.int32();
+                            break;
+                        case 8:
+                            message.ready = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14387,6 +14401,9 @@
                         case 2:
                             break;
                         }
+                    if (message.ready != null && message.hasOwnProperty("ready"))
+                        if (typeof message.ready !== "boolean")
+                            return "ready: boolean expected";
                     return null;
                 };
     

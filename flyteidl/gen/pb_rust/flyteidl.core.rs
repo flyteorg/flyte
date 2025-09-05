@@ -2249,6 +2249,8 @@ pub struct TaskLog {
     pub hide_once_finished: bool,
     #[prost(enumeration="task_log::LinkType", tag="7")]
     pub link_type: i32,
+    #[prost(bool, tag="8")]
+    pub ready: bool,
 }
 /// Nested message and enum types in `TaskLog`.
 pub mod task_log {

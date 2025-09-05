@@ -442,6 +442,11 @@ export class TaskLog extends Message<TaskLog> {
    */
   linkType = TaskLog_LinkType.EXTERNAL;
 
+  /**
+   * @generated from field: bool ready = 8;
+   */
+  ready = false;
+
   constructor(data?: PartialMessage<TaskLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -457,6 +462,7 @@ export class TaskLog extends Message<TaskLog> {
     { no: 5, name: "ShowWhilePending", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "HideOnceFinished", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 7, name: "link_type", kind: "enum", T: proto3.getEnumType(TaskLog_LinkType) },
+    { no: 8, name: "ready", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskLog {

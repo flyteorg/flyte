@@ -208,13 +208,13 @@ func (input Input) templateVars() []TemplateVar {
 }
 
 func getDynamicLogLinkTypes(input Input) []string {
-	if input.TaskTemplate == nil {
-		return nil
-	}
-
 	var dynamicLogLinkTypes []string
 	if input.EnableVscode {
 		dynamicLogLinkTypes = []string{vscode}
+	}
+
+	if input.TaskTemplate == nil {
+		return nil
 	}
 
 	config := input.TaskTemplate.GetConfig()
@@ -246,6 +246,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			ShowWhilePending: p.ShowWhilePending,
 			HideOnceFinished: p.HideOnceFinished,
 			LinkType:         linkType,
+			Ready:            true,
 		})
 	}
 
@@ -270,6 +271,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 					ShowWhilePending: p.ShowWhilePending,
 					HideOnceFinished: p.HideOnceFinished,
 					LinkType:         linkType,
+					Ready:            true,
 				})
 			}
 		}

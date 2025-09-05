@@ -506,6 +506,19 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
 	}
 
+	for _, tl := range info.Logs {
+		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD && strings.Contains(tl.Name, "Spark Driver UI") {
+			if phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				tl.Ready = false
+				phaseInfo.WithReason("Spark driver UI is not ready")
+			} else {
+				tl.Ready = true
+				phaseInfo.WithReason("Spark driver UI is ready")
+			}
+			break
+		}
+	}
+
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr

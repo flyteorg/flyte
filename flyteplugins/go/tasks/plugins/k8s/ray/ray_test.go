@@ -987,8 +987,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "namespace",
-					Uri:  "http://test/test-namespace",
+					Name:  "namespace",
+					Uri:   "http://test/test-namespace",
+					Ready: true,
 				},
 			},
 		},
@@ -1003,8 +1004,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "taskExecID",
-					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Name:  "taskExecID",
+					Uri:   "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Ready: true,
 				},
 			},
 		},
@@ -1024,8 +1026,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray cluster name",
-					Uri:  "http://test/test-namespace/ray-cluster",
+					Name:  "ray cluster name",
+					Uri:   "http://test/test-namespace/ray-cluster",
+					Ready: true,
 				},
 			},
 		},
@@ -1045,8 +1048,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray job ID",
-					Uri:  "http://test/test-namespace/ray-job-1",
+					Name:  "ray job ID",
+					Uri:   "http://test/test-namespace/ray-job-1",
+					Ready: true,
 				},
 			},
 		},
@@ -1088,8 +1092,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "namespace",
-					Uri:  "http://test/test-namespace",
+					Name:  "namespace",
+					Uri:   "http://test/test-namespace",
+					Ready: true,
 				},
 			},
 		},
@@ -1104,8 +1109,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "taskExecID",
-					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Name:  "taskExecID",
+					Uri:   "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Ready: true,
 				},
 			},
 		},
@@ -1125,8 +1131,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray cluster name",
-					Uri:  "http://test/test-namespace/ray-cluster",
+					Name:  "ray cluster name",
+					Uri:   "http://test/test-namespace/ray-cluster",
+					Ready: true,
 				},
 			},
 		},
@@ -1146,8 +1153,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray job ID",
-					Uri:  "http://test/test-namespace/ray-job-1",
+					Name:  "ray job ID",
+					Uri:   "http://test/test-namespace/ray-job-1",
+					Ready: true,
 				},
 			},
 		},
@@ -1193,6 +1201,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 					Name:     "Ray Dashboard",
 					Uri:      "http://test/generated-name",
 					LinkType: core.TaskLog_DASHBOARD,
+					Ready:    true,
 				},
 			},
 		},
@@ -1247,6 +1256,7 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 					Name:     "Ray Dashboard",
 					Uri:      "http://test/generated-name",
 					LinkType: core.TaskLog_DASHBOARD,
+					Ready:    true,
 				},
 			},
 		},

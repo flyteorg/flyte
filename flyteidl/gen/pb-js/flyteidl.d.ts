@@ -5885,6 +5885,9 @@ export namespace flyteidl {
 
             /** TaskLog linkType */
             linkType?: (flyteidl.core.TaskLog.LinkType|null);
+
+            /** TaskLog ready */
+            ready?: (boolean|null);
         }
 
         /** Represents a TaskLog. */
@@ -5916,6 +5919,9 @@ export namespace flyteidl {
 
             /** TaskLog linkType. */
             public linkType: flyteidl.core.TaskLog.LinkType;
+
+            /** TaskLog ready. */
+            public ready: boolean;
 
             /**
              * Creates a new TaskLog instance using the specified properties.

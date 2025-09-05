@@ -5,6 +5,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -120,6 +121,27 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		return nil, err
 	}
 
+	for i, c := range podSpec.Containers {
+		if len(podSpec.Containers) > 1 && c.Name != primaryContainerName {
+			continue
+		}
+		if !flytek8s.IsVscodeEnabled(ctx, &podSpec.Containers[i]) {
+			break
+		}
+		newContainer := c.DeepCopy()
+		newContainer.ReadinessProbe = &v1.Probe{
+			ProbeHandler: v1.ProbeHandler{
+				HTTPGet: &v1.HTTPGetAction{
+					Port: intstr.FromInt32(6060),
+				},
+			},
+			InitialDelaySeconds: 15,
+			PeriodSeconds:       5,
+			FailureThreshold:    50,
+		}
+		podSpec.Containers[i] = *newContainer
+	}
+
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
@@ -189,8 +211,40 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
+
+	for _, tl := range info.Logs {
+		if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			tl.Ready = IsPodReady(pod)
+			if tl.Ready {
+				phaseInfo.WithReason("Vscode server is ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is not ready")
+			}
+			break
+		}
+	}
+
 	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
+}
+
+func IsPodReady(pod *v1.Pod) bool {
+	primaryContainerName := flytek8s.GetPrimaryContainerName(pod)
+	if len(primaryContainerName) == 0 {
+		// Check pod readiness only when primary container is nod defined.
+		for _, cond := range pod.Status.Conditions {
+			if cond.Type == v1.PodReady && cond.Status == v1.ConditionTrue {
+				return true
+			}
+		}
+	} else {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name == primaryContainerName && status.Ready {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (plugin) GetProperties() k8s.PluginProperties {

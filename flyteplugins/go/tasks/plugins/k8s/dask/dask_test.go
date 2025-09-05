@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -284,6 +285,10 @@ func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.Resou
 		func(v interface{}) error {
 			return nil
 		})
+
+	// Add K8sReader mock
+	reader := fake.NewFakeClient()
+	pCtx.OnK8sReader().Return(reader)
 
 	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx

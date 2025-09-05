@@ -445,17 +445,7 @@ func (p *Plugin) buildTaskInfoWithLogs(ctx context.Context, executionEnvID inter
 		return taskInfo, podContainerNotFoundError
 	}
 
-	enableVscode := false
-	for _, env := range pod.Spec.Containers[containerIndex].Env {
-		if env.Name != logs.FlyteEnableVscode {
-			continue
-		}
-		var err error
-		enableVscode, err = strconv.ParseBool(env.Value)
-		if err != nil {
-			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", logs.FlyteEnableVscode, env.Value, pod.Name)
-		}
-	}
+	enableVscode := flytek8s.IsVscodeEnabled(ctx, &pod.Spec.Containers[containerIndex])
 
 	in := tasklog.Input{
 		Namespace:       pod.Namespace,

@@ -3,13 +3,13 @@ package logs
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -48,18 +48,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 	startTime := pod.CreationTimestamp.Unix()
 	finishTime := time.Now().Unix()
 
-	enableVscode := false
-	for _, env := range pod.Spec.Containers[index].Env {
-		if env.Name != FlyteEnableVscode {
-			continue
-		}
-		var err error
-		enableVscode, err = strconv.ParseBool(env.Value)
-		if err != nil {
-			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", FlyteEnableVscode, env.Value, pod.Name)
-		}
-	}
-
+	enableVscode := flytek8s.IsVscodeEnabled(ctx, &pod.Spec.Containers[index])
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
 			PodName:              pod.Name,

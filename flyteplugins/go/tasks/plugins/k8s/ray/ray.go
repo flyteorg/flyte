@@ -30,6 +30,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -581,8 +583,12 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	}
 
 	var taskLogs []*core.TaskLog
-
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
+	podList := &v1.PodList{}
+	err = pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list node execution pods. Error: %w", err)
+	}
 	input := tasklog.Input{
 		Namespace:         rayJob.Namespace,
 		TaskExecutionID:   taskExecID,
@@ -628,16 +634,30 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 		taskLogs = append(taskLogs, dashboardURLOutput.TaskLogs...)
 	}
 
-	podList := &v1.PodList{}
-	err = pluginContext.K8sReader().List(ctx, podList)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list node execution pods. Error: %w", err)
-	}
-
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: logContextForPods(rayJob.Name, podList.Items),
 	}, nil
+}
+
+func isRayDashboardReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
+	podList := &v1.PodList{}
+	err := pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return false, fmt.Errorf("failed to list node execution pods. Error: %w", err)
+	}
+	pods := lo.Filter(podList.Items, func(pod v1.Pod, _ int) bool {
+		return pod.Status.Phase != v1.PodPending && strings.HasPrefix(pod.Name, rayJobName) && strings.Contains(pod.Name, "head") && flytek8s.GetPrimaryContainerName(&pod) == RayHeadContainerName
+	})
+	if len(pods) == 0 {
+		return false, nil
+	} else if len(pods) == 1 {
+		return pod.IsPodReady(&pods[0]), nil
+	}
+
+	// More than one head pod. Should not happen.
+	logger.Debug(ctx, "Cannot determine Ray dashboard readiness: more than one head pod found")
+	return true, fmt.Errorf("more than one head pod found for Ray job %s", rayJobName)
 }
 
 func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
@@ -692,6 +712,22 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.
 		phaseInfo, err = pluginsCore.PhaseInfoUndefined, fmt.Errorf("unknown job deployment status: %s", rayJob.Status.JobDeploymentStatus)
+	}
+
+	if ready, err := isRayDashboardReady(ctx, rayJob.Name, pluginContext); err != nil {
+		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
+	} else {
+		for _, tl := range info.Logs {
+			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
+				tl.Ready = ready
+				if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
+					phaseInfo.WithReason("Ray dashboard is not ready")
+				} else {
+					phaseInfo.WithReason("Ray dashboard is ready")
+				}
+				break
+			}
+		}
 	}
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
