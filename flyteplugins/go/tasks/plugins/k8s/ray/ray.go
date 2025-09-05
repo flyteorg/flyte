@@ -71,7 +71,8 @@ var submitterDefaultResourceRequirements = v1.ResourceRequirements{
 type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	maxLength := 47
+	return k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
 }
 
 // BuildResource Creates a new ray job resource

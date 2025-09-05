@@ -1288,7 +1288,8 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
-	expected := k8s.PluginProperties{}
+	maxLength := 47
+	expected := k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
 }
 
