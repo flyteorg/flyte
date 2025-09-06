@@ -16,8 +16,8 @@ type failFastWorkflowLauncher struct {
 	Reader
 }
 
-func (failFastWorkflowLauncher) Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier,
-	launchPlanRef *core.Identifier, inputs *core.LiteralMap, parentWorkflowID v1alpha1.WorkflowID) error {
+func (failFastWorkflowLauncher) Launch(ctx context.Context, _ LaunchContext, executionID *core.WorkflowExecutionIdentifier,
+	launchPlanRef *core.Identifier, _ *core.LiteralMap, _ v1alpha1.WorkflowID) error {
 
 	logger.Infof(ctx, "Fail: Launch Workflow requested with ExecID [%s], LaunchPlan [%s]", executionID.GetName(), fmt.Sprintf("%s:%s:%s", launchPlanRef.GetProject(), launchPlanRef.GetDomain(), launchPlanRef.GetName()))
 	return errors.Wrapf(RemoteErrorUser, fmt.Errorf("badly configured system"), "please enable admin workflow launch to use launchplans")
@@ -28,16 +28,16 @@ func (failFastWorkflowLauncher) GetStatus(ctx context.Context, executionID *core
 	return nil, nil, errors.Wrapf(RemoteErrorUser, fmt.Errorf("badly configured system"), "please enable admin workflow launch to use launchplans")
 }
 
-func (failFastWorkflowLauncher) Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error {
+func (failFastWorkflowLauncher) Kill(context.Context, *core.WorkflowExecutionIdentifier, string) error {
 	return nil
 }
 
-func (failFastWorkflowLauncher) GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error) {
+func (failFastWorkflowLauncher) GetLaunchPlan(context.Context, *core.Identifier) (*admin.LaunchPlan, error) {
 	return nil, nil
 }
 
 // Initializes Executor.
-func (failFastWorkflowLauncher) Initialize(ctx context.Context) error {
+func (failFastWorkflowLauncher) Initialize(context.Context) error {
 	return nil
 }
 
