@@ -20,3 +20,15 @@ plugins:
     out: gen/go
     opt:
       - paths=source_relative
+  - plugin: buf.build/grpc-ecosystem/gateway:v2.15.2
+    out: gen/go/gateway
+    opt:
+      - paths=import
+      - module=github.com/flyteorg/flyte/v2/gen/go
+      - standalone=true
+      - allow_delete_body=true
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: gen/go/gateway
+    opt:
+      - json_names_for_fields=false
+      - allow_delete_body=true
