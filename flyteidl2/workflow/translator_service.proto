@@ -13,6 +13,7 @@ service TranslatorService {
   rpc LiteralsToJson(LiteralsToJsonRequest) returns (LiteralsToJsonResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
   rpc JsonToLiterals(JsonToLiteralsRequest) returns (JsonToLiteralsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -20,7 +21,7 @@ service TranslatorService {
 
 message LiteralsToJsonRequest {
   // The literals to convert to JSON.
-  repeated flyteidl2.workflow.NamedLiteral literals = 1;
+  repeated NamedLiteral literals = 1;
   flyteidl2.core.VariableMap variables = 2;
 }
 
@@ -36,5 +37,5 @@ message JsonToLiteralsRequest {
 
 message JsonToLiteralsResponse {
   // The literals generated from the JSON schema.
-  repeated flyteidl2.workflow.NamedLiteral literals = 1;
+  repeated NamedLiteral literals = 1;
 }
