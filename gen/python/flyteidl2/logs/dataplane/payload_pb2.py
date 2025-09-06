@@ -15,7 +15,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&flyteidl2/logs/dataplane/payload.proto\x12\x18\x66lyteidl2.logs.dataplane\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"o\n\x0bPodResource\x12%\n\tnamespace\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\tnamespace\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x04name\x12\x1c\n\tcontainer\x18\x03 \x01(\tR\tcontainer\"\xdc\x01\n\x1cTailTaskExecutionLogsRequest\x12[\n\x0flogging_context\x18\x01 \x01(\x0b\x32(.flyteidl2.logs.dataplane.LoggingContextB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\x0eloggingContext\x12<\n\x06source\x18\x03 \x01(\x0e\x32$.flyteidl2.logs.dataplane.LogsSourceR\x06source\x12\x1b\n\tno_follow\x18\x04 \x01(\x08R\x08noFollowJ\x04\x08\x02\x10\x03\"\xed\x01\n\x1dTailTaskExecutionLogsResponse\x12R\n\x04logs\x18\x01 \x01(\x0b\x32<.flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.LogsH\x00R\x04logs\x1an\n\x04Logs\x12\x18\n\x05lines\x18\x01 \x03(\tB\x02\x18\x01R\x05lines\x12L\n\x10structured_lines\x18\x02 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x0fstructuredLinesB\x08\n\x06result\"\xf7\x04\n\x0eLoggingContext\x12*\n\x0c\x63luster_name\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x04 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12\x37\n\x13kubernetes_pod_name\x18\x05 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x11kubernetesPodName\x12\x43\n\x19kubernetes_container_name\x18\x06 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x17kubernetesContainerName\x12[\n\x1c\x65xecution_attempt_start_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x19\x65xecutionAttemptStartTime\x12W\n\x1a\x65xecution_attempt_end_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x17\x65xecutionAttemptEndTime\x12u\n\x15kubernetes_pod_labels\x18\t \x03(\x0b\x32\x41.flyteidl2.logs.dataplane.LoggingContext.KubernetesPodLabelsEntryR\x13kubernetesPodLabels\x1a\x46\n\x18KubernetesPodLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01J\x04\x08\x01\x10\x02J\x04\x08\x02\x10\x03\"\xf2\x01\n\x13\x43ontainerIdentifier\x12*\n\x0c\x63luster_name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12\x37\n\x13kubernetes_pod_name\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x11kubernetesPodName\x12:\n\x19kubernetes_container_name\x18\x04 \x01(\tR\x17kubernetesContainerName\"\xb7\x02\n\x11\x43ontainerSelector\x12*\n\x0c\x63luster_name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12;\n\x1akubernetes_pod_name_prefix\x18\x03 \x01(\tR\x17kubernetesPodNamePrefix\x12:\n\x19kubernetes_container_name\x18\x04 \x01(\tR\x17kubernetesContainerName\x12\x41\n\x1dkubernetes_pod_label_selector\x18\x05 \x01(\tR\x1akubernetesPodLabelSelector\"^\n\x0fLiveLogsOptions\x12$\n\x0elog_pod_status\x18\x01 \x01(\x08R\x0clogPodStatus\x12%\n\x0elog_timestamps\x18\x02 \x01(\x08R\rlogTimestamps\"\xd9\x03\n\x0fTailLogsRequest\x12M\n\tcontainer\x18\x01 \x01(\x0b\x32-.flyteidl2.logs.dataplane.ContainerIdentifierH\x00R\tcontainer\x12\\\n\x12\x63ontainer_selector\x18\x02 \x01(\x0b\x32+.flyteidl2.logs.dataplane.ContainerSelectorH\x00R\x11\x63ontainerSelector\x12\x43\n\nstart_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x08\xfa\x42\x05\xb2\x01\x02\x08\x01R\tstartTime\x12\x35\n\x08\x65nd_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x07\x65ndTime\x12<\n\x06source\x18\x05 \x01(\x0e\x32$.flyteidl2.logs.dataplane.LogsSourceR\x06source\x12U\n\x11live_logs_options\x18\x06 \x01(\x0b\x32).flyteidl2.logs.dataplane.LiveLogsOptionsR\x0fliveLogsOptionsB\x08\n\x06target\"\xaa\x01\n\x07LogLine\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12K\n\noriginator\x18\x03 \x01(\x0e\x32+.flyteidl2.logs.dataplane.LogLineOriginatorR\noriginator\"\xf2\x01\n\x08LogLines\x12\x18\n\x05lines\x18\x01 \x03(\tB\x02\x18\x01R\x05lines\x12\'\n\x0f\x63ontainer_index\x18\x02 \x01(\rR\x0e\x63ontainerIndex\x12U\n\tcontainer\x18\x03 \x01(\x0b\x32-.flyteidl2.logs.dataplane.ContainerIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\tcontainer\x12L\n\x10structured_lines\x18\x04 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x0fstructuredLines\"b\n\x11LogContainersList\x12M\n\ncontainers\x18\x01 \x03(\x0b\x32-.flyteidl2.logs.dataplane.ContainerIdentifierR\ncontainers\"G\n\rLogLinesBatch\x12\x36\n\x04logs\x18\x01 \x03(\x0b\x32\".flyteidl2.logs.dataplane.LogLinesR\x04logs\"\xdb\x01\n\x10TailLogsResponse\x12W\n\ncontainers\x18\x01 \x01(\x0b\x32+.flyteidl2.logs.dataplane.LogContainersListB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\ncontainers\x12[\n\x0flog_lines_batch\x18\x03 \x01(\x0b\x32\'.flyteidl2.logs.dataplane.LogLinesBatchB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01H\x00R\rlogLinesBatchB\x0b\n\x04resp\x12\x03\xf8\x42\x01J\x04\x08\x02\x10\x03*6\n\x11LogLineOriginator\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04USER\x10\x01\x12\n\n\x06SYSTEM\x10\x02*F\n\nLogsSource\x12\x15\n\x11LIVE_OR_PERSISTED\x10\x00\x12\r\n\tLIVE_ONLY\x10\x01\x12\x12\n\x0ePERSISTED_ONLY\x10\x02\x42\xee\x01\n\x1c\x63om.flyteidl2.logs.dataplaneB\x0cPayloadProtoH\x02P\x01Z<github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane\xa2\x02\x03\x46LD\xaa\x02\x18\x46lyteidl2.Logs.Dataplane\xca\x02\x18\x46lyteidl2\\Logs\\Dataplane\xe2\x02$Flyteidl2\\Logs\\Dataplane\\GPBMetadata\xea\x02\x1a\x46lyteidl2::Logs::Dataplaneb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&flyteidl2/logs/dataplane/payload.proto\x12\x18\x66lyteidl2.logs.dataplane\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"o\n\x0bPodResource\x12%\n\tnamespace\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\tnamespace\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x04name\x12\x1c\n\tcontainer\x18\x03 \x01(\tR\tcontainer\"\xf7\x04\n\x0eLoggingContext\x12*\n\x0c\x63luster_name\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x04 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12\x37\n\x13kubernetes_pod_name\x18\x05 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x11kubernetesPodName\x12\x43\n\x19kubernetes_container_name\x18\x06 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x17kubernetesContainerName\x12[\n\x1c\x65xecution_attempt_start_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x19\x65xecutionAttemptStartTime\x12W\n\x1a\x65xecution_attempt_end_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x17\x65xecutionAttemptEndTime\x12u\n\x15kubernetes_pod_labels\x18\t \x03(\x0b\x32\x41.flyteidl2.logs.dataplane.LoggingContext.KubernetesPodLabelsEntryR\x13kubernetesPodLabels\x1a\x46\n\x18KubernetesPodLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01J\x04\x08\x01\x10\x02J\x04\x08\x02\x10\x03\"\xf2\x01\n\x13\x43ontainerIdentifier\x12*\n\x0c\x63luster_name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12\x37\n\x13kubernetes_pod_name\x18\x03 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x11kubernetesPodName\x12:\n\x19kubernetes_container_name\x18\x04 \x01(\tR\x17kubernetesContainerName\"\xb7\x02\n\x11\x43ontainerSelector\x12*\n\x0c\x63luster_name\x18\x01 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x0b\x63lusterName\x12:\n\x14kubernetes_namespace\x18\x02 \x01(\tB\x07\xfa\x42\x04r\x02\x10\x01R\x13kubernetesNamespace\x12;\n\x1akubernetes_pod_name_prefix\x18\x03 \x01(\tR\x17kubernetesPodNamePrefix\x12:\n\x19kubernetes_container_name\x18\x04 \x01(\tR\x17kubernetesContainerName\x12\x41\n\x1dkubernetes_pod_label_selector\x18\x05 \x01(\tR\x1akubernetesPodLabelSelector\"^\n\x0fLiveLogsOptions\x12$\n\x0elog_pod_status\x18\x01 \x01(\x08R\x0clogPodStatus\x12%\n\x0elog_timestamps\x18\x02 \x01(\x08R\rlogTimestamps\"\xaa\x01\n\x07LogLine\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12K\n\noriginator\x18\x03 \x01(\x0e\x32+.flyteidl2.logs.dataplane.LogLineOriginatorR\noriginator\"\xf2\x01\n\x08LogLines\x12\x18\n\x05lines\x18\x01 \x03(\tB\x02\x18\x01R\x05lines\x12\'\n\x0f\x63ontainer_index\x18\x02 \x01(\rR\x0e\x63ontainerIndex\x12U\n\tcontainer\x18\x03 \x01(\x0b\x32-.flyteidl2.logs.dataplane.ContainerIdentifierB\x08\xfa\x42\x05\x8a\x01\x02\x10\x01R\tcontainer\x12L\n\x10structured_lines\x18\x04 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x0fstructuredLines\"b\n\x11LogContainersList\x12M\n\ncontainers\x18\x01 \x03(\x0b\x32-.flyteidl2.logs.dataplane.ContainerIdentifierR\ncontainers\"G\n\rLogLinesBatch\x12\x36\n\x04logs\x18\x01 \x03(\x0b\x32\".flyteidl2.logs.dataplane.LogLinesR\x04logs*6\n\x11LogLineOriginator\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04USER\x10\x01\x12\n\n\x06SYSTEM\x10\x02*F\n\nLogsSource\x12\x15\n\x11LIVE_OR_PERSISTED\x10\x00\x12\r\n\tLIVE_ONLY\x10\x01\x12\x12\n\x0ePERSISTED_ONLY\x10\x02\x42\xee\x01\n\x1c\x63om.flyteidl2.logs.dataplaneB\x0cPayloadProtoH\x02P\x01Z<github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane\xa2\x02\x03\x46LD\xaa\x02\x18\x46lyteidl2.Logs.Dataplane\xca\x02\x18\x46lyteidl2\\Logs\\Dataplane\xe2\x02$Flyteidl2\\Logs\\Dataplane\\GPBMetadata\xea\x02\x1a\x46lyteidl2::Logs::Dataplaneb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -27,10 +27,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _PODRESOURCE.fields_by_name['namespace']._serialized_options = b'\372B\004r\002\020\001'
   _PODRESOURCE.fields_by_name['name']._options = None
   _PODRESOURCE.fields_by_name['name']._serialized_options = b'\372B\004r\002\020\001'
-  _TAILTASKEXECUTIONLOGSREQUEST.fields_by_name['logging_context']._options = None
-  _TAILTASKEXECUTIONLOGSREQUEST.fields_by_name['logging_context']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _TAILTASKEXECUTIONLOGSRESPONSE_LOGS.fields_by_name['lines']._options = None
-  _TAILTASKEXECUTIONLOGSRESPONSE_LOGS.fields_by_name['lines']._serialized_options = b'\030\001'
   _LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY._options = None
   _LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY._serialized_options = b'8\001'
   _LOGGINGCONTEXT.fields_by_name['cluster_name']._options = None
@@ -51,50 +47,32 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CONTAINERSELECTOR.fields_by_name['cluster_name']._serialized_options = b'\372B\004r\002\020\001'
   _CONTAINERSELECTOR.fields_by_name['kubernetes_namespace']._options = None
   _CONTAINERSELECTOR.fields_by_name['kubernetes_namespace']._serialized_options = b'\372B\004r\002\020\001'
-  _TAILLOGSREQUEST.fields_by_name['start_time']._options = None
-  _TAILLOGSREQUEST.fields_by_name['start_time']._serialized_options = b'\372B\005\262\001\002\010\001'
   _LOGLINES.fields_by_name['lines']._options = None
   _LOGLINES.fields_by_name['lines']._serialized_options = b'\030\001'
   _LOGLINES.fields_by_name['container']._options = None
   _LOGLINES.fields_by_name['container']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _TAILLOGSRESPONSE.oneofs_by_name['resp']._options = None
-  _TAILLOGSRESPONSE.oneofs_by_name['resp']._serialized_options = b'\370B\001'
-  _TAILLOGSRESPONSE.fields_by_name['containers']._options = None
-  _TAILLOGSRESPONSE.fields_by_name['containers']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _TAILLOGSRESPONSE.fields_by_name['log_lines_batch']._options = None
-  _TAILLOGSRESPONSE.fields_by_name['log_lines_batch']._serialized_options = b'\372B\005\212\001\002\020\001'
-  _globals['_LOGLINEORIGINATOR']._serialized_start=3280
-  _globals['_LOGLINEORIGINATOR']._serialized_end=3334
-  _globals['_LOGSSOURCE']._serialized_start=3336
-  _globals['_LOGSSOURCE']._serialized_end=3406
+  _globals['_LOGLINEORIGINATOR']._serialized_start=2119
+  _globals['_LOGLINEORIGINATOR']._serialized_end=2173
+  _globals['_LOGSSOURCE']._serialized_start=2175
+  _globals['_LOGSSOURCE']._serialized_end=2245
   _globals['_PODRESOURCE']._serialized_start=126
   _globals['_PODRESOURCE']._serialized_end=237
-  _globals['_TAILTASKEXECUTIONLOGSREQUEST']._serialized_start=240
-  _globals['_TAILTASKEXECUTIONLOGSREQUEST']._serialized_end=460
-  _globals['_TAILTASKEXECUTIONLOGSRESPONSE']._serialized_start=463
-  _globals['_TAILTASKEXECUTIONLOGSRESPONSE']._serialized_end=700
-  _globals['_TAILTASKEXECUTIONLOGSRESPONSE_LOGS']._serialized_start=580
-  _globals['_TAILTASKEXECUTIONLOGSRESPONSE_LOGS']._serialized_end=690
-  _globals['_LOGGINGCONTEXT']._serialized_start=703
-  _globals['_LOGGINGCONTEXT']._serialized_end=1334
-  _globals['_LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY']._serialized_start=1252
-  _globals['_LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY']._serialized_end=1322
-  _globals['_CONTAINERIDENTIFIER']._serialized_start=1337
-  _globals['_CONTAINERIDENTIFIER']._serialized_end=1579
-  _globals['_CONTAINERSELECTOR']._serialized_start=1582
-  _globals['_CONTAINERSELECTOR']._serialized_end=1893
-  _globals['_LIVELOGSOPTIONS']._serialized_start=1895
-  _globals['_LIVELOGSOPTIONS']._serialized_end=1989
-  _globals['_TAILLOGSREQUEST']._serialized_start=1992
-  _globals['_TAILLOGSREQUEST']._serialized_end=2465
-  _globals['_LOGLINE']._serialized_start=2468
-  _globals['_LOGLINE']._serialized_end=2638
-  _globals['_LOGLINES']._serialized_start=2641
-  _globals['_LOGLINES']._serialized_end=2883
-  _globals['_LOGCONTAINERSLIST']._serialized_start=2885
-  _globals['_LOGCONTAINERSLIST']._serialized_end=2983
-  _globals['_LOGLINESBATCH']._serialized_start=2985
-  _globals['_LOGLINESBATCH']._serialized_end=3056
-  _globals['_TAILLOGSRESPONSE']._serialized_start=3059
-  _globals['_TAILLOGSRESPONSE']._serialized_end=3278
+  _globals['_LOGGINGCONTEXT']._serialized_start=240
+  _globals['_LOGGINGCONTEXT']._serialized_end=871
+  _globals['_LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY']._serialized_start=789
+  _globals['_LOGGINGCONTEXT_KUBERNETESPODLABELSENTRY']._serialized_end=859
+  _globals['_CONTAINERIDENTIFIER']._serialized_start=874
+  _globals['_CONTAINERIDENTIFIER']._serialized_end=1116
+  _globals['_CONTAINERSELECTOR']._serialized_start=1119
+  _globals['_CONTAINERSELECTOR']._serialized_end=1430
+  _globals['_LIVELOGSOPTIONS']._serialized_start=1432
+  _globals['_LIVELOGSOPTIONS']._serialized_end=1526
+  _globals['_LOGLINE']._serialized_start=1529
+  _globals['_LOGLINE']._serialized_end=1699
+  _globals['_LOGLINES']._serialized_start=1702
+  _globals['_LOGLINES']._serialized_end=1944
+  _globals['_LOGCONTAINERSLIST']._serialized_start=1946
+  _globals['_LOGCONTAINERSLIST']._serialized_end=2044
+  _globals['_LOGLINESBATCH']._serialized_start=2046
+  _globals['_LOGLINESBATCH']._serialized_end=2117
 # @@protoc_insertion_point(module_scope)

@@ -36,29 +36,6 @@ class PodResource(_message.Message):
     container: str
     def __init__(self, namespace: _Optional[str] = ..., name: _Optional[str] = ..., container: _Optional[str] = ...) -> None: ...
 
-class TailTaskExecutionLogsRequest(_message.Message):
-    __slots__ = ["logging_context", "source", "no_follow"]
-    LOGGING_CONTEXT_FIELD_NUMBER: _ClassVar[int]
-    SOURCE_FIELD_NUMBER: _ClassVar[int]
-    NO_FOLLOW_FIELD_NUMBER: _ClassVar[int]
-    logging_context: LoggingContext
-    source: LogsSource
-    no_follow: bool
-    def __init__(self, logging_context: _Optional[_Union[LoggingContext, _Mapping]] = ..., source: _Optional[_Union[LogsSource, str]] = ..., no_follow: bool = ...) -> None: ...
-
-class TailTaskExecutionLogsResponse(_message.Message):
-    __slots__ = ["logs"]
-    class Logs(_message.Message):
-        __slots__ = ["lines", "structured_lines"]
-        LINES_FIELD_NUMBER: _ClassVar[int]
-        STRUCTURED_LINES_FIELD_NUMBER: _ClassVar[int]
-        lines: _containers.RepeatedScalarFieldContainer[str]
-        structured_lines: _containers.RepeatedCompositeFieldContainer[LogLine]
-        def __init__(self, lines: _Optional[_Iterable[str]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ...) -> None: ...
-    LOGS_FIELD_NUMBER: _ClassVar[int]
-    logs: TailTaskExecutionLogsResponse.Logs
-    def __init__(self, logs: _Optional[_Union[TailTaskExecutionLogsResponse.Logs, _Mapping]] = ...) -> None: ...
-
 class LoggingContext(_message.Message):
     __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name", "execution_attempt_start_time", "execution_attempt_end_time", "kubernetes_pod_labels"]
     class KubernetesPodLabelsEntry(_message.Message):
@@ -118,22 +95,6 @@ class LiveLogsOptions(_message.Message):
     log_timestamps: bool
     def __init__(self, log_pod_status: bool = ..., log_timestamps: bool = ...) -> None: ...
 
-class TailLogsRequest(_message.Message):
-    __slots__ = ["container", "container_selector", "start_time", "end_time", "source", "live_logs_options"]
-    CONTAINER_FIELD_NUMBER: _ClassVar[int]
-    CONTAINER_SELECTOR_FIELD_NUMBER: _ClassVar[int]
-    START_TIME_FIELD_NUMBER: _ClassVar[int]
-    END_TIME_FIELD_NUMBER: _ClassVar[int]
-    SOURCE_FIELD_NUMBER: _ClassVar[int]
-    LIVE_LOGS_OPTIONS_FIELD_NUMBER: _ClassVar[int]
-    container: ContainerIdentifier
-    container_selector: ContainerSelector
-    start_time: _timestamp_pb2.Timestamp
-    end_time: _timestamp_pb2.Timestamp
-    source: LogsSource
-    live_logs_options: LiveLogsOptions
-    def __init__(self, container: _Optional[_Union[ContainerIdentifier, _Mapping]] = ..., container_selector: _Optional[_Union[ContainerSelector, _Mapping]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., source: _Optional[_Union[LogsSource, str]] = ..., live_logs_options: _Optional[_Union[LiveLogsOptions, _Mapping]] = ...) -> None: ...
-
 class LogLine(_message.Message):
     __slots__ = ["timestamp", "message", "originator"]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -167,11 +128,3 @@ class LogLinesBatch(_message.Message):
     LOGS_FIELD_NUMBER: _ClassVar[int]
     logs: _containers.RepeatedCompositeFieldContainer[LogLines]
     def __init__(self, logs: _Optional[_Iterable[_Union[LogLines, _Mapping]]] = ...) -> None: ...
-
-class TailLogsResponse(_message.Message):
-    __slots__ = ["containers", "log_lines_batch"]
-    CONTAINERS_FIELD_NUMBER: _ClassVar[int]
-    LOG_LINES_BATCH_FIELD_NUMBER: _ClassVar[int]
-    containers: LogContainersList
-    log_lines_batch: LogLinesBatch
-    def __init__(self, containers: _Optional[_Union[LogContainersList, _Mapping]] = ..., log_lines_batch: _Optional[_Union[LogLinesBatch, _Mapping]] = ...) -> None: ...

@@ -19,41 +19,6 @@ message PodResource {
   string container = 3;
 }
 
-message TailTaskExecutionLogsRequest {
-  LoggingContext logging_context = 1 [(validate.rules).message.required = true];
-
-  reserved 2;
-
-  // +optional, used in api-tests
-  LogsSource source = 3;
-
-  // +optional, used in api-tests
-  bool no_follow = 4;
-  // This will be extended in the future:
-  // see https://unionai.atlassian.net/wiki/spaces/ENG/pages/922583046/Persisted+Logs
-}
-
-message TailTaskExecutionLogsResponse {
-  oneof result {
-    Logs logs = 1;
-
-    // This will be extended in the future:
-    // see https://unionai.atlassian.net/wiki/spaces/ENG/pages/922583046/Persisted+Logs
-  }
-
-  message Logs {
-    // Each line is separated by either CRLF, CR or LF, which are included
-    // at the ends of the lines. This lets clients know whether log emitter
-    // wanted to overwrite the previous line (LF) or append a new line (CRLF).
-    repeated string lines = 1 [deprecated = true];
-
-    // Each line is separated by either CRLF, CR or LF, which are included
-    // at the ends of the lines. This lets clients know whether log emitter
-    // wanted to overwrite the previous line (LF) or append a new line (CRLF).
-    repeated LogLine structured_lines = 2;
-  }
-}
-
 // Parameters of environment in which logs were collected. Should contain everything
 // necessary to identify location of task execution logs in cloud providers.
 message LoggingContext {
@@ -113,31 +78,6 @@ message LiveLogsOptions {
   bool log_timestamps = 2;
 }
 
-message TailLogsRequest {
-  oneof target {
-    // Container identifier.
-    ContainerIdentifier container = 1;
-
-    // Container selector to collect logs from multiple pods/containers.
-    ContainerSelector container_selector = 2;
-  }
-
-  // StartTime defines the earliest time at which logs should be retrieved.
-  google.protobuf.Timestamp start_time = 3 [(validate.rules).timestamp.required = true];
-
-  // EndTime defines the latest time at which logs should be retrieved. If left empty, it'll stream indefinitely for live
-  // pods and Now() will be used for persisted logs.
-  google.protobuf.Timestamp end_time = 4;
-
-  // +optional
-  LogsSource source = 5;
-
-  // +optional
-  LiveLogsOptions live_logs_options = 6;
-
-  // Add query/filter in the future
-}
-
 enum LogLineOriginator {
   // The originator of the log line is unknown.
   UNKNOWN = 0;
@@ -185,25 +125,6 @@ message LogContainersList {
 
 message LogLinesBatch {
   repeated LogLines logs = 1;
-}
-
-message TailLogsResponse {
-  oneof resp {
-    option (validate.required) = true;
-
-    // Containers lists the containers that the logs are being tailed for. This is expected to be the first
-    // message to be sent in the stream but also can be sent at any later time to update the list of
-    // containers being tailed.
-    LogContainersList containers = 1 [(validate.rules).message.required = true];
-
-    // The latest log lines for the application.
-    LogLinesBatch log_lines_batch = 3 [(validate.rules).message.required = true];
-  }
-
-  reserved 2;
-
-  // This will be extended in the future:
-  // see https://unionai.atlassian.net/wiki/spaces/ENG/pages/922583046/Persisted+Logs
 }
 
 enum LogsSource {

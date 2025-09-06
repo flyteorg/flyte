@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/logs/dataplane/payload.proto.
  */
 export const file_flyteidl2_logs_dataplane_payload: GenFile = /*@__PURE__*/
-  fileDesc("CiZmbHl0ZWlkbDIvbG9ncy9kYXRhcGxhbmUvcGF5bG9hZC5wcm90bxIYZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lIlMKC1BvZFJlc291cmNlEhoKCW5hbWVzcGFjZRgBIAEoCUIH+kIEcgIQARIVCgRuYW1lGAIgASgJQgf6QgRyAhABEhEKCWNvbnRhaW5lchgDIAEoCSK6AQocVGFpbFRhc2tFeGVjdXRpb25Mb2dzUmVxdWVzdBJLCg9sb2dnaW5nX2NvbnRleHQYASABKAsyKC5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nZ2luZ0NvbnRleHRCCPpCBYoBAhABEjQKBnNvdXJjZRgDIAEoDjIkLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dzU291cmNlEhEKCW5vX2ZvbGxvdxgEIAEoCEoECAIQAyLPAQodVGFpbFRhc2tFeGVjdXRpb25Mb2dzUmVzcG9uc2USTAoEbG9ncxgBIAEoCzI8LmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5UYWlsVGFza0V4ZWN1dGlvbkxvZ3NSZXNwb25zZS5Mb2dzSAAaVgoETG9ncxIRCgVsaW5lcxgBIAMoCUICGAESOwoQc3RydWN0dXJlZF9saW5lcxgCIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lQggKBnJlc3VsdCLUAwoOTG9nZ2luZ0NvbnRleHQSHQoMY2x1c3Rlcl9uYW1lGAMgASgJQgf6QgRyAhABEiUKFGt1YmVybmV0ZXNfbmFtZXNwYWNlGAQgASgJQgf6QgRyAhABEiQKE2t1YmVybmV0ZXNfcG9kX25hbWUYBSABKAlCB/pCBHICEAESKgoZa3ViZXJuZXRlc19jb250YWluZXJfbmFtZRgGIAEoCUIH+kIEcgIQARJAChxleGVjdXRpb25fYXR0ZW1wdF9zdGFydF90aW1lGAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI+ChpleGVjdXRpb25fYXR0ZW1wdF9lbmRfdGltZRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASYAoVa3ViZXJuZXRlc19wb2RfbGFiZWxzGAkgAygLMkEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ2dpbmdDb250ZXh0Lkt1YmVybmV0ZXNQb2RMYWJlbHNFbnRyeRo6ChhLdWJlcm5ldGVzUG9kTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUoECAEQAkoECAIQAyKkAQoTQ29udGFpbmVySWRlbnRpZmllchIdCgxjbHVzdGVyX25hbWUYASABKAlCB/pCBHICEAESJQoUa3ViZXJuZXRlc19uYW1lc3BhY2UYAiABKAlCB/pCBHICEAESJAoTa3ViZXJuZXRlc19wb2RfbmFtZRgDIAEoCUIH+kIEcgIQARIhChlrdWJlcm5ldGVzX2NvbnRhaW5lcl9uYW1lGAQgASgJIscBChFDb250YWluZXJTZWxlY3RvchIdCgxjbHVzdGVyX25hbWUYASABKAlCB/pCBHICEAESJQoUa3ViZXJuZXRlc19uYW1lc3BhY2UYAiABKAlCB/pCBHICEAESIgoaa3ViZXJuZXRlc19wb2RfbmFtZV9wcmVmaXgYAyABKAkSIQoZa3ViZXJuZXRlc19jb250YWluZXJfbmFtZRgEIAEoCRIlCh1rdWJlcm5ldGVzX3BvZF9sYWJlbF9zZWxlY3RvchgFIAEoCSJBCg9MaXZlTG9nc09wdGlvbnMSFgoObG9nX3BvZF9zdGF0dXMYASABKAgSFgoObG9nX3RpbWVzdGFtcHMYAiABKAgijgMKD1RhaWxMb2dzUmVxdWVzdBJCCgljb250YWluZXIYASABKAsyLS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuQ29udGFpbmVySWRlbnRpZmllckgAEkkKEmNvbnRhaW5lcl9zZWxlY3RvchgCIAEoCzIrLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Db250YWluZXJTZWxlY3RvckgAEjgKCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgj6QgWyAQIIARIsCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoGc291cmNlGAUgASgOMiQuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ3NTb3VyY2USRAoRbGl2ZV9sb2dzX29wdGlvbnMYBiABKAsyKS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTGl2ZUxvZ3NPcHRpb25zQggKBnRhcmdldCKKAQoHTG9nTGluZRItCgl0aW1lc3RhbXAYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg8KB21lc3NhZ2UYAiABKAkSPwoKb3JpZ2luYXRvchgDIAEoDjIrLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lT3JpZ2luYXRvciK/AQoITG9nTGluZXMSEQoFbGluZXMYASADKAlCAhgBEhcKD2NvbnRhaW5lcl9pbmRleBgCIAEoDRJKCgljb250YWluZXIYAyABKAsyLS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuQ29udGFpbmVySWRlbnRpZmllckII+kIFigECEAESOwoQc3RydWN0dXJlZF9saW5lcxgEIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lIlYKEUxvZ0NvbnRhaW5lcnNMaXN0EkEKCmNvbnRhaW5lcnMYASADKAsyLS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuQ29udGFpbmVySWRlbnRpZmllciJBCg1Mb2dMaW5lc0JhdGNoEjAKBGxvZ3MYASADKAsyIi5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZXMiwAEKEFRhaWxMb2dzUmVzcG9uc2USSwoKY29udGFpbmVycxgBIAEoCzIrLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dDb250YWluZXJzTGlzdEII+kIFigECEAFIABJMCg9sb2dfbGluZXNfYmF0Y2gYAyABKAsyJy5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZXNCYXRjaEII+kIFigECEAFIAEILCgRyZXNwEgP4QgFKBAgCEAMqNgoRTG9nTGluZU9yaWdpbmF0b3ISCwoHVU5LTk9XThAAEggKBFVTRVIQARIKCgZTWVNURU0QAipGCgpMb2dzU291cmNlEhUKEUxJVkVfT1JfUEVSU0lTVEVEEAASDQoJTElWRV9PTkxZEAESEgoOUEVSU0lTVEVEX09OTFkQAkLuAQocY29tLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZUIMUGF5bG9hZFByb3RvSAJQAVo8Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2xvZ3MvZGF0YXBsYW5logIDRkxEqgIYRmx5dGVpZGwyLkxvZ3MuRGF0YXBsYW5lygIYRmx5dGVpZGwyXExvZ3NcRGF0YXBsYW5l4gIkRmx5dGVpZGwyXExvZ3NcRGF0YXBsYW5lXEdQQk1ldGFkYXRh6gIaRmx5dGVpZGwyOjpMb2dzOjpEYXRhcGxhbmViBnByb3RvMw", [file_google_protobuf_timestamp, file_validate_validate]);
+  fileDesc("CiZmbHl0ZWlkbDIvbG9ncy9kYXRhcGxhbmUvcGF5bG9hZC5wcm90bxIYZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lIlMKC1BvZFJlc291cmNlEhoKCW5hbWVzcGFjZRgBIAEoCUIH+kIEcgIQARIVCgRuYW1lGAIgASgJQgf6QgRyAhABEhEKCWNvbnRhaW5lchgDIAEoCSLUAwoOTG9nZ2luZ0NvbnRleHQSHQoMY2x1c3Rlcl9uYW1lGAMgASgJQgf6QgRyAhABEiUKFGt1YmVybmV0ZXNfbmFtZXNwYWNlGAQgASgJQgf6QgRyAhABEiQKE2t1YmVybmV0ZXNfcG9kX25hbWUYBSABKAlCB/pCBHICEAESKgoZa3ViZXJuZXRlc19jb250YWluZXJfbmFtZRgGIAEoCUIH+kIEcgIQARJAChxleGVjdXRpb25fYXR0ZW1wdF9zdGFydF90aW1lGAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI+ChpleGVjdXRpb25fYXR0ZW1wdF9lbmRfdGltZRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASYAoVa3ViZXJuZXRlc19wb2RfbGFiZWxzGAkgAygLMkEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ2dpbmdDb250ZXh0Lkt1YmVybmV0ZXNQb2RMYWJlbHNFbnRyeRo6ChhLdWJlcm5ldGVzUG9kTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUoECAEQAkoECAIQAyKkAQoTQ29udGFpbmVySWRlbnRpZmllchIdCgxjbHVzdGVyX25hbWUYASABKAlCB/pCBHICEAESJQoUa3ViZXJuZXRlc19uYW1lc3BhY2UYAiABKAlCB/pCBHICEAESJAoTa3ViZXJuZXRlc19wb2RfbmFtZRgDIAEoCUIH+kIEcgIQARIhChlrdWJlcm5ldGVzX2NvbnRhaW5lcl9uYW1lGAQgASgJIscBChFDb250YWluZXJTZWxlY3RvchIdCgxjbHVzdGVyX25hbWUYASABKAlCB/pCBHICEAESJQoUa3ViZXJuZXRlc19uYW1lc3BhY2UYAiABKAlCB/pCBHICEAESIgoaa3ViZXJuZXRlc19wb2RfbmFtZV9wcmVmaXgYAyABKAkSIQoZa3ViZXJuZXRlc19jb250YWluZXJfbmFtZRgEIAEoCRIlCh1rdWJlcm5ldGVzX3BvZF9sYWJlbF9zZWxlY3RvchgFIAEoCSJBCg9MaXZlTG9nc09wdGlvbnMSFgoObG9nX3BvZF9zdGF0dXMYASABKAgSFgoObG9nX3RpbWVzdGFtcHMYAiABKAgiigEKB0xvZ0xpbmUSLQoJdGltZXN0YW1wGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIPCgdtZXNzYWdlGAIgASgJEj8KCm9yaWdpbmF0b3IYAyABKA4yKy5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZU9yaWdpbmF0b3IivwEKCExvZ0xpbmVzEhEKBWxpbmVzGAEgAygJQgIYARIXCg9jb250YWluZXJfaW5kZXgYAiABKA0SSgoJY29udGFpbmVyGAMgASgLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXJCCPpCBYoBAhABEjsKEHN0cnVjdHVyZWRfbGluZXMYBCADKAsyIS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZSJWChFMb2dDb250YWluZXJzTGlzdBJBCgpjb250YWluZXJzGAEgAygLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXIiQQoNTG9nTGluZXNCYXRjaBIwCgRsb2dzGAEgAygLMiIuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmVzKjYKEUxvZ0xpbmVPcmlnaW5hdG9yEgsKB1VOS05PV04QABIICgRVU0VSEAESCgoGU1lTVEVNEAIqRgoKTG9nc1NvdXJjZRIVChFMSVZFX09SX1BFUlNJU1RFRBAAEg0KCUxJVkVfT05MWRABEhIKDlBFUlNJU1RFRF9PTkxZEAJC7gEKHGNvbS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmVCDFBheWxvYWRQcm90b0gCUAFaPGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9sb2dzL2RhdGFwbGFuZaICA0ZMRKoCGEZseXRlaWRsMi5Mb2dzLkRhdGFwbGFuZcoCGEZseXRlaWRsMlxMb2dzXERhdGFwbGFuZeICJEZseXRlaWRsMlxMb2dzXERhdGFwbGFuZVxHUEJNZXRhZGF0YeoCGkZseXRlaWRsMjo6TG9nczo6RGF0YXBsYW5lYgZwcm90bzM", [file_google_protobuf_timestamp, file_validate_validate]);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.PodResource
@@ -48,94 +48,6 @@ export type PodResource = Message<"flyteidl2.logs.dataplane.PodResource"> & {
  */
 export const PodResourceSchema: GenMessage<PodResource> = /*@__PURE__*/
   messageDesc(file_flyteidl2_logs_dataplane_payload, 0);
-
-/**
- * @generated from message flyteidl2.logs.dataplane.TailTaskExecutionLogsRequest
- */
-export type TailTaskExecutionLogsRequest = Message<"flyteidl2.logs.dataplane.TailTaskExecutionLogsRequest"> & {
-  /**
-   * @generated from field: flyteidl2.logs.dataplane.LoggingContext logging_context = 1;
-   */
-  loggingContext?: LoggingContext;
-
-  /**
-   * +optional, used in api-tests
-   *
-   * @generated from field: flyteidl2.logs.dataplane.LogsSource source = 3;
-   */
-  source: LogsSource;
-
-  /**
-   * +optional, used in api-tests
-   *
-   * This will be extended in the future:
-   * see https://unionai.atlassian.net/wiki/spaces/ENG/pages/922583046/Persisted+Logs
-   *
-   * @generated from field: bool no_follow = 4;
-   */
-  noFollow: boolean;
-};
-
-/**
- * Describes the message flyteidl2.logs.dataplane.TailTaskExecutionLogsRequest.
- * Use `create(TailTaskExecutionLogsRequestSchema)` to create a new message.
- */
-export const TailTaskExecutionLogsRequestSchema: GenMessage<TailTaskExecutionLogsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 1);
-
-/**
- * @generated from message flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse
- */
-export type TailTaskExecutionLogsResponse = Message<"flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse"> & {
-  /**
-   * @generated from oneof flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.result
-   */
-  result: {
-    /**
-     * @generated from field: flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.Logs logs = 1;
-     */
-    value: TailTaskExecutionLogsResponse_Logs;
-    case: "logs";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.
- * Use `create(TailTaskExecutionLogsResponseSchema)` to create a new message.
- */
-export const TailTaskExecutionLogsResponseSchema: GenMessage<TailTaskExecutionLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 2);
-
-/**
- * @generated from message flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.Logs
- */
-export type TailTaskExecutionLogsResponse_Logs = Message<"flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.Logs"> & {
-  /**
-   * Each line is separated by either CRLF, CR or LF, which are included
-   * at the ends of the lines. This lets clients know whether log emitter
-   * wanted to overwrite the previous line (LF) or append a new line (CRLF).
-   *
-   * @generated from field: repeated string lines = 1 [deprecated = true];
-   * @deprecated
-   */
-  lines: string[];
-
-  /**
-   * Each line is separated by either CRLF, CR or LF, which are included
-   * at the ends of the lines. This lets clients know whether log emitter
-   * wanted to overwrite the previous line (LF) or append a new line (CRLF).
-   *
-   * @generated from field: repeated flyteidl2.logs.dataplane.LogLine structured_lines = 2;
-   */
-  structuredLines: LogLine[];
-};
-
-/**
- * Describes the message flyteidl2.logs.dataplane.TailTaskExecutionLogsResponse.Logs.
- * Use `create(TailTaskExecutionLogsResponse_LogsSchema)` to create a new message.
- */
-export const TailTaskExecutionLogsResponse_LogsSchema: GenMessage<TailTaskExecutionLogsResponse_Logs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 2, 0);
 
 /**
  * Parameters of environment in which logs were collected. Should contain everything
@@ -185,7 +97,7 @@ export type LoggingContext = Message<"flyteidl2.logs.dataplane.LoggingContext"> 
  * Use `create(LoggingContextSchema)` to create a new message.
  */
 export const LoggingContextSchema: GenMessage<LoggingContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 3);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 1);
 
 /**
  * Parameters of environment in which logs were collected. Should contain everything
@@ -228,7 +140,7 @@ export type ContainerIdentifier = Message<"flyteidl2.logs.dataplane.ContainerIde
  * Use `create(ContainerIdentifierSchema)` to create a new message.
  */
 export const ContainerIdentifierSchema: GenMessage<ContainerIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 4);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 2);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.ContainerSelector
@@ -278,7 +190,7 @@ export type ContainerSelector = Message<"flyteidl2.logs.dataplane.ContainerSelec
  * Use `create(ContainerSelectorSchema)` to create a new message.
  */
 export const ContainerSelectorSchema: GenMessage<ContainerSelector> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 5);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 3);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.LiveLogsOptions
@@ -305,69 +217,7 @@ export type LiveLogsOptions = Message<"flyteidl2.logs.dataplane.LiveLogsOptions"
  * Use `create(LiveLogsOptionsSchema)` to create a new message.
  */
 export const LiveLogsOptionsSchema: GenMessage<LiveLogsOptions> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 6);
-
-/**
- * @generated from message flyteidl2.logs.dataplane.TailLogsRequest
- */
-export type TailLogsRequest = Message<"flyteidl2.logs.dataplane.TailLogsRequest"> & {
-  /**
-   * @generated from oneof flyteidl2.logs.dataplane.TailLogsRequest.target
-   */
-  target: {
-    /**
-     * Container identifier.
-     *
-     * @generated from field: flyteidl2.logs.dataplane.ContainerIdentifier container = 1;
-     */
-    value: ContainerIdentifier;
-    case: "container";
-  } | {
-    /**
-     * Container selector to collect logs from multiple pods/containers.
-     *
-     * @generated from field: flyteidl2.logs.dataplane.ContainerSelector container_selector = 2;
-     */
-    value: ContainerSelector;
-    case: "containerSelector";
-  } | { case: undefined; value?: undefined };
-
-  /**
-   * StartTime defines the earliest time at which logs should be retrieved.
-   *
-   * @generated from field: google.protobuf.Timestamp start_time = 3;
-   */
-  startTime?: Timestamp;
-
-  /**
-   * EndTime defines the latest time at which logs should be retrieved. If left empty, it'll stream indefinitely for live
-   * pods and Now() will be used for persisted logs.
-   *
-   * @generated from field: google.protobuf.Timestamp end_time = 4;
-   */
-  endTime?: Timestamp;
-
-  /**
-   * +optional
-   *
-   * @generated from field: flyteidl2.logs.dataplane.LogsSource source = 5;
-   */
-  source: LogsSource;
-
-  /**
-   * +optional
-   *
-   * @generated from field: flyteidl2.logs.dataplane.LiveLogsOptions live_logs_options = 6;
-   */
-  liveLogsOptions?: LiveLogsOptions;
-};
-
-/**
- * Describes the message flyteidl2.logs.dataplane.TailLogsRequest.
- * Use `create(TailLogsRequestSchema)` to create a new message.
- */
-export const TailLogsRequestSchema: GenMessage<TailLogsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 7);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 4);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.LogLine
@@ -398,7 +248,7 @@ export type LogLine = Message<"flyteidl2.logs.dataplane.LogLine"> & {
  * Use `create(LogLineSchema)` to create a new message.
  */
 export const LogLineSchema: GenMessage<LogLine> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 8);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 5);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.LogLines
@@ -444,7 +294,7 @@ export type LogLines = Message<"flyteidl2.logs.dataplane.LogLines"> & {
  * Use `create(LogLinesSchema)` to create a new message.
  */
 export const LogLinesSchema: GenMessage<LogLines> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 9);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 6);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.LogContainersList
@@ -461,7 +311,7 @@ export type LogContainersList = Message<"flyteidl2.logs.dataplane.LogContainersL
  * Use `create(LogContainersListSchema)` to create a new message.
  */
 export const LogContainersListSchema: GenMessage<LogContainersList> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 10);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 7);
 
 /**
  * @generated from message flyteidl2.logs.dataplane.LogLinesBatch
@@ -478,42 +328,7 @@ export type LogLinesBatch = Message<"flyteidl2.logs.dataplane.LogLinesBatch"> & 
  * Use `create(LogLinesBatchSchema)` to create a new message.
  */
 export const LogLinesBatchSchema: GenMessage<LogLinesBatch> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 11);
-
-/**
- * @generated from message flyteidl2.logs.dataplane.TailLogsResponse
- */
-export type TailLogsResponse = Message<"flyteidl2.logs.dataplane.TailLogsResponse"> & {
-  /**
-   * @generated from oneof flyteidl2.logs.dataplane.TailLogsResponse.resp
-   */
-  resp: {
-    /**
-     * Containers lists the containers that the logs are being tailed for. This is expected to be the first
-     * message to be sent in the stream but also can be sent at any later time to update the list of
-     * containers being tailed.
-     *
-     * @generated from field: flyteidl2.logs.dataplane.LogContainersList containers = 1;
-     */
-    value: LogContainersList;
-    case: "containers";
-  } | {
-    /**
-     * The latest log lines for the application.
-     *
-     * @generated from field: flyteidl2.logs.dataplane.LogLinesBatch log_lines_batch = 3;
-     */
-    value: LogLinesBatch;
-    case: "logLinesBatch";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.logs.dataplane.TailLogsResponse.
- * Use `create(TailLogsResponseSchema)` to create a new message.
- */
-export const TailLogsResponseSchema: GenMessage<TailLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_logs_dataplane_payload, 12);
+  messageDesc(file_flyteidl2_logs_dataplane_payload, 8);
 
 /**
  * @generated from enum flyteidl2.logs.dataplane.LogLineOriginator
