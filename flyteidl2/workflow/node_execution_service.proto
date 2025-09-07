@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package flyteidl2.workflow;
-
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
-
-service NodeExecutionService {}
