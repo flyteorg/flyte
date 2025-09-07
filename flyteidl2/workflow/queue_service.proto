@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "flyteidl2/workflow/run_definition.proto";
-import "flyteidl2/workflow/task_definition.proto";
+import "flyteidl2/task/task_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -59,10 +59,10 @@ message EnqueueActionRequest {
 
 message TaskAction {
   // a unique identifier for the task this action is associated with, if applicable.
-  TaskIdentifier id = 1;
+  task.TaskIdentifier id = 1;
 
   // the definition of the task to be executed.
-  TaskSpec spec = 2 [(validate.rules).message.required = true];
+  task.TaskSpec spec = 2 [(validate.rules).message.required = true];
 
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
@@ -91,7 +91,7 @@ message TraceAction {
   OutputReferences outputs = 5;
 
   // Task spec for the trace, useful for the typed interface inside.
-  TraceSpec spec = 6 [(validate.rules).message.required = true];
+  task.TraceSpec spec = 6 [(validate.rules).message.required = true];
 }
 
 // ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to

@@ -6,7 +6,7 @@ from flyteidl2.core import literals_pb2 as _literals_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from validate import validate_pb2 as _validate_pb2
-from flyteidl2.workflow import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor

@@ -6,7 +6,7 @@ import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "validate/validate.proto";
 import "flyteidl2/workflow/run_definition.proto";
-import "flyteidl2/workflow/task_definition.proto";
+import "flyteidl2/task/task_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -81,10 +81,10 @@ message CreateRunRequest {
     option (validate.required) = true;
 
     // The task id to use.
-    TaskIdentifier task_id = 2 [(validate.rules).message.required = true];
+    task.TaskIdentifier task_id = 2 [(validate.rules).message.required = true];
 
     // The task spec to use.
-    TaskSpec task_spec = 3 [(validate.rules).message.required = true];
+    task.TaskSpec task_spec = 3 [(validate.rules).message.required = true];
   }
 
   // Inputs to use.
@@ -212,7 +212,7 @@ message WatchRunsRequest {
     // Project identifier for filtering runs.
     common.ProjectIdentifier project_id = 4 [(validate.rules).message.required = true];
     // Task identifier for filtering runs.
-    TaskIdentifier task_id = 5 [(validate.rules).message.required = true];
+    task.TaskIdentifier task_id = 5 [(validate.rules).message.required = true];
   }
 }
 

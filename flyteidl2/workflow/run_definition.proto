@@ -10,7 +10,7 @@ import "flyteidl2/core/literals.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
-import "flyteidl2/workflow/task_definition.proto";
+import "flyteidl2/task/task_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -76,7 +76,7 @@ message RunDetails {
 
 message TaskActionMetadata {
   // Id of the task this action is associated with.
-  TaskIdentifier id = 1;
+  task.TaskIdentifier id = 1;
 
   // Extensible task type.
   string task_type = 2;
@@ -237,8 +237,8 @@ message ActionDetails {
 
   // Fully resolved spec of the action. Merges user submitted task spec with platform defaults.
   oneof spec {
-    TaskSpec task = 6;
-    TraceSpec trace = 8;
+    task.TaskSpec task = 6;
+    task.TraceSpec trace = 8;
   }
 
   // List of action attempts.
