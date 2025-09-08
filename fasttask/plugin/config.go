@@ -16,6 +16,7 @@ var (
 		CallbackURI:               "http://host.docker.internal:15605",
 		DefaultEnvironmentTTL:     config.Duration{Duration: time.Second * 90},
 		DefaultWorkerTTL:          config.Duration{Duration: time.Second * 90},
+		InitializingWorkerTTL:     config.Duration{Duration: time.Minute * 5},
 		OrphanedWorkerTTL:         config.Duration{Duration: time.Second * 30},
 		Endpoint:                  "0.0.0.0:15605",
 		EnvDetectOrphanInterval:   config.Duration{Duration: time.Second * 60},
@@ -54,6 +55,7 @@ type Config struct {
 	CallbackURI               string                        `json:"callback-uri" pflag:",Fasttask gRPC service URI that fasttask workers will connect to."`
 	DefaultEnvironmentTTL     config.Duration               `json:"default-ttl" pflag:",Default TTL for environments."`
 	DefaultWorkerTTL          config.Duration               `json:"default-worker-ttl" pflag:",Default TTL for workers."`
+	InitializingWorkerTTL     config.Duration               `json:"initializing-worker-ttl" pflag:",TTL for initializing workers."`
 	OrphanedWorkerTTL         config.Duration               `json:"orphaned-worker-ttl" pflag:",TTL for orphaned workers."`
 	Endpoint                  string                        `json:"endpoint" pflag:",Fasttask gRPC service endpoint."`
 	EnvDetectOrphanInterval   config.Duration               `json:"env-detect-orphan-interval" pflag:",Frequency that orphaned environments detection is performed."`

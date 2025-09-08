@@ -39,7 +39,7 @@ func (e *environmentImpl) GetOrCreateWorker(workerID string) interfaces.Worker {
 			lastAccessedAt: time.Now().Unix(),
 			lock:           sync.RWMutex{},
 			responseChan:   make(chan *pb.HeartbeatResponse, GetConfig().HeartbeatBufferSize),
-			state:          interfaces.ORPHANED,
+			state:          interfaces.INITIALIZING,
 		}
 
 		workerValue, _ = e.workers.LoadOrStore(workerID, worker)

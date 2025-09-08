@@ -37,10 +37,13 @@ import (
  *  `Worker`
  *  - HEALTHY: The pod for this worker exists and the gRPC connection is active. This worker **can
  *    accept new task executions**.
- *  - ORPHANED: The pod for this worker exists but the gRPC connection is not active. This worker
- *    **can not accept new task executions**.
+ *  - ORPHANED: The pod for this worker exists and previously had an active gRPC connection that was lost.
+ *    This worker **can not accept new task executions** but may reconnect within the grace period.
  *  - TOMBSTONED: Workers can not be tombstoned.
- *  - INITIALIZING: Workers can not be initializing.
+ *  - INITIALIZING: The pod for this worker is starting up (scheduling, pulling image, or launching).
+ *    It has never established a gRPC connection and **can not accept new task executions**. Workers
+ *    in this state are also created during orphan detection for pods that exist but haven't connected
+ *    to the current deployment.
  */
 
 type State int32

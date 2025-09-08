@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_initializing-worker-ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.InitializingWorkerTTL.String()
+
+			cmdFlags.Set("initializing-worker-ttl", testValue)
+			if vString, err := cmdFlags.GetString("initializing-worker-ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.InitializingWorkerTTL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_orphaned-worker-ttl", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

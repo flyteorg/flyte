@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -677,7 +678,9 @@ func TestScaleDown(t *testing.T) {
 					},
 					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
 						PodTemplateSpec: podTemplateSpecBytes,
-						ReplicaCount:    2,
+						ReplicaCount:    3,
+						// expect min replicas to be ignored
+						MinReplicaCount: wrapperspb.Int32(3),
 						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
 							TtlSeconds: 300,
 						},
@@ -709,6 +712,65 @@ func TestScaleDown(t *testing.T) {
 
 				env.workers.Store("orphaned-1", orphanedWorker1)
 				env.workers.Store("orphaned-2", orphanedWorker2)
+				env.workers.Store("healthy-1", healthyWorker)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"orphaned-1"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 1,
+		},
+		{
+			name: "Delete initializing workers beyond TTL",
+			setupConfig: func() {
+				GetConfig().InitializingWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    3,
+						// expect min replicas to be ignored
+						MinReplicaCount: wrapperspb.Int32(3),
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Create initializing workers
+				initializingWorker1 := &workerImpl{
+					id:             "initializing-1",
+					lastAccessedAt: time.Now().Unix() - 40, // Beyond 30s TTL
+					state:          interfaces.INITIALIZING,
+					lock:           sync.RWMutex{},
+				}
+				initializingWorker2 := &workerImpl{
+					id:             "initializing-2",
+					lastAccessedAt: time.Now().Unix() - 20, // Within 30s TTL
+					state:          interfaces.INITIALIZING,
+					lock:           sync.RWMutex{},
+				}
+				healthyWorker := &workerImpl{
+					id:             "healthy-1",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("initializing-1", initializingWorker1)
+				env.workers.Store("initializing-2", initializingWorker2)
 				env.workers.Store("healthy-1", healthyWorker)
 
 				return env

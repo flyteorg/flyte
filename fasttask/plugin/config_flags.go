@@ -54,6 +54,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "callback-uri"), defaultConfig.CallbackURI, "Fasttask gRPC service URI that fasttask workers will connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-ttl"), defaultConfig.DefaultEnvironmentTTL.String(), "Default TTL for environments.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-worker-ttl"), defaultConfig.DefaultWorkerTTL.String(), "Default TTL for workers.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "initializing-worker-ttl"), defaultConfig.InitializingWorkerTTL.String(), "TTL for initializing workers.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "orphaned-worker-ttl"), defaultConfig.OrphanedWorkerTTL.String(), "TTL for orphaned workers.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "endpoint"), defaultConfig.Endpoint, "Fasttask gRPC service endpoint.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "env-detect-orphan-interval"), defaultConfig.EnvDetectOrphanInterval.String(), "Frequency that orphaned environments detection is performed.")

@@ -457,8 +457,8 @@ func (e *environmentBuilderImpl) GetOrCreateEnvironment(ctx context.Context, tCt
 }
 
 // deletePod deletes the pod with the given name and namespace.
-func (e *environmentBuilderImpl) deletePod(ctx context.Context, env interfaces.Environment, name types.NamespacedName) error {
-	logger.Debugf(ctx, "deleting pod '%s' for environment '%s'", name.Name, env.EnvID())
+func (e *environmentBuilderImpl) deletePod(ctx context.Context, env interfaces.Environment, name types.NamespacedName, reason string) error {
+	logger.Debugf(ctx, "deleting pod '%s' for environment '%s' (reason: %s)", name.Name, env.EnvID(), reason)
 
 	objectMeta := metav1.ObjectMeta{
 		Name:      name.Name,
@@ -469,7 +469,7 @@ func (e *environmentBuilderImpl) deletePod(ctx context.Context, env interfaces.E
 		ObjectMeta: objectMeta,
 	}, client.GracePeriodSeconds(0))
 
-	metricLabels := append(e.getMetricLabels(env.EnvID().String()), "gc")
+	metricLabels := append(e.getMetricLabels(env.EnvID().String()), reason)
 
 	if err != nil {
 		logger.Warnf(ctx, "failed to gc pod '%s' for environment '%s' [%v]", name.Name, env.EnvID(), err)
@@ -506,7 +506,7 @@ func (e *environmentBuilderImpl) deleteEnvironment(ctx context.Context, env inte
 			Namespace: podTemplateSpec.Namespace,
 		}
 
-		err := e.deletePod(ctx, env, namespacedName)
+		err := e.deletePod(ctx, env, namespacedName, "gc_env")
 		if err != nil && !k8serrors.IsNotFound(err) {
 			logger.Warnf(ctx, "failed to gc pod '%s' for environment '%s' [%v]", workerID, env.EnvID().String(), err)
 			allDeleted = false
@@ -533,10 +533,14 @@ func (e *environmentBuilderImpl) deleteEnvironment(ctx context.Context, env inte
 
 func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.Environment) error {
 	now := time.Now().Unix()
-	orphanedWorkers := make([]string, 0)
-	expiredWorkers := make([]string, 0)
+
 	orphanedTTL := GetConfig().OrphanedWorkerTTL.Seconds()
+	initializingTTL := GetConfig().InitializingWorkerTTL.Seconds()
 	workerTTL := getReplicaTTLOrDefault(env.FastTaskEnvironmentSpec())
+
+	expiredOrphanedWorkers := make([]string, 0)
+	expiredInitializingWorkers := make([]string, 0)
+	expiredIdleWorkers := make([]string, 0)
 
 	// identify latest accessed timestamp
 	lastAccessedAt := int64(0)
@@ -547,14 +551,24 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 			lastAccessedAt = workerLastAccessedAt
 		}
 
-		if worker.State() == interfaces.ORPHANED {
-			if float64(now-workerLastAccessedAt) > orphanedTTL {
-				orphanedWorkers = append(orphanedWorkers, worker.ID())
+		timeSinceLastAccess := float64(now - workerLastAccessedAt)
+		switch worker.State() {
+		case interfaces.INITIALIZING:
+			if timeSinceLastAccess > initializingTTL {
+				expiredInitializingWorkers = append(expiredInitializingWorkers, worker.ID())
 			}
-		} else {
-			if float64(now-workerLastAccessedAt) > workerTTL {
-				// expired will only get scaled down if we have more than the minimum number of replicas
-				expiredWorkers = append(expiredWorkers, worker.ID())
+			// allow time for:
+			// - new pods to start up and connect
+			// - pod detected during env orphan detection to connect to the new deployment
+		case interfaces.ORPHANED:
+			if timeSinceLastAccess > orphanedTTL {
+				expiredOrphanedWorkers = append(expiredOrphanedWorkers, worker.ID())
+			}
+			// allow orphaned pods time to re-connect to salvage any already running tasks
+		default:
+			// expired will only get scaled down if we have more than the minimum number of replicas
+			if timeSinceLastAccess > workerTTL {
+				expiredIdleWorkers = append(expiredIdleWorkers, worker.ID())
 			}
 		}
 
@@ -563,7 +577,7 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 	})
 
 	if lastAccessedAt == 0 {
-		// if no workers exist then we use the createdAt timestamp
+		// if no workers exist, then we use the createdAt timestamp
 		lastAccessedAt = env.CreatedAt()
 	}
 
@@ -578,26 +592,31 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), err.Error())
 	}
 
-	// delete orphaned workers disregarding min replica count to get to the minimum number of healthy replicas as soon as possible
-	for _, worker := range orphanedWorkers {
-		e.metrics.scaleDownWorkerEvents.WithLabelValues(env.EnvID().String()).Inc()
+	// delete unhealthy workers disregarding min replica count to get to the minimum number of healthy replicas as soon as possible
+	deleteUnhealthyWorkers := func(workers []string, reason string) {
+		for _, worker := range workers {
+			e.metrics.scaleDownWorkerEvents.WithLabelValues(env.EnvID().String()).Inc()
 
-		namespacedName := types.NamespacedName{
-			Name:      worker,
-			Namespace: podTemplateSpec.Namespace,
-		}
+			namespacedName := types.NamespacedName{
+				Name:      worker,
+				Namespace: podTemplateSpec.Namespace,
+			}
 
-		err := e.deletePod(ctx, env, namespacedName)
-		if err != nil && !k8serrors.IsNotFound(err) {
-			logger.Warnf(ctx, "failed to gc orphaned pod '%s' for environment '%s' [%v]", worker, env.EnvID().String(), err)
-		} else {
-			env.DeleteWorker(worker)
-			workerCount--
+			err := e.deletePod(ctx, env, namespacedName, reason)
+			if err != nil && !k8serrors.IsNotFound(err) {
+				logger.Warnf(ctx, "failed to gc %s pod '%s' for environment '%s' [%v]", reason, worker, env.EnvID().String(), err)
+			} else {
+				env.DeleteWorker(worker)
+				workerCount--
+			}
 		}
 	}
 
+	deleteUnhealthyWorkers(expiredOrphanedWorkers, "gc_orphaned")
+	deleteUnhealthyWorkers(expiredInitializingWorkers, "gc_initializing")
+
 	minReplicaCount := getMinReplicaCount(env.FastTaskEnvironmentSpec())
-	for _, worker := range expiredWorkers {
+	for _, worker := range expiredIdleWorkers {
 		if workerCount <= minReplicaCount {
 			break
 		}
@@ -608,7 +627,7 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 			Namespace: podTemplateSpec.Namespace,
 		}
 
-		err := e.deletePod(ctx, env, namespacedName)
+		err := e.deletePod(ctx, env, namespacedName, "gc_idle")
 		if err != nil && !k8serrors.IsNotFound(err) {
 			logger.Warnf(ctx, "failed to gc pod '%s' for environment '%s' [%v]", worker, env.EnvID().String(), err)
 		} else {
