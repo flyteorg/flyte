@@ -29,6 +29,7 @@ dist
 vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
+!fasttask/worker-v2/bridge/src/bin
 docs/_tags/
 docs/flytectl
 docs/protos

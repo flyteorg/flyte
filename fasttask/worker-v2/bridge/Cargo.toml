@@ -10,6 +10,10 @@ path = "src/lib.rs"
 name = "unionai-actor-bridge"
 path = "src/main.rs"
 
+[[bin]]
+name = "test_server"
+path = "src/bin/test_server.rs"
+
 [dependencies]
 anyhow = "1.0"
 async-channel = "2.1"

@@ -4,6 +4,7 @@ use futures::{SinkExt, StreamExt};
 use pyo3::impl_::wrap::SomeWrap;
 use pyo3::prelude::*;
 use pyo3_async_runtimes::TaskLocals;
+use pyo3_async_runtimes::tokio::into_future;
 use std::env;
 use std::sync::Arc;
 use tempfile::TempDir;
@@ -110,6 +111,16 @@ pub async fn run(args: ExecutorArgs, locals: TaskLocals) -> Result<(), PyErr> {
     Ok(())
 }
 
+async fn watch_for_errors(controller: &Py<PyAny>) -> PyResult<()> {
+    let fut = Python::with_gil(|py| {
+        let ctrl = controller.bind(py);
+        let coro = ctrl.call_method0("watch_for_errors")?;
+        into_future(coro)
+    })?;
+    fut.await?;
+    Ok(())
+}
+
 #[instrument(skip(args, locals), fields(executor.id = args.id, num_workers = args.num_workers.unwrap_or(1)
 ))]
 pub async fn run_worker_pool(
@@ -138,6 +149,10 @@ pub async fn run_worker_pool(
             .await?
         }
     };
+
+    let controller_watcher = Python::with_gil(|py| {
+        controller.clone_ref(py)
+    });
 
     debug!("Creating actor environment");
     let actor_environment = Arc::new(ActorEnvironment::new(controller, locals));
@@ -258,7 +273,22 @@ pub async fn run_worker_pool(
     }
 
     tracker.close();
-    tracker.wait().await;
+
+    tokio::select! {
+        result = tracker.wait() => {
+            info!(result = ?result, "Worker pool ended ");
+        }
+        watch_result = watch_for_errors(&controller_watcher) => {
+            match watch_result {
+                Ok(_) => {
+                    error!("Watch for errors terminated but with no error, shutting down executor");
+                }
+                Err(e) => {
+                    error!(error = %e, "Watch for errors terminated error");
+                }
+            }
+        }
+    }
 
     Ok(())
 }
