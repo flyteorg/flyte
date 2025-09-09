@@ -1,5 +1,5 @@
 .idea
-.vscode/launch.json
+.vscode/
 _build/
 _bin/
 build/
