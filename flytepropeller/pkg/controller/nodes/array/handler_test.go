@@ -15,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	eventmocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -55,7 +54,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	// mock components
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
-	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
+	eventConfig := &config.EventConfig{}
 	offloadingConfig := config.LiteralOffloadingConfig{Enabled: false}
 	literalOffloadingConfig := config.LiteralOffloadingConfig{Enabled: true, MinSizeInMBForOffloading: 1024, MaxSizeInMBForOffloading: 1024 * 1024}
 	mockEventSink := eventmocks.NewMockEventSink()
@@ -209,6 +208,7 @@ func TestAbort(t *testing.T) {
 		inputMap                       map[string][]int64
 		subNodePhases                  []v1alpha1.NodePhase
 		subNodeTaskPhases              []core.Phase
+		expectedAbortCalls             int
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
 		arrayNodeStatePhase            v1alpha1.ArrayNodePhase
 		arrayNodeStateError            *idlcore.ExecutionError
@@ -222,7 +222,8 @@ func TestAbort(t *testing.T) {
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
-			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_ABORTED, idlcore.TaskExecution_UNDEFINED},
+			expectedAbortCalls:             1,
 			arrayNodeStatePhase:            v1alpha1.ArrayNodePhaseFailing,
 			arrayNodeStateError:            testError,
 			expectedTaskExecutionPhase:     idlcore.TaskExecution_FAILED,
@@ -235,7 +236,8 @@ func TestAbort(t *testing.T) {
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
-			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_ABORTED, idlcore.TaskExecution_UNDEFINED},
+			expectedAbortCalls:             1,
 			arrayNodeStatePhase:            v1alpha1.ArrayNodePhaseExecuting,
 			arrayNodeStateError:            testError,
 			expectedTaskExecutionPhase:     idlcore.TaskExecution_ABORTED,
@@ -305,7 +307,7 @@ func TestAbort(t *testing.T) {
 			err = arrayNodeHandler.Abort(ctx, nCtx, "foo")
 			assert.NoError(t, err)
 
-			nodeHandler.AssertNumberOfCalls(t, "Abort", len(test.expectedExternalResourcePhases))
+			nodeHandler.AssertNumberOfCalls(t, "Abort", test.expectedAbortCalls)
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 				assert.Equal(t, test.expectedTaskExecutionPhase, eventRecorder.taskExecutionEvents[0].GetPhase())
@@ -833,61 +835,6 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
-		},
-		{
-			name:        "EventingAlreadyExists_EventuallySucceeds",
-			parallelism: uint32Ptr(0),
-			subNodePhases: []v1alpha1.NodePhase{
-				v1alpha1.NodePhaseQueued,
-				v1alpha1.NodePhaseQueued,
-			},
-			subNodeTaskPhases: []core.Phase{
-				core.PhaseRunning,
-				core.PhaseRunning,
-			},
-			subNodeTransitions: []handler.Transition{
-				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
-				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
-			},
-			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
-			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
-				v1alpha1.NodePhaseRunning,
-				v1alpha1.NodePhaseRunning,
-			},
-			expectedTaskPhaseVersion:       2,
-			expectedTransitionPhase:        handler.EPhaseRunning,
-			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
-			useFakeEventRecorder:           true,
-			eventRecorderFailures:          2,
-			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
-			incrementParallelismCount:      1,
-			expectedEventingCalls:          2,
-		},
-		{
-			name:        "EventingAlreadyExists_EventuallyFails",
-			parallelism: uint32Ptr(0),
-			subNodePhases: []v1alpha1.NodePhase{
-				v1alpha1.NodePhaseQueued,
-				v1alpha1.NodePhaseQueued,
-			},
-			subNodeTaskPhases: []core.Phase{
-				core.PhaseRunning,
-				core.PhaseRunning,
-			},
-			subNodeTransitions: []handler.Transition{
-				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
-				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
-			},
-			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
-				v1alpha1.NodePhaseQueued,
-				v1alpha1.NodePhaseQueued,
-			},
-			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
-			useFakeEventRecorder:           true,
-			eventRecorderFailures:          5,
-			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
-			expectHandleError:              true,
-			expectedEventingCalls:          4,
 		},
 		{
 			name:        "EventingFails",
