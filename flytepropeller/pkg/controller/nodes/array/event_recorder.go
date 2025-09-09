@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
@@ -77,6 +78,39 @@ func mapNodeExecutionPhaseToTaskExecutionPhase(nodePhase idlcore.NodeExecution_P
 		return idlcore.TaskExecution_SUCCEEDED
 	default:
 		return idlcore.TaskExecution_UNDEFINED
+	}
+}
+
+func mapNodePhaseToNodeExecutionPhase(nodePhase v1alpha1.NodePhase) idlcore.NodeExecution_Phase {
+	switch nodePhase {
+	case v1alpha1.NodePhaseNotYetStarted:
+		return idlcore.NodeExecution_UNDEFINED
+	case v1alpha1.NodePhaseQueued:
+		return idlcore.NodeExecution_QUEUED
+	case v1alpha1.NodePhaseRunning:
+		return idlcore.NodeExecution_RUNNING
+	case v1alpha1.NodePhaseFailing:
+		return idlcore.NodeExecution_FAILING
+	case v1alpha1.NodePhaseSucceeding:
+		return idlcore.NodeExecution_SUCCEEDED
+	case v1alpha1.NodePhaseSucceeded:
+		return idlcore.NodeExecution_SUCCEEDED
+	case v1alpha1.NodePhaseFailed:
+		return idlcore.NodeExecution_FAILED
+	case v1alpha1.NodePhaseSkipped:
+		return idlcore.NodeExecution_SKIPPED
+	case v1alpha1.NodePhaseRetryableFailure:
+		return idlcore.NodeExecution_FAILED
+	case v1alpha1.NodePhaseTimingOut:
+		return idlcore.NodeExecution_TIMED_OUT
+	case v1alpha1.NodePhaseTimedOut:
+		return idlcore.NodeExecution_TIMED_OUT
+	case v1alpha1.NodePhaseDynamicRunning:
+		return idlcore.NodeExecution_DYNAMIC_RUNNING
+	case v1alpha1.NodePhaseRecovered:
+		return idlcore.NodeExecution_RECOVERED
+	default:
+		return idlcore.NodeExecution_UNDEFINED
 	}
 }
 
@@ -207,6 +241,48 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	return nil
 }
 
+func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, existingExternalResources []*events.ExternalResourceInfo) ([]*events.ExternalResourceInfo, error) {
+	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
+	subNodePhases := arrayNodeState.SubNodePhases.GetItems()
+	subNodeRetryAttempts := arrayNodeState.SubNodeRetryAttempts.GetItems()
+
+	updatedExternalResources := make([]*events.ExternalResourceInfo, 0, len(subNodePhases))
+
+	existingExternalResourcesMap := make(map[uint32]*events.ExternalResourceInfo)
+	for _, resource := range existingExternalResources {
+		existingExternalResourcesMap[resource.Index] = resource
+	}
+
+	for index, subNodePhase := range subNodePhases {
+		if existingResource, exists := existingExternalResourcesMap[uint32(index)]; exists {
+			updatedExternalResources = append(updatedExternalResources, existingResource)
+			continue
+		}
+
+		// ensure that all subnodes have the latest state set to handle scenarios where
+		// eventing fails due to taskPhaseVersion being out of sync
+		// Note: in opting for eventual subnode phase consistency when the array node reaches a terminal phase
+		// instead of having retries to ensure subnodes are updated while running, subnodes could potentially
+		// in rare cases drop fields such as logs.
+
+		nodePhase := v1alpha1.NodePhase(subNodePhase)
+		nodeExecutionPhase := mapNodePhaseToNodeExecutionPhase(nodePhase)
+		retryAttempt := uint32(subNodeRetryAttempts[index])
+		externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
+		if err != nil {
+			return nil, err
+		}
+		updatedExternalResources = append(updatedExternalResources, &events.ExternalResourceInfo{
+			ExternalId:   externalResourceID,
+			Phase:        mapNodeExecutionPhaseToTaskExecutionPhase(nodeExecutionPhase),
+			Index:        uint32(index),
+			RetryAttempt: retryAttempt,
+		})
+	}
+
+	return updatedExternalResources, nil
+}
+
 func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error {
 
@@ -252,6 +328,15 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 			return err
 		}
 		nodeExecutionID.NodeId = currentNodeUniqueID
+	}
+
+	if nodes.IsTerminalTaskPhase(taskPhase) {
+		updatedExternalResources, err := updateExternalResourceSubnodePhases(nCtx, e.externalResources)
+		if err != nil {
+			logger.Errorf(ctx, "failed to update external resource phases for ArrayNode with error: %v", err)
+			return err
+		}
+		e.externalResources = updatedExternalResources
 	}
 
 	taskExecutionEvent := &events.TaskExecutionEvent{

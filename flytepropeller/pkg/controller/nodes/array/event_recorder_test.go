@@ -14,7 +14,9 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	execmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 type bufferedEventRecorder struct {
@@ -155,5 +157,231 @@ func TestGetExternalResourceID(t *testing.T) {
 		externalResourceID, err := generateExternalResourceID(nCtx, test.index, test.retryAttempt)
 		assert.Nil(t, err)
 		assert.Equal(t, test.expectedExternalResourceID, externalResourceID)
+	}
+}
+
+func TestUpdateExternalResourceSubnodePhases(t *testing.T) {
+	tests := []struct {
+		name                             string
+		subNodePhases                    []v1alpha1.NodePhase
+		subNodeRetryAttempts             []uint32
+		existingExternalResources        []*event.ExternalResourceInfo
+		expectedUpdatedExternalResources []*event.ExternalResourceInfo
+	}{
+		{
+			name: "all new resources - empty existing",
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseRunning,
+			},
+			subNodeRetryAttempts:      []uint32{0, 1, 2},
+			existingExternalResources: []*event.ExternalResourceInfo{},
+			expectedUpdatedExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "test-name-test-node-0-n0-0",
+					Index:        0,
+					RetryAttempt: 0,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "test-name-test-node-0-n1-1",
+					Index:        1,
+					RetryAttempt: 1,
+					Phase:        idlcore.TaskExecution_FAILED,
+				},
+				{
+					ExternalId:   "test-name-test-node-0-n2-2",
+					Index:        2,
+					RetryAttempt: 2,
+					Phase:        idlcore.TaskExecution_RUNNING,
+				},
+			},
+		},
+		{
+			name: "some existing resources - preserve order",
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeRetryAttempts: []uint32{0, 1, 2, 3},
+			existingExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "existing-0",
+					Index:        0,
+					RetryAttempt: 0,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "existing-2",
+					Index:        2,
+					RetryAttempt: 2,
+					Phase:        idlcore.TaskExecution_RUNNING,
+				},
+			},
+			expectedUpdatedExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "existing-0",
+					Index:        0,
+					RetryAttempt: 0,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "test-name-test-node-0-n1-1",
+					Index:        1,
+					RetryAttempt: 1,
+					Phase:        idlcore.TaskExecution_FAILED,
+				},
+				{
+					ExternalId:   "existing-2",
+					Index:        2,
+					RetryAttempt: 2,
+					Phase:        idlcore.TaskExecution_RUNNING,
+				},
+				{
+					ExternalId:   "test-name-test-node-0-n3-3",
+					Index:        3,
+					RetryAttempt: 3,
+					Phase:        idlcore.TaskExecution_QUEUED,
+				},
+			},
+		},
+		{
+			name: "all existing resources - no new ones",
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
+			},
+			subNodeRetryAttempts: []uint32{0, 1},
+			existingExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "existing-0",
+					Index:        0,
+					RetryAttempt: 0,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "existing-1",
+					Index:        1,
+					RetryAttempt: 1,
+					Phase:        idlcore.TaskExecution_FAILED,
+				},
+			},
+			expectedUpdatedExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "existing-0",
+					Index:        0,
+					RetryAttempt: 0,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "existing-1",
+					Index:        1,
+					RetryAttempt: 1,
+					Phase:        idlcore.TaskExecution_FAILED,
+				},
+			},
+		},
+		{
+			name: "preserve existing resource data",
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseRunning,
+			},
+			subNodeRetryAttempts: []uint32{5, 10, 15}, // Different from existing
+			existingExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "preserve-this-id",
+					Index:        1,
+					RetryAttempt: 99,                              // Should preserve this, not use 10
+					Phase:        idlcore.TaskExecution_SUCCEEDED, // Should preserve this
+					Logs: []*idlcore.TaskLog{
+						{Name: "test-log"},
+					},
+					CacheStatus: idlcore.CatalogCacheStatus_CACHE_HIT,
+				},
+			},
+			expectedUpdatedExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId:   "test-name-test-node-0-n0-5",
+					Index:        0,
+					RetryAttempt: 5,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+				},
+				{
+					ExternalId:   "preserve-this-id",
+					Index:        1,
+					RetryAttempt: 99, // Preserved from existing
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+					Logs: []*idlcore.TaskLog{
+						{Name: "test-log"},
+					},
+					CacheStatus: idlcore.CatalogCacheStatus_CACHE_HIT,
+				},
+				{
+					ExternalId:   "test-name-test-node-0-n2-15",
+					Index:        2,
+					RetryAttempt: 15,
+					Phase:        idlcore.TaskExecution_RUNNING,
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			nCtx := &mocks.NodeExecutionContext{}
+			nodeStateReader := &mocks.NodeStateReader{}
+			executionContext := &execmocks.ExecutionContext{}
+			nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
+
+			arrayNodeState := &handler.ArrayNodeState{}
+			if len(test.subNodePhases) > 0 {
+				subNodePhasesArray, err := bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(v1alpha1.NodePhaseRecovered))
+				assert.NoError(t, err)
+				subNodeRetryAttemptsArray, err := bitarray.NewCompactArray(uint(len(test.subNodeRetryAttempts)), bitarray.Item(100))
+				assert.NoError(t, err)
+
+				for i, phase := range test.subNodePhases {
+					subNodePhasesArray.SetItem(i, bitarray.Item(phase))
+				}
+				for i, retryAttempt := range test.subNodeRetryAttempts {
+					subNodeRetryAttemptsArray.SetItem(i, bitarray.Item(retryAttempt))
+				}
+
+				arrayNodeState.SubNodePhases = subNodePhasesArray
+				arrayNodeState.SubNodeRetryAttempts = subNodeRetryAttemptsArray
+			} else {
+				subNodePhasesArray, err := bitarray.NewCompactArray(0, bitarray.Item(v1alpha1.NodePhaseRecovered))
+				assert.NoError(t, err)
+				subNodeRetryAttemptsArray, err := bitarray.NewCompactArray(0, bitarray.Item(100))
+				assert.NoError(t, err)
+				arrayNodeState.SubNodePhases = subNodePhasesArray
+				arrayNodeState.SubNodeRetryAttempts = subNodeRetryAttemptsArray
+			}
+
+			executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+
+			nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+				Namespace: "test-namespace",
+				Name:      "test-name",
+			})
+
+			nCtx.OnNodeStateReader().Return(nodeStateReader)
+			nCtx.OnExecutionContext().Return(executionContext)
+			nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
+			nCtx.OnNodeID().Return("test-node")
+			nCtx.OnCurrentAttempt().Return(uint32(0))
+			nodeStateReader.OnGetArrayNodeState().Return(*arrayNodeState)
+
+			result, err := updateExternalResourceSubnodePhases(nCtx, test.existingExternalResources)
+
+			assert.NoError(t, err)
+			assert.NotNil(t, result)
+			assert.Equal(t, test.expectedUpdatedExternalResources, result)
+		})
 	}
 }

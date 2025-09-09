@@ -19,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
-	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -694,40 +693,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.TaskPhaseVersion++
 		}
 
-		maxRetries := config.GetConfig().ArrayNode.MaxTaskPhaseVersionAttempts
-		retries := 0
-		for retries <= maxRetries {
-			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig, arrayNodeState.Error)
-
-			if err == nil {
-				break
-			}
-
-			// Handle potential race condition if FlyteWorkflow CRD fails to get synced
-			if eventsErr.IsAlreadyExists(err) {
-				if !incrementTaskPhaseVersion {
-					break
-				}
-				logger.Warnf(ctx, "Event version already exists, bumping version and retrying (%d/%d): [%s]", retries+1, maxRetries, err.Error())
-				arrayNodeState.TaskPhaseVersion++
-			} else {
-				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-				return handler.UnknownTransition, err
-			}
-
-			retries++
-			if retries > maxRetries {
-				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
-				return handler.UnknownTransition, err
-			}
+		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig, arrayNodeState.Error); err != nil {
+			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+			return handler.UnknownTransition, err
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		}
-
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		// if the ArrayNode phase has changed, then we need to reset the taskPhaseVersion to 0
 		if currentArrayNodePhase != arrayNodeState.Phase {
 			arrayNodeState.TaskPhaseVersion = 0
 		}
@@ -772,21 +743,9 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalO
 		return nil, err
 	}
 
-	eventConfigCopy, err := stdConfig.DeepCopyConfig(eventConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	deepCopiedEventConfig, ok := eventConfigCopy.(*config.EventConfig)
-	if !ok {
-		return nil, fmt.Errorf("deep copy error: expected *config.EventConfig, but got %T", eventConfigCopy)
-	}
-
-	deepCopiedEventConfig.ErrorOnAlreadyExists = true
-
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
-		eventConfig:                 deepCopiedEventConfig,
+		eventConfig:                 eventConfig,
 		literalOffloadingConfig:     literalOffloadingConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
