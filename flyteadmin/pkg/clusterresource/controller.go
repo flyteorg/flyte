@@ -811,7 +811,7 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 	// processedOrgs is used to track which orgs have been processed without error and can be reported to the self-serve service
 	// This is only used in Serverless (self-serve) mode
 	processedOrgs := sets.Set[string]{}
-	if c.config.ClusterResourceConfiguration().IsSelfServe() {
+	if c.config.ClusterResourceConfiguration().IsServerless() {
 		// Add all orgs to the set to start with
 		for _, project := range projects {
 			processedOrgs.Insert(project.Org)

@@ -44,7 +44,7 @@ func (c MockClusterResourceConfiguration) GetUnionProjectSyncConfig() interfaces
 	return c.UnionProjectSyncConfig
 }
 
-func (c MockClusterResourceConfiguration) IsSelfServe() bool {
+func (c MockClusterResourceConfiguration) IsServerless() bool {
 	return c.SelfServe
 }
 
