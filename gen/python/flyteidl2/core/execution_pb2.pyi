@@ -111,7 +111,7 @@ class ExecutionError(_message.Message):
     def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ...) -> None: ...
 
 class TaskLog(_message.Message):
-    __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished"]
+    __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished", "link_type", "ready"]
     class MessageFormat(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[TaskLog.MessageFormat]
@@ -120,19 +120,31 @@ class TaskLog(_message.Message):
     UNKNOWN: TaskLog.MessageFormat
     CSV: TaskLog.MessageFormat
     JSON: TaskLog.MessageFormat
+    class LinkType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        EXTERNAL: _ClassVar[TaskLog.LinkType]
+        DASHBOARD: _ClassVar[TaskLog.LinkType]
+        IDE: _ClassVar[TaskLog.LinkType]
+    EXTERNAL: TaskLog.LinkType
+    DASHBOARD: TaskLog.LinkType
+    IDE: TaskLog.LinkType
     URI_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FORMAT_FIELD_NUMBER: _ClassVar[int]
     TTL_FIELD_NUMBER: _ClassVar[int]
     SHOWWHILEPENDING_FIELD_NUMBER: _ClassVar[int]
     HIDEONCEFINISHED_FIELD_NUMBER: _ClassVar[int]
+    LINK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    READY_FIELD_NUMBER: _ClassVar[int]
     uri: str
     name: str
     message_format: TaskLog.MessageFormat
     ttl: _duration_pb2.Duration
     ShowWhilePending: bool
     HideOnceFinished: bool
-    def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ..., HideOnceFinished: bool = ...) -> None: ...
+    link_type: TaskLog.LinkType
+    ready: bool
+    def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ..., HideOnceFinished: bool = ..., link_type: _Optional[_Union[TaskLog.LinkType, str]] = ..., ready: bool = ...) -> None: ...
 
 class LogContext(_message.Message):
     __slots__ = ["pods", "primary_pod_name"]

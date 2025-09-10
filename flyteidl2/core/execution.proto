@@ -91,12 +91,23 @@ message TaskLog {
         JSON = 2;
     }
 
+    enum LinkType {
+        // The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.
+        EXTERNAL = 0;
+        // The link for spark UI, ray dashboard, etc.
+        DASHBOARD = 1;
+        // The link for vscode or other IDEs.
+        IDE = 2;
+    }
+
     string uri = 1;
     string name = 2;
     MessageFormat message_format = 3;
     google.protobuf.Duration ttl = 4;
     bool ShowWhilePending = 5;
     bool HideOnceFinished = 6;
+    LinkType link_type = 7;
+    bool ready = 8;
 }
 
 // Contains metadata required to identify logs produces by a set of pods

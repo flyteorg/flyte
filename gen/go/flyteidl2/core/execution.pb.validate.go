@@ -536,6 +536,10 @@ func (m *TaskLog) validate(all bool) error {
 
 	// no validation rules for HideOnceFinished
 
+	// no validation rules for LinkType
+
+	// no validation rules for Ready
+
 	if len(errors) > 0 {
 		return TaskLogMultiError(errors)
 	}
