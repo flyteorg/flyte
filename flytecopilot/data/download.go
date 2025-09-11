@@ -102,6 +102,11 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}()
 
 				ref := storage.DataReference(absPath)
+				scheme, _, prefix, err := ref.Split()
+				if err != nil {
+					logger.Errorf(ctx, "Failed to parse [%s] [%s]", ref, err)
+					return
+				}
 				var reader io.ReadCloser
 				if scheme == "http" || scheme == "https" {
 					reader, err = DownloadFileFromHTTP(ctx, ref)
@@ -123,12 +128,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					mu.Unlock()
 				}()
 
-				_, _, k, err := ref.Split()
-				if err != nil {
-					logger.Errorf(ctx, "Failed to parse ref [%s]", ref)
-					return
-				}
-				newPath := filepath.Join(toPath, k)
+				newPath := filepath.Join(toPath, prefix)
 				dir := filepath.Dir(newPath)
 				fmt.Printf("newPath: %s\n", newPath)
 
