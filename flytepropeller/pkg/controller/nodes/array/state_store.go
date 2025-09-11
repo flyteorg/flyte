@@ -45,6 +45,7 @@ func (f *fullStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailu
 		// we use NodePhaseRecovered for the `maxValue` of `SubNodePhases` because `Phase` is
 		// defined as an `iota` so it is impossible to programmatically get largest value
 		{arrayReference: &f.arrayNodeStateCopy.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
+		{arrayReference: &f.arrayNodeStateCopy.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 	} {
 		var err error
 		*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
@@ -57,6 +58,7 @@ func (f *fullStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailu
 
 func (f *fullStateStore) persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int) {
 	f.arrayNodeStateCopy.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
+	f.arrayNodeStateCopy.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 
 	if subNodeStatus.GetExecutionError() != nil {
 		subNodeStatus.ClearExecutionError()
