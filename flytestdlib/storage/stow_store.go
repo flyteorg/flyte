@@ -288,7 +288,20 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			results[index] = DataReference(item.URL().String())
+			// It appears that stow items behave differently for different stores. The cases below have been tested
+			// for S3 and GCS. S3's path comes with https:// prepended, GCS does not. Also GCS's scheme is 'google',
+			// not 'gs', so it's best to just construct the proper https path.
+			logger.Debugf(ctx, "Stow store appending k=%s url=[%v]", k, item.URL())
+			urlPath := item.URL().Path
+			if strings.HasPrefix(urlPath, "http") {
+				results[index] = DataReference(urlPath)
+			} else {
+				if item.URL().Scheme == "google" {
+					results[index] = DataReference("https://" + item.URL().Host + "/" + item.URL().Path)
+				} else {
+					results[index] = DataReference(item.URL().String())
+				}
+			}
 		}
 		if stow.IsCursorEnd(stowCursor) {
 			cursor = NewCursorAtEnd()

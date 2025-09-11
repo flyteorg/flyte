@@ -54,6 +54,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 
 	blobRef := storage.DataReference(blob.Uri)
 	scheme, _, _, err := blobRef.Split()
+	logger.Debugf(ctx, "Downloader handling blob [%s] uri [%s]", scheme, blob.Uri)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
@@ -72,6 +73,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				return nil, err
 			}
 			for _, item := range items {
+				logger.Warningf(ctx, "Adding item.URL item.string [%s]", item.String())
 				absPaths = append(absPaths, item.String())
 			}
 			if storage.IsCursorEnd(cursor) {
@@ -101,9 +103,20 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}()
 
 				ref := storage.DataReference(absPath)
-				reader, err := DownloadFileFromStorage(ctx, ref, d.store)
+				scheme, _, prefix, err := ref.Split()
 				if err != nil {
-					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
+					logger.Errorf(ctx, "Failed to parse [%s] [%s]", ref, err)
+					return
+				}
+
+				var reader io.ReadCloser
+				if scheme == "http" || scheme == "https" {
+					reader, err = DownloadFileFromHTTP(ctx, ref)
+				} else {
+					reader, err = DownloadFileFromStorage(ctx, ref, d.store)
+				}
+				if err != nil {
+					logger.Errorf(ctx, "Failed to download from ref [%s] [%s]", ref, err)
 					return
 				}
 				defer func() {
@@ -117,12 +130,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					mu.Unlock()
 				}()
 
-				_, _, k, err := ref.Split()
-				if err != nil {
-					logger.Errorf(ctx, "Failed to parse ref [%s]", ref)
-					return
-				}
-				newPath := filepath.Join(toPath, k)
+				newPath := filepath.Join(toPath, prefix)
 				dir := filepath.Dir(newPath)
 
 				mu.Lock()
