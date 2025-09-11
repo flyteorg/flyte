@@ -1,4 +1,4 @@
-{{- if .Values.flyteadmin.autoscaling.enabled }}
+{{- if and .Values.flyteadmin.enabled .Values.flyteadmin.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
