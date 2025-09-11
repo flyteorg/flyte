@@ -7,8 +7,12 @@ help: ## Show this help message
 	@echo 'Available targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+.PHONY: buf-dep
+buf-dep: ## Update buf modules
+	buf dep update
+
 .PHONY: buf
-buf: buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
+buf: buf-dep buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
 
 .PHONY: buf-ts
 buf-ts: ## Generate TypeScript protocol buffer files
@@ -34,5 +38,9 @@ buf-python: ## Generate Python protocol buffer files
 	find gen/python -type d -exec touch {}/__init__.py \;
 	cd gen/python && uv lock
 
+.PHONY: go_tidy
+go_tidy: ## Run go mod tidy
+	go mod tidy
+
 .PHONY: gen
-gen: buf ## Generates everything in the 'gen' directory
+gen: buf go_tidy ## Generates everything in the 'gen' directory
