@@ -57,27 +57,9 @@ func (m *PodResource) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetNamespace()) < 1 {
-		err := PodResourceValidationError{
-			field:  "Namespace",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Namespace
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := PodResourceValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	// no validation rules for Container
 
@@ -180,49 +162,13 @@ func (m *LoggingContext) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
-		err := LoggingContextValidationError{
-			field:  "ClusterName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for ClusterName
 
-	if utf8.RuneCountInString(m.GetKubernetesNamespace()) < 1 {
-		err := LoggingContextValidationError{
-			field:  "KubernetesNamespace",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesNamespace
 
-	if utf8.RuneCountInString(m.GetKubernetesPodName()) < 1 {
-		err := LoggingContextValidationError{
-			field:  "KubernetesPodName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesPodName
 
-	if utf8.RuneCountInString(m.GetKubernetesContainerName()) < 1 {
-		err := LoggingContextValidationError{
-			field:  "KubernetesContainerName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesContainerName
 
 	if all {
 		switch v := interface{}(m.GetExecutionAttemptStartTime()).(type) {
@@ -384,38 +330,11 @@ func (m *ContainerIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
-		err := ContainerIdentifierValidationError{
-			field:  "ClusterName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for ClusterName
 
-	if utf8.RuneCountInString(m.GetKubernetesNamespace()) < 1 {
-		err := ContainerIdentifierValidationError{
-			field:  "KubernetesNamespace",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesNamespace
 
-	if utf8.RuneCountInString(m.GetKubernetesPodName()) < 1 {
-		err := ContainerIdentifierValidationError{
-			field:  "KubernetesPodName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesPodName
 
 	// no validation rules for KubernetesContainerName
 
@@ -521,27 +440,9 @@ func (m *ContainerSelector) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
-		err := ContainerSelectorValidationError{
-			field:  "ClusterName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for ClusterName
 
-	if utf8.RuneCountInString(m.GetKubernetesNamespace()) < 1 {
-		err := ContainerSelectorValidationError{
-			field:  "KubernetesNamespace",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for KubernetesNamespace
 
 	// no validation rules for KubernetesPodNamePrefix
 
@@ -887,17 +788,6 @@ func (m *LogLines) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for ContainerIndex
-
-	if m.GetContainer() == nil {
-		err := LogLinesValidationError{
-			field:  "Container",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetContainer()).(type) {

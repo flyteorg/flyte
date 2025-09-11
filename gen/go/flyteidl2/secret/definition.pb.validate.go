@@ -59,7 +59,6 @@ func (m *SecretSpec) validate(all bool) error {
 
 	// no validation rules for Type
 
-	oneofValuePresent := false
 	switch v := m.Value.(type) {
 	case *SecretSpec_StringValue:
 		if v == nil {
@@ -72,7 +71,6 @@ func (m *SecretSpec) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofValuePresent = true
 		// no validation rules for StringValue
 	case *SecretSpec_BinaryValue:
 		if v == nil {
@@ -85,20 +83,9 @@ func (m *SecretSpec) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofValuePresent = true
 		// no validation rules for BinaryValue
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofValuePresent {
-		err := SecretSpecValidationError{
-			field:  "Value",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -200,27 +187,7 @@ func (m *SecretIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := SecretIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if !_SecretIdentifier_Name_Pattern.MatchString(m.GetName()) {
-		err := SecretIdentifierValidationError{
-			field:  "Name",
-			reason: "value does not match regex pattern \"^[-a-zA-Z0-9_]+$\"",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	// no validation rules for Organization
 
@@ -305,8 +272,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SecretIdentifierValidationError{}
-
-var _SecretIdentifier_Name_Pattern = regexp.MustCompile("^[-a-zA-Z0-9_]+$")
 
 // Validate checks the field values on SecretMetadata with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

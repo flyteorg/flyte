@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 
@@ -10,7 +10,7 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 message Environment {
   // Name of the environment.
   string name = 1 [
-    (validate.rules).string.min_len = 1,
-    (validate.rules).string.max_len = 63
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
   ];
 }

@@ -5,7 +5,7 @@ package flyteidl2.common;
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/policy.proto";
 import "flyteidl2/common/role.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
@@ -50,9 +50,9 @@ message AppSpec {
 
 message EnrichedIdentity {
   oneof principal {
-    option (validate.required) = true;
-    User user = 1 [(validate.rules).message.required = true];
-    Application application = 2 [(validate.rules).message.required = true];
+    option (buf.validate.oneof).required = true;
+    User user = 1 [(buf.validate.field).required = true];
+    Application application = 2 [(buf.validate.field).required = true];
   }
 }
 

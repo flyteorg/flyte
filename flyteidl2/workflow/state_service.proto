@@ -5,7 +5,7 @@ package flyteidl2.workflow;
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/execution.proto";
 import "google/rpc/status.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
@@ -25,7 +25,7 @@ service StateService {
 // request message to put the state of an action.
 message PutRequest {
   // a unique identifier for the action.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // optional name of the parent action if this is a nested action.
   optional string parent_action_name = 2;
@@ -33,41 +33,41 @@ message PutRequest {
   // currently we will store state as a json serialized `NodeStatus` object. this will be required
   // to seamlessly integrate with existing FlytePropeller node execution logic. we can update this
   // to be a subset of fields in the future if there are necessary performance improvements.
-  string state = 3 [(validate.rules).string.min_len = 1];
+  string state = 3 [(buf.validate.field).string.min_len = 1];
 }
 
 // response message for putting the state of an action.
 message PutResponse {
   // a unique identifier for the action.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // The result.
-  google.rpc.Status status = 2 [(validate.rules).message.required = true];
+  google.rpc.Status status = 2 [(buf.validate.field).required = true];
 }
 
 // request message to get the state of an action.
 message GetRequest {
   // a unique identifier for the action.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 }
 
 // response message for getting the state of an action.
 message GetResponse {
   // a unique identifier for the action.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
   //
   // The result.
-  google.rpc.Status status = 2 [(validate.rules).message.required = true];
+  google.rpc.Status status = 2 [(buf.validate.field).required = true];
 
   // a json serialized `NodeStatus` object.
-  string state = 3 [(validate.rules).string.min_len = 1];
+  string state = 3 [(buf.validate.field).string.min_len = 1];
 }
 
 // request message for watching updates to the state of actions.
 message WatchRequest {
   // criteria for filtering which actions to watch.
   oneof filter {
-    option (validate.required) = true;
+    option (buf.validate.oneof).required = true;
 
     // a unique identifier for the parent action to watch. this will result in updates for all child
     // actions.
@@ -94,7 +94,7 @@ message ControlMessage {
 // message to represent an update to the state of an action.
 message ActionUpdate {
   // A unique identifier for the action. `nil` is used as a sentinel value; for example,
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // the current phase of the action.
   Phase phase = 2;

@@ -6,7 +6,7 @@ import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/types.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 import "flyteidl2/workflow/run_definition.proto";
 import "flyteidl2/task/task_definition.proto";
 
@@ -27,7 +27,7 @@ service QueueService {
 // request message for queuing an action.
 message EnqueueActionRequest {
   // the unique identifier for the action.
-  flyteidl2.common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
   // project, domain) will be the same as the action_id defined above.
@@ -37,10 +37,10 @@ message EnqueueActionRequest {
   RunSpec run_spec = 3;
 
   // the path to the input data for this action.
-  string input_uri = 6 [(validate.rules).string.min_len = 1];
+  string input_uri = 6 [(buf.validate.field).string.min_len = 1];
 
   // the run base path this action should write its output to.
-  string run_output_base = 7 [(validate.rules).string.min_len = 1];
+  string run_output_base = 7 [(buf.validate.field).string.min_len = 1];
 
   // group this action belongs to, if applicable.
   string group = 8;
@@ -51,9 +51,9 @@ message EnqueueActionRequest {
   oneof spec {
     // TODO(haytham): Uncomment when we update all code paths to use this.
     // option (validate.required) = true;
-    TaskAction task = 10 [(validate.rules).message.required = true];
-    TraceAction trace = 11 [(validate.rules).message.required = true];
-    ConditionAction condition = 12 [(validate.rules).message.required = true];
+    TaskAction task = 10 [(buf.validate.field).required = true];
+    TraceAction trace = 11 [(buf.validate.field).required = true];
+    ConditionAction condition = 12 [(buf.validate.field).required = true];
   }
 }
 
@@ -62,7 +62,7 @@ message TaskAction {
   task.TaskIdentifier id = 1;
 
   // the definition of the task to be executed.
-  task.TaskSpec spec = 2 [(validate.rules).message.required = true];
+  task.TaskSpec spec = 2 [(buf.validate.field).required = true];
 
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
@@ -76,7 +76,7 @@ message TaskAction {
 // by the local worker. This can be used to bring determinism to code that's otherwise not deterministic (e.g. current
 // time).
 message TraceAction {
-  string name = 1 [(validate.rules).string.min_len = 1];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
 
   // Last known phase.
   Phase phase = 2;
@@ -91,22 +91,22 @@ message TraceAction {
   OutputReferences outputs = 5;
 
   // Task spec for the trace, useful for the typed interface inside.
-  task.TraceSpec spec = 6 [(validate.rules).message.required = true];
+  task.TraceSpec spec = 6 [(buf.validate.field).required = true];
 }
 
 // ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
 // await a signal from an external system and can carry a value.
 message ConditionAction {
   // Name is the unique identifier for the action. It must be unique within the defined scope below.
-  string name = 1 [(validate.rules).string.min_len = 1];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
 
   oneof scope {
-    option (validate.required) = true;
+    option (buf.validate.oneof).required = true;
     // RunId is the unique identifier for the run this action is associated with.
-    string run_id = 2 [(validate.rules).string.min_len = 1];
+    string run_id = 2 [(buf.validate.field).string.min_len = 1];
 
     // ActionId is the unique identifier for the action this action is associated with.
-    string action_id = 3 [(validate.rules).string.min_len = 1];
+    string action_id = 3 [(buf.validate.field).string.min_len = 1];
 
     // Global indicates the condition is global and can be used across all runs and actions.
     bool global = 4;
@@ -131,7 +131,7 @@ message EnqueueActionResponse {}
 // request message for aborting a run.
 message AbortQueuedRunRequest {
   // the unique identifier for the run to be aborted.
-  common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
 
   // Reason for aborting the run, if applicable.
   optional string reason = 2;
@@ -142,7 +142,7 @@ message AbortQueuedRunResponse {}
 
 message AbortQueuedActionRequest {
   // ActionId is the unique identifier for the action to be aborted
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // Reason for aborting the action, if applicable.
   optional string reason = 2;

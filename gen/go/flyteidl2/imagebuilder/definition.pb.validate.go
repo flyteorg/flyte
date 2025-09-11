@@ -57,16 +57,7 @@ func (m *ImageIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ImageIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return ImageIdentifierMultiError(errors)

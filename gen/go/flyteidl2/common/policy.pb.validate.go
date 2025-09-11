@@ -56,17 +56,6 @@ func (m *Policy) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() == nil {
-		err := PolicyValidationError{
-			field:  "Id",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -231,17 +220,6 @@ func (m *PolicyBinding) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetRoleId() == nil {
-		err := PolicyBindingValidationError{
-			field:  "RoleId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetRoleId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -269,17 +247,6 @@ func (m *PolicyBinding) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetResource() == nil {
-		err := PolicyBindingValidationError{
-			field:  "Resource",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {

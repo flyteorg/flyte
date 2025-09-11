@@ -6,14 +6,14 @@ import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Image, ImageIdentifier } from "./definition_pb.ts";
 import { file_flyteidl2_imagebuilder_definition } from "./definition_pb.ts";
-import { file_validate_validate } from "../../validate/validate_pb.ts";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/imagebuilder/payload.proto.
  */
 export const file_flyteidl2_imagebuilder_payload: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIiZgoPR2V0SW1hZ2VSZXF1ZXN0Ej0KAmlkGAEgASgLMicuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZUlkZW50aWZpZXJCCPpCBYoBAhABEhQKDG9yZ2FuaXphdGlvbhgCIAEoCSJAChBHZXRJbWFnZVJlc3BvbnNlEiwKBWltYWdlGAEgASgLMh0uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZULhAQoaY29tLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXJCDFBheWxvYWRQcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9pbWFnZWJ1aWxkZXKiAgNGSViqAhZGbHl0ZWlkbDIuSW1hZ2VidWlsZGVyygIWRmx5dGVpZGwyXEltYWdlYnVpbGRlcuICIkZseXRlaWRsMlxJbWFnZWJ1aWxkZXJcR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6OkltYWdlYnVpbGRlcmIGcHJvdG8z", [file_flyteidl2_imagebuilder_definition, file_validate_validate]);
+  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIiZAoPR2V0SW1hZ2VSZXF1ZXN0EjsKAmlkGAEgASgLMicuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZUlkZW50aWZpZXJCBrpIA8gBARIUCgxvcmdhbml6YXRpb24YAiABKAkiQAoQR2V0SW1hZ2VSZXNwb25zZRIsCgVpbWFnZRgBIAEoCzIdLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuSW1hZ2VC4QEKGmNvbS5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyQgxQYXlsb2FkUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvaW1hZ2VidWlsZGVyogIDRklYqgIWRmx5dGVpZGwyLkltYWdlYnVpbGRlcsoCFkZseXRlaWRsMlxJbWFnZWJ1aWxkZXLiAiJGbHl0ZWlkbDJcSW1hZ2VidWlsZGVyXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpJbWFnZWJ1aWxkZXJiBnByb3RvMw", [file_flyteidl2_imagebuilder_definition, file_buf_validate_validate]);
 
 /**
  * @generated from message flyteidl2.imagebuilder.GetImageRequest

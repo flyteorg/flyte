@@ -4,7 +4,7 @@ package flyteidl2.common;
 
 import "flyteidl2/common/authorization.proto";
 import "flyteidl2/common/identifier.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
@@ -41,7 +41,7 @@ enum RoleType {
 }
 
 message Role {
-  RoleIdentifier id = 1 [(validate.rules).message.required = true];
+  RoleIdentifier id = 1 [(buf.validate.field).required = true];
 
   repeated Permission permissions = 2 [deprecated = true];
 

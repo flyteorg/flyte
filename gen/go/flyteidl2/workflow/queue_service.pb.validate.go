@@ -57,17 +57,6 @@ func (m *EnqueueActionRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := EnqueueActionRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -126,27 +115,9 @@ func (m *EnqueueActionRequest) validate(all bool) error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetInputUri()) < 1 {
-		err := EnqueueActionRequestValidationError{
-			field:  "InputUri",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for InputUri
 
-	if utf8.RuneCountInString(m.GetRunOutputBase()) < 1 {
-		err := EnqueueActionRequestValidationError{
-			field:  "RunOutputBase",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for RunOutputBase
 
 	// no validation rules for Group
 
@@ -158,17 +129,6 @@ func (m *EnqueueActionRequest) validate(all bool) error {
 			err := EnqueueActionRequestValidationError{
 				field:  "Spec",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if m.GetTask() == nil {
-			err := EnqueueActionRequestValidationError{
-				field:  "Task",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -217,17 +177,6 @@ func (m *EnqueueActionRequest) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-		if m.GetTrace() == nil {
-			err := EnqueueActionRequestValidationError{
-				field:  "Trace",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
 		if all {
 			switch v := interface{}(m.GetTrace()).(type) {
 			case interface{ ValidateAll() error }:
@@ -262,17 +211,6 @@ func (m *EnqueueActionRequest) validate(all bool) error {
 			err := EnqueueActionRequestValidationError{
 				field:  "Spec",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if m.GetCondition() == nil {
-			err := EnqueueActionRequestValidationError{
-				field:  "Condition",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -448,17 +386,6 @@ func (m *TaskAction) validate(all bool) error {
 		}
 	}
 
-	if m.GetSpec() == nil {
-		err := TaskActionValidationError{
-			field:  "Spec",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetSpec()).(type) {
 		case interface{ ValidateAll() error }:
@@ -618,16 +545,7 @@ func (m *TraceAction) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := TraceActionValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	// no validation rules for Phase
 
@@ -687,17 +605,6 @@ func (m *TraceAction) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetSpec() == nil {
-		err := TraceActionValidationError{
-			field:  "Spec",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -861,16 +768,7 @@ func (m *ConditionAction) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ConditionActionValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if all {
 		switch v := interface{}(m.GetType()).(type) {
@@ -905,7 +803,6 @@ func (m *ConditionAction) validate(all bool) error {
 
 	// no validation rules for Description
 
-	oneofScopePresent := false
 	switch v := m.Scope.(type) {
 	case *ConditionAction_RunId:
 		if v == nil {
@@ -918,19 +815,7 @@ func (m *ConditionAction) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
-
-		if utf8.RuneCountInString(m.GetRunId()) < 1 {
-			err := ConditionActionValidationError{
-				field:  "RunId",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for RunId
 	case *ConditionAction_ActionId:
 		if v == nil {
 			err := ConditionActionValidationError{
@@ -942,19 +827,7 @@ func (m *ConditionAction) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
-
-		if utf8.RuneCountInString(m.GetActionId()) < 1 {
-			err := ConditionActionValidationError{
-				field:  "ActionId",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for ActionId
 	case *ConditionAction_Global:
 		if v == nil {
 			err := ConditionActionValidationError{
@@ -966,20 +839,9 @@ func (m *ConditionAction) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
 		// no validation rules for Global
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofScopePresent {
-		err := ConditionActionValidationError{
-			field:  "Scope",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -1183,17 +1045,6 @@ func (m *AbortQueuedRunRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetRunId() == nil {
-		err := AbortQueuedRunRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetRunId()).(type) {
@@ -1431,17 +1282,6 @@ func (m *AbortQueuedActionRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetActionId() == nil {
-		err := AbortQueuedActionRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {

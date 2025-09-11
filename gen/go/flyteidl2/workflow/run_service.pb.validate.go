@@ -115,25 +115,12 @@ func (m *CreateRunRequest) validate(all bool) error {
 		}
 	}
 
-	oneofIdPresent := false
 	switch v := m.Id.(type) {
 	case *CreateRunRequest_RunId:
 		if v == nil {
 			err := CreateRunRequestValidationError{
 				field:  "Id",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofIdPresent = true
-
-		if m.GetRunId() == nil {
-			err := CreateRunRequestValidationError{
-				field:  "RunId",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -181,18 +168,6 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofIdPresent = true
-
-		if m.GetProjectId() == nil {
-			err := CreateRunRequestValidationError{
-				field:  "ProjectId",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
 
 		if all {
 			switch v := interface{}(m.GetProjectId()).(type) {
@@ -226,35 +201,12 @@ func (m *CreateRunRequest) validate(all bool) error {
 	default:
 		_ = v // ensures v is used
 	}
-	if !oneofIdPresent {
-		err := CreateRunRequestValidationError{
-			field:  "Id",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-	oneofTaskPresent := false
 	switch v := m.Task.(type) {
 	case *CreateRunRequest_TaskId:
 		if v == nil {
 			err := CreateRunRequestValidationError{
 				field:  "Task",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofTaskPresent = true
-
-		if m.GetTaskId() == nil {
-			err := CreateRunRequestValidationError{
-				field:  "TaskId",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -302,18 +254,6 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofTaskPresent = true
-
-		if m.GetTaskSpec() == nil {
-			err := CreateRunRequestValidationError{
-				field:  "TaskSpec",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
 
 		if all {
 			switch v := interface{}(m.GetTaskSpec()).(type) {
@@ -346,16 +286,6 @@ func (m *CreateRunRequest) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofTaskPresent {
-		err := CreateRunRequestValidationError{
-			field:  "Task",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -589,17 +519,6 @@ func (m *AbortRunRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetRunId() == nil {
-		err := AbortRunRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetRunId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -832,17 +751,6 @@ func (m *GetRunDetailsRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetRunId() == nil {
-		err := GetRunDetailsRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetRunId()).(type) {
@@ -1106,17 +1014,6 @@ func (m *WatchRunDetailsRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetRunId() == nil {
-		err := WatchRunDetailsRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetRunId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1378,17 +1275,6 @@ func (m *GetActionDetailsRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetActionId() == nil {
-		err := GetActionDetailsRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
@@ -1652,17 +1538,6 @@ func (m *WatchActionDetailsRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := WatchActionDetailsRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1924,17 +1799,6 @@ func (m *GetActionDataRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetActionId() == nil {
-		err := GetActionDataRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
@@ -2256,7 +2120,6 @@ func (m *ListRunsRequest) validate(all bool) error {
 		}
 	}
 
-	oneofScopeByPresent := false
 	switch v := m.ScopeBy.(type) {
 	case *ListRunsRequest_Org:
 		if v == nil {
@@ -2269,36 +2132,12 @@ func (m *ListRunsRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopeByPresent = true
-
-		if utf8.RuneCountInString(m.GetOrg()) < 1 {
-			err := ListRunsRequestValidationError{
-				field:  "Org",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for Org
 	case *ListRunsRequest_ProjectId:
 		if v == nil {
 			err := ListRunsRequestValidationError{
 				field:  "ScopeBy",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofScopeByPresent = true
-
-		if m.GetProjectId() == nil {
-			err := ListRunsRequestValidationError{
-				field:  "ProjectId",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -2337,16 +2176,6 @@ func (m *ListRunsRequest) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofScopeByPresent {
-		err := ListRunsRequestValidationError{
-			field:  "ScopeBy",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -2585,7 +2414,6 @@ func (m *WatchRunsRequest) validate(all bool) error {
 
 	var errors []error
 
-	oneofTargetPresent := false
 	switch v := m.Target.(type) {
 	case *WatchRunsRequest_Org:
 		if v == nil {
@@ -2598,36 +2426,12 @@ func (m *WatchRunsRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofTargetPresent = true
-
-		if utf8.RuneCountInString(m.GetOrg()) < 1 {
-			err := WatchRunsRequestValidationError{
-				field:  "Org",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for Org
 	case *WatchRunsRequest_ClusterId:
 		if v == nil {
 			err := WatchRunsRequestValidationError{
 				field:  "Target",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofTargetPresent = true
-
-		if m.GetClusterId() == nil {
-			err := WatchRunsRequestValidationError{
-				field:  "ClusterId",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -2675,18 +2479,6 @@ func (m *WatchRunsRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofTargetPresent = true
-
-		if m.GetProjectId() == nil {
-			err := WatchRunsRequestValidationError{
-				field:  "ProjectId",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
 
 		if all {
 			switch v := interface{}(m.GetProjectId()).(type) {
@@ -2728,18 +2520,6 @@ func (m *WatchRunsRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofTargetPresent = true
-
-		if m.GetTaskId() == nil {
-			err := WatchRunsRequestValidationError{
-				field:  "TaskId",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
 
 		if all {
 			switch v := interface{}(m.GetTaskId()).(type) {
@@ -2772,16 +2552,6 @@ func (m *WatchRunsRequest) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofTargetPresent {
-		err := WatchRunsRequestValidationError{
-			field:  "Target",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -3047,17 +2817,6 @@ func (m *ListActionsRequest) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetRunId() == nil {
-		err := ListActionsRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -3328,17 +3087,6 @@ func (m *WatchActionsRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetRunId() == nil {
-		err := WatchActionsRequestValidationError{
-			field:  "RunId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetRunId()).(type) {
@@ -3641,17 +3389,6 @@ func (m *WatchClusterEventsRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() == nil {
-		err := WatchClusterEventsRequestValidationError{
-			field:  "Id",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -3681,16 +3418,7 @@ func (m *WatchClusterEventsRequest) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempt() <= 0 {
-		err := WatchClusterEventsRequestValidationError{
-			field:  "Attempt",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempt
 
 	if len(errors) > 0 {
 		return WatchClusterEventsRequestMultiError(errors)
@@ -3929,17 +3657,6 @@ func (m *AbortActionRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetActionId() == nil {
-		err := AbortActionRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {

@@ -56,17 +56,6 @@ func (m *Role) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() == nil {
-		err := RoleValidationError{
-			field:  "Id",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:

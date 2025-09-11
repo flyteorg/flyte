@@ -57,49 +57,13 @@ func (m *TaskName) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetOrg()); l < 1 || l > 63 {
-		err := TaskNameValidationError{
-			field:  "Org",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Org
 
-	if l := utf8.RuneCountInString(m.GetProject()); l < 1 || l > 63 {
-		err := TaskNameValidationError{
-			field:  "Project",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Project
 
-	if l := utf8.RuneCountInString(m.GetDomain()); l < 1 || l > 63 {
-		err := TaskNameValidationError{
-			field:  "Domain",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Domain
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 255 {
-		err := TaskNameValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 255 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return TaskNameMultiError(errors)
@@ -200,60 +164,15 @@ func (m *TaskIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetOrg()); l < 1 || l > 63 {
-		err := TaskIdentifierValidationError{
-			field:  "Org",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Org
 
-	if l := utf8.RuneCountInString(m.GetProject()); l < 1 || l > 63 {
-		err := TaskIdentifierValidationError{
-			field:  "Project",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Project
 
-	if l := utf8.RuneCountInString(m.GetDomain()); l < 1 || l > 63 {
-		err := TaskIdentifierValidationError{
-			field:  "Domain",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Domain
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 255 {
-		err := TaskIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 255 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
-	if l := utf8.RuneCountInString(m.GetVersion()); l < 1 || l > 63 {
-		err := TaskIdentifierValidationError{
-			field:  "Version",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Version
 
 	if len(errors) > 0 {
 		return TaskIdentifierMultiError(errors)
@@ -355,17 +274,6 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetDeployedBy() == nil {
-		err := TaskMetadataValidationError{
-			field:  "DeployedBy",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetDeployedBy()).(type) {
 		case interface{ ValidateAll() error }:
@@ -397,15 +305,33 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	// no validation rules for ShortName
 
-	if m.GetDeployedAt() == nil {
-		err := TaskMetadataValidationError{
-			field:  "DeployedAt",
-			reason: "value is required",
+	if all {
+		switch v := interface{}(m.GetDeployedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "DeployedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "DeployedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
 		}
-		if !all {
-			return err
+	} else if v, ok := interface{}(m.GetDeployedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskMetadataValidationError{
+				field:  "DeployedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
-		errors = append(errors, err)
 	}
 
 	// no validation rules for EnvironmentName
@@ -508,17 +434,6 @@ func (m *Task) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetTaskId() == nil {
-		err := TaskValidationError{
-			field:  "TaskId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetTaskId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -546,17 +461,6 @@ func (m *Task) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetMetadata() == nil {
-		err := TaskValidationError{
-			field:  "Metadata",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -687,17 +591,6 @@ func (m *TaskSpec) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetTaskTemplate() == nil {
-		err := TaskSpecValidationError{
-			field:  "TaskTemplate",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetTaskTemplate()).(type) {
 		case interface{ ValidateAll() error }:
@@ -761,16 +654,7 @@ func (m *TaskSpec) validate(all bool) error {
 
 	}
 
-	if utf8.RuneCountInString(m.GetShortName()) > 63 {
-		err := TaskSpecValidationError{
-			field:  "ShortName",
-			reason: "value length must be at most 63 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for ShortName
 
 	if all {
 		switch v := interface{}(m.GetEnvironment()).(type) {
@@ -1028,17 +912,6 @@ func (m *TaskDetails) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetTaskId() == nil {
-		err := TaskDetailsValidationError{
-			field:  "TaskId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetTaskId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1068,17 +941,6 @@ func (m *TaskDetails) validate(all bool) error {
 		}
 	}
 
-	if m.GetMetadata() == nil {
-		err := TaskDetailsValidationError{
-			field:  "Metadata",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetMetadata()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1106,17 +968,6 @@ func (m *TaskDetails) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetSpec() == nil {
-		err := TaskDetailsValidationError{
-			field:  "Spec",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {

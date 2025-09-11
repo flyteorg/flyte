@@ -3,32 +3,32 @@ syntax = "proto3";
 package flyteidl2.common;
 
 import "flyteidl2/common/identifier.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
 message Organization {
-  string name = 1 [(validate.rules).string.min_len = 1];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message Domain {
   string name = 1;
-  Organization organization = 2 [(validate.rules).message.required = true];
+  Organization organization = 2 [(buf.validate.field).required = true];
 }
 
 message Project {
-  string name = 1 [(validate.rules).string.min_len = 1];
-  Domain domain = 2 [(validate.rules).message.required = true];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  Domain domain = 2 [(buf.validate.field).required = true];
 }
 
 message Workflow {
-  string name = 1 [(validate.rules).string.min_len = 1];
-  Project project = 2 [(validate.rules).message.required = true];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  Project project = 2 [(buf.validate.field).required = true];
 }
 
 message LaunchPlan {
-  string name = 1 [(validate.rules).string.min_len = 1];
-  Project project = 2 [(validate.rules).message.required = true];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  Project project = 2 [(buf.validate.field).required = true];
 }
 
 message Resource {

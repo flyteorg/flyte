@@ -57,16 +57,7 @@ func (m *Environment) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 63 {
-		err := EnvironmentValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return EnvironmentMultiError(errors)

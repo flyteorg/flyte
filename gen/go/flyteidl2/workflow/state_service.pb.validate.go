@@ -57,17 +57,6 @@ func (m *PutRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := PutRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -97,16 +86,7 @@ func (m *PutRequest) validate(all bool) error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetState()) < 1 {
-		err := PutRequestValidationError{
-			field:  "State",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for State
 
 	if m.ParentActionName != nil {
 		// no validation rules for ParentActionName
@@ -211,17 +191,6 @@ func (m *PutResponse) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := PutResponseValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -249,17 +218,6 @@ func (m *PutResponse) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetStatus() == nil {
-		err := PutResponseValidationError{
-			field:  "Status",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -390,17 +348,6 @@ func (m *GetRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := GetRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -529,17 +476,6 @@ func (m *GetResponse) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := GetResponseValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -567,17 +503,6 @@ func (m *GetResponse) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetStatus() == nil {
-		err := GetResponseValidationError{
-			field:  "Status",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -609,16 +534,7 @@ func (m *GetResponse) validate(all bool) error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetState()) < 1 {
-		err := GetResponseValidationError{
-			field:  "State",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for State
 
 	if len(errors) > 0 {
 		return GetResponseMultiError(errors)
@@ -719,7 +635,6 @@ func (m *WatchRequest) validate(all bool) error {
 
 	var errors []error
 
-	oneofFilterPresent := false
 	switch v := m.Filter.(type) {
 	case *WatchRequest_ParentActionId:
 		if v == nil {
@@ -732,7 +647,6 @@ func (m *WatchRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofFilterPresent = true
 
 		if all {
 			switch v := interface{}(m.GetParentActionId()).(type) {
@@ -765,16 +679,6 @@ func (m *WatchRequest) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofFilterPresent {
-		err := WatchRequestValidationError{
-			field:  "Filter",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -1164,17 +1068,6 @@ func (m *ActionUpdate) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetActionId() == nil {
-		err := ActionUpdateValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {

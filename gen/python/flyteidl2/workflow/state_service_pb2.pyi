@@ -1,7 +1,7 @@
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
 from google.rpc import status_pb2 as _status_pb2
-from validate import validate_pb2 as _validate_pb2
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message

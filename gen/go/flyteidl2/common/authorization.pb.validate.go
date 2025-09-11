@@ -57,16 +57,7 @@ func (m *Organization) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := OrganizationValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return OrganizationMultiError(errors)
@@ -167,17 +158,6 @@ func (m *Domain) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for Name
-
-	if m.GetOrganization() == nil {
-		err := DomainValidationError{
-			field:  "Organization",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetOrganization()).(type) {
@@ -306,27 +286,7 @@ func (m *Project) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ProjectValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetDomain() == nil {
-		err := ProjectValidationError{
-			field:  "Domain",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if all {
 		switch v := interface{}(m.GetDomain()).(type) {
@@ -456,27 +416,7 @@ func (m *Workflow) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := WorkflowValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetProject() == nil {
-		err := WorkflowValidationError{
-			field:  "Project",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if all {
 		switch v := interface{}(m.GetProject()).(type) {
@@ -606,27 +546,7 @@ func (m *LaunchPlan) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := LaunchPlanValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetProject() == nil {
-		err := LaunchPlanValidationError{
-			field:  "Project",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if all {
 		switch v := interface{}(m.GetProject()).(type) {

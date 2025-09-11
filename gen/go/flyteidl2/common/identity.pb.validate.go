@@ -651,25 +651,12 @@ func (m *EnrichedIdentity) validate(all bool) error {
 
 	var errors []error
 
-	oneofPrincipalPresent := false
 	switch v := m.Principal.(type) {
 	case *EnrichedIdentity_User:
 		if v == nil {
 			err := EnrichedIdentityValidationError{
 				field:  "Principal",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofPrincipalPresent = true
-
-		if m.GetUser() == nil {
-			err := EnrichedIdentityValidationError{
-				field:  "User",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -717,18 +704,6 @@ func (m *EnrichedIdentity) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofPrincipalPresent = true
-
-		if m.GetApplication() == nil {
-			err := EnrichedIdentityValidationError{
-				field:  "Application",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
 
 		if all {
 			switch v := interface{}(m.GetApplication()).(type) {
@@ -761,16 +736,6 @@ func (m *EnrichedIdentity) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofPrincipalPresent {
-		err := EnrichedIdentityValidationError{
-			field:  "Principal",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {

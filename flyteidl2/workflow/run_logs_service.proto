@@ -4,7 +4,7 @@ package flyteidl2.workflow;
 
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/logs/dataplane/payload.proto";
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -18,10 +18,10 @@ service RunLogsService {
 // Request message for tailing logs.
 message TailLogsRequest {
   // The action id.
-  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // The attempt number.
-  uint32 attempt = 2 [(validate.rules).uint32.gt = 0];
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 }
 
 // Reponse message for tailing logs.

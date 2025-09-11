@@ -57,38 +57,11 @@ func (m *ProjectIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetOrganization()) < 1 {
-		err := ProjectIdentifierValidationError{
-			field:  "Organization",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetDomain()) < 1 {
-		err := ProjectIdentifierValidationError{
-			field:  "Domain",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Domain
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ProjectIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return ProjectIdentifierMultiError(errors)
@@ -194,16 +167,7 @@ func (m *ClusterIdentifier) validate(all bool) error {
 
 	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ClusterIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return ClusterIdentifierMultiError(errors)
@@ -413,27 +377,9 @@ func (m *ClusterConfigIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetOrganization()) < 1 {
-		err := ClusterConfigIdentifierValidationError{
-			field:  "Organization",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetId()) < 1 {
-		err := ClusterConfigIdentifierValidationError{
-			field:  "Id",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Id
 
 	if len(errors) > 0 {
 		return ClusterConfigIdentifierMultiError(errors)
@@ -539,27 +485,9 @@ func (m *ClusterNodepoolIdentifier) validate(all bool) error {
 
 	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
-		err := ClusterNodepoolIdentifierValidationError{
-			field:  "ClusterName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for ClusterName
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ClusterNodepoolIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return ClusterNodepoolIdentifierMultiError(errors)
@@ -663,16 +591,7 @@ func (m *UserIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetSubject()) < 1 {
-		err := UserIdentifierValidationError{
-			field:  "Subject",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Subject
 
 	if len(errors) > 0 {
 		return UserIdentifierMultiError(errors)
@@ -774,16 +693,7 @@ func (m *ApplicationIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetSubject()) < 1 {
-		err := ApplicationIdentifierValidationError{
-			field:  "Subject",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Subject
 
 	if len(errors) > 0 {
 		return ApplicationIdentifierMultiError(errors)
@@ -889,16 +799,7 @@ func (m *RoleIdentifier) validate(all bool) error {
 
 	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := RoleIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return RoleIdentifierMultiError(errors)
@@ -1000,27 +901,7 @@ func (m *OrgIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 63 {
-		err := OrgIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if !_OrgIdentifier_Name_Pattern.MatchString(m.GetName()) {
-		err := OrgIdentifierValidationError{
-			field:  "Name",
-			reason: "value does not match regex pattern \"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$\"",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return OrgIdentifierMultiError(errors)
@@ -1100,8 +981,6 @@ var _ interface {
 	ErrorName() string
 } = OrgIdentifierValidationError{}
 
-var _OrgIdentifier_Name_Pattern = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
-
 // Validate checks the field values on ManagedClusterIdentifier with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -1124,27 +1003,7 @@ func (m *ManagedClusterIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := ManagedClusterIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetOrg() == nil {
-		err := ManagedClusterIdentifierValidationError{
-			field:  "Org",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if all {
 		switch v := interface{}(m.GetOrg()).(type) {
@@ -1279,16 +1138,7 @@ func (m *PolicyIdentifier) validate(all bool) error {
 
 	// no validation rules for Organization
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := PolicyIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return PolicyIdentifierMultiError(errors)
@@ -1390,49 +1240,13 @@ func (m *RunIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetOrg()); l < 1 || l > 63 {
-		err := RunIdentifierValidationError{
-			field:  "Org",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Org
 
-	if l := utf8.RuneCountInString(m.GetProject()); l < 1 || l > 63 {
-		err := RunIdentifierValidationError{
-			field:  "Project",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Project
 
-	if l := utf8.RuneCountInString(m.GetDomain()); l < 1 || l > 63 {
-		err := RunIdentifierValidationError{
-			field:  "Domain",
-			reason: "value length must be between 1 and 63 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Domain
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 30 {
-		err := RunIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 30 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return RunIdentifierMultiError(errors)
@@ -1534,17 +1348,6 @@ func (m *ActionIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetRun() == nil {
-		err := ActionIdentifierValidationError{
-			field:  "Run",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetRun()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1574,16 +1377,7 @@ func (m *ActionIdentifier) validate(all bool) error {
 		}
 	}
 
-	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 30 {
-		err := ActionIdentifierValidationError{
-			field:  "Name",
-			reason: "value length must be between 1 and 30 runes, inclusive",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
 	if len(errors) > 0 {
 		return ActionIdentifierMultiError(errors)
@@ -1685,17 +1479,6 @@ func (m *ActionAttemptIdentifier) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := ActionAttemptIdentifierValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1725,16 +1508,7 @@ func (m *ActionAttemptIdentifier) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempt() <= 0 {
-		err := ActionAttemptIdentifierValidationError{
-			field:  "Attempt",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempt
 
 	if len(errors) > 0 {
 		return ActionAttemptIdentifierMultiError(errors)

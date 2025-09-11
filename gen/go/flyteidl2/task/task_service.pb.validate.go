@@ -57,17 +57,6 @@ func (m *DeployTaskRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetTaskId() == nil {
-		err := DeployTaskRequestValidationError{
-			field:  "TaskId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetTaskId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -95,17 +84,6 @@ func (m *DeployTaskRequest) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetSpec() == nil {
-		err := DeployTaskRequestValidationError{
-			field:  "Spec",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if all {
@@ -340,17 +318,6 @@ func (m *GetTaskDetailsRequest) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if m.GetTaskId() == nil {
-		err := GetTaskDetailsRequestValidationError{
-			field:  "TaskId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
 
 	if all {
 		switch v := interface{}(m.GetTaskId()).(type) {
@@ -677,7 +644,6 @@ func (m *ListTasksRequest) validate(all bool) error {
 
 	}
 
-	oneofScopeByPresent := false
 	switch v := m.ScopeBy.(type) {
 	case *ListTasksRequest_Org:
 		if v == nil {
@@ -690,36 +656,12 @@ func (m *ListTasksRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopeByPresent = true
-
-		if utf8.RuneCountInString(m.GetOrg()) < 1 {
-			err := ListTasksRequestValidationError{
-				field:  "Org",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for Org
 	case *ListTasksRequest_ProjectId:
 		if v == nil {
 			err := ListTasksRequestValidationError{
 				field:  "ScopeBy",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofScopeByPresent = true
-
-		if m.GetProjectId() == nil {
-			err := ListTasksRequestValidationError{
-				field:  "ProjectId",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -758,16 +700,6 @@ func (m *ListTasksRequest) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofScopeByPresent {
-		err := ListTasksRequestValidationError{
-			field:  "ScopeBy",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {

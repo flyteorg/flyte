@@ -1137,7 +1137,6 @@ func (m *ConditionActionMetadata) validate(all bool) error {
 
 	// no validation rules for Name
 
-	oneofScopePresent := false
 	switch v := m.Scope.(type) {
 	case *ConditionActionMetadata_RunId:
 		if v == nil {
@@ -1150,19 +1149,7 @@ func (m *ConditionActionMetadata) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
-
-		if utf8.RuneCountInString(m.GetRunId()) < 1 {
-			err := ConditionActionMetadataValidationError{
-				field:  "RunId",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for RunId
 	case *ConditionActionMetadata_ActionId:
 		if v == nil {
 			err := ConditionActionMetadataValidationError{
@@ -1174,19 +1161,7 @@ func (m *ConditionActionMetadata) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
-
-		if utf8.RuneCountInString(m.GetActionId()) < 1 {
-			err := ConditionActionMetadataValidationError{
-				field:  "ActionId",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
+		// no validation rules for ActionId
 	case *ConditionActionMetadata_Global:
 		if v == nil {
 			err := ConditionActionMetadataValidationError{
@@ -1198,20 +1173,9 @@ func (m *ConditionActionMetadata) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		oneofScopePresent = true
 		// no validation rules for Global
 	default:
 		_ = v // ensures v is used
-	}
-	if !oneofScopePresent {
-		err := ConditionActionMetadataValidationError{
-			field:  "Scope",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -1364,17 +1328,6 @@ func (m *ActionMetadata) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-		if m.GetTask() == nil {
-			err := ActionMetadataValidationError{
-				field:  "Task",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
 		if all {
 			switch v := interface{}(m.GetTask()).(type) {
 			case interface{ ValidateAll() error }:
@@ -1416,17 +1369,6 @@ func (m *ActionMetadata) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-		if m.GetTrace() == nil {
-			err := ActionMetadataValidationError{
-				field:  "Trace",
-				reason: "value is required",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
 		if all {
 			switch v := interface{}(m.GetTrace()).(type) {
 			case interface{ ValidateAll() error }:
@@ -1461,17 +1403,6 @@ func (m *ActionMetadata) validate(all bool) error {
 			err := ActionMetadataValidationError{
 				field:  "Spec",
 				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if m.GetCondition() == nil {
-			err := ActionMetadataValidationError{
-				field:  "Condition",
-				reason: "value is required",
 			}
 			if !all {
 				return err
@@ -1643,16 +1574,7 @@ func (m *ActionStatus) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempts() <= 0 {
-		err := ActionStatusValidationError{
-			field:  "Attempts",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempts
 
 	// no validation rules for CacheStatus
 
@@ -2764,16 +2686,7 @@ func (m *ActionAttempt) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempt() <= 0 {
-		err := ActionAttemptValidationError{
-			field:  "Attempt",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempt
 
 	for idx, item := range m.GetLogInfo() {
 		_, _ = idx, item
@@ -3401,17 +3314,6 @@ func (m *ActionEvent) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() == nil {
-		err := ActionEventValidationError{
-			field:  "Id",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -3441,16 +3343,7 @@ func (m *ActionEvent) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempt() <= 0 {
-		err := ActionEventValidationError{
-			field:  "Attempt",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempt
 
 	// no validation rules for Phase
 

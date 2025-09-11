@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package flyteidl2.imagebuilder;
 
-import "validate/validate.proto";
+import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
 
 // ImageIdentifier is how to identify an image
 message ImageIdentifier {
-  string name = 1 [(validate.rules).string.min_len = 1];
+  string name = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 // Simple container to surface if image exists

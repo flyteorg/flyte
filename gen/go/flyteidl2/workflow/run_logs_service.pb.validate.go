@@ -57,17 +57,6 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetActionId() == nil {
-		err := TailLogsRequestValidationError{
-			field:  "ActionId",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
@@ -97,16 +86,7 @@ func (m *TailLogsRequest) validate(all bool) error {
 		}
 	}
 
-	if m.GetAttempt() <= 0 {
-		err := TailLogsRequestValidationError{
-			field:  "Attempt",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Attempt
 
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
