@@ -292,6 +292,24 @@ datacatalog:
       memory: 50Mi
   # Strategy for Datacatalog deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
   # -- Default regex string for searching configuration files
   configPath: /etc/datacatalog/config/*.yaml
   # -- Service settings for Datacatalog
