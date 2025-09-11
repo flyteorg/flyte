@@ -34,8 +34,7 @@ license-files = ["licenses/*.txt", "LICENSE"]
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["flyteidl2*"]
-include = ["buf*"]
+include = ["flyteidl2*", "buf*"]
 exclude = ["build*"]
 
 [tool.setuptools_scm]
