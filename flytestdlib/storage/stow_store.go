@@ -291,9 +291,17 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			fmt.Printf("item.URL().Pat: %vh", item.URL().Path)
-			fmt.Printf("item.URL().String(): %v", item.URL().String())
-			results[index] = DataReference(item.URL().Path)
+			logger.Debugf(ctx, "Stow store appending k=%s url=[%v]", key, item.URL())
+			urlPath := item.URL().Path
+			if strings.HasPrefix(urlPath, "http") {
+				results[index] = DataReference(urlPath)
+			} else {
+				if item.URL().Scheme == "google" {
+					results[index] = DataReference("https://" + item.URL().Host + "/" + item.URL().Path)
+				} else {
+					results[index] = DataReference(item.URL().String())
+				}
+			}
 		}
 		if stow.IsCursorEnd(stowCursor) {
 			cursor = NewCursorAtEnd()
