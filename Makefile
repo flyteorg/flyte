@@ -33,7 +33,6 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python: ## Generate Python protocol buffer files
 	buf generate --clean --template buf.gen.python.yaml
-	buf generate buf.build/bufbuild/protovalidate --template buf.gen.python.yaml
 	cp flyteidl2/gen_utils/python/* gen/python/
 	find gen/python -type d -exec touch {}/__init__.py \;
 	cd gen/python && uv lock
