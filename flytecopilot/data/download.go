@@ -63,7 +63,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		maxItems := 100
 		cursor := storage.NewCursorAtStart()
 		var items []storage.DataReference
-		fmt.Printf("blobRef: %s\n", blobRef)
 		var absPaths []string
 		for {
 			items, cursor, err = d.store.List(ctx, blobRef, maxItems, cursor)
@@ -90,7 +89,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
 			absPath := absPath
-			fmt.Printf("absPath: %s\n", absPath)
 
 			wg.Add(1)
 			go func() {
@@ -130,7 +128,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 
 				newPath := filepath.Join(toPath, prefix)
 				dir := filepath.Dir(newPath)
-				fmt.Printf("newPath: %s\n", newPath)
 
 				mu.Lock()
 				// os.MkdirAll creates the specified directory structure if it doesn’t already exist
