@@ -291,7 +291,7 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			results[index] = DataReference(item.URL().String())
+			results[index] = DataReference(item.URL().Path)
 		}
 		if stow.IsCursorEnd(stowCursor) {
 			cursor = NewCursorAtEnd()
