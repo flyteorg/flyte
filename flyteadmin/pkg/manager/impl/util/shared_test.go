@@ -364,24 +364,26 @@ func TestGetLaunchPlan_TransformerError(t *testing.T) {
 
 func TestGetNamedEntityModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
-		assert.Equal(t, project, input.Project)
-		assert.Equal(t, domain, input.Domain)
-		assert.Equal(t, name, input.Name)
-		assert.Equal(t, resourceType, input.ResourceType)
-		return models.NamedEntity{
-			NamedEntityKey: models.NamedEntityKey{
-				Project:      input.Project,
-				Domain:       input.Domain,
-				Name:         input.Name,
-				ResourceType: input.ResourceType,
-			},
-			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
-				Description: description,
-			},
-		}, nil
-	}
-	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().
+		Get(mock.Anything, mock.Anything).
+		RunAndReturn(func(ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+			assert.Equal(t, name, input.Name)
+			assert.Equal(t, resourceType, input.ResourceType)
+			return models.NamedEntity{
+				NamedEntityKey: models.NamedEntityKey{
+					ResourceType: input.ResourceType,
+					Project:      input.Project,
+					Domain:       input.Domain,
+					Name:         input.Name,
+				},
+				NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+					Description: description,
+				},
+			}, nil
+		})
 	entity, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
 		&admin.NamedEntityIdentifier{
@@ -400,10 +402,10 @@ func TestGetNamedEntityModel(t *testing.T) {
 
 func TestGetNamedEntityModel_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
-		return models.NamedEntity{}, errExpected
-	}
-	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().
+		Get(mock.Anything, mock.Anything).
+		Return(models.NamedEntity{}, errExpected)
 	launchPlan, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
 		&admin.NamedEntityIdentifier{
@@ -417,24 +419,26 @@ func TestGetNamedEntityModel_DatabaseError(t *testing.T) {
 
 func TestGetNamedEntity(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
-		assert.Equal(t, project, input.Project)
-		assert.Equal(t, domain, input.Domain)
-		assert.Equal(t, name, input.Name)
-		assert.Equal(t, resourceType, input.ResourceType)
-		return models.NamedEntity{
-			NamedEntityKey: models.NamedEntityKey{
-				Project:      input.Project,
-				Domain:       input.Domain,
-				Name:         input.Name,
-				ResourceType: core.ResourceType_WORKFLOW,
-			},
-			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
-				Description: description,
-			},
-		}, nil
-	}
-	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	namedEntityRepo := repository.NamedEntityRepo().(*repositoryMocks.NamedEntityRepoInterface)
+	namedEntityRepo.EXPECT().
+		Get(mock.Anything, mock.Anything).
+		RunAndReturn(func(ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+			assert.Equal(t, name, input.Name)
+			assert.Equal(t, resourceType, input.ResourceType)
+			return models.NamedEntity{
+				NamedEntityKey: models.NamedEntityKey{
+					ResourceType: core.ResourceType_WORKFLOW,
+					Project:      input.Project,
+					Domain:       input.Domain,
+					Name:         input.Name,
+				},
+				NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+					Description: description,
+				},
+			}, nil
+		})
 	entity, err := GetNamedEntity(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
 		&admin.NamedEntityIdentifier{
