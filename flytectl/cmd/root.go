@@ -29,7 +29,7 @@ import (
 
 var (
 	cfgFile        string
-	configAccessor = viper.NewAccessor(stdConfig.Options{StrictMode: true})
+	configAccessor = viper.NewAccessor(stdConfig.Options{StrictMode: false})
 )
 
 const (
@@ -116,7 +116,7 @@ func initConfig(cmd *cobra.Command, _ []string) error {
 	}
 
 	configAccessor = viper.NewAccessor(stdConfig.Options{
-		StrictMode:  true,
+		StrictMode:  false,
 		SearchPaths: []string{configFile},
 	})
 
