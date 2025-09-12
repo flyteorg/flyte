@@ -55,6 +55,25 @@ flyteadmin:
       memory: 50Mi
   # Strategy for Flyteadmin deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
   # -- Initial projects to create

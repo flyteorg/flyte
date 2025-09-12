@@ -190,6 +190,17 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.annotations | object | `{}` | Annotations for Flyteadmin deployment |
+| flyteadmin.autoscaling.enabled | bool | `false` |  |
+| flyteadmin.autoscaling.maxReplicas | int | `10` |  |
+| flyteadmin.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| flyteadmin.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| flyteadmin.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| flyteadmin.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| flyteadmin.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| flyteadmin.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| flyteadmin.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| flyteadmin.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| flyteadmin.autoscaling.minReplicas | int | `1` |  |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables  e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>"  e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
