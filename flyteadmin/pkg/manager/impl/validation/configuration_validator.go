@@ -28,7 +28,17 @@ func (v ConfigurationValidator) ValidateUpdateRequest(ctx context.Context, reque
 	if request.Configuration == nil {
 		return shared.GetMissingArgumentError(shared.Configuration)
 	}
+	if err := v.validateConfiguration(request.Configuration); err != nil {
+		return err
+	}
 	return v.validateConfigurationID(ctx, request.Id)
+}
+
+func (v ConfigurationValidator) validateConfiguration(configuration *admin.Configuration) error {
+	if configuration.TaskResourceAttributes != nil && (configuration.TaskResourceAttributes.GetDefaults() == nil || configuration.TaskResourceAttributes.GetLimits() == nil) {
+		return shared.GetInvalidArgumentError("task resource attributes")
+	}
+	return nil
 }
 
 func (v ConfigurationValidator) validateConfigurationID(ctx context.Context, configurationID *admin.ConfigurationID) error {

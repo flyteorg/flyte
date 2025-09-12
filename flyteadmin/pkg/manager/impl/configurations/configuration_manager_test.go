@@ -481,7 +481,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 			return false
 		}
 		return *input.NewConfigurationMetadata == models.ConfigurationDocumentMetadata{
-			Version:          "/2q3/pKW4h7lf1uExxhntIXaoI3dj0wL+JwEIrTIHUg=",
+			Version:          "lsv8IskmHja9u2NVe4N2jK5gGDIJHBVySqcbcwjzY9Y=",
 			DocumentLocation: "s3://bucket/v2",
 			Active:           true,
 		}
@@ -504,6 +504,10 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 					Cpu: "1",
 					Gpu: "2",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "1",
+					Gpu: "2",
+				},
 			},
 		}
 		projectKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
@@ -517,6 +521,10 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 					Cpu: "5",
 					Gpu: "6",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "5",
+					Gpu: "6",
+				},
 			},
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
 				MaxParallelism: 1,
@@ -527,6 +535,10 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 		configurations[globalKey] = &admin.Configuration{
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
 				Defaults: &admin.TaskResourceSpec{
+					Cpu: "7",
+					Gpu: "8",
+				},
+				Limits: &admin.TaskResourceSpec{
 					Cpu: "7",
 					Gpu: "8",
 				},
@@ -598,6 +610,10 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 					Cpu: "3",
 					Gpu: "4",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "3",
+					Gpu: "4",
+				},
 			},
 		},
 	})
@@ -610,12 +626,16 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 	fmt.Printf("Response: %v\n", response)
 	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
 		Id:      &admin.ConfigurationID{Org: "org", Project: "project", Domain: "domain"},
-		Version: "/2q3/pKW4h7lf1uExxhntIXaoI3dj0wL+JwEIrTIHUg=",
+		Version: "lsv8IskmHja9u2NVe4N2jK5gGDIJHBVySqcbcwjzY9Y=",
 		Configuration: &admin.ConfigurationWithSource{
 			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
 				Source: admin.AttributesSource_PROJECT_DOMAIN,
 				Value: &admin.TaskResourceAttributes{
 					Defaults: &admin.TaskResourceSpec{
+						Cpu: "3",
+						Gpu: "4",
+					},
+					Limits: &admin.TaskResourceSpec{
 						Cpu: "3",
 						Gpu: "4",
 					},
@@ -803,6 +823,10 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 					Cpu: "3",
 					Gpu: "4",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "3",
+					Gpu: "4",
+				},
 			},
 		},
 	})
@@ -842,7 +866,7 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 			return false
 		}
 		return *input.NewConfigurationMetadata == models.ConfigurationDocumentMetadata{
-			Version:          "xsqt/y06Uiiae023ZmNbFkYnQHNBtucHThzcj3i2aeE=",
+			Version:          "tUQwHo60D9d/nN7BPgJ3fU0VASy/Cw2quKQcq4BJlDs=",
 			DocumentLocation: "s3://bucket/v2",
 			Active:           true,
 		}
@@ -873,6 +897,10 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 					Cpu: "1",
 					Gpu: "2",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "1",
+					Gpu: "2",
+				},
 			},
 		}
 		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
@@ -880,6 +908,10 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 		configurations[globalKey] = &admin.Configuration{
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
 				Defaults: &admin.TaskResourceSpec{
+					Cpu: "3",
+					Gpu: "4",
+				},
+				Limits: &admin.TaskResourceSpec{
 					Cpu: "3",
 					Gpu: "4",
 				},
@@ -952,6 +984,10 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 					Cpu: "5",
 					Gpu: "6",
 				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "5",
+					Gpu: "6",
+				},
 			},
 		},
 	})
@@ -962,12 +998,16 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 
 	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
 		Id:      &admin.ConfigurationID{Org: "org"},
-		Version: "xsqt/y06Uiiae023ZmNbFkYnQHNBtucHThzcj3i2aeE=",
+		Version: "tUQwHo60D9d/nN7BPgJ3fU0VASy/Cw2quKQcq4BJlDs=",
 		Configuration: &admin.ConfigurationWithSource{
 			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
 				Source: admin.AttributesSource_ORG,
 				Value: &admin.TaskResourceAttributes{
 					Defaults: &admin.TaskResourceSpec{
+						Cpu: "5",
+						Gpu: "6",
+					},
+					Limits: &admin.TaskResourceSpec{
 						Cpu: "5",
 						Gpu: "6",
 					},
@@ -1063,6 +1103,41 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 			},
 		},
 	}))
+}
+
+func TestUpdateConfigurationFailsWithNilTaskResourceAttributesLimits(t *testing.T) {
+	ctx := context.Background()
+	db := mocks.NewMockRepository()
+	mockConfig := &runtimeMocks.Configuration{}
+	mockPBStore := &storageMocks.ComposedProtobufStore{}
+	mockRefConstructor := &storageMocks.ReferenceConstructor{}
+	mockStorage := &storage.DataStore{
+		ComposedProtobufStore: mockPBStore,
+		ReferenceConstructor:  mockRefConstructor,
+	}
+	pluginRegistry := plugins.NewRegistry()
+	// Mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+
+	_, err = configurationManager.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Org: "org",
+		},
+		VersionToUpdate: "v1",
+		Configuration: &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "5",
+					Gpu: "6",
+				},
+			},
+		},
+	})
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid value for task resource attributes", err.Error())
 }
 
 func TestNewAttributes(t *testing.T) {
