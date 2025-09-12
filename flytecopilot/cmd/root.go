@@ -116,11 +116,6 @@ func NewDataCommand() *cobra.Command {
 			}
 			rootOpts.Scope = promutils.NewScope("flyte:data")
 			cfg := storage.GetConfig()
-			if cfg.Type == storage.TypeS3 {
-				if err := waitForAWSCreds(context.Background(), time.Minute*10); err != nil {
-					return err
-				}
-			}
 			store, err := storage.NewDataStore(cfg, rootOpts.Scope)
 			if err != nil {
 				return errors.Wrap(err, "failed to create datastore client")
