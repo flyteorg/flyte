@@ -100,7 +100,17 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}()
 
 				ref := storage.DataReference(absPath)
-				reader, err := DownloadFileFromStorage(ctx, ref, d.store)
+				scheme, _, prefix, err := ref.Split()
+				if err != nil {
+					logger.Errorf(ctx, "Failed to parse [%s] [%s]", ref, err)
+					return
+				}
+				var reader io.ReadCloser
+				if scheme == "http" || scheme == "https" {
+					reader, err = DownloadFileFromHTTP(ctx, ref)
+				} else {
+					reader, err = DownloadFileFromStorage(ctx, ref, d.store)
+				}
 				if err != nil {
 					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
 					return
@@ -116,12 +126,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					mu.Unlock()
 				}()
 
-				_, _, k, err := ref.Split()
-				if err != nil {
-					logger.Errorf(ctx, "Failed to parse ref [%s]", ref)
-					return
-				}
-				newPath := filepath.Join(toPath, k)
+				newPath := filepath.Join(toPath, prefix)
 				dir := filepath.Dir(newPath)
 
 				mu.Lock()
