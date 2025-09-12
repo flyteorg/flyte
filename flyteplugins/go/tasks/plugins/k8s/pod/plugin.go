@@ -122,7 +122,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.GetType() == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.GetType() == SidecarTaskType || (len(podSpec.Containers) == 1 && taskTemplate.GetType() != rawContainerTaskType) {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 

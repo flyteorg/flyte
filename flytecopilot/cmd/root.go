@@ -6,15 +6,10 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog"
 
@@ -68,41 +63,6 @@ func (r RootOptions) UploadError(ctx context.Context, code string, recvErr error
 	})
 }
 
-func PollUntilTimeout(ctx context.Context, pollInterval, timeout time.Duration, condition wait.ConditionFunc) error {
-	childCtx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-	return wait.PollUntil(pollInterval, condition, childCtx.Done())
-}
-
-func checkAWSCreds() (*credentials.Value, error) {
-	sess, err := session.NewSession(&aws.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	// Determine the AWS credentials from the default credential chain
-	creds, err := sess.Config.Credentials.Get()
-	if err != nil {
-		return nil, err
-	}
-	if creds.AccessKeyID == "" || creds.SecretAccessKey == "" || creds.SessionToken == "" {
-		return nil, fmt.Errorf("invalid data in credential fetch")
-	}
-	return &creds, nil
-}
-
-func waitForAWSCreds(ctx context.Context, timeout time.Duration) error {
-	return PollUntilTimeout(ctx, time.Second*5, timeout, func() (bool, error) {
-		if creds, err := checkAWSCreds(); err != nil {
-			logger.Errorf(ctx, "failed to get AWS credentials: %s", err)
-			return false, nil
-		} else if creds != nil {
-			logger.Infof(ctx, "found AWS credentials from provider: %s", creds.ProviderName)
-		}
-		return true, nil
-	})
-}
-
 // NewDataCommand returns a new instance of the co-pilot root command
 func NewDataCommand() *cobra.Command {
 	rootOpts := &RootOptions{}
@@ -116,11 +76,6 @@ func NewDataCommand() *cobra.Command {
 			}
 			rootOpts.Scope = promutils.NewScope("flyte:data")
 			cfg := storage.GetConfig()
-			if cfg.Type == storage.TypeS3 {
-				if err := waitForAWSCreds(context.Background(), time.Minute*10); err != nil {
-					return err
-				}
-			}
 			store, err := storage.NewDataStore(cfg, rootOpts.Scope)
 			if err != nil {
 				return errors.Wrap(err, "failed to create datastore client")
