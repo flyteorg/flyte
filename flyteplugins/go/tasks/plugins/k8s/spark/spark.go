@@ -446,6 +446,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			taskLogs = append(taskLogs, &core.TaskLog{
 				Uri:           customInfoMap[sparkHistoryUI],
 				Name:          "Spark History UI",
+				Ready:         true,
 				MessageFormat: core.TaskLog_JSON,
 				LinkType:      core.TaskLog_DASHBOARD,
 			})
@@ -462,6 +463,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:           customInfoMap[sparkDriverUI],
 			Name:          "Spark Driver UI",
+			Ready:         true,
 			MessageFormat: core.TaskLog_JSON,
 			LinkType:      core.TaskLog_DASHBOARD,
 		})
