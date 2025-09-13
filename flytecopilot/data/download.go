@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/ghodss/yaml"
@@ -36,23 +37,35 @@ type Downloader struct {
 // TODO use chunk to download
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
 	/*
-	   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
-	   For multipart blobs, it lists all parts recursively and spawns concurrent goroutines to download each part while managing file I/O in parallel.
+			   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
+			   For multipart blobs, it lists all parts recursively and spawns concurrent goroutines to download each part while managing file I/O in parallel.
 
-	   - The function begins by validating the blob URI and categorizing the blob type (single or multipart).
-	   - In the multipart case, it recursively lists all blob parts and launches goroutines to download and save each part.
-	     Goroutine closure and I/O success tracking are managed to avoid resource leaks.
-	   - For single-part blobs, it directly downloads and writes the data to the specified path.
+			   - The function begins by validating the blob URI and categorizing the blob type (single or multipart).
+			   - In the multipart case, it recursively lists all blob parts and launches goroutines to download and save each part.
+			     Goroutine closure and I/O success tracking are managed to avoid resource leaks.
+			   - For single-part blobs, it directly downloads and writes the data to the specified path.
 
-	   Life Cycle:
-	   1. Blob URI                    -> Blob Metadata Type check       -> Recursive List parts if Multipart          -> Launch goroutines to download parts
-	      (input blob object)            (determine multipart/single)       (List API, handles recursive case)              (each part handled in parallel)
-	   2. Download part or full blob   -> Save locally with error checks -> Handle reader/writer closures             -> Return local path or error
-	      (download each part)             (error on write or directory)     (close streams safely, track success)        (completion or report missing closures)
+			   Life Cycle:
+			   1. Blob URI                    -> Blob Metadata Type check       -> Recursive List parts if Multipart          -> Launch goroutines to download parts
+			      (input blob object)            (determine multipart/single)       (List API, handles recursive case)              (each part handled in parallel)
+			   2. Download part or full blob   -> Save locally with error checks -> Handle reader/writer closures             -> Return local path or error
+			      (download each part)             (error on write or directory)     (close streams safely, track success)        (completion or report missing closures)
+
+			More clarification on Folders. If a user returns FlyteFile("/my/folder") and inside /my/folder is
+		      - sample.txt
+		      - nested/
+		      -   deep_file.txt
+
+			The blob uri is something like: s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7cd4e45cfae4920f0b8a586d
+			and inside are the files:
+				- s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7cd4e45cfae4920f0b8a586d/sample.txt
+				- s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7cd4e45cfae4920f0b8a586d/nested/deep_file.txt
+			the top level folder disappears. If we want t
 	*/
 
 	blobRef := storage.DataReference(blob.GetUri())
-	scheme, _, _, err := blobRef.Split()
+	scheme, baseContainer, basePrefix, err := blobRef.Split()
+	logger.Debugf(ctx, "Downloader handling blob [%s] uri [%s] in bucket [%s] prefix [%s]", scheme, blob.GetUri(), baseContainer, basePrefix)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
@@ -64,6 +77,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		cursor := storage.NewCursorAtStart()
 		var items []storage.DataReference
 		var absPaths []string
+
 		for {
 			items, cursor, err = d.store.List(ctx, blobRef, maxItems, cursor)
 			if err != nil || len(items) == 0 {
@@ -126,7 +140,43 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					mu.Unlock()
 				}()
 
-				newPath := filepath.Join(toPath, prefix)
+				// Strip the base path from the item prefix to get the relative path
+				// For HTTP/HTTPS URLs: prefix includes bucket + path (e.g., "bucket/sm/akm6s4bgd6lwx6fhzf58-n0-0/705fe4570586b256a5b0e5fd598b4c28/sample.txt")
+				// For S3/GS URLs: prefix only includes path (e.g., "sm/akm6s4bgd6lwx6fhzf58-n0-0/705fe4570586b256a5b0e5fd598b4c28/sample.txt")
+				// We need to strip the blob's base path to get just the relative file path
+				relativePath := prefix
+
+				// Strip the base path from the item prefix to get the relative path
+				// This works for both HTTP and native cloud storage URLs:
+				// - HTTP: prefix="bucket/path/file.txt", basePrefix="path"
+				// - S3/GS: prefix="path/file.txt", basePrefix="path"
+				if strings.HasPrefix(absPath, "http") {
+					// Try matching two ways...
+					logger.Debugf(ctx, "matching with container, prefix=[%s] %s", prefix, baseContainer+"/"+basePrefix)
+					if strings.HasPrefix(prefix, baseContainer) {
+						// This works for S3
+						relativePath = strings.TrimPrefix(prefix, baseContainer+"/"+basePrefix)
+					} else {
+						// This is here because google has the aggravating behavior of injecting a /o/ into the download
+						// link so we can't use the above. instead just look for the basePrefix in the prefix.
+						// This should work for S3 too, but using the base container feels safer.
+						idx := strings.Index(prefix, basePrefix)
+						if idx == -1 {
+							logger.Errorf(ctx, "Failed to find container prefix [%s]", prefix)
+						} else {
+							// Extract everything after basePrefix
+							relativePath = prefix[idx+len(basePrefix):]
+						}
+					}
+				} else {
+					logger.Debugf(ctx, "matching prefix=[%s] %s", prefix, basePrefix)
+					relativePath = strings.TrimPrefix(prefix, basePrefix)
+				}
+				// Remove leading slash if it exists
+				relativePath = strings.TrimPrefix(relativePath, "/")
+				logger.Debugf(ctx, "Extracting file from %s, using relative path %s", absPath, relativePath)
+
+				newPath := filepath.Join(toPath, relativePath)
 				dir := filepath.Dir(newPath)
 
 				mu.Lock()

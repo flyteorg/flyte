@@ -18,17 +18,20 @@ func TestHandleBlobMultipart(t *testing.T) {
 	t.Run("Successful Query", func(t *testing.T) {
 		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
-		ref := storage.DataReference("s3://container/folder/file1")
-		err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+
+		// Create one file at root level and another in a nested folder
+		ref1 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/root_file.txt")
+		err = s.WriteRaw(context.Background(), ref1, 0, storage.Options{}, bytes.NewReader([]byte("root content")))
 		assert.NoError(t, err)
-		ref = storage.DataReference("s3://container/folder/file2")
-		err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+
+		ref2 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/nested/deep_file.txt")
+		err = s.WriteRaw(context.Background(), ref2, 0, storage.Options{}, bytes.NewReader([]byte("nested content")))
 		assert.NoError(t, err)
 
 		d := Downloader{store: s}
 
 		blob := &core.Blob{
-			Uri: "s3://container/folder",
+			Uri: "s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c",
 			Metadata: &core.BlobMetadata{
 				Type: &core.BlobType{
 					Dimensionality: core.BlobType_MULTIPART,
@@ -36,22 +39,31 @@ func TestHandleBlobMultipart(t *testing.T) {
 			},
 		}
 
-		toPath := "./inputs"
+		// Create temporary directory with inputs/my_var structure
+		tmpDir, err := os.MkdirTemp("", "blob_test")
+		assert.NoError(t, err)
+		testPath := filepath.Join(tmpDir, "inputs", "my_var")
 		defer func() {
-			err := os.RemoveAll(toPath)
+			err := os.RemoveAll(tmpDir)
 			if err != nil {
 				t.Errorf("Failed to delete directory: %v", err)
 			}
 		}()
 
-		result, err := d.handleBlob(context.Background(), blob, toPath)
+		result, err := d.handleBlob(context.Background(), blob, testPath)
 		assert.NoError(t, err)
-		assert.Equal(t, toPath, result)
+		assert.Equal(t, testPath, result)
 
 		// Check if files were created and data written
-		for _, file := range []string{"file1", "file2"} {
-			if _, err := os.Stat(filepath.Join(toPath, "folder", file)); os.IsNotExist(err) {
-				t.Errorf("expected file %s to exist", file)
+		// With the new fix, files should be directly under testPath, not in a "folder" subdirectory
+		expectedFiles := []string{
+			filepath.Join(testPath, "root_file.txt"),
+			filepath.Join(testPath, "nested", "deep_file.txt"),
+		}
+
+		for _, expectedFile := range expectedFiles {
+			if _, err := os.Stat(expectedFile); os.IsNotExist(err) {
+				t.Errorf("expected file %s to exist", expectedFile)
 			}
 		}
 	})
