@@ -65,7 +65,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 
 	blobRef := storage.DataReference(blob.GetUri())
 	scheme, baseContainer, basePrefix, err := blobRef.Split()
-	logger.Debugf(ctx, "Downloader handling blob [%s] uri [%s] in bucket [%s] prefix [%s]", scheme, blob.Uri, baseContainer, basePrefix)
+	logger.Debugf(ctx, "Downloader handling blob [%s] uri [%s] in bucket [%s] prefix [%s]", scheme, blob.GetUri(), baseContainer, basePrefix)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
