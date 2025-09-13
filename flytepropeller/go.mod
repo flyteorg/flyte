@@ -41,6 +41,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/unionai/flyte/fasttask/plugin v0.0.0-00010101000000-000000000000
+	go.etcd.io/etcd/api/v3 v3.5.9
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0
 	go.opentelemetry.io/otel v1.29.0
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
