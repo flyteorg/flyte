@@ -104,7 +104,7 @@ type SchemaTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SchemaTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -244,7 +244,7 @@ type StructuredDatasetTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m StructuredDatasetTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -349,7 +349,7 @@ type BlobTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m BlobTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -448,7 +448,7 @@ type EnumTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EnumTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -581,7 +581,7 @@ type UnionTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UnionTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -729,7 +729,7 @@ type TypeStructureMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TypeStructureMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -858,7 +858,7 @@ type TypeAnnotationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TypeAnnotationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1348,7 +1348,7 @@ type LiteralTypeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LiteralTypeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1486,7 +1486,7 @@ type OutputReferenceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OutputReferenceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1615,7 +1615,7 @@ type PromiseAttributeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PromiseAttributeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1717,7 +1717,7 @@ type ErrorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ErrorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1821,7 +1821,7 @@ type SchemaType_SchemaColumnMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SchemaType_SchemaColumnMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1956,7 +1956,7 @@ type StructuredDatasetType_DatasetColumnMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m StructuredDatasetType_DatasetColumnMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

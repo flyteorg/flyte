@@ -134,7 +134,7 @@ type LiteralsToJsonRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LiteralsToJsonRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -270,7 +270,7 @@ type LiteralsToJsonResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LiteralsToJsonResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -406,7 +406,7 @@ type JsonToLiteralsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JsonToLiteralsRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -542,7 +542,7 @@ type JsonToLiteralsResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JsonToLiteralsResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

@@ -12,7 +12,11 @@ buf-dep: ## Update buf modules
 	buf dep update
 
 .PHONY: buf
-buf: buf-dep buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
+buf: buf-dep buf-lint buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
+
+.PHONY: buf-lint
+buf-lint: ## Lint protocol buffer files
+	#buf lint
 
 .PHONY: buf-ts
 buf-ts: ## Generate TypeScript protocol buffer files

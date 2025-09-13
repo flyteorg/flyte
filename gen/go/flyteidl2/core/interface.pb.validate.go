@@ -159,7 +159,7 @@ type VariableMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m VariableMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -304,7 +304,7 @@ type VariableMapMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m VariableMapMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -462,7 +462,7 @@ type TypedInterfaceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TypedInterfaceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -730,7 +730,7 @@ type ParameterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ParameterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -875,7 +875,7 @@ type ParameterMapMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ParameterMapMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

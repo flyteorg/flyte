@@ -138,7 +138,7 @@ type ResourcesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ResourcesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -269,7 +269,7 @@ type GPUAcceleratorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GPUAcceleratorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -374,7 +374,7 @@ type SharedMemoryMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SharedMemoryMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -532,7 +532,7 @@ type ExtendedResourcesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ExtendedResourcesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -640,7 +640,7 @@ type RuntimeMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RuntimeMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -915,7 +915,7 @@ type TaskMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1322,7 +1322,7 @@ type TaskTemplateMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskTemplateMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1426,7 +1426,7 @@ type ContainerPortMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerPortMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1689,7 +1689,7 @@ type ContainerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1792,7 +1792,7 @@ type IOStrategyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m IOStrategyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1929,7 +1929,7 @@ type DataLoadingConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DataLoadingConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2118,7 +2118,7 @@ type K8SPodMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m K8SPodMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2222,7 +2222,7 @@ type K8SObjectMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m K8SObjectMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2326,7 +2326,7 @@ type SqlMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SqlMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2430,7 +2430,7 @@ type Resources_ResourceEntryMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m Resources_ResourceEntryMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

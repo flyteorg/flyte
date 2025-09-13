@@ -76,7 +76,7 @@ type PodResourceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PodResourceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -244,7 +244,7 @@ type LoggingContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LoggingContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -352,7 +352,7 @@ type ContainerIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -464,7 +464,7 @@ type ContainerSelectorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerSelectorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -570,7 +570,7 @@ type LiveLogsOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LiveLogsOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -701,7 +701,7 @@ type LogLineMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LogLineMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -865,7 +865,7 @@ type LogLinesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LogLinesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -999,7 +999,7 @@ type LogContainersListMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LogContainersListMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1135,7 +1135,7 @@ type LogLinesBatchMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LogLinesBatchMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

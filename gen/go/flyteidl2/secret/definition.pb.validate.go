@@ -101,7 +101,7 @@ type SecretSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -209,7 +209,7 @@ type SecretIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -369,7 +369,7 @@ type SecretMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -504,7 +504,7 @@ type SecretStatusMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretStatusMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -635,7 +635,7 @@ type ClusterSecretStatusMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterSecretStatusMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -793,7 +793,7 @@ type SecretMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

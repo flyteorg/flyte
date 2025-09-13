@@ -75,7 +75,7 @@ type CatalogArtifactTagMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CatalogArtifactTagMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -281,7 +281,7 @@ type CatalogMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CatalogMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -381,7 +381,7 @@ type CatalogReservationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CatalogReservationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

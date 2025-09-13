@@ -77,7 +77,7 @@ type ProjectIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProjectIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -183,7 +183,7 @@ type ClusterIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -289,7 +289,7 @@ type ClusterPoolIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterPoolIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -395,7 +395,7 @@ type ClusterConfigIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterConfigIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -503,7 +503,7 @@ type ClusterNodepoolIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterNodepoolIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -607,7 +607,7 @@ type UserIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UserIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -709,7 +709,7 @@ type ApplicationIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplicationIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -815,7 +815,7 @@ type RoleIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RoleIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -917,7 +917,7 @@ type OrgIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OrgIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1048,7 +1048,7 @@ type ManagedClusterIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ManagedClusterIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1154,7 +1154,7 @@ type PolicyIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PolicyIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1262,7 +1262,7 @@ type RunIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RunIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1393,7 +1393,7 @@ type ActionIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ActionIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1524,7 +1524,7 @@ type ActionAttemptIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ActionAttemptIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

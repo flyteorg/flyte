@@ -73,7 +73,7 @@ type ImageIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ImageIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -202,7 +202,7 @@ type ImageMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ImageMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -301,7 +301,7 @@ type AptPackagesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AptPackagesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -406,7 +406,7 @@ type PipOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PipOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -534,7 +534,7 @@ type PipPackagesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PipPackagesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -664,7 +664,7 @@ type RequirementsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RequirementsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -794,7 +794,7 @@ type PythonWheelsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PythonWheelsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -926,7 +926,7 @@ type UVProjectMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UVProjectMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1025,7 +1025,7 @@ type CommandsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CommandsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1125,7 +1125,7 @@ type WorkDirMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m WorkDirMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1228,7 +1228,7 @@ type CopyConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CopyConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1328,7 +1328,7 @@ type EnvMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EnvMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1800,7 +1800,7 @@ type LayerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LayerMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1937,7 +1937,7 @@ type ImageSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ImageSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

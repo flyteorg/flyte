@@ -79,7 +79,7 @@ type SecretMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecretMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -209,7 +209,7 @@ type OAuth2ClientMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2ClientMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -343,7 +343,7 @@ type IdentityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m IdentityMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -480,7 +480,7 @@ type OAuth2TokenRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2TokenRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -679,7 +679,7 @@ type SecurityContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SecurityContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

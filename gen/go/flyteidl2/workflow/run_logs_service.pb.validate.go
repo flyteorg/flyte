@@ -102,7 +102,7 @@ type TailLogsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TailLogsRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -236,7 +236,7 @@ type TailLogsResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TailLogsResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -370,7 +370,7 @@ type TailLogsResponse_LogsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TailLogsResponse_LogsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

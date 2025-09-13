@@ -195,7 +195,7 @@ type UserMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UserMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -306,7 +306,7 @@ type UserSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UserSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -463,7 +463,7 @@ type ApplicationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ApplicationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -565,7 +565,7 @@ type AppSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AppSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -752,7 +752,7 @@ type EnrichedIdentityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EnrichedIdentityMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -938,7 +938,7 @@ type IdentityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m IdentityMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

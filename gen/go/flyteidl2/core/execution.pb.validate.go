@@ -71,7 +71,7 @@ type WorkflowExecutionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m WorkflowExecutionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -173,7 +173,7 @@ type NodeExecutionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m NodeExecutionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -273,7 +273,7 @@ type TaskExecutionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskExecutionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -412,7 +412,7 @@ type ExecutionErrorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ExecutionErrorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -553,7 +553,7 @@ type TaskLogMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskLogMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -688,7 +688,7 @@ type LogContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LogContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -862,7 +862,7 @@ type PodLogContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PodLogContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -993,7 +993,7 @@ type ContainerContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1122,7 +1122,7 @@ type QualityOfServiceSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m QualityOfServiceSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1282,7 +1282,7 @@ type QualityOfServiceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m QualityOfServiceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1440,7 +1440,7 @@ type ContainerContext_ProcessContextMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ContainerContext_ProcessContextMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

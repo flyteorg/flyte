@@ -78,7 +78,7 @@ type ArtifactKeyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ArtifactKeyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -236,7 +236,7 @@ type ArtifactBindingDataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ArtifactBindingDataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -342,7 +342,7 @@ type TimeTransformMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TimeTransformMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -444,7 +444,7 @@ type InputBindingDataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m InputBindingDataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -544,7 +544,7 @@ type RuntimeBindingMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RuntimeBindingMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -824,7 +824,7 @@ type LabelValueMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LabelValueMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -969,7 +969,7 @@ type PartitionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PartitionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1100,7 +1100,7 @@ type TimePartitionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TimePartitionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1288,7 +1288,7 @@ type ArtifactIDMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ArtifactIDMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1445,7 +1445,7 @@ type ArtifactTagMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ArtifactTagMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1685,7 +1685,7 @@ type ArtifactQueryMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ArtifactQueryMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

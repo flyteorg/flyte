@@ -129,7 +129,7 @@ type DeployTaskRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeployTaskRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -231,7 +231,7 @@ type DeployTaskResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeployTaskResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -362,7 +362,7 @@ type GetTaskDetailsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetTaskDetailsRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -493,7 +493,7 @@ type GetTaskDetailsResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetTaskDetailsResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -716,7 +716,7 @@ type ListTasksRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListTasksRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -852,7 +852,7 @@ type ListTasksResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListTasksResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -971,7 +971,7 @@ type ListTasksRequest_KnownFilterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListTasksRequest_KnownFilterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

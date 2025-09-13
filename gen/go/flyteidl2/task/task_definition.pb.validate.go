@@ -78,7 +78,7 @@ type TaskNameMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskNameMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -188,7 +188,7 @@ type TaskIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -349,7 +349,7 @@ type TaskMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -505,7 +505,7 @@ type TaskMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -698,7 +698,7 @@ type TaskSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -826,7 +826,7 @@ type TraceSpecMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TraceSpecMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1012,7 +1012,7 @@ type TaskDetailsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskDetailsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

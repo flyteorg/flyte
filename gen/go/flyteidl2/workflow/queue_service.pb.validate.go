@@ -269,7 +269,7 @@ type EnqueueActionRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EnqueueActionRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -459,7 +459,7 @@ type TaskActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -682,7 +682,7 @@ type TraceActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TraceActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -858,7 +858,7 @@ type ConditionActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ConditionActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -958,7 +958,7 @@ type EnqueueActionResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m EnqueueActionResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1093,7 +1093,7 @@ type AbortQueuedRunRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AbortQueuedRunRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1195,7 +1195,7 @@ type AbortQueuedRunResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AbortQueuedRunResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1330,7 +1330,7 @@ type AbortQueuedActionRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AbortQueuedActionRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1432,7 +1432,7 @@ type AbortQueuedActionResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m AbortQueuedActionResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

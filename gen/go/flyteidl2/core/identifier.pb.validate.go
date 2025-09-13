@@ -82,7 +82,7 @@ type IdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m IdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -190,7 +190,7 @@ type WorkflowExecutionIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m WorkflowExecutionIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -324,7 +324,7 @@ type NodeExecutionIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m NodeExecutionIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -486,7 +486,7 @@ type TaskExecutionIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TaskExecutionIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -619,7 +619,7 @@ type SignalIdentifierMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SignalIdentifierMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
