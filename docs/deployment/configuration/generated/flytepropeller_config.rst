@@ -1378,30 +1378,6 @@ logs (`logs.LogConfig`_)
   templates: null
   
 
-qubole (`config.Config`_)
-------------------------------------------------------------------------------------------------------------------------
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  analyzeLinkPath: /v2/analyze
-  clusterConfigs:
-  - labels:
-    - default
-    limit: 100
-    namespaceScopeQuotaProportionCap: 0.7
-    primaryLabel: default
-    projectScopeQuotaProportionCap: 0.7
-  commandApiPath: /api/v1.2/commands/
-  defaultClusterLabel: default
-  destinationClusterConfigs: []
-  endpoint: https://wellness.qubole.com
-  lruCacheSize: 2000
-  quboleTokenKey: FLYTE_QUBOLE_CLIENT_TOKEN
-  workers: 15
-  
-
 ray (`ray.Config`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -2280,118 +2256,6 @@ timeout (`config.Duration`_)
 .. code-block:: yaml
 
   1m0s
-  
-
-config.Config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-endpoint (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Endpoint for qubole to use
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  https://wellness.qubole.com
-  
-
-commandApiPath (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-API Path where commands can be launched on Qubole. Should be a valid url.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  /api/v1.2/commands/
-  
-
-analyzeLinkPath (`config.URL`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-URL path where queries can be visualized on qubole website. Should be a valid url.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  /v2/analyze
-  
-
-quboleTokenKey (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Name of the key where to find Qubole token in the secret manager.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  FLYTE_QUBOLE_CLIENT_TOKEN
-  
-
-lruCacheSize (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Size of the AutoRefreshCache
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "2000"
-  
-
-workers (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Number of parallel workers to refresh the cache
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "15"
-  
-
-defaultClusterLabel (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The default cluster label. This will be used if label is not specified on the hive job.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  default
-  
-
-clusterConfigs ([]config.ClusterConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  - labels:
-    - default
-    limit: 100
-    namespaceScopeQuotaProportionCap: 0.7
-    primaryLabel: default
-    projectScopeQuotaProportionCap: 0.7
-  
-
-destinationClusterConfigs ([]config.DestinationClusterConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  []
   
 
 config.K8sPluginConfig
@@ -4919,7 +4783,7 @@ admin-launcher (`launchplan.AdminConfig`_)
   workers: 10
   
 
-resourcemanager (`config.Config (resourcemanager)`_)
+resourcemanager (`config.Config`_)
 ------------------------------------------------------------------------------------------------------------------------
 
 **Default Value**: 
@@ -5141,7 +5005,7 @@ Bucket capacity as number of items
   "10000"
   
 
-config.Config (resourcemanager)
+config.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 type (string)
