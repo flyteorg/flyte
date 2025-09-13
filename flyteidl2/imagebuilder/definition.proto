@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.imagebuilder;
 
+import "flyteidl2/core/security.proto";
 import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
@@ -22,6 +23,7 @@ message Image {
 message AptPackages {
   // List of apt packages to install
   repeated string packages = 1;
+  repeated flyteidl2.core.Secret secret_mounts = 2;
 }
 
 // PipOptions defines options for pip packages to install in the image.
@@ -42,6 +44,7 @@ message PipPackages {
   repeated string packages = 1;
   // Options for pip packages.
   PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
 }
 
 // Requirements defines a python requirements file to use in the image.
@@ -50,6 +53,7 @@ message Requirements {
   string file = 1;
   // Options for pip packages.
   PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
 }
 
 message PythonWheels {
@@ -57,6 +61,7 @@ message PythonWheels {
   string dir = 1;
   // Options for pip packages.
   PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
 }
 
 // UVProject defines a UV project configuration, which includes
@@ -66,12 +71,14 @@ message UVProject {
   string uvlock = 2;
   // Options for pip packages.
   PipOptions options = 3;
+  repeated flyteidl2.core.Secret secret_mounts = 4;
 }
 
 // Commands defines a list of commands to run in the image.
 message Commands {
   // The command to run.
   repeated string cmd = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
 }
 
 // WorkDir defines the working directory to set in the image.

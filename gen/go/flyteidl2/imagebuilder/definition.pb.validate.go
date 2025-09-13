@@ -288,6 +288,40 @@ func (m *AptPackages) validate(all bool) error {
 
 	var errors []error
 
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AptPackagesValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AptPackagesValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AptPackagesValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return AptPackagesMultiError(errors)
 	}
@@ -521,6 +555,40 @@ func (m *PipPackages) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PipPackagesValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PipPackagesValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PipPackagesValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return PipPackagesMultiError(errors)
 	}
@@ -651,6 +719,40 @@ func (m *Requirements) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RequirementsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RequirementsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RequirementsValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return RequirementsMultiError(errors)
 	}
@@ -779,6 +881,40 @@ func (m *PythonWheels) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PythonWheelsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PythonWheelsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PythonWheelsValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	if len(errors) > 0 {
@@ -913,6 +1049,40 @@ func (m *UVProject) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UVProjectValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UVProjectValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UVProjectValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return UVProjectMultiError(errors)
 	}
@@ -1011,6 +1181,40 @@ func (m *Commands) validate(all bool) error {
 	}
 
 	var errors []error
+
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CommandsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CommandsValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommandsValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return CommandsMultiError(errors)

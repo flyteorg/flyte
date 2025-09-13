@@ -1,3 +1,4 @@
+from flyteidl2.core import security_pb2 as _security_pb2
 from buf.validate import validate_pb2 as _validate_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -21,10 +22,12 @@ class Image(_message.Message):
     def __init__(self, id: _Optional[_Union[ImageIdentifier, _Mapping]] = ..., fqin: _Optional[str] = ...) -> None: ...
 
 class AptPackages(_message.Message):
-    __slots__ = ["packages"]
+    __slots__ = ["packages", "secret_mounts"]
     PACKAGES_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     packages: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, packages: _Optional[_Iterable[str]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, packages: _Optional[_Iterable[str]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class PipOptions(_message.Message):
     __slots__ = ["index_url", "extra_index_urls", "pre", "extra_args"]
@@ -39,44 +42,54 @@ class PipOptions(_message.Message):
     def __init__(self, index_url: _Optional[str] = ..., extra_index_urls: _Optional[_Iterable[str]] = ..., pre: bool = ..., extra_args: _Optional[str] = ...) -> None: ...
 
 class PipPackages(_message.Message):
-    __slots__ = ["packages", "options"]
+    __slots__ = ["packages", "options", "secret_mounts"]
     PACKAGES_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     packages: _containers.RepeatedScalarFieldContainer[str]
     options: PipOptions
-    def __init__(self, packages: _Optional[_Iterable[str]] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, packages: _Optional[_Iterable[str]] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class Requirements(_message.Message):
-    __slots__ = ["file", "options"]
+    __slots__ = ["file", "options", "secret_mounts"]
     FILE_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     file: str
     options: PipOptions
-    def __init__(self, file: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, file: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class PythonWheels(_message.Message):
-    __slots__ = ["dir", "options"]
+    __slots__ = ["dir", "options", "secret_mounts"]
     DIR_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     dir: str
     options: PipOptions
-    def __init__(self, dir: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, dir: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class UVProject(_message.Message):
-    __slots__ = ["pyproject", "uvlock", "options"]
+    __slots__ = ["pyproject", "uvlock", "options", "secret_mounts"]
     PYPROJECT_FIELD_NUMBER: _ClassVar[int]
     UVLOCK_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     pyproject: str
     uvlock: str
     options: PipOptions
-    def __init__(self, pyproject: _Optional[str] = ..., uvlock: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, pyproject: _Optional[str] = ..., uvlock: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class Commands(_message.Message):
-    __slots__ = ["cmd"]
+    __slots__ = ["cmd", "secret_mounts"]
     CMD_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
     cmd: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, cmd: _Optional[_Iterable[str]] = ...) -> None: ...
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, cmd: _Optional[_Iterable[str]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class WorkDir(_message.Message):
     __slots__ = ["workdir"]

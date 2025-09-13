@@ -4,6 +4,8 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { Secret } from "../core/security_pb.ts";
+import { file_flyteidl2_core_security } from "../core/security_pb.ts";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -11,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/imagebuilder/definition.proto.
  */
 export const file_flyteidl2_imagebuilder_definition: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIiKAoPSW1hZ2VJZGVudGlmaWVyEhUKBG5hbWUYASABKAlCB7pIBHICEAEiSgoFSW1hZ2USMwoCaWQYASABKAsyJy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkltYWdlSWRlbnRpZmllchIMCgRmcWluGAIgASgJIh8KC0FwdFBhY2thZ2VzEhAKCHBhY2thZ2VzGAEgAygJIloKClBpcE9wdGlvbnMSEQoJaW5kZXhfdXJsGAIgASgJEhgKEGV4dHJhX2luZGV4X3VybHMYAyADKAkSCwoDcHJlGAQgASgIEhIKCmV4dHJhX2FyZ3MYBSABKAkiVAoLUGlwUGFja2FnZXMSEAoIcGFja2FnZXMYASADKAkSMwoHb3B0aW9ucxgCIAEoCzIiLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuUGlwT3B0aW9ucyJRCgxSZXF1aXJlbWVudHMSDAoEZmlsZRgBIAEoCRIzCgdvcHRpb25zGAIgASgLMiIuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QaXBPcHRpb25zIlAKDFB5dGhvbldoZWVscxILCgNkaXIYASABKAkSMwoHb3B0aW9ucxgCIAEoCzIiLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuUGlwT3B0aW9ucyJjCglVVlByb2plY3QSEQoJcHlwcm9qZWN0GAEgASgJEg4KBnV2bG9jaxgCIAEoCRIzCgdvcHRpb25zGAMgASgLMiIuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QaXBPcHRpb25zIhcKCENvbW1hbmRzEgsKA2NtZBgCIAMoCSIaCgdXb3JrRGlyEg8KB3dvcmtkaXIYASABKAkiJgoKQ29weUNvbmZpZxILCgNzcmMYASABKAkSCwoDZHN0GAIgASgJIoABCgNFbnYSRAoNZW52X3ZhcmlhYmxlcxgBIAMoCzItLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuRW52LkVudlZhcmlhYmxlc0VudHJ5GjMKEUVudlZhcmlhYmxlc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEikQQKBUxheWVyEjsKDGFwdF9wYWNrYWdlcxgBIAEoCzIjLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuQXB0UGFja2FnZXNIABI7CgxwaXBfcGFja2FnZXMYAiABKAsyIy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLlBpcFBhY2thZ2VzSAASNAoIY29tbWFuZHMYAyABKAsyIC5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkNvbW1hbmRzSAASPAoMcmVxdWlyZW1lbnRzGAQgASgLMiQuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5SZXF1aXJlbWVudHNIABI9Cg1weXRob25fd2hlZWxzGAUgASgLMiQuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QeXRob25XaGVlbHNIABIyCgd3b3JrZGlyGAYgASgLMh8uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5Xb3JrRGlySAASOQoLY29weV9jb25maWcYByABKAsyIi5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkNvcHlDb25maWdIABI3Cgp1dl9wcm9qZWN0GAggASgLMiEuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5VVlByb2plY3RIABIqCgNlbnYYCSABKAsyGy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkVudkgAQgcKBWxheWVyIngKCUltYWdlU3BlYxISCgpiYXNlX2ltYWdlGAEgASgJEhYKDnB5dGhvbl92ZXJzaW9uGAIgASgJEi0KBmxheWVycxgDIAMoCzIdLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuTGF5ZXISEAoIcGxhdGZvcm0YBCADKAlC5AEKGmNvbS5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyQg9EZWZpbml0aW9uUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvaW1hZ2VidWlsZGVyogIDRklYqgIWRmx5dGVpZGwyLkltYWdlYnVpbGRlcsoCFkZseXRlaWRsMlxJbWFnZWJ1aWxkZXLiAiJGbHl0ZWlkbDJcSW1hZ2VidWlsZGVyXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpJbWFnZWJ1aWxkZXJiBnByb3RvMw", [file_buf_validate_validate]);
+  fileDesc("CidmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIiKAoPSW1hZ2VJZGVudGlmaWVyEhUKBG5hbWUYASABKAlCB7pIBHICEAEiSgoFSW1hZ2USMwoCaWQYASABKAsyJy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkltYWdlSWRlbnRpZmllchIMCgRmcWluGAIgASgJIk4KC0FwdFBhY2thZ2VzEhAKCHBhY2thZ2VzGAEgAygJEi0KDXNlY3JldF9tb3VudHMYAiADKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQiWgoKUGlwT3B0aW9ucxIRCglpbmRleF91cmwYAiABKAkSGAoQZXh0cmFfaW5kZXhfdXJscxgDIAMoCRILCgNwcmUYBCABKAgSEgoKZXh0cmFfYXJncxgFIAEoCSKDAQoLUGlwUGFja2FnZXMSEAoIcGFja2FnZXMYASADKAkSMwoHb3B0aW9ucxgCIAEoCzIiLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuUGlwT3B0aW9ucxItCg1zZWNyZXRfbW91bnRzGAMgAygLMhYuZmx5dGVpZGwyLmNvcmUuU2VjcmV0IoABCgxSZXF1aXJlbWVudHMSDAoEZmlsZRgBIAEoCRIzCgdvcHRpb25zGAIgASgLMiIuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QaXBPcHRpb25zEi0KDXNlY3JldF9tb3VudHMYAyADKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQifwoMUHl0aG9uV2hlZWxzEgsKA2RpchgBIAEoCRIzCgdvcHRpb25zGAIgASgLMiIuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QaXBPcHRpb25zEi0KDXNlY3JldF9tb3VudHMYAyADKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQikgEKCVVWUHJvamVjdBIRCglweXByb2plY3QYASABKAkSDgoGdXZsb2NrGAIgASgJEjMKB29wdGlvbnMYAyABKAsyIi5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLlBpcE9wdGlvbnMSLQoNc2VjcmV0X21vdW50cxgEIAMoCzIWLmZseXRlaWRsMi5jb3JlLlNlY3JldCJGCghDb21tYW5kcxILCgNjbWQYAiADKAkSLQoNc2VjcmV0X21vdW50cxgDIAMoCzIWLmZseXRlaWRsMi5jb3JlLlNlY3JldCIaCgdXb3JrRGlyEg8KB3dvcmtkaXIYASABKAkiJgoKQ29weUNvbmZpZxILCgNzcmMYASABKAkSCwoDZHN0GAIgASgJIoABCgNFbnYSRAoNZW52X3ZhcmlhYmxlcxgBIAMoCzItLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuRW52LkVudlZhcmlhYmxlc0VudHJ5GjMKEUVudlZhcmlhYmxlc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEikQQKBUxheWVyEjsKDGFwdF9wYWNrYWdlcxgBIAEoCzIjLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuQXB0UGFja2FnZXNIABI7CgxwaXBfcGFja2FnZXMYAiABKAsyIy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLlBpcFBhY2thZ2VzSAASNAoIY29tbWFuZHMYAyABKAsyIC5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkNvbW1hbmRzSAASPAoMcmVxdWlyZW1lbnRzGAQgASgLMiQuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5SZXF1aXJlbWVudHNIABI9Cg1weXRob25fd2hlZWxzGAUgASgLMiQuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5QeXRob25XaGVlbHNIABIyCgd3b3JrZGlyGAYgASgLMh8uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5Xb3JrRGlySAASOQoLY29weV9jb25maWcYByABKAsyIi5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkNvcHlDb25maWdIABI3Cgp1dl9wcm9qZWN0GAggASgLMiEuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5VVlByb2plY3RIABIqCgNlbnYYCSABKAsyGy5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyLkVudkgAQgcKBWxheWVyIngKCUltYWdlU3BlYxISCgpiYXNlX2ltYWdlGAEgASgJEhYKDnB5dGhvbl92ZXJzaW9uGAIgASgJEi0KBmxheWVycxgDIAMoCzIdLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuTGF5ZXISEAoIcGxhdGZvcm0YBCADKAlC5AEKGmNvbS5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyQg9EZWZpbml0aW9uUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvaW1hZ2VidWlsZGVyogIDRklYqgIWRmx5dGVpZGwyLkltYWdlYnVpbGRlcsoCFkZseXRlaWRsMlxJbWFnZWJ1aWxkZXLiAiJGbHl0ZWlkbDJcSW1hZ2VidWlsZGVyXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpJbWFnZWJ1aWxkZXJiBnByb3RvMw", [file_flyteidl2_core_security, file_buf_validate_validate]);
 
 /**
  * ImageIdentifier is how to identify an image
@@ -70,6 +72,11 @@ export type AptPackages = Message<"flyteidl2.imagebuilder.AptPackages"> & {
    * @generated from field: repeated string packages = 1;
    */
   packages: string[];
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 2;
+   */
+  secretMounts: Secret[];
 };
 
 /**
@@ -140,6 +147,11 @@ export type PipPackages = Message<"flyteidl2.imagebuilder.PipPackages"> & {
    * @generated from field: flyteidl2.imagebuilder.PipOptions options = 2;
    */
   options?: PipOptions;
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 3;
+   */
+  secretMounts: Secret[];
 };
 
 /**
@@ -168,6 +180,11 @@ export type Requirements = Message<"flyteidl2.imagebuilder.Requirements"> & {
    * @generated from field: flyteidl2.imagebuilder.PipOptions options = 2;
    */
   options?: PipOptions;
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 3;
+   */
+  secretMounts: Secret[];
 };
 
 /**
@@ -194,6 +211,11 @@ export type PythonWheels = Message<"flyteidl2.imagebuilder.PythonWheels"> & {
    * @generated from field: flyteidl2.imagebuilder.PipOptions options = 2;
    */
   options?: PipOptions;
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 3;
+   */
+  secretMounts: Secret[];
 };
 
 /**
@@ -226,6 +248,11 @@ export type UVProject = Message<"flyteidl2.imagebuilder.UVProject"> & {
    * @generated from field: flyteidl2.imagebuilder.PipOptions options = 3;
    */
   options?: PipOptions;
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 4;
+   */
+  secretMounts: Secret[];
 };
 
 /**
@@ -247,6 +274,11 @@ export type Commands = Message<"flyteidl2.imagebuilder.Commands"> & {
    * @generated from field: repeated string cmd = 2;
    */
   cmd: string[];
+
+  /**
+   * @generated from field: repeated flyteidl2.core.Secret secret_mounts = 3;
+   */
+  secretMounts: Secret[];
 };
 
 /**
