@@ -5,8 +5,6 @@ managed:
     - file_option: optimize_for
       value: CODE_SIZE
   # Use managed mode: https://buf.build/docs/generate/managed-mode/#managed-mode
-  disable:
-    - module: buf.build/bufbuild/protovalidate
 plugins:
   - remote: buf.build/protocolbuffers/python:v24.1
     out: gen/python
