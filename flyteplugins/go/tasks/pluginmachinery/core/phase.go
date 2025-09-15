@@ -179,7 +179,11 @@ func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
 }
 
 func (p *PhaseInfo) WithReason(reason string) {
-	p.reason = reason
+	if p.reason != "" {
+		p.reason += ", " + reason
+	} else {
+		p.reason = reason
+	}
 }
 
 func (p PhaseInfo) String() string {

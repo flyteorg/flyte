@@ -48,7 +48,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 	startTime := pod.CreationTimestamp.Unix()
 	finishTime := time.Now().Unix()
 
-	enableVscode := flytek8s.IsVscodeEnabled(ctx, &pod.Spec.Containers[index])
+	enableVscode := flytek8s.IsVscodeEnabled(ctx, pod.Spec.Containers[index].Env)
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
 			PodName:              pod.Name,

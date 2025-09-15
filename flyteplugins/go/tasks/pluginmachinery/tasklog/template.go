@@ -214,7 +214,7 @@ func getDynamicLogLinkTypes(input Input) []string {
 	}
 
 	if input.TaskTemplate == nil {
-		return nil
+		return dynamicLogLinkTypes
 	}
 
 	config := input.TaskTemplate.GetConfig()

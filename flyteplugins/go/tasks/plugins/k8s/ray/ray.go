@@ -590,10 +590,18 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	if err != nil {
 		return nil, fmt.Errorf("failed to list node execution pods. Error: %w", err)
 	}
+	var enableVscode bool
+	if rayJob.Spec.RayClusterSpec != nil &&
+		rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers != nil &&
+		len(rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers) > 0 {
+		enableVscode = flytek8s.IsVscodeEnabled(ctx, rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Env)
+	}
 	input := tasklog.Input{
+		PodName:           fmt.Sprintf("%s-head", rayJob.Status.RayClusterName),
 		Namespace:         rayJob.Namespace,
 		TaskExecutionID:   taskExecID,
 		ExtraTemplateVars: []tasklog.TemplateVar{},
+		EnableVscode:      enableVscode,
 	}
 	if rayJob.Status.JobId != "" {
 		input.ExtraTemplateVars = append(
@@ -641,7 +649,7 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	}, nil
 }
 
-func isRayDashboardReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
+func isRayHeadReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
 	err := pluginContext.K8sReader().List(ctx, podList)
 	if err != nil {
@@ -657,7 +665,7 @@ func isRayDashboardReady(ctx context.Context, rayJobName string, pluginContext k
 	}
 
 	// More than one head pod. Should not happen.
-	logger.Debug(ctx, "Cannot determine Ray dashboard readiness: more than one head pod found")
+	logger.Debug(ctx, "Cannot determine Ray head readiness: more than one head pod found")
 	return true, fmt.Errorf("more than one head pod found for Ray job %s", rayJobName)
 }
 
@@ -715,7 +723,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		phaseInfo, err = pluginsCore.PhaseInfoUndefined, fmt.Errorf("unknown job deployment status: %s", rayJob.Status.JobDeploymentStatus)
 	}
 
-	if ready, err := isRayDashboardReady(ctx, rayJob.Name, pluginContext); err != nil {
+	if ready, err := isRayHeadReady(ctx, rayJob.Name, pluginContext); err != nil {
 		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
 	} else {
 		for _, tl := range info.Logs {
@@ -726,7 +734,13 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 				} else {
 					phaseInfo.WithReason("Ray dashboard is ready")
 				}
-				break
+			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+				tl.Ready = ready
+				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+					phaseInfo.WithReason("Vscode server is not ready")
+				} else {
+					phaseInfo.WithReason("Vscode server is ready")
+				}
 			}
 		}
 	}

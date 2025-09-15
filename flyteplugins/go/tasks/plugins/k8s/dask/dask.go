@@ -316,13 +316,29 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	o, err := logPlugin.GetTaskLogs(
-		tasklog.Input{
-			Namespace:       job.ObjectMeta.Namespace,
-			PodName:         job.Status.JobRunnerPodName,
-			TaskExecutionID: taskExecID,
+	schedulerPodName, err := getDaskSchedulerPodName(ctx, job.Name, pluginContext)
+	if err != nil {
+		logger.Debug(ctx, "Failed to get dask scheduler pod name. Error: %v", err)
+	}
+	var enableVscode bool
+	if len(job.Spec.Cluster.Spec.Scheduler.Spec.Containers) > 0 {
+		enableVscode = flytek8s.IsVscodeEnabled(ctx, job.Spec.Cluster.Spec.Scheduler.Spec.Containers[0].Env)
+	}
+	input := tasklog.Input{
+		Namespace:       job.ObjectMeta.Namespace,
+		PodName:         job.Status.JobRunnerPodName,
+		TaskExecutionID: taskExecID,
+		EnableVscode:    enableVscode,
+	}
+	input.ExtraTemplateVars = append(
+		input.ExtraTemplateVars,
+		tasklog.TemplateVar{
+			Regex: tasklog.MustCreateRegex("daskSchedulerName"),
+			Value: schedulerPodName,
 		},
 	)
+
+	o, err := logPlugin.GetTaskLogs(input)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -356,7 +372,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
 	}
 
-	ready, err := isDaskDashboardReady(ctx, job.Name, pluginContext)
+	ready, err := isDaskSchedulerReady(ctx, job.Name, pluginContext)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to determine Dask dashboard readiness. Error: %v", err)
 	} else {
@@ -368,7 +384,13 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 				} else {
 					phaseInfo.WithReason("Dask dashboard is ready")
 				}
-				break
+			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+				tl.Ready = ready
+				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+					phaseInfo.WithReason("Vscode server is not ready")
+				} else {
+					phaseInfo.WithReason("Vscode server is ready")
+				}
 			}
 		}
 	}
@@ -380,14 +402,29 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	return phaseInfo, nil
 }
 
-func isDaskDashboardReady(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (bool, error) {
+func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (string, error) {
+	podList := &v1.PodList{}
+	err := pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return "", fmt.Errorf("failed to list dask execution pods. Error: %w", err)
+	}
+	pods := lo.Filter(podList.Items, func(pod v1.Pod, _ int) bool {
+		return strings.HasPrefix(pod.Name, daskJobName) && strings.Contains(pod.Name, "scheduler") && flytek8s.GetPrimaryContainerName(&pod) == "scheduler"
+	})
+	if len(pods) == 0 {
+		return "", fmt.Errorf("no dask scheduler pod found for dask job [%v]", daskJobName)
+	}
+	return pods[0].Name, nil
+}
+
+func isDaskSchedulerReady(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
 	err := pluginContext.K8sReader().List(ctx, podList)
 	if err != nil {
 		return false, fmt.Errorf("failed to list dask execution pods. Error: %w", err)
 	}
-	pods := lo.Filter(podList.Items, func(pod v1.Pod, _ int) bool {
-		return pod.Status.Phase != v1.PodPending && strings.HasPrefix(pod.Name, daskJobName) && strings.Contains(pod.Name, "scheduler") && flytek8s.GetPrimaryContainerName(&pod) == "scheduler"
+	pods := lo.Filter(podList.Items, func(p v1.Pod, _ int) bool {
+		return strings.HasPrefix(p.Name, daskJobName) && strings.Contains(p.Name, "scheduler")
 	})
 	if len(pods) == 0 {
 		return false, nil
@@ -396,8 +433,8 @@ func isDaskDashboardReady(ctx context.Context, daskJobName string, pluginContext
 	}
 
 	// More than one dask scheduler pod. Should not happen.
-	logger.Debug(ctx, "Cannot determine dask dashboard readiness as more than one dask scheduler pod found")
-	return true, fmt.Errorf("more than one dask scheduler pod found for dask job [%v]", daskJobName)
+	logger.Debug(ctx, "Cannot determine dask scheduler readiness as more than one dask scheduler pod found")
+	return false, fmt.Errorf("more than one dask scheduler pod found for dask job [%v]", daskJobName)
 }
 
 func (daskResourceHandler) GetProperties() k8s.PluginProperties {

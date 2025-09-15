@@ -321,7 +321,7 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 	}, nil
 }
 
-func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
 
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
@@ -339,6 +339,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 				PodName:         sj.Status.DriverInfo.PodName,
 				Namespace:       sj.Namespace,
 				TaskExecutionID: taskExecID,
+				EnableVscode:    flytek8s.IsVscodeEnabled(ctx, sj.Spec.Driver.Env),
 			})
 
 			if err != nil {
@@ -484,7 +485,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 
 	app := resource.(*sparkOp.SparkApplication)
-	info, err := getEventInfoForSpark(pluginContext, app)
+	info, err := getEventInfoForSpark(ctx, pluginContext, app)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -509,6 +510,7 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	}
 
 	for _, tl := range info.Logs {
+		// TODO: Add readiness probe for spark driver pod. Need to upgrade spark-operator client version.
 		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD && strings.Contains(tl.Name, "Spark Driver UI") {
 			if phaseInfo.Phase() != pluginsCore.PhaseRunning {
 				tl.Ready = false
@@ -517,7 +519,13 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 				tl.Ready = true
 				phaseInfo.WithReason("Spark driver UI is ready")
 			}
-			break
+
+		} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			if phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Vscode server is not ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is ready")
+			}
 		}
 	}
 

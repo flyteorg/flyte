@@ -544,20 +544,19 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	return podSpec, objectMeta, nil
 }
 
-func IsVscodeEnabled(ctx context.Context, container *v1.Container) bool {
-	for _, env := range container.Env {
+func IsVscodeEnabled(ctx context.Context, envVar []v1.EnvVar) bool {
+	for _, env := range envVar {
 		if env.Name != FlyteEnableVscode {
 			continue
 		}
 		var err error
 		enableVscode, err := strconv.ParseBool(env.Value)
 		if err != nil {
-			logger.Errorf(ctx, "failed to parse %s env var [%s] for container [%s]", FlyteEnableVscode, env.Value, container.Name)
+			logger.Errorf(ctx, "failed to parse %s env var: [%s]", FlyteEnableVscode, env.Value)
 			return false
 		}
 		return enableVscode
 	}
-
 	return false
 }
 

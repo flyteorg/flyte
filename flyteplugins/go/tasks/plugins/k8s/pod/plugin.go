@@ -125,7 +125,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		if len(podSpec.Containers) > 1 && c.Name != primaryContainerName {
 			continue
 		}
-		if !flytek8s.IsVscodeEnabled(ctx, &podSpec.Containers[i]) {
+		if !flytek8s.IsVscodeEnabled(ctx, podSpec.Containers[i].Env) {
 			break
 		}
 		newContainer := c.DeepCopy()

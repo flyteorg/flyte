@@ -445,7 +445,7 @@ func (p *Plugin) buildTaskInfoWithLogs(ctx context.Context, executionEnvID inter
 		return taskInfo, podContainerNotFoundError
 	}
 
-	enableVscode := flytek8s.IsVscodeEnabled(ctx, &pod.Spec.Containers[containerIndex])
+	enableVscode := flytek8s.IsVscodeEnabled(ctx, pod.Spec.Containers[containerIndex].Env)
 
 	in := tasklog.Input{
 		Namespace:       pod.Namespace,

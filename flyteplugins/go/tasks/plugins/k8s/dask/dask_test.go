@@ -87,6 +87,23 @@ func dummyDaskJob(status daskAPI.JobStatus) *daskAPI.DaskJob {
 			Name:      "dask-job-name",
 			Namespace: defaultNamespace,
 		},
+		Spec: daskAPI.DaskJobSpec{
+			Cluster: daskAPI.DaskCluster{
+				Spec: daskAPI.DaskClusterSpec{
+					Scheduler: daskAPI.SchedulerSpec{
+						Spec: v1.PodSpec{
+							Containers: []v1.Container{
+								{
+									Name:  "scheduler",
+									Image: defaultTestImage,
+									Env:   testEnvVars,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 		Status: daskAPI.DaskJobStatus{
 			ClusterName:      "dask-cluster-name",
 			EndTime:          metav1.Time{Time: time.Now()},

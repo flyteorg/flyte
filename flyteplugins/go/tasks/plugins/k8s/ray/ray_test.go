@@ -928,6 +928,23 @@ func TestGetTaskPhase(t *testing.T) {
 		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
 			startTime := metav1.NewTime(time.Now())
 			rayObject := &rayv1.RayJob{
+				Spec: rayv1.RayJobSpec{
+					RayClusterSpec: &rayv1.RayClusterSpec{
+						HeadGroupSpec: rayv1.HeadGroupSpec{
+							Template: corev1.PodTemplateSpec{
+								Spec: corev1.PodSpec{
+									Containers: []corev1.Container{
+										{
+											Name:  "ray-head",
+											Image: "rayproject/ray:latest",
+											Env:   []corev1.EnvVar{},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 				Status: rayv1.RayJobStatus{
 					JobDeploymentStatus: tc.rayJobPhase,
 					RayClusterName:      "ray-clust",

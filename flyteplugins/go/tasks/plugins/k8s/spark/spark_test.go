@@ -99,7 +99,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
-	info, err := getEventInfoForSpark(pluginContext, dummySparkApplication(sj.RunningState))
+	info, err := getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
 	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
@@ -119,7 +119,7 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.Equal(t, expectedLinks, generatedLinks)
 
-	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.SubmittedState))
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.SubmittedState))
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
 		generatedLinks = append(generatedLinks, l.Uri)
@@ -157,7 +157,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 
-	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.FailedState))
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())

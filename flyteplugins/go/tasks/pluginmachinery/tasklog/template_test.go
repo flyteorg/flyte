@@ -623,6 +623,19 @@ func TestGetDynamicLogLinkTypes(t *testing.T) {
 	})
 	assert.Nil(t, linkTypes)
 
+	// Test that empty input with vscode enabled returns vscode
+	linkTypes = getDynamicLogLinkTypes(Input{
+		EnableVscode: true,
+	})
+	assert.Equal(t, []string{vscode}, linkTypes)
+
+	// Test that nil TaskTemplate returns dynamicLogLinkTypes when vscode enabled
+	linkTypes = getDynamicLogLinkTypes(Input{
+		EnableVscode: true,
+		TaskTemplate: nil,
+	})
+	assert.Equal(t, []string{vscode}, linkTypes)
+
 	linkTypes = getDynamicLogLinkTypes(Input{
 		EnableVscode: true,
 		TaskTemplate: &core.TaskTemplate{
