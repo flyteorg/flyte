@@ -40,12 +40,22 @@ func ExtractTar(ss io.Reader, destination string) error {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.Mkdir(header.Name, 0755); err != nil {
+			targetPath := filepath.Join(destination, header.Name)
+			// Ensure the target path is within the destination directory
+			if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destination)) {
+				return fmt.Errorf("invalid file path: %s", header.Name)
+			}
+			if err := os.Mkdir(targetPath, 0755); err != nil {
 				return err
 			}
 		case tar.TypeReg:
 			fmt.Printf("Creating Flyte configuration file at: %s\n", destination)
-			outFile, err := os.Create(destination)
+			targetPath := filepath.Join(destination, header.Name)
+			// Ensure the target path is within the destination directory
+			if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destination)) {
+				return fmt.Errorf("invalid file path: %s", header.Name)
+			}
+			outFile, err := os.Create(targetPath)
 			if err != nil {
 				return err
 			}
