@@ -70,10 +70,10 @@ message CreateRunRequest {
     option (buf.validate.oneof).required = true;
 
     // The user provided run id.
-    common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+    common.RunIdentifier run_id = 1;
 
     // The project id for this run. Run name will be generated.
-    common.ProjectIdentifier project_id = 6 [(buf.validate.field).required = true];
+    common.ProjectIdentifier project_id = 6;
   }
 
   // The task to run.
@@ -81,10 +81,10 @@ message CreateRunRequest {
     option (buf.validate.oneof).required = true;
 
     // The task id to use.
-    task.TaskIdentifier task_id = 2 [(buf.validate.field).required = true];
+    task.TaskIdentifier task_id = 2;
 
     // The task spec to use.
-    task.TaskSpec task_spec = 3 [(buf.validate.field).required = true];
+    task.TaskSpec task_spec = 3;
   }
 
   // Inputs to use.
@@ -185,9 +185,13 @@ message ListRunsRequest {
     option (buf.validate.oneof).required = true;
 
     // Organization name for filtering runs.
-    string org = 2 [(buf.validate.field).string.min_len = 1];
+    string org = 2 [
+      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+      (buf.validate.field).string.min_len = 1
+    ];
+
     // Project identifier for filtering runs.
-    common.ProjectIdentifier project_id = 4 [(buf.validate.field).required = true];
+    common.ProjectIdentifier project_id = 4;
   }
 }
 
@@ -208,11 +212,11 @@ message WatchRunsRequest {
     // Organization name for filtering runs.
     string org = 2 [(buf.validate.field).string.min_len = 1];
     // Cluster identifier for filtering runs.
-    common.ClusterIdentifier cluster_id = 3 [(buf.validate.field).required = true];
+    common.ClusterIdentifier cluster_id = 3;
     // Project identifier for filtering runs.
-    common.ProjectIdentifier project_id = 4 [(buf.validate.field).required = true];
+    common.ProjectIdentifier project_id = 4;
     // Task identifier for filtering runs.
-    task.TaskIdentifier task_id = 5 [(buf.validate.field).required = true];
+    task.TaskIdentifier task_id = 5;
   }
 }
 

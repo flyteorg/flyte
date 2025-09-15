@@ -49,11 +49,10 @@ message EnqueueActionRequest {
   string subject = 9;
 
   oneof spec {
-    // TODO(haytham): Uncomment when we update all code paths to use this.
-    // option (validate.required) = true;
-    TaskAction task = 10 [(buf.validate.field).required = true];
-    TraceAction trace = 11 [(buf.validate.field).required = true];
-    ConditionAction condition = 12 [(buf.validate.field).required = true];
+    option (buf.validate.oneof).required = true;
+    TaskAction task = 10;
+    TraceAction trace = 11;
+    ConditionAction condition = 12;
   }
 }
 

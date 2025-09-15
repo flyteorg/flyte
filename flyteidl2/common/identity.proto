@@ -51,8 +51,8 @@ message AppSpec {
 message EnrichedIdentity {
   oneof principal {
     option (buf.validate.oneof).required = true;
-    User user = 1 [(buf.validate.field).required = true];
-    Application application = 2 [(buf.validate.field).required = true];
+    User user = 1;
+    Application application = 2;
   }
 }
 

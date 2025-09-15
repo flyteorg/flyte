@@ -117,13 +117,13 @@ message ActionMetadata {
 
   oneof spec {
     // Task action.
-    TaskActionMetadata task = 7 [(buf.validate.field).required = true];
+    TaskActionMetadata task = 7;
 
     // Trace action.
-    TraceActionMetadata trace = 8 [(buf.validate.field).required = true];
+    TraceActionMetadata trace = 8;
 
     // Condition action.
-    ConditionActionMetadata condition = 9 [(buf.validate.field).required = true];
+    ConditionActionMetadata condition = 9;
   }
 
   // Action type.
