@@ -1,7 +1,5 @@
 # Flyte 1.16.0
 
-# Flyte 1.16.0 Release Highlights
-
 ## Added
 
 - Agent/Connector Functionality: Renamed agent to connector ([#6400](https://github.com/flyteorg/flyte/pull/6400)) with improved task retry support in Flyte Connectors ([#6486](https://github.com/flyteorg/flyte/pull/6486))
