@@ -62,8 +62,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bufbuild-protovalidate-protocolbuffers-pyi", specifier = "==32.1.0.1.20240401165935+b983156c5e99" },
-    { name = "bufbuild-protovalidate-protocolbuffers-python", specifier = "==32.0.0.1.20250912141014+52f32327d4b0" },
+    { name = "bufbuild-protovalidate-protocolbuffers-pyi", specifier = "==32.1.0.1.20240401165935+b983156c5e99", index = "https://buf.build/gen/python" },
+    { name = "bufbuild-protovalidate-protocolbuffers-python", specifier = "==32.0.0.1.20250912141014+52f32327d4b0", index = "https://buf.build/gen/python" },
     { name = "googleapis-common-protos" },
     { name = "protobuf", specifier = ">=4.21.1" },
     { name = "protoc-gen-openapiv2" },
