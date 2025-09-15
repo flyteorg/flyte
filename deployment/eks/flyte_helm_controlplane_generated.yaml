@@ -113,7 +113,8 @@ data:
       name: production
   otel.yaml: | 
     otel:
-      file: /tmp/trace.txt
+      file:
+        filename: /tmp/trace.txt
       jaeger:
         endpoint: http://localhost:14268/api/traces
       otlpgrpc:
@@ -360,7 +361,8 @@ data:
       username: flyteadmin
   otel.yaml: | 
     otel:
-      file: /tmp/trace.txt
+      file:
+        filename: /tmp/trace.txt
       jaeger:
         endpoint: http://localhost:14268/api/traces
       otlpgrpc:
@@ -581,7 +583,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c26f85c2c14e2d92b7ffe4c931918a375a459870b142caad4f9b97947e467ad"
+        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -903,7 +905,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "43fd7fbb0370b3be922e40062b2903cb185d2436b4507c4e357a7c18dee71a1"
+        configChecksum: "1150f42645741b09ff07a85129828e62314df0b4dea984225c9b728a88bf1e2"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1007,7 +1009,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c26f85c2c14e2d92b7ffe4c931918a375a459870b142caad4f9b97947e467ad"
+        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
