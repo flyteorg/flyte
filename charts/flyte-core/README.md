@@ -149,6 +149,17 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.annotations | object | `{}` | Annotations for Datacatalog deployment |
+| datacatalog.autoscaling.enabled | bool | `false` |  |
+| datacatalog.autoscaling.maxReplicas | int | `10` |  |
+| datacatalog.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| datacatalog.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| datacatalog.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| datacatalog.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| datacatalog.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| datacatalog.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| datacatalog.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| datacatalog.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| datacatalog.autoscaling.minReplicas | int | `1` |  |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.enabled | bool | `true` |  |
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
