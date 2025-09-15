@@ -377,7 +377,7 @@ message OutputReferences {
 
 // Input payload for an action.
 message Inputs {
-  // Ordered inputs.
+  // Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
   repeated NamedLiteral literals = 1;
 
   // Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
@@ -391,6 +391,6 @@ message Inputs {
 
 // Output payload for an action.
 message Outputs {
-  // Ordered outputs.
+  // Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
   repeated NamedLiteral literals = 1;
 }

@@ -332,6 +332,7 @@ type TaskSpec struct {
 	// Client should not send required=true flag in underlying flyteidl2.core.Parameter.
 	DefaultInputs []*NamedParameter `protobuf:"bytes,2,rep,name=default_inputs,json=defaultInputs,proto3" json:"default_inputs,omitempty"`
 	// User facing display name for this task. Not required to be unique.
+	// This is passed in via the SDK when the task is created and is either a user defined override or the name of the task.
 	ShortName string `protobuf:"bytes,3,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
 	// Optional environment for this task. Note, some tasks may not be run in the context of an environment.
 	Environment *Environment `protobuf:"bytes,4,opt,name=environment,proto3" json:"environment,omitempty"`

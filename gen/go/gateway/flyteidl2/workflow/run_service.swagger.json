@@ -2155,7 +2155,7 @@
         },
         "short_name": {
           "type": "string",
-          "description": "User facing display name for this task. Not required to be unique."
+          "description": "User facing display name for this task. Not required to be unique.\nThis is passed in via the SDK when the task is created and is either a user defined override or the name of the task."
         },
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
@@ -2530,7 +2530,7 @@
             "type": "object",
             "$ref": "#/definitions/workflowNamedLiteral"
           },
-          "description": "Ordered inputs."
+          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
         },
         "context": {
           "type": "array",
@@ -2629,7 +2629,7 @@
             "type": "object",
             "$ref": "#/definitions/workflowNamedLiteral"
           },
-          "description": "Ordered outputs."
+          "description": "Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
         }
       },
       "description": "Output payload for an action."

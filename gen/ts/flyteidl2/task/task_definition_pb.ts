@@ -211,6 +211,7 @@ export type TaskSpec = Message<"flyteidl2.task.TaskSpec"> & {
 
   /**
    * User facing display name for this task. Not required to be unique.
+   * This is passed in via the SDK when the task is created and is either a user defined override or the name of the task.
    *
    * @generated from field: string short_name = 3;
    */

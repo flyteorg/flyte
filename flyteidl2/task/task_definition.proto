@@ -108,6 +108,7 @@ message TaskSpec {
   repeated NamedParameter default_inputs = 2;
 
   // User facing display name for this task. Not required to be unique.
+  // This is passed in via the SDK when the task is created and is either a user defined override or the name of the task.
   string short_name = 3 [(buf.validate.field).string.max_len = 63];
 
   // Optional environment for this task. Note, some tasks may not be run in the context of an environment.

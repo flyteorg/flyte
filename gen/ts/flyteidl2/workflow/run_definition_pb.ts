@@ -996,7 +996,7 @@ export const OutputReferencesSchema: GenMessage<OutputReferences> = /*@__PURE__*
  */
 export type Inputs = Message<"flyteidl2.workflow.Inputs"> & {
   /**
-   * Ordered inputs.
+   * Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
    *
    * @generated from field: repeated flyteidl2.workflow.NamedLiteral literals = 1;
    */
@@ -1029,7 +1029,7 @@ export const InputsSchema: GenMessage<Inputs> = /*@__PURE__*/
  */
 export type Outputs = Message<"flyteidl2.workflow.Outputs"> & {
   /**
-   * Ordered outputs.
+   * Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
    *
    * @generated from field: repeated flyteidl2.workflow.NamedLiteral literals = 1;
    */

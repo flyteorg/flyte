@@ -2034,7 +2034,7 @@
         },
         "short_name": {
           "type": "string",
-          "description": "User facing display name for this task. Not required to be unique."
+          "description": "User facing display name for this task. Not required to be unique.\nThis is passed in via the SDK when the task is created and is either a user defined override or the name of the task."
         },
         "environment": {
           "$ref": "#/definitions/taskEnvironment",

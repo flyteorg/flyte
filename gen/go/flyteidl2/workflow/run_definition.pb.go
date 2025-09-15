@@ -1985,7 +1985,7 @@ type Inputs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Ordered inputs.
+	// Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
 	Literals []*NamedLiteral `protobuf:"bytes,1,rep,name=literals,proto3" json:"literals,omitempty"`
 	// Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
 	// Context will not be used for cache key computation.
@@ -2048,7 +2048,7 @@ type Outputs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Ordered outputs.
+	// Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
 	Literals []*NamedLiteral `protobuf:"bytes,1,rep,name=literals,proto3" json:"literals,omitempty"`
 }
 
