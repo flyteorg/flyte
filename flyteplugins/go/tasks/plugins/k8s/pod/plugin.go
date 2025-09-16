@@ -212,15 +212,17 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	for _, tl := range info.Logs {
-		if tl != nil && tl.LinkType == core.TaskLog_IDE {
-			tl.Ready = IsPodReady(pod)
-			if tl.Ready {
-				phaseInfo.WithReason("Vscode server is ready")
-			} else {
-				phaseInfo.WithReason("Vscode server is not ready")
+	if phaseInfo.Phase() >= pluginsCore.PhaseRunning {
+		for _, tl := range info.Logs {
+			if tl != nil && tl.LinkType == core.TaskLog_IDE {
+				tl.Ready = IsPodReady(pod)
+				if tl.Ready {
+					phaseInfo.WithReason("Vscode server is ready")
+				} else {
+					phaseInfo.WithReason("Vscode server is not ready")
+				}
+				break
 			}
-			break
 		}
 	}
 

@@ -174,7 +174,7 @@ func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 // Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
 
 func MaybeUpdatePhaseVersion(phaseInfo *pluginsCore.PhaseInfo, pluginState *PluginState) {
-	if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+	if phaseInfo.Phase() == pluginState.Phase &&
 		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
 
 		*phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
