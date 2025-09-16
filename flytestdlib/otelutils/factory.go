@@ -101,10 +101,15 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
 
+	schemaURL := config.SchemaURL
+	if len(schemaURL) == 0 {
+		schemaURL = semconv.SchemaURL
+	}
+
 	telemetryResource, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
-			semconv.SchemaURL,
+			schemaURL,
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.ServiceVersionKey.String(version.Version),
 		),
