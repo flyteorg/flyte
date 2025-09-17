@@ -37,18 +37,6 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 func (t *Handler) IsCacheable(ctx context.Context, nCtx interfaces.NodeExecutionContext) (bool, bool, error) {
 	// check if plugin has caching disabled
 	ttype := nCtx.TaskReader().GetTaskType()
-	ctx = contextutils.WithTaskType(ctx, ttype)
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
-	if err != nil {
-		return false, false, errors2.Wrapf(errors2.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
-	}
-
-	checkCatalog := !p.GetProperties().DisableNodeLevelCaching
-	if !checkCatalog {
-		logger.Infof(ctx, "Node level caching is disabled. Skipping catalog read.")
-		return false, false, nil
-	}
-
 	// read task template
 	taskTemplatePath, err := ioutils.GetTaskTemplatePath(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetDataDir())
 	if err != nil {
@@ -60,6 +48,18 @@ func (t *Handler) IsCacheable(ctx context.Context, nCtx interfaces.NodeExecution
 	if err != nil {
 		logger.Errorf(ctx, "failed to read TaskTemplate, error :%s", err.Error())
 		return false, false, err
+	}
+	tVersion := taskTemplate.GetTaskTypeVersion()
+	ctx = contextutils.WithTaskType(ctx, ttype)
+	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig(), tVersion)
+	if err != nil {
+		return false, false, errors2.Wrapf(errors2.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
+	}
+
+	checkCatalog := !p.GetProperties().DisableNodeLevelCaching
+	if !checkCatalog {
+		logger.Infof(ctx, "Node level caching is disabled. Skipping catalog read.")
+		return false, false, nil
 	}
 
 	return taskTemplate.GetMetadata().GetDiscoverable(), taskTemplate.GetMetadata().GetDiscoverable() && taskTemplate.GetMetadata().GetCacheSerializable(), nil
