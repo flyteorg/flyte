@@ -586,6 +586,24 @@ flyteconsole:
       memory: 50Mi
   # Strategy for Flyteconsole deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
   # -- Service settings for Flyteconsole
   service:
     appProtocols:
