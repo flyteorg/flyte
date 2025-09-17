@@ -20,8 +20,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-const maxPrimitiveSize = 1024
-
 type Unmarshal func(r io.Reader, msg proto.Message) error
 type Uploader struct {
 	format core.DataLoadingConfig_LiteralMapFormat
@@ -45,9 +43,6 @@ func (u Uploader) handleSimpleType(_ context.Context, t core.SimpleType, filePat
 	}
 	if info.IsDir() {
 		return nil, fmt.Errorf("expected file for type [%s], found dir at path [%s]", t.String(), filePath)
-	}
-	if info.Size() > maxPrimitiveSize {
-		return nil, fmt.Errorf("maximum allowed filesize is [%d], but found [%d]", maxPrimitiveSize, info.Size())
 	}
 	b, err := ioutil.ReadFile(fpath)
 	if err != nil {
