@@ -40,7 +40,7 @@ type branchNodeStateHolder struct {
 func (t *branchNodeStateHolder) ClearNodeStatus() {
 }
 
-func (t *branchNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
+func (t *branchNodeStateHolder) PutTaskNodeState(handler.TaskNodeState) error {
 	panic("not implemented")
 }
 
@@ -49,19 +49,19 @@ func (t *branchNodeStateHolder) PutBranchNode(s handler.BranchNodeState) error {
 	return nil
 }
 
-func (t branchNodeStateHolder) PutWorkflowNodeState(s handler.WorkflowNodeState) error {
+func (t branchNodeStateHolder) PutWorkflowNodeState(handler.WorkflowNodeState) error {
 	panic("not implemented")
 }
 
-func (t branchNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) error {
+func (t branchNodeStateHolder) PutDynamicNodeState(handler.DynamicNodeState) error {
 	panic("not implemented")
 }
 
-func (t branchNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+func (t branchNodeStateHolder) PutGateNodeState(handler.GateNodeState) error {
 	panic("not implemented")
 }
 
-func (t branchNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
+func (t branchNodeStateHolder) PutArrayNodeState(handler.ArrayNodeState) error {
 	panic("not implemented")
 }
 
@@ -110,8 +110,8 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 	})
 
 	ns := &mocks2.ExecutableNodeStatus{}
-	ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-	ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+	ns.EXPECT().GetDataDir().Return("data-dir")
+	ns.EXPECT().GetOutputDir().Return("output-dir")
 	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 
 	ir := &mocks3.InputReader{}
@@ -231,7 +231,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/child/0")).Once()
 			mockNodeLookup.EXPECT().GetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
 			if test.childPhase == v1alpha1.NodePhaseSucceeded && test.hasOutputs {
-				_ = nCtx.DataStore().WriteRaw(ctx, storage.DataReference("/output-dir/child/0/outputs.pb"), 0, storage.Options{}, bytes.NewReader([]byte{}))
+				_ = nCtx.DataStore().WriteRaw(ctx, "/output-dir/child/0/outputs.pb", 0, storage.Options{}, bytes.NewReader([]byte{}))
 			}
 
 			branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope()).(*branchHandler)

@@ -34,9 +34,9 @@ func TestBranchNodeSpecMethods(t *testing.T) {
 		Message: "Test error",
 	}
 
-	ifNode := NodeID("ifNode")
-	elifNode := NodeID("elifNode")
-	elseNode := NodeID("elseNode")
+	ifNode := "ifNode"
+	elifNode := "elifNode"
+	elseNode := "elseNode"
 
 	// Creating a BranchNodeSpec instance for testing
 	branchNodeSpec := BranchNodeSpec{

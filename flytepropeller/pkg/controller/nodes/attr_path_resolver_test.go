@@ -1844,7 +1844,7 @@ func TestConvertInterfaceToLiteralScalarBigUint64(t *testing.T) {
 			hasError: false,
 		},
 		{
-			value: float64(3.141592653589793),
+			value: 3.141592653589793,
 			expectedType: &core.Scalar_Primitive{
 				Primitive: &core.Primitive{
 					Value: &core.Primitive_FloatValue{FloatValue: 3.141592653589793},

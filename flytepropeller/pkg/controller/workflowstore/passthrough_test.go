@@ -30,7 +30,7 @@ type mockWFLister struct {
 	V listers.FlyteWorkflowNamespaceLister
 }
 
-func (m *mockWFLister) FlyteWorkflows(namespace string) listers.FlyteWorkflowNamespaceLister {
+func (m *mockWFLister) FlyteWorkflows(string) listers.FlyteWorkflowNamespaceLister {
 	return m.V
 }
 

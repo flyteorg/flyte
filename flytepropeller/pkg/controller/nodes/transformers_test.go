@@ -14,7 +14,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func TestToNodeExecutionEvent(t *testing.T) {
@@ -34,7 +33,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			},
 		}})
 		status := mocks.ExecutableNodeStatus{}
-		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetOutputDir().Return("s3://foo/bar")
 		status.EXPECT().GetParentNodeID().Return(nil)
 		parentInfo := mocks2.ImmutableParentInfo{}
 		parentInfo.EXPECT().CurrentAttempt().Return(0)
@@ -66,7 +65,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			TaskNodeMetadata: &event.TaskNodeMetadata{},
 		}})
 		status := mocks.ExecutableNodeStatus{}
-		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetOutputDir().Return("s3://foo/bar")
 		status.EXPECT().GetParentNodeID().Return(nil)
 		parentInfo := mocks2.ImmutableParentInfo{}
 		parentInfo.EXPECT().CurrentAttempt().Return(0)
@@ -104,7 +103,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		}
 		info := handler.PhaseInfoQueued("z", inputs)
 		status := mocks.ExecutableNodeStatus{}
-		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetOutputDir().Return("s3://foo/bar")
 		status.EXPECT().GetParentNodeID().Return(nil)
 		node := mocks.ExecutableNode{}
 		node.EXPECT().GetID().Return("n")
