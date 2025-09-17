@@ -2,10 +2,10 @@ package k8s
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	flyteErr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -130,7 +130,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	if err != nil {
 		return currentState, externalResources, err
 	} else if taskTemplate == nil {
-		return currentState, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+		return currentState, externalResources, flyteErr.Errorf(flyteErr.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
 	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.GetTaskTypeVersion())
@@ -353,7 +353,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	if err != nil {
 		return currentState, externalResources, err
 	} else if taskTemplate == nil {
-		return currentState, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+		return currentState, externalResources, flyteErr.Errorf(flyteErr.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
 	messageCollector := errorcollector.NewErrorMessageCollector()
@@ -390,7 +390,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	}
 
 	if messageCollector.Length() > 0 {
-		return currentState, externalResources, fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength)) //nolint
+		return currentState, externalResources, errors.New(messageCollector.Summary(config.MaxErrorStringLength))
 	}
 
 	return currentState.SetPhase(arrayCore.PhaseWriteToDiscoveryThenFail, currentState.PhaseVersion+1), externalResources, nil
