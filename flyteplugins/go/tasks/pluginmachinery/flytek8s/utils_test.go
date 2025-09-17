@@ -27,6 +27,29 @@ func TestToK8sEnvVar(t *testing.T) {
 	assert.Empty(t, e)
 }
 
+func TestToK8sDoesntFillIn(t *testing.T) {
+	{
+		// This shouldn't fill in resources that are not specified.
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{})
+
+		assert.NoError(t, err)
+		_, ok := r[v1.ResourceCPU]
+		assert.False(t, ok)
+	}
+
+	{
+		// And also shouldn't fill in resources that are zero.
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
+			{Name: core.Resources_CPU, Value: "0"},
+			{Name: core.Resources_MEMORY, Value: "1024Mi"},
+		})
+
+		assert.NoError(t, err)
+		_, ok := r[v1.ResourceCPU]
+		assert.False(t, ok)
+	}
+}
+
 func TestToK8sResourceList(t *testing.T) {
 	{
 		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
