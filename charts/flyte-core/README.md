@@ -262,6 +262,17 @@ helm install gateway bitnami/contour -n flyte
 | flyteconnector.podLabels | object | `{}` | Labels for flyteconnector pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.annotations | object | `{}` | Annotations for Flyteconsole deployment |
+| flyteconsole.autoscaling.enabled | bool | `false` |  |
+| flyteconsole.autoscaling.maxReplicas | int | `10` |  |
+| flyteconsole.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| flyteconsole.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| flyteconsole.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| flyteconsole.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| flyteconsole.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| flyteconsole.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| flyteconsole.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| flyteconsole.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| flyteconsole.autoscaling.minReplicas | int | `1` |  |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
 | flyteconsole.ga.tracking_id | string | `"G-0QW4DJWJ20"` |  |
