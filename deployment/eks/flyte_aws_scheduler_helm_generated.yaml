@@ -132,7 +132,8 @@ data:
       name: production
   otel.yaml: | 
     otel:
-      file: /tmp/trace.txt
+      file:
+        filename: /tmp/trace.txt
       jaeger:
         endpoint: http://localhost:14268/api/traces
       otlpgrpc:
@@ -394,7 +395,8 @@ data:
       username: flyteadmin
   otel.yaml: | 
     otel:
-      file: /tmp/trace.txt
+      file:
+        filename: /tmp/trace.txt
       jaeger:
         endpoint: http://localhost:14268/api/traces
       otlpgrpc:
@@ -533,7 +535,8 @@ data:
         default-memory: 100Mi
   otel.yaml: | 
     otel:
-      file: /tmp/trace.txt
+      file:
+        filename: /tmp/trace.txt
       jaeger:
         endpoint: http://localhost:14268/api/traces
       otlpgrpc:
@@ -883,7 +886,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1a3b03ce2201b7f44bd9e8d17d00e1ef9d227362fc9b4e45f3d08b56f7e1530"
+        configChecksum: "6fd4bb5460f260b492db7ddd34b6011581292e88b28c2e4514b7da75673cd4d"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1205,7 +1208,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "43fd7fbb0370b3be922e40062b2903cb185d2436b4507c4e357a7c18dee71a1"
+        configChecksum: "1150f42645741b09ff07a85129828e62314df0b4dea984225c9b728a88bf1e2"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1309,7 +1312,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "36a92fbbe19cb32e78a045f395c5c42a222d74491aecac870cf277fa9353acd"
+        configChecksum: "1cea68e6ccfdf4838847710d41b88bee0b9b3e15bb827d1be4332cfca17885c"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1395,7 +1398,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.0
       annotations:
-        configChecksum: "36a92fbbe19cb32e78a045f395c5c42a222d74491aecac870cf277fa9353acd"
+        configChecksum: "1cea68e6ccfdf4838847710d41b88bee0b9b3e15bb827d1be4332cfca17885c"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

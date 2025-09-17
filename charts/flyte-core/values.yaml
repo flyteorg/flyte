@@ -906,7 +906,8 @@ configmap:
       # -- The type of exporter to use
       type: noop
       # -- Configuration for the file exporter type
-      file: "/tmp/trace.txt"
+      file:
+        filename: "/tmp/trace.txt"
       # -- Configuration for the jaeger exporter type
       jaeger:
         endpoint: "http://localhost:14268/api/traces"
