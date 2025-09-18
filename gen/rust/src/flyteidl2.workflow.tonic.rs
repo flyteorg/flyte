@@ -2533,11 +2533,11 @@ pub mod translator_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn literals_to_json(
+        pub async fn literals_to_launch_form_json(
             &mut self,
-            request: impl tonic::IntoRequest<super::LiteralsToJsonRequest>,
+            request: impl tonic::IntoRequest<super::LiteralsToLaunchFormJsonRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::LiteralsToJsonResponse>,
+            tonic::Response<super::LiteralsToLaunchFormJsonResponse>,
             tonic::Status,
         > {
             self.inner
@@ -2551,23 +2551,23 @@ pub mod translator_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TranslatorService/LiteralsToJson",
+                "/flyteidl2.workflow.TranslatorService/LiteralsToLaunchFormJson",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl2.workflow.TranslatorService",
-                        "LiteralsToJson",
+                        "LiteralsToLaunchFormJson",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn json_to_literals(
+        pub async fn launch_form_json_to_literals(
             &mut self,
-            request: impl tonic::IntoRequest<super::JsonToLiteralsRequest>,
+            request: impl tonic::IntoRequest<super::LaunchFormJsonToLiteralsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::JsonToLiteralsResponse>,
+            tonic::Response<super::LaunchFormJsonToLiteralsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -2581,14 +2581,44 @@ pub mod translator_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TranslatorService/JsonToLiterals",
+                "/flyteidl2.workflow.TranslatorService/LaunchFormJsonToLiterals",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl2.workflow.TranslatorService",
-                        "JsonToLiterals",
+                        "LaunchFormJsonToLiterals",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn task_spec_to_launch_form_json(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TaskSpecToLaunchFormJsonRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TaskSpecToLaunchFormJsonResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.TranslatorService",
+                        "TaskSpecToLaunchFormJson",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -2602,18 +2632,25 @@ pub mod translator_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with TranslatorServiceServer.
     #[async_trait]
     pub trait TranslatorService: Send + Sync + 'static {
-        async fn literals_to_json(
+        async fn literals_to_launch_form_json(
             &self,
-            request: tonic::Request<super::LiteralsToJsonRequest>,
+            request: tonic::Request<super::LiteralsToLaunchFormJsonRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::LiteralsToJsonResponse>,
+            tonic::Response<super::LiteralsToLaunchFormJsonResponse>,
             tonic::Status,
         >;
-        async fn json_to_literals(
+        async fn launch_form_json_to_literals(
             &self,
-            request: tonic::Request<super::JsonToLiteralsRequest>,
+            request: tonic::Request<super::LaunchFormJsonToLiteralsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::JsonToLiteralsResponse>,
+            tonic::Response<super::LaunchFormJsonToLiteralsResponse>,
+            tonic::Status,
+        >;
+        async fn task_spec_to_launch_form_json(
+            &self,
+            request: tonic::Request<super::TaskSpecToLaunchFormJsonRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::TaskSpecToLaunchFormJsonResponse>,
             tonic::Status,
         >;
     }
@@ -2693,25 +2730,30 @@ pub mod translator_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.TranslatorService/LiteralsToJson" => {
+                "/flyteidl2.workflow.TranslatorService/LiteralsToLaunchFormJson" => {
                     #[allow(non_camel_case_types)]
-                    struct LiteralsToJsonSvc<T: TranslatorService>(pub Arc<T>);
+                    struct LiteralsToLaunchFormJsonSvc<T: TranslatorService>(pub Arc<T>);
                     impl<
                         T: TranslatorService,
-                    > tonic::server::UnaryService<super::LiteralsToJsonRequest>
-                    for LiteralsToJsonSvc<T> {
-                        type Response = super::LiteralsToJsonResponse;
+                    > tonic::server::UnaryService<super::LiteralsToLaunchFormJsonRequest>
+                    for LiteralsToLaunchFormJsonSvc<T> {
+                        type Response = super::LiteralsToLaunchFormJsonResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::LiteralsToJsonRequest>,
+                            request: tonic::Request<
+                                super::LiteralsToLaunchFormJsonRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TranslatorService>::literals_to_json(&inner, request)
+                                <T as TranslatorService>::literals_to_launch_form_json(
+                                        &inner,
+                                        request,
+                                    )
                                     .await
                             };
                             Box::pin(fut)
@@ -2723,7 +2765,7 @@ pub mod translator_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = LiteralsToJsonSvc(inner);
+                        let method = LiteralsToLaunchFormJsonSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -2739,25 +2781,30 @@ pub mod translator_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TranslatorService/JsonToLiterals" => {
+                "/flyteidl2.workflow.TranslatorService/LaunchFormJsonToLiterals" => {
                     #[allow(non_camel_case_types)]
-                    struct JsonToLiteralsSvc<T: TranslatorService>(pub Arc<T>);
+                    struct LaunchFormJsonToLiteralsSvc<T: TranslatorService>(pub Arc<T>);
                     impl<
                         T: TranslatorService,
-                    > tonic::server::UnaryService<super::JsonToLiteralsRequest>
-                    for JsonToLiteralsSvc<T> {
-                        type Response = super::JsonToLiteralsResponse;
+                    > tonic::server::UnaryService<super::LaunchFormJsonToLiteralsRequest>
+                    for LaunchFormJsonToLiteralsSvc<T> {
+                        type Response = super::LaunchFormJsonToLiteralsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::JsonToLiteralsRequest>,
+                            request: tonic::Request<
+                                super::LaunchFormJsonToLiteralsRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TranslatorService>::json_to_literals(&inner, request)
+                                <T as TranslatorService>::launch_form_json_to_literals(
+                                        &inner,
+                                        request,
+                                    )
                                     .await
                             };
                             Box::pin(fut)
@@ -2769,7 +2816,58 @@ pub mod translator_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = JsonToLiteralsSvc(inner);
+                        let method = LaunchFormJsonToLiteralsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson" => {
+                    #[allow(non_camel_case_types)]
+                    struct TaskSpecToLaunchFormJsonSvc<T: TranslatorService>(pub Arc<T>);
+                    impl<
+                        T: TranslatorService,
+                    > tonic::server::UnaryService<super::TaskSpecToLaunchFormJsonRequest>
+                    for TaskSpecToLaunchFormJsonSvc<T> {
+                        type Response = super::TaskSpecToLaunchFormJsonResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::TaskSpecToLaunchFormJsonRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as TranslatorService>::task_spec_to_launch_form_json(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = TaskSpecToLaunchFormJsonSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -15,15 +15,20 @@ class TranslatorServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.LiteralsToJson = channel.unary_unary(
-                '/flyteidl2.workflow.TranslatorService/LiteralsToJson',
-                request_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonResponse.FromString,
+        self.LiteralsToLaunchFormJson = channel.unary_unary(
+                '/flyteidl2.workflow.TranslatorService/LiteralsToLaunchFormJson',
+                request_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonResponse.FromString,
                 )
-        self.JsonToLiterals = channel.unary_unary(
-                '/flyteidl2.workflow.TranslatorService/JsonToLiterals',
-                request_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsResponse.FromString,
+        self.LaunchFormJsonToLiterals = channel.unary_unary(
+                '/flyteidl2.workflow.TranslatorService/LaunchFormJsonToLiterals',
+                request_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsResponse.FromString,
+                )
+        self.TaskSpecToLaunchFormJson = channel.unary_unary(
+                '/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson',
+                request_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonResponse.FromString,
                 )
 
 
@@ -31,13 +36,19 @@ class TranslatorServiceServicer(object):
     """TranslatorService provides an interface for all diferent types of translations for the platform.
     """
 
-    def LiteralsToJson(self, request, context):
+    def LiteralsToLaunchFormJson(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def JsonToLiterals(self, request, context):
+    def LaunchFormJsonToLiterals(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def TaskSpecToLaunchFormJson(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -46,15 +57,20 @@ class TranslatorServiceServicer(object):
 
 def add_TranslatorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'LiteralsToJson': grpc.unary_unary_rpc_method_handler(
-                    servicer.LiteralsToJson,
-                    request_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonResponse.SerializeToString,
+            'LiteralsToLaunchFormJson': grpc.unary_unary_rpc_method_handler(
+                    servicer.LiteralsToLaunchFormJson,
+                    request_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonResponse.SerializeToString,
             ),
-            'JsonToLiterals': grpc.unary_unary_rpc_method_handler(
-                    servicer.JsonToLiterals,
-                    request_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsResponse.SerializeToString,
+            'LaunchFormJsonToLiterals': grpc.unary_unary_rpc_method_handler(
+                    servicer.LaunchFormJsonToLiterals,
+                    request_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsResponse.SerializeToString,
+            ),
+            'TaskSpecToLaunchFormJson': grpc.unary_unary_rpc_method_handler(
+                    servicer.TaskSpecToLaunchFormJson,
+                    request_deserializer=flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -68,7 +84,7 @@ class TranslatorService(object):
     """
 
     @staticmethod
-    def LiteralsToJson(request,
+    def LiteralsToLaunchFormJson(request,
             target,
             options=(),
             channel_credentials=None,
@@ -78,14 +94,14 @@ class TranslatorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TranslatorService/LiteralsToJson',
-            flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TranslatorService/LiteralsToLaunchFormJson',
+            flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_translator__service__pb2.LiteralsToLaunchFormJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def JsonToLiterals(request,
+    def LaunchFormJsonToLiterals(request,
             target,
             options=(),
             channel_credentials=None,
@@ -95,8 +111,25 @@ class TranslatorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TranslatorService/JsonToLiterals',
-            flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_translator__service__pb2.JsonToLiteralsResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TranslatorService/LaunchFormJsonToLiterals',
+            flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_translator__service__pb2.LaunchFormJsonToLiteralsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def TaskSpecToLaunchFormJson(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson',
+            flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_translator__service__pb2.TaskSpecToLaunchFormJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

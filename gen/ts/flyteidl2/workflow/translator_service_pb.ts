@@ -9,18 +9,20 @@ import type { VariableMap } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
 import type { NamedLiteral } from "./run_definition_pb.ts";
 import { file_flyteidl2_workflow_run_definition } from "./run_definition_pb.ts";
+import type { TaskSpec } from "../task/task_definition_pb.ts";
+import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
 import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/workflow/translator_service.proto.
  */
 export const file_flyteidl2_workflow_translator_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3ciewoVTGl0ZXJhbHNUb0pzb25SZXF1ZXN0EjIKCGxpdGVyYWxzGAEgAygLMiAuZmx5dGVpZGwyLndvcmtmbG93Lk5hbWVkTGl0ZXJhbBIuCgl2YXJpYWJsZXMYAiABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcCI/ChZMaXRlcmFsc1RvSnNvblJlc3BvbnNlEiUKBGpzb24YASADKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ij4KFUpzb25Ub0xpdGVyYWxzUmVxdWVzdBIlCgRqc29uGAEgAygLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJMChZKc29uVG9MaXRlcmFsc1Jlc3BvbnNlEjIKCGxpdGVyYWxzGAEgAygLMiAuZmx5dGVpZGwyLndvcmtmbG93Lk5hbWVkTGl0ZXJhbDLvAQoRVHJhbnNsYXRvclNlcnZpY2USbAoOTGl0ZXJhbHNUb0pzb24SKS5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0pzb25SZXF1ZXN0GiouZmx5dGVpZGwyLndvcmtmbG93LkxpdGVyYWxzVG9Kc29uUmVzcG9uc2UiA5ACARJsCg5Kc29uVG9MaXRlcmFscxIpLmZseXRlaWRsMi53b3JrZmxvdy5Kc29uVG9MaXRlcmFsc1JlcXVlc3QaKi5mbHl0ZWlkbDIud29ya2Zsb3cuSnNvblRvTGl0ZXJhbHNSZXNwb25zZSIDkAIBQtMBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhZUcmFuc2xhdG9yU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_google_protobuf_struct, file_flyteidl2_core_interface, file_flyteidl2_workflow_run_definition]);
+  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cihQEKH0xpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSMgoIbGl0ZXJhbHMYASADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuTmFtZWRMaXRlcmFsEi4KCXZhcmlhYmxlcxgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLlZhcmlhYmxlTWFwIkkKIExpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlc3BvbnNlEiUKBGpzb24YASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0IkgKH0xhdW5jaEZvcm1Kc29uVG9MaXRlcmFsc1JlcXVlc3QSJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiVgogTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVzcG9uc2USMgoIbGl0ZXJhbHMYASADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuTmFtZWRMaXRlcmFsIk4KH1Rhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSKwoJdGFza19zcGVjGAEgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWMiSQogVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2USJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QyugMKEVRyYW5zbGF0b3JTZXJ2aWNlEooBChhMaXRlcmFsc1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MaXRlcmFsc1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEooBChhMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHMSMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZSIDkAIBEooBChhUYXNrU3BlY1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBQtMBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhZUcmFuc2xhdG9yU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_google_protobuf_struct, file_flyteidl2_core_interface, file_flyteidl2_workflow_run_definition, file_flyteidl2_task_task_definition]);
 
 /**
- * @generated from message flyteidl2.workflow.LiteralsToJsonRequest
+ * @generated from message flyteidl2.workflow.LiteralsToLaunchFormJsonRequest
  */
-export type LiteralsToJsonRequest = Message<"flyteidl2.workflow.LiteralsToJsonRequest"> & {
+export type LiteralsToLaunchFormJsonRequest = Message<"flyteidl2.workflow.LiteralsToLaunchFormJsonRequest"> & {
   /**
    * The literals to convert to JSON.
    *
@@ -35,54 +37,54 @@ export type LiteralsToJsonRequest = Message<"flyteidl2.workflow.LiteralsToJsonRe
 };
 
 /**
- * Describes the message flyteidl2.workflow.LiteralsToJsonRequest.
- * Use `create(LiteralsToJsonRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.LiteralsToLaunchFormJsonRequest.
+ * Use `create(LiteralsToLaunchFormJsonRequestSchema)` to create a new message.
  */
-export const LiteralsToJsonRequestSchema: GenMessage<LiteralsToJsonRequest> = /*@__PURE__*/
+export const LiteralsToLaunchFormJsonRequestSchema: GenMessage<LiteralsToLaunchFormJsonRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_translator_service, 0);
 
 /**
- * @generated from message flyteidl2.workflow.LiteralsToJsonResponse
+ * @generated from message flyteidl2.workflow.LiteralsToLaunchFormJsonResponse
  */
-export type LiteralsToJsonResponse = Message<"flyteidl2.workflow.LiteralsToJsonResponse"> & {
+export type LiteralsToLaunchFormJsonResponse = Message<"flyteidl2.workflow.LiteralsToLaunchFormJsonResponse"> & {
   /**
    * The JSON for the literals.
    *
-   * @generated from field: repeated google.protobuf.Struct json = 1;
+   * @generated from field: google.protobuf.Struct json = 1;
    */
-  json: JsonObject[];
+  json?: JsonObject;
 };
 
 /**
- * Describes the message flyteidl2.workflow.LiteralsToJsonResponse.
- * Use `create(LiteralsToJsonResponseSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.LiteralsToLaunchFormJsonResponse.
+ * Use `create(LiteralsToLaunchFormJsonResponseSchema)` to create a new message.
  */
-export const LiteralsToJsonResponseSchema: GenMessage<LiteralsToJsonResponse> = /*@__PURE__*/
+export const LiteralsToLaunchFormJsonResponseSchema: GenMessage<LiteralsToLaunchFormJsonResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_translator_service, 1);
 
 /**
- * @generated from message flyteidl2.workflow.JsonToLiteralsRequest
+ * @generated from message flyteidl2.workflow.LaunchFormJsonToLiteralsRequest
  */
-export type JsonToLiteralsRequest = Message<"flyteidl2.workflow.JsonToLiteralsRequest"> & {
+export type LaunchFormJsonToLiteralsRequest = Message<"flyteidl2.workflow.LaunchFormJsonToLiteralsRequest"> & {
   /**
    * The JSON schema to convert to literals.
    *
-   * @generated from field: repeated google.protobuf.Struct json = 1;
+   * @generated from field: google.protobuf.Struct json = 1;
    */
-  json: JsonObject[];
+  json?: JsonObject;
 };
 
 /**
- * Describes the message flyteidl2.workflow.JsonToLiteralsRequest.
- * Use `create(JsonToLiteralsRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.LaunchFormJsonToLiteralsRequest.
+ * Use `create(LaunchFormJsonToLiteralsRequestSchema)` to create a new message.
  */
-export const JsonToLiteralsRequestSchema: GenMessage<JsonToLiteralsRequest> = /*@__PURE__*/
+export const LaunchFormJsonToLiteralsRequestSchema: GenMessage<LaunchFormJsonToLiteralsRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_translator_service, 2);
 
 /**
- * @generated from message flyteidl2.workflow.JsonToLiteralsResponse
+ * @generated from message flyteidl2.workflow.LaunchFormJsonToLiteralsResponse
  */
-export type JsonToLiteralsResponse = Message<"flyteidl2.workflow.JsonToLiteralsResponse"> & {
+export type LaunchFormJsonToLiteralsResponse = Message<"flyteidl2.workflow.LaunchFormJsonToLiteralsResponse"> & {
   /**
    * The literals generated from the JSON schema.
    *
@@ -92,11 +94,50 @@ export type JsonToLiteralsResponse = Message<"flyteidl2.workflow.JsonToLiteralsR
 };
 
 /**
- * Describes the message flyteidl2.workflow.JsonToLiteralsResponse.
- * Use `create(JsonToLiteralsResponseSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.LaunchFormJsonToLiteralsResponse.
+ * Use `create(LaunchFormJsonToLiteralsResponseSchema)` to create a new message.
  */
-export const JsonToLiteralsResponseSchema: GenMessage<JsonToLiteralsResponse> = /*@__PURE__*/
+export const LaunchFormJsonToLiteralsResponseSchema: GenMessage<LaunchFormJsonToLiteralsResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_translator_service, 3);
+
+/**
+ * @generated from message flyteidl2.workflow.TaskSpecToLaunchFormJsonRequest
+ */
+export type TaskSpecToLaunchFormJsonRequest = Message<"flyteidl2.workflow.TaskSpecToLaunchFormJsonRequest"> & {
+  /**
+   * The task spec to convert to JSON.
+   * Merges the VariableMap and the default inputs
+   *
+   * @generated from field: flyteidl2.task.TaskSpec task_spec = 1;
+   */
+  taskSpec?: TaskSpec;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TaskSpecToLaunchFormJsonRequest.
+ * Use `create(TaskSpecToLaunchFormJsonRequestSchema)` to create a new message.
+ */
+export const TaskSpecToLaunchFormJsonRequestSchema: GenMessage<TaskSpecToLaunchFormJsonRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_translator_service, 4);
+
+/**
+ * @generated from message flyteidl2.workflow.TaskSpecToLaunchFormJsonResponse
+ */
+export type TaskSpecToLaunchFormJsonResponse = Message<"flyteidl2.workflow.TaskSpecToLaunchFormJsonResponse"> & {
+  /**
+   * The JSON for the variables.
+   *
+   * @generated from field: google.protobuf.Struct json = 1;
+   */
+  json?: JsonObject;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TaskSpecToLaunchFormJsonResponse.
+ * Use `create(TaskSpecToLaunchFormJsonResponseSchema)` to create a new message.
+ */
+export const TaskSpecToLaunchFormJsonResponseSchema: GenMessage<TaskSpecToLaunchFormJsonResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_translator_service, 5);
 
 /**
  * TranslatorService provides an interface for all diferent types of translations for the platform.
@@ -105,20 +146,28 @@ export const JsonToLiteralsResponseSchema: GenMessage<JsonToLiteralsResponse> = 
  */
 export const TranslatorService: GenService<{
   /**
-   * @generated from rpc flyteidl2.workflow.TranslatorService.LiteralsToJson
+   * @generated from rpc flyteidl2.workflow.TranslatorService.LiteralsToLaunchFormJson
    */
-  literalsToJson: {
+  literalsToLaunchFormJson: {
     methodKind: "unary";
-    input: typeof LiteralsToJsonRequestSchema;
-    output: typeof LiteralsToJsonResponseSchema;
+    input: typeof LiteralsToLaunchFormJsonRequestSchema;
+    output: typeof LiteralsToLaunchFormJsonResponseSchema;
   },
   /**
-   * @generated from rpc flyteidl2.workflow.TranslatorService.JsonToLiterals
+   * @generated from rpc flyteidl2.workflow.TranslatorService.LaunchFormJsonToLiterals
    */
-  jsonToLiterals: {
+  launchFormJsonToLiterals: {
     methodKind: "unary";
-    input: typeof JsonToLiteralsRequestSchema;
-    output: typeof JsonToLiteralsResponseSchema;
+    input: typeof LaunchFormJsonToLiteralsRequestSchema;
+    output: typeof LaunchFormJsonToLiteralsResponseSchema;
+  },
+  /**
+   * @generated from rpc flyteidl2.workflow.TranslatorService.TaskSpecToLaunchFormJson
+   */
+  taskSpecToLaunchFormJson: {
+    methodKind: "unary";
+    input: typeof TaskSpecToLaunchFormJsonRequestSchema;
+    output: typeof TaskSpecToLaunchFormJsonResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_workflow_translator_service, 0);

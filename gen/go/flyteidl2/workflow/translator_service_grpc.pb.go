@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TranslatorService_LiteralsToJson_FullMethodName = "/flyteidl2.workflow.TranslatorService/LiteralsToJson"
-	TranslatorService_JsonToLiterals_FullMethodName = "/flyteidl2.workflow.TranslatorService/JsonToLiterals"
+	TranslatorService_LiteralsToLaunchFormJson_FullMethodName = "/flyteidl2.workflow.TranslatorService/LiteralsToLaunchFormJson"
+	TranslatorService_LaunchFormJsonToLiterals_FullMethodName = "/flyteidl2.workflow.TranslatorService/LaunchFormJsonToLiterals"
+	TranslatorService_TaskSpecToLaunchFormJson_FullMethodName = "/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson"
 )
 
 // TranslatorServiceClient is the client API for TranslatorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TranslatorServiceClient interface {
-	LiteralsToJson(ctx context.Context, in *LiteralsToJsonRequest, opts ...grpc.CallOption) (*LiteralsToJsonResponse, error)
-	JsonToLiterals(ctx context.Context, in *JsonToLiteralsRequest, opts ...grpc.CallOption) (*JsonToLiteralsResponse, error)
+	LiteralsToLaunchFormJson(ctx context.Context, in *LiteralsToLaunchFormJsonRequest, opts ...grpc.CallOption) (*LiteralsToLaunchFormJsonResponse, error)
+	LaunchFormJsonToLiterals(ctx context.Context, in *LaunchFormJsonToLiteralsRequest, opts ...grpc.CallOption) (*LaunchFormJsonToLiteralsResponse, error)
+	TaskSpecToLaunchFormJson(ctx context.Context, in *TaskSpecToLaunchFormJsonRequest, opts ...grpc.CallOption) (*TaskSpecToLaunchFormJsonResponse, error)
 }
 
 type translatorServiceClient struct {
@@ -39,18 +41,27 @@ func NewTranslatorServiceClient(cc grpc.ClientConnInterface) TranslatorServiceCl
 	return &translatorServiceClient{cc}
 }
 
-func (c *translatorServiceClient) LiteralsToJson(ctx context.Context, in *LiteralsToJsonRequest, opts ...grpc.CallOption) (*LiteralsToJsonResponse, error) {
-	out := new(LiteralsToJsonResponse)
-	err := c.cc.Invoke(ctx, TranslatorService_LiteralsToJson_FullMethodName, in, out, opts...)
+func (c *translatorServiceClient) LiteralsToLaunchFormJson(ctx context.Context, in *LiteralsToLaunchFormJsonRequest, opts ...grpc.CallOption) (*LiteralsToLaunchFormJsonResponse, error) {
+	out := new(LiteralsToLaunchFormJsonResponse)
+	err := c.cc.Invoke(ctx, TranslatorService_LiteralsToLaunchFormJson_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *translatorServiceClient) JsonToLiterals(ctx context.Context, in *JsonToLiteralsRequest, opts ...grpc.CallOption) (*JsonToLiteralsResponse, error) {
-	out := new(JsonToLiteralsResponse)
-	err := c.cc.Invoke(ctx, TranslatorService_JsonToLiterals_FullMethodName, in, out, opts...)
+func (c *translatorServiceClient) LaunchFormJsonToLiterals(ctx context.Context, in *LaunchFormJsonToLiteralsRequest, opts ...grpc.CallOption) (*LaunchFormJsonToLiteralsResponse, error) {
+	out := new(LaunchFormJsonToLiteralsResponse)
+	err := c.cc.Invoke(ctx, TranslatorService_LaunchFormJsonToLiterals_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *translatorServiceClient) TaskSpecToLaunchFormJson(ctx context.Context, in *TaskSpecToLaunchFormJsonRequest, opts ...grpc.CallOption) (*TaskSpecToLaunchFormJsonResponse, error) {
+	out := new(TaskSpecToLaunchFormJsonResponse)
+	err := c.cc.Invoke(ctx, TranslatorService_TaskSpecToLaunchFormJson_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,19 +72,23 @@ func (c *translatorServiceClient) JsonToLiterals(ctx context.Context, in *JsonTo
 // All implementations should embed UnimplementedTranslatorServiceServer
 // for forward compatibility
 type TranslatorServiceServer interface {
-	LiteralsToJson(context.Context, *LiteralsToJsonRequest) (*LiteralsToJsonResponse, error)
-	JsonToLiterals(context.Context, *JsonToLiteralsRequest) (*JsonToLiteralsResponse, error)
+	LiteralsToLaunchFormJson(context.Context, *LiteralsToLaunchFormJsonRequest) (*LiteralsToLaunchFormJsonResponse, error)
+	LaunchFormJsonToLiterals(context.Context, *LaunchFormJsonToLiteralsRequest) (*LaunchFormJsonToLiteralsResponse, error)
+	TaskSpecToLaunchFormJson(context.Context, *TaskSpecToLaunchFormJsonRequest) (*TaskSpecToLaunchFormJsonResponse, error)
 }
 
 // UnimplementedTranslatorServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedTranslatorServiceServer struct {
 }
 
-func (UnimplementedTranslatorServiceServer) LiteralsToJson(context.Context, *LiteralsToJsonRequest) (*LiteralsToJsonResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LiteralsToJson not implemented")
+func (UnimplementedTranslatorServiceServer) LiteralsToLaunchFormJson(context.Context, *LiteralsToLaunchFormJsonRequest) (*LiteralsToLaunchFormJsonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LiteralsToLaunchFormJson not implemented")
 }
-func (UnimplementedTranslatorServiceServer) JsonToLiterals(context.Context, *JsonToLiteralsRequest) (*JsonToLiteralsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JsonToLiterals not implemented")
+func (UnimplementedTranslatorServiceServer) LaunchFormJsonToLiterals(context.Context, *LaunchFormJsonToLiteralsRequest) (*LaunchFormJsonToLiteralsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LaunchFormJsonToLiterals not implemented")
+}
+func (UnimplementedTranslatorServiceServer) TaskSpecToLaunchFormJson(context.Context, *TaskSpecToLaunchFormJsonRequest) (*TaskSpecToLaunchFormJsonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TaskSpecToLaunchFormJson not implemented")
 }
 
 // UnsafeTranslatorServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -87,38 +102,56 @@ func RegisterTranslatorServiceServer(s grpc.ServiceRegistrar, srv TranslatorServ
 	s.RegisterService(&TranslatorService_ServiceDesc, srv)
 }
 
-func _TranslatorService_LiteralsToJson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LiteralsToJsonRequest)
+func _TranslatorService_LiteralsToLaunchFormJson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LiteralsToLaunchFormJsonRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TranslatorServiceServer).LiteralsToJson(ctx, in)
+		return srv.(TranslatorServiceServer).LiteralsToLaunchFormJson(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TranslatorService_LiteralsToJson_FullMethodName,
+		FullMethod: TranslatorService_LiteralsToLaunchFormJson_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TranslatorServiceServer).LiteralsToJson(ctx, req.(*LiteralsToJsonRequest))
+		return srv.(TranslatorServiceServer).LiteralsToLaunchFormJson(ctx, req.(*LiteralsToLaunchFormJsonRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TranslatorService_JsonToLiterals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JsonToLiteralsRequest)
+func _TranslatorService_LaunchFormJsonToLiterals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LaunchFormJsonToLiteralsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TranslatorServiceServer).JsonToLiterals(ctx, in)
+		return srv.(TranslatorServiceServer).LaunchFormJsonToLiterals(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TranslatorService_JsonToLiterals_FullMethodName,
+		FullMethod: TranslatorService_LaunchFormJsonToLiterals_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TranslatorServiceServer).JsonToLiterals(ctx, req.(*JsonToLiteralsRequest))
+		return srv.(TranslatorServiceServer).LaunchFormJsonToLiterals(ctx, req.(*LaunchFormJsonToLiteralsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TranslatorService_TaskSpecToLaunchFormJson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TaskSpecToLaunchFormJsonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TranslatorServiceServer).TaskSpecToLaunchFormJson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TranslatorService_TaskSpecToLaunchFormJson_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TranslatorServiceServer).TaskSpecToLaunchFormJson(ctx, req.(*TaskSpecToLaunchFormJsonRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -131,12 +164,16 @@ var TranslatorService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TranslatorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "LiteralsToJson",
-			Handler:    _TranslatorService_LiteralsToJson_Handler,
+			MethodName: "LiteralsToLaunchFormJson",
+			Handler:    _TranslatorService_LiteralsToLaunchFormJson_Handler,
 		},
 		{
-			MethodName: "JsonToLiterals",
-			Handler:    _TranslatorService_JsonToLiterals_Handler,
+			MethodName: "LaunchFormJsonToLiterals",
+			Handler:    _TranslatorService_LaunchFormJsonToLiterals_Handler,
+		},
+		{
+			MethodName: "TaskSpecToLaunchFormJson",
+			Handler:    _TranslatorService_TaskSpecToLaunchFormJson_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
