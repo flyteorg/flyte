@@ -1,11 +1,14 @@
-version: v1
+version: v2
 managed:
   enabled: true
-  optimize_for: CODE_SIZE
+  override:
+    - file_option: optimize_for
+      value: CODE_SIZE
+  # Use managed mode: https://buf.build/docs/generate/managed-mode/#managed-mode
 plugins:
-  - plugin: buf.build/protocolbuffers/python:v24.1
+  - remote: buf.build/protocolbuffers/python:v24.1
     out: gen/python
-  - plugin: buf.build/protocolbuffers/pyi:v24.1
+  - remote: buf.build/protocolbuffers/pyi:v24.1
     out: gen/python
-  - plugin: buf.build/grpc/python:v1.58.1
+  - remote: buf.build/grpc/python:v1.58.1
     out: gen/python

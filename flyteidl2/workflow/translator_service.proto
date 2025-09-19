@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "google/protobuf/struct.proto";
+import "flyteidl2/core/interface.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/task/task_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// TranslatorService provides an interface for all diferent types of translations for the platform.
+service TranslatorService {
+  rpc LiteralsToLaunchFormJson(LiteralsToLaunchFormJsonRequest) returns (LiteralsToLaunchFormJsonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc LaunchFormJsonToLiterals(LaunchFormJsonToLiteralsRequest) returns (LaunchFormJsonToLiteralsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc TaskSpecToLaunchFormJson(TaskSpecToLaunchFormJsonRequest) returns (TaskSpecToLaunchFormJsonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message LiteralsToLaunchFormJsonRequest {
+  // The literals to convert to JSON.
+  repeated NamedLiteral literals = 1;
+  flyteidl2.core.VariableMap variables = 2;
+}
+
+message LiteralsToLaunchFormJsonResponse {
+  // The JSON for the literals.
+  google.protobuf.Struct json = 1;
+}
+
+message LaunchFormJsonToLiteralsRequest {
+  // The JSON schema to convert to literals.
+  google.protobuf.Struct json = 1;
+}
+
+message LaunchFormJsonToLiteralsResponse {
+  // The literals generated from the JSON schema.
+  repeated NamedLiteral literals = 1;
+}
+
+message TaskSpecToLaunchFormJsonRequest {
+  // The task spec to convert to JSON.
+  // Merges the VariableMap and the default inputs
+  flyteidl2.task.TaskSpec task_spec = 1;
+}
+
+message TaskSpecToLaunchFormJsonResponse {
+  // The JSON for the variables.
+  google.protobuf.Struct json = 1;
+}

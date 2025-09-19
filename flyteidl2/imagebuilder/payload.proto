@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package flyteidl2.imagebuilder;
+
+import "flyteidl2/imagebuilder/definition.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
+
+message GetImageRequest {
+  // Image ID
+  ImageIdentifier id = 1 [(buf.validate.field).required = true];
+  // Optional organization that dictates which dataplane registry to reference
+  string organization = 2;
+}
+
+// GetSecretProxyResponse returns the looked up secret from the secret service
+message GetImageResponse {
+  Image image = 1;
+}

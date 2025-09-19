@@ -1,5 +1,0 @@
-version: v1
-name: buf.build/unionai-oss/cloud
-deps:
-  - buf.build/googleapis/googleapis:62f35d8aed1149c291d606d958a7ce32
-  - buf.build/envoyproxy/protoc-gen-validate

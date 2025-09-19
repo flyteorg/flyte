@@ -23,8 +23,8 @@ jobs:
         uses: bufbuild/buf-setup-action@v1 # Install the Buf CLI
         with:
           version: 'latest' # Or specify a precise version like '1.56.0'
-      - name: Run make generate
-        run: make generate
+      - name: Run make buf
+        run: make buf
       - name: Check for changes
         run: |
           git diff --exit-code || (echo 'Generated files are out of date. Run make generate and commit changes.' && exit 1)

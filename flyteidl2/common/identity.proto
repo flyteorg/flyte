@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/policy.proto";
+import "flyteidl2/common/role.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// Encapsulates user profile details for a member of an organization.
+message User {
+  UserIdentifier id = 1;
+
+  UserSpec spec = 2;
+
+  repeated Role roles = 3 [deprecated = true];
+
+  repeated Policy policies = 4;
+}
+
+message UserSpec {
+  string first_name = 1;
+
+  string last_name = 2;
+
+  string email = 3;
+
+  string organization = 4;
+
+  string user_handle = 5;
+
+  repeated string groups = 6;
+
+  string photo_url = 7;
+}
+
+message Application {
+  ApplicationIdentifier id = 1;
+
+  AppSpec spec = 2;
+}
+
+message AppSpec {
+  string name = 1;
+
+  string organization = 2;
+}
+
+message EnrichedIdentity {
+  oneof principal {
+    option (buf.validate.oneof).required = true;
+    User user = 1;
+    Application application = 2;
+  }
+}
+
+message Identity {
+  oneof principal {
+    common.UserIdentifier user_id = 1;
+    common.ApplicationIdentifier application_id = 2;
+  }
+}

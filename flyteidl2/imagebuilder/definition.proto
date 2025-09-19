@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package flyteidl2.imagebuilder;
+
+import "flyteidl2/core/security.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
+
+// ImageIdentifier is how to identify an image
+message ImageIdentifier {
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// Simple container to surface if image exists
+message Image {
+  ImageIdentifier id = 1;
+  // Fully qualified, pullable, image name
+  string fqin = 2;
+}
+
+// AptPackages defines a list of apt packages to install in the image.
+message AptPackages {
+  // List of apt packages to install
+  repeated string packages = 1;
+  repeated flyteidl2.core.Secret secret_mounts = 2;
+}
+
+// PipOptions defines options for pip packages to install in the image.
+message PipOptions {
+  // Optional index URL for pip packages
+  string index_url = 2;
+  // Optional list of extra index URLs for pip packages
+  repeated string extra_index_urls = 3;
+  // Optional pre-release flag for pip packages
+  bool pre = 4;
+  // Optional extra arguments for pip install command
+  string extra_args = 5;
+}
+
+// PipPackages defines a list of pip packages to install in the image.
+message PipPackages {
+  // List of pip packages to install
+  repeated string packages = 1;
+  // Options for pip packages.
+  PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
+}
+
+// Requirements defines a python requirements file to use in the image.
+message Requirements {
+  // The requirements file to use.
+  string file = 1;
+  // Options for pip packages.
+  PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
+}
+
+message PythonWheels {
+  // The directory containing Python wheel files.
+  string dir = 1;
+  // Options for pip packages.
+  PipOptions options = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
+}
+
+// UVProject defines a UV project configuration, which includes
+// a pyproject.toml file and a uvlock file.
+message UVProject {
+  string pyproject = 1;
+  string uvlock = 2;
+  // Options for pip packages.
+  PipOptions options = 3;
+  repeated flyteidl2.core.Secret secret_mounts = 4;
+}
+
+// Commands defines a list of commands to run in the image.
+message Commands {
+  // The command to run.
+  repeated string cmd = 2;
+  repeated flyteidl2.core.Secret secret_mounts = 3;
+}
+
+// WorkDir defines the working directory to set in the image.
+message WorkDir {
+  // The working directory to use.
+  string workdir = 1;
+}
+
+// CopyConfig defines a configuration for copying files/directories into the image.
+message CopyConfig {
+  // The source directory to copy from.
+  string src = 1;
+  // The destination directory to copy to.
+  string dst = 2;
+}
+
+// Env defines environment to set in the image.
+message Env {
+  // Environment variables to set in the image.
+  map<string, string> env_variables = 1;
+}
+
+// Layer defines a layer in the image, which can be one of several types.
+message Layer {
+  oneof layer {
+    // Apt packages to install.
+    AptPackages apt_packages = 1;
+    // Python packages to install.
+    PipPackages pip_packages = 2;
+    // Custom command to run.
+    Commands commands = 3;
+    // Requirements file to use.
+    Requirements requirements = 4;
+    // Python wheel file to use.
+    PythonWheels python_wheels = 5;
+    // Working directory to set.
+    WorkDir workdir = 6;
+    // Copy files/directories into the image.
+    CopyConfig copy_config = 7;
+    // UV project configuration.
+    UVProject uv_project = 8;
+    // Environment variables to set.
+    Env env = 9;
+  }
+}
+
+// Image definition defined in the sdk.
+message ImageSpec {
+  // Identifier for the base image.
+  string base_image = 1;
+  // python version to use in the image.
+  string python_version = 2;
+  // List of layers to apply to the image.
+  repeated Layer layers = 3;
+  // List of platforms to build the image for.
+  repeated string platform = 4;
+}

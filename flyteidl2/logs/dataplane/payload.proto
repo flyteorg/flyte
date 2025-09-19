@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package flyteidl2.logs.dataplane;
+
+import "google/protobuf/timestamp.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane";
+
+message PodResource {
+  // The namespace of the pod.
+  string namespace = 1 [(buf.validate.field).string.min_len = 1];
+
+  // The pod name.
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+
+  // The container name. If not provided, attempt to find the primary container, else assume the first container.
+  // +optional
+  string container = 3;
+}
+
+// Parameters of environment in which logs were collected. Should contain everything
+// necessary to identify location of task execution logs in cloud providers.
+message LoggingContext {
+  reserved 1, 2;
+
+  string cluster_name = 3 [(buf.validate.field).string.min_len = 1];
+  string kubernetes_namespace = 4 [(buf.validate.field).string.min_len = 1];
+  string kubernetes_pod_name = 5 [(buf.validate.field).string.min_len = 1];
+  string kubernetes_container_name = 6 [(buf.validate.field).string.min_len = 1];
+  google.protobuf.Timestamp execution_attempt_start_time = 7;
+  google.protobuf.Timestamp execution_attempt_end_time = 8;
+  map<string, string> kubernetes_pod_labels = 9;
+}
+
+// Parameters of environment in which logs were collected. Should contain everything
+// necessary to identify location of task execution logs in cloud providers.
+message ContainerIdentifier {
+  // The name of the cluster.
+  string cluster_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // The namespace in Kubernetes.
+  string kubernetes_namespace = 2 [(buf.validate.field).string.min_len = 1];
+
+  // The name of the pod in Kubernetes.
+  string kubernetes_pod_name = 3 [(buf.validate.field).string.min_len = 1];
+
+  // The name of the container in Kubernetes.
+  string kubernetes_container_name = 4;
+}
+
+message ContainerSelector {
+  // The name of the cluster.
+  string cluster_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // The namespace in Kubernetes.
+  string kubernetes_namespace = 2 [(buf.validate.field).string.min_len = 1];
+
+  // The prefix of the name of the pod in Kubernetes. This will only apply to persisted pods' logs because listing by
+  // prefix is the supported way to filter pods.
+  string kubernetes_pod_name_prefix = 3;
+
+  // The name of the container in Kubernetes. If not specified, logs for all containers
+  // will be streamed.
+  string kubernetes_container_name = 4;
+
+  // The label selector to filter pods. This will only apply to live pods' logs because Listing by prefix
+  // isn't supported.
+  string kubernetes_pod_label_selector = 5;
+}
+
+message LiveLogsOptions {
+  // LogPodStatus indicates whether to log the pod status along with the logs.
+  bool log_pod_status = 1;
+
+  // LogTimestamps indicates whether to log the timestamps along with the logs. It prepends RFC3339 or RFC3339Nano
+  // format in the beginning of each log line.
+  bool log_timestamps = 2;
+}
+
+enum LogLineOriginator {
+  // The originator of the log line is unknown.
+  UNKNOWN = 0;
+
+  // The originator of the log line is the user application.
+  USER = 1;
+
+  // The originator of the log line is the system.
+  SYSTEM = 2;
+}
+
+message LogLine {
+  google.protobuf.Timestamp timestamp = 1;
+
+  // Each line is separated by either CRLF, CR or LF, which are included
+  // at the ends of the lines. This lets clients know whether log emitter
+  // wanted to overwrite the previous line (LF) or append a new line (CRLF).
+  string message = 2;
+
+  LogLineOriginator originator = 3;
+}
+
+message LogLines {
+  // Each line is separated by either CRLF, CR or LF, which are included
+  // at the ends of the lines. This lets clients know whether log emitter
+  // wanted to overwrite the previous line (LF) or append a new line (CRLF).
+  repeated string lines = 1 [deprecated = true];
+
+  // The index of the container in the list of containers. If the request was made with a single container identifier,
+  // this value will always be 0. Otherwise, it'll be an index into the last list of containers sent in the stream.
+  uint32 container_index = 2;
+
+  // The container identifier.
+  ContainerIdentifier container = 3 [(buf.validate.field).required = true];
+
+  // Each line is separated by either CRLF, CR or LF, which are included
+  // at the ends of the lines. This lets clients know whether log emitter
+  // wanted to overwrite the previous line (LF) or append a new line (CRLF).
+  repeated LogLine structured_lines = 4;
+}
+
+message LogContainersList {
+  repeated ContainerIdentifier containers = 1;
+}
+
+message LogLinesBatch {
+  repeated LogLines logs = 1;
+}
+
+enum LogsSource {
+  // Return live logs and fall back to persisted if not available.
+  LIVE_OR_PERSISTED = 0;
+
+  // Return live logs only or error if pod is no longer around.
+  LIVE_ONLY = 1;
+
+  // Return persisted logs only.
+  PERSISTED_ONLY = 2;
+}
