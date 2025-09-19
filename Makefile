@@ -45,5 +45,9 @@ buf-python: ## Generate Python protocol buffer files
 go_tidy: ## Run go mod tidy
 	go mod tidy
 
+.PHONY: mocks
+mocks: ## Generate go mocks
+	mockery
+
 .PHONY: gen
-gen: buf go_tidy ## Generates everything in the 'gen' directory
+gen: buf go_tidy mocks ## Generates everything in the 'gen' directory
