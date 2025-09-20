@@ -3,18 +3,23 @@ package pytorch
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
+	"github.com/samber/lo"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -203,9 +208,14 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 
 	occurredAt := time.Now()
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	podList := &v1.PodList{}
+	err = pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to list pytorch execution pods. Error: %w", err)
+	}
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
-		LogContext: nil, // TODO populate log context
+		LogContext: logContextForPods(app.Name, podList.Items),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
@@ -218,6 +228,24 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	}
 
 	return phaseInfo, err
+}
+
+func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
+	pods = lo.Filter(pods, func(item v1.Pod, _ int) bool {
+		// Running, Succeeded or Failed is OK
+		return item.Status.Phase != v1.PodPending
+	})
+	logCtx := &core.LogContext{
+		Pods: make([]*core.PodLogContext, len(pods)),
+	}
+	for i, pod := range pods {
+		p := pod
+		if strings.HasPrefix(p.Name, pytorchJobName) && strings.Contains(p.Name, "worker-0") {
+			logCtx.PrimaryPodName = p.Name
+		}
+		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
+	}
+	return logCtx
 }
 
 func init() {

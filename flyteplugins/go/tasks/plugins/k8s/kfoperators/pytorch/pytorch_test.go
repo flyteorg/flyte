@@ -14,6 +14,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -703,6 +705,36 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 
 	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	podList := []runtime.Object{
+		&corev1.Pod{
+			ObjectMeta: v1.ObjectMeta{Namespace: "ns", Name: "initializing ignored pod"},
+			Status:     corev1.PodStatus{Phase: corev1.PodPending},
+		},
+		&corev1.Pod{
+			ObjectMeta: v1.ObjectMeta{Namespace: "ns", Name: "test"},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{Name: "test-work-0"},
+				},
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: "test-work-0",
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  v1.Time{Time: time.Now()},
+								FinishedAt: v1.Time{Time: time.Now()},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	reader := fake.NewFakeClient(podList...)
+	pluginContext.OnK8sReader().Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -731,6 +763,7 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, taskPhase.Info().LogContext.Pods[0].PodName, "test")
 	assert.Nil(t, err)
 }
 
@@ -744,7 +777,8 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		Reason:       "task submitted to K8s",
 	}
 	pluginCtx := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, pluginState)
-
+	reader := fake.NewFakeClient()
+	pluginCtx.OnK8sReader().Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
