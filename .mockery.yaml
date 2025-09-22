@@ -1,0 +1,32 @@
+log-level: warn
+resolve-type-alias: False
+disable-version-string: True
+issue-845-fix: True
+structname: ""
+mockname: "{{.InterfaceName}}"
+packages:
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/workflow/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/secret/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/imagebuilder/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/task/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/common/mocks'

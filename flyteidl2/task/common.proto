@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package flyteidl2.task;
+
+import "flyteidl2/core/interface.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
+
+message NamedParameter {
+  string name = 1;
+
+  flyteidl2.core.Parameter parameter = 2;
+}

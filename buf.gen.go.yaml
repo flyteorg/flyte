@@ -1,22 +1,40 @@
-version: v1
+version: v2
 managed:
   enabled: true
-  optimize_for: CODE_SIZE
+  override:
+    - file_option: optimize_for
+      value: CODE_SIZE
+  # Use managed mode. Ref: https://protovalidate.com/quickstart/#depend-on-protovalidate
+  disable:
+    - file_option: go_package
+    - module: buf.build/bufbuild/protovalidate
 plugins:
-  - plugin: buf.build/protocolbuffers/go:v1.30.0
+  - remote: buf.build/protocolbuffers/go:v1.30.0
     out: gen/go
     opt:
       - paths=source_relative
-  - plugin: buf.build/grpc/go:v1.3.0
+  - remote: buf.build/grpc/go:v1.3.0
     out: gen/go
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - plugin: buf.build/connectrpc/go:v1.16.2
+  - remote: buf.build/connectrpc/go:v1.16.2
     out: gen/go
     opt:
       - paths=source_relative
-  - plugin: buf.build/bufbuild/validate-go:v1.0.1
+  - remote: buf.build/bufbuild/validate-go:v1.2.1
     out: gen/go
     opt:
       - paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway:v2.15.2
+    out: gen/go/gateway
+    opt:
+      - paths=import
+      - module=github.com/flyteorg/flyte/v2/gen/go
+      - standalone=true
+      - allow_delete_body=true
+  - remote: buf.build/grpc-ecosystem/openapiv2
+    out: gen/go/gateway
+    opt:
+      - json_names_for_fields=false
+      - allow_delete_body=true
