@@ -17,14 +17,30 @@ jobs:
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           working-directory: './gen/python'
+        env:
+          UV_PROJECT_ENVIRONMENT: /tmp/flyte2-venv
       - name: Setup Buf CLI
         uses: bufbuild/buf-setup-action@v1 # Install the Buf CLI
         with:
           version: 'latest' # Or specify a precise version like '1.56.0'
-      - name: Run make generate
-        run: make generate
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        id: setup-uv
+        with:
+          enable-cache: 'false'
+          cache-suffix: 3.12
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+          working-directory: ./
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
+      - name: Run make download_tooling
+        run: make download_tooling && which mockery
+      - name: Run make gen
+        run: which mockery && make gen
       - name: Check for changes
         run: |
           git diff --exit-code || (echo 'Generated files are out of date. Run make generate and commit changes.' && exit 1)

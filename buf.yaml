@@ -1,0 +1,36 @@
+version: v2
+name: buf.build/flyteorg/flyte
+deps:
+  - buf.build/googleapis/googleapis:62f35d8aed1149c291d606d958a7ce32
+  - buf.build/bufbuild/protovalidate:v0.14.1
+lint:
+  except:
+    - PACKAGE_VERSION_SUFFIX
+    - FIELD_LOWER_SNAKE_CASE
+  ignore_only:
+    ENUM_VALUE_PREFIX:
+      - flyteidl2/common/list.proto
+      - flyteidl2/common/runtime_version.proto
+      - flyteidl2/core/artifact_id.proto
+      - flyteidl2/core/catalog.proto
+      - flyteidl2/core/execution.proto
+      - flyteidl2/core/identifier.proto
+      - flyteidl2/core/security.proto
+      - flyteidl2/core/tasks.proto
+      - flyteidl2/core/types.proto
+      - flyteidl2/logs/dataplane/payload.proto
+      - flyteidl2/secret/definition.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      - flyteidl2/common/authorization.proto
+      - flyteidl2/common/list.proto
+      - flyteidl2/common/role.proto
+      - flyteidl2/common/runtime_version.proto
+      - flyteidl2/core/artifact_id.proto
+      - flyteidl2/core/catalog.proto
+      - flyteidl2/core/execution.proto
+      - flyteidl2/core/identifier.proto
+      - flyteidl2/core/security.proto
+      - flyteidl2/core/tasks.proto
+      - flyteidl2/core/types.proto
+      - flyteidl2/logs/dataplane/payload.proto
+      - flyteidl2/secret/definition.proto
