@@ -347,6 +347,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		PrimaryPodName: job.Status.JobRunnerPodName,
 		Pods: []*core.PodLogContext{
 			{
+				Namespace:            job.ObjectMeta.Namespace,
 				PodName:              job.Status.JobRunnerPodName,
 				PrimaryContainerName: "job-runner",
 				Containers: []*core.ContainerContext{
@@ -379,7 +380,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		for _, tl := range info.Logs {
 			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
 				tl.Ready = ready
-				if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
+				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
 					phaseInfo.WithReason("Dask dashboard is not ready")
 				} else {
 					phaseInfo.WithReason("Dask dashboard is ready")
