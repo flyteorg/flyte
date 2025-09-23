@@ -591,6 +591,42 @@
       },
       "description": "Specifies sort ordering in a list request."
     },
+    "commonTriggerIdentifier": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/commonTriggerName"
+        },
+        "revision": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Revision of the trigger."
+        }
+      },
+      "title": "Identifies a trigger revision within an org, project and domain"
+    },
+    "commonTriggerName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this trigger belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this trigger belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this trigger belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the trigger."
+        }
+      },
+      "title": "Identifies trigger within an org, project and domain"
+    },
     "commonUser": {
       "type": "object",
       "properties": {
@@ -2338,6 +2374,10 @@
         "action_type": {
           "$ref": "#/definitions/workflowActionType",
           "description": "Action type."
+        },
+        "trigger_id": {
+          "$ref": "#/definitions/commonTriggerIdentifier",
+          "description": "If this run was initiated by a trigger, this will store the trigger identifier."
         }
       },
       "description": "Static, lightweight metadata about an action."

@@ -85,6 +85,9 @@ message CreateRunRequest {
 
     // The task spec to use.
     task.TaskSpec task_spec = 3;
+
+    // The trigger name to use.
+    common.TriggerName trigger_name = 7;
   }
 
   // Inputs to use.

@@ -114,3 +114,38 @@ message ActionAttemptIdentifier {
 
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 }
+
+// Identifies trigger within an org, project and domain
+message TriggerName {
+  // Org this trigger belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this trigger belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this trigger belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the trigger.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// Identifies a trigger revision within an org, project and domain
+message TriggerIdentifier {
+  TriggerName name = 1 [(buf.validate.field).required = true];
+
+  // Revision of the trigger.
+  uint64 revision = 2 [(buf.validate.field).uint64.gt = 0];
+}

@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/common/identifier.proto.
  */
 export const file_flyteidl2_common_identifier: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvY29tbW9uL2lkZW50aWZpZXIucHJvdG8SEGZseXRlaWRsMi5jb21tb24iYgoRUHJvamVjdElkZW50aWZpZXISHQoMb3JnYW5pemF0aW9uGAEgASgJQge6SARyAhABEhcKBmRvbWFpbhgCIAEoCUIHukgEcgIQARIVCgRuYW1lGAMgASgJQge6SARyAhABIkAKEUNsdXN0ZXJJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIjsKFUNsdXN0ZXJQb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSDAoEbmFtZRgCIAEoCSJNChdDbHVzdGVyQ29uZmlnSWRlbnRpZmllchIdCgxvcmdhbml6YXRpb24YASABKAlCB7pIBHICEAESEwoCaWQYAiABKAlCB7pIBHICEAEiZwoZQ2x1c3Rlck5vZGVwb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSHQoMY2x1c3Rlcl9uYW1lGAIgASgJQge6SARyAhABEhUKBG5hbWUYAyABKAlCB7pIBHICEAEiKgoOVXNlcklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASIxChVBcHBsaWNhdGlvbklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASI9Cg5Sb2xlSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSFQoEbmFtZRgCIAEoCUIHukgEcgIQASJJCg1PcmdJZGVudGlmaWVyEjgKBG5hbWUYASABKAlCKrpIJ3IlEAEYPzIfXlthLXowLTldKFstYS16MC05XSpbYS16MC05XSk/JCJtChhNYW5hZ2VkQ2x1c3RlcklkZW50aWZpZXISFQoEbmFtZRgCIAEoCUIHukgEcgIQARI0CgNvcmcYAyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLk9yZ0lkZW50aWZpZXJCBrpIA8gBAUoECAEQAiI/ChBQb2xpY3lJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIncKDVJ1bklkZW50aWZpZXISFgoDb3JnGAEgASgJQgm6SAZyBBABGD8SGgoHcHJvamVjdBgCIAEoCUIJukgGcgQQARg/EhkKBmRvbWFpbhgDIAEoCUIJukgGcgQQARg/EhcKBG5hbWUYBCABKAlCCbpIBnIEEAEYHiJhChBBY3Rpb25JZGVudGlmaWVyEjQKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEhcKBG5hbWUYAiABKAlCCbpIBnIEEAEYHiJyChdBY3Rpb25BdHRlbXB0SWRlbnRpZmllchI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAQsABChRjb20uZmx5dGVpZGwyLmNvbW1vbkIPSWRlbnRpZmllclByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate]);
+  fileDesc("CiFmbHl0ZWlkbDIvY29tbW9uL2lkZW50aWZpZXIucHJvdG8SEGZseXRlaWRsMi5jb21tb24iYgoRUHJvamVjdElkZW50aWZpZXISHQoMb3JnYW5pemF0aW9uGAEgASgJQge6SARyAhABEhcKBmRvbWFpbhgCIAEoCUIHukgEcgIQARIVCgRuYW1lGAMgASgJQge6SARyAhABIkAKEUNsdXN0ZXJJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIjsKFUNsdXN0ZXJQb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSDAoEbmFtZRgCIAEoCSJNChdDbHVzdGVyQ29uZmlnSWRlbnRpZmllchIdCgxvcmdhbml6YXRpb24YASABKAlCB7pIBHICEAESEwoCaWQYAiABKAlCB7pIBHICEAEiZwoZQ2x1c3Rlck5vZGVwb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSHQoMY2x1c3Rlcl9uYW1lGAIgASgJQge6SARyAhABEhUKBG5hbWUYAyABKAlCB7pIBHICEAEiKgoOVXNlcklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASIxChVBcHBsaWNhdGlvbklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASI9Cg5Sb2xlSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSFQoEbmFtZRgCIAEoCUIHukgEcgIQASJJCg1PcmdJZGVudGlmaWVyEjgKBG5hbWUYASABKAlCKrpIJ3IlEAEYPzIfXlthLXowLTldKFstYS16MC05XSpbYS16MC05XSk/JCJtChhNYW5hZ2VkQ2x1c3RlcklkZW50aWZpZXISFQoEbmFtZRgCIAEoCUIHukgEcgIQARI0CgNvcmcYAyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLk9yZ0lkZW50aWZpZXJCBrpIA8gBAUoECAEQAiI/ChBQb2xpY3lJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIncKDVJ1bklkZW50aWZpZXISFgoDb3JnGAEgASgJQgm6SAZyBBABGD8SGgoHcHJvamVjdBgCIAEoCUIJukgGcgQQARg/EhkKBmRvbWFpbhgDIAEoCUIJukgGcgQQARg/EhcKBG5hbWUYBCABKAlCCbpIBnIEEAEYHiJhChBBY3Rpb25JZGVudGlmaWVyEjQKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEhcKBG5hbWUYAiABKAlCCbpIBnIEEAEYHiJyChdBY3Rpb25BdHRlbXB0SWRlbnRpZmllchI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAInYKC1RyaWdnZXJOYW1lEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BImMKEVRyaWdnZXJJZGVudGlmaWVyEjMKBG5hbWUYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJOYW1lQga6SAPIAQESGQoIcmV2aXNpb24YAiABKARCB7pIBDICIABCwAEKFGNvbS5mbHl0ZWlkbDIuY29tbW9uQg9JZGVudGlmaWVyUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw", [file_buf_validate_validate]);
 
 /**
  * @generated from message flyteidl2.common.ProjectIdentifier
@@ -347,4 +347,72 @@ export type ActionAttemptIdentifier = Message<"flyteidl2.common.ActionAttemptIde
  */
 export const ActionAttemptIdentifierSchema: GenMessage<ActionAttemptIdentifier> = /*@__PURE__*/
   messageDesc(file_flyteidl2_common_identifier, 13);
+
+/**
+ * Identifies trigger within an org, project and domain
+ *
+ * @generated from message flyteidl2.common.TriggerName
+ */
+export type TriggerName = Message<"flyteidl2.common.TriggerName"> & {
+  /**
+   * Org this trigger belongs to.
+   *
+   * @generated from field: string org = 1;
+   */
+  org: string;
+
+  /**
+   * Project this trigger belongs to.
+   *
+   * @generated from field: string project = 2;
+   */
+  project: string;
+
+  /**
+   * Domain this trigger belongs to.
+   *
+   * @generated from field: string domain = 3;
+   */
+  domain: string;
+
+  /**
+   * Unique name of the trigger.
+   *
+   * @generated from field: string name = 4;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message flyteidl2.common.TriggerName.
+ * Use `create(TriggerNameSchema)` to create a new message.
+ */
+export const TriggerNameSchema: GenMessage<TriggerName> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_common_identifier, 14);
+
+/**
+ * Identifies a trigger revision within an org, project and domain
+ *
+ * @generated from message flyteidl2.common.TriggerIdentifier
+ */
+export type TriggerIdentifier = Message<"flyteidl2.common.TriggerIdentifier"> & {
+  /**
+   * @generated from field: flyteidl2.common.TriggerName name = 1;
+   */
+  name?: TriggerName;
+
+  /**
+   * Revision of the trigger.
+   *
+   * @generated from field: uint64 revision = 2;
+   */
+  revision: bigint;
+};
+
+/**
+ * Describes the message flyteidl2.common.TriggerIdentifier.
+ * Use `create(TriggerIdentifierSchema)` to create a new message.
+ */
+export const TriggerIdentifierSchema: GenMessage<TriggerIdentifier> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_common_identifier, 15);
 

@@ -128,6 +128,9 @@ message ActionMetadata {
 
   // Action type.
   ActionType action_type = 10;
+
+  // If this run was initiated by a trigger, this will store the trigger identifier.
+  common.TriggerIdentifier trigger_id = 11;
 }
 
 // TODO: define phase transitions
