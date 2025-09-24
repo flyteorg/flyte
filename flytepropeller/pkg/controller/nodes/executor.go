@@ -825,7 +825,7 @@ func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, 
 		if err.GetKind() == core.ExecutionError_SYSTEM {
 			currentAttempt = nodeStatus.GetSystemFailures()
 			maxAttempts = c.maxNodeRetriesForSystemFailures
-			isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
+			isEligible = currentAttempt < maxAttempts
 			return
 		}
 
