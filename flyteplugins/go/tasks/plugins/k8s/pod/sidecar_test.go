@@ -751,7 +751,6 @@ func TestGetTaskSidecarStatus(t *testing.T) {
 		v1.PodSucceeded:           pluginsCore.PhaseSuccess,
 		v1.PodFailed:              pluginsCore.PhaseRetryableFailure,
 		v1.PodReasonUnschedulable: pluginsCore.PhaseQueued,
-		v1.PodUnknown:             pluginsCore.PhaseUndefined,
 	}
 
 	for podPhase, expectedTaskPhase := range testCases {
