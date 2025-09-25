@@ -173,11 +173,11 @@ spec:
         - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         readinessProbe:
         {{- with .Values.flyteadmin.readinessProbe -}}
-        {{- . | nindent 10 }}
+        {{- tpl . $ | nindent 10 }}
         {{- end }}
         livenessProbe:
         {{- with .Values.flyteadmin.livenessProbe -}}
-        {{- . | nindent 10 }}
+        {{- tpl . $ | nindent 10 }}
         {{- end }}
         resources: {{- toYaml .Values.flyteadmin.resources | nindent 10 }}
         securityContext:

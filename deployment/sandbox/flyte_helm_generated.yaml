@@ -6839,12 +6839,12 @@ spec:
         - containerPort: 8089
         - containerPort: 10254
         readinessProbe:
-          exec:
-            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          grpc: 
+            port: 8089
           initialDelaySeconds: 15
         livenessProbe:
-          exec:
-            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          grpc: 
+            port: 8089
           initialDelaySeconds: 20
           periodSeconds: 5
         resources:
