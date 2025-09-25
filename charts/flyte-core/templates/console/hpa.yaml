@@ -1,0 +1,17 @@
+{{- if and .Values.flyteconsole.enabled .Values.flyteconsole.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "flyteconsole.name" . }}
+  minReplicas: {{ .Values.flyteconsole.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.flyteconsole.autoscaling.maxReplicas }}
+  metrics:
+    {{ .Values.flyteconsole.autoscaling.metrics | toYaml | nindent 4 }}
+{{- end }}
