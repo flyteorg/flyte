@@ -623,6 +623,9 @@
         "name": {
           "type": "string",
           "description": "Unique name of the trigger."
+        },
+        "task_name": {
+          "type": "string"
         }
       },
       "title": "Identifies trigger within an org, project and domain"

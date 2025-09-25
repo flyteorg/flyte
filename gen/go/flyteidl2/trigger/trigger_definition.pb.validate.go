@@ -595,6 +595,8 @@ func (m *TriggerSpec) validate(all bool) error {
 
 	// no validation rules for Active
 
+	// no validation rules for TaskVersion
+
 	if len(errors) > 0 {
 		return TriggerSpecMultiError(errors)
 	}
@@ -1140,35 +1142,6 @@ func (m *Trigger) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return TriggerValidationError{
 				field:  "Status",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetTaskId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, TriggerValidationError{
-					field:  "TaskId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, TriggerValidationError{
-					field:  "TaskId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TriggerValidationError{
-				field:  "TaskId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

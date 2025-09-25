@@ -109,14 +109,16 @@ class GetActionDataResponse(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_run_definition_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_run_definition_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
-    __slots__ = ["request", "org", "project_id"]
+    __slots__ = ["request", "org", "project_id", "trigger_name"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     project_id: _identifier_pb2.ProjectIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+    trigger_name: _identifier_pb2.TriggerName
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ...) -> None: ...
 
 class ListRunsResponse(_message.Message):
     __slots__ = ["runs", "token"]

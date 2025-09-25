@@ -64,6 +64,12 @@ message TriggerSpec {
 
   // Whether trigger is active
   bool active = 4;
+
+  // Task version together with trigger name will give us the unique task id
+  string task_version = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
 }
 
 message TriggerStatus {
@@ -100,13 +106,13 @@ message TriggerAutomationSpec {
 
 // Light-weight information about trigger for a list view
 message Trigger {
+  reserved 4;
+
   common.TriggerIdentifier id = 1;
 
   TriggerMetadata meta = 2;
 
   TriggerStatus status = 3;
-
-  flyteidl2.task.TaskIdentifier task_id = 4;
 
   bool active = 5;
 

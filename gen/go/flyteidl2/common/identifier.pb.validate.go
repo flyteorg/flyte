@@ -1620,6 +1620,8 @@ func (m *TriggerName) validate(all bool) error {
 
 	// no validation rules for Name
 
+	// no validation rules for TaskName
+
 	if len(errors) > 0 {
 		return TriggerNameMultiError(errors)
 	}

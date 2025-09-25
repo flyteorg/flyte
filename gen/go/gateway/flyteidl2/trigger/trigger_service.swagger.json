@@ -452,6 +452,9 @@
         "name": {
           "type": "string",
           "description": "Unique name of the trigger."
+        },
+        "task_name": {
+          "type": "string"
         }
       },
       "title": "Identifies trigger within an org, project and domain"
@@ -1168,9 +1171,6 @@
         "status": {
           "$ref": "#/definitions/triggerTriggerStatus"
         },
-        "task_id": {
-          "$ref": "#/definitions/taskTaskIdentifier"
-        },
         "active": {
           "type": "boolean"
         },
@@ -1285,6 +1285,10 @@
         "active": {
           "type": "boolean",
           "title": "Whether trigger is active"
+        },
+        "task_version": {
+          "type": "string",
+          "title": "Task version together with trigger name will give us the unique task id"
         }
       }
     },
