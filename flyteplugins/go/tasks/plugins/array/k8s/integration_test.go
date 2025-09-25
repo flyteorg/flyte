@@ -135,8 +135,6 @@ func advancePodPhases(ctx context.Context, store *storage.DataStore, outputWrite
 
 func nextHappyPodPhase(phase v1.PodPhase) v1.PodPhase {
 	switch phase {
-	case v1.PodUnknown:
-		fallthrough
 	case v1.PodPending:
 		fallthrough
 	case "":
@@ -147,5 +145,5 @@ func nextHappyPodPhase(phase v1.PodPhase) v1.PodPhase {
 		return v1.PodSucceeded
 	}
 
-	return v1.PodUnknown
+	return ""
 }
