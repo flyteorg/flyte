@@ -99,24 +99,6 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_VERSION",
 				Value: taskID.GetVersion(),
-			},
-			// Historic Task Definition Level env variables.
-			// Remove these once SDK is migrated to use the new ones.
-			v1.EnvVar{
-				Name:  "FLYTE_INTERNAL_PROJECT",
-				Value: taskID.GetProject(),
-			},
-			v1.EnvVar{
-				Name:  "FLYTE_INTERNAL_DOMAIN",
-				Value: taskID.GetDomain(),
-			},
-			v1.EnvVar{
-				Name:  "FLYTE_INTERNAL_NAME",
-				Value: taskID.GetName(),
-			},
-			v1.EnvVar{
-				Name:  "FLYTE_INTERNAL_VERSION",
-				Value: taskID.GetVersion(),
 			})
 
 	}
