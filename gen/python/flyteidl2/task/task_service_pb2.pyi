@@ -10,12 +10,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DeployTaskRequest(_message.Message):
-    __slots__ = ["task_id", "spec"]
+    __slots__ = ["task_id", "spec", "triggers"]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
+    TRIGGERS_FIELD_NUMBER: _ClassVar[int]
     task_id: _task_definition_pb2.TaskIdentifier
     spec: _task_definition_pb2.TaskSpec
-    def __init__(self, task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ...) -> None: ...
+    triggers: _containers.RepeatedCompositeFieldContainer[_task_definition_pb2.TaskTrigger]
+    def __init__(self, task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., triggers: _Optional[_Iterable[_Union[_task_definition_pb2.TaskTrigger, _Mapping]]] = ...) -> None: ...
 
 class DeployTaskResponse(_message.Message):
     __slots__ = []

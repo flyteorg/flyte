@@ -84,11 +84,11 @@ pub mod trigger_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn save_trigger(
+        pub async fn deploy_trigger(
             &mut self,
-            request: impl tonic::IntoRequest<super::SaveTriggerRequest>,
+            request: impl tonic::IntoRequest<super::DeployTriggerRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::SaveTriggerResponse>,
+            tonic::Response<super::DeployTriggerResponse>,
             tonic::Status,
         > {
             self.inner
@@ -102,12 +102,12 @@ pub mod trigger_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.trigger.TriggerService/SaveTrigger",
+                "/flyteidl2.trigger.TriggerService/DeployTrigger",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.trigger.TriggerService", "SaveTrigger"),
+                    GrpcMethod::new("flyteidl2.trigger.TriggerService", "DeployTrigger"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -291,11 +291,11 @@ pub mod trigger_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with TriggerServiceServer.
     #[async_trait]
     pub trait TriggerService: Send + Sync + 'static {
-        async fn save_trigger(
+        async fn deploy_trigger(
             &self,
-            request: tonic::Request<super::SaveTriggerRequest>,
+            request: tonic::Request<super::DeployTriggerRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::SaveTriggerResponse>,
+            tonic::Response<super::DeployTriggerResponse>,
             tonic::Status,
         >;
         async fn get_trigger_details(
@@ -417,25 +417,25 @@ pub mod trigger_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.trigger.TriggerService/SaveTrigger" => {
+                "/flyteidl2.trigger.TriggerService/DeployTrigger" => {
                     #[allow(non_camel_case_types)]
-                    struct SaveTriggerSvc<T: TriggerService>(pub Arc<T>);
+                    struct DeployTriggerSvc<T: TriggerService>(pub Arc<T>);
                     impl<
                         T: TriggerService,
-                    > tonic::server::UnaryService<super::SaveTriggerRequest>
-                    for SaveTriggerSvc<T> {
-                        type Response = super::SaveTriggerResponse;
+                    > tonic::server::UnaryService<super::DeployTriggerRequest>
+                    for DeployTriggerSvc<T> {
+                        type Response = super::DeployTriggerResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::SaveTriggerRequest>,
+                            request: tonic::Request<super::DeployTriggerRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TriggerService>::save_trigger(&inner, request).await
+                                <T as TriggerService>::deploy_trigger(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -446,7 +446,7 @@ pub mod trigger_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = SaveTriggerSvc(inner);
+                        let method = DeployTriggerSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

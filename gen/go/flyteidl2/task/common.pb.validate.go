@@ -165,3 +165,444 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NamedParameterValidationError{}
+
+// Validate checks the field values on FixedRate with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FixedRate) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FixedRate with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FixedRateMultiError, or nil
+// if none found.
+func (m *FixedRate) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FixedRate) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Value
+
+	// no validation rules for Unit
+
+	if all {
+		switch v := interface{}(m.GetStartTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, FixedRateValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, FixedRateValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FixedRateValidationError{
+				field:  "StartTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return FixedRateMultiError(errors)
+	}
+
+	return nil
+}
+
+// FixedRateMultiError is an error wrapping multiple validation errors returned
+// by FixedRate.ValidateAll() if the designated constraints aren't met.
+type FixedRateMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FixedRateMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FixedRateMultiError) AllErrors() []error { return m }
+
+// FixedRateValidationError is the validation error returned by
+// FixedRate.Validate if the designated constraints aren't met.
+type FixedRateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FixedRateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FixedRateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FixedRateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FixedRateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FixedRateValidationError) ErrorName() string { return "FixedRateValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FixedRateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFixedRate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FixedRateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FixedRateValidationError{}
+
+// Validate checks the field values on Schedule with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Schedule) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Schedule with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ScheduleMultiError, or nil
+// if none found.
+func (m *Schedule) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Schedule) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for KickoffTimeInputArg
+
+	switch v := m.Expression.(type) {
+	case *Schedule_Rate:
+		if v == nil {
+			err := ScheduleValidationError{
+				field:  "Expression",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRate()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ScheduleValidationError{
+						field:  "Rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ScheduleValidationError{
+						field:  "Rate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRate()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ScheduleValidationError{
+					field:  "Rate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Schedule_CronExpression:
+		if v == nil {
+			err := ScheduleValidationError{
+				field:  "Expression",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for CronExpression
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return ScheduleMultiError(errors)
+	}
+
+	return nil
+}
+
+// ScheduleMultiError is an error wrapping multiple validation errors returned
+// by Schedule.ValidateAll() if the designated constraints aren't met.
+type ScheduleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ScheduleMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ScheduleMultiError) AllErrors() []error { return m }
+
+// ScheduleValidationError is the validation error returned by
+// Schedule.Validate if the designated constraints aren't met.
+type ScheduleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScheduleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScheduleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScheduleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScheduleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScheduleValidationError) ErrorName() string { return "ScheduleValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ScheduleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSchedule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScheduleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScheduleValidationError{}
+
+// Validate checks the field values on TriggerAutomationSpec with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TriggerAutomationSpec) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TriggerAutomationSpec with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TriggerAutomationSpecMultiError, or nil if none found.
+func (m *TriggerAutomationSpec) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TriggerAutomationSpec) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Type
+
+	switch v := m.Automation.(type) {
+	case *TriggerAutomationSpec_Schedule:
+		if v == nil {
+			err := TriggerAutomationSpecValidationError{
+				field:  "Automation",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSchedule()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TriggerAutomationSpecValidationError{
+						field:  "Schedule",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TriggerAutomationSpecValidationError{
+						field:  "Schedule",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSchedule()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TriggerAutomationSpecValidationError{
+					field:  "Schedule",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return TriggerAutomationSpecMultiError(errors)
+	}
+
+	return nil
+}
+
+// TriggerAutomationSpecMultiError is an error wrapping multiple validation
+// errors returned by TriggerAutomationSpec.ValidateAll() if the designated
+// constraints aren't met.
+type TriggerAutomationSpecMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TriggerAutomationSpecMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TriggerAutomationSpecMultiError) AllErrors() []error { return m }
+
+// TriggerAutomationSpecValidationError is the validation error returned by
+// TriggerAutomationSpec.Validate if the designated constraints aren't met.
+type TriggerAutomationSpecValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TriggerAutomationSpecValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TriggerAutomationSpecValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TriggerAutomationSpecValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TriggerAutomationSpecValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TriggerAutomationSpecValidationError) ErrorName() string {
+	return "TriggerAutomationSpecValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TriggerAutomationSpecValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTriggerAutomationSpec.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TriggerAutomationSpecValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TriggerAutomationSpecValidationError{}

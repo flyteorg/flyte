@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/task/common.proto";
 import "flyteidl2/trigger/trigger_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
@@ -20,7 +21,7 @@ service TriggerService {
   // If trigger is found, client should set `trigger.id.revision` to the <latest>.
   // Backend validates that version is the latest and creates a new revision of the trigger.
   // Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
-  rpc SaveTrigger(SaveTriggerRequest) returns (SaveTriggerResponse) {}
+  rpc DeployTrigger(DeployTriggerRequest) returns (DeployTriggerResponse) {}
 
   // Get detailed info about the latest trigger revision
   rpc GetTriggerDetails(GetTriggerDetailsRequest) returns (GetTriggerDetailsResponse) {
@@ -50,12 +51,17 @@ service TriggerService {
 }
 
 // Request message for saving a trigger.
-message SaveTriggerRequest {
-  flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
+message DeployTriggerRequest {
+  flyteidl2.common.TriggerIdentifier id = 1 [(buf.validate.field).required = true];
+
+  TriggerSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Optional automation spec.
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 3;
 }
 
 // Response message for saving a trigger.
-message SaveTriggerResponse {
+message DeployTriggerResponse {
   flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
 }
 

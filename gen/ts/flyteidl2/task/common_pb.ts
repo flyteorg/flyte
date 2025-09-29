@@ -2,17 +2,19 @@
 // @generated from file flyteidl2/task/common.proto (package flyteidl2.task, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Parameter } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyQrABChJjb20uZmx5dGVpZGwyLnRhc2tCC0NvbW1vblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_flyteidl2_core_interface]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIncKCUZpeGVkUmF0ZRINCgV2YWx1ZRgBIAEoDRIrCgR1bml0GAIgASgOMh0uZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlVW5pdBIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJ+CghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUIMCgpleHByZXNzaW9uIs0BChVUcmlnZ2VyQXV0b21hdGlvblNwZWMSOAoEdHlwZRgBIAEoDjIqLmZseXRlaWRsMi50YXNrLlRyaWdnZXJBdXRvbWF0aW9uU3BlYy5UeXBlEiwKCHNjaGVkdWxlGAIgASgLMhguZmx5dGVpZGwyLnRhc2suU2NoZWR1bGVIACI+CgRUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABINCglUWVBFX05PTkUQARIRCg1UWVBFX1NDSEVEVUxFEAJCDAoKYXV0b21hdGlvbip/Cg1GaXhlZFJhdGVVbml0Eh8KG0ZJWEVEX1JBVEVfVU5JVF9VTlNQRUNJRklFRBAAEhoKFkZJWEVEX1JBVEVfVU5JVF9NSU5VVEUQARIYChRGSVhFRF9SQVRFX1VOSVRfSE9VUhACEhcKE0ZJWEVEX1JBVEVfVU5JVF9EQVkQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_core_interface, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -35,4 +37,170 @@ export type NamedParameter = Message<"flyteidl2.task.NamedParameter"> & {
  */
 export const NamedParameterSchema: GenMessage<NamedParameter> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_common, 0);
+
+/**
+ * Option for schedules run at a certain frequency e.g. every 2 minutes.
+ *
+ * @generated from message flyteidl2.task.FixedRate
+ */
+export type FixedRate = Message<"flyteidl2.task.FixedRate"> & {
+  /**
+   * @generated from field: uint32 value = 1;
+   */
+  value: number;
+
+  /**
+   * @generated from field: flyteidl2.task.FixedRateUnit unit = 2;
+   */
+  unit: FixedRateUnit;
+
+  /**
+   * Optional, timestamp after which rate should be calculated. Can be only in future.
+   * E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
+   * Activate it at "12:04".
+   * Trigger should fire at "12:05" as it adds 5 minutes to start_time="12:00".
+   *
+   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   */
+  startTime?: Timestamp;
+};
+
+/**
+ * Describes the message flyteidl2.task.FixedRate.
+ * Use `create(FixedRateSchema)` to create a new message.
+ */
+export const FixedRateSchema: GenMessage<FixedRate> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 1);
+
+/**
+ * Defines complete set of information required to trigger an execution on a schedule.
+ *
+ * @generated from message flyteidl2.task.Schedule
+ */
+export type Schedule = Message<"flyteidl2.task.Schedule"> & {
+  /**
+   * @generated from oneof flyteidl2.task.Schedule.expression
+   */
+  expression: {
+    /**
+     * Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+     * e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+     *
+     * @generated from field: flyteidl2.task.FixedRate rate = 1;
+     */
+    value: FixedRate;
+    case: "rate";
+  } | {
+    /**
+     * @generated from field: string cron_expression = 2;
+     */
+    value: string;
+    case: "cronExpression";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
+   *
+   * @generated from field: string kickoff_time_input_arg = 3;
+   */
+  kickoffTimeInputArg: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.Schedule.
+ * Use `create(ScheduleSchema)` to create a new message.
+ */
+export const ScheduleSchema: GenMessage<Schedule> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 2);
+
+/**
+ * @generated from message flyteidl2.task.TriggerAutomationSpec
+ */
+export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpec"> & {
+  /**
+   * Explicitly defines trigger automation type.
+   *
+   * @generated from field: flyteidl2.task.TriggerAutomationSpec.Type type = 1;
+   */
+  type: TriggerAutomationSpec_Type;
+
+  /**
+   * @generated from oneof flyteidl2.task.TriggerAutomationSpec.automation
+   */
+  automation: {
+    /**
+     * @generated from field: flyteidl2.task.Schedule schedule = 2;
+     */
+    value: Schedule;
+    case: "schedule";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.task.TriggerAutomationSpec.
+ * Use `create(TriggerAutomationSpecSchema)` to create a new message.
+ */
+export const TriggerAutomationSpecSchema: GenMessage<TriggerAutomationSpec> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 3);
+
+/**
+ * Specifies type of the automation attached to trigger if any.
+ *
+ * @generated from enum flyteidl2.task.TriggerAutomationSpec.Type
+ */
+export enum TriggerAutomationSpec_Type {
+  /**
+   * @generated from enum value: TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TYPE_NONE = 1;
+   */
+  NONE = 1,
+
+  /**
+   * @generated from enum value: TYPE_SCHEDULE = 2;
+   */
+  SCHEDULE = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.task.TriggerAutomationSpec.Type.
+ */
+export const TriggerAutomationSpec_TypeSchema: GenEnum<TriggerAutomationSpec_Type> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_task_common, 3, 0);
+
+/**
+ * Represents a frequency at which to run a schedule.
+ *
+ * @generated from enum flyteidl2.task.FixedRateUnit
+ */
+export enum FixedRateUnit {
+  /**
+   * @generated from enum value: FIXED_RATE_UNIT_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: FIXED_RATE_UNIT_MINUTE = 1;
+   */
+  MINUTE = 1,
+
+  /**
+   * @generated from enum value: FIXED_RATE_UNIT_HOUR = 2;
+   */
+  HOUR = 2,
+
+  /**
+   * @generated from enum value: FIXED_RATE_UNIT_DAY = 3;
+   */
+  DAY = 3,
+}
+
+/**
+ * Describes the enum flyteidl2.task.FixedRateUnit.
+ */
+export const FixedRateUnitSchema: GenEnum<FixedRateUnit> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_task_common, 0);
 

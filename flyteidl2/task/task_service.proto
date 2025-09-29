@@ -32,6 +32,9 @@ message DeployTaskRequest {
 
   // Specification for the task.
   TaskSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Optional, set of triggers for a given task. Replaces previous set of triggers entirely if any.
+  repeated TaskTrigger triggers = 3;
 }
 
 // Response message for deploying a task.

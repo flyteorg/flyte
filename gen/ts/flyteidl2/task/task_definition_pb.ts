@@ -14,7 +14,7 @@ import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { NamedParameter } from "./common_pb.ts";
+import type { NamedParameter, TriggerAutomationSpec } from "./common_pb.ts";
 import { file_flyteidl2_task_common } from "./common_pb.ts";
 import type { Environment } from "./environment_pb.ts";
 import { file_flyteidl2_task_environment } from "./environment_pb.ts";
@@ -24,7 +24,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/task_definition.proto.
  */
 export const file_flyteidl2_task_task_definition: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvdGFzay90YXNrX2RlZmluaXRpb24ucHJvdG8SDmZseXRlaWRsMi50YXNrInMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgm6SAZyBBABGD8itgEKDFRhc2tNZXRhZGF0YRI/CgtkZXBsb3llZF9ieRgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eUIGukgDyAEBEhIKCnNob3J0X25hbWUYAiABKAkSNwoLZGVwbG95ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQESGAoQZW52aXJvbm1lbnRfbmFtZRgEIAEoCSJ3CgRUYXNrEjcKB3Rhc2tfaWQYASABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckIGukgDyAEBEjYKCG1ldGFkYXRhGAIgASgLMhwuZmx5dGVpZGwyLnRhc2suVGFza01ldGFkYXRhQga6SAPIAQEizgEKCFRhc2tTcGVjEjsKDXRhc2tfdGVtcGxhdGUYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5UYXNrVGVtcGxhdGVCBrpIA8gBARI2Cg5kZWZhdWx0X2lucHV0cxgCIAMoCzIeLmZseXRlaWRsMi50YXNrLk5hbWVkUGFyYW1ldGVyEhsKCnNob3J0X25hbWUYAyABKAlCB7pIBHICGD8SMAoLZW52aXJvbm1lbnQYBCABKAsyGy5mbHl0ZWlkbDIudGFzay5FbnZpcm9ubWVudCI+CglUcmFjZVNwZWMSMQoJaW50ZXJmYWNlGAEgASgLMh4uZmx5dGVpZGwyLmNvcmUuVHlwZWRJbnRlcmZhY2UirgEKC1Rhc2tEZXRhaWxzEjcKB3Rhc2tfaWQYASABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckIGukgDyAEBEjYKCG1ldGFkYXRhGAIgASgLMhwuZmx5dGVpZGwyLnRhc2suVGFza01ldGFkYXRhQga6SAPIAQESLgoEc3BlYxgDIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjQga6SAPIAQFCuAEKEmNvbS5mbHl0ZWlkbDIudGFza0ITVGFza0RlZmluaXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_interface, file_flyteidl2_core_tasks, file_google_protobuf_timestamp, file_buf_validate_validate, file_flyteidl2_task_common, file_flyteidl2_task_environment]);
+  fileDesc("CiRmbHl0ZWlkbDIvdGFzay90YXNrX2RlZmluaXRpb24ucHJvdG8SDmZseXRlaWRsMi50YXNrInMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgm6SAZyBBABGD8i1AEKE1Rhc2tUcmlnZ2Vyc1N1bW1hcnkSQAoPYXV0b21hdGlvbl9zcGVjGAEgASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjSAASQQoFc3RhdHMYAiABKAsyMC5mbHl0ZWlkbDIudGFzay5UYXNrVHJpZ2dlcnNTdW1tYXJ5LlRyaWdnZXJTdGF0c0gAGi0KDFRyaWdnZXJTdGF0cxINCgV0b3RhbBgBIAEoDRIOCgZhY3RpdmUYAiABKA1CCQoHc3VtbWFyeSL1AQoMVGFza01ldGFkYXRhEj8KC2RlcGxveWVkX2J5GAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5Qga6SAPIAQESEgoKc2hvcnRfbmFtZRgCIAEoCRI3CgtkZXBsb3llZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBARIYChBlbnZpcm9ubWVudF9uYW1lGAQgASgJEj0KEHRyaWdnZXJzX3N1bW1hcnkYBSABKAsyIy5mbHl0ZWlkbDIudGFzay5UYXNrVHJpZ2dlcnNTdW1tYXJ5IncKBFRhc2sSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQESNgoIbWV0YWRhdGEYAiABKAsyHC5mbHl0ZWlkbDIudGFzay5UYXNrTWV0YWRhdGFCBrpIA8gBASLOAQoIVGFza1NwZWMSOwoNdGFza190ZW1wbGF0ZRgBIAEoCzIcLmZseXRlaWRsMi5jb3JlLlRhc2tUZW1wbGF0ZUIGukgDyAEBEjYKDmRlZmF1bHRfaW5wdXRzGAIgAygLMh4uZmx5dGVpZGwyLnRhc2suTmFtZWRQYXJhbWV0ZXISGwoKc2hvcnRfbmFtZRgDIAEoCUIHukgEcgIYPxIwCgtlbnZpcm9ubWVudBgEIAEoCzIbLmZseXRlaWRsMi50YXNrLkVudmlyb25tZW50Ij4KCVRyYWNlU3BlYxIxCglpbnRlcmZhY2UYASABKAsyHi5mbHl0ZWlkbDIuY29yZS5UeXBlZEludGVyZmFjZSKuAQoLVGFza0RldGFpbHMSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQESNgoIbWV0YWRhdGEYAiABKAsyHC5mbHl0ZWlkbDIudGFzay5UYXNrTWV0YWRhdGFCBrpIA8gBARIuCgRzcGVjGAMgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNCBrpIA8gBASKeAQoLVGFza1RyaWdnZXISGAoEbmFtZRgBIAEoCUIKukgHcgUQARj/ARI1CgRzcGVjGAIgASgLMh8uZmx5dGVpZGwyLnRhc2suVGFza1RyaWdnZXJTcGVjQga6SAPIAQESPgoPYXV0b21hdGlvbl9zcGVjGAMgASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjIiEKD1Rhc2tUcmlnZ2VyU3BlYxIOCgZhY3RpdmUYASABKAhCuAEKEmNvbS5mbHl0ZWlkbDIudGFza0ITVGFza0RlZmluaXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_interface, file_flyteidl2_core_tasks, file_google_protobuf_timestamp, file_buf_validate_validate, file_flyteidl2_task_common, file_flyteidl2_task_environment]);
 
 /**
  * Name of a task. It may have multiple versions deployed.
@@ -118,6 +118,57 @@ export const TaskIdentifierSchema: GenMessage<TaskIdentifier> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_task_definition, 1);
 
 /**
+ * @generated from message flyteidl2.task.TaskTriggersSummary
+ */
+export type TaskTriggersSummary = Message<"flyteidl2.task.TaskTriggersSummary"> & {
+  /**
+   * @generated from oneof flyteidl2.task.TaskTriggersSummary.summary
+   */
+  summary: {
+    /**
+     * @generated from field: flyteidl2.task.TriggerAutomationSpec automation_spec = 1;
+     */
+    value: TriggerAutomationSpec;
+    case: "automationSpec";
+  } | {
+    /**
+     * @generated from field: flyteidl2.task.TaskTriggersSummary.TriggerStats stats = 2;
+     */
+    value: TaskTriggersSummary_TriggerStats;
+    case: "stats";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.task.TaskTriggersSummary.
+ * Use `create(TaskTriggersSummarySchema)` to create a new message.
+ */
+export const TaskTriggersSummarySchema: GenMessage<TaskTriggersSummary> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_definition, 2);
+
+/**
+ * @generated from message flyteidl2.task.TaskTriggersSummary.TriggerStats
+ */
+export type TaskTriggersSummary_TriggerStats = Message<"flyteidl2.task.TaskTriggersSummary.TriggerStats"> & {
+  /**
+   * @generated from field: uint32 total = 1;
+   */
+  total: number;
+
+  /**
+   * @generated from field: uint32 active = 2;
+   */
+  active: number;
+};
+
+/**
+ * Describes the message flyteidl2.task.TaskTriggersSummary.TriggerStats.
+ * Use `create(TaskTriggersSummary_TriggerStatsSchema)` to create a new message.
+ */
+export const TaskTriggersSummary_TriggerStatsSchema: GenMessage<TaskTriggersSummary_TriggerStats> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_definition, 2, 0);
+
+/**
  * TaskMetadata is static, lightweight metadata about a task.
  *
  * @generated from message flyteidl2.task.TaskMetadata
@@ -150,6 +201,13 @@ export type TaskMetadata = Message<"flyteidl2.task.TaskMetadata"> & {
    * @generated from field: string environment_name = 4;
    */
   environmentName: string;
+
+  /**
+   * Brief overview of attached triggers if any.
+   *
+   * @generated from field: flyteidl2.task.TaskTriggersSummary triggers_summary = 5;
+   */
+  triggersSummary?: TaskTriggersSummary;
 };
 
 /**
@@ -157,7 +215,7 @@ export type TaskMetadata = Message<"flyteidl2.task.TaskMetadata"> & {
  * Use `create(TaskMetadataSchema)` to create a new message.
  */
 export const TaskMetadataSchema: GenMessage<TaskMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 2);
+  messageDesc(file_flyteidl2_task_task_definition, 3);
 
 /**
  * Lightweight representation of a task.
@@ -185,7 +243,7 @@ export type Task = Message<"flyteidl2.task.Task"> & {
  * Use `create(TaskSchema)` to create a new message.
  */
 export const TaskSchema: GenMessage<Task> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 3);
+  messageDesc(file_flyteidl2_task_task_definition, 4);
 
 /**
  * Specification for a task.
@@ -230,7 +288,7 @@ export type TaskSpec = Message<"flyteidl2.task.TaskSpec"> & {
  * Use `create(TaskSpecSchema)` to create a new message.
  */
 export const TaskSpecSchema: GenMessage<TaskSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 4);
+  messageDesc(file_flyteidl2_task_task_definition, 5);
 
 /**
  * Specification for a trace action.
@@ -251,7 +309,7 @@ export type TraceSpec = Message<"flyteidl2.task.TraceSpec"> & {
  * Use `create(TraceSpecSchema)` to create a new message.
  */
 export const TraceSpecSchema: GenMessage<TraceSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 5);
+  messageDesc(file_flyteidl2_task_task_definition, 6);
 
 /**
  * Detailed information about a task.
@@ -286,5 +344,58 @@ export type TaskDetails = Message<"flyteidl2.task.TaskDetails"> & {
  * Use `create(TaskDetailsSchema)` to create a new message.
  */
 export const TaskDetailsSchema: GenMessage<TaskDetails> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 6);
+  messageDesc(file_flyteidl2_task_task_definition, 7);
+
+/**
+ * Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint.
+ *
+ * @generated from message flyteidl2.task.TaskTrigger
+ */
+export type TaskTrigger = Message<"flyteidl2.task.TaskTrigger"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: flyteidl2.task.TaskTriggerSpec spec = 2;
+   */
+  spec?: TaskTriggerSpec;
+
+  /**
+   * Optional automation spec.
+   *
+   * @generated from field: flyteidl2.task.TriggerAutomationSpec automation_spec = 3;
+   */
+  automationSpec?: TriggerAutomationSpec;
+};
+
+/**
+ * Describes the message flyteidl2.task.TaskTrigger.
+ * Use `create(TaskTriggerSchema)` to create a new message.
+ */
+export const TaskTriggerSchema: GenMessage<TaskTrigger> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_definition, 8);
+
+/**
+ * TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.
+ * This is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id.
+ *
+ * @generated from message flyteidl2.task.TaskTriggerSpec
+ */
+export type TaskTriggerSpec = Message<"flyteidl2.task.TaskTriggerSpec"> & {
+  /**
+   * Whether trigger is active
+   *
+   * @generated from field: bool active = 1;
+   */
+  active: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.task.TaskTriggerSpec.
+ * Use `create(TaskTriggerSpecSchema)` to create a new message.
+ */
+export const TaskTriggerSpecSchema: GenMessage<TaskTriggerSpec> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_definition, 9);
 

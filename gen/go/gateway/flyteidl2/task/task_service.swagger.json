@@ -192,6 +192,19 @@
         }
       }
     },
+    "TaskTriggersSummaryTriggerStats": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "active": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "commonAppSpec": {
       "type": "object",
       "properties": {
@@ -1862,6 +1875,10 @@
         "environment_name": {
           "type": "string",
           "description": "The environment name for this task, if present."
+        },
+        "triggers_summary": {
+          "$ref": "#/definitions/taskTaskTriggersSummary",
+          "description": "Brief overview of attached triggers if any."
         }
       },
       "description": "TaskMetadata is static, lightweight metadata about a task."
@@ -1922,6 +1939,35 @@
       },
       "description": "Environment for a task."
     },
+    "taskFixedRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/taskFixedRateUnit"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        }
+      },
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
+    },
+    "taskFixedRateUnit": {
+      "type": "string",
+      "enum": [
+        "FIXED_RATE_UNIT_UNSPECIFIED",
+        "FIXED_RATE_UNIT_MINUTE",
+        "FIXED_RATE_UNIT_HOUR",
+        "FIXED_RATE_UNIT_DAY"
+      ],
+      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
+      "description": "Represents a frequency at which to run a schedule."
+    },
     "taskGetTaskDetailsResponse": {
       "type": "object",
       "properties": {
@@ -1958,6 +2004,23 @@
           "$ref": "#/definitions/coreParameter"
         }
       }
+    },
+    "taskSchedule": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/taskFixedRate",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "cron_expression": {
+          "type": "string"
+        },
+        "kickoff_time_input_arg": {
+          "type": "string",
+          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        }
+      },
+      "description": "Defines complete set of information required to trigger an execution on a schedule."
     },
     "taskTask": {
       "type": "object",
@@ -2042,6 +2105,65 @@
         }
       },
       "description": "Specification for a task."
+    },
+    "taskTaskTrigger": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "spec": {
+          "$ref": "#/definitions/taskTaskTriggerSpec"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "description": "Optional automation spec."
+        }
+      },
+      "description": "Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint."
+    },
+    "taskTaskTriggerSpec": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "title": "Whether trigger is active"
+        }
+      },
+      "description": "TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.\nThis is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id."
+    },
+    "taskTaskTriggersSummary": {
+      "type": "object",
+      "properties": {
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
+        },
+        "stats": {
+          "$ref": "#/definitions/TaskTriggersSummaryTriggerStats"
+        }
+      }
+    },
+    "taskTriggerAutomationSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpecType",
+          "description": "Explicitly defines trigger automation type."
+        },
+        "schedule": {
+          "$ref": "#/definitions/taskSchedule"
+        }
+      }
+    },
+    "taskTriggerAutomationSpecType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_NONE",
+        "TYPE_SCHEDULE"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "Specifies type of the automation attached to trigger if any."
     }
   }
 }

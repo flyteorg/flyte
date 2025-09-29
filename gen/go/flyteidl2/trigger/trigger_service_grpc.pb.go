@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TriggerService_SaveTrigger_FullMethodName               = "/flyteidl2.trigger.TriggerService/SaveTrigger"
+	TriggerService_DeployTrigger_FullMethodName             = "/flyteidl2.trigger.TriggerService/DeployTrigger"
 	TriggerService_GetTriggerDetails_FullMethodName         = "/flyteidl2.trigger.TriggerService/GetTriggerDetails"
 	TriggerService_GetTriggerRevisionDetails_FullMethodName = "/flyteidl2.trigger.TriggerService/GetTriggerRevisionDetails"
 	TriggerService_ListTriggers_FullMethodName              = "/flyteidl2.trigger.TriggerService/ListTriggers"
@@ -40,7 +40,7 @@ type TriggerServiceClient interface {
 	// If trigger is found, client should set `trigger.id.revision` to the <latest>.
 	// Backend validates that version is the latest and creates a new revision of the trigger.
 	// Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
-	SaveTrigger(ctx context.Context, in *SaveTriggerRequest, opts ...grpc.CallOption) (*SaveTriggerResponse, error)
+	DeployTrigger(ctx context.Context, in *DeployTriggerRequest, opts ...grpc.CallOption) (*DeployTriggerResponse, error)
 	// Get detailed info about the latest trigger revision
 	GetTriggerDetails(ctx context.Context, in *GetTriggerDetailsRequest, opts ...grpc.CallOption) (*GetTriggerDetailsResponse, error)
 	// Get detailed info about a specific trigger revision
@@ -63,9 +63,9 @@ func NewTriggerServiceClient(cc grpc.ClientConnInterface) TriggerServiceClient {
 	return &triggerServiceClient{cc}
 }
 
-func (c *triggerServiceClient) SaveTrigger(ctx context.Context, in *SaveTriggerRequest, opts ...grpc.CallOption) (*SaveTriggerResponse, error) {
-	out := new(SaveTriggerResponse)
-	err := c.cc.Invoke(ctx, TriggerService_SaveTrigger_FullMethodName, in, out, opts...)
+func (c *triggerServiceClient) DeployTrigger(ctx context.Context, in *DeployTriggerRequest, opts ...grpc.CallOption) (*DeployTriggerResponse, error) {
+	out := new(DeployTriggerResponse)
+	err := c.cc.Invoke(ctx, TriggerService_DeployTrigger_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ type TriggerServiceServer interface {
 	// If trigger is found, client should set `trigger.id.revision` to the <latest>.
 	// Backend validates that version is the latest and creates a new revision of the trigger.
 	// Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
-	SaveTrigger(context.Context, *SaveTriggerRequest) (*SaveTriggerResponse, error)
+	DeployTrigger(context.Context, *DeployTriggerRequest) (*DeployTriggerResponse, error)
 	// Get detailed info about the latest trigger revision
 	GetTriggerDetails(context.Context, *GetTriggerDetailsRequest) (*GetTriggerDetailsResponse, error)
 	// Get detailed info about a specific trigger revision
@@ -157,8 +157,8 @@ type TriggerServiceServer interface {
 type UnimplementedTriggerServiceServer struct {
 }
 
-func (UnimplementedTriggerServiceServer) SaveTrigger(context.Context, *SaveTriggerRequest) (*SaveTriggerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveTrigger not implemented")
+func (UnimplementedTriggerServiceServer) DeployTrigger(context.Context, *DeployTriggerRequest) (*DeployTriggerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeployTrigger not implemented")
 }
 func (UnimplementedTriggerServiceServer) GetTriggerDetails(context.Context, *GetTriggerDetailsRequest) (*GetTriggerDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTriggerDetails not implemented")
@@ -190,20 +190,20 @@ func RegisterTriggerServiceServer(s grpc.ServiceRegistrar, srv TriggerServiceSer
 	s.RegisterService(&TriggerService_ServiceDesc, srv)
 }
 
-func _TriggerService_SaveTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveTriggerRequest)
+func _TriggerService_DeployTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeployTriggerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TriggerServiceServer).SaveTrigger(ctx, in)
+		return srv.(TriggerServiceServer).DeployTrigger(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TriggerService_SaveTrigger_FullMethodName,
+		FullMethod: TriggerService_DeployTrigger_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TriggerServiceServer).SaveTrigger(ctx, req.(*SaveTriggerRequest))
+		return srv.(TriggerServiceServer).DeployTrigger(ctx, req.(*DeployTriggerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -324,8 +324,8 @@ var TriggerService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TriggerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SaveTrigger",
-			Handler:    _TriggerService_SaveTrigger_Handler,
+			MethodName: "DeployTrigger",
+			Handler:    _TriggerService_DeployTrigger_Handler,
 		},
 		{
 			MethodName: "GetTriggerDetails",

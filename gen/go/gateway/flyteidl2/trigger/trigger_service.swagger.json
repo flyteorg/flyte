@@ -1021,6 +1021,52 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskFixedRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/taskFixedRateUnit"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        }
+      },
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
+    },
+    "taskFixedRateUnit": {
+      "type": "string",
+      "enum": [
+        "FIXED_RATE_UNIT_UNSPECIFIED",
+        "FIXED_RATE_UNIT_MINUTE",
+        "FIXED_RATE_UNIT_HOUR",
+        "FIXED_RATE_UNIT_DAY"
+      ],
+      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
+      "description": "Represents a frequency at which to run a schedule."
+    },
+    "taskSchedule": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/taskFixedRate",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "cron_expression": {
+          "type": "string"
+        },
+        "kickoff_time_input_arg": {
+          "type": "string",
+          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        }
+      },
+      "description": "Defines complete set of information required to trigger an execution on a schedule."
+    },
     "taskTaskIdentifier": {
       "type": "object",
       "properties": {
@@ -1047,38 +1093,40 @@
       },
       "description": "TaskIdentifier is the unique identifier for a task."
     },
+    "taskTriggerAutomationSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpecType",
+          "description": "Explicitly defines trigger automation type."
+        },
+        "schedule": {
+          "$ref": "#/definitions/taskSchedule"
+        }
+      }
+    },
+    "taskTriggerAutomationSpecType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_NONE",
+        "TYPE_SCHEDULE"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "Specifies type of the automation attached to trigger if any."
+    },
     "triggerDeleteTriggersResponse": {
       "type": "object",
       "description": "Response message for activating or deactivating multiple triggers."
     },
-    "triggerFixedRate": {
+    "triggerDeployTriggerResponse": {
       "type": "object",
       "properties": {
-        "value": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "unit": {
-          "$ref": "#/definitions/triggerFixedRateUnit"
-        },
-        "start_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        "trigger": {
+          "$ref": "#/definitions/triggerTriggerDetails"
         }
       },
-      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
-    },
-    "triggerFixedRateUnit": {
-      "type": "string",
-      "enum": [
-        "FIXED_RATE_UNIT_UNSPECIFIED",
-        "FIXED_RATE_UNIT_MINUTE",
-        "FIXED_RATE_UNIT_HOUR",
-        "FIXED_RATE_UNIT_DAY"
-      ],
-      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
-      "description": "Represents a frequency at which to run a schedule."
+      "description": "Response message for saving a trigger."
     },
     "triggerGetTriggerDetailsResponse": {
       "type": "object",
@@ -1133,39 +1181,13 @@
       },
       "description": "Response message for listing triggers."
     },
-    "triggerSaveTriggerResponse": {
-      "type": "object",
-      "properties": {
-        "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
-        }
-      },
-      "description": "Response message for saving a trigger."
-    },
-    "triggerSchedule": {
-      "type": "object",
-      "properties": {
-        "rate": {
-          "$ref": "#/definitions/triggerFixedRate",
-          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
-        },
-        "cron_expression": {
-          "type": "string"
-        },
-        "kickoff_time_input_arg": {
-          "type": "string",
-          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
-        }
-      },
-      "description": "Defines complete set of information required to trigger an execution on a schedule."
-    },
     "triggerTrigger": {
       "type": "object",
       "properties": {
         "id": {
           "$ref": "#/definitions/commonTriggerIdentifier"
         },
-        "meta": {
+        "metadata": {
           "$ref": "#/definitions/triggerTriggerMetadata"
         },
         "status": {
@@ -1175,32 +1197,10 @@
           "type": "boolean"
         },
         "automation_spec": {
-          "$ref": "#/definitions/triggerTriggerAutomationSpec"
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
         }
       },
       "title": "Light-weight information about trigger for a list view"
-    },
-    "triggerTriggerAutomationSpec": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/triggerTriggerAutomationSpecType",
-          "description": "Explicitly defines trigger automation type."
-        },
-        "schedule": {
-          "$ref": "#/definitions/triggerSchedule"
-        }
-      }
-    },
-    "triggerTriggerAutomationSpecType": {
-      "type": "string",
-      "enum": [
-        "TYPE_UNSPECIFIED",
-        "TYPE_NONE",
-        "TYPE_SCHEDULE"
-      ],
-      "default": "TYPE_UNSPECIFIED",
-      "description": "Specifies type of the automation attached to trigger if any."
     },
     "triggerTriggerDetails": {
       "type": "object",
@@ -1208,7 +1208,7 @@
         "id": {
           "$ref": "#/definitions/commonTriggerIdentifier"
         },
-        "meta": {
+        "metadata": {
           "$ref": "#/definitions/triggerTriggerMetadata"
         },
         "spec": {
@@ -1218,7 +1218,7 @@
           "$ref": "#/definitions/triggerTriggerStatus"
         },
         "automation_spec": {
-          "$ref": "#/definitions/triggerTriggerAutomationSpec",
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
           "description": "Optional automation spec."
         }
       },
@@ -1243,7 +1243,7 @@
         "id": {
           "$ref": "#/definitions/commonTriggerIdentifier"
         },
-        "meta": {
+        "metadata": {
           "$ref": "#/definitions/triggerTriggerMetadata"
         },
         "status": {

@@ -33,9 +33,9 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TriggerServiceSaveTriggerProcedure is the fully-qualified name of the TriggerService's
-	// SaveTrigger RPC.
-	TriggerServiceSaveTriggerProcedure = "/flyteidl2.trigger.TriggerService/SaveTrigger"
+	// TriggerServiceDeployTriggerProcedure is the fully-qualified name of the TriggerService's
+	// DeployTrigger RPC.
+	TriggerServiceDeployTriggerProcedure = "/flyteidl2.trigger.TriggerService/DeployTrigger"
 	// TriggerServiceGetTriggerDetailsProcedure is the fully-qualified name of the TriggerService's
 	// GetTriggerDetails RPC.
 	TriggerServiceGetTriggerDetailsProcedure = "/flyteidl2.trigger.TriggerService/GetTriggerDetails"
@@ -59,7 +59,7 @@ const (
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	triggerServiceServiceDescriptor                         = trigger.File_flyteidl2_trigger_trigger_service_proto.Services().ByName("TriggerService")
-	triggerServiceSaveTriggerMethodDescriptor               = triggerServiceServiceDescriptor.Methods().ByName("SaveTrigger")
+	triggerServiceDeployTriggerMethodDescriptor             = triggerServiceServiceDescriptor.Methods().ByName("DeployTrigger")
 	triggerServiceGetTriggerDetailsMethodDescriptor         = triggerServiceServiceDescriptor.Methods().ByName("GetTriggerDetails")
 	triggerServiceGetTriggerRevisionDetailsMethodDescriptor = triggerServiceServiceDescriptor.Methods().ByName("GetTriggerRevisionDetails")
 	triggerServiceListTriggersMethodDescriptor              = triggerServiceServiceDescriptor.Methods().ByName("ListTriggers")
@@ -78,7 +78,7 @@ type TriggerServiceClient interface {
 	// If trigger is found, client should set `trigger.id.revision` to the <latest>.
 	// Backend validates that version is the latest and creates a new revision of the trigger.
 	// Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
-	SaveTrigger(context.Context, *connect.Request[trigger.SaveTriggerRequest]) (*connect.Response[trigger.SaveTriggerResponse], error)
+	DeployTrigger(context.Context, *connect.Request[trigger.DeployTriggerRequest]) (*connect.Response[trigger.DeployTriggerResponse], error)
 	// Get detailed info about the latest trigger revision
 	GetTriggerDetails(context.Context, *connect.Request[trigger.GetTriggerDetailsRequest]) (*connect.Response[trigger.GetTriggerDetailsResponse], error)
 	// Get detailed info about a specific trigger revision
@@ -103,10 +103,10 @@ type TriggerServiceClient interface {
 func NewTriggerServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TriggerServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &triggerServiceClient{
-		saveTrigger: connect.NewClient[trigger.SaveTriggerRequest, trigger.SaveTriggerResponse](
+		deployTrigger: connect.NewClient[trigger.DeployTriggerRequest, trigger.DeployTriggerResponse](
 			httpClient,
-			baseURL+TriggerServiceSaveTriggerProcedure,
-			connect.WithSchema(triggerServiceSaveTriggerMethodDescriptor),
+			baseURL+TriggerServiceDeployTriggerProcedure,
+			connect.WithSchema(triggerServiceDeployTriggerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getTriggerDetails: connect.NewClient[trigger.GetTriggerDetailsRequest, trigger.GetTriggerDetailsResponse](
@@ -154,7 +154,7 @@ func NewTriggerServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // triggerServiceClient implements TriggerServiceClient.
 type triggerServiceClient struct {
-	saveTrigger               *connect.Client[trigger.SaveTriggerRequest, trigger.SaveTriggerResponse]
+	deployTrigger             *connect.Client[trigger.DeployTriggerRequest, trigger.DeployTriggerResponse]
 	getTriggerDetails         *connect.Client[trigger.GetTriggerDetailsRequest, trigger.GetTriggerDetailsResponse]
 	getTriggerRevisionDetails *connect.Client[trigger.GetTriggerRevisionDetailsRequest, trigger.GetTriggerRevisionDetailsResponse]
 	listTriggers              *connect.Client[trigger.ListTriggersRequest, trigger.ListTriggersResponse]
@@ -163,9 +163,9 @@ type triggerServiceClient struct {
 	deleteTriggers            *connect.Client[trigger.DeleteTriggersRequest, trigger.DeleteTriggersResponse]
 }
 
-// SaveTrigger calls flyteidl2.trigger.TriggerService.SaveTrigger.
-func (c *triggerServiceClient) SaveTrigger(ctx context.Context, req *connect.Request[trigger.SaveTriggerRequest]) (*connect.Response[trigger.SaveTriggerResponse], error) {
-	return c.saveTrigger.CallUnary(ctx, req)
+// DeployTrigger calls flyteidl2.trigger.TriggerService.DeployTrigger.
+func (c *triggerServiceClient) DeployTrigger(ctx context.Context, req *connect.Request[trigger.DeployTriggerRequest]) (*connect.Response[trigger.DeployTriggerResponse], error) {
+	return c.deployTrigger.CallUnary(ctx, req)
 }
 
 // GetTriggerDetails calls flyteidl2.trigger.TriggerService.GetTriggerDetails.
@@ -208,7 +208,7 @@ type TriggerServiceHandler interface {
 	// If trigger is found, client should set `trigger.id.revision` to the <latest>.
 	// Backend validates that version is the latest and creates a new revision of the trigger.
 	// Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
-	SaveTrigger(context.Context, *connect.Request[trigger.SaveTriggerRequest]) (*connect.Response[trigger.SaveTriggerResponse], error)
+	DeployTrigger(context.Context, *connect.Request[trigger.DeployTriggerRequest]) (*connect.Response[trigger.DeployTriggerResponse], error)
 	// Get detailed info about the latest trigger revision
 	GetTriggerDetails(context.Context, *connect.Request[trigger.GetTriggerDetailsRequest]) (*connect.Response[trigger.GetTriggerDetailsResponse], error)
 	// Get detailed info about a specific trigger revision
@@ -229,10 +229,10 @@ type TriggerServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTriggerServiceHandler(svc TriggerServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	triggerServiceSaveTriggerHandler := connect.NewUnaryHandler(
-		TriggerServiceSaveTriggerProcedure,
-		svc.SaveTrigger,
-		connect.WithSchema(triggerServiceSaveTriggerMethodDescriptor),
+	triggerServiceDeployTriggerHandler := connect.NewUnaryHandler(
+		TriggerServiceDeployTriggerProcedure,
+		svc.DeployTrigger,
+		connect.WithSchema(triggerServiceDeployTriggerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	triggerServiceGetTriggerDetailsHandler := connect.NewUnaryHandler(
@@ -277,8 +277,8 @@ func NewTriggerServiceHandler(svc TriggerServiceHandler, opts ...connect.Handler
 	)
 	return "/flyteidl2.trigger.TriggerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case TriggerServiceSaveTriggerProcedure:
-			triggerServiceSaveTriggerHandler.ServeHTTP(w, r)
+		case TriggerServiceDeployTriggerProcedure:
+			triggerServiceDeployTriggerHandler.ServeHTTP(w, r)
 		case TriggerServiceGetTriggerDetailsProcedure:
 			triggerServiceGetTriggerDetailsHandler.ServeHTTP(w, r)
 		case TriggerServiceGetTriggerRevisionDetailsProcedure:
@@ -300,8 +300,8 @@ func NewTriggerServiceHandler(svc TriggerServiceHandler, opts ...connect.Handler
 // UnimplementedTriggerServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTriggerServiceHandler struct{}
 
-func (UnimplementedTriggerServiceHandler) SaveTrigger(context.Context, *connect.Request[trigger.SaveTriggerRequest]) (*connect.Response[trigger.SaveTriggerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.trigger.TriggerService.SaveTrigger is not implemented"))
+func (UnimplementedTriggerServiceHandler) DeployTrigger(context.Context, *connect.Request[trigger.DeployTriggerRequest]) (*connect.Response[trigger.DeployTriggerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.trigger.TriggerService.DeployTrigger is not implemented"))
 }
 
 func (UnimplementedTriggerServiceHandler) GetTriggerDetails(context.Context, *connect.Request[trigger.GetTriggerDetailsRequest]) (*connect.Response[trigger.GetTriggerDetailsResponse], error) {

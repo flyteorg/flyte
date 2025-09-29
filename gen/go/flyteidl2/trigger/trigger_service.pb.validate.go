@@ -35,22 +35,22 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on SaveTriggerRequest with the rules
+// Validate checks the field values on DeployTriggerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *SaveTriggerRequest) Validate() error {
+func (m *DeployTriggerRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on SaveTriggerRequest with the rules
+// ValidateAll checks the field values on DeployTriggerRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// SaveTriggerRequestMultiError, or nil if none found.
-func (m *SaveTriggerRequest) ValidateAll() error {
+// DeployTriggerRequestMultiError, or nil if none found.
+func (m *DeployTriggerRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *SaveTriggerRequest) validate(all bool) error {
+func (m *DeployTriggerRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -58,159 +58,86 @@ func (m *SaveTriggerRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetTrigger()).(type) {
+		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SaveTriggerRequestValidationError{
-					field:  "Trigger",
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "Id",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, SaveTriggerRequestValidationError{
-					field:  "Trigger",
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "Id",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetTrigger()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return SaveTriggerRequestValidationError{
-				field:  "Trigger",
+			return DeployTriggerRequestValidationError{
+				field:  "Id",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
-
-	if len(errors) > 0 {
-		return SaveTriggerRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// SaveTriggerRequestMultiError is an error wrapping multiple validation errors
-// returned by SaveTriggerRequest.ValidateAll() if the designated constraints
-// aren't met.
-type SaveTriggerRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m SaveTriggerRequestMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m SaveTriggerRequestMultiError) AllErrors() []error { return m }
-
-// SaveTriggerRequestValidationError is the validation error returned by
-// SaveTriggerRequest.Validate if the designated constraints aren't met.
-type SaveTriggerRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e SaveTriggerRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e SaveTriggerRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e SaveTriggerRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e SaveTriggerRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e SaveTriggerRequestValidationError) ErrorName() string {
-	return "SaveTriggerRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e SaveTriggerRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sSaveTriggerRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = SaveTriggerRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = SaveTriggerRequestValidationError{}
-
-// Validate checks the field values on SaveTriggerResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *SaveTriggerResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on SaveTriggerResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// SaveTriggerResponseMultiError, or nil if none found.
-func (m *SaveTriggerResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *SaveTriggerResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetTrigger()).(type) {
+		switch v := interface{}(m.GetSpec()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SaveTriggerResponseValidationError{
-					field:  "Trigger",
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "Spec",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, SaveTriggerResponseValidationError{
-					field:  "Trigger",
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "Spec",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetTrigger()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSpec()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return SaveTriggerResponseValidationError{
-				field:  "Trigger",
+			return DeployTriggerRequestValidationError{
+				field:  "Spec",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAutomationSpec()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "AutomationSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeployTriggerRequestValidationError{
+					field:  "AutomationSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAutomationSpec()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeployTriggerRequestValidationError{
+				field:  "AutomationSpec",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -218,19 +145,19 @@ func (m *SaveTriggerResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return SaveTriggerResponseMultiError(errors)
+		return DeployTriggerRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// SaveTriggerResponseMultiError is an error wrapping multiple validation
-// errors returned by SaveTriggerResponse.ValidateAll() if the designated
+// DeployTriggerRequestMultiError is an error wrapping multiple validation
+// errors returned by DeployTriggerRequest.ValidateAll() if the designated
 // constraints aren't met.
-type SaveTriggerResponseMultiError []error
+type DeployTriggerRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m SaveTriggerResponseMultiError) Error() string {
+func (m DeployTriggerRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -239,11 +166,11 @@ func (m SaveTriggerResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m SaveTriggerResponseMultiError) AllErrors() []error { return m }
+func (m DeployTriggerRequestMultiError) AllErrors() []error { return m }
 
-// SaveTriggerResponseValidationError is the validation error returned by
-// SaveTriggerResponse.Validate if the designated constraints aren't met.
-type SaveTriggerResponseValidationError struct {
+// DeployTriggerRequestValidationError is the validation error returned by
+// DeployTriggerRequest.Validate if the designated constraints aren't met.
+type DeployTriggerRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -251,24 +178,24 @@ type SaveTriggerResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e SaveTriggerResponseValidationError) Field() string { return e.field }
+func (e DeployTriggerRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e SaveTriggerResponseValidationError) Reason() string { return e.reason }
+func (e DeployTriggerRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e SaveTriggerResponseValidationError) Cause() error { return e.cause }
+func (e DeployTriggerRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e SaveTriggerResponseValidationError) Key() bool { return e.key }
+func (e DeployTriggerRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e SaveTriggerResponseValidationError) ErrorName() string {
-	return "SaveTriggerResponseValidationError"
+func (e DeployTriggerRequestValidationError) ErrorName() string {
+	return "DeployTriggerRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e SaveTriggerResponseValidationError) Error() string {
+func (e DeployTriggerRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -280,14 +207,14 @@ func (e SaveTriggerResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sSaveTriggerResponse.%s: %s%s",
+		"invalid %sDeployTriggerRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = SaveTriggerResponseValidationError{}
+var _ error = DeployTriggerRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -295,7 +222,138 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = SaveTriggerResponseValidationError{}
+} = DeployTriggerRequestValidationError{}
+
+// Validate checks the field values on DeployTriggerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeployTriggerResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeployTriggerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeployTriggerResponseMultiError, or nil if none found.
+func (m *DeployTriggerResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeployTriggerResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTrigger()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeployTriggerResponseValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeployTriggerResponseValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTrigger()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeployTriggerResponseValidationError{
+				field:  "Trigger",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DeployTriggerResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeployTriggerResponseMultiError is an error wrapping multiple validation
+// errors returned by DeployTriggerResponse.ValidateAll() if the designated
+// constraints aren't met.
+type DeployTriggerResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeployTriggerResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeployTriggerResponseMultiError) AllErrors() []error { return m }
+
+// DeployTriggerResponseValidationError is the validation error returned by
+// DeployTriggerResponse.Validate if the designated constraints aren't met.
+type DeployTriggerResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeployTriggerResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeployTriggerResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeployTriggerResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeployTriggerResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeployTriggerResponseValidationError) ErrorName() string {
+	return "DeployTriggerResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeployTriggerResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeployTriggerResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeployTriggerResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeployTriggerResponseValidationError{}
 
 // Validate checks the field values on GetTriggerDetailsRequest with the rules
 // defined in the proto definition for this message. If any rules are

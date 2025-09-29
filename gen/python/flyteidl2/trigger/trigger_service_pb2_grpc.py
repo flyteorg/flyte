@@ -15,10 +15,10 @@ class TriggerServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SaveTrigger = channel.unary_unary(
-                '/flyteidl2.trigger.TriggerService/SaveTrigger',
-                request_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerResponse.FromString,
+        self.DeployTrigger = channel.unary_unary(
+                '/flyteidl2.trigger.TriggerService/DeployTrigger',
+                request_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerResponse.FromString,
                 )
         self.GetTriggerDetails = channel.unary_unary(
                 '/flyteidl2.trigger.TriggerService/GetTriggerDetails',
@@ -56,7 +56,7 @@ class TriggerServiceServicer(object):
     """TriggerService provides an interface for managing triggers.
     """
 
-    def SaveTrigger(self, request, context):
+    def DeployTrigger(self, request, context):
         """Create if trigger didn't exist previously.
         Update if it already exists.
         Re-create(or undelete) if it was soft-deleted.
@@ -115,10 +115,10 @@ class TriggerServiceServicer(object):
 
 def add_TriggerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SaveTrigger': grpc.unary_unary_rpc_method_handler(
-                    servicer.SaveTrigger,
-                    request_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerRequest.FromString,
-                    response_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerResponse.SerializeToString,
+            'DeployTrigger': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeployTrigger,
+                    request_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerRequest.FromString,
+                    response_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerResponse.SerializeToString,
             ),
             'GetTriggerDetails': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTriggerDetails,
@@ -162,7 +162,7 @@ class TriggerService(object):
     """
 
     @staticmethod
-    def SaveTrigger(request,
+    def DeployTrigger(request,
             target,
             options=(),
             channel_credentials=None,
@@ -172,9 +172,9 @@ class TriggerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.trigger.TriggerService/SaveTrigger',
-            flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerRequest.SerializeToString,
-            flyteidl2_dot_trigger_dot_trigger__service__pb2.SaveTriggerResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.trigger.TriggerService/DeployTrigger',
+            flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerRequest.SerializeToString,
+            flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

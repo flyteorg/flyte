@@ -8,6 +8,7 @@ import "flyteidl2/common/identity.proto";
 import "flyteidl2/task/task_definition.proto";
 import "flyteidl2/workflow/run_definition.proto";
 import "google/protobuf/timestamp.proto";
+import "flyteidl2/task/common.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
 
@@ -17,39 +18,6 @@ message TriggerMetadata {
 
   // Identity that last activated or deactivated the trigger
   common.EnrichedIdentity updated_by = 2 [(buf.validate.field).required = true];
-}
-
-// Represents a frequency at which to run a schedule.
-enum FixedRateUnit {
-  FIXED_RATE_UNIT_UNSPECIFIED = 0;
-  FIXED_RATE_UNIT_MINUTE = 1;
-  FIXED_RATE_UNIT_HOUR = 2;
-  FIXED_RATE_UNIT_DAY = 3;
-}
-
-// Option for schedules run at a certain frequency e.g. every 2 minutes.
-message FixedRate {
-  uint32 value = 1;
-  FixedRateUnit unit = 2;
-
-  // Optional, timestamp after which rate should be calculated. Can be only in future.
-  // E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
-  // Activate it at "12:04".
-  // Trigger should fire at "12:05" as it adds 5 minutes to start_time="12:00".
-  google.protobuf.Timestamp start_time = 3;
-}
-
-// Defines complete set of information required to trigger an execution on a schedule.
-message Schedule {
-  oneof expression {
-    // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
-    // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
-    FixedRate rate = 1;
-    string cron_expression = 2;
-  }
-
-  // Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
-  string kickoff_time_input_arg = 3;
 }
 
 message TriggerSpec {
@@ -86,39 +54,6 @@ message TriggerStatus {
   google.protobuf.Timestamp deleted_at = 4;
 }
 
-message TriggerAutomationSpec {
-  // Specifies type of the automation attached to trigger if any.
-  enum Type {
-    TYPE_UNSPECIFIED = 0;
-    TYPE_NONE = 1;
-    TYPE_SCHEDULE = 2;
-  }
-
-  // Explicitly defines trigger automation type.
-  Type type = 1;
-
-  oneof automation {
-    Schedule schedule = 2;
-
-    // In future will be extended with other automation types: webhook, artifacts, etc.
-  }
-}
-
-// Light-weight information about trigger for a list view
-message Trigger {
-  reserved 4;
-
-  common.TriggerIdentifier id = 1;
-
-  TriggerMetadata meta = 2;
-
-  TriggerStatus status = 3;
-
-  bool active = 5;
-
-  TriggerAutomationSpec automation_spec = 6;
-}
-
 // Stores human- and machine-friendly explanation of what changed in the revision
 enum TriggerRevisionAction {
   TRIGGER_REVISION_ACTION_UNSPECIFIED = 0;
@@ -130,9 +65,9 @@ enum TriggerRevisionAction {
 
 // Light-weight information about a single trigger revision
 message TriggerRevision {
-  common.TriggerIdentifier id = 1;
+  flyteidl2.common.TriggerIdentifier id = 1;
 
-  TriggerMetadata meta = 2;
+  TriggerMetadata metadata = 2;
 
   TriggerStatus status = 3;
 
@@ -143,12 +78,27 @@ message TriggerRevision {
 message TriggerDetails {
   common.TriggerIdentifier id = 1 [(buf.validate.field).required = true];
 
-  TriggerMetadata meta = 2;
+  TriggerMetadata metadata = 2;
 
   TriggerSpec spec = 3 [(buf.validate.field).required = true];
 
   TriggerStatus status = 4;
 
   // Optional automation spec.
-  TriggerAutomationSpec automation_spec = 5;
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 5;
+}
+
+// Light-weight information about trigger for a list view
+message Trigger {
+  reserved 4;
+
+  flyteidl2.common.TriggerIdentifier id = 1;
+
+  TriggerMetadata metadata = 2;
+
+  TriggerStatus status = 3;
+
+  bool active = 5;
+
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 6;
 }

@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.trigger import trigger_definition_pb2 as _trigger_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -10,13 +11,17 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class SaveTriggerRequest(_message.Message):
-    __slots__ = ["trigger"]
-    TRIGGER_FIELD_NUMBER: _ClassVar[int]
-    trigger: _trigger_definition_pb2.TriggerDetails
-    def __init__(self, trigger: _Optional[_Union[_trigger_definition_pb2.TriggerDetails, _Mapping]] = ...) -> None: ...
+class DeployTriggerRequest(_message.Message):
+    __slots__ = ["id", "spec", "automation_spec"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SPEC_FIELD_NUMBER: _ClassVar[int]
+    AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
+    id: _identifier_pb2.TriggerIdentifier
+    spec: _trigger_definition_pb2.TriggerSpec
+    automation_spec: _common_pb2.TriggerAutomationSpec
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_trigger_definition_pb2.TriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
 
-class SaveTriggerResponse(_message.Message):
+class DeployTriggerResponse(_message.Message):
     __slots__ = ["trigger"]
     TRIGGER_FIELD_NUMBER: _ClassVar[int]
     trigger: _trigger_definition_pb2.TriggerDetails

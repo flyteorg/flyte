@@ -12,9 +12,10 @@ _sym_db = _symbol_database.Default()
 
 
 from flyteidl2.core import interface_pb2 as flyteidl2_dot_core_dot_interface__pb2
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/task/common.proto\x12\x0e\x66lyteidl2.task\x1a\x1e\x66lyteidl2/core/interface.proto\"]\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x37\n\tparameter\x18\x02 \x01(\x0b\x32\x19.flyteidl2.core.ParameterR\tparameterB\xb0\x01\n\x12\x63om.flyteidl2.taskB\x0b\x43ommonProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/task/common.proto\x12\x0e\x66lyteidl2.task\x1a\x1e\x66lyteidl2/core/interface.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"]\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x37\n\tparameter\x18\x02 \x01(\x0b\x32\x19.flyteidl2.core.ParameterR\tparameter\"\x8f\x01\n\tFixedRate\x12\x14\n\x05value\x18\x01 \x01(\rR\x05value\x12\x31\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl2.task.FixedRateUnitR\x04unit\x12\x39\n\nstart_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\"\xa9\x01\n\x08Schedule\x12/\n\x04rate\x18\x01 \x01(\x0b\x32\x19.flyteidl2.task.FixedRateH\x00R\x04rate\x12)\n\x0f\x63ron_expression\x18\x02 \x01(\tH\x00R\x0e\x63ronExpression\x12\x33\n\x16kickoff_time_input_arg\x18\x03 \x01(\tR\x13kickoffTimeInputArgB\x0c\n\nexpression\"\xdd\x01\n\x15TriggerAutomationSpec\x12>\n\x04type\x18\x01 \x01(\x0e\x32*.flyteidl2.task.TriggerAutomationSpec.TypeR\x04type\x12\x36\n\x08schedule\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.ScheduleH\x00R\x08schedule\">\n\x04Type\x12\x14\n\x10TYPE_UNSPECIFIED\x10\x00\x12\r\n\tTYPE_NONE\x10\x01\x12\x11\n\rTYPE_SCHEDULE\x10\x02\x42\x0c\n\nautomation*\x7f\n\rFixedRateUnit\x12\x1f\n\x1b\x46IXED_RATE_UNIT_UNSPECIFIED\x10\x00\x12\x1a\n\x16\x46IXED_RATE_UNIT_MINUTE\x10\x01\x12\x18\n\x14\x46IXED_RATE_UNIT_HOUR\x10\x02\x12\x17\n\x13\x46IXED_RATE_UNIT_DAY\x10\x03\x42\xb0\x01\n\x12\x63om.flyteidl2.taskB\x0b\x43ommonProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,6 +23,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.task.common_pb2',
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.taskB\013CommonProtoH\002P\001Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\242\002\003FTX\252\002\016Flyteidl2.Task\312\002\016Flyteidl2\\Task\342\002\032Flyteidl2\\Task\\GPBMetadata\352\002\017Flyteidl2::Task'
-  _globals['_NAMEDPARAMETER']._serialized_start=79
-  _globals['_NAMEDPARAMETER']._serialized_end=172
+  _globals['_FIXEDRATEUNIT']._serialized_start=749
+  _globals['_FIXEDRATEUNIT']._serialized_end=876
+  _globals['_NAMEDPARAMETER']._serialized_start=112
+  _globals['_NAMEDPARAMETER']._serialized_end=205
+  _globals['_FIXEDRATE']._serialized_start=208
+  _globals['_FIXEDRATE']._serialized_end=351
+  _globals['_SCHEDULE']._serialized_start=354
+  _globals['_SCHEDULE']._serialized_end=523
+  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_start=526
+  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_end=747
+  _globals['_TRIGGERAUTOMATIONSPEC_TYPE']._serialized_start=671
+  _globals['_TRIGGERAUTOMATIONSPEC_TYPE']._serialized_end=733
 # @@protoc_insertion_point(module_scope)
