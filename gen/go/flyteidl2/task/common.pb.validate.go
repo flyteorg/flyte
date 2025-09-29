@@ -606,3 +606,535 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TriggerAutomationSpecValidationError{}
+
+// Validate checks the field values on NamedLiteral with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *NamedLiteral) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on NamedLiteral with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in NamedLiteralMultiError, or
+// nil if none found.
+func (m *NamedLiteral) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *NamedLiteral) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	if all {
+		switch v := interface{}(m.GetValue()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, NamedLiteralValidationError{
+					field:  "Value",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, NamedLiteralValidationError{
+					field:  "Value",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedLiteralValidationError{
+				field:  "Value",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return NamedLiteralMultiError(errors)
+	}
+
+	return nil
+}
+
+// NamedLiteralMultiError is an error wrapping multiple validation errors
+// returned by NamedLiteral.ValidateAll() if the designated constraints aren't met.
+type NamedLiteralMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m NamedLiteralMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m NamedLiteralMultiError) AllErrors() []error { return m }
+
+// NamedLiteralValidationError is the validation error returned by
+// NamedLiteral.Validate if the designated constraints aren't met.
+type NamedLiteralValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedLiteralValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedLiteralValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedLiteralValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedLiteralValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedLiteralValidationError) ErrorName() string { return "NamedLiteralValidationError" }
+
+// Error satisfies the builtin error interface
+func (e NamedLiteralValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedLiteral.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedLiteralValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedLiteralValidationError{}
+
+// Validate checks the field values on OutputReferences with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *OutputReferences) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on OutputReferences with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// OutputReferencesMultiError, or nil if none found.
+func (m *OutputReferences) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *OutputReferences) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OutputUri
+
+	// no validation rules for ReportUri
+
+	if len(errors) > 0 {
+		return OutputReferencesMultiError(errors)
+	}
+
+	return nil
+}
+
+// OutputReferencesMultiError is an error wrapping multiple validation errors
+// returned by OutputReferences.ValidateAll() if the designated constraints
+// aren't met.
+type OutputReferencesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m OutputReferencesMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m OutputReferencesMultiError) AllErrors() []error { return m }
+
+// OutputReferencesValidationError is the validation error returned by
+// OutputReferences.Validate if the designated constraints aren't met.
+type OutputReferencesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OutputReferencesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OutputReferencesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OutputReferencesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OutputReferencesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OutputReferencesValidationError) ErrorName() string { return "OutputReferencesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OutputReferencesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOutputReferences.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OutputReferencesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OutputReferencesValidationError{}
+
+// Validate checks the field values on Inputs with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Inputs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Inputs with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in InputsMultiError, or nil if none found.
+func (m *Inputs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Inputs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLiterals() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InputsValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InputsValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InputsValidationError{
+					field:  fmt.Sprintf("Literals[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetContext() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InputsValidationError{
+						field:  fmt.Sprintf("Context[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InputsValidationError{
+						field:  fmt.Sprintf("Context[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InputsValidationError{
+					field:  fmt.Sprintf("Context[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return InputsMultiError(errors)
+	}
+
+	return nil
+}
+
+// InputsMultiError is an error wrapping multiple validation errors returned by
+// Inputs.ValidateAll() if the designated constraints aren't met.
+type InputsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InputsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InputsMultiError) AllErrors() []error { return m }
+
+// InputsValidationError is the validation error returned by Inputs.Validate if
+// the designated constraints aren't met.
+type InputsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InputsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InputsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InputsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InputsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InputsValidationError) ErrorName() string { return "InputsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InputsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInputs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InputsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InputsValidationError{}
+
+// Validate checks the field values on Outputs with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Outputs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Outputs with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in OutputsMultiError, or nil if none found.
+func (m *Outputs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Outputs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLiterals() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, OutputsValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, OutputsValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return OutputsValidationError{
+					field:  fmt.Sprintf("Literals[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return OutputsMultiError(errors)
+	}
+
+	return nil
+}
+
+// OutputsMultiError is an error wrapping multiple validation errors returned
+// by Outputs.ValidateAll() if the designated constraints aren't met.
+type OutputsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m OutputsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m OutputsMultiError) AllErrors() []error { return m }
+
+// OutputsValidationError is the validation error returned by Outputs.Validate
+// if the designated constraints aren't met.
+type OutputsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OutputsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OutputsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OutputsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OutputsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OutputsValidationError) ErrorName() string { return "OutputsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OutputsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOutputs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OutputsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OutputsValidationError{}

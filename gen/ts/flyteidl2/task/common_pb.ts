@@ -6,6 +6,8 @@ import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1"
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Parameter } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
+import type { KeyValuePair, Literal } from "../core/literals_pb.ts";
+import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -14,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIncKCUZpeGVkUmF0ZRINCgV2YWx1ZRgBIAEoDRIrCgR1bml0GAIgASgOMh0uZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlVW5pdBIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJ+CghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUIMCgpleHByZXNzaW9uIs0BChVUcmlnZ2VyQXV0b21hdGlvblNwZWMSOAoEdHlwZRgBIAEoDjIqLmZseXRlaWRsMi50YXNrLlRyaWdnZXJBdXRvbWF0aW9uU3BlYy5UeXBlEiwKCHNjaGVkdWxlGAIgASgLMhguZmx5dGVpZGwyLnRhc2suU2NoZWR1bGVIACI+CgRUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABINCglUWVBFX05PTkUQARIRCg1UWVBFX1NDSEVEVUxFEAJCDAoKYXV0b21hdGlvbip/Cg1GaXhlZFJhdGVVbml0Eh8KG0ZJWEVEX1JBVEVfVU5JVF9VTlNQRUNJRklFRBAAEhoKFkZJWEVEX1JBVEVfVU5JVF9NSU5VVEUQARIYChRGSVhFRF9SQVRFX1VOSVRfSE9VUhACEhcKE0ZJWEVEX1JBVEVfVU5JVF9EQVkQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_core_interface, file_google_protobuf_timestamp]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIncKCUZpeGVkUmF0ZRINCgV2YWx1ZRgBIAEoDRIrCgR1bml0GAIgASgOMh0uZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlVW5pdBIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJ+CghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUIMCgpleHByZXNzaW9uIs0BChVUcmlnZ2VyQXV0b21hdGlvblNwZWMSOAoEdHlwZRgBIAEoDjIqLmZseXRlaWRsMi50YXNrLlRyaWdnZXJBdXRvbWF0aW9uU3BlYy5UeXBlEiwKCHNjaGVkdWxlGAIgASgLMhguZmx5dGVpZGwyLnRhc2suU2NoZWR1bGVIACI+CgRUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABINCglUWVBFX05PTkUQARIRCg1UWVBFX1NDSEVEVUxFEAJCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIiOQoHT3V0cHV0cxIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCp/Cg1GaXhlZFJhdGVVbml0Eh8KG0ZJWEVEX1JBVEVfVU5JVF9VTlNQRUNJRklFRBAAEhoKFkZJWEVEX1JBVEVfVU5JVF9NSU5VVEUQARIYChRGSVhFRF9SQVRFX1VOSVRfSE9VUhACEhcKE0ZJWEVEX1JBVEVfVU5JVF9EQVkQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -170,6 +172,116 @@ export enum TriggerAutomationSpec_Type {
  */
 export const TriggerAutomationSpec_TypeSchema: GenEnum<TriggerAutomationSpec_Type> = /*@__PURE__*/
   enumDesc(file_flyteidl2_task_common, 3, 0);
+
+/**
+ * Named literal value.
+ *
+ * @generated from message flyteidl2.task.NamedLiteral
+ */
+export type NamedLiteral = Message<"flyteidl2.task.NamedLiteral"> & {
+  /**
+   * Name of the literal.
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Literal value.
+   *
+   * @generated from field: flyteidl2.core.Literal value = 2;
+   */
+  value?: Literal;
+};
+
+/**
+ * Describes the message flyteidl2.task.NamedLiteral.
+ * Use `create(NamedLiteralSchema)` to create a new message.
+ */
+export const NamedLiteralSchema: GenMessage<NamedLiteral> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 4);
+
+/**
+ * Output references.
+ *
+ * @generated from message flyteidl2.task.OutputReferences
+ */
+export type OutputReferences = Message<"flyteidl2.task.OutputReferences"> & {
+  /**
+   * The output uri.
+   *
+   * @generated from field: string output_uri = 1;
+   */
+  outputUri: string;
+
+  /**
+   * Native URI to HTML report
+   *
+   * @generated from field: string report_uri = 2;
+   */
+  reportUri: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.OutputReferences.
+ * Use `create(OutputReferencesSchema)` to create a new message.
+ */
+export const OutputReferencesSchema: GenMessage<OutputReferences> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 5);
+
+/**
+ * Input payload for an action.
+ *
+ * @generated from message flyteidl2.task.Inputs
+ */
+export type Inputs = Message<"flyteidl2.task.Inputs"> & {
+  /**
+   * Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+   *
+   * @generated from field: repeated flyteidl2.task.NamedLiteral literals = 1;
+   */
+  literals: NamedLiteral[];
+
+  /**
+   * Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
+   * Context will not be used for cache key computation.
+   * Examples for context include:
+   *  - User-provided metadata that is not part of the action's inputs.
+   *  - Information about the environment the action is running in (e.g. cluster, region, etc.)
+   *  - Tracing information about the action
+   *
+   * @generated from field: repeated flyteidl2.core.KeyValuePair context = 2;
+   */
+  context: KeyValuePair[];
+};
+
+/**
+ * Describes the message flyteidl2.task.Inputs.
+ * Use `create(InputsSchema)` to create a new message.
+ */
+export const InputsSchema: GenMessage<Inputs> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 6);
+
+/**
+ * Output payload for an action.
+ *
+ * @generated from message flyteidl2.task.Outputs
+ */
+export type Outputs = Message<"flyteidl2.task.Outputs"> & {
+  /**
+   * Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+   *
+   * @generated from field: repeated flyteidl2.task.NamedLiteral literals = 1;
+   */
+  literals: NamedLiteral[];
+};
+
+/**
+ * Describes the message flyteidl2.task.Outputs.
+ * Use `create(OutputsSchema)` to create a new message.
+ */
+export const OutputsSchema: GenMessage<Outputs> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 7);
 
 /**
  * Represents a frequency at which to run a schedule.

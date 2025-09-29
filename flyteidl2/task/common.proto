@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "flyteidl2/core/interface.proto";
+import "flyteidl2/core/literals.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -64,3 +65,40 @@ message TriggerAutomationSpec {
   }
 }
 
+// Named literal value.
+message NamedLiteral {
+  // Name of the literal.
+  string name = 1;
+
+  // Literal value.
+  flyteidl2.core.Literal value = 2;
+}
+
+// Output references.
+message OutputReferences {
+  // The output uri.
+  string output_uri = 1;
+
+  // Native URI to HTML report
+  string report_uri = 2;
+}
+
+// Input payload for an action.
+message Inputs {
+  // Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+  repeated NamedLiteral literals = 1;
+
+  // Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
+  // Context will not be used for cache key computation.
+  // Examples for context include:
+  //  - User-provided metadata that is not part of the action's inputs.
+  //  - Information about the environment the action is running in (e.g. cluster, region, etc.)
+  //  - Tracing information about the action
+  repeated flyteidl2.core.KeyValuePair context = 2;
+}
+
+// Output payload for an action.
+message Outputs {
+  // Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+  repeated NamedLiteral literals = 1;
+}

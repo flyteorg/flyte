@@ -5,10 +5,10 @@ package flyteidl2.trigger;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
-import "flyteidl2/task/task_definition.proto";
-import "flyteidl2/workflow/run_definition.proto";
-import "google/protobuf/timestamp.proto";
 import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
 
@@ -25,10 +25,10 @@ message TriggerSpec {
   flyteidl2.task.TaskIdentifier task_id = 1 [(buf.validate.field).required = true];
 
   // Inputs for triggered task.
-  flyteidl2.workflow.Inputs inputs = 2;
+  flyteidl2.task.Inputs inputs = 2;
 
   // The run spec for triggered task.
-  flyteidl2.workflow.RunSpec run_spec = 3;
+  flyteidl2.task.RunSpec run_spec = 3;
 
   // Whether trigger is active
   bool active = 4;

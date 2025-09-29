@@ -5,8 +5,8 @@ package flyteidl2.trigger;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
-import "flyteidl2/task/task_definition.proto";
 import "flyteidl2/task/common.proto";
+import "flyteidl2/task/task_definition.proto";
 import "flyteidl2/trigger/trigger_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";

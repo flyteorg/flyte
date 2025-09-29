@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package flyteidl2.task;
+
+import "flyteidl2/core/literals.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
+
+// Label values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge labels defined at registration and execution time.
+message Labels {
+  // Map of custom labels to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Annotation values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge annotations defined at registration and execution time.
+message Annotations {
+  // Map of custom annotations to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Environment variable values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge environment variables defined at registration and execution time.
+message Envs {
+  // Map of custom environment variables to be applied to the execution resource.
+  repeated flyteidl2.core.KeyValuePair values = 1;
+}
+
+message RunSpec {
+  // Labels to apply to the run.
+  Labels labels = 1;
+
+  // Annotations to apply to the run.
+  Annotations annotations = 2;
+
+  // Envs to apply to the run.
+  Envs envs = 3;
+
+  // Explicit override for executing this run as interruptible or not. If not set, use the default.
+  google.protobuf.BoolValue interruptible = 4;
+
+  // If true, recompute outputs for this run and overwrite any existing cache.
+  bool overwrite_cache = 5;
+
+  // Future: service account, security context, execution env, etc.
+
+  // the specific cluster that this action should be executed on. this value will be used as the
+  // default for all actions in the run unless overridden.
+  string cluster = 6;
+}

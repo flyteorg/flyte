@@ -1021,6 +1021,33 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskAnnotations": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom annotations to be applied to the execution resource."
+        }
+      },
+      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
+    },
+    "taskEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
     "taskFixedRate": {
       "type": "object",
       "properties": {
@@ -1049,6 +1076,84 @@
       ],
       "default": "FIXED_RATE_UNIT_UNSPECIFIED",
       "description": "Represents a frequency at which to run a schedule."
+    },
+    "taskInputs": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskNamedLiteral"
+          },
+          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
+        }
+      },
+      "description": "Input payload for an action."
+    },
+    "taskLabels": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom labels to be applied to the execution resource."
+        }
+      },
+      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
+    },
+    "taskNamedLiteral": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the literal."
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Literal value."
+        }
+      },
+      "description": "Named literal value."
+    },
+    "taskRunSpec": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "$ref": "#/definitions/taskLabels",
+          "description": "Labels to apply to the run."
+        },
+        "annotations": {
+          "$ref": "#/definitions/taskAnnotations",
+          "description": "Annotations to apply to the run."
+        },
+        "envs": {
+          "$ref": "#/definitions/taskEnvs",
+          "description": "Envs to apply to the run."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cluster": {
+          "type": "string",
+          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        }
+      }
     },
     "taskSchedule": {
       "type": "object",
@@ -1275,11 +1380,11 @@
           "description": "Identifies which task to trigger."
         },
         "inputs": {
-          "$ref": "#/definitions/workflowInputs",
+          "$ref": "#/definitions/taskInputs",
           "description": "Inputs for triggered task."
         },
         "run_spec": {
-          "$ref": "#/definitions/workflowRunSpec",
+          "$ref": "#/definitions/taskRunSpec",
           "description": "The run spec for triggered task."
         },
         "active": {
@@ -1320,111 +1425,6 @@
     "triggerUpdateTriggersResponse": {
       "type": "object",
       "title": "Response message for updating some trigger spec fields for multiple triggers"
-    },
-    "workflowAnnotations": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom annotations to be applied to the execution resource."
-        }
-      },
-      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
-    },
-    "workflowEnvs": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
-          },
-          "description": "Map of custom environment variables to be applied to the execution resource."
-        }
-      },
-      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
-    },
-    "workflowInputs": {
-      "type": "object",
-      "properties": {
-        "literals": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowNamedLiteral"
-          },
-          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
-        },
-        "context": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
-          },
-          "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
-        }
-      },
-      "description": "Input payload for an action."
-    },
-    "workflowLabels": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom labels to be applied to the execution resource."
-        }
-      },
-      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
-    },
-    "workflowNamedLiteral": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the literal."
-        },
-        "value": {
-          "$ref": "#/definitions/coreLiteral",
-          "description": "Literal value."
-        }
-      },
-      "description": "Named literal value."
-    },
-    "workflowRunSpec": {
-      "type": "object",
-      "properties": {
-        "labels": {
-          "$ref": "#/definitions/workflowLabels",
-          "description": "Labels to apply to the run."
-        },
-        "annotations": {
-          "$ref": "#/definitions/workflowAnnotations",
-          "description": "Annotations to apply to the run."
-        },
-        "envs": {
-          "$ref": "#/definitions/workflowEnvs",
-          "description": "Envs to apply to the run."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
-        },
-        "overwrite_cache": {
-          "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
-        },
-        "cluster": {
-          "type": "string",
-          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
-        }
-      }
     }
   }
 }

@@ -50,8 +50,8 @@ message RoleIdentifier {
 
 message OrgIdentifier {
   string name = 1 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 63,
+    min_len: 1
+    max_len: 63
     pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
   }];
 }

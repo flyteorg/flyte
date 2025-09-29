@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/logs/dataplane/payload.proto";
-import "buf/validate/validate.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 

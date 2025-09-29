@@ -11,11 +11,11 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl2.imagebuilder import definition_pb2 as flyteidl2_dot_imagebuilder_dot_definition__pb2
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from flyteidl2.imagebuilder import definition_pb2 as flyteidl2_dot_imagebuilder_dot_definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/imagebuilder/payload.proto\x12\x16\x66lyteidl2.imagebuilder\x1a\'flyteidl2/imagebuilder/definition.proto\x1a\x1b\x62uf/validate/validate.proto\"v\n\x0fGetImageRequest\x12?\n\x02id\x18\x01 \x01(\x0b\x32\'.flyteidl2.imagebuilder.ImageIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\"G\n\x10GetImageResponse\x12\x33\n\x05image\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.imagebuilder.ImageR\x05imageB\xe1\x01\n\x1a\x63om.flyteidl2.imagebuilderB\x0cPayloadProtoH\x02P\x01Z:github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x16\x46lyteidl2.Imagebuilder\xca\x02\x16\x46lyteidl2\\Imagebuilder\xe2\x02\"Flyteidl2\\Imagebuilder\\GPBMetadata\xea\x02\x17\x46lyteidl2::Imagebuilderb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/imagebuilder/payload.proto\x12\x16\x66lyteidl2.imagebuilder\x1a\x1b\x62uf/validate/validate.proto\x1a\'flyteidl2/imagebuilder/definition.proto\"v\n\x0fGetImageRequest\x12?\n\x02id\x18\x01 \x01(\x0b\x32\'.flyteidl2.imagebuilder.ImageIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12\"\n\x0corganization\x18\x02 \x01(\tR\x0corganization\"G\n\x10GetImageResponse\x12\x33\n\x05image\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.imagebuilder.ImageR\x05imageB\xe1\x01\n\x1a\x63om.flyteidl2.imagebuilderB\x0cPayloadProtoH\x02P\x01Z:github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder\xa2\x02\x03\x46IX\xaa\x02\x16\x46lyteidl2.Imagebuilder\xca\x02\x16\x46lyteidl2\\Imagebuilder\xe2\x02\"Flyteidl2\\Imagebuilder\\GPBMetadata\xea\x02\x17\x46lyteidl2::Imagebuilderb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

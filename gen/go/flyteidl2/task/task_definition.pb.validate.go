@@ -1477,6 +1477,64 @@ func (m *TaskTriggerSpec) validate(all bool) error {
 
 	// no validation rules for Active
 
+	if all {
+		switch v := interface{}(m.GetInputs()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskTriggerSpecValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskTriggerSpecValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskTriggerSpecValidationError{
+				field:  "Inputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRunSpec()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskTriggerSpecValidationError{
+					field:  "RunSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskTriggerSpecValidationError{
+					field:  "RunSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRunSpec()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskTriggerSpecValidationError{
+				field:  "RunSpec",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return TaskTriggerSpecMultiError(errors)
 	}

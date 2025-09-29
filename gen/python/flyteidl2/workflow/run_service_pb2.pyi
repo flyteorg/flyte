@@ -1,8 +1,10 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
-from buf.validate import validate_pb2 as _validate_pb2
-from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
+from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -24,9 +26,9 @@ class CreateRunRequest(_message.Message):
     task_id: _task_definition_pb2.TaskIdentifier
     task_spec: _task_definition_pb2.TaskSpec
     trigger_name: _identifier_pb2.TriggerName
-    inputs: _run_definition_pb2.Inputs
-    run_spec: _run_definition_pb2.RunSpec
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_run_definition_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_definition_pb2.RunSpec, _Mapping]] = ...) -> None: ...
+    inputs: _common_pb2.Inputs
+    run_spec: _run_pb2.RunSpec
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ...) -> None: ...
 
 class CreateRunResponse(_message.Message):
     __slots__ = ["run"]
@@ -104,9 +106,9 @@ class GetActionDataResponse(_message.Message):
     __slots__ = ["inputs", "outputs"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    inputs: _run_definition_pb2.Inputs
-    outputs: _run_definition_pb2.Outputs
-    def __init__(self, inputs: _Optional[_Union[_run_definition_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_run_definition_pb2.Outputs, _Mapping]] = ...) -> None: ...
+    inputs: _common_pb2.Inputs
+    outputs: _common_pb2.Outputs
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "trigger_name"]
