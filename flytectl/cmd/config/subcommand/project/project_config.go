@@ -1,7 +1,7 @@
 package project
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 
 	"github.com/flyteorg/flyte/flytectl/clierrors"
@@ -74,12 +74,12 @@ func (c *ConfigProject) GetProjectSpec(cf *config.Config) (*admin.Project, error
 
 	project := cf.Project
 	if len(projectSpec.GetId()) == 0 && len(project) == 0 {
-		err := fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
+		err := errors.New(clierrors.ErrProjectNotPassed)
 		return nil, err
 	}
 
 	if len(projectSpec.GetId()) > 0 && len(project) > 0 {
-		err := fmt.Errorf(clierrors.ErrProjectIDBothPassed) //nolint
+		err := errors.New(clierrors.ErrProjectIDBothPassed)
 		return nil, err
 	}
 
@@ -104,7 +104,7 @@ func (c *ConfigProject) MapToAdminState() (admin.Project_ProjectState, error) {
 
 	if activate || archive {
 		if activate == archive {
-			return admin.Project_ACTIVE, fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
+			return admin.Project_ACTIVE, errors.New(clierrors.ErrInvalidStateUpdate)
 		}
 		if archive {
 			return admin.Project_ARCHIVED, nil
