@@ -14,7 +14,6 @@ use pyo3::prelude::*;
 // include!("flyteidl.core.rs");
 // include!("google.rpc.rs");
 // include!("validate.rs");
-use pyo3::pymodule;
 
 // use crate::*;
 // Re-export all generated protobuf modules
