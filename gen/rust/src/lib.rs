@@ -14,42 +14,38 @@ use pyo3::prelude::*;
 // include!("flyteidl.core.rs");
 // include!("google.rpc.rs");
 // include!("validate.rs");
-use pyo3::pymodule;
 
 // use crate::*;
 // Re-export all generated protobuf modules
 pub mod flyteidl {
 
     pub mod common {
-        include!("flyteidl.common.rs");
-        //         pub mod serde {
-        //             include!("flyteidl.common.serde.rs");
-        //         }
+        include!("flyteidl2.common.rs");
     }
     pub mod workflow {
-        include!("flyteidl.workflow.rs");
-        //         pub mod serde {
-        //             include!("flyteidl.workflow.serde.rs");
-        //         }
-        //         pub mod tonic {
-        //             include!("flyteidl.workflow.tonic.rs");
-        //         }
+        include!("flyteidl2.workflow.rs");
     }
 
     pub mod logs {
         pub mod dataplane {
-            include!("flyteidl.logs.dataplane.rs");
-            //             pub mod serde {
-            //                 include!("flyteidl.logs.dataplane.serde.rs");
-            //             }
+            include!("flyteidl2.logs.dataplane.rs");
         }
     }
 
     pub mod core {
-        include!("flyteidl.core.rs");
-        //         pub mod serde {
-        //             include!("flyteidl.core.serde.rs");
-        //         }
+        include!("flyteidl2.core.rs");
+    }
+
+    pub mod task {
+        include!("flyteidl2.task.rs");
+    }
+
+    pub mod trigger {
+        include!("flyteidl2.trigger.rs");
+    }
+
+    pub mod secret {
+        include!("flyteidl2.secret.rs");
     }
 }
 
