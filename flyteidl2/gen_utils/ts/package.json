@@ -9,9 +9,10 @@
   "author": "Union Eng <support@union.ai>",
   "license": "Apache-2.0",
   "keywords": [
-    "flyte"
+    "flyte",
+    "flyte2"
   ],
   "files": [
-    "../../../gen/ts"
+    "flyteidl2"
   ]
 }
