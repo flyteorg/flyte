@@ -3,12 +3,9 @@
 
 use prettyplease::unparse;
 use quote::quote;
-use regex::Regex;
-use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use syn::parse_str;
 use syn::{parse_quote, Type};
 
 type Error = Box<dyn std::error::Error>;
