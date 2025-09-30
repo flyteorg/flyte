@@ -11,12 +11,12 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import authorization_pb2 as flyteidl2_dot_common_dot_authorization__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
-from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl2/common/policy.proto\x12\x10\x66lyteidl2.common\x1a$flyteidl2/common/authorization.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x62uf/validate/validate.proto\"\xa3\x01\n\x06Policy\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.PolicyIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12;\n\x08\x62indings\x18\x02 \x03(\x0b\x32\x1f.flyteidl2.common.PolicyBindingR\x08\x62indings\x12 \n\x0b\x64\x65scription\x18\x03 \x01(\tR\x0b\x64\x65scription\"\x92\x01\n\rPolicyBinding\x12\x41\n\x07role_id\x18\x01 \x01(\x0b\x32 .flyteidl2.common.RoleIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06roleId\x12>\n\x08resource\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.common.ResourceB\x06\xbaH\x03\xc8\x01\x01R\x08resourceB\xbc\x01\n\x14\x63om.flyteidl2.commonB\x0bPolicyProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl2/common/policy.proto\x12\x10\x66lyteidl2.common\x1a\x1b\x62uf/validate/validate.proto\x1a$flyteidl2/common/authorization.proto\x1a!flyteidl2/common/identifier.proto\"\xa3\x01\n\x06Policy\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.PolicyIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12;\n\x08\x62indings\x18\x02 \x03(\x0b\x32\x1f.flyteidl2.common.PolicyBindingR\x08\x62indings\x12 \n\x0b\x64\x65scription\x18\x03 \x01(\tR\x0b\x64\x65scription\"\x92\x01\n\rPolicyBinding\x12\x41\n\x07role_id\x18\x01 \x01(\x0b\x32 .flyteidl2.common.RoleIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06roleId\x12>\n\x08resource\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.common.ResourceB\x06\xbaH\x03\xc8\x01\x01R\x08resourceB\xbc\x01\n\x14\x63om.flyteidl2.commonB\x0bPolicyProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

@@ -864,7 +864,7 @@
         "DATASET"
       ],
       "default": "UNSPECIFIED",
-      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
+      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects\nin a similar manner to other Flyte objects"
     },
     "coreResources": {
       "type": "object",
@@ -1473,6 +1473,19 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskAnnotations": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom annotations to be applied to the execution resource."
+        }
+      },
+      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
@@ -1483,6 +1496,33 @@
       },
       "description": "Environment for a task."
     },
+    "taskEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
+    "taskLabels": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom labels to be applied to the execution resource."
+        }
+      },
+      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
+    },
     "taskNamedParameter": {
       "type": "object",
       "properties": {
@@ -1491,6 +1531,49 @@
         },
         "parameter": {
           "$ref": "#/definitions/coreParameter"
+        }
+      }
+    },
+    "taskOutputReferences": {
+      "type": "object",
+      "properties": {
+        "output_uri": {
+          "type": "string",
+          "description": "The output uri."
+        },
+        "report_uri": {
+          "type": "string",
+          "title": "Native URI to HTML report"
+        }
+      },
+      "description": "Output references."
+    },
+    "taskRunSpec": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "$ref": "#/definitions/taskLabels",
+          "description": "Labels to apply to the run."
+        },
+        "annotations": {
+          "$ref": "#/definitions/taskAnnotations",
+          "description": "Annotations to apply to the run."
+        },
+        "envs": {
+          "$ref": "#/definitions/taskEnvs",
+          "description": "Envs to apply to the run."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cluster": {
+          "type": "string",
+          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
         }
       }
     },
@@ -1563,19 +1646,6 @@
       "type": "object",
       "description": "response message for aborting a run."
     },
-    "workflowAnnotations": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom annotations to be applied to the execution resource."
-        }
-      },
-      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
-    },
     "workflowConditionAction": {
       "type": "object",
       "properties": {
@@ -1613,76 +1683,6 @@
     "workflowEnqueueActionResponse": {
       "type": "object",
       "description": "response message for queuing an action."
-    },
-    "workflowEnvs": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
-          },
-          "description": "Map of custom environment variables to be applied to the execution resource."
-        }
-      },
-      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
-    },
-    "workflowLabels": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom labels to be applied to the execution resource."
-        }
-      },
-      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
-    },
-    "workflowOutputReferences": {
-      "type": "object",
-      "properties": {
-        "output_uri": {
-          "type": "string",
-          "description": "The output uri."
-        },
-        "report_uri": {
-          "type": "string",
-          "title": "Native URI to HTML report"
-        }
-      },
-      "description": "Output references."
-    },
-    "workflowRunSpec": {
-      "type": "object",
-      "properties": {
-        "labels": {
-          "$ref": "#/definitions/workflowLabels",
-          "description": "Labels to apply to the run."
-        },
-        "annotations": {
-          "$ref": "#/definitions/workflowAnnotations",
-          "description": "Annotations to apply to the run."
-        },
-        "envs": {
-          "$ref": "#/definitions/workflowEnvs",
-          "description": "Envs to apply to the run."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
-        },
-        "overwrite_cache": {
-          "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
-        },
-        "cluster": {
-          "type": "string",
-          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
-        }
-      }
     },
     "workflowTaskAction": {
       "type": "object",
@@ -1726,7 +1726,7 @@
           "description": "Time the attempt ended, if applicable."
         },
         "outputs": {
-          "$ref": "#/definitions/workflowOutputReferences",
+          "$ref": "#/definitions/taskOutputReferences",
           "description": "Output references."
         },
         "spec": {

@@ -284,6 +284,47 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 		}
 
+	case *CreateRunRequest_TriggerName:
+		if v == nil {
+			err := CreateRunRequestValidationError{
+				field:  "Task",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTriggerName()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTriggerName()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateRunRequestValidationError{
+					field:  "TriggerName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -2168,6 +2209,47 @@ func (m *ListRunsRequest) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ListRunsRequestValidationError{
 					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ListRunsRequest_TriggerName:
+		if v == nil {
+			err := ListRunsRequestValidationError{
+				field:  "ScopeBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTriggerName()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListRunsRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListRunsRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTriggerName()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListRunsRequestValidationError{
+					field:  "TriggerName",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

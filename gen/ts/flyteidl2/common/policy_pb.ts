@@ -4,18 +4,18 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Resource } from "./authorization_pb.ts";
 import { file_flyteidl2_common_authorization } from "./authorization_pb.ts";
 import type { PolicyIdentifier, RoleIdentifier } from "./identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "./identifier_pb.ts";
-import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/common/policy.proto.
  */
 export const file_flyteidl2_common_policy: GenFile = /*@__PURE__*/
-  fileDesc("Ch1mbHl0ZWlkbDIvY29tbW9uL3BvbGljeS5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiKIAQoGUG9saWN5EjYKAmlkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5Qb2xpY3lJZGVudGlmaWVyQga6SAPIAQESMQoIYmluZGluZ3MYAiADKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlBvbGljeUJpbmRpbmcSEwoLZGVzY3JpcHRpb24YAyABKAkigAEKDVBvbGljeUJpbmRpbmcSOQoHcm9sZV9pZBgBIAEoCzIgLmZseXRlaWRsMi5jb21tb24uUm9sZUlkZW50aWZpZXJCBrpIA8gBARI0CghyZXNvdXJjZRgCIAEoCzIaLmZseXRlaWRsMi5jb21tb24uUmVzb3VyY2VCBrpIA8gBAUK8AQoUY29tLmZseXRlaWRsMi5jb21tb25CC1BvbGljeVByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_flyteidl2_common_authorization, file_flyteidl2_common_identifier, file_buf_validate_validate]);
+  fileDesc("Ch1mbHl0ZWlkbDIvY29tbW9uL3BvbGljeS5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiKIAQoGUG9saWN5EjYKAmlkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5Qb2xpY3lJZGVudGlmaWVyQga6SAPIAQESMQoIYmluZGluZ3MYAiADKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlBvbGljeUJpbmRpbmcSEwoLZGVzY3JpcHRpb24YAyABKAkigAEKDVBvbGljeUJpbmRpbmcSOQoHcm9sZV9pZBgBIAEoCzIgLmZseXRlaWRsMi5jb21tb24uUm9sZUlkZW50aWZpZXJCBrpIA8gBARI0CghyZXNvdXJjZRgCIAEoCzIaLmZseXRlaWRsMi5jb21tb24uUmVzb3VyY2VCBrpIA8gBAUK8AQoUY29tLmZseXRlaWRsMi5jb21tb25CC1BvbGljeVByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_authorization, file_flyteidl2_common_identifier]);
 
 /**
  * A policy is a collection of roles bound to a resource.

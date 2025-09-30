@@ -1,12 +1,12 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.core import catalog_pb2 as _catalog_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
-from flyteidl2.core import literals_pb2 as _literals_pb2
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from google.protobuf import wrappers_pb2 as _wrappers_pb2
-from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
+from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -47,54 +47,6 @@ ACTION_TYPE_TASK: ActionType
 ACTION_TYPE_TRACE: ActionType
 ACTION_TYPE_CONDITION: ActionType
 
-class Labels(_message.Message):
-    __slots__ = ["values"]
-    class ValuesEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    VALUES_FIELD_NUMBER: _ClassVar[int]
-    values: _containers.ScalarMap[str, str]
-    def __init__(self, values: _Optional[_Mapping[str, str]] = ...) -> None: ...
-
-class Annotations(_message.Message):
-    __slots__ = ["values"]
-    class ValuesEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    VALUES_FIELD_NUMBER: _ClassVar[int]
-    values: _containers.ScalarMap[str, str]
-    def __init__(self, values: _Optional[_Mapping[str, str]] = ...) -> None: ...
-
-class Envs(_message.Message):
-    __slots__ = ["values"]
-    VALUES_FIELD_NUMBER: _ClassVar[int]
-    values: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
-    def __init__(self, values: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
-
-class RunSpec(_message.Message):
-    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster"]
-    LABELS_FIELD_NUMBER: _ClassVar[int]
-    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
-    ENVS_FIELD_NUMBER: _ClassVar[int]
-    INTERRUPTIBLE_FIELD_NUMBER: _ClassVar[int]
-    OVERWRITE_CACHE_FIELD_NUMBER: _ClassVar[int]
-    CLUSTER_FIELD_NUMBER: _ClassVar[int]
-    labels: Labels
-    annotations: Annotations
-    envs: Envs
-    interruptible: _wrappers_pb2.BoolValue
-    overwrite_cache: bool
-    cluster: str
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ...) -> None: ...
-
 class Run(_message.Message):
     __slots__ = ["action"]
     ACTION_FIELD_NUMBER: _ClassVar[int]
@@ -105,9 +57,9 @@ class RunDetails(_message.Message):
     __slots__ = ["run_spec", "action"]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
-    run_spec: RunSpec
+    run_spec: _run_pb2.RunSpec
     action: ActionDetails
-    def __init__(self, run_spec: _Optional[_Union[RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
+    def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
 
 class TaskActionMetadata(_message.Message):
     __slots__ = ["id", "task_type", "short_name"]
@@ -137,7 +89,7 @@ class ConditionActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ..., run_id: _Optional[str] = ..., action_id: _Optional[str] = ..., **kwargs) -> None: ...
 
 class ActionMetadata(_message.Message):
-    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type"]
+    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id"]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     EXECUTED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -145,6 +97,7 @@ class ActionMetadata(_message.Message):
     TRACE_FIELD_NUMBER: _ClassVar[int]
     CONDITION_FIELD_NUMBER: _ClassVar[int]
     ACTION_TYPE_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
     parent: str
     group: str
     executed_by: _identity_pb2.EnrichedIdentity
@@ -152,7 +105,8 @@ class ActionMetadata(_message.Message):
     trace: TraceActionMetadata
     condition: ConditionActionMetadata
     action_type: ActionType
-    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ...) -> None: ...
+    trigger_id: _identifier_pb2.TriggerIdentifier
+    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ...) -> None: ...
 
 class ActionStatus(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status"]
@@ -260,14 +214,14 @@ class ActionAttempt(_message.Message):
     error_info: ErrorInfo
     attempt: int
     log_info: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
-    outputs: OutputReferences
+    outputs: _common_pb2.OutputReferences
     logs_available: bool
     cache_status: _catalog_pb2.CatalogCacheStatus
     cluster_events: _containers.RepeatedCompositeFieldContainer[ClusterEvent]
     phase_transitions: _containers.RepeatedCompositeFieldContainer[PhaseTransition]
     cluster: str
     log_context: _execution_pb2.LogContext
-    def __init__(self, phase: _Optional[_Union[Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ...) -> None: ...
+    def __init__(self, phase: _Optional[_Union[Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ...) -> None: ...
 
 class ClusterEvent(_message.Message):
     __slots__ = ["occurred_at", "message"]
@@ -315,38 +269,8 @@ class ActionEvent(_message.Message):
     log_info: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     log_context: _execution_pb2.LogContext
     cluster: str
-    outputs: OutputReferences
+    outputs: _common_pb2.OutputReferences
     cache_status: _catalog_pb2.CatalogCacheStatus
     cluster_events: _containers.RepeatedCompositeFieldContainer[ClusterEvent]
     reported_time: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., phase: _Optional[_Union[Phase, str]] = ..., version: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., outputs: _Optional[_Union[OutputReferences, _Mapping]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., reported_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-
-class NamedLiteral(_message.Message):
-    __slots__ = ["name", "value"]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    VALUE_FIELD_NUMBER: _ClassVar[int]
-    name: str
-    value: _literals_pb2.Literal
-    def __init__(self, name: _Optional[str] = ..., value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
-
-class OutputReferences(_message.Message):
-    __slots__ = ["output_uri", "report_uri"]
-    OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
-    REPORT_URI_FIELD_NUMBER: _ClassVar[int]
-    output_uri: str
-    report_uri: str
-    def __init__(self, output_uri: _Optional[str] = ..., report_uri: _Optional[str] = ...) -> None: ...
-
-class Inputs(_message.Message):
-    __slots__ = ["literals", "context"]
-    LITERALS_FIELD_NUMBER: _ClassVar[int]
-    CONTEXT_FIELD_NUMBER: _ClassVar[int]
-    literals: _containers.RepeatedCompositeFieldContainer[NamedLiteral]
-    context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
-    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
-
-class Outputs(_message.Message):
-    __slots__ = ["literals"]
-    LITERALS_FIELD_NUMBER: _ClassVar[int]
-    literals: _containers.RepeatedCompositeFieldContainer[NamedLiteral]
-    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., phase: _Optional[_Union[Phase, str]] = ..., version: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., reported_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...

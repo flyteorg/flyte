@@ -118,3 +118,25 @@ class ActionAttemptIdentifier(_message.Message):
     action_id: ActionIdentifier
     attempt: int
     def __init__(self, action_id: _Optional[_Union[ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
+
+class TriggerName(_message.Message):
+    __slots__ = ["org", "project", "domain", "name", "task_name"]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    org: str
+    project: str
+    domain: str
+    name: str
+    task_name: str
+    def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., task_name: _Optional[str] = ...) -> None: ...
+
+class TriggerIdentifier(_message.Message):
+    __slots__ = ["name", "revision"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    REVISION_FIELD_NUMBER: _ClassVar[int]
+    name: TriggerName
+    revision: int
+    def __init__(self, name: _Optional[_Union[TriggerName, _Mapping]] = ..., revision: _Optional[int] = ...) -> None: ...

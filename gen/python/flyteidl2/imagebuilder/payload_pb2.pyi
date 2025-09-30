@@ -1,5 +1,5 @@
-from flyteidl2.imagebuilder import definition_pb2 as _definition_pb2
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.imagebuilder import definition_pb2 as _definition_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union

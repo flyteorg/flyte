@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
-
 import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
 
 message ArtifactKey {
   // Project and domain and suffix needs to be unique across a given artifact store.

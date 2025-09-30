@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package flyteidl2.trigger;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
+
+message TriggerMetadata {
+  // Identity that last deployed the trigger
+  common.EnrichedIdentity deployed_by = 1 [(buf.validate.field).required = true];
+
+  // Identity that last activated or deactivated the trigger
+  common.EnrichedIdentity updated_by = 2 [(buf.validate.field).required = true];
+}
+
+message TriggerSpec {
+  // Identifies which task to trigger.
+  flyteidl2.task.TaskIdentifier task_id = 1 [(buf.validate.field).required = true];
+
+  // Inputs for triggered task.
+  flyteidl2.task.Inputs inputs = 2;
+
+  // The run spec for triggered task.
+  flyteidl2.task.RunSpec run_spec = 3;
+
+  // Whether trigger is active
+  bool active = 4;
+
+  // Task version together with trigger name will give us the unique task id
+  string task_version = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+}
+
+message TriggerStatus {
+  // The first time trigger was deployed.
+  google.protobuf.Timestamp deployed_at = 1 [(buf.validate.field).required = true];
+
+  // The last time the trigger was updated.
+  google.protobuf.Timestamp updated_at = 2 [(buf.validate.field).required = true];
+
+  // The last time the trigger fired.
+  google.protobuf.Timestamp triggered_at = 3;
+
+  // The time trigger was deleted.
+  google.protobuf.Timestamp deleted_at = 4;
+}
+
+// Stores human- and machine-friendly explanation of what changed in the revision
+enum TriggerRevisionAction {
+  TRIGGER_REVISION_ACTION_UNSPECIFIED = 0;
+  TRIGGER_REVISION_ACTION_DEPLOY = 1;
+  TRIGGER_REVISION_ACTION_ACTIVATE = 2;
+  TRIGGER_REVISION_ACTION_DEACTIVATE = 3;
+  TRIGGER_REVISION_ACTION_DELETE = 4;
+}
+
+// Light-weight information about a single trigger revision
+message TriggerRevision {
+  flyteidl2.common.TriggerIdentifier id = 1;
+
+  TriggerMetadata metadata = 2;
+
+  TriggerStatus status = 3;
+
+  TriggerRevisionAction action = 4;
+}
+
+// Full details about a trigger stored in DB
+message TriggerDetails {
+  common.TriggerIdentifier id = 1 [(buf.validate.field).required = true];
+
+  TriggerMetadata metadata = 2;
+
+  TriggerSpec spec = 3 [(buf.validate.field).required = true];
+
+  TriggerStatus status = 4;
+
+  // Optional automation spec.
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 5;
+}
+
+// Light-weight information about trigger for a list view
+message Trigger {
+  reserved 4;
+
+  flyteidl2.common.TriggerIdentifier id = 1;
+
+  TriggerMetadata metadata = 2;
+
+  TriggerStatus status = 3;
+
+  bool active = 5;
+
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 6;
+}

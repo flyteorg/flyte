@@ -2,11 +2,13 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
-import "buf/validate/validate.proto";
-import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -85,13 +87,16 @@ message CreateRunRequest {
 
     // The task spec to use.
     task.TaskSpec task_spec = 3;
+
+    // The trigger name to use.
+    common.TriggerName trigger_name = 7;
   }
 
   // Inputs to use.
-  Inputs inputs = 4;
+  task.Inputs inputs = 4;
 
   // The run spec to use.
-  RunSpec run_spec = 5;
+  task.RunSpec run_spec = 5;
 }
 
 // Response message for creating a run.
@@ -168,10 +173,10 @@ message GetActionDataRequest {
 // Response message for querying action data.
 message GetActionDataResponse {
   // Inputs for the action.
-  Inputs inputs = 1;
+  task.Inputs inputs = 1;
 
   // Outputs for the action.
-  Outputs outputs = 2;
+  task.Outputs outputs = 2;
 }
 
 // Request message for listing runs.
@@ -192,6 +197,9 @@ message ListRunsRequest {
 
     // Project identifier for filtering runs.
     common.ProjectIdentifier project_id = 4;
+
+    // List runs created from a trigger.
+    common.TriggerName trigger_name = 6;
   }
 }
 

@@ -11,18 +11,18 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 from flyteidl2.common import identity_pb2 as flyteidl2_dot_common_dot_identity__pb2
 from flyteidl2.core import catalog_pb2 as flyteidl2_dot_core_dot_catalog__pb2
 from flyteidl2.core import execution_pb2 as flyteidl2_dot_core_dot_execution__pb2
-from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
-from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
-from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb2
-from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from flyteidl2.task import common_pb2 as flyteidl2_dot_task_dot_common__pb2
+from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
 from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__definition__pb2
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/workflow/run_definition.proto\x12\x12\x66lyteidl2.workflow\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1c\x66lyteidl2/core/catalog.proto\x1a\x1e\x66lyteidl2/core/execution.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1b\x62uf/validate/validate.proto\x1a$flyteidl2/task/task_definition.proto\"\x83\x01\n\x06Labels\x12>\n\x06values\x18\x01 \x03(\x0b\x32&.flyteidl2.workflow.Labels.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x8d\x01\n\x0b\x41nnotations\x12\x43\n\x06values\x18\x01 \x03(\x0b\x32+.flyteidl2.workflow.Annotations.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"<\n\x04\x45nvs\x12\x34\n\x06values\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x06values\"\xb3\x02\n\x07RunSpec\x12\x32\n\x06labels\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.workflow.LabelsR\x06labels\x12\x41\n\x0b\x61nnotations\x18\x02 \x01(\x0b\x32\x1f.flyteidl2.workflow.AnnotationsR\x0b\x61nnotations\x12,\n\x04\x65nvs\x18\x03 \x01(\x0b\x32\x18.flyteidl2.workflow.EnvsR\x04\x65nvs\x12@\n\rinterruptible\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.BoolValueR\rinterruptible\x12\'\n\x0foverwrite_cache\x18\x05 \x01(\x08R\x0eoverwriteCache\x12\x18\n\x07\x63luster\x18\x06 \x01(\tR\x07\x63luster\"9\n\x03Run\x12\x32\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x06\x61\x63tion\"\x7f\n\nRunDetails\x12\x36\n\x08run_spec\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.workflow.RunSpecR\x07runSpec\x12\x39\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x06\x61\x63tion\"\x80\x01\n\x12TaskActionMetadata\x12.\n\x02id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierR\x02id\x12\x1b\n\ttask_type\x18\x02 \x01(\tR\x08taskType\x12\x1d\n\nshort_name\x18\x03 \x01(\tR\tshortName\")\n\x13TraceActionMetadata\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\"\xa1\x01\n\x17\x43onditionActionMetadata\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12 \n\x06run_id\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x05runId\x12&\n\taction_id\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x08\x61\x63tionId\x12\x18\n\x06global\x18\x04 \x01(\x08H\x00R\x06globalB\x0e\n\x05scope\x12\x05\xbaH\x02\x08\x01\"\x98\x03\n\x0e\x41\x63tionMetadata\x12\x16\n\x06parent\x18\x03 \x01(\tR\x06parent\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x43\n\x0b\x65xecuted_by\x18\x06 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\nexecutedBy\x12<\n\x04task\x18\x07 \x01(\x0b\x32&.flyteidl2.workflow.TaskActionMetadataH\x00R\x04task\x12?\n\x05trace\x18\x08 \x01(\x0b\x32\'.flyteidl2.workflow.TraceActionMetadataH\x00R\x05trace\x12K\n\tcondition\x18\t \x01(\x0b\x32+.flyteidl2.workflow.ConditionActionMetadataH\x00R\tcondition\x12?\n\x0b\x61\x63tion_type\x18\n \x01(\x0e\x32\x1e.flyteidl2.workflow.ActionTypeR\nactionTypeB\x06\n\x04spec\"\xaf\x02\n\x0c\x41\x63tionStatus\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x12#\n\x08\x61ttempts\x18\x04 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x08\x61ttempts\x12\x45\n\x0c\x63\x61\x63he_status\x18\x05 \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatusB\x0b\n\t_end_time\"\xb6\x01\n\x06\x41\x63tion\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\x02id\x12>\n\x08metadata\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ActionMetadataR\x08metadata\x12\x38\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06status\"\xa0\x02\n\x0e\x45nrichedAction\x12\x32\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x06\x61\x63tion\x12!\n\x0cmeets_filter\x18\x02 \x01(\x08R\x0bmeetsFilter\x12o\n\x15\x63hildren_phase_counts\x18\x03 \x03(\x0b\x32;.flyteidl2.workflow.EnrichedAction.ChildrenPhaseCountsEntryR\x13\x63hildrenPhaseCounts\x1a\x46\n\x18\x43hildrenPhaseCountsEntry\x12\x10\n\x03key\x18\x01 \x01(\x05R\x03key\x12\x14\n\x05value\x18\x02 \x01(\x05R\x05value:\x02\x38\x01\"\x9b\x01\n\tErrorInfo\x12\x18\n\x07message\x18\x01 \x01(\tR\x07message\x12\x36\n\x04kind\x18\x02 \x01(\x0e\x32\".flyteidl2.workflow.ErrorInfo.KindR\x04kind\"<\n\x04Kind\x12\x14\n\x10KIND_UNSPECIFIED\x10\x00\x12\r\n\tKIND_USER\x10\x01\x12\x0f\n\x0bKIND_SYSTEM\x10\x02\"f\n\tAbortInfo\x12\x16\n\x06reason\x18\x01 \x01(\tR\x06reason\x12\x41\n\naborted_by\x18\x02 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tabortedBy\"\xf1\x03\n\rActionDetails\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\x02id\x12>\n\x08metadata\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ActionMetadataR\x08metadata\x12\x38\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06status\x12>\n\nerror_info\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x00R\terrorInfo\x12>\n\nabort_info\x18\x05 \x01(\x0b\x32\x1d.flyteidl2.workflow.AbortInfoH\x00R\tabortInfo\x12.\n\x04task\x18\x06 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x04task\x12\x31\n\x05trace\x18\x08 \x01(\x0b\x32\x19.flyteidl2.task.TraceSpecH\x01R\x05trace\x12=\n\x08\x61ttempts\x18\x07 \x03(\x0b\x32!.flyteidl2.workflow.ActionAttemptR\x08\x61ttemptsB\x08\n\x06resultB\x06\n\x04spec\"\x8d\x06\n\rActionAttempt\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x12\x41\n\nerror_info\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x01R\terrorInfo\x88\x01\x01\x12!\n\x07\x61ttempt\x18\x05 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12\x32\n\x08log_info\x18\x06 \x03(\x0b\x32\x17.flyteidl2.core.TaskLogR\x07logInfo\x12>\n\x07outputs\x18\x07 \x01(\x0b\x32$.flyteidl2.workflow.OutputReferencesR\x07outputs\x12%\n\x0elogs_available\x18\x08 \x01(\x08R\rlogsAvailable\x12\x45\n\x0c\x63\x61\x63he_status\x18\t \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatus\x12G\n\x0e\x63luster_events\x18\n \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\x12P\n\x11phase_transitions\x18\x0b \x03(\x0b\x32#.flyteidl2.workflow.PhaseTransitionR\x10phaseTransitions\x12\x18\n\x07\x63luster\x18\x0c \x01(\tR\x07\x63luster\x12;\n\x0blog_context\x18\r \x01(\x0b\x32\x1a.flyteidl2.core.LogContextR\nlogContextB\x0b\n\t_end_timeB\r\n\x0b_error_info\"e\n\x0c\x43lusterEvent\x12;\n\x0boccurred_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\noccurredAt\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"\xc6\x01\n\x0fPhaseTransition\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x42\x0b\n\t_end_time\"\xf0\x06\n\x0b\x41\x63tionEvent\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12/\n\x05phase\x18\x03 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x18\n\x07version\x18\x04 \x01(\rR\x07version\x12=\n\nstart_time\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x02\x18\x01R\tstartTime\x12=\n\x0cupdated_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0bupdatedTime\x12>\n\x08\x65nd_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x02\x18\x01H\x00R\x07\x65ndTime\x88\x01\x01\x12\x41\n\nerror_info\x18\x08 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x01R\terrorInfo\x88\x01\x01\x12\x32\n\x08log_info\x18\t \x03(\x0b\x32\x17.flyteidl2.core.TaskLogR\x07logInfo\x12;\n\x0blog_context\x18\n \x01(\x0b\x32\x1a.flyteidl2.core.LogContextR\nlogContext\x12\x18\n\x07\x63luster\x18\x0b \x01(\tR\x07\x63luster\x12>\n\x07outputs\x18\x0c \x01(\x0b\x32$.flyteidl2.workflow.OutputReferencesR\x07outputs\x12\x45\n\x0c\x63\x61\x63he_status\x18\r \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatus\x12G\n\x0e\x63luster_events\x18\x0e \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\x12?\n\rreported_time\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0creportedTimeB\x0b\n\t_end_timeB\r\n\x0b_error_info\"Q\n\x0cNamedLiteral\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12-\n\x05value\x18\x02 \x01(\x0b\x32\x17.flyteidl2.core.LiteralR\x05value\"P\n\x10OutputReferences\x12\x1d\n\noutput_uri\x18\x01 \x01(\tR\toutputUri\x12\x1d\n\nreport_uri\x18\x02 \x01(\tR\treportUri\"~\n\x06Inputs\x12<\n\x08literals\x18\x01 \x03(\x0b\x32 .flyteidl2.workflow.NamedLiteralR\x08literals\x12\x36\n\x07\x63ontext\x18\x02 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x07\x63ontext\"G\n\x07Outputs\x12<\n\x08literals\x18\x01 \x03(\x0b\x32 .flyteidl2.workflow.NamedLiteralR\x08literals*\xcb\x01\n\x05Phase\x12\x15\n\x11PHASE_UNSPECIFIED\x10\x00\x12\x10\n\x0cPHASE_QUEUED\x10\x01\x12\x1f\n\x1bPHASE_WAITING_FOR_RESOURCES\x10\x02\x12\x16\n\x12PHASE_INITIALIZING\x10\x03\x12\x11\n\rPHASE_RUNNING\x10\x04\x12\x13\n\x0fPHASE_SUCCEEDED\x10\x05\x12\x10\n\x0cPHASE_FAILED\x10\x06\x12\x11\n\rPHASE_ABORTED\x10\x07\x12\x13\n\x0fPHASE_TIMED_OUT\x10\x08*q\n\nActionType\x12\x1b\n\x17\x41\x43TION_TYPE_UNSPECIFIED\x10\x00\x12\x14\n\x10\x41\x43TION_TYPE_TASK\x10\x01\x12\x15\n\x11\x41\x43TION_TYPE_TRACE\x10\x02\x12\x19\n\x15\x41\x43TION_TYPE_CONDITION\x10\x03\x42\xcf\x01\n\x16\x63om.flyteidl2.workflowB\x12RunDefinitionProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/workflow/run_definition.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1c\x66lyteidl2/core/catalog.proto\x1a\x1e\x66lyteidl2/core/execution.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a$flyteidl2/task/task_definition.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"9\n\x03Run\x12\x32\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x06\x61\x63tion\"{\n\nRunDetails\x12\x32\n\x08run_spec\x18\x01 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12\x39\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x06\x61\x63tion\"\x80\x01\n\x12TaskActionMetadata\x12.\n\x02id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierR\x02id\x12\x1b\n\ttask_type\x18\x02 \x01(\tR\x08taskType\x12\x1d\n\nshort_name\x18\x03 \x01(\tR\tshortName\")\n\x13TraceActionMetadata\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\"\xa1\x01\n\x17\x43onditionActionMetadata\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12 \n\x06run_id\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x05runId\x12&\n\taction_id\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x08\x61\x63tionId\x12\x18\n\x06global\x18\x04 \x01(\x08H\x00R\x06globalB\x0e\n\x05scope\x12\x05\xbaH\x02\x08\x01\"\xdc\x03\n\x0e\x41\x63tionMetadata\x12\x16\n\x06parent\x18\x03 \x01(\tR\x06parent\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x43\n\x0b\x65xecuted_by\x18\x06 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\nexecutedBy\x12<\n\x04task\x18\x07 \x01(\x0b\x32&.flyteidl2.workflow.TaskActionMetadataH\x00R\x04task\x12?\n\x05trace\x18\x08 \x01(\x0b\x32\'.flyteidl2.workflow.TraceActionMetadataH\x00R\x05trace\x12K\n\tcondition\x18\t \x01(\x0b\x32+.flyteidl2.workflow.ConditionActionMetadataH\x00R\tcondition\x12?\n\x0b\x61\x63tion_type\x18\n \x01(\x0e\x32\x1e.flyteidl2.workflow.ActionTypeR\nactionType\x12\x42\n\ntrigger_id\x18\x0b \x01(\x0b\x32#.flyteidl2.common.TriggerIdentifierR\ttriggerIdB\x06\n\x04spec\"\xaf\x02\n\x0c\x41\x63tionStatus\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x12#\n\x08\x61ttempts\x18\x04 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x08\x61ttempts\x12\x45\n\x0c\x63\x61\x63he_status\x18\x05 \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatusB\x0b\n\t_end_time\"\xb6\x01\n\x06\x41\x63tion\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\x02id\x12>\n\x08metadata\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ActionMetadataR\x08metadata\x12\x38\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06status\"\xa0\x02\n\x0e\x45nrichedAction\x12\x32\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x06\x61\x63tion\x12!\n\x0cmeets_filter\x18\x02 \x01(\x08R\x0bmeetsFilter\x12o\n\x15\x63hildren_phase_counts\x18\x03 \x03(\x0b\x32;.flyteidl2.workflow.EnrichedAction.ChildrenPhaseCountsEntryR\x13\x63hildrenPhaseCounts\x1a\x46\n\x18\x43hildrenPhaseCountsEntry\x12\x10\n\x03key\x18\x01 \x01(\x05R\x03key\x12\x14\n\x05value\x18\x02 \x01(\x05R\x05value:\x02\x38\x01\"\x9b\x01\n\tErrorInfo\x12\x18\n\x07message\x18\x01 \x01(\tR\x07message\x12\x36\n\x04kind\x18\x02 \x01(\x0e\x32\".flyteidl2.workflow.ErrorInfo.KindR\x04kind\"<\n\x04Kind\x12\x14\n\x10KIND_UNSPECIFIED\x10\x00\x12\r\n\tKIND_USER\x10\x01\x12\x0f\n\x0bKIND_SYSTEM\x10\x02\"f\n\tAbortInfo\x12\x16\n\x06reason\x18\x01 \x01(\tR\x06reason\x12\x41\n\naborted_by\x18\x02 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tabortedBy\"\xf1\x03\n\rActionDetails\x12\x32\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\x02id\x12>\n\x08metadata\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ActionMetadataR\x08metadata\x12\x38\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06status\x12>\n\nerror_info\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x00R\terrorInfo\x12>\n\nabort_info\x18\x05 \x01(\x0b\x32\x1d.flyteidl2.workflow.AbortInfoH\x00R\tabortInfo\x12.\n\x04task\x18\x06 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x04task\x12\x31\n\x05trace\x18\x08 \x01(\x0b\x32\x19.flyteidl2.task.TraceSpecH\x01R\x05trace\x12=\n\x08\x61ttempts\x18\x07 \x03(\x0b\x32!.flyteidl2.workflow.ActionAttemptR\x08\x61ttemptsB\x08\n\x06resultB\x06\n\x04spec\"\x89\x06\n\rActionAttempt\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x12\x41\n\nerror_info\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x01R\terrorInfo\x88\x01\x01\x12!\n\x07\x61ttempt\x18\x05 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12\x32\n\x08log_info\x18\x06 \x03(\x0b\x32\x17.flyteidl2.core.TaskLogR\x07logInfo\x12:\n\x07outputs\x18\x07 \x01(\x0b\x32 .flyteidl2.task.OutputReferencesR\x07outputs\x12%\n\x0elogs_available\x18\x08 \x01(\x08R\rlogsAvailable\x12\x45\n\x0c\x63\x61\x63he_status\x18\t \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatus\x12G\n\x0e\x63luster_events\x18\n \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\x12P\n\x11phase_transitions\x18\x0b \x03(\x0b\x32#.flyteidl2.workflow.PhaseTransitionR\x10phaseTransitions\x12\x18\n\x07\x63luster\x18\x0c \x01(\tR\x07\x63luster\x12;\n\x0blog_context\x18\r \x01(\x0b\x32\x1a.flyteidl2.core.LogContextR\nlogContextB\x0b\n\t_end_timeB\r\n\x0b_error_info\"e\n\x0c\x43lusterEvent\x12;\n\x0boccurred_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\noccurredAt\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"\xc6\x01\n\x0fPhaseTransition\x12/\n\x05phase\x18\x01 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x39\n\nstart_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12:\n\x08\x65nd_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\x07\x65ndTime\x88\x01\x01\x42\x0b\n\t_end_time\"\xec\x06\n\x0b\x41\x63tionEvent\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12/\n\x05phase\x18\x03 \x01(\x0e\x32\x19.flyteidl2.workflow.PhaseR\x05phase\x12\x18\n\x07version\x18\x04 \x01(\rR\x07version\x12=\n\nstart_time\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x02\x18\x01R\tstartTime\x12=\n\x0cupdated_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0bupdatedTime\x12>\n\x08\x65nd_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x02\x18\x01H\x00R\x07\x65ndTime\x88\x01\x01\x12\x41\n\nerror_info\x18\x08 \x01(\x0b\x32\x1d.flyteidl2.workflow.ErrorInfoH\x01R\terrorInfo\x88\x01\x01\x12\x32\n\x08log_info\x18\t \x03(\x0b\x32\x17.flyteidl2.core.TaskLogR\x07logInfo\x12;\n\x0blog_context\x18\n \x01(\x0b\x32\x1a.flyteidl2.core.LogContextR\nlogContext\x12\x18\n\x07\x63luster\x18\x0b \x01(\tR\x07\x63luster\x12:\n\x07outputs\x18\x0c \x01(\x0b\x32 .flyteidl2.task.OutputReferencesR\x07outputs\x12\x45\n\x0c\x63\x61\x63he_status\x18\r \x01(\x0e\x32\".flyteidl2.core.CatalogCacheStatusR\x0b\x63\x61\x63heStatus\x12G\n\x0e\x63luster_events\x18\x0e \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\x12?\n\rreported_time\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0creportedTimeB\x0b\n\t_end_timeB\r\n\x0b_error_info*\xcb\x01\n\x05Phase\x12\x15\n\x11PHASE_UNSPECIFIED\x10\x00\x12\x10\n\x0cPHASE_QUEUED\x10\x01\x12\x1f\n\x1bPHASE_WAITING_FOR_RESOURCES\x10\x02\x12\x16\n\x12PHASE_INITIALIZING\x10\x03\x12\x11\n\rPHASE_RUNNING\x10\x04\x12\x13\n\x0fPHASE_SUCCEEDED\x10\x05\x12\x10\n\x0cPHASE_FAILED\x10\x06\x12\x11\n\rPHASE_ABORTED\x10\x07\x12\x13\n\x0fPHASE_TIMED_OUT\x10\x08*q\n\nActionType\x12\x1b\n\x17\x41\x43TION_TYPE_UNSPECIFIED\x10\x00\x12\x14\n\x10\x41\x43TION_TYPE_TASK\x10\x01\x12\x15\n\x11\x41\x43TION_TYPE_TRACE\x10\x02\x12\x19\n\x15\x41\x43TION_TYPE_CONDITION\x10\x03\x42\xcf\x01\n\x16\x63om.flyteidl2.workflowB\x12RunDefinitionProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -30,10 +30,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.workflow.run_defi
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\022RunDefinitionProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
-  _LABELS_VALUESENTRY._options = None
-  _LABELS_VALUESENTRY._serialized_options = b'8\001'
-  _ANNOTATIONS_VALUESENTRY._options = None
-  _ANNOTATIONS_VALUESENTRY._serialized_options = b'8\001'
   _CONDITIONACTIONMETADATA.oneofs_by_name['scope']._options = None
   _CONDITIONACTIONMETADATA.oneofs_by_name['scope']._serialized_options = b'\272H\002\010\001'
   _CONDITIONACTIONMETADATA.fields_by_name['run_id']._options = None
@@ -54,64 +50,44 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ACTIONEVENT.fields_by_name['start_time']._serialized_options = b'\030\001'
   _ACTIONEVENT.fields_by_name['end_time']._options = None
   _ACTIONEVENT.fields_by_name['end_time']._serialized_options = b'\030\001'
-  _globals['_PHASE']._serialized_start=5825
-  _globals['_PHASE']._serialized_end=6028
-  _globals['_ACTIONTYPE']._serialized_start=6030
-  _globals['_ACTIONTYPE']._serialized_end=6143
-  _globals['_LABELS']._serialized_start=357
-  _globals['_LABELS']._serialized_end=488
-  _globals['_LABELS_VALUESENTRY']._serialized_start=431
-  _globals['_LABELS_VALUESENTRY']._serialized_end=488
-  _globals['_ANNOTATIONS']._serialized_start=491
-  _globals['_ANNOTATIONS']._serialized_end=632
-  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_start=431
-  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_end=488
-  _globals['_ENVS']._serialized_start=634
-  _globals['_ENVS']._serialized_end=694
-  _globals['_RUNSPEC']._serialized_start=697
-  _globals['_RUNSPEC']._serialized_end=1004
-  _globals['_RUN']._serialized_start=1006
-  _globals['_RUN']._serialized_end=1063
-  _globals['_RUNDETAILS']._serialized_start=1065
-  _globals['_RUNDETAILS']._serialized_end=1192
-  _globals['_TASKACTIONMETADATA']._serialized_start=1195
-  _globals['_TASKACTIONMETADATA']._serialized_end=1323
-  _globals['_TRACEACTIONMETADATA']._serialized_start=1325
-  _globals['_TRACEACTIONMETADATA']._serialized_end=1366
-  _globals['_CONDITIONACTIONMETADATA']._serialized_start=1369
-  _globals['_CONDITIONACTIONMETADATA']._serialized_end=1530
-  _globals['_ACTIONMETADATA']._serialized_start=1533
-  _globals['_ACTIONMETADATA']._serialized_end=1941
-  _globals['_ACTIONSTATUS']._serialized_start=1944
-  _globals['_ACTIONSTATUS']._serialized_end=2247
-  _globals['_ACTION']._serialized_start=2250
-  _globals['_ACTION']._serialized_end=2432
-  _globals['_ENRICHEDACTION']._serialized_start=2435
-  _globals['_ENRICHEDACTION']._serialized_end=2723
-  _globals['_ENRICHEDACTION_CHILDRENPHASECOUNTSENTRY']._serialized_start=2653
-  _globals['_ENRICHEDACTION_CHILDRENPHASECOUNTSENTRY']._serialized_end=2723
-  _globals['_ERRORINFO']._serialized_start=2726
-  _globals['_ERRORINFO']._serialized_end=2881
-  _globals['_ERRORINFO_KIND']._serialized_start=2821
-  _globals['_ERRORINFO_KIND']._serialized_end=2881
-  _globals['_ABORTINFO']._serialized_start=2883
-  _globals['_ABORTINFO']._serialized_end=2985
-  _globals['_ACTIONDETAILS']._serialized_start=2988
-  _globals['_ACTIONDETAILS']._serialized_end=3485
-  _globals['_ACTIONATTEMPT']._serialized_start=3488
-  _globals['_ACTIONATTEMPT']._serialized_end=4269
-  _globals['_CLUSTEREVENT']._serialized_start=4271
-  _globals['_CLUSTEREVENT']._serialized_end=4372
-  _globals['_PHASETRANSITION']._serialized_start=4375
-  _globals['_PHASETRANSITION']._serialized_end=4573
-  _globals['_ACTIONEVENT']._serialized_start=4576
-  _globals['_ACTIONEVENT']._serialized_end=5456
-  _globals['_NAMEDLITERAL']._serialized_start=5458
-  _globals['_NAMEDLITERAL']._serialized_end=5539
-  _globals['_OUTPUTREFERENCES']._serialized_start=5541
-  _globals['_OUTPUTREFERENCES']._serialized_end=5621
-  _globals['_INPUTS']._serialized_start=5623
-  _globals['_INPUTS']._serialized_end=5749
-  _globals['_OUTPUTS']._serialized_start=5751
-  _globals['_OUTPUTS']._serialized_end=5822
+  _globals['_PHASE']._serialized_start=4857
+  _globals['_PHASE']._serialized_end=5060
+  _globals['_ACTIONTYPE']._serialized_start=5062
+  _globals['_ACTIONTYPE']._serialized_end=5175
+  _globals['_RUN']._serialized_start=348
+  _globals['_RUN']._serialized_end=405
+  _globals['_RUNDETAILS']._serialized_start=407
+  _globals['_RUNDETAILS']._serialized_end=530
+  _globals['_TASKACTIONMETADATA']._serialized_start=533
+  _globals['_TASKACTIONMETADATA']._serialized_end=661
+  _globals['_TRACEACTIONMETADATA']._serialized_start=663
+  _globals['_TRACEACTIONMETADATA']._serialized_end=704
+  _globals['_CONDITIONACTIONMETADATA']._serialized_start=707
+  _globals['_CONDITIONACTIONMETADATA']._serialized_end=868
+  _globals['_ACTIONMETADATA']._serialized_start=871
+  _globals['_ACTIONMETADATA']._serialized_end=1347
+  _globals['_ACTIONSTATUS']._serialized_start=1350
+  _globals['_ACTIONSTATUS']._serialized_end=1653
+  _globals['_ACTION']._serialized_start=1656
+  _globals['_ACTION']._serialized_end=1838
+  _globals['_ENRICHEDACTION']._serialized_start=1841
+  _globals['_ENRICHEDACTION']._serialized_end=2129
+  _globals['_ENRICHEDACTION_CHILDRENPHASECOUNTSENTRY']._serialized_start=2059
+  _globals['_ENRICHEDACTION_CHILDRENPHASECOUNTSENTRY']._serialized_end=2129
+  _globals['_ERRORINFO']._serialized_start=2132
+  _globals['_ERRORINFO']._serialized_end=2287
+  _globals['_ERRORINFO_KIND']._serialized_start=2227
+  _globals['_ERRORINFO_KIND']._serialized_end=2287
+  _globals['_ABORTINFO']._serialized_start=2289
+  _globals['_ABORTINFO']._serialized_end=2391
+  _globals['_ACTIONDETAILS']._serialized_start=2394
+  _globals['_ACTIONDETAILS']._serialized_end=2891
+  _globals['_ACTIONATTEMPT']._serialized_start=2894
+  _globals['_ACTIONATTEMPT']._serialized_end=3671
+  _globals['_CLUSTEREVENT']._serialized_start=3673
+  _globals['_CLUSTEREVENT']._serialized_end=3774
+  _globals['_PHASETRANSITION']._serialized_start=3777
+  _globals['_PHASETRANSITION']._serialized_end=3975
+  _globals['_ACTIONEVENT']._serialized_start=3978
+  _globals['_ACTIONEVENT']._serialized_end=4854
 # @@protoc_insertion_point(module_scope)

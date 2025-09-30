@@ -3,6 +3,8 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "flyteidl2/core/interface.proto";
+import "flyteidl2/core/literals.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 
@@ -10,4 +12,93 @@ message NamedParameter {
   string name = 1;
 
   flyteidl2.core.Parameter parameter = 2;
+}
+
+// Represents a frequency at which to run a schedule.
+enum FixedRateUnit {
+  FIXED_RATE_UNIT_UNSPECIFIED = 0;
+  FIXED_RATE_UNIT_MINUTE = 1;
+  FIXED_RATE_UNIT_HOUR = 2;
+  FIXED_RATE_UNIT_DAY = 3;
+}
+
+// Option for schedules run at a certain frequency e.g. every 2 minutes.
+message FixedRate {
+  uint32 value = 1;
+  FixedRateUnit unit = 2;
+
+  // Optional, timestamp after which rate should be calculated. Can be only in future.
+  // E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
+  // Activate it at "12:04".
+  // Trigger should fire at "12:05" as it adds 5 minutes to start_time="12:00".
+  google.protobuf.Timestamp start_time = 3;
+}
+
+// Defines complete set of information required to trigger an execution on a schedule.
+message Schedule {
+  oneof expression {
+    // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+    // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+    FixedRate rate = 1;
+    string cron_expression = 2;
+  }
+
+  // Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
+  string kickoff_time_input_arg = 3;
+}
+
+message TriggerAutomationSpec {
+  // Specifies type of the automation attached to trigger if any.
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_NONE = 1;
+    TYPE_SCHEDULE = 2;
+  }
+
+  // Explicitly defines trigger automation type.
+  Type type = 1;
+
+  oneof automation {
+    Schedule schedule = 2;
+
+    // In future will be extended with other automation types: webhook, artifacts, etc.
+  }
+}
+
+// Named literal value.
+message NamedLiteral {
+  // Name of the literal.
+  string name = 1;
+
+  // Literal value.
+  flyteidl2.core.Literal value = 2;
+}
+
+// Output references.
+message OutputReferences {
+  // The output uri.
+  string output_uri = 1;
+
+  // Native URI to HTML report
+  string report_uri = 2;
+}
+
+// Input payload for an action.
+message Inputs {
+  // Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+  repeated NamedLiteral literals = 1;
+
+  // Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
+  // Context will not be used for cache key computation.
+  // Examples for context include:
+  //  - User-provided metadata that is not part of the action's inputs.
+  //  - Information about the environment the action is running in (e.g. cluster, region, etc.)
+  //  - Tracing information about the action
+  repeated flyteidl2.core.KeyValuePair context = 2;
+}
+
+// Output payload for an action.
+message Outputs {
+  // Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+  repeated NamedLiteral literals = 1;
 }

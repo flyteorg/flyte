@@ -25,8 +25,14 @@ buf-dep: ## Update buf modules
 	buf dep update $(OUT_REDIRECT)
 	@$(MAKE) sep
 
+.PHONY: buf-format
+buf-format:
+	@echo 'Running buf format'
+	buf format -w
+	@$(MAKE) sep
+
 .PHONY: buf
-buf: buf-dep buf-lint buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
+buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
 	@echo '🛠️  Finished generating all protocol buffer files for all languages'
 	@$(MAKE) sep
 

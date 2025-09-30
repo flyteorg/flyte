@@ -192,6 +192,19 @@
         }
       }
     },
+    "TaskTriggersSummaryTriggerStats": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "active": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "commonAppSpec": {
       "type": "object",
       "properties": {
@@ -1268,7 +1281,7 @@
         "DATASET"
       ],
       "default": "UNSPECIFIED",
-      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
+      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects\nin a similar manner to other Flyte objects"
     },
     "coreResources": {
       "type": "object",
@@ -1862,6 +1875,10 @@
         "environment_name": {
           "type": "string",
           "description": "The environment name for this task, if present."
+        },
+        "triggers_summary": {
+          "$ref": "#/definitions/taskTaskTriggersSummary",
+          "description": "Brief overview of attached triggers if any."
         }
       },
       "description": "TaskMetadata is static, lightweight metadata about a task."
@@ -1908,6 +1925,19 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskAnnotations": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom annotations to be applied to the execution resource."
+        }
+      },
+      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
+    },
     "taskDeployTaskResponse": {
       "type": "object",
       "description": "Response message for deploying a task."
@@ -1922,6 +1952,49 @@
       },
       "description": "Environment for a task."
     },
+    "taskEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
+    "taskFixedRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/taskFixedRateUnit"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        }
+      },
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
+    },
+    "taskFixedRateUnit": {
+      "type": "string",
+      "enum": [
+        "FIXED_RATE_UNIT_UNSPECIFIED",
+        "FIXED_RATE_UNIT_MINUTE",
+        "FIXED_RATE_UNIT_HOUR",
+        "FIXED_RATE_UNIT_DAY"
+      ],
+      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
+      "description": "Represents a frequency at which to run a schedule."
+    },
     "taskGetTaskDetailsResponse": {
       "type": "object",
       "properties": {
@@ -1931,6 +2004,41 @@
         }
       },
       "description": "Response message for deploying a task."
+    },
+    "taskInputs": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskNamedLiteral"
+          },
+          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
+        }
+      },
+      "description": "Input payload for an action."
+    },
+    "taskLabels": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom labels to be applied to the execution resource."
+        }
+      },
+      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
     },
     "taskListTasksResponse": {
       "type": "object",
@@ -1948,6 +2056,20 @@
         }
       }
     },
+    "taskNamedLiteral": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the literal."
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Literal value."
+        }
+      },
+      "description": "Named literal value."
+    },
     "taskNamedParameter": {
       "type": "object",
       "properties": {
@@ -1958,6 +2080,52 @@
           "$ref": "#/definitions/coreParameter"
         }
       }
+    },
+    "taskRunSpec": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "$ref": "#/definitions/taskLabels",
+          "description": "Labels to apply to the run."
+        },
+        "annotations": {
+          "$ref": "#/definitions/taskAnnotations",
+          "description": "Annotations to apply to the run."
+        },
+        "envs": {
+          "$ref": "#/definitions/taskEnvs",
+          "description": "Envs to apply to the run."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cluster": {
+          "type": "string",
+          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        }
+      }
+    },
+    "taskSchedule": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/taskFixedRate",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "cron_expression": {
+          "type": "string"
+        },
+        "kickoff_time_input_arg": {
+          "type": "string",
+          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        }
+      },
+      "description": "Defines complete set of information required to trigger an execution on a schedule."
     },
     "taskTask": {
       "type": "object",
@@ -2042,6 +2210,73 @@
         }
       },
       "description": "Specification for a task."
+    },
+    "taskTaskTrigger": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "spec": {
+          "$ref": "#/definitions/taskTaskTriggerSpec"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "description": "Optional automation spec."
+        }
+      },
+      "description": "Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint."
+    },
+    "taskTaskTriggerSpec": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "title": "Whether trigger is active"
+        },
+        "inputs": {
+          "$ref": "#/definitions/taskInputs",
+          "description": "Inputs for triggered task."
+        },
+        "run_spec": {
+          "$ref": "#/definitions/taskRunSpec",
+          "description": "The run spec for triggered task."
+        }
+      },
+      "description": "TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.\nThis is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id."
+    },
+    "taskTaskTriggersSummary": {
+      "type": "object",
+      "properties": {
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
+        },
+        "stats": {
+          "$ref": "#/definitions/TaskTriggersSummaryTriggerStats"
+        }
+      }
+    },
+    "taskTriggerAutomationSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpecType",
+          "description": "Explicitly defines trigger automation type."
+        },
+        "schedule": {
+          "$ref": "#/definitions/taskSchedule"
+        }
+      }
+    },
+    "taskTriggerAutomationSpecType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_NONE",
+        "TYPE_SCHEDULE"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "Specifies type of the automation attached to trigger if any."
     }
   }
 }

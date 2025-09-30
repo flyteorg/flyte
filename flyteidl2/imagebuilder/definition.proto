@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package flyteidl2.imagebuilder;
 
-import "flyteidl2/core/security.proto";
 import "buf/validate/validate.proto";
+import "flyteidl2/core/security.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
 

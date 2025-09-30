@@ -1589,3 +1589,245 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ActionAttemptIdentifierValidationError{}
+
+// Validate checks the field values on TriggerName with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TriggerName) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TriggerName with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TriggerNameMultiError, or
+// nil if none found.
+func (m *TriggerName) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TriggerName) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Org
+
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
+	// no validation rules for Name
+
+	// no validation rules for TaskName
+
+	if len(errors) > 0 {
+		return TriggerNameMultiError(errors)
+	}
+
+	return nil
+}
+
+// TriggerNameMultiError is an error wrapping multiple validation errors
+// returned by TriggerName.ValidateAll() if the designated constraints aren't met.
+type TriggerNameMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TriggerNameMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TriggerNameMultiError) AllErrors() []error { return m }
+
+// TriggerNameValidationError is the validation error returned by
+// TriggerName.Validate if the designated constraints aren't met.
+type TriggerNameValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TriggerNameValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TriggerNameValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TriggerNameValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TriggerNameValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TriggerNameValidationError) ErrorName() string { return "TriggerNameValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TriggerNameValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTriggerName.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TriggerNameValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TriggerNameValidationError{}
+
+// Validate checks the field values on TriggerIdentifier with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TriggerIdentifier) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TriggerIdentifier with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TriggerIdentifierMultiError, or nil if none found.
+func (m *TriggerIdentifier) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TriggerIdentifier) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TriggerIdentifierValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TriggerIdentifierValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TriggerIdentifierValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Revision
+
+	if len(errors) > 0 {
+		return TriggerIdentifierMultiError(errors)
+	}
+
+	return nil
+}
+
+// TriggerIdentifierMultiError is an error wrapping multiple validation errors
+// returned by TriggerIdentifier.ValidateAll() if the designated constraints
+// aren't met.
+type TriggerIdentifierMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TriggerIdentifierMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TriggerIdentifierMultiError) AllErrors() []error { return m }
+
+// TriggerIdentifierValidationError is the validation error returned by
+// TriggerIdentifier.Validate if the designated constraints aren't met.
+type TriggerIdentifierValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TriggerIdentifierValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TriggerIdentifierValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TriggerIdentifierValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TriggerIdentifierValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TriggerIdentifierValidationError) ErrorName() string {
+	return "TriggerIdentifierValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TriggerIdentifierValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTriggerIdentifier.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TriggerIdentifierValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TriggerIdentifierValidationError{}

@@ -10,6 +10,7 @@ import (
 	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -20,6 +21,109 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+// Represents a frequency at which to run a schedule.
+type FixedRateUnit int32
+
+const (
+	FixedRateUnit_FIXED_RATE_UNIT_UNSPECIFIED FixedRateUnit = 0
+	FixedRateUnit_FIXED_RATE_UNIT_MINUTE      FixedRateUnit = 1
+	FixedRateUnit_FIXED_RATE_UNIT_HOUR        FixedRateUnit = 2
+	FixedRateUnit_FIXED_RATE_UNIT_DAY         FixedRateUnit = 3
+)
+
+// Enum value maps for FixedRateUnit.
+var (
+	FixedRateUnit_name = map[int32]string{
+		0: "FIXED_RATE_UNIT_UNSPECIFIED",
+		1: "FIXED_RATE_UNIT_MINUTE",
+		2: "FIXED_RATE_UNIT_HOUR",
+		3: "FIXED_RATE_UNIT_DAY",
+	}
+	FixedRateUnit_value = map[string]int32{
+		"FIXED_RATE_UNIT_UNSPECIFIED": 0,
+		"FIXED_RATE_UNIT_MINUTE":      1,
+		"FIXED_RATE_UNIT_HOUR":        2,
+		"FIXED_RATE_UNIT_DAY":         3,
+	}
+)
+
+func (x FixedRateUnit) Enum() *FixedRateUnit {
+	p := new(FixedRateUnit)
+	*p = x
+	return p
+}
+
+func (x FixedRateUnit) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FixedRateUnit) Descriptor() protoreflect.EnumDescriptor {
+	return file_flyteidl2_task_common_proto_enumTypes[0].Descriptor()
+}
+
+func (FixedRateUnit) Type() protoreflect.EnumType {
+	return &file_flyteidl2_task_common_proto_enumTypes[0]
+}
+
+func (x FixedRateUnit) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FixedRateUnit.Descriptor instead.
+func (FixedRateUnit) EnumDescriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{0}
+}
+
+// Specifies type of the automation attached to trigger if any.
+type TriggerAutomationSpec_Type int32
+
+const (
+	TriggerAutomationSpec_TYPE_UNSPECIFIED TriggerAutomationSpec_Type = 0
+	TriggerAutomationSpec_TYPE_NONE        TriggerAutomationSpec_Type = 1
+	TriggerAutomationSpec_TYPE_SCHEDULE    TriggerAutomationSpec_Type = 2
+)
+
+// Enum value maps for TriggerAutomationSpec_Type.
+var (
+	TriggerAutomationSpec_Type_name = map[int32]string{
+		0: "TYPE_UNSPECIFIED",
+		1: "TYPE_NONE",
+		2: "TYPE_SCHEDULE",
+	}
+	TriggerAutomationSpec_Type_value = map[string]int32{
+		"TYPE_UNSPECIFIED": 0,
+		"TYPE_NONE":        1,
+		"TYPE_SCHEDULE":    2,
+	}
+)
+
+func (x TriggerAutomationSpec_Type) Enum() *TriggerAutomationSpec_Type {
+	p := new(TriggerAutomationSpec_Type)
+	*p = x
+	return p
+}
+
+func (x TriggerAutomationSpec_Type) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TriggerAutomationSpec_Type) Descriptor() protoreflect.EnumDescriptor {
+	return file_flyteidl2_task_common_proto_enumTypes[1].Descriptor()
+}
+
+func (TriggerAutomationSpec_Type) Type() protoreflect.EnumType {
+	return &file_flyteidl2_task_common_proto_enumTypes[1]
+}
+
+func (x TriggerAutomationSpec_Type) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TriggerAutomationSpec_Type.Descriptor instead.
+func (TriggerAutomationSpec_Type) EnumDescriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{3, 0}
+}
 
 type NamedParameter struct {
 	state         protoimpl.MessageState
@@ -76,6 +180,471 @@ func (x *NamedParameter) GetParameter() *core.Parameter {
 	return nil
 }
 
+// Option for schedules run at a certain frequency e.g. every 2 minutes.
+type FixedRate struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Value uint32        `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	Unit  FixedRateUnit `protobuf:"varint,2,opt,name=unit,proto3,enum=flyteidl2.task.FixedRateUnit" json:"unit,omitempty"`
+	// Optional, timestamp after which rate should be calculated. Can be only in future.
+	// E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
+	// Activate it at "12:04".
+	// Trigger should fire at "12:05" as it adds 5 minutes to start_time="12:00".
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+}
+
+func (x *FixedRate) Reset() {
+	*x = FixedRate{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FixedRate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FixedRate) ProtoMessage() {}
+
+func (x *FixedRate) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FixedRate.ProtoReflect.Descriptor instead.
+func (*FixedRate) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *FixedRate) GetValue() uint32 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+func (x *FixedRate) GetUnit() FixedRateUnit {
+	if x != nil {
+		return x.Unit
+	}
+	return FixedRateUnit_FIXED_RATE_UNIT_UNSPECIFIED
+}
+
+func (x *FixedRate) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+// Defines complete set of information required to trigger an execution on a schedule.
+type Schedule struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Expression:
+	//
+	//	*Schedule_Rate
+	//	*Schedule_CronExpression
+	Expression isSchedule_Expression `protobuf_oneof:"expression"`
+	// Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
+	KickoffTimeInputArg string `protobuf:"bytes,3,opt,name=kickoff_time_input_arg,json=kickoffTimeInputArg,proto3" json:"kickoff_time_input_arg,omitempty"`
+}
+
+func (x *Schedule) Reset() {
+	*x = Schedule{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Schedule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Schedule) ProtoMessage() {}
+
+func (x *Schedule) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Schedule.ProtoReflect.Descriptor instead.
+func (*Schedule) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (m *Schedule) GetExpression() isSchedule_Expression {
+	if m != nil {
+		return m.Expression
+	}
+	return nil
+}
+
+func (x *Schedule) GetRate() *FixedRate {
+	if x, ok := x.GetExpression().(*Schedule_Rate); ok {
+		return x.Rate
+	}
+	return nil
+}
+
+func (x *Schedule) GetCronExpression() string {
+	if x, ok := x.GetExpression().(*Schedule_CronExpression); ok {
+		return x.CronExpression
+	}
+	return ""
+}
+
+func (x *Schedule) GetKickoffTimeInputArg() string {
+	if x != nil {
+		return x.KickoffTimeInputArg
+	}
+	return ""
+}
+
+type isSchedule_Expression interface {
+	isSchedule_Expression()
+}
+
+type Schedule_Rate struct {
+	// Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+	// e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+	Rate *FixedRate `protobuf:"bytes,1,opt,name=rate,proto3,oneof"`
+}
+
+type Schedule_CronExpression struct {
+	CronExpression string `protobuf:"bytes,2,opt,name=cron_expression,json=cronExpression,proto3,oneof"`
+}
+
+func (*Schedule_Rate) isSchedule_Expression() {}
+
+func (*Schedule_CronExpression) isSchedule_Expression() {}
+
+type TriggerAutomationSpec struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Explicitly defines trigger automation type.
+	Type TriggerAutomationSpec_Type `protobuf:"varint,1,opt,name=type,proto3,enum=flyteidl2.task.TriggerAutomationSpec_Type" json:"type,omitempty"`
+	// Types that are assignable to Automation:
+	//
+	//	*TriggerAutomationSpec_Schedule
+	Automation isTriggerAutomationSpec_Automation `protobuf_oneof:"automation"`
+}
+
+func (x *TriggerAutomationSpec) Reset() {
+	*x = TriggerAutomationSpec{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TriggerAutomationSpec) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerAutomationSpec) ProtoMessage() {}
+
+func (x *TriggerAutomationSpec) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerAutomationSpec.ProtoReflect.Descriptor instead.
+func (*TriggerAutomationSpec) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TriggerAutomationSpec) GetType() TriggerAutomationSpec_Type {
+	if x != nil {
+		return x.Type
+	}
+	return TriggerAutomationSpec_TYPE_UNSPECIFIED
+}
+
+func (m *TriggerAutomationSpec) GetAutomation() isTriggerAutomationSpec_Automation {
+	if m != nil {
+		return m.Automation
+	}
+	return nil
+}
+
+func (x *TriggerAutomationSpec) GetSchedule() *Schedule {
+	if x, ok := x.GetAutomation().(*TriggerAutomationSpec_Schedule); ok {
+		return x.Schedule
+	}
+	return nil
+}
+
+type isTriggerAutomationSpec_Automation interface {
+	isTriggerAutomationSpec_Automation()
+}
+
+type TriggerAutomationSpec_Schedule struct {
+	Schedule *Schedule `protobuf:"bytes,2,opt,name=schedule,proto3,oneof"`
+}
+
+func (*TriggerAutomationSpec_Schedule) isTriggerAutomationSpec_Automation() {}
+
+// Named literal value.
+type NamedLiteral struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Name of the literal.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Literal value.
+	Value *core.Literal `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *NamedLiteral) Reset() {
+	*x = NamedLiteral{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NamedLiteral) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NamedLiteral) ProtoMessage() {}
+
+func (x *NamedLiteral) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NamedLiteral.ProtoReflect.Descriptor instead.
+func (*NamedLiteral) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *NamedLiteral) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *NamedLiteral) GetValue() *core.Literal {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+// Output references.
+type OutputReferences struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The output uri.
+	OutputUri string `protobuf:"bytes,1,opt,name=output_uri,json=outputUri,proto3" json:"output_uri,omitempty"`
+	// Native URI to HTML report
+	ReportUri string `protobuf:"bytes,2,opt,name=report_uri,json=reportUri,proto3" json:"report_uri,omitempty"`
+}
+
+func (x *OutputReferences) Reset() {
+	*x = OutputReferences{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OutputReferences) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OutputReferences) ProtoMessage() {}
+
+func (x *OutputReferences) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OutputReferences.ProtoReflect.Descriptor instead.
+func (*OutputReferences) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *OutputReferences) GetOutputUri() string {
+	if x != nil {
+		return x.OutputUri
+	}
+	return ""
+}
+
+func (x *OutputReferences) GetReportUri() string {
+	if x != nil {
+		return x.ReportUri
+	}
+	return ""
+}
+
+// Input payload for an action.
+type Inputs struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+	Literals []*NamedLiteral `protobuf:"bytes,1,rep,name=literals,proto3" json:"literals,omitempty"`
+	// Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.
+	// Context will not be used for cache key computation.
+	// Examples for context include:
+	//   - User-provided metadata that is not part of the action's inputs.
+	//   - Information about the environment the action is running in (e.g. cluster, region, etc.)
+	//   - Tracing information about the action
+	Context []*core.KeyValuePair `protobuf:"bytes,2,rep,name=context,proto3" json:"context,omitempty"`
+}
+
+func (x *Inputs) Reset() {
+	*x = Inputs{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Inputs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Inputs) ProtoMessage() {}
+
+func (x *Inputs) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Inputs.ProtoReflect.Descriptor instead.
+func (*Inputs) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Inputs) GetLiterals() []*NamedLiteral {
+	if x != nil {
+		return x.Literals
+	}
+	return nil
+}
+
+func (x *Inputs) GetContext() []*core.KeyValuePair {
+	if x != nil {
+		return x.Context
+	}
+	return nil
+}
+
+// Output payload for an action.
+type Outputs struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
+	Literals []*NamedLiteral `protobuf:"bytes,1,rep,name=literals,proto3" json:"literals,omitempty"`
+}
+
+func (x *Outputs) Reset() {
+	*x = Outputs{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_common_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Outputs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Outputs) ProtoMessage() {}
+
+func (x *Outputs) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_common_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Outputs.ProtoReflect.Descriptor instead.
+func (*Outputs) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_common_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Outputs) GetLiterals() []*NamedLiteral {
+	if x != nil {
+		return x.Literals
+	}
+	return nil
+}
+
 var File_flyteidl2_task_common_proto protoreflect.FileDescriptor
 
 var file_flyteidl2_task_common_proto_rawDesc = []byte{
@@ -83,25 +652,93 @@ var file_flyteidl2_task_common_proto_rawDesc = []byte{
 	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x66,
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x1a, 0x1e, 0x66,
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x69, 0x6e,
-	0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x5d, 0x0a,
+	0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1d, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x6c, 0x69,
+	0x74, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x5d, 0x0a,
 	0x0e, 0x4e, 0x61, 0x6d, 0x65, 0x64, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x12,
 	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
 	0x61, 0x6d, 0x65, 0x12, 0x37, 0x0a, 0x09, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72,
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
 	0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65,
-	0x72, 0x52, 0x09, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x42, 0xb0, 0x01, 0x0a,
-	0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74,
-	0x61, 0x73, 0x6b, 0x42, 0x0b, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x48, 0x02, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f,
-	0x76, 0x32, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
-	0x64, 0x6c, 0x32, 0x2f, 0x74, 0x61, 0x73, 0x6b, 0xa2, 0x02, 0x03, 0x46, 0x54, 0x58, 0xaa, 0x02,
-	0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0xca,
-	0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b,
-	0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73,
-	0x6b, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f,
-	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x3a, 0x3a, 0x54, 0x61, 0x73, 0x6b, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x52, 0x09, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x22, 0x8f, 0x01, 0x0a,
+	0x09, 0x46, 0x69, 0x78, 0x65, 0x64, 0x52, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x12, 0x31, 0x0a, 0x04, 0x75, 0x6e, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1d,
+	0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e,
+	0x46, 0x69, 0x78, 0x65, 0x64, 0x52, 0x61, 0x74, 0x65, 0x55, 0x6e, 0x69, 0x74, 0x52, 0x04, 0x75,
+	0x6e, 0x69, 0x74, 0x12, 0x39, 0x0a, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xa9,
+	0x01, 0x0a, 0x08, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x2f, 0x0a, 0x04, 0x72,
+	0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x46, 0x69, 0x78, 0x65, 0x64,
+	0x52, 0x61, 0x74, 0x65, 0x48, 0x00, 0x52, 0x04, 0x72, 0x61, 0x74, 0x65, 0x12, 0x29, 0x0a, 0x0f,
+	0x63, 0x72, 0x6f, 0x6e, 0x5f, 0x65, 0x78, 0x70, 0x72, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0e, 0x63, 0x72, 0x6f, 0x6e, 0x45, 0x78, 0x70,
+	0x72, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x33, 0x0a, 0x16, 0x6b, 0x69, 0x63, 0x6b, 0x6f,
+	0x66, 0x66, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x5f, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5f, 0x61, 0x72,
+	0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x13, 0x6b, 0x69, 0x63, 0x6b, 0x6f, 0x66, 0x66,
+	0x54, 0x69, 0x6d, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x72, 0x67, 0x42, 0x0c, 0x0a, 0x0a,
+	0x65, 0x78, 0x70, 0x72, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0xdd, 0x01, 0x0a, 0x15, 0x54,
+	0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x41, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x53, 0x70, 0x65, 0x63, 0x12, 0x3e, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0e, 0x32, 0x2a, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74,
+	0x61, 0x73, 0x6b, 0x2e, 0x54, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x41, 0x75, 0x74, 0x6f, 0x6d,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x70, 0x65, 0x63, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04,
+	0x74, 0x79, 0x70, 0x65, 0x12, 0x36, 0x0a, 0x08, 0x73, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
+	0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65,
+	0x48, 0x00, 0x52, 0x08, 0x73, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x22, 0x3e, 0x0a, 0x04,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x10, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53,
+	0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0d, 0x0a, 0x09, 0x54, 0x59,
+	0x50, 0x45, 0x5f, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x01, 0x12, 0x11, 0x0a, 0x0d, 0x54, 0x59, 0x50,
+	0x45, 0x5f, 0x53, 0x43, 0x48, 0x45, 0x44, 0x55, 0x4c, 0x45, 0x10, 0x02, 0x42, 0x0c, 0x0a, 0x0a,
+	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x51, 0x0a, 0x0c, 0x4e, 0x61,
+	0x6d, 0x65, 0x64, 0x4c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x2d,
+	0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4c,
+	0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x50, 0x0a,
+	0x10, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x52, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65,
+	0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x5f, 0x75, 0x72, 0x69, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x55, 0x72, 0x69,
+	0x12, 0x1d, 0x0a, 0x0a, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x75, 0x72, 0x69, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x55, 0x72, 0x69, 0x22,
+	0x7a, 0x0a, 0x06, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x12, 0x38, 0x0a, 0x08, 0x6c, 0x69, 0x74,
+	0x65, 0x72, 0x61, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x66, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4e, 0x61, 0x6d,
+	0x65, 0x64, 0x4c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x52, 0x08, 0x6c, 0x69, 0x74, 0x65, 0x72,
+	0x61, 0x6c, 0x73, 0x12, 0x36, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x18, 0x02,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
+	0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x50, 0x61,
+	0x69, 0x72, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x22, 0x43, 0x0a, 0x07, 0x4f,
+	0x75, 0x74, 0x70, 0x75, 0x74, 0x73, 0x12, 0x38, 0x0a, 0x08, 0x6c, 0x69, 0x74, 0x65, 0x72, 0x61,
+	0x6c, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4e, 0x61, 0x6d, 0x65, 0x64, 0x4c,
+	0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x52, 0x08, 0x6c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x73,
+	0x2a, 0x7f, 0x0a, 0x0d, 0x46, 0x69, 0x78, 0x65, 0x64, 0x52, 0x61, 0x74, 0x65, 0x55, 0x6e, 0x69,
+	0x74, 0x12, 0x1f, 0x0a, 0x1b, 0x46, 0x49, 0x58, 0x45, 0x44, 0x5f, 0x52, 0x41, 0x54, 0x45, 0x5f,
+	0x55, 0x4e, 0x49, 0x54, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44,
+	0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16, 0x46, 0x49, 0x58, 0x45, 0x44, 0x5f, 0x52, 0x41, 0x54, 0x45,
+	0x5f, 0x55, 0x4e, 0x49, 0x54, 0x5f, 0x4d, 0x49, 0x4e, 0x55, 0x54, 0x45, 0x10, 0x01, 0x12, 0x18,
+	0x0a, 0x14, 0x46, 0x49, 0x58, 0x45, 0x44, 0x5f, 0x52, 0x41, 0x54, 0x45, 0x5f, 0x55, 0x4e, 0x49,
+	0x54, 0x5f, 0x48, 0x4f, 0x55, 0x52, 0x10, 0x02, 0x12, 0x17, 0x0a, 0x13, 0x46, 0x49, 0x58, 0x45,
+	0x44, 0x5f, 0x52, 0x41, 0x54, 0x45, 0x5f, 0x55, 0x4e, 0x49, 0x54, 0x5f, 0x44, 0x41, 0x59, 0x10,
+	0x03, 0x42, 0xb0, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x42, 0x0b, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e,
+	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x48, 0x02, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x74, 0x61, 0x73, 0x6b, 0xa2, 0x02, 0x03,
+	0x46, 0x54, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e,
+	0x54, 0x61, 0x73, 0x6b, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
+	0x5c, 0x54, 0x61, 0x73, 0x6b, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x3a, 0x3a,
+	0x54, 0x61, 0x73, 0x6b, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -116,18 +753,40 @@ func file_flyteidl2_task_common_proto_rawDescGZIP() []byte {
 	return file_flyteidl2_task_common_proto_rawDescData
 }
 
-var file_flyteidl2_task_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_flyteidl2_task_common_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_flyteidl2_task_common_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_flyteidl2_task_common_proto_goTypes = []interface{}{
-	(*NamedParameter)(nil), // 0: flyteidl2.task.NamedParameter
-	(*core.Parameter)(nil), // 1: flyteidl2.core.Parameter
+	(FixedRateUnit)(0),              // 0: flyteidl2.task.FixedRateUnit
+	(TriggerAutomationSpec_Type)(0), // 1: flyteidl2.task.TriggerAutomationSpec.Type
+	(*NamedParameter)(nil),          // 2: flyteidl2.task.NamedParameter
+	(*FixedRate)(nil),               // 3: flyteidl2.task.FixedRate
+	(*Schedule)(nil),                // 4: flyteidl2.task.Schedule
+	(*TriggerAutomationSpec)(nil),   // 5: flyteidl2.task.TriggerAutomationSpec
+	(*NamedLiteral)(nil),            // 6: flyteidl2.task.NamedLiteral
+	(*OutputReferences)(nil),        // 7: flyteidl2.task.OutputReferences
+	(*Inputs)(nil),                  // 8: flyteidl2.task.Inputs
+	(*Outputs)(nil),                 // 9: flyteidl2.task.Outputs
+	(*core.Parameter)(nil),          // 10: flyteidl2.core.Parameter
+	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
+	(*core.Literal)(nil),            // 12: flyteidl2.core.Literal
+	(*core.KeyValuePair)(nil),       // 13: flyteidl2.core.KeyValuePair
 }
 var file_flyteidl2_task_common_proto_depIdxs = []int32{
-	1, // 0: flyteidl2.task.NamedParameter.parameter:type_name -> flyteidl2.core.Parameter
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	10, // 0: flyteidl2.task.NamedParameter.parameter:type_name -> flyteidl2.core.Parameter
+	0,  // 1: flyteidl2.task.FixedRate.unit:type_name -> flyteidl2.task.FixedRateUnit
+	11, // 2: flyteidl2.task.FixedRate.start_time:type_name -> google.protobuf.Timestamp
+	3,  // 3: flyteidl2.task.Schedule.rate:type_name -> flyteidl2.task.FixedRate
+	1,  // 4: flyteidl2.task.TriggerAutomationSpec.type:type_name -> flyteidl2.task.TriggerAutomationSpec.Type
+	4,  // 5: flyteidl2.task.TriggerAutomationSpec.schedule:type_name -> flyteidl2.task.Schedule
+	12, // 6: flyteidl2.task.NamedLiteral.value:type_name -> flyteidl2.core.Literal
+	6,  // 7: flyteidl2.task.Inputs.literals:type_name -> flyteidl2.task.NamedLiteral
+	13, // 8: flyteidl2.task.Inputs.context:type_name -> flyteidl2.core.KeyValuePair
+	6,  // 9: flyteidl2.task.Outputs.literals:type_name -> flyteidl2.task.NamedLiteral
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_task_common_proto_init() }
@@ -148,19 +807,111 @@ func file_flyteidl2_task_common_proto_init() {
 				return nil
 			}
 		}
+		file_flyteidl2_task_common_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FixedRate); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Schedule); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TriggerAutomationSpec); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NamedLiteral); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*OutputReferences); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Inputs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_common_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Outputs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+	}
+	file_flyteidl2_task_common_proto_msgTypes[2].OneofWrappers = []interface{}{
+		(*Schedule_Rate)(nil),
+		(*Schedule_CronExpression)(nil),
+	}
+	file_flyteidl2_task_common_proto_msgTypes[3].OneofWrappers = []interface{}{
+		(*TriggerAutomationSpec_Schedule)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_task_common_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      2,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_flyteidl2_task_common_proto_goTypes,
 		DependencyIndexes: file_flyteidl2_task_common_proto_depIdxs,
+		EnumInfos:         file_flyteidl2_task_common_proto_enumTypes,
 		MessageInfos:      file_flyteidl2_task_common_proto_msgTypes,
 	}.Build()
 	File_flyteidl2_task_common_proto = out.File

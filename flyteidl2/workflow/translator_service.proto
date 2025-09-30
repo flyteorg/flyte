@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
-import "google/protobuf/struct.proto";
 import "flyteidl2/core/interface.proto";
-import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -24,7 +24,7 @@ service TranslatorService {
 
 message LiteralsToLaunchFormJsonRequest {
   // The literals to convert to JSON.
-  repeated NamedLiteral literals = 1;
+  repeated task.NamedLiteral literals = 1;
   flyteidl2.core.VariableMap variables = 2;
 }
 
@@ -40,7 +40,7 @@ message LaunchFormJsonToLiteralsRequest {
 
 message LaunchFormJsonToLiteralsResponse {
   // The literals generated from the JSON schema.
-  repeated NamedLiteral literals = 1;
+  repeated task.NamedLiteral literals = 1;
 }
 
 message TaskSpecToLaunchFormJsonRequest {

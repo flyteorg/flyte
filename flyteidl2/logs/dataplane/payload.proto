@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package flyteidl2.logs.dataplane;
 
-import "google/protobuf/timestamp.proto";
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane";
 

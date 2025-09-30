@@ -828,7 +828,7 @@
         "DATASET"
       ],
       "default": "UNSPECIFIED",
-      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
+      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects\nin a similar manner to other Flyte objects"
     },
     "coreResources": {
       "type": "object",
@@ -1431,6 +1431,20 @@
       },
       "description": "Environment for a task."
     },
+    "taskNamedLiteral": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the literal."
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Literal value."
+        }
+      },
+      "description": "Named literal value."
+    },
     "taskNamedParameter": {
       "type": "object",
       "properties": {
@@ -1475,7 +1489,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/workflowNamedLiteral"
+            "$ref": "#/definitions/taskNamedLiteral"
           },
           "description": "The literals generated from the JSON schema."
         }
@@ -1489,20 +1503,6 @@
           "description": "The JSON for the literals."
         }
       }
-    },
-    "workflowNamedLiteral": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the literal."
-        },
-        "value": {
-          "$ref": "#/definitions/coreLiteral",
-          "description": "Literal value."
-        }
-      },
-      "description": "Named literal value."
     },
     "workflowTaskSpecToLaunchFormJsonResponse": {
       "type": "object",

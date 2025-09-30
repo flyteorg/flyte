@@ -2,14 +2,15 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/tasks.proto";
-import "google/protobuf/timestamp.proto";
-import "buf/validate/validate.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/environment.proto";
+import "flyteidl2/task/run.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 
@@ -73,6 +74,18 @@ message TaskIdentifier {
   ];
 }
 
+message TaskTriggersSummary {
+  message TriggerStats {
+    uint32 total = 1;
+    uint32 active = 2;
+  }
+
+  oneof summary {
+    TriggerAutomationSpec automation_spec = 1;
+    TriggerStats stats = 2;
+  }
+}
+
 // TaskMetadata is static, lightweight metadata about a task.
 message TaskMetadata {
   // Identity that deployed the task.
@@ -86,6 +99,9 @@ message TaskMetadata {
 
   // The environment name for this task, if present.
   string environment_name = 4;
+
+  // Brief overview of attached triggers if any.
+  TaskTriggersSummary triggers_summary = 5;
 }
 
 // Lightweight representation of a task.
@@ -131,4 +147,30 @@ message TaskDetails {
 
   // Specification for this task.
   TaskSpec spec = 3 [(buf.validate.field).required = true];
+}
+
+// Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint.
+message TaskTrigger {
+  string name = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  TaskTriggerSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Optional automation spec.
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 3;
+}
+
+// TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.
+// This is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id.
+message TaskTriggerSpec {
+  // Whether trigger is active
+  bool active = 1;
+
+  // Inputs for triggered task.
+  Inputs inputs = 2;
+
+  // The run spec for triggered task.
+  flyteidl2.task.RunSpec run_spec = 3;
 }

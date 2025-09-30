@@ -1,10 +1,12 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
+from flyteidl2.task import run_pb2 as _run_pb2
+from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
-from buf.validate import validate_pb2 as _validate_pb2
-from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
-from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
@@ -25,7 +27,7 @@ class EnqueueActionRequest(_message.Message):
     CONDITION_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
-    run_spec: _run_definition_pb2.RunSpec
+    run_spec: _run_pb2.RunSpec
     input_uri: str
     run_output_base: str
     group: str
@@ -33,7 +35,7 @@ class EnqueueActionRequest(_message.Message):
     task: TaskAction
     trace: TraceAction
     condition: ConditionAction
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_definition_pb2.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[TaskAction, _Mapping]] = ..., trace: _Optional[_Union[TraceAction, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[TaskAction, _Mapping]] = ..., trace: _Optional[_Union[TraceAction, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
     __slots__ = ["id", "spec", "cache_key", "cluster"]
@@ -59,9 +61,9 @@ class TraceAction(_message.Message):
     phase: _run_definition_pb2.Phase
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
-    outputs: _run_definition_pb2.OutputReferences
+    outputs: _common_pb2.OutputReferences
     spec: _task_definition_pb2.TraceSpec
-    def __init__(self, name: _Optional[str] = ..., phase: _Optional[_Union[_run_definition_pb2.Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., outputs: _Optional[_Union[_run_definition_pb2.OutputReferences, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., phase: _Optional[_Union[_run_definition_pb2.Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ...) -> None: ...
 
 class ConditionAction(_message.Message):
     __slots__ = ["name", "run_id", "action_id", "type", "prompt", "description"]

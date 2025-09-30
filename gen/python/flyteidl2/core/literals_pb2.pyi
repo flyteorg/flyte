@@ -1,7 +1,7 @@
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
-from flyteidl2.core import types_pb2 as _types_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
