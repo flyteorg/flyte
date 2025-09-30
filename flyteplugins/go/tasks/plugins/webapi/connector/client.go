@@ -3,6 +3,7 @@ package connector
 import (
 	"context"
 	"crypto/x509"
+	"fmt"
 	"strings"
 
 	"golang.org/x/exp/maps"
@@ -15,11 +16,13 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const defaultTaskTypeVersion = 0
+const defaultDeploymentID = "default"
 
 type Connector struct {
 	// IsSync indicates whether this connector is a sync connector. Sync connectors are expected to return their
@@ -91,16 +94,21 @@ func getFinalContext(ctx context.Context, operation string, connector *Deploymen
 	return context.WithTimeout(ctx, timeout)
 }
 
-func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
-	newConnectorRegistry := make(Registry)
+func watchConnectors(ctx context.Context, cs *ClientSet) {
 	cfg := GetConfig()
+	var connectorDeploymentIDs []string
 	var connectorDeployments []*Deployment
 
+	// Merge DefaultConnector (if endpoint is not empty)
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
+		connectorDeploymentIDs = append(connectorDeploymentIDs, defaultDeploymentID)
+		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector) 
 	}
+	connectorDeploymentIDs = append(connectorDeploymentIDs, maps.Keys(cfg.ConnectorDeployments)...)
 	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
-	for _, connectorDeployment := range connectorDeployments {
+	
+	for idx, connectorDeployment := range connectorDeployments {
+		deploymentID := connectorDeploymentIDs[idx]
 		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
 		if !ok {
 			logger.Warningf(ctx, "Connector client not found in the clientSet for the endpoint: %v", connectorDeployment.Endpoint)
@@ -128,45 +136,40 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 			continue
 		}
 
+		// If a connector's support task type plugin was not registered yet, we should do registration
 		connectorSupportedTaskCategories := make(map[string]struct{})
 		for _, connector := range res.GetAgents() {
 			deprecatedSupportedTaskTypes := connector.GetSupportedTaskTypes()
-			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
-				newConnectorRegistry[supportedTaskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
-				connectorSupportedTaskCategories[supportedTaskType] = struct{}{}
-			}
-
 			supportedTaskCategories := connector.GetSupportedTaskCategories()
+			// Process deprecated supported task types
+			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
+				versionedTaskType := createOrUpdatePlugin(ctx, supportedTaskType, defaultTaskTypeVersion, deploymentID, connectorDeployment, cs)
+				connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
+			}
+			// Process supported task categories
 			for _, supportedCategory := range supportedTaskCategories {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
-				supportedCategoryName := supportedCategory.GetName()
-				newConnectorRegistry[supportedCategoryName] = map[int32]*Connector{supportedCategory.GetVersion(): connector}
-				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
+				if supportedCategory.Version != defaultTaskTypeVersion {
+					versionedTaskType := createOrUpdatePlugin(ctx, supportedCategory.Name, supportedCategory.Version, deploymentID, connectorDeployment, cs)
+					connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
+				}
 			}
 		}
 		logger.Infof(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
 			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
-
-	// Always replace the connector registry with the settings defined in the configuration
+	// always overwrite with connectorForTaskTypes config
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
-		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: false}
-			newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+		if deployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
+			createOrUpdatePlugin(ctx, taskType, defaultTaskTypeVersion, connectorDeploymentID, deployment, cs)
 		}
 	}
-
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		if _, ok := newConnectorRegistry[taskType]; !ok {
-			connector := &Connector{ConnectorDeployment: &cfg.DefaultConnector, IsSync: false}
-			newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+		versionedTaskType := fmt.Sprintf("%s_%d", taskType, defaultTaskTypeVersion)
+		if ok := pluginmachinery.PluginRegistry().IsConnectorCorePluginRegistered(versionedTaskType, defaultDeploymentID); !ok {
+			createOrUpdatePlugin(ctx, taskType, defaultTaskTypeVersion, defaultDeploymentID, &cfg.DefaultConnector, cs)
 		}
 	}
-
-	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(maps.Keys(newConnectorRegistry), ", "))
-	return newConnectorRegistry
 }
 
 func getConnectorClientSets(ctx context.Context) *ClientSet {
@@ -176,13 +179,18 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 		connectorMetadataClients: make(map[string]service.AgentMetadataServiceClient),
 	}
 
-	var connectorDeployments []*Deployment
+	connectorDeployments := make(map[string]*Deployment)
 	cfg := GetConfig()
 
-	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
+	// Merge ConnectorDeployments
+	for key, deployment := range cfg.ConnectorDeployments {
+		connectorDeployments[key] = deployment
 	}
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
+	
+	// Merge DefaultConnector (if endpoint is not empty)
+	if len(cfg.DefaultConnector.Endpoint) != 0 {
+		connectorDeployments["default"] = &cfg.DefaultConnector
+	}
 	for _, connectorDeployment := range connectorDeployments {
 		if _, ok := clientSet.connectorMetadataClients[connectorDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)

@@ -4,10 +4,8 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"slices"
 	"sync"
 
-	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -25,35 +23,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-const ID = "connector-service"
-
-type ConnectorService struct {
-	mu                 sync.RWMutex
-	supportedTaskTypes []string
-	CorePlugin         core.Plugin
-}
-
-// ContainTaskType check if connector supports this task type.
-func (p *ConnectorService) ContainTaskType(taskType string) bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return slices.Contains(p.supportedTaskTypes, taskType)
-}
-
-// SetSupportedTaskType set supportTaskType in the connector service.
-func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.supportedTaskTypes = taskTypes
-}
-
-type Registry map[string]map[int32]*Connector // map[taskTypeName][taskTypeVersion] => Connector
-
 type Plugin struct {
 	metricScope promutils.Scope
 	cfg         *Config
 	cs          *ClientSet
-	registry    Registry
+	deployment  Connector
 	mu          sync.RWMutex
 }
 
@@ -79,14 +53,56 @@ type ResourceMetaWrapper struct {
 	TaskCategory          admin.TaskCategory
 }
 
-func (p *Plugin) setRegistry(r Registry) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.registry = r
-}
-
 func (p *Plugin) GetConfig() webapi.PluginConfig {
-	return GetConfig().WebAPI
+	// Return default config if deployment is nil
+	if p.deployment.ConnectorDeployment == nil {
+		return p.cfg.WebAPI
+	}
+
+	// Create a new config object by copying deployment's config
+	config := p.deployment.ConnectorDeployment.WebAPI
+
+	// Check if ResourceQuotas is nil
+	if config.ResourceQuotas == nil {
+		config.ResourceQuotas = p.cfg.WebAPI.ResourceQuotas
+	}
+
+	// Check ReadRateLimiter values individually
+	if config.ReadRateLimiter.QPS == 0 {
+		config.ReadRateLimiter.QPS = p.cfg.WebAPI.ReadRateLimiter.QPS
+	}
+	if config.ReadRateLimiter.Burst == 0 {
+		config.ReadRateLimiter.Burst = p.cfg.WebAPI.ReadRateLimiter.Burst
+	}
+
+	// Check WriteRateLimiter values individually
+	if config.WriteRateLimiter.QPS == 0 {
+		config.WriteRateLimiter.QPS = p.cfg.WebAPI.WriteRateLimiter.QPS
+	}
+	if config.WriteRateLimiter.Burst == 0 {
+		config.WriteRateLimiter.Burst = p.cfg.WebAPI.WriteRateLimiter.Burst
+	}
+
+	// Check Caching configuration values individually
+	if config.Caching.ResyncInterval.Duration == time.Duration(0) {
+		config.Caching.ResyncInterval = p.cfg.WebAPI.Caching.ResyncInterval
+	}
+	if config.Caching.Size == 0 {
+		config.Caching.Size = p.cfg.WebAPI.Caching.Size
+	}
+	if config.Caching.Workers == 0 {
+		config.Caching.Workers = p.cfg.WebAPI.Caching.Workers
+	}
+	if config.Caching.MaxSystemFailures == 0 {
+		config.Caching.MaxSystemFailures = p.cfg.WebAPI.Caching.MaxSystemFailures
+	}
+
+	// Check if ResourceMeta is nil
+	if config.ResourceMeta == nil {
+		config.ResourceMeta = p.cfg.WebAPI.ResourceMeta
+	}
+
+	return config
 }
 
 func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (
@@ -98,6 +114,7 @@ func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionC
 
 func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
+	logger.Debug(ctx, "create task for deployment %s", p.deployment.ConnectorDeployment.Endpoint)
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read task template with error: %v", err)
@@ -129,11 +146,11 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	connector, isSync := p.getFinalConnector(&taskCategory, p.cfg)
+	connector := p.deployment.ConnectorDeployment
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
-	if isSync {
+	if p.deployment.IsSync {
 		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", connector)
 		defer cancel()
 		client, err := p.getSyncConnectorClient(ctx, connector)
@@ -228,7 +245,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector := p.deployment.ConnectorDeployment
 
 	client, err := p.getAsyncConnectorClient(ctx, connector)
 	if err != nil {
@@ -263,7 +280,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector := p.deployment.ConnectorDeployment
 
 	client, err := p.getAsyncConnectorClient(ctx, connector)
 	if err != nil {
@@ -367,25 +384,22 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 	return client, nil
 }
 
-func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
+// UpdateDeployment updates the deployment configuration for the plugin.
+// This method is thread-safe and can be called concurrently.
+func (p *Plugin) UpdateDeployment(deployment Connector) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.deployment = deployment
+}
+
+func WatchConnectors(ctx context.Context) {
+	cfg := GetConfig()
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		clientSet := getConnectorClientSets(childCtx)
-		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
-		p.setRegistry(connectorRegistry)
-		connectorService.SetSupportedTaskType(maps.Keys(connectorRegistry))
-	}, p.cfg.PollInterval.Duration, ctx.Done())
-}
-
-func (p *Plugin) getFinalConnector(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
-	if connector, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
-		return connector.ConnectorDeployment, connector.IsSync
-	}
-	return &cfg.DefaultConnector, false
+		watchConnectors(ctx, clientSet)
+	}, cfg.PollInterval.Duration, ctx.Done())
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -424,35 +438,48 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
-	ctx := context.Background()
-	gob.Register(ResourceMetaWrapper{})
-	gob.Register(ResourceWrapper{})
-
-	clientSet := getConnectorClientSets(ctx)
-	connectorRegistry := getConnectorRegistry(ctx, clientSet)
-	supportedTaskTypes := maps.Keys(connectorRegistry)
-	connectorService.SetSupportedTaskType(supportedTaskTypes)
-
+func createPluginEntry(taskType core.TaskType, taskVersion int32, deployment Deployment, clientSet *ClientSet) webapi.PluginEntry {
+	versionedTaskType := fmt.Sprintf("%s_%d", taskType, taskVersion)
 	plugin := &Plugin{
-		metricScope: promutils.NewScope("connector_plugin"),
+		metricScope: promutils.NewScope(versionedTaskType),
 		cfg:         GetConfig(),
 		cs:          clientSet,
-		registry:    connectorRegistry,
+		deployment:  Connector{IsSync: false, ConnectorDeployment: &deployment},
 	}
-	plugin.watchConnectors(ctx, connectorService)
-
 	return webapi.PluginEntry{
-		ID:                 ID,
-		SupportedTaskTypes: supportedTaskTypes,
+		ID:                 versionedTaskType,
+		SupportedTaskTypes: []core.TaskType{taskType},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return plugin, nil
 		},
 	}
 }
 
-func RegisterConnectorPlugin(connectorService *ConnectorService) {
+// createOrUpdatePlugin handles the registration or update of a task type plugin
+func createOrUpdatePlugin(ctx context.Context, taskName string, taskVersion int32, deploymentID string, connectorDeployment *Deployment, cs *ClientSet) string {
+	versionedTaskType := fmt.Sprintf("%s_%d", taskName, taskVersion)
+
+	// Register core plugin if not registered
+	if !pluginmachinery.PluginRegistry().IsConnectorCorePluginRegistered(versionedTaskType, deploymentID) {
+		plugin := createPluginEntry(taskName, taskVersion, *connectorDeployment, cs)
+		pluginmachinery.PluginRegistry().RegisterConnectorCorePlugin(plugin, deploymentID)
+	}
+
+	// send message to Flyte Propeller TaskHandler to register or update plugin
+	select {
+		case pluginmachinery.PluginRegistry().GetPluginChan() <- pluginmachinery.PluginInfo{
+			VersionedTaskType: versionedTaskType,
+			DeploymentID: deploymentID,
+		}:
+		default:
+			logger.Errorf(context.Background(), "Failed to create/update plugin for task type %s: channel is full", versionedTaskType)
+		}
+	return versionedTaskType
+}
+
+func RegisterConnectorPlugin() {
+	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))
+	WatchConnectors(ctx)
 }
