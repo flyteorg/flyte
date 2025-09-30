@@ -101,5 +101,5 @@ gen: buf mocks go_tidy ## Generates everything in the 'gen' directory
 
 build-crate: ## Builds the rust crate
 	@echo 'Cargo build the generated rust code'
-	pushd gen/rust && cargo build && popd
+	cd gen/rust && cargo build
 	@$(MAKE) sep
