@@ -86,7 +86,7 @@ func TestConstructLiteralMap(t *testing.T) {
 			"SingleList",
 			&core.LiteralMap{
 				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
+					"foo": {
 						Value: &core.Literal_Collection{
 							Collection: &core.LiteralCollection{
 								Literals: []*core.Literal{
@@ -99,12 +99,12 @@ func TestConstructLiteralMap(t *testing.T) {
 				},
 			},
 			[]*core.LiteralMap{
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalOne,
 					},
 				},
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalTwo,
 					},
@@ -116,7 +116,7 @@ func TestConstructLiteralMap(t *testing.T) {
 			"MultiList",
 			&core.LiteralMap{
 				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
+					"foo": {
 						Value: &core.Literal_Collection{
 							Collection: &core.LiteralCollection{
 								Literals: []*core.Literal{
@@ -126,7 +126,7 @@ func TestConstructLiteralMap(t *testing.T) {
 							},
 						},
 					},
-					"bar": &core.Literal{
+					"bar": {
 						Value: &core.Literal_Collection{
 							Collection: &core.LiteralCollection{
 								Literals: []*core.Literal{
@@ -139,13 +139,13 @@ func TestConstructLiteralMap(t *testing.T) {
 				},
 			},
 			[]*core.LiteralMap{
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalOne,
 						"bar": literalTwo,
 					},
 				},
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalTwo,
 						"bar": literalOne,
@@ -158,7 +158,7 @@ func TestConstructLiteralMap(t *testing.T) {
 			"Partial",
 			&core.LiteralMap{
 				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
+					"foo": {
 						Value: &core.Literal_Collection{
 							Collection: &core.LiteralCollection{
 								Literals: []*core.Literal{
@@ -172,13 +172,13 @@ func TestConstructLiteralMap(t *testing.T) {
 				},
 			},
 			[]*core.LiteralMap{
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalOne,
 						"bar": literalTwo,
 					},
 				},
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalTwo,
 						"bar": literalTwo,
@@ -196,7 +196,7 @@ func TestConstructLiteralMap(t *testing.T) {
 				},
 			},
 			[]*core.LiteralMap{
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": literalTwo,
 						"bar": literalTwo,
@@ -214,13 +214,13 @@ func TestConstructLiteralMap(t *testing.T) {
 				},
 			},
 			[]*core.LiteralMap{
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": collectionLiteral,
 						"bar": collectionLiteralTwo,
 					},
 				},
-				&core.LiteralMap{
+				{
 					Literals: map[string]*core.Literal{
 						"foo": collectionLiteralTwo,
 						"bar": collectionLiteralTwo,

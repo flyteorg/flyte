@@ -15,31 +15,31 @@ import (
 type FakeInformers struct {
 }
 
-func (f *FakeInformers) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+func (f *FakeInformers) Get(context.Context, client.ObjectKey, client.Object, ...client.GetOption) error {
 	return nil
 }
 
-func (f *FakeInformers) WaitForCacheSync(ctx context.Context) bool {
+func (f *FakeInformers) WaitForCacheSync(context.Context) bool {
 	return true
 }
 
-func (f *FakeInformers) IndexField(ctx context.Context, obj client.Object, field string, extractValue client.IndexerFunc) error {
+func (f *FakeInformers) IndexField(context.Context, client.Object, string, client.IndexerFunc) error {
 	return nil
 }
 
-func (f *FakeInformers) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+func (f *FakeInformers) List(context.Context, client.ObjectList, ...client.ListOption) error {
 	return nil
 }
 
-func (f *FakeInformers) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind, opts ...cache.InformerGetOption) (cache.Informer, error) {
+func (f *FakeInformers) GetInformerForKind(context.Context, schema.GroupVersionKind, ...cache.InformerGetOption) (cache.Informer, error) {
 	return &controllertest.FakeInformer{}, nil
 }
 
-func (f *FakeInformers) Start(ctx context.Context) error {
+func (f *FakeInformers) Start(context.Context) error {
 	return nil
 }
 
-func (f *FakeInformers) GetInformer(ctx context.Context, obj client.Object, opts ...cache.InformerGetOption) (cache.Informer, error) {
+func (f *FakeInformers) GetInformer(context.Context, client.Object, ...cache.InformerGetOption) (cache.Informer, error) {
 	return &controllertest.FakeInformer{}, nil
 }
 

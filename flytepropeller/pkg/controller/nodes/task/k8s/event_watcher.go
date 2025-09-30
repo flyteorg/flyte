@@ -49,7 +49,7 @@ type EventInfo struct {
 	RecordedAt time.Time
 }
 
-func (e *eventWatcher) OnAdd(obj interface{}, isInInitialList bool) {
+func (e *eventWatcher) OnAdd(obj interface{}, _ bool) {
 	event := obj.(*eventsv1.Event)
 	objectNsName := types.NamespacedName{Namespace: event.Regarding.Namespace, Name: event.Regarding.Name}
 	eventNsName := types.NamespacedName{Namespace: event.Namespace, Name: event.Name}
@@ -67,7 +67,7 @@ func (e *eventWatcher) OnAdd(obj interface{}, isInInitialList bool) {
 	}
 }
 
-func (e *eventWatcher) OnUpdate(_, newObj interface{}) {
+func (e *eventWatcher) OnUpdate(_, _ interface{}) {
 	// Dropping event updates since we only care about the creation
 }
 
