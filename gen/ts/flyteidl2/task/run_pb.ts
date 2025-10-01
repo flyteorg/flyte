@@ -6,6 +6,8 @@ import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { KeyValuePair } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
+import type { SecurityContext } from "../core/security_pb.ts";
+import { file_flyteidl2_core_security } from "../core/security_pb.ts";
 import { file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -13,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIuQBCgdSdW5TcGVjEiYKBmxhYmVscxgBIAEoCzIWLmZseXRlaWRsMi50YXNrLkxhYmVscxIwCgthbm5vdGF0aW9ucxgCIAEoCzIbLmZseXRlaWRsMi50YXNrLkFubm90YXRpb25zEiIKBGVudnMYAyABKAsyFC5mbHl0ZWlkbDIudGFzay5FbnZzEjEKDWludGVycnVwdGlibGUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuQm9vbFZhbHVlEhcKD292ZXJ3cml0ZV9jYWNoZRgFIAEoCBIPCgdjbHVzdGVyGAYgASgJQq0BChJjb20uZmx5dGVpZGwyLnRhc2tCCFJ1blByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_flyteidl2_core_literals, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSLZAgoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIXCg9vdmVyd3JpdGVfY2FjaGUYBSABKAgSDwoHY2x1c3RlchgGIAEoCRI4ChByYXdfZGF0YV9zdG9yYWdlGAcgASgLMh4uZmx5dGVpZGwyLnRhc2suUmF3RGF0YVN0b3JhZ2USOQoQc2VjdXJpdHlfY29udGV4dBgIIAEoCzIfLmZseXRlaWRsMi5jb3JlLlNlY3VyaXR5Q29udGV4dEKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_core_literals, file_flyteidl2_core_security, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -85,6 +87,26 @@ export const EnvsSchema: GenMessage<Envs> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 2);
 
 /**
+ * @generated from message flyteidl2.task.RawDataStorage
+ */
+export type RawDataStorage = Message<"flyteidl2.task.RawDataStorage"> & {
+  /**
+   * Prefix for where offloaded data from user actions will be written
+   * e.g. s3://bucket/key or s3://bucket/
+   *
+   * @generated from field: string raw_data_prefix = 1;
+   */
+  rawDataPrefix: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.RawDataStorage.
+ * Use `create(RawDataStorageSchema)` to create a new message.
+ */
+export const RawDataStorageSchema: GenMessage<RawDataStorage> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_run, 3);
+
+/**
  * @generated from message flyteidl2.task.RunSpec
  */
 export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
@@ -130,6 +152,20 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
    * @generated from field: string cluster = 6;
    */
   cluster: string;
+
+  /**
+   * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+   *
+   * @generated from field: flyteidl2.task.RawDataStorage raw_data_storage = 7;
+   */
+  rawDataStorage?: RawDataStorage;
+
+  /**
+   * SecurityContext holds security attributes that apply to tasks.
+   *
+   * @generated from field: flyteidl2.core.SecurityContext security_context = 8;
+   */
+  securityContext?: SecurityContext;
 };
 
 /**
@@ -137,5 +173,5 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
  * Use `create(RunSpecSchema)` to create a new message.
  */
 export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 3);
+  messageDesc(file_flyteidl2_task_run, 4);
 
