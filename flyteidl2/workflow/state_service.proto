@@ -13,10 +13,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 // provides an interface for managing the state of actions.
 service StateService {
   // put the state of an action.
-  rpc Put(stream PutRequest) returns (stream PutResponse) {}
+  rpc Put(PutRequest) returns (PutResponse) {}
 
   // get the state of an action.
-  rpc Get(stream GetRequest) returns (stream GetResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
 
   // watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
   rpc Watch(WatchRequest) returns (stream WatchResponse) {}
