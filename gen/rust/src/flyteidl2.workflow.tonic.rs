@@ -1163,6 +1163,31 @@ pub mod run_service_client {
                 .insert(GrpcMethod::new("flyteidl2.workflow.RunService", "AbortAction"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn watch_groups(
+            &mut self,
+            request: impl tonic::IntoRequest<super::WatchGroupsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::WatchGroupsResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunService/WatchGroups",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.workflow.RunService", "WatchGroups"));
+            self.inner.server_streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1294,6 +1319,19 @@ pub mod run_service_server {
             request: tonic::Request<super::AbortActionRequest>,
         ) -> std::result::Result<
             tonic::Response<super::AbortActionResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the WatchGroups method.
+        type WatchGroupsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::WatchGroupsResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn watch_groups(
+            &self,
+            request: tonic::Request<super::WatchGroupsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<Self::WatchGroupsStream>,
             tonic::Status,
         >;
     }
@@ -1964,6 +2002,52 @@ pub mod run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.RunService/WatchGroups" => {
+                    #[allow(non_camel_case_types)]
+                    struct WatchGroupsSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::ServerStreamingService<super::WatchGroupsRequest>
+                    for WatchGroupsSvc<T> {
+                        type Response = super::WatchGroupsResponse;
+                        type ResponseStream = T::WatchGroupsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::WatchGroupsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::watch_groups(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = WatchGroupsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
