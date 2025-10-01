@@ -29,9 +29,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StateServiceClient interface {
 	// put the state of an action.
-	Put(ctx context.Context, opts ...grpc.CallOption) (StateService_PutClient, error)
+	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error)
 	// get the state of an action.
-	Get(ctx context.Context, opts ...grpc.CallOption) (StateService_GetClient, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	// watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
 	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (StateService_WatchClient, error)
 }
@@ -44,70 +44,26 @@ func NewStateServiceClient(cc grpc.ClientConnInterface) StateServiceClient {
 	return &stateServiceClient{cc}
 }
 
-func (c *stateServiceClient) Put(ctx context.Context, opts ...grpc.CallOption) (StateService_PutClient, error) {
-	stream, err := c.cc.NewStream(ctx, &StateService_ServiceDesc.Streams[0], StateService_Put_FullMethodName, opts...)
+func (c *stateServiceClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error) {
+	out := new(PutResponse)
+	err := c.cc.Invoke(ctx, StateService_Put_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &stateServicePutClient{stream}
-	return x, nil
+	return out, nil
 }
 
-type StateService_PutClient interface {
-	Send(*PutRequest) error
-	Recv() (*PutResponse, error)
-	grpc.ClientStream
-}
-
-type stateServicePutClient struct {
-	grpc.ClientStream
-}
-
-func (x *stateServicePutClient) Send(m *PutRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *stateServicePutClient) Recv() (*PutResponse, error) {
-	m := new(PutResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *stateServiceClient) Get(ctx context.Context, opts ...grpc.CallOption) (StateService_GetClient, error) {
-	stream, err := c.cc.NewStream(ctx, &StateService_ServiceDesc.Streams[1], StateService_Get_FullMethodName, opts...)
+func (c *stateServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, StateService_Get_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &stateServiceGetClient{stream}
-	return x, nil
-}
-
-type StateService_GetClient interface {
-	Send(*GetRequest) error
-	Recv() (*GetResponse, error)
-	grpc.ClientStream
-}
-
-type stateServiceGetClient struct {
-	grpc.ClientStream
-}
-
-func (x *stateServiceGetClient) Send(m *GetRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *stateServiceGetClient) Recv() (*GetResponse, error) {
-	m := new(GetResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *stateServiceClient) Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (StateService_WatchClient, error) {
-	stream, err := c.cc.NewStream(ctx, &StateService_ServiceDesc.Streams[2], StateService_Watch_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &StateService_ServiceDesc.Streams[0], StateService_Watch_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,9 +99,9 @@ func (x *stateServiceWatchClient) Recv() (*WatchResponse, error) {
 // for forward compatibility
 type StateServiceServer interface {
 	// put the state of an action.
-	Put(StateService_PutServer) error
+	Put(context.Context, *PutRequest) (*PutResponse, error)
 	// get the state of an action.
-	Get(StateService_GetServer) error
+	Get(context.Context, *GetRequest) (*GetResponse, error)
 	// watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
 	Watch(*WatchRequest, StateService_WatchServer) error
 }
@@ -154,11 +110,11 @@ type StateServiceServer interface {
 type UnimplementedStateServiceServer struct {
 }
 
-func (UnimplementedStateServiceServer) Put(StateService_PutServer) error {
-	return status.Errorf(codes.Unimplemented, "method Put not implemented")
+func (UnimplementedStateServiceServer) Put(context.Context, *PutRequest) (*PutResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Put not implemented")
 }
-func (UnimplementedStateServiceServer) Get(StateService_GetServer) error {
-	return status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (UnimplementedStateServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedStateServiceServer) Watch(*WatchRequest, StateService_WatchServer) error {
 	return status.Errorf(codes.Unimplemented, "method Watch not implemented")
@@ -175,56 +131,40 @@ func RegisterStateServiceServer(s grpc.ServiceRegistrar, srv StateServiceServer)
 	s.RegisterService(&StateService_ServiceDesc, srv)
 }
 
-func _StateService_Put_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(StateServiceServer).Put(&stateServicePutServer{stream})
-}
-
-type StateService_PutServer interface {
-	Send(*PutResponse) error
-	Recv() (*PutRequest, error)
-	grpc.ServerStream
-}
-
-type stateServicePutServer struct {
-	grpc.ServerStream
-}
-
-func (x *stateServicePutServer) Send(m *PutResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *stateServicePutServer) Recv() (*PutRequest, error) {
-	m := new(PutRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
+func _StateService_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutRequest)
+	if err := dec(in); err != nil {
 		return nil, err
 	}
-	return m, nil
+	if interceptor == nil {
+		return srv.(StateServiceServer).Put(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StateService_Put_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateServiceServer).Put(ctx, req.(*PutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _StateService_Get_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(StateServiceServer).Get(&stateServiceGetServer{stream})
-}
-
-type StateService_GetServer interface {
-	Send(*GetResponse) error
-	Recv() (*GetRequest, error)
-	grpc.ServerStream
-}
-
-type stateServiceGetServer struct {
-	grpc.ServerStream
-}
-
-func (x *stateServiceGetServer) Send(m *GetResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *stateServiceGetServer) Recv() (*GetRequest, error) {
-	m := new(GetRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
+func _StateService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
 		return nil, err
 	}
-	return m, nil
+	if interceptor == nil {
+		return srv.(StateServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StateService_Get_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateServiceServer).Get(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _StateService_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -254,20 +194,17 @@ func (x *stateServiceWatchServer) Send(m *WatchResponse) error {
 var StateService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "flyteidl2.workflow.StateService",
 	HandlerType: (*StateServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Put",
+			Handler:    _StateService_Put_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _StateService_Get_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "Put",
-			Handler:       _StateService_Put_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "Get",
-			Handler:       _StateService_Get_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
 		{
 			StreamName:    "Watch",
 			Handler:       _StateService_Watch_Handler,

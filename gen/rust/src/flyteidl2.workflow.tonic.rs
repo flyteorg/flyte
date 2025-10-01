@@ -2089,11 +2089,8 @@ pub mod state_service_client {
         }
         pub async fn put(
             &mut self,
-            request: impl tonic::IntoStreamingRequest<Message = super::PutRequest>,
-        ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::PutResponse>>,
-            tonic::Status,
-        > {
+            request: impl tonic::IntoRequest<super::PutRequest>,
+        ) -> std::result::Result<tonic::Response<super::PutResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -2107,18 +2104,15 @@ pub mod state_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/flyteidl2.workflow.StateService/Put",
             );
-            let mut req = request.into_streaming_request();
+            let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("flyteidl2.workflow.StateService", "Put"));
-            self.inner.streaming(req, path, codec).await
+            self.inner.unary(req, path, codec).await
         }
         pub async fn get(
             &mut self,
-            request: impl tonic::IntoStreamingRequest<Message = super::GetRequest>,
-        ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::GetResponse>>,
-            tonic::Status,
-        > {
+            request: impl tonic::IntoRequest<super::GetRequest>,
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -2132,10 +2126,10 @@ pub mod state_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/flyteidl2.workflow.StateService/Get",
             );
-            let mut req = request.into_streaming_request();
+            let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("flyteidl2.workflow.StateService", "Get"));
-            self.inner.streaming(req, path, codec).await
+            self.inner.unary(req, path, codec).await
         }
         pub async fn watch(
             &mut self,
@@ -2171,26 +2165,14 @@ pub mod state_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with StateServiceServer.
     #[async_trait]
     pub trait StateService: Send + Sync + 'static {
-        /// Server streaming response type for the Put method.
-        type PutStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<super::PutResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
         async fn put(
             &self,
-            request: tonic::Request<tonic::Streaming<super::PutRequest>>,
-        ) -> std::result::Result<tonic::Response<Self::PutStream>, tonic::Status>;
-        /// Server streaming response type for the Get method.
-        type GetStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<super::GetResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
+            request: tonic::Request<super::PutRequest>,
+        ) -> std::result::Result<tonic::Response<super::PutResponse>, tonic::Status>;
         async fn get(
             &self,
-            request: tonic::Request<tonic::Streaming<super::GetRequest>>,
-        ) -> std::result::Result<tonic::Response<Self::GetStream>, tonic::Status>;
+            request: tonic::Request<super::GetRequest>,
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status>;
         /// Server streaming response type for the Watch method.
         type WatchStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<super::WatchResponse, tonic::Status>,
@@ -2281,18 +2263,16 @@ pub mod state_service_server {
                 "/flyteidl2.workflow.StateService/Put" => {
                     #[allow(non_camel_case_types)]
                     struct PutSvc<T: StateService>(pub Arc<T>);
-                    impl<
-                        T: StateService,
-                    > tonic::server::StreamingService<super::PutRequest> for PutSvc<T> {
+                    impl<T: StateService> tonic::server::UnaryService<super::PutRequest>
+                    for PutSvc<T> {
                         type Response = super::PutResponse;
-                        type ResponseStream = T::PutStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<tonic::Streaming<super::PutRequest>>,
+                            request: tonic::Request<super::PutRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -2318,7 +2298,7 @@ pub mod state_service_server {
                                 max_decoding_message_size,
                                 max_encoding_message_size,
                             );
-                        let res = grpc.streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
@@ -2326,18 +2306,16 @@ pub mod state_service_server {
                 "/flyteidl2.workflow.StateService/Get" => {
                     #[allow(non_camel_case_types)]
                     struct GetSvc<T: StateService>(pub Arc<T>);
-                    impl<
-                        T: StateService,
-                    > tonic::server::StreamingService<super::GetRequest> for GetSvc<T> {
+                    impl<T: StateService> tonic::server::UnaryService<super::GetRequest>
+                    for GetSvc<T> {
                         type Response = super::GetResponse;
-                        type ResponseStream = T::GetStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
+                            tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<tonic::Streaming<super::GetRequest>>,
+                            request: tonic::Request<super::GetRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -2363,7 +2341,7 @@ pub mod state_service_server {
                                 max_decoding_message_size,
                                 max_encoding_message_size,
                             );
-                        let res = grpc.streaming(method, req).await;
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

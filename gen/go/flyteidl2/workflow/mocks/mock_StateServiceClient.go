@@ -25,14 +25,14 @@ func (_m *StateServiceClient) EXPECT() *StateServiceClient_Expecter {
 	return &StateServiceClient_Expecter{mock: &_m.Mock}
 }
 
-// Get provides a mock function with given fields: ctx, opts
-func (_m *StateServiceClient) Get(ctx context.Context, opts ...grpc.CallOption) (workflow.StateService_GetClient, error) {
+// Get provides a mock function with given fields: ctx, in, opts
+func (_m *StateServiceClient) Get(ctx context.Context, in *workflow.GetRequest, opts ...grpc.CallOption) (*workflow.GetResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
 	var _ca []interface{}
-	_ca = append(_ca, ctx)
+	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
@@ -40,21 +40,21 @@ func (_m *StateServiceClient) Get(ctx context.Context, opts ...grpc.CallOption) 
 		panic("no return value specified for Get")
 	}
 
-	var r0 workflow.StateService_GetClient
+	var r0 *workflow.GetResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, ...grpc.CallOption) (workflow.StateService_GetClient, error)); ok {
-		return rf(ctx, opts...)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetRequest, ...grpc.CallOption) (*workflow.GetResponse, error)); ok {
+		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, ...grpc.CallOption) workflow.StateService_GetClient); ok {
-		r0 = rf(ctx, opts...)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetRequest, ...grpc.CallOption) *workflow.GetResponse); ok {
+		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(workflow.StateService_GetClient)
+			r0 = ret.Get(0).(*workflow.GetResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, opts...)
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.GetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -69,43 +69,44 @@ type StateServiceClient_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
+//   - in *workflow.GetRequest
 //   - opts ...grpc.CallOption
-func (_e *StateServiceClient_Expecter) Get(ctx interface{}, opts ...interface{}) *StateServiceClient_Get_Call {
+func (_e *StateServiceClient_Expecter) Get(ctx interface{}, in interface{}, opts ...interface{}) *StateServiceClient_Get_Call {
 	return &StateServiceClient_Get_Call{Call: _e.mock.On("Get",
-		append([]interface{}{ctx}, opts...)...)}
+		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *StateServiceClient_Get_Call) Run(run func(ctx context.Context, opts ...grpc.CallOption)) *StateServiceClient_Get_Call {
+func (_c *StateServiceClient_Get_Call) Run(run func(ctx context.Context, in *workflow.GetRequest, opts ...grpc.CallOption)) *StateServiceClient_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]grpc.CallOption, len(args)-1)
-		for i, a := range args[1:] {
+		variadicArgs := make([]grpc.CallOption, len(args)-2)
+		for i, a := range args[2:] {
 			if a != nil {
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*workflow.GetRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *StateServiceClient_Get_Call) Return(_a0 workflow.StateService_GetClient, _a1 error) *StateServiceClient_Get_Call {
+func (_c *StateServiceClient_Get_Call) Return(_a0 *workflow.GetResponse, _a1 error) *StateServiceClient_Get_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *StateServiceClient_Get_Call) RunAndReturn(run func(context.Context, ...grpc.CallOption) (workflow.StateService_GetClient, error)) *StateServiceClient_Get_Call {
+func (_c *StateServiceClient_Get_Call) RunAndReturn(run func(context.Context, *workflow.GetRequest, ...grpc.CallOption) (*workflow.GetResponse, error)) *StateServiceClient_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Put provides a mock function with given fields: ctx, opts
-func (_m *StateServiceClient) Put(ctx context.Context, opts ...grpc.CallOption) (workflow.StateService_PutClient, error) {
+// Put provides a mock function with given fields: ctx, in, opts
+func (_m *StateServiceClient) Put(ctx context.Context, in *workflow.PutRequest, opts ...grpc.CallOption) (*workflow.PutResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
 	var _ca []interface{}
-	_ca = append(_ca, ctx)
+	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
@@ -113,21 +114,21 @@ func (_m *StateServiceClient) Put(ctx context.Context, opts ...grpc.CallOption) 
 		panic("no return value specified for Put")
 	}
 
-	var r0 workflow.StateService_PutClient
+	var r0 *workflow.PutResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, ...grpc.CallOption) (workflow.StateService_PutClient, error)); ok {
-		return rf(ctx, opts...)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.PutRequest, ...grpc.CallOption) (*workflow.PutResponse, error)); ok {
+		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, ...grpc.CallOption) workflow.StateService_PutClient); ok {
-		r0 = rf(ctx, opts...)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.PutRequest, ...grpc.CallOption) *workflow.PutResponse); ok {
+		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(workflow.StateService_PutClient)
+			r0 = ret.Get(0).(*workflow.PutResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, opts...)
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.PutRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -142,31 +143,32 @@ type StateServiceClient_Put_Call struct {
 
 // Put is a helper method to define mock.On call
 //   - ctx context.Context
+//   - in *workflow.PutRequest
 //   - opts ...grpc.CallOption
-func (_e *StateServiceClient_Expecter) Put(ctx interface{}, opts ...interface{}) *StateServiceClient_Put_Call {
+func (_e *StateServiceClient_Expecter) Put(ctx interface{}, in interface{}, opts ...interface{}) *StateServiceClient_Put_Call {
 	return &StateServiceClient_Put_Call{Call: _e.mock.On("Put",
-		append([]interface{}{ctx}, opts...)...)}
+		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *StateServiceClient_Put_Call) Run(run func(ctx context.Context, opts ...grpc.CallOption)) *StateServiceClient_Put_Call {
+func (_c *StateServiceClient_Put_Call) Run(run func(ctx context.Context, in *workflow.PutRequest, opts ...grpc.CallOption)) *StateServiceClient_Put_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]grpc.CallOption, len(args)-1)
-		for i, a := range args[1:] {
+		variadicArgs := make([]grpc.CallOption, len(args)-2)
+		for i, a := range args[2:] {
 			if a != nil {
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*workflow.PutRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *StateServiceClient_Put_Call) Return(_a0 workflow.StateService_PutClient, _a1 error) *StateServiceClient_Put_Call {
+func (_c *StateServiceClient_Put_Call) Return(_a0 *workflow.PutResponse, _a1 error) *StateServiceClient_Put_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *StateServiceClient_Put_Call) RunAndReturn(run func(context.Context, ...grpc.CallOption) (workflow.StateService_PutClient, error)) *StateServiceClient_Put_Call {
+func (_c *StateServiceClient_Put_Call) RunAndReturn(run func(context.Context, *workflow.PutRequest, ...grpc.CallOption) (*workflow.PutResponse, error)) *StateServiceClient_Put_Call {
 	_c.Call.Return(run)
 	return _c
 }

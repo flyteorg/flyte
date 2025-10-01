@@ -3,6 +3,8 @@
 package workflow
 
 import (
+	context "context"
+
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -20,22 +22,34 @@ func (_m *StateServiceServer) EXPECT() *StateServiceServer_Expecter {
 	return &StateServiceServer_Expecter{mock: &_m.Mock}
 }
 
-// Get provides a mock function with given fields: _a0
-func (_m *StateServiceServer) Get(_a0 workflow.StateService_GetServer) error {
-	ret := _m.Called(_a0)
+// Get provides a mock function with given fields: _a0, _a1
+func (_m *StateServiceServer) Get(_a0 context.Context, _a1 *workflow.GetRequest) (*workflow.GetResponse, error) {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(workflow.StateService_GetServer) error); ok {
-		r0 = rf(_a0)
+	var r0 *workflow.GetResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetRequest) (*workflow.GetResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetRequest) *workflow.GetResponse); ok {
+		r0 = rf(_a0, _a1)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*workflow.GetResponse)
+		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.GetRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // StateServiceServer_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
@@ -44,44 +58,57 @@ type StateServiceServer_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - _a0 workflow.StateService_GetServer
-func (_e *StateServiceServer_Expecter) Get(_a0 interface{}) *StateServiceServer_Get_Call {
-	return &StateServiceServer_Get_Call{Call: _e.mock.On("Get", _a0)}
+//   - _a0 context.Context
+//   - _a1 *workflow.GetRequest
+func (_e *StateServiceServer_Expecter) Get(_a0 interface{}, _a1 interface{}) *StateServiceServer_Get_Call {
+	return &StateServiceServer_Get_Call{Call: _e.mock.On("Get", _a0, _a1)}
 }
 
-func (_c *StateServiceServer_Get_Call) Run(run func(_a0 workflow.StateService_GetServer)) *StateServiceServer_Get_Call {
+func (_c *StateServiceServer_Get_Call) Run(run func(_a0 context.Context, _a1 *workflow.GetRequest)) *StateServiceServer_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(workflow.StateService_GetServer))
+		run(args[0].(context.Context), args[1].(*workflow.GetRequest))
 	})
 	return _c
 }
 
-func (_c *StateServiceServer_Get_Call) Return(_a0 error) *StateServiceServer_Get_Call {
-	_c.Call.Return(_a0)
+func (_c *StateServiceServer_Get_Call) Return(_a0 *workflow.GetResponse, _a1 error) *StateServiceServer_Get_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *StateServiceServer_Get_Call) RunAndReturn(run func(workflow.StateService_GetServer) error) *StateServiceServer_Get_Call {
+func (_c *StateServiceServer_Get_Call) RunAndReturn(run func(context.Context, *workflow.GetRequest) (*workflow.GetResponse, error)) *StateServiceServer_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Put provides a mock function with given fields: _a0
-func (_m *StateServiceServer) Put(_a0 workflow.StateService_PutServer) error {
-	ret := _m.Called(_a0)
+// Put provides a mock function with given fields: _a0, _a1
+func (_m *StateServiceServer) Put(_a0 context.Context, _a1 *workflow.PutRequest) (*workflow.PutResponse, error) {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Put")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(workflow.StateService_PutServer) error); ok {
-		r0 = rf(_a0)
+	var r0 *workflow.PutResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.PutRequest) (*workflow.PutResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.PutRequest) *workflow.PutResponse); ok {
+		r0 = rf(_a0, _a1)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*workflow.PutResponse)
+		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.PutRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // StateServiceServer_Put_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Put'
@@ -90,24 +117,25 @@ type StateServiceServer_Put_Call struct {
 }
 
 // Put is a helper method to define mock.On call
-//   - _a0 workflow.StateService_PutServer
-func (_e *StateServiceServer_Expecter) Put(_a0 interface{}) *StateServiceServer_Put_Call {
-	return &StateServiceServer_Put_Call{Call: _e.mock.On("Put", _a0)}
+//   - _a0 context.Context
+//   - _a1 *workflow.PutRequest
+func (_e *StateServiceServer_Expecter) Put(_a0 interface{}, _a1 interface{}) *StateServiceServer_Put_Call {
+	return &StateServiceServer_Put_Call{Call: _e.mock.On("Put", _a0, _a1)}
 }
 
-func (_c *StateServiceServer_Put_Call) Run(run func(_a0 workflow.StateService_PutServer)) *StateServiceServer_Put_Call {
+func (_c *StateServiceServer_Put_Call) Run(run func(_a0 context.Context, _a1 *workflow.PutRequest)) *StateServiceServer_Put_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(workflow.StateService_PutServer))
+		run(args[0].(context.Context), args[1].(*workflow.PutRequest))
 	})
 	return _c
 }
 
-func (_c *StateServiceServer_Put_Call) Return(_a0 error) *StateServiceServer_Put_Call {
-	_c.Call.Return(_a0)
+func (_c *StateServiceServer_Put_Call) Return(_a0 *workflow.PutResponse, _a1 error) *StateServiceServer_Put_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *StateServiceServer_Put_Call) RunAndReturn(run func(workflow.StateService_PutServer) error) *StateServiceServer_Put_Call {
+func (_c *StateServiceServer_Put_Call) RunAndReturn(run func(context.Context, *workflow.PutRequest) (*workflow.PutResponse, error)) *StateServiceServer_Put_Call {
 	_c.Call.Return(run)
 	return _c
 }

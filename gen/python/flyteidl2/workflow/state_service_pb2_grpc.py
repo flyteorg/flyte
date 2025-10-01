@@ -15,12 +15,12 @@ class StateServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Put = channel.stream_stream(
+        self.Put = channel.unary_unary(
                 '/flyteidl2.workflow.StateService/Put',
                 request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
                 )
-        self.Get = channel.stream_stream(
+        self.Get = channel.unary_unary(
                 '/flyteidl2.workflow.StateService/Get',
                 request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
@@ -36,14 +36,14 @@ class StateServiceServicer(object):
     """provides an interface for managing the state of actions.
     """
 
-    def Put(self, request_iterator, context):
+    def Put(self, request, context):
         """put the state of an action.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Get(self, request_iterator, context):
+    def Get(self, request, context):
         """get the state of an action.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -60,12 +60,12 @@ class StateServiceServicer(object):
 
 def add_StateServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Put': grpc.stream_stream_rpc_method_handler(
+            'Put': grpc.unary_unary_rpc_method_handler(
                     servicer.Put,
                     request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.SerializeToString,
             ),
-            'Get': grpc.stream_stream_rpc_method_handler(
+            'Get': grpc.unary_unary_rpc_method_handler(
                     servicer.Get,
                     request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.SerializeToString,
@@ -87,7 +87,7 @@ class StateService(object):
     """
 
     @staticmethod
-    def Put(request_iterator,
+    def Put(request,
             target,
             options=(),
             channel_credentials=None,
@@ -97,14 +97,14 @@ class StateService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Put',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.StateService/Put',
             flyteidl2_dot_workflow_dot_state__service__pb2.PutRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_state__service__pb2.PutResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Get(request_iterator,
+    def Get(request,
             target,
             options=(),
             channel_credentials=None,
@@ -114,7 +114,7 @@ class StateService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.StateService/Get',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.StateService/Get',
             flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse.FromString,
             options, channel_credentials,
