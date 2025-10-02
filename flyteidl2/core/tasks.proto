@@ -48,6 +48,18 @@ message Resources {
 // information about device type, and for multi-instance GPUs, the partition size to
 // use.
 message GPUAccelerator {
+  // Specifies the class of accelerator device.
+  enum DeviceClass {
+    // NVIDIA GPU devices (default for backward compatibility)
+    NVIDIA_GPU = 0;
+    // Google TPU devices
+    GOOGLE_TPU = 1;
+    // Amazon Neuron devices
+    AMAZON_NEURON = 2;
+    // AMD GPU devices
+    AMD_GPU = 3;
+  }
+
   // This can be any arbitrary string, and should be informed by the labels or taints
   // associated with the nodes in question. Default cloud provider labels typically
   // use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
@@ -59,6 +71,8 @@ message GPUAccelerator {
     // provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
     string partition_size = 3;
   }
+  // The class of accelerator device. Defaults to NVIDIA_GPU if not specified.
+  DeviceClass device_class = 4;
 }
 
 // Metadata associated with configuring a shared memory volume for a task.
