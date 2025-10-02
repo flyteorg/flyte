@@ -2764,6 +2764,54 @@
         }
       }
     },
+    "workflowTaskGroup": {
+      "type": "object",
+      "properties": {
+        "task_name": {
+          "type": "string",
+          "description": "Task name."
+        },
+        "environment_name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "total_runs": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of runs for this task."
+        },
+        "latest_run_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent run."
+        },
+        "recent_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flyteidl2workflowPhase"
+          },
+          "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
+        },
+        "average_failure_rate": {
+          "type": "number",
+          "format": "double",
+          "description": "Average failure rate of runs in this group (0.0 to 1.0).\nComputed as number of root actions with phase FAILED divided by total root actions."
+        },
+        "average_duration": {
+          "type": "string",
+          "description": "Average duration of runs in this group."
+        },
+        "latest_finished_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent finished run (terminal phase)."
+        },
+        "should_delete": {
+          "type": "boolean"
+        }
+      },
+      "description": "TaskGroup represents a group of runs for a specific task."
+    },
     "workflowTraceActionMetadata": {
       "type": "object",
       "properties": {
@@ -2807,6 +2855,24 @@
           }
         }
       }
+    },
+    "workflowWatchGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "task_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workflowTaskGroup"
+          },
+          "description": "List of task groups matching the filter criteria.\nFor the initial response, this contains all groups.\nFor subsequent updates, this contains only changed groups."
+        },
+        "sentinel": {
+          "type": "boolean",
+          "description": "Indicates when the initial List call is complete, and subsequent messages are updates."
+        }
+      },
+      "description": "Response message for watching task groups."
     },
     "workflowWatchRunDetailsResponse": {
       "type": "object",
