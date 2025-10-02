@@ -43,14 +43,26 @@ class Resources(_message.Message):
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
 class GPUAccelerator(_message.Message):
-    __slots__ = ["device", "unpartitioned", "partition_size"]
+    __slots__ = ["device", "unpartitioned", "partition_size", "device_class"]
+    class DeviceClass(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        NVIDIA_GPU: _ClassVar[GPUAccelerator.DeviceClass]
+        GOOGLE_TPU: _ClassVar[GPUAccelerator.DeviceClass]
+        AMAZON_NEURON: _ClassVar[GPUAccelerator.DeviceClass]
+        AMD_GPU: _ClassVar[GPUAccelerator.DeviceClass]
+    NVIDIA_GPU: GPUAccelerator.DeviceClass
+    GOOGLE_TPU: GPUAccelerator.DeviceClass
+    AMAZON_NEURON: GPUAccelerator.DeviceClass
+    AMD_GPU: GPUAccelerator.DeviceClass
     DEVICE_FIELD_NUMBER: _ClassVar[int]
     UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
     PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]
+    DEVICE_CLASS_FIELD_NUMBER: _ClassVar[int]
     device: str
     unpartitioned: bool
     partition_size: str
-    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ...) -> None: ...
+    device_class: GPUAccelerator.DeviceClass
+    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ..., device_class: _Optional[_Union[GPUAccelerator.DeviceClass, str]] = ...) -> None: ...
 
 class SharedMemory(_message.Message):
     __slots__ = ["mount_path", "mount_name", "size_limit"]

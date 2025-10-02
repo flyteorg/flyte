@@ -48,6 +48,17 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
+    "GPUAcceleratorDeviceClass": {
+      "type": "string",
+      "enum": [
+        "NVIDIA_GPU",
+        "GOOGLE_TPU",
+        "AMAZON_NEURON",
+        "AMD_GPU"
+      ],
+      "default": "NVIDIA_GPU",
+      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices"
+    },
     "IOStrategyDownloadMode": {
       "type": "string",
       "enum": [
@@ -461,6 +472,10 @@
         "partition_size": {
           "type": "string",
           "description": "Like `device`, this can be any arbitrary string, and should be informed by\nthe labels or taints associated with the nodes in question. Default cloud\nprovider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc."
+        },
+        "device_class": {
+          "$ref": "#/definitions/GPUAcceleratorDeviceClass",
+          "description": "The class of accelerator device. Defaults to NVIDIA_GPU if not specified."
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
