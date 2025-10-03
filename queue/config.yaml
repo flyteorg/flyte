@@ -1,0 +1,24 @@
+# Queue Service Configuration
+
+queue:
+  server:
+    host: "0.0.0.0"
+    port: 8089
+  maxQueueSize: 10000
+  workerCount: 10
+
+database:
+  postgres:
+    host: "localhost"
+    port: 5432
+    dbname: "flyte_queue"
+    username: "postgres"
+    password: "postgres"
+    extraOptions: "sslmode=disable"
+  maxIdleConnections: 10
+  maxOpenConnections: 100
+  connMaxLifeTime: 1h
+
+logger:
+  level: 4  # Info level
+  show-source: true
