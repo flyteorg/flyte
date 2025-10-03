@@ -83,6 +83,67 @@ func (Resources_ResourceName) EnumDescriptor() ([]byte, []int) {
 	return file_flyteidl2_core_tasks_proto_rawDescGZIP(), []int{0, 0}
 }
 
+// Specifies the class of accelerator device.
+type GPUAccelerator_DeviceClass int32
+
+const (
+	// NVIDIA GPU devices (default for backward compatibility)
+	GPUAccelerator_NVIDIA_GPU GPUAccelerator_DeviceClass = 0
+	// Google TPU devices
+	GPUAccelerator_GOOGLE_TPU GPUAccelerator_DeviceClass = 1
+	// Amazon Neuron devices
+	GPUAccelerator_AMAZON_NEURON GPUAccelerator_DeviceClass = 2
+	// AMD GPU devices
+	GPUAccelerator_AMD_GPU GPUAccelerator_DeviceClass = 3
+	// Habana Gaudi devices
+	GPUAccelerator_HABANA_GAUDI GPUAccelerator_DeviceClass = 4
+)
+
+// Enum value maps for GPUAccelerator_DeviceClass.
+var (
+	GPUAccelerator_DeviceClass_name = map[int32]string{
+		0: "NVIDIA_GPU",
+		1: "GOOGLE_TPU",
+		2: "AMAZON_NEURON",
+		3: "AMD_GPU",
+		4: "HABANA_GAUDI",
+	}
+	GPUAccelerator_DeviceClass_value = map[string]int32{
+		"NVIDIA_GPU":    0,
+		"GOOGLE_TPU":    1,
+		"AMAZON_NEURON": 2,
+		"AMD_GPU":       3,
+		"HABANA_GAUDI":  4,
+	}
+)
+
+func (x GPUAccelerator_DeviceClass) Enum() *GPUAccelerator_DeviceClass {
+	p := new(GPUAccelerator_DeviceClass)
+	*p = x
+	return p
+}
+
+func (x GPUAccelerator_DeviceClass) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GPUAccelerator_DeviceClass) Descriptor() protoreflect.EnumDescriptor {
+	return file_flyteidl2_core_tasks_proto_enumTypes[1].Descriptor()
+}
+
+func (GPUAccelerator_DeviceClass) Type() protoreflect.EnumType {
+	return &file_flyteidl2_core_tasks_proto_enumTypes[1]
+}
+
+func (x GPUAccelerator_DeviceClass) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use GPUAccelerator_DeviceClass.Descriptor instead.
+func (GPUAccelerator_DeviceClass) EnumDescriptor() ([]byte, []int) {
+	return file_flyteidl2_core_tasks_proto_rawDescGZIP(), []int{1, 0}
+}
+
 type RuntimeMetadata_RuntimeType int32
 
 const (
@@ -113,11 +174,11 @@ func (x RuntimeMetadata_RuntimeType) String() string {
 }
 
 func (RuntimeMetadata_RuntimeType) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[1].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[2].Descriptor()
 }
 
 func (RuntimeMetadata_RuntimeType) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[1]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[2]
 }
 
 func (x RuntimeMetadata_RuntimeType) Number() protoreflect.EnumNumber {
@@ -169,11 +230,11 @@ func (x Container_Architecture) String() string {
 }
 
 func (Container_Architecture) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[2].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[3].Descriptor()
 }
 
 func (Container_Architecture) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[2]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[3]
 }
 
 func (x Container_Architecture) Number() protoreflect.EnumNumber {
@@ -222,11 +283,11 @@ func (x IOStrategy_DownloadMode) String() string {
 }
 
 func (IOStrategy_DownloadMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[3].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[4].Descriptor()
 }
 
 func (IOStrategy_DownloadMode) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[3]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[4]
 }
 
 func (x IOStrategy_DownloadMode) Number() protoreflect.EnumNumber {
@@ -275,11 +336,11 @@ func (x IOStrategy_UploadMode) String() string {
 }
 
 func (IOStrategy_UploadMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[4].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[5].Descriptor()
 }
 
 func (IOStrategy_UploadMode) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[4]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[5]
 }
 
 func (x IOStrategy_UploadMode) Number() protoreflect.EnumNumber {
@@ -330,11 +391,11 @@ func (x DataLoadingConfig_LiteralMapFormat) String() string {
 }
 
 func (DataLoadingConfig_LiteralMapFormat) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[5].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[6].Descriptor()
 }
 
 func (DataLoadingConfig_LiteralMapFormat) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[5]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[6]
 }
 
 func (x DataLoadingConfig_LiteralMapFormat) Number() protoreflect.EnumNumber {
@@ -385,11 +446,11 @@ func (x Sql_Dialect) String() string {
 }
 
 func (Sql_Dialect) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl2_core_tasks_proto_enumTypes[6].Descriptor()
+	return file_flyteidl2_core_tasks_proto_enumTypes[7].Descriptor()
 }
 
 func (Sql_Dialect) Type() protoreflect.EnumType {
-	return &file_flyteidl2_core_tasks_proto_enumTypes[6]
+	return &file_flyteidl2_core_tasks_proto_enumTypes[7]
 }
 
 func (x Sql_Dialect) Number() protoreflect.EnumNumber {
@@ -478,6 +539,8 @@ type GPUAccelerator struct {
 	//	*GPUAccelerator_Unpartitioned
 	//	*GPUAccelerator_PartitionSize
 	PartitionSizeValue isGPUAccelerator_PartitionSizeValue `protobuf_oneof:"partition_size_value"`
+	// The class of accelerator device. Defaults to NVIDIA_GPU if not specified.
+	DeviceClass GPUAccelerator_DeviceClass `protobuf:"varint,4,opt,name=device_class,json=deviceClass,proto3,enum=flyteidl2.core.GPUAccelerator_DeviceClass" json:"device_class,omitempty"`
 }
 
 func (x *GPUAccelerator) Reset() {
@@ -538,6 +601,13 @@ func (x *GPUAccelerator) GetPartitionSize() string {
 		return x.PartitionSize
 	}
 	return ""
+}
+
+func (x *GPUAccelerator) GetDeviceClass() GPUAccelerator_DeviceClass {
+	if x != nil {
+		return x.DeviceClass
+	}
+	return GPUAccelerator_NVIDIA_GPU
 }
 
 type isGPUAccelerator_PartitionSizeValue interface {
@@ -1795,14 +1865,25 @@ var file_flyteidl2_core_tasks_proto_rawDesc = []byte{
 	0x0a, 0x0a, 0x06, 0x4d, 0x45, 0x4d, 0x4f, 0x52, 0x59, 0x10, 0x03, 0x12, 0x0b, 0x0a, 0x07, 0x53,
 	0x54, 0x4f, 0x52, 0x41, 0x47, 0x45, 0x10, 0x04, 0x12, 0x15, 0x0a, 0x11, 0x45, 0x50, 0x48, 0x45,
 	0x4d, 0x45, 0x52, 0x41, 0x4c, 0x5f, 0x53, 0x54, 0x4f, 0x52, 0x41, 0x47, 0x45, 0x10, 0x05, 0x22,
-	0x91, 0x01, 0x0a, 0x0e, 0x47, 0x50, 0x55, 0x41, 0x63, 0x63, 0x65, 0x6c, 0x65, 0x72, 0x61, 0x74,
+	0xc1, 0x02, 0x0a, 0x0e, 0x47, 0x50, 0x55, 0x41, 0x63, 0x63, 0x65, 0x6c, 0x65, 0x72, 0x61, 0x74,
 	0x6f, 0x72, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x06, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x12, 0x26, 0x0a, 0x0d, 0x75, 0x6e,
 	0x70, 0x61, 0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x08, 0x48, 0x00, 0x52, 0x0d, 0x75, 0x6e, 0x70, 0x61, 0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e,
 	0x65, 0x64, 0x12, 0x27, 0x0a, 0x0e, 0x70, 0x61, 0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
 	0x73, 0x69, 0x7a, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0d, 0x70, 0x61,
-	0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x69, 0x7a, 0x65, 0x42, 0x16, 0x0a, 0x14, 0x70,
+	0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x69, 0x7a, 0x65, 0x12, 0x4d, 0x0a, 0x0c, 0x64,
+	0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x2a, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f,
+	0x72, 0x65, 0x2e, 0x47, 0x50, 0x55, 0x41, 0x63, 0x63, 0x65, 0x6c, 0x65, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x2e, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x52, 0x0b, 0x64,
+	0x65, 0x76, 0x69, 0x63, 0x65, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x22, 0x5f, 0x0a, 0x0b, 0x44, 0x65,
+	0x76, 0x69, 0x63, 0x65, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x12, 0x0e, 0x0a, 0x0a, 0x4e, 0x56, 0x49,
+	0x44, 0x49, 0x41, 0x5f, 0x47, 0x50, 0x55, 0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x47, 0x4f, 0x4f,
+	0x47, 0x4c, 0x45, 0x5f, 0x54, 0x50, 0x55, 0x10, 0x01, 0x12, 0x11, 0x0a, 0x0d, 0x41, 0x4d, 0x41,
+	0x5a, 0x4f, 0x4e, 0x5f, 0x4e, 0x45, 0x55, 0x52, 0x4f, 0x4e, 0x10, 0x02, 0x12, 0x0b, 0x0a, 0x07,
+	0x41, 0x4d, 0x44, 0x5f, 0x47, 0x50, 0x55, 0x10, 0x03, 0x12, 0x10, 0x0a, 0x0c, 0x48, 0x41, 0x42,
+	0x41, 0x4e, 0x41, 0x5f, 0x47, 0x41, 0x55, 0x44, 0x49, 0x10, 0x04, 0x42, 0x16, 0x0a, 0x14, 0x70,
 	0x61, 0x72, 0x74, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x73, 0x69, 0x7a, 0x65, 0x5f, 0x76, 0x61,
 	0x6c, 0x75, 0x65, 0x22, 0x6b, 0x0a, 0x0c, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x4d, 0x65, 0x6d,
 	0x6f, 0x72, 0x79, 0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x5f, 0x70, 0x61, 0x74,
@@ -2074,88 +2155,90 @@ func file_flyteidl2_core_tasks_proto_rawDescGZIP() []byte {
 	return file_flyteidl2_core_tasks_proto_rawDescData
 }
 
-var file_flyteidl2_core_tasks_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_flyteidl2_core_tasks_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
 var file_flyteidl2_core_tasks_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_flyteidl2_core_tasks_proto_goTypes = []interface{}{
 	(Resources_ResourceName)(0),             // 0: flyteidl2.core.Resources.ResourceName
-	(RuntimeMetadata_RuntimeType)(0),        // 1: flyteidl2.core.RuntimeMetadata.RuntimeType
-	(Container_Architecture)(0),             // 2: flyteidl2.core.Container.Architecture
-	(IOStrategy_DownloadMode)(0),            // 3: flyteidl2.core.IOStrategy.DownloadMode
-	(IOStrategy_UploadMode)(0),              // 4: flyteidl2.core.IOStrategy.UploadMode
-	(DataLoadingConfig_LiteralMapFormat)(0), // 5: flyteidl2.core.DataLoadingConfig.LiteralMapFormat
-	(Sql_Dialect)(0),                        // 6: flyteidl2.core.Sql.Dialect
-	(*Resources)(nil),                       // 7: flyteidl2.core.Resources
-	(*GPUAccelerator)(nil),                  // 8: flyteidl2.core.GPUAccelerator
-	(*SharedMemory)(nil),                    // 9: flyteidl2.core.SharedMemory
-	(*ExtendedResources)(nil),               // 10: flyteidl2.core.ExtendedResources
-	(*RuntimeMetadata)(nil),                 // 11: flyteidl2.core.RuntimeMetadata
-	(*TaskMetadata)(nil),                    // 12: flyteidl2.core.TaskMetadata
-	(*TaskTemplate)(nil),                    // 13: flyteidl2.core.TaskTemplate
-	(*ContainerPort)(nil),                   // 14: flyteidl2.core.ContainerPort
-	(*Container)(nil),                       // 15: flyteidl2.core.Container
-	(*IOStrategy)(nil),                      // 16: flyteidl2.core.IOStrategy
-	(*DataLoadingConfig)(nil),               // 17: flyteidl2.core.DataLoadingConfig
-	(*K8SPod)(nil),                          // 18: flyteidl2.core.K8sPod
-	(*K8SObjectMetadata)(nil),               // 19: flyteidl2.core.K8sObjectMetadata
-	(*Sql)(nil),                             // 20: flyteidl2.core.Sql
-	(*Resources_ResourceEntry)(nil),         // 21: flyteidl2.core.Resources.ResourceEntry
-	nil,                                     // 22: flyteidl2.core.TaskMetadata.TagsEntry
-	nil,                                     // 23: flyteidl2.core.TaskTemplate.ConfigEntry
-	nil,                                     // 24: flyteidl2.core.K8sObjectMetadata.LabelsEntry
-	nil,                                     // 25: flyteidl2.core.K8sObjectMetadata.AnnotationsEntry
-	(*durationpb.Duration)(nil),             // 26: google.protobuf.Duration
-	(*RetryStrategy)(nil),                   // 27: flyteidl2.core.RetryStrategy
-	(*wrapperspb.BoolValue)(nil),            // 28: google.protobuf.BoolValue
-	(*Identifier)(nil),                      // 29: flyteidl2.core.Identifier
-	(*TypedInterface)(nil),                  // 30: flyteidl2.core.TypedInterface
-	(*structpb.Struct)(nil),                 // 31: google.protobuf.Struct
-	(*SecurityContext)(nil),                 // 32: flyteidl2.core.SecurityContext
-	(*KeyValuePair)(nil),                    // 33: flyteidl2.core.KeyValuePair
+	(GPUAccelerator_DeviceClass)(0),         // 1: flyteidl2.core.GPUAccelerator.DeviceClass
+	(RuntimeMetadata_RuntimeType)(0),        // 2: flyteidl2.core.RuntimeMetadata.RuntimeType
+	(Container_Architecture)(0),             // 3: flyteidl2.core.Container.Architecture
+	(IOStrategy_DownloadMode)(0),            // 4: flyteidl2.core.IOStrategy.DownloadMode
+	(IOStrategy_UploadMode)(0),              // 5: flyteidl2.core.IOStrategy.UploadMode
+	(DataLoadingConfig_LiteralMapFormat)(0), // 6: flyteidl2.core.DataLoadingConfig.LiteralMapFormat
+	(Sql_Dialect)(0),                        // 7: flyteidl2.core.Sql.Dialect
+	(*Resources)(nil),                       // 8: flyteidl2.core.Resources
+	(*GPUAccelerator)(nil),                  // 9: flyteidl2.core.GPUAccelerator
+	(*SharedMemory)(nil),                    // 10: flyteidl2.core.SharedMemory
+	(*ExtendedResources)(nil),               // 11: flyteidl2.core.ExtendedResources
+	(*RuntimeMetadata)(nil),                 // 12: flyteidl2.core.RuntimeMetadata
+	(*TaskMetadata)(nil),                    // 13: flyteidl2.core.TaskMetadata
+	(*TaskTemplate)(nil),                    // 14: flyteidl2.core.TaskTemplate
+	(*ContainerPort)(nil),                   // 15: flyteidl2.core.ContainerPort
+	(*Container)(nil),                       // 16: flyteidl2.core.Container
+	(*IOStrategy)(nil),                      // 17: flyteidl2.core.IOStrategy
+	(*DataLoadingConfig)(nil),               // 18: flyteidl2.core.DataLoadingConfig
+	(*K8SPod)(nil),                          // 19: flyteidl2.core.K8sPod
+	(*K8SObjectMetadata)(nil),               // 20: flyteidl2.core.K8sObjectMetadata
+	(*Sql)(nil),                             // 21: flyteidl2.core.Sql
+	(*Resources_ResourceEntry)(nil),         // 22: flyteidl2.core.Resources.ResourceEntry
+	nil,                                     // 23: flyteidl2.core.TaskMetadata.TagsEntry
+	nil,                                     // 24: flyteidl2.core.TaskTemplate.ConfigEntry
+	nil,                                     // 25: flyteidl2.core.K8sObjectMetadata.LabelsEntry
+	nil,                                     // 26: flyteidl2.core.K8sObjectMetadata.AnnotationsEntry
+	(*durationpb.Duration)(nil),             // 27: google.protobuf.Duration
+	(*RetryStrategy)(nil),                   // 28: flyteidl2.core.RetryStrategy
+	(*wrapperspb.BoolValue)(nil),            // 29: google.protobuf.BoolValue
+	(*Identifier)(nil),                      // 30: flyteidl2.core.Identifier
+	(*TypedInterface)(nil),                  // 31: flyteidl2.core.TypedInterface
+	(*structpb.Struct)(nil),                 // 32: google.protobuf.Struct
+	(*SecurityContext)(nil),                 // 33: flyteidl2.core.SecurityContext
+	(*KeyValuePair)(nil),                    // 34: flyteidl2.core.KeyValuePair
 }
 var file_flyteidl2_core_tasks_proto_depIdxs = []int32{
-	21, // 0: flyteidl2.core.Resources.requests:type_name -> flyteidl2.core.Resources.ResourceEntry
-	21, // 1: flyteidl2.core.Resources.limits:type_name -> flyteidl2.core.Resources.ResourceEntry
-	8,  // 2: flyteidl2.core.ExtendedResources.gpu_accelerator:type_name -> flyteidl2.core.GPUAccelerator
-	9,  // 3: flyteidl2.core.ExtendedResources.shared_memory:type_name -> flyteidl2.core.SharedMemory
-	1,  // 4: flyteidl2.core.RuntimeMetadata.type:type_name -> flyteidl2.core.RuntimeMetadata.RuntimeType
-	11, // 5: flyteidl2.core.TaskMetadata.runtime:type_name -> flyteidl2.core.RuntimeMetadata
-	26, // 6: flyteidl2.core.TaskMetadata.timeout:type_name -> google.protobuf.Duration
-	27, // 7: flyteidl2.core.TaskMetadata.retries:type_name -> flyteidl2.core.RetryStrategy
-	22, // 8: flyteidl2.core.TaskMetadata.tags:type_name -> flyteidl2.core.TaskMetadata.TagsEntry
-	28, // 9: flyteidl2.core.TaskMetadata.generates_deck:type_name -> google.protobuf.BoolValue
-	19, // 10: flyteidl2.core.TaskMetadata.metadata:type_name -> flyteidl2.core.K8sObjectMetadata
-	29, // 11: flyteidl2.core.TaskTemplate.id:type_name -> flyteidl2.core.Identifier
-	12, // 12: flyteidl2.core.TaskTemplate.metadata:type_name -> flyteidl2.core.TaskMetadata
-	30, // 13: flyteidl2.core.TaskTemplate.interface:type_name -> flyteidl2.core.TypedInterface
-	31, // 14: flyteidl2.core.TaskTemplate.custom:type_name -> google.protobuf.Struct
-	15, // 15: flyteidl2.core.TaskTemplate.container:type_name -> flyteidl2.core.Container
-	18, // 16: flyteidl2.core.TaskTemplate.k8s_pod:type_name -> flyteidl2.core.K8sPod
-	20, // 17: flyteidl2.core.TaskTemplate.sql:type_name -> flyteidl2.core.Sql
-	32, // 18: flyteidl2.core.TaskTemplate.security_context:type_name -> flyteidl2.core.SecurityContext
-	10, // 19: flyteidl2.core.TaskTemplate.extended_resources:type_name -> flyteidl2.core.ExtendedResources
-	23, // 20: flyteidl2.core.TaskTemplate.config:type_name -> flyteidl2.core.TaskTemplate.ConfigEntry
-	7,  // 21: flyteidl2.core.Container.resources:type_name -> flyteidl2.core.Resources
-	33, // 22: flyteidl2.core.Container.env:type_name -> flyteidl2.core.KeyValuePair
-	33, // 23: flyteidl2.core.Container.config:type_name -> flyteidl2.core.KeyValuePair
-	14, // 24: flyteidl2.core.Container.ports:type_name -> flyteidl2.core.ContainerPort
-	17, // 25: flyteidl2.core.Container.data_config:type_name -> flyteidl2.core.DataLoadingConfig
-	2,  // 26: flyteidl2.core.Container.architecture:type_name -> flyteidl2.core.Container.Architecture
-	3,  // 27: flyteidl2.core.IOStrategy.download_mode:type_name -> flyteidl2.core.IOStrategy.DownloadMode
-	4,  // 28: flyteidl2.core.IOStrategy.upload_mode:type_name -> flyteidl2.core.IOStrategy.UploadMode
-	5,  // 29: flyteidl2.core.DataLoadingConfig.format:type_name -> flyteidl2.core.DataLoadingConfig.LiteralMapFormat
-	16, // 30: flyteidl2.core.DataLoadingConfig.io_strategy:type_name -> flyteidl2.core.IOStrategy
-	19, // 31: flyteidl2.core.K8sPod.metadata:type_name -> flyteidl2.core.K8sObjectMetadata
-	31, // 32: flyteidl2.core.K8sPod.pod_spec:type_name -> google.protobuf.Struct
-	17, // 33: flyteidl2.core.K8sPod.data_config:type_name -> flyteidl2.core.DataLoadingConfig
-	24, // 34: flyteidl2.core.K8sObjectMetadata.labels:type_name -> flyteidl2.core.K8sObjectMetadata.LabelsEntry
-	25, // 35: flyteidl2.core.K8sObjectMetadata.annotations:type_name -> flyteidl2.core.K8sObjectMetadata.AnnotationsEntry
-	6,  // 36: flyteidl2.core.Sql.dialect:type_name -> flyteidl2.core.Sql.Dialect
-	0,  // 37: flyteidl2.core.Resources.ResourceEntry.name:type_name -> flyteidl2.core.Resources.ResourceName
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	22, // 0: flyteidl2.core.Resources.requests:type_name -> flyteidl2.core.Resources.ResourceEntry
+	22, // 1: flyteidl2.core.Resources.limits:type_name -> flyteidl2.core.Resources.ResourceEntry
+	1,  // 2: flyteidl2.core.GPUAccelerator.device_class:type_name -> flyteidl2.core.GPUAccelerator.DeviceClass
+	9,  // 3: flyteidl2.core.ExtendedResources.gpu_accelerator:type_name -> flyteidl2.core.GPUAccelerator
+	10, // 4: flyteidl2.core.ExtendedResources.shared_memory:type_name -> flyteidl2.core.SharedMemory
+	2,  // 5: flyteidl2.core.RuntimeMetadata.type:type_name -> flyteidl2.core.RuntimeMetadata.RuntimeType
+	12, // 6: flyteidl2.core.TaskMetadata.runtime:type_name -> flyteidl2.core.RuntimeMetadata
+	27, // 7: flyteidl2.core.TaskMetadata.timeout:type_name -> google.protobuf.Duration
+	28, // 8: flyteidl2.core.TaskMetadata.retries:type_name -> flyteidl2.core.RetryStrategy
+	23, // 9: flyteidl2.core.TaskMetadata.tags:type_name -> flyteidl2.core.TaskMetadata.TagsEntry
+	29, // 10: flyteidl2.core.TaskMetadata.generates_deck:type_name -> google.protobuf.BoolValue
+	20, // 11: flyteidl2.core.TaskMetadata.metadata:type_name -> flyteidl2.core.K8sObjectMetadata
+	30, // 12: flyteidl2.core.TaskTemplate.id:type_name -> flyteidl2.core.Identifier
+	13, // 13: flyteidl2.core.TaskTemplate.metadata:type_name -> flyteidl2.core.TaskMetadata
+	31, // 14: flyteidl2.core.TaskTemplate.interface:type_name -> flyteidl2.core.TypedInterface
+	32, // 15: flyteidl2.core.TaskTemplate.custom:type_name -> google.protobuf.Struct
+	16, // 16: flyteidl2.core.TaskTemplate.container:type_name -> flyteidl2.core.Container
+	19, // 17: flyteidl2.core.TaskTemplate.k8s_pod:type_name -> flyteidl2.core.K8sPod
+	21, // 18: flyteidl2.core.TaskTemplate.sql:type_name -> flyteidl2.core.Sql
+	33, // 19: flyteidl2.core.TaskTemplate.security_context:type_name -> flyteidl2.core.SecurityContext
+	11, // 20: flyteidl2.core.TaskTemplate.extended_resources:type_name -> flyteidl2.core.ExtendedResources
+	24, // 21: flyteidl2.core.TaskTemplate.config:type_name -> flyteidl2.core.TaskTemplate.ConfigEntry
+	8,  // 22: flyteidl2.core.Container.resources:type_name -> flyteidl2.core.Resources
+	34, // 23: flyteidl2.core.Container.env:type_name -> flyteidl2.core.KeyValuePair
+	34, // 24: flyteidl2.core.Container.config:type_name -> flyteidl2.core.KeyValuePair
+	15, // 25: flyteidl2.core.Container.ports:type_name -> flyteidl2.core.ContainerPort
+	18, // 26: flyteidl2.core.Container.data_config:type_name -> flyteidl2.core.DataLoadingConfig
+	3,  // 27: flyteidl2.core.Container.architecture:type_name -> flyteidl2.core.Container.Architecture
+	4,  // 28: flyteidl2.core.IOStrategy.download_mode:type_name -> flyteidl2.core.IOStrategy.DownloadMode
+	5,  // 29: flyteidl2.core.IOStrategy.upload_mode:type_name -> flyteidl2.core.IOStrategy.UploadMode
+	6,  // 30: flyteidl2.core.DataLoadingConfig.format:type_name -> flyteidl2.core.DataLoadingConfig.LiteralMapFormat
+	17, // 31: flyteidl2.core.DataLoadingConfig.io_strategy:type_name -> flyteidl2.core.IOStrategy
+	20, // 32: flyteidl2.core.K8sPod.metadata:type_name -> flyteidl2.core.K8sObjectMetadata
+	32, // 33: flyteidl2.core.K8sPod.pod_spec:type_name -> google.protobuf.Struct
+	18, // 34: flyteidl2.core.K8sPod.data_config:type_name -> flyteidl2.core.DataLoadingConfig
+	25, // 35: flyteidl2.core.K8sObjectMetadata.labels:type_name -> flyteidl2.core.K8sObjectMetadata.LabelsEntry
+	26, // 36: flyteidl2.core.K8sObjectMetadata.annotations:type_name -> flyteidl2.core.K8sObjectMetadata.AnnotationsEntry
+	7,  // 37: flyteidl2.core.Sql.dialect:type_name -> flyteidl2.core.Sql.Dialect
+	0,  // 38: flyteidl2.core.Resources.ResourceEntry.name:type_name -> flyteidl2.core.Resources.ResourceName
+	39, // [39:39] is the sub-list for method output_type
+	39, // [39:39] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_core_tasks_proto_init() }
@@ -2366,7 +2449,7 @@ func file_flyteidl2_core_tasks_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_core_tasks_proto_rawDesc,
-			NumEnums:      7,
+			NumEnums:      8,
 			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
