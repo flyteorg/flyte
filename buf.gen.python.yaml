@@ -10,5 +10,7 @@ plugins:
     out: gen/python
   - remote: buf.build/protocolbuffers/pyi:v24.1
     out: gen/python
+    include_imports: true
   - remote: buf.build/grpc/python:v1.58.1
     out: gen/python
+    include_imports: true
