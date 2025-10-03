@@ -3,8 +3,8 @@ package storage
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

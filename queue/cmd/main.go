@@ -14,10 +14,10 @@ import (
 	"golang.org/x/net/http2/h2c"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/database"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	queueconfig "github.com/flyteorg/flyte/v2/queue/config"
 	"github.com/flyteorg/flyte/v2/queue/migrations"
@@ -164,25 +164,13 @@ func initConfig() error {
 }
 
 func initDB(ctx context.Context, cfg *database.DbConfig) (*gorm.DB, error) {
-	gormConfig := &gorm.Config{
-		// We can add GORM-specific configuration here
-	}
+	logCfg := logger.GetConfig()
 
-	// Create database if it doesn't exist
-	db, err := database.CreatePostgresDbIfNotExists(ctx, gormConfig, cfg.Postgres)
+	// Use flytestdlib's GetDB which handles both SQLite and PostgreSQL
+	db, err := database.GetDB(ctx, cfg, logCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create database: %w", err)
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
-
-	// Apply connection pool settings
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get sql.DB: %w", err)
-	}
-
-	sqlDB.SetMaxIdleConns(cfg.MaxIdleConnections)
-	sqlDB.SetMaxOpenConns(cfg.MaxOpenConnections)
-	sqlDB.SetConnMaxLifetime(cfg.ConnMaxLifeTime.Duration)
 
 	logger.Infof(ctx, "Database connection established")
 	return db, nil

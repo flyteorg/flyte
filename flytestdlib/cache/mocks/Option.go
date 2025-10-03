@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	cache "github.com/flyteorg/flyte/flytestdlib/cache"
+	cache "github.com/flyteorg/flyte/v2/flytestdlib/cache"
 	mock "github.com/stretchr/testify/mock"
 )
 

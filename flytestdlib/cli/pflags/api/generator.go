@@ -10,7 +10,7 @@ import (
 	"github.com/ernesto-jimenez/gogen/gogenutil"
 	"golang.org/x/tools/go/packages"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 const (

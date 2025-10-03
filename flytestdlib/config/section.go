@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/atomic"
 )
 
 type Section interface {

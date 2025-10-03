@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
 
 type ItemID = string

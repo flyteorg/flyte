@@ -5,10 +5,10 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/queue/repository"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // QueueService implements the QueueServiceHandler interface

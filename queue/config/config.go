@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 )
 
 const configSectionKey = "queue"

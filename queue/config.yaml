@@ -8,16 +8,21 @@ queue:
   workerCount: 10
 
 database:
-  postgres:
-    host: "localhost"
-    port: 5432
-    dbname: "flyte_queue"
-    username: "postgres"
-    password: "postgres"
-    extraOptions: "sslmode=disable"
-  maxIdleConnections: 10
-  maxOpenConnections: 100
-  connMaxLifeTime: 1h
+  # Option 1: Use SQLite (easier for testing, no setup required)
+  sqlite:
+    file: "./queue.db"
+
+  # Option 2: Use PostgreSQL (comment out sqlite above and uncomment below)
+  # postgres:
+  #   host: "localhost"
+  #   port: 5432
+  #   dbname: "flyte_queue"
+  #   username: "postgres"
+  #   password: "postgres"
+  #   extraOptions: "sslmode=disable"
+  # maxIdleConnections: 10
+  # maxOpenConnections: 100
+  # connMaxLifeTime: 1h
 
 logger:
   level: 4  # Info level

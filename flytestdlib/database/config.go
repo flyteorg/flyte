@@ -3,7 +3,7 @@ package database
 import (
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 const (
