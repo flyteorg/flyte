@@ -34,6 +34,9 @@ license-files = ["licenses/*.txt", "LICENSE"]
 [tool.setuptools]
 include-package-data = true
 
+# Intentionally leaving out the google folder, which contains googleapis-common-protos. This library is a dependency
+# of too many google libraries including grpcio-status which flyte already depends on, so don't want to
+# risk version conflicts.
 [tool.setuptools.packages.find]
 include = ["flyteidl2*", "buf*"]
 exclude = ["build*"]
