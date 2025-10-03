@@ -10,6 +10,7 @@ description = "IDL for Flyte"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
 dependencies = [
+    'googleapis-common-protos',
     'protoc-gen-openapiv2',
     'protobuf>=4.21.1',
     "protovalidate>=1.0.0",
