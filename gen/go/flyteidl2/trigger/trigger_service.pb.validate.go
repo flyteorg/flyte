@@ -58,11 +58,11 @@ func (m *DeployTriggerRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetId()).(type) {
+		switch v := interface{}(m.GetName()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, DeployTriggerRequestValidationError{
-					field:  "Id",
+					field:  "Name",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -70,21 +70,23 @@ func (m *DeployTriggerRequest) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, DeployTriggerRequestValidationError{
-					field:  "Id",
+					field:  "Name",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeployTriggerRequestValidationError{
-				field:  "Id",
+				field:  "Name",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
+
+	// no validation rules for Revision
 
 	if all {
 		switch v := interface{}(m.GetSpec()).(type) {
@@ -1025,6 +1027,47 @@ func (m *ListTriggersRequest) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ListTriggersRequestValidationError{
 					field:  "TaskId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ListTriggersRequest_TaskName:
+		if v == nil {
+			err := ListTriggersRequestValidationError{
+				field:  "ScopeBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTaskName()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListTriggersRequestValidationError{
+						field:  "TaskName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListTriggersRequestValidationError{
+						field:  "TaskName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTaskName()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListTriggersRequestValidationError{
+					field:  "TaskName",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
