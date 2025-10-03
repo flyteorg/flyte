@@ -58,6 +58,8 @@ message GPUAccelerator {
     AMAZON_NEURON = 2;
     // AMD GPU devices
     AMD_GPU = 3;
+    // Habana Gaudi devices
+    HABANA_GAUDI = 4;
   }
 
   // This can be any arbitrary string, and should be informed by the labels or taints

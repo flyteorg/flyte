@@ -50,10 +50,12 @@ class GPUAccelerator(_message.Message):
         GOOGLE_TPU: _ClassVar[GPUAccelerator.DeviceClass]
         AMAZON_NEURON: _ClassVar[GPUAccelerator.DeviceClass]
         AMD_GPU: _ClassVar[GPUAccelerator.DeviceClass]
+        HABANA_GAUDI: _ClassVar[GPUAccelerator.DeviceClass]
     NVIDIA_GPU: GPUAccelerator.DeviceClass
     GOOGLE_TPU: GPUAccelerator.DeviceClass
     AMAZON_NEURON: GPUAccelerator.DeviceClass
     AMD_GPU: GPUAccelerator.DeviceClass
+    HABANA_GAUDI: GPUAccelerator.DeviceClass
     DEVICE_FIELD_NUMBER: _ClassVar[int]
     UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
     PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]

@@ -95,10 +95,11 @@
         "NVIDIA_GPU",
         "GOOGLE_TPU",
         "AMAZON_NEURON",
-        "AMD_GPU"
+        "AMD_GPU",
+        "HABANA_GAUDI"
       ],
       "default": "NVIDIA_GPU",
-      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices"
+      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices\n - HABANA_GAUDI: Habana Gaudi devices"
     },
     "IOStrategyDownloadMode": {
       "type": "string",
