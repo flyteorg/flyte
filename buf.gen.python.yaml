@@ -8,6 +8,7 @@ managed:
 plugins:
   - remote: buf.build/protocolbuffers/python:v24.1
     out: gen/python
+    include_imports: true
   - remote: buf.build/protocolbuffers/pyi:v24.1
     out: gen/python
     include_imports: true

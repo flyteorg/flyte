@@ -33,14 +33,6 @@ license-files = ["licenses/*.txt", "LICENSE"]
 [tool.setuptools]
 include-package-data = true
 
-[tool.uv.sources]
-bufbuild-protovalidate-protocolbuffers-python = { index = "buf-build" }
-bufbuild-protovalidate-protocolbuffers-pyi = { index = "buf-build" }
-
-[[tool.uv.index]]
-name = "buf-build"
-url = "https://buf.build/gen/python"
-
 [tool.setuptools.packages.find]
 include = ["flyteidl2*", "buf*"]
 exclude = ["build*"]
