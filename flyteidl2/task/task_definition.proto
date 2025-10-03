@@ -102,6 +102,9 @@ message TaskMetadata {
 
   // Brief overview of attached triggers if any.
   TaskTriggersSummary triggers_summary = 5;
+
+  // The function name for this task
+  string function_name = 6;
 }
 
 // Lightweight representation of a task.

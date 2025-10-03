@@ -554,6 +554,8 @@ func (m *TaskMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for FunctionName
+
 	if len(errors) > 0 {
 		return TaskMetadataMultiError(errors)
 	}
