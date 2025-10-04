@@ -56,20 +56,18 @@ class TaskTriggersSummary(_message.Message):
     def __init__(self, automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., stats: _Optional[_Union[TaskTriggersSummary.TriggerStats, _Mapping]] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["deployed_by", "short_name", "deployed_at", "environment_name", "triggers_summary", "function_name"]
+    __slots__ = ["deployed_by", "function_name", "deployed_at", "environment_name", "triggers_summary"]
     DEPLOYED_BY_FIELD_NUMBER: _ClassVar[int]
-    SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
+    FUNCTION_NAME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYED_AT_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_NAME_FIELD_NUMBER: _ClassVar[int]
     TRIGGERS_SUMMARY_FIELD_NUMBER: _ClassVar[int]
-    FUNCTION_NAME_FIELD_NUMBER: _ClassVar[int]
     deployed_by: _identity_pb2.EnrichedIdentity
-    short_name: str
+    function_name: str
     deployed_at: _timestamp_pb2.Timestamp
     environment_name: str
     triggers_summary: TaskTriggersSummary
-    function_name: str
-    def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., short_name: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., environment_name: _Optional[str] = ..., triggers_summary: _Optional[_Union[TaskTriggersSummary, _Mapping]] = ..., function_name: _Optional[str] = ...) -> None: ...
+    def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., function_name: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., environment_name: _Optional[str] = ..., triggers_summary: _Optional[_Union[TaskTriggersSummary, _Mapping]] = ...) -> None: ...
 
 class Task(_message.Message):
     __slots__ = ["task_id", "metadata"]

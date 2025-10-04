@@ -1879,9 +1879,9 @@
           "$ref": "#/definitions/commonEnrichedIdentity",
           "description": "Identity that deployed the task."
         },
-        "short_name": {
+        "function_name": {
           "type": "string",
-          "title": "The short name for this task"
+          "title": "The function name for this task"
         },
         "deployed_at": {
           "type": "string",
@@ -1895,10 +1895,6 @@
         "triggers_summary": {
           "$ref": "#/definitions/taskTaskTriggersSummary",
           "description": "Brief overview of attached triggers if any."
-        },
-        "function_name": {
-          "type": "string",
-          "title": "The function name for this task"
         }
       },
       "description": "TaskMetadata is static, lightweight metadata about a task."
