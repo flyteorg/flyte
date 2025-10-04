@@ -12,14 +12,16 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DeployTriggerRequest(_message.Message):
-    __slots__ = ["id", "spec", "automation_spec"]
-    ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["name", "revision", "spec", "automation_spec"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    REVISION_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
-    id: _identifier_pb2.TriggerIdentifier
+    name: _identifier_pb2.TriggerName
+    revision: int
     spec: _trigger_definition_pb2.TriggerSpec
     automation_spec: _common_pb2.TriggerAutomationSpec
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_trigger_definition_pb2.TriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
+    def __init__(self, name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., revision: _Optional[int] = ..., spec: _Optional[_Union[_trigger_definition_pb2.TriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
 
 class DeployTriggerResponse(_message.Message):
     __slots__ = ["trigger"]
@@ -52,16 +54,18 @@ class GetTriggerRevisionDetailsResponse(_message.Message):
     def __init__(self, trigger: _Optional[_Union[_trigger_definition_pb2.TriggerDetails, _Mapping]] = ...) -> None: ...
 
 class ListTriggersRequest(_message.Message):
-    __slots__ = ["request", "org", "project_id", "task_id"]
+    __slots__ = ["request", "org", "project_id", "task_id", "task_name"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     project_id: _identifier_pb2.ProjectIdentifier
     task_id: _task_definition_pb2.TaskIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ...) -> None: ...
+    task_name: _task_definition_pb2.TaskName
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
 
 class ListTriggersResponse(_message.Message):
     __slots__ = ["triggers", "token"]
