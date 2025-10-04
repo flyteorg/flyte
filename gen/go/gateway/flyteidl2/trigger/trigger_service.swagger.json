@@ -1,0 +1,1430 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl2/trigger/trigger_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TriggerService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "BlobTypeBlobDimensionality": {
+      "type": "string",
+      "enum": [
+        "SINGLE",
+        "MULTIPART"
+      ],
+      "default": "SINGLE"
+    },
+    "FilterFunction": {
+      "type": "string",
+      "enum": [
+        "EQUAL",
+        "NOT_EQUAL",
+        "GREATER_THAN",
+        "GREATER_THAN_OR_EQUAL",
+        "LESS_THAN",
+        "LESS_THAN_OR_EQUAL",
+        "CONTAINS",
+        "VALUE_IN",
+        "ENDS_WITH",
+        "NOT_ENDS_WITH",
+        "CONTAINS_CASE_INSENSITIVE"
+      ],
+      "default": "EQUAL",
+      "description": " - CONTAINS: Case sensitive contains function.\n - CONTAINS_CASE_INSENSITIVE: Case insensitive contains function."
+    },
+    "SchemaColumnSchemaColumnType": {
+      "type": "string",
+      "enum": [
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION"
+      ],
+      "default": "INTEGER"
+    },
+    "SchemaTypeSchemaColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "A unique name -within the schema type- for the column"
+        },
+        "type": {
+          "$ref": "#/definitions/SchemaColumnSchemaColumnType",
+          "description": "The column type. This allows a limited set of types currently."
+        }
+      }
+    },
+    "SortDirection": {
+      "type": "string",
+      "enum": [
+        "DESCENDING",
+        "ASCENDING"
+      ],
+      "default": "DESCENDING",
+      "description": " - DESCENDING: By default, fields are sorted in descending order."
+    },
+    "StructuredDatasetTypeDatasetColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name within the schema type for the column."
+        },
+        "literal_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The column type."
+        }
+      }
+    },
+    "commonAppSpec": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        }
+      }
+    },
+    "commonApplication": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonApplicationIdentifier"
+        },
+        "spec": {
+          "$ref": "#/definitions/commonAppSpec"
+        }
+      }
+    },
+    "commonApplicationIdentifier": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string"
+        }
+      }
+    },
+    "commonClusterIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "commonDomain": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "$ref": "#/definitions/commonOrganization"
+        }
+      }
+    },
+    "commonEnrichedIdentity": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/commonUser"
+        },
+        "application": {
+          "$ref": "#/definitions/commonApplication"
+        }
+      }
+    },
+    "commonFilter": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "$ref": "#/definitions/FilterFunction"
+        },
+        "field": {
+          "type": "string",
+          "title": "e.g. name or version"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Only in the case of a VALUE_IN function, values may contain multiple entries."
+        }
+      }
+    },
+    "commonLaunchPlan": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        }
+      }
+    },
+    "commonListRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Indicates the number of resources to be returned.\n+required"
+        },
+        "token": {
+          "type": "string",
+          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
+        },
+        "sort_by": {
+          "$ref": "#/definitions/commonSort",
+          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonFilter"
+          },
+          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
+        },
+        "raw_filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
+        },
+        "sort_by_fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonSort"
+          },
+          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
+        }
+      }
+    },
+    "commonOrganization": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "commonPermission": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/commonResource"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flyteidl2commonAction"
+          }
+        }
+      },
+      "description": "Defines a set of allowed actions on a specific authorization resource."
+    },
+    "commonPolicy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonPolicyIdentifier"
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonPolicyBinding"
+          }
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional: human readable description"
+        }
+      },
+      "description": "A policy is a collection of roles bound to a resource."
+    },
+    "commonPolicyBinding": {
+      "type": "object",
+      "properties": {
+        "role_id": {
+          "$ref": "#/definitions/commonRoleIdentifier",
+          "description": "The role designates the permitted set of actions which can be applied to the resource."
+        },
+        "resource": {
+          "$ref": "#/definitions/commonResource"
+        }
+      },
+      "description": "A policy binding represents a role (a set of actions) defined on a resource."
+    },
+    "commonPolicyIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "title": "Unique name for this policy within the organization"
+        }
+      }
+    },
+    "commonProject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "$ref": "#/definitions/commonDomain"
+        }
+      }
+    },
+    "commonProjectIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "commonResource": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/commonOrganization"
+        },
+        "domain": {
+          "$ref": "#/definitions/commonDomain"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        },
+        "workflow": {
+          "$ref": "#/definitions/commonWorkflow"
+        },
+        "launch_plan": {
+          "$ref": "#/definitions/commonLaunchPlan"
+        },
+        "cluster": {
+          "$ref": "#/definitions/commonClusterIdentifier"
+        }
+      }
+    },
+    "commonRole": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonRoleIdentifier"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonPermission"
+          }
+        },
+        "role_spec": {
+          "$ref": "#/definitions/commonRoleSpec"
+        },
+        "role_type": {
+          "$ref": "#/definitions/commonRoleType"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flyteidl2commonAction"
+          }
+        }
+      }
+    },
+    "commonRoleIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "title": "Unique name for this role within the organization"
+        }
+      }
+    },
+    "commonRoleSpec": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Optional, human readable description for this role."
+        }
+      }
+    },
+    "commonRoleType": {
+      "type": "string",
+      "enum": [
+        "ROLE_TYPE_NONE",
+        "ROLE_TYPE_ADMIN",
+        "ROLE_TYPE_CONTRIBUTOR",
+        "ROLE_TYPE_VIEWER",
+        "ROLE_TYPE_CUSTOM",
+        "ROLE_TYPE_CLUSTER_MANAGER",
+        "ROLE_TYPE_FLYTE_PROJECT_ADMIN",
+        "ROLE_TYPE_SERVERLESS_VIEWER",
+        "ROLE_TYPE_SERVERLESS_CONTRIBUTOR",
+        "ROLE_TYPE_SUPPORT"
+      ],
+      "default": "ROLE_TYPE_NONE",
+      "description": "- ROLE_TYPE_NONE: Default group. Not used in practice.\n - ROLE_TYPE_ADMIN: The admin role has a collective set of permissions to do everything\n - ROLE_TYPE_CONTRIBUTOR: The contributor role has a collective set of permissions to view inventory, view executions, write inventory and create executions\n - ROLE_TYPE_VIEWER: The viewer role has a collective set of permissions to view inventory and view executions\n - ROLE_TYPE_CUSTOM: Represent a role with user-defined sets of permissions.\n - ROLE_TYPE_CLUSTER_MANAGER: The role with permissions to administer a specific customer cluster.\n - ROLE_TYPE_FLYTE_PROJECT_ADMIN: Role with permissions specific to administer flyte project(s).\n - ROLE_TYPE_SERVERLESS_VIEWER: The viewer role for serverless\n - ROLE_TYPE_SERVERLESS_CONTRIBUTOR: The contributor role for serverless\n - ROLE_TYPE_SUPPORT: The support role would have contributor permissions plus the access to support endpoints",
+      "title": "A role type is a short-hand for understanding the permissions associated with a role.\nBoilerplate role types include a conventional collection of permissions\nCustom role types include a user-defined collection of permissions"
+    },
+    "commonSort": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Indicates an attribute to sort the response values.\n+required"
+        },
+        "direction": {
+          "$ref": "#/definitions/SortDirection",
+          "title": "Indicates the direction to apply sort key for response values.\n+optional"
+        }
+      },
+      "description": "Specifies sort ordering in a list request."
+    },
+    "commonTriggerIdentifier": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/commonTriggerName"
+        },
+        "revision": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Revision of the trigger."
+        }
+      },
+      "title": "Identifies a trigger revision within an org, project and domain"
+    },
+    "commonTriggerName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this trigger belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this trigger belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this trigger belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the trigger."
+        },
+        "task_name": {
+          "type": "string"
+        }
+      },
+      "title": "Identifies trigger within an org, project and domain"
+    },
+    "commonUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonUserIdentifier"
+        },
+        "spec": {
+          "$ref": "#/definitions/commonUserSpec"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonRole"
+          }
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonPolicy"
+          }
+        }
+      },
+      "description": "Encapsulates user profile details for a member of an organization."
+    },
+    "commonUserIdentifier": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string"
+        }
+      }
+    },
+    "commonUserSpec": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "user_handle": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "photo_url": {
+          "type": "string"
+        }
+      }
+    },
+    "commonWorkflow": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        }
+      }
+    },
+    "coreBinary": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict."
+        },
+        "tag": {
+          "type": "string",
+          "description": "The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization."
+        }
+      },
+      "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
+    },
+    "coreBlob": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreBlobMetadata"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "description": "Refers to an offloaded set of files. It encapsulates the type of the store and a unique uri for where the data is.\nThere are no restrictions on how the uri is formatted since it will depend on how to interact with the store."
+    },
+    "coreBlobMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreBlobType"
+        }
+      }
+    },
+    "coreBlobType": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "title": "Format can be a free form string understood by SDK/UI etc like\ncsv, parquet etc"
+        },
+        "dimensionality": {
+          "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        }
+      },
+      "title": "Defines type behavior for blob objects"
+    },
+    "coreError": {
+      "type": "object",
+      "properties": {
+        "failed_node_id": {
+          "type": "string",
+          "description": "The node id that threw the error."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message thrown."
+        }
+      },
+      "description": "Represents an error thrown from a node."
+    },
+    "coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
+    "coreLiteral": {
+      "type": "object",
+      "properties": {
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "description": "A simple value."
+        },
+        "collection": {
+          "$ref": "#/definitions/coreLiteralCollection",
+          "description": "A collection of literals to allow nesting."
+        },
+        "map": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of strings to literals."
+        },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
+        },
+        "hash": {
+          "type": "string",
+          "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
+        }
+      },
+      "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
+    },
+    "coreLiteralCollection": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralMap": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralOffloadedMetadata": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The location of the offloaded core.Literal."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The size of the offloaded data."
+        },
+        "inferred_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The inferred literal type of the offloaded data."
+        }
+      },
+      "description": "A message that contains the metadata of the offloaded data."
+    },
+    "coreLiteralType": {
+      "type": "object",
+      "properties": {
+        "simple": {
+          "$ref": "#/definitions/coreSimpleType",
+          "description": "A simple type that can be compared one-to-one with another."
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchemaType",
+          "description": "A complex type that requires matching of inner fields."
+        },
+        "collection_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a collection. Only homogeneous collections are allowed."
+        },
+        "map_value_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a map type. The type of the key is always a string."
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlobType",
+          "description": "A blob might have specialized implementation details depending on associated metadata."
+        },
+        "enum_type": {
+          "$ref": "#/definitions/flyteidl2coreEnumType",
+          "description": "Defines an enum with pre-defined string values."
+        },
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "title": "Generalized schema support"
+        },
+        "union_type": {
+          "$ref": "#/definitions/coreUnionType",
+          "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
+        },
+        "annotation": {
+          "$ref": "#/definitions/coreTypeAnnotation",
+          "description": "This field contains arbitrary data that might have special semantic\nmeaning for the client but does not effect internal flyte behavior."
+        },
+        "structure": {
+          "$ref": "#/definitions/coreTypeStructure",
+          "description": "Hints to improve type matching."
+        }
+      },
+      "description": "Defines a strong type to allow type checking between interfaces."
+    },
+    "corePrimitive": {
+      "type": "object",
+      "properties": {
+        "integer": {
+          "type": "string",
+          "format": "int64"
+        },
+        "float_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "boolean": {
+          "type": "boolean"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        }
+      },
+      "title": "Primitive Types"
+    },
+    "coreScalar": {
+      "type": "object",
+      "properties": {
+        "primitive": {
+          "$ref": "#/definitions/corePrimitive"
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlob"
+        },
+        "binary": {
+          "$ref": "#/definitions/coreBinary"
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchema"
+        },
+        "none_type": {
+          "$ref": "#/definitions/coreVoid"
+        },
+        "error": {
+          "$ref": "#/definitions/coreError"
+        },
+        "generic": {
+          "type": "object"
+        },
+        "structured_dataset": {
+          "$ref": "#/definitions/coreStructuredDataset"
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnion"
+        }
+      }
+    },
+    "coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "coreSchemaType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SchemaTypeSchemaColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        }
+      },
+      "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
+    },
+    "coreSimpleType": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION",
+        "BINARY",
+        "ERROR",
+        "STRUCT"
+      ],
+      "default": "NONE",
+      "description": "Define a set of simple types."
+    },
+    "coreStructuredDataset": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the data is.\nShould start with the storage location (e.g. s3://, gs://, bq://, etc.)"
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreStructuredDatasetMetadata"
+        }
+      }
+    },
+    "coreStructuredDatasetMetadata": {
+      "type": "object",
+      "properties": {
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "description": "Bundle the type information along with the literal.\nThis is here because StructuredDatasets can often be more defined at run time than at compile time.\nThat is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,\nwithout any column information, but at run time, you might have that column information.\nflytekit python will copy this type information into the literal, from the type information, if not provided by\nthe various plugins (encoders).\nSince this field is run time generated, it's not used for any type checking."
+        }
+      }
+    },
+    "coreStructuredDatasetType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        },
+        "format": {
+          "type": "string",
+          "description": "This is the storage format, the format of the bits at rest\nparquet, feather, csv, etc.\nFor two types to be compatible, the format will need to be an exact match."
+        },
+        "external_schema_type": {
+          "type": "string",
+          "description": "This is a string representing the type that the bytes in external_schema_bytes are formatted in.\nThis is an optional field that will not be used for type checking."
+        },
+        "external_schema_bytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
+    },
+    "coreTypeAnnotation": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "description": "A arbitrary JSON payload to describe a type."
+        }
+      },
+      "description": "TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs."
+    },
+    "coreTypeStructure": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "Must exactly match for types to be castable"
+        },
+        "dataclass_type": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "title": "dataclass_type only exists for dataclasses.\nThis is used to resolve the type of the fields of dataclass\nThe key is the field name, and the value is the literal type of the field\ne.g. For dataclass Foo, with fields a, and a is a string\nFoo.a will be resolved as a literal type of string from dataclass_type"
+        }
+      },
+      "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
+    },
+    "coreUnion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      },
+      "description": "The runtime representation of a tagged union value. See `UnionType` for more details."
+    },
+    "coreUnionType": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "description": "Predefined set of variants in union."
+        }
+      },
+      "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
+    },
+    "coreVoid": {
+      "type": "object",
+      "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "flyteidl2commonAction": {
+      "type": "string",
+      "enum": [
+        "ACTION_NONE",
+        "ACTION_CREATE",
+        "ACTION_READ",
+        "ACTION_UPDATE",
+        "ACTION_DELETE",
+        "ACTION_VIEW_FLYTE_INVENTORY",
+        "ACTION_VIEW_FLYTE_EXECUTIONS",
+        "ACTION_REGISTER_FLYTE_INVENTORY",
+        "ACTION_CREATE_FLYTE_EXECUTIONS",
+        "ACTION_ADMINISTER_PROJECT",
+        "ACTION_MANAGE_PERMISSIONS",
+        "ACTION_ADMINISTER_ACCOUNT",
+        "ACTION_MANAGE_CLUSTER",
+        "ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES",
+        "ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES",
+        "ACTION_EDIT_UNUSED_ATTRIBUTES",
+        "ACTION_SUPPORT_SYSTEM_LOGS"
+      ],
+      "default": "ACTION_NONE",
+      "title": "- ACTION_VIEW_FLYTE_INVENTORY: Read Flyte workflows, tasks and launch plans\n - ACTION_VIEW_FLYTE_EXECUTIONS: View Flyte executions\n - ACTION_REGISTER_FLYTE_INVENTORY: Register new versions of Flyte workflows, tasks and launch plans\n - ACTION_CREATE_FLYTE_EXECUTIONS: Create new Flyte workflow and task executions\n - ACTION_ADMINISTER_PROJECT: Create new projects and update project descriptions\n - ACTION_MANAGE_PERMISSIONS: Add users, roles and update role assignments.\n - ACTION_ADMINISTER_ACCOUNT: Manage billing, account-wide settings\n - ACTION_MANAGE_CLUSTER: Operations for clusters\n - ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE\n - ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT\n - ACTION_EDIT_UNUSED_ATTRIBUTES: Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE\n - ACTION_SUPPORT_SYSTEM_LOGS: View system logs"
+    },
+    "flyteidl2coreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code]."
+        },
+        "message": {
+          "type": "string",
+          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client."
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use."
+        }
+      },
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "taskAnnotations": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom annotations to be applied to the execution resource."
+        }
+      },
+      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
+    },
+    "taskEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
+    "taskFixedRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/taskFixedRateUnit"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        }
+      },
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
+    },
+    "taskFixedRateUnit": {
+      "type": "string",
+      "enum": [
+        "FIXED_RATE_UNIT_UNSPECIFIED",
+        "FIXED_RATE_UNIT_MINUTE",
+        "FIXED_RATE_UNIT_HOUR",
+        "FIXED_RATE_UNIT_DAY"
+      ],
+      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
+      "description": "Represents a frequency at which to run a schedule."
+    },
+    "taskInputs": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskNamedLiteral"
+          },
+          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
+        }
+      },
+      "description": "Input payload for an action."
+    },
+    "taskLabels": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom labels to be applied to the execution resource."
+        }
+      },
+      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
+    },
+    "taskNamedLiteral": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the literal."
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Literal value."
+        }
+      },
+      "description": "Named literal value."
+    },
+    "taskRunSpec": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "$ref": "#/definitions/taskLabels",
+          "description": "Labels to apply to the run."
+        },
+        "annotations": {
+          "$ref": "#/definitions/taskAnnotations",
+          "description": "Annotations to apply to the run."
+        },
+        "envs": {
+          "$ref": "#/definitions/taskEnvs",
+          "description": "Envs to apply to the run."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cluster": {
+          "type": "string",
+          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        }
+      }
+    },
+    "taskSchedule": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/taskFixedRate",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "cron_expression": {
+          "type": "string"
+        },
+        "kickoff_time_input_arg": {
+          "type": "string",
+          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        }
+      },
+      "description": "Defines complete set of information required to trigger an execution on a schedule."
+    },
+    "taskTaskIdentifier": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this task belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this task belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the task."
+        }
+      },
+      "description": "TaskIdentifier is the unique identifier for a task."
+    },
+    "taskTriggerAutomationSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpecType",
+          "description": "Explicitly defines trigger automation type."
+        },
+        "schedule": {
+          "$ref": "#/definitions/taskSchedule"
+        }
+      }
+    },
+    "taskTriggerAutomationSpecType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_NONE",
+        "TYPE_SCHEDULE"
+      ],
+      "default": "TYPE_UNSPECIFIED",
+      "description": "Specifies type of the automation attached to trigger if any."
+    },
+    "triggerDeleteTriggersResponse": {
+      "type": "object",
+      "description": "Response message for activating or deactivating multiple triggers."
+    },
+    "triggerDeployTriggerResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/triggerTriggerDetails"
+        }
+      },
+      "description": "Response message for saving a trigger."
+    },
+    "triggerGetTriggerDetailsResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/triggerTriggerDetails"
+        }
+      },
+      "description": "Response message for saving a trigger."
+    },
+    "triggerGetTriggerRevisionDetailsResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/triggerTriggerDetails"
+        }
+      },
+      "description": "Response message for saving a trigger."
+    },
+    "triggerGetTriggerRevisionHistoryResponse": {
+      "type": "object",
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/triggerTriggerRevision"
+          },
+          "description": "List of triggers matching the filter criteria."
+        },
+        "token": {
+          "type": "string",
+          "description": "Token for fetching the next page of results, if any."
+        }
+      }
+    },
+    "triggerListTriggersResponse": {
+      "type": "object",
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/triggerTrigger"
+          },
+          "description": "List of triggers matching the filter criteria."
+        },
+        "token": {
+          "type": "string",
+          "description": "Token for fetching the next page of results, if any."
+        }
+      },
+      "description": "Response message for listing triggers."
+    },
+    "triggerTrigger": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonTriggerIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/triggerTriggerMetadata"
+        },
+        "status": {
+          "$ref": "#/definitions/triggerTriggerStatus"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
+        }
+      },
+      "title": "Light-weight information about trigger for a list view"
+    },
+    "triggerTriggerDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonTriggerIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/triggerTriggerMetadata"
+        },
+        "spec": {
+          "$ref": "#/definitions/triggerTriggerSpec"
+        },
+        "status": {
+          "$ref": "#/definitions/triggerTriggerStatus"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "description": "Optional automation spec."
+        }
+      },
+      "title": "Full details about a trigger stored in DB"
+    },
+    "triggerTriggerMetadata": {
+      "type": "object",
+      "properties": {
+        "deployed_by": {
+          "$ref": "#/definitions/commonEnrichedIdentity",
+          "title": "Identity that last deployed the trigger"
+        },
+        "updated_by": {
+          "$ref": "#/definitions/commonEnrichedIdentity",
+          "title": "Identity that last activated or deactivated the trigger"
+        }
+      }
+    },
+    "triggerTriggerRevision": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonTriggerIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/triggerTriggerMetadata"
+        },
+        "status": {
+          "$ref": "#/definitions/triggerTriggerStatus"
+        },
+        "action": {
+          "$ref": "#/definitions/triggerTriggerRevisionAction"
+        }
+      },
+      "title": "Light-weight information about a single trigger revision"
+    },
+    "triggerTriggerRevisionAction": {
+      "type": "string",
+      "enum": [
+        "TRIGGER_REVISION_ACTION_UNSPECIFIED",
+        "TRIGGER_REVISION_ACTION_DEPLOY",
+        "TRIGGER_REVISION_ACTION_ACTIVATE",
+        "TRIGGER_REVISION_ACTION_DEACTIVATE",
+        "TRIGGER_REVISION_ACTION_DELETE"
+      ],
+      "default": "TRIGGER_REVISION_ACTION_UNSPECIFIED",
+      "title": "Stores human- and machine-friendly explanation of what changed in the revision"
+    },
+    "triggerTriggerSpec": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "$ref": "#/definitions/taskTaskIdentifier",
+          "description": "Identifies which task to trigger."
+        },
+        "inputs": {
+          "$ref": "#/definitions/taskInputs",
+          "description": "Inputs for triggered task."
+        },
+        "run_spec": {
+          "$ref": "#/definitions/taskRunSpec",
+          "description": "The run spec for triggered task."
+        },
+        "active": {
+          "type": "boolean",
+          "title": "Whether trigger is active"
+        },
+        "task_version": {
+          "type": "string",
+          "title": "Task version together with trigger name will give us the unique task id"
+        }
+      }
+    },
+    "triggerTriggerStatus": {
+      "type": "object",
+      "properties": {
+        "deployed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The first time trigger was deployed."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The last time the trigger was updated."
+        },
+        "triggered_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The last time the trigger fired."
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time trigger was deleted."
+        }
+      }
+    },
+    "triggerUpdateTriggersResponse": {
+      "type": "object",
+      "title": "Response message for updating some trigger spec fields for multiple triggers"
+    }
+  }
+}

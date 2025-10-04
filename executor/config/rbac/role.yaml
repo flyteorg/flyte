@@ -1,0 +1,32 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - flyte.org.flyte.org
+  resources:
+  - taskactions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - flyte.org.flyte.org
+  resources:
+  - taskactions/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - flyte.org.flyte.org
+  resources:
+  - taskactions/status
+  verbs:
+  - get
+  - patch
+  - update

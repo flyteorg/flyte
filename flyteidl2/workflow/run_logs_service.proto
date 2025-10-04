@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// RunLogsService provides an interface for streaming logs.
+service RunLogsService {
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+// Request message for tailing logs.
+message TailLogsRequest {
+  // The action id.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Reponse message for tailing logs.
+message TailLogsResponse {
+  // A batch of logs.
+  message Logs {
+    // Structured log lines.
+    repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+  }
+
+  // One or more batches of logs.
+  repeated Logs logs = 1;
+}
