@@ -103,9 +103,13 @@ type Action struct {
 	TraceSpec     datatypes.JSON
 	ConditionSpec datatypes.JSON
 
+	// State (JSON serialized NodeStatus)
+	State datatypes.JSON
+
 	// Input/Output references
 	InputURI      *string
 	RunOutputBase *string
+	OutputURI     *string
 
 	// Timestamps
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP"`

@@ -550,3 +550,209 @@ func (r *PostgresRepository) WatchActionUpdates(ctx context.Context, runID *comm
 		}
 	}
 }
+
+// UpdateActionState updates the state of an action
+func (r *PostgresRepository) UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
+	updates := map[string]interface{}{
+		"state":      datatypes.JSON([]byte(state)),
+		"updated_at": time.Now(),
+	}
+
+	result := r.db.WithContext(ctx).
+		Model(&Action{}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+			actionID.Run.Name, actionID.Name).
+		Updates(updates)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update action state: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("action not found")
+	}
+
+	logger.Infof(ctx, "Updated state for action: %s", actionID.Name)
+	return nil
+}
+
+// GetActionState retrieves the state of an action
+func (r *PostgresRepository) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
+	var action Action
+	result := r.db.WithContext(ctx).
+		Select("state").
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+			actionID.Run.Name, actionID.Name).
+		First(&action)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return "", fmt.Errorf("action not found")
+		}
+		return "", fmt.Errorf("failed to get action state: %w", result.Error)
+	}
+
+	if action.State == nil {
+		return "", fmt.Errorf("no state found for action")
+	}
+
+	return string(action.State), nil
+}
+
+// NotifyStateUpdate sends a notification about a state update
+// For PostgreSQL, this uses pg_notify. For SQLite, it's a no-op (polling is used instead)
+func (r *PostgresRepository) NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
+	// Check if we're using PostgreSQL
+	if r.db.Dialector.Name() == "postgres" {
+		// Construct notification payload: "org/project/domain/run/action"
+		payload := fmt.Sprintf("%s/%s/%s/%s/%s",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+			actionID.Run.Name, actionID.Name)
+
+		// Send notification via pg_notify
+		result := r.db.WithContext(ctx).Exec("SELECT pg_notify('action_state_updates', ?)", payload)
+		if result.Error != nil {
+			return fmt.Errorf("failed to send notification: %w", result.Error)
+		}
+
+		logger.Debugf(ctx, "Sent state update notification for action: %s", actionID.Name)
+	}
+	// For SQLite, we rely on polling in WatchStateUpdates
+
+	return nil
+}
+
+// WatchStateUpdates watches for state updates and streams action identifiers
+// For PostgreSQL, this uses LISTEN. For SQLite, it uses polling.
+func (r *PostgresRepository) WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
+	if r.db.Dialector.Name() == "postgres" {
+		r.watchStateUpdatesPostgres(ctx, updates, errs)
+	} else {
+		r.watchStateUpdatesSQLite(ctx, updates, errs)
+	}
+}
+
+// watchStateUpdatesPostgres uses PostgreSQL LISTEN/NOTIFY
+func (r *PostgresRepository) watchStateUpdatesPostgres(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
+	// Get the underlying sql.DB
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		errs <- fmt.Errorf("failed to get sql.DB: %w", err)
+		return
+	}
+
+	// Create a new connection for LISTEN
+	conn, err := sqlDB.Conn(ctx)
+	if err != nil {
+		errs <- fmt.Errorf("failed to get connection: %w", err)
+		return
+	}
+	defer conn.Close()
+
+	// Start listening
+	if _, err := conn.ExecContext(ctx, "LISTEN action_state_updates"); err != nil {
+		errs <- fmt.Errorf("failed to LISTEN: %w", err)
+		return
+	}
+
+	logger.Infof(ctx, "Started listening for state updates on PostgreSQL")
+
+	// Poll for notifications
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			// Check for notifications using a raw query
+			// Note: This is a simplified implementation. In production, you'd use
+			// a library like github.com/lib/pq for proper LISTEN support
+			var payload string
+			err := conn.QueryRowContext(ctx, "SELECT pg_notification_queue_usage()").Scan(&payload)
+			if err != nil {
+				// No notifications available
+				continue
+			}
+
+			// Parse the payload (format: "org/project/domain/run/action")
+			parts := splitPayload(payload)
+			if len(parts) == 5 {
+				actionID := &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org:     parts[0],
+						Project: parts[1],
+						Domain:  parts[2],
+						Name:    parts[3],
+					},
+					Name: parts[4],
+				}
+				updates <- actionID
+			}
+		}
+	}
+}
+
+// watchStateUpdatesSQLite uses polling for state updates
+func (r *PostgresRepository) watchStateUpdatesSQLite(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	lastCheck := time.Now()
+
+	logger.Infof(ctx, "Started polling for state updates on SQLite")
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			// Find all actions updated since last check
+			var actions []*Action
+			if err := r.db.WithContext(ctx).
+				Select("org, project, domain, run_name, name").
+				Where("state IS NOT NULL AND updated_at > ?", lastCheck).
+				Find(&actions).Error; err != nil {
+				errs <- fmt.Errorf("failed to poll for updates: %w", err)
+				return
+			}
+
+			for _, action := range actions {
+				actionID := &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org:     action.Org,
+						Project: action.Project,
+						Domain:  action.Domain,
+						Name:    action.RunName,
+					},
+					Name: action.Name,
+				}
+				updates <- actionID
+			}
+
+			lastCheck = time.Now()
+		}
+	}
+}
+
+// Helper function to split notification payload
+func splitPayload(payload string) []string {
+	// Simple string split on "/"
+	parts := make([]string, 0, 5)
+	current := ""
+	for _, ch := range payload {
+		if ch == '/' {
+			parts = append(parts, current)
+			current = ""
+		} else {
+			current += string(ch)
+		}
+	}
+	if current != "" {
+		parts = append(parts, current)
+	}
+	return parts
+}

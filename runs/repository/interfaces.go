@@ -38,4 +38,12 @@ type Repository interface {
 	// Watch operations (for streaming)
 	WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Run, errs chan<- error)
 	WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Action, errs chan<- error)
+
+	// State operations
+	UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error
+	GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error)
+
+	// Event notification (for state updates)
+	NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error
+	WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error)
 }

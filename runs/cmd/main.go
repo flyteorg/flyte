@@ -86,15 +86,23 @@ func serve(ctx context.Context) error {
 	)
 	logger.Infof(ctx, "Queue service client configured for: %s", cfg.QueueServiceURL)
 
-	// Create service
+	// Create services
 	runsSvc := service.NewRunService(repo, queueClient)
+	stateSvc := service.NewStateService(repo)
 
 	// Setup HTTP server with Connect handlers
 	mux := http.NewServeMux()
 
 	// Mount the Run Service
-	path, handler := workflowconnect.NewRunServiceHandler(runsSvc)
-	mux.Handle(path, handler)
+	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
+	mux.Handle(runsPath, runsHandler)
+
+	// Mount the State Service
+	statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
+	mux.Handle(statePath, stateHandler)
+
+	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
+	logger.Infof(ctx, "Mounted StateService at %s", statePath)
 
 	// Add health check endpoint
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
