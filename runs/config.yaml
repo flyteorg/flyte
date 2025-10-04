@@ -1,0 +1,28 @@
+# Runs Service Configuration
+
+runs:
+  server:
+    host: "0.0.0.0"
+    port: 8090
+  watchBufferSize: 100
+
+database:
+  # Option 1: Use SQLite (easier for testing, no setup required)
+  sqlite:
+    file: "./runs.db"
+
+  # Option 2: Use PostgreSQL (comment out sqlite above and uncomment below)
+  # postgres:
+  #   host: "localhost"
+  #   port: 5432
+  #   dbname: "flyte_runs"
+  #   username: "postgres"
+  #   password: "postgres"
+  #   extraOptions: "sslmode=disable"
+  # maxIdleConnections: 10
+  # maxOpenConnections: 100
+  # connMaxLifeTime: 1h
+
+logger:
+  level: 4  # Info level
+  show-source: true

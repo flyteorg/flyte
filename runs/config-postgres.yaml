@@ -1,0 +1,24 @@
+# Runs Service Configuration - PostgreSQL
+
+runs:
+  server:
+    host: "0.0.0.0"
+    port: 8090
+  watchBufferSize: 100
+
+database:
+  # Using PostgreSQL
+  postgres:
+    host: "localhost"
+    port: 5433
+    dbname: "flyte_runs"
+    username: "postgres"
+    password: "postgres"
+    extraOptions: "sslmode=disable"
+  maxIdleConnections: 10
+  maxOpenConnections: 100
+  connMaxLifeTime: 1h
+
+logger:
+  level: 4  # Info level
+  show-source: true
