@@ -7,25 +7,18 @@ import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { ActionIdentifier, RunIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
-import type { LiteralType } from "../core/types_pb.ts";
-import { file_flyteidl2_core_types } from "../core/types_pb.ts";
-import type { OutputReferences } from "../task/common_pb.ts";
 import { file_flyteidl2_task_common } from "../task/common_pb.ts";
 import type { RunSpec } from "../task/run_pb.ts";
 import { file_flyteidl2_task_run } from "../task/run_pb.ts";
-import type { TaskIdentifier, TaskSpec, TraceSpec } from "../task/task_definition_pb.ts";
-import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
-import type { Phase } from "./run_definition_pb.ts";
+import type { ConditionAction, TaskAction, TraceAction } from "./run_definition_pb.ts";
 import { file_flyteidl2_workflow_run_definition } from "./run_definition_pb.ts";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/workflow/queue_service.proto.
  */
 export const file_flyteidl2_workflow_queue_service: GenFile = /*@__PURE__*/
-  fileDesc("CiZmbHl0ZWlkbDIvd29ya2Zsb3cvcXVldWVfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93IsEDChRFbnF1ZXVlQWN0aW9uUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIpCghydW5fc3BlYxgDIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSGgoJaW5wdXRfdXJpGAYgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgHIAEoCUIHukgEcgIQARINCgVncm91cBgIIAEoCRIPCgdzdWJqZWN0GAkgASgJEi4KBHRhc2sYCiABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAsgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAwgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUiqgEKClRhc2tBY3Rpb24SKgoCaWQYASABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllchIuCgRzcGVjGAIgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNCBrpIA8gBARIvCgljYWNoZV9rZXkYAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSDwoHY2x1c3RlchgEIAEoCSKiAgoLVHJhY2VBY3Rpb24SFQoEbmFtZRgBIAEoCUIHukgEcgIQARIoCgVwaGFzZRgCIAEoDjIZLmZseXRlaWRsMi53b3JrZmxvdy5QaGFzZRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIxCgdvdXRwdXRzGAUgASgLMiAuZmx5dGVpZGwyLnRhc2suT3V0cHV0UmVmZXJlbmNlcxIvCgRzcGVjGAYgASgLMhkuZmx5dGVpZGwyLnRhc2suVHJhY2VTcGVjQga6SAPIAQFCCwoJX2VuZF90aW1lItMBCg9Db25kaXRpb25BY3Rpb24SFQoEbmFtZRgBIAEoCUIHukgEcgIQARIZCgZydW5faWQYAiABKAlCB7pIBHICEAFIABIcCglhY3Rpb25faWQYAyABKAlCB7pIBHICEAFIABIQCgZnbG9iYWwYBCABKAhIABIpCgR0eXBlGAYgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUSDgoGcHJvbXB0GAcgASgJEhMKC2Rlc2NyaXB0aW9uGAggASgJQg4KBXNjb3BlEgW6SAIIASIXChVFbnF1ZXVlQWN0aW9uUmVzcG9uc2UicAoVQWJvcnRRdWV1ZWRSdW5SZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEhMKBnJlYXNvbhgCIAEoCUgAiAEBQgkKB19yZWFzb24iGAoWQWJvcnRRdWV1ZWRSdW5SZXNwb25zZSJ5ChhBYm9ydFF1ZXVlZEFjdGlvblJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIbChlBYm9ydFF1ZXVlZEFjdGlvblJlc3BvbnNlMtUCCgxRdWV1ZVNlcnZpY2USZgoNRW5xdWV1ZUFjdGlvbhIoLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVzcG9uc2UiABJpCg5BYm9ydFF1ZXVlZFJ1bhIpLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZFJ1blJlcXVlc3QaKi5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXNwb25zZSIAEnIKEUFib3J0UXVldWVkQWN0aW9uEiwuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UXVldWVkQWN0aW9uUmVxdWVzdBotLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZEFjdGlvblJlc3BvbnNlIgBCzgEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCEVF1ZXVlU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_types, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("CiZmbHl0ZWlkbDIvd29ya2Zsb3cvcXVldWVfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93IsEDChRFbnF1ZXVlQWN0aW9uUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIpCghydW5fc3BlYxgDIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSGgoJaW5wdXRfdXJpGAYgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgHIAEoCUIHukgEcgIQARINCgVncm91cBgIIAEoCRIPCgdzdWJqZWN0GAkgASgJEi4KBHRhc2sYCiABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAsgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAwgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUiFwoVRW5xdWV1ZUFjdGlvblJlc3BvbnNlInAKFUFib3J0UXVldWVkUnVuUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIhgKFkFib3J0UXVldWVkUnVuUmVzcG9uc2UieQoYQWJvcnRRdWV1ZWRBY3Rpb25SZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhMKBnJlYXNvbhgCIAEoCUgAiAEBQgkKB19yZWFzb24iGwoZQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZTLVAgoMUXVldWVTZXJ2aWNlEmYKDUVucXVldWVBY3Rpb24SKC5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlc3BvbnNlIgASaQoOQWJvcnRRdWV1ZWRSdW4SKS5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRSdW5SZXF1ZXN0GiouZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UXVldWVkUnVuUmVzcG9uc2UiABJyChFBYm9ydFF1ZXVlZEFjdGlvbhIsLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZEFjdGlvblJlcXVlc3QaLS5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZSIAQs4BChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhFRdWV1ZVNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition]);
 
 /**
  * request message for queuing an action.
@@ -115,178 +108,6 @@ export const EnqueueActionRequestSchema: GenMessage<EnqueueActionRequest> = /*@_
   messageDesc(file_flyteidl2_workflow_queue_service, 0);
 
 /**
- * @generated from message flyteidl2.workflow.TaskAction
- */
-export type TaskAction = Message<"flyteidl2.workflow.TaskAction"> & {
-  /**
-   * a unique identifier for the task this action is associated with, if applicable.
-   *
-   * @generated from field: flyteidl2.task.TaskIdentifier id = 1;
-   */
-  id?: TaskIdentifier;
-
-  /**
-   * the definition of the task to be executed.
-   *
-   * @generated from field: flyteidl2.task.TaskSpec spec = 2;
-   */
-  spec?: TaskSpec;
-
-  /**
-   * Enables caching when set and specifies the cache version to use.
-   *
-   * @generated from field: google.protobuf.StringValue cache_key = 3;
-   */
-  cacheKey?: string;
-
-  /**
-   * the specific cluster that this action should be executed on. if not set, the cluster from the
-   * `RunSpec` will be used.
-   *
-   * @generated from field: string cluster = 4;
-   */
-  cluster: string;
-};
-
-/**
- * Describes the message flyteidl2.workflow.TaskAction.
- * Use `create(TaskActionSchema)` to create a new message.
- */
-export const TaskActionSchema: GenMessage<TaskAction> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 1);
-
-/**
- * TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
- * by the local worker. This can be used to bring determinism to code that's otherwise not deterministic (e.g. current
- * time).
- *
- * @generated from message flyteidl2.workflow.TraceAction
- */
-export type TraceAction = Message<"flyteidl2.workflow.TraceAction"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * Last known phase.
-   *
-   * @generated from field: flyteidl2.workflow.Phase phase = 2;
-   */
-  phase: Phase;
-
-  /**
-   * Time the attempt started.
-   *
-   * @generated from field: google.protobuf.Timestamp start_time = 3;
-   */
-  startTime?: Timestamp;
-
-  /**
-   * Time the attempt ended, if applicable.
-   *
-   * @generated from field: optional google.protobuf.Timestamp end_time = 4;
-   */
-  endTime?: Timestamp;
-
-  /**
-   * Output references.
-   *
-   * @generated from field: flyteidl2.task.OutputReferences outputs = 5;
-   */
-  outputs?: OutputReferences;
-
-  /**
-   * Task spec for the trace, useful for the typed interface inside.
-   *
-   * @generated from field: flyteidl2.task.TraceSpec spec = 6;
-   */
-  spec?: TraceSpec;
-};
-
-/**
- * Describes the message flyteidl2.workflow.TraceAction.
- * Use `create(TraceActionSchema)` to create a new message.
- */
-export const TraceActionSchema: GenMessage<TraceAction> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 2);
-
-/**
- * ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
- * await a signal from an external system and can carry a value.
- *
- * @generated from message flyteidl2.workflow.ConditionAction
- */
-export type ConditionAction = Message<"flyteidl2.workflow.ConditionAction"> & {
-  /**
-   * Name is the unique identifier for the action. It must be unique within the defined scope below.
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * @generated from oneof flyteidl2.workflow.ConditionAction.scope
-   */
-  scope: {
-    /**
-     * RunId is the unique identifier for the run this action is associated with.
-     *
-     * @generated from field: string run_id = 2;
-     */
-    value: string;
-    case: "runId";
-  } | {
-    /**
-     * ActionId is the unique identifier for the action this action is associated with.
-     *
-     * @generated from field: string action_id = 3;
-     */
-    value: string;
-    case: "actionId";
-  } | {
-    /**
-     * Global indicates the condition is global and can be used across all runs and actions.
-     *
-     * @generated from field: bool global = 4;
-     */
-    value: boolean;
-    case: "global";
-  } | { case: undefined; value?: undefined };
-
-  /**
-   * Type is the type of the value the condition is expected. This can be used to properly render
-   * a UI element for the condition or validate when a value is received that it is of the expected
-   * type.
-   *
-   * @generated from field: flyteidl2.core.LiteralType type = 6;
-   */
-  type?: LiteralType;
-
-  /**
-   * Prompt is the prompt that will be shown to the user when the condition is awaited.
-   *
-   * @generated from field: string prompt = 7;
-   */
-  prompt: string;
-
-  /**
-   * Description is a description of the condition. This can be used to provide additional
-   * information to the user about the condition.
-   *
-   * @generated from field: string description = 8;
-   */
-  description: string;
-};
-
-/**
- * Describes the message flyteidl2.workflow.ConditionAction.
- * Use `create(ConditionActionSchema)` to create a new message.
- */
-export const ConditionActionSchema: GenMessage<ConditionAction> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 3);
-
-/**
  * response message for queuing an action.
  *
  * @generated from message flyteidl2.workflow.EnqueueActionResponse
@@ -299,7 +120,7 @@ export type EnqueueActionResponse = Message<"flyteidl2.workflow.EnqueueActionRes
  * Use `create(EnqueueActionResponseSchema)` to create a new message.
  */
 export const EnqueueActionResponseSchema: GenMessage<EnqueueActionResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 4);
+  messageDesc(file_flyteidl2_workflow_queue_service, 1);
 
 /**
  * request message for aborting a run.
@@ -327,7 +148,7 @@ export type AbortQueuedRunRequest = Message<"flyteidl2.workflow.AbortQueuedRunRe
  * Use `create(AbortQueuedRunRequestSchema)` to create a new message.
  */
 export const AbortQueuedRunRequestSchema: GenMessage<AbortQueuedRunRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 5);
+  messageDesc(file_flyteidl2_workflow_queue_service, 2);
 
 /**
  * response message for aborting a run.
@@ -342,7 +163,7 @@ export type AbortQueuedRunResponse = Message<"flyteidl2.workflow.AbortQueuedRunR
  * Use `create(AbortQueuedRunResponseSchema)` to create a new message.
  */
 export const AbortQueuedRunResponseSchema: GenMessage<AbortQueuedRunResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 6);
+  messageDesc(file_flyteidl2_workflow_queue_service, 3);
 
 /**
  * @generated from message flyteidl2.workflow.AbortQueuedActionRequest
@@ -368,7 +189,7 @@ export type AbortQueuedActionRequest = Message<"flyteidl2.workflow.AbortQueuedAc
  * Use `create(AbortQueuedActionRequestSchema)` to create a new message.
  */
 export const AbortQueuedActionRequestSchema: GenMessage<AbortQueuedActionRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 7);
+  messageDesc(file_flyteidl2_workflow_queue_service, 4);
 
 /**
  * @generated from message flyteidl2.workflow.AbortQueuedActionResponse
@@ -381,7 +202,7 @@ export type AbortQueuedActionResponse = Message<"flyteidl2.workflow.AbortQueuedA
  * Use `create(AbortQueuedActionResponseSchema)` to create a new message.
  */
 export const AbortQueuedActionResponseSchema: GenMessage<AbortQueuedActionResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_queue_service, 8);
+  messageDesc(file_flyteidl2_workflow_queue_service, 5);
 
 /**
  * provides an interface for managing execution of runs over a collection of workers.
