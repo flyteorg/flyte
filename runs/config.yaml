@@ -5,6 +5,7 @@ runs:
     host: "0.0.0.0"
     port: 8090
   watchBufferSize: 100
+  queueServiceUrl: "http://localhost:8089"
 
 database:
   # Option 1: Use SQLite (easier for testing, no setup required)

@@ -79,8 +79,15 @@ func serve(ctx context.Context) error {
 	// Create repository
 	repo := repository.NewPostgresRepository(db)
 
+	// Create queue service client
+	queueClient := workflowconnect.NewQueueServiceClient(
+		http.DefaultClient,
+		cfg.QueueServiceURL,
+	)
+	logger.Infof(ctx, "Queue service client configured for: %s", cfg.QueueServiceURL)
+
 	// Create service
-	runsSvc := service.NewRunService(repo)
+	runsSvc := service.NewRunService(repo, queueClient)
 
 	// Setup HTTP server with Connect handlers
 	mux := http.NewServeMux()

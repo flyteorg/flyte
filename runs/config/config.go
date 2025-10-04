@@ -15,6 +15,7 @@ var defaultConfig = &Config{
 		Host: "0.0.0.0",
 	},
 	WatchBufferSize: 100,
+	QueueServiceURL: "http://localhost:8089",
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -29,6 +30,9 @@ type Config struct {
 
 	// Watch/streaming settings
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
+
+	// Queue service URL for enqueuing actions
+	QueueServiceURL string `json:"queueServiceUrl" pflag:",URL of the queue service"`
 }
 
 // ServerConfig holds HTTP server configuration

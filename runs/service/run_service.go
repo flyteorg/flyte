@@ -15,12 +15,16 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo repository.Repository
+	repo        repository.Repository
+	queueClient workflowconnect.QueueServiceClient
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo repository.Repository) *RunService {
-	return &RunService{repo: repo}
+func NewRunService(repo repository.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
+	return &RunService{
+		repo:        repo,
+		queueClient: queueClient,
+	}
 }
 
 // Ensure we implement the interface
@@ -46,19 +50,57 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	// Enqueue the root action to the queue service
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     run.Org,
+			Project: run.Project,
+			Domain:  run.Domain,
+			Name:    run.Name,
+		},
+		Name: run.RootActionName,
+	}
+
+	// Build EnqueueActionRequest from CreateRunRequest
+	enqueueReq := &workflow.EnqueueActionRequest{
+		ActionId:      actionID,
+		RunSpec:       req.Msg.RunSpec,
+		InputUri:      buildInputURI(run),
+		RunOutputBase: buildRunOutputBase(run),
+	}
+
+	// Set the spec based on the task type in CreateRunRequest
+	switch taskSpec := req.Msg.Task.(type) {
+	case *workflow.CreateRunRequest_TaskSpec:
+		enqueueReq.Spec = &workflow.EnqueueActionRequest_Task{
+			Task: &workflow.TaskAction{
+				Spec: taskSpec.TaskSpec,
+			},
+		}
+	case *workflow.CreateRunRequest_TaskId:
+		enqueueReq.Spec = &workflow.EnqueueActionRequest_Task{
+			Task: &workflow.TaskAction{
+				Id: taskSpec.TaskId,
+			},
+		}
+	}
+
+	// Call queue service to enqueue the root action
+	_, err = s.queueClient.EnqueueAction(ctx, connect.NewRequest(enqueueReq))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
+		// Note: We don't fail the CreateRun if enqueue fails - the run is already created
+		// In production, you might want to mark the run as failed or retry the enqueue
+		logger.Warnf(ctx, "Run %s created but failed to enqueue root action", run.Name)
+	} else {
+		logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
+	}
+
 	// Build response (simplified - you'd convert the full Run model)
 	resp := &workflow.CreateRunResponse{
 		Run: &workflow.Run{
 			Action: &workflow.Action{
-				Id: &common.ActionIdentifier{
-					Run: &common.RunIdentifier{
-						Org:     run.Org,
-						Project: run.Project,
-						Domain:  run.Domain,
-						Name:    run.Name,
-					},
-					Name: run.RootActionName,
-				},
+				Id: actionID,
 			},
 		},
 	}
@@ -437,4 +479,18 @@ func (s *RunService) WatchClusterEvents(
 	// TODO: Watch for new events
 	<-ctx.Done()
 	return nil
+}
+
+// Helper functions
+
+// buildInputURI generates the input URI for the root action
+func buildInputURI(run *repository.Run) string {
+	// TODO: In production, this should be a real storage path (e.g., s3://bucket/inputs/org/project/domain/run)
+	return ""
+}
+
+// buildRunOutputBase generates the output base path for the run
+func buildRunOutputBase(run *repository.Run) string {
+	// TODO: In production, this should be a real storage path (e.g., s3://bucket/outputs/org/project/domain/run)
+	return ""
 }
