@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	"github.com/flyteorg/flyte/v2/executor/internal/controller"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -61,6 +61,7 @@ func main() {
 	var probeAddr string
 	var secureMetrics bool
 	var enableHTTP2 bool
+	var stateServiceURL string
 	var tlsOpts []func(*tls.Config)
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -79,6 +80,8 @@ func main() {
 	flag.StringVar(&metricsCertKey, "metrics-cert-key", "tls.key", "The name of the metrics server key file.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
+	flag.StringVar(&stateServiceURL, "state-service-url", "http://localhost:8090",
+		"The URL of the State Service for reporting action state updates")
 	opts := zap.Options{
 		Development: true,
 	}
@@ -178,13 +181,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (&controller.TaskActionReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	if err := controller.NewTaskActionReconciler(
+		mgr.GetClient(),
+		mgr.GetScheme(),
+		stateServiceURL,
+	).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TaskAction")
 		os.Exit(1)
 	}
+	setupLog.Info("TaskActionReconciler configured", "state-service-url", stateServiceURL)
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

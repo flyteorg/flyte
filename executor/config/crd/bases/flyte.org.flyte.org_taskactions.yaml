@@ -117,6 +117,18 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              message:
+                description: Message provides additional information about the current
+                  state
+                type: string
+              phase:
+                description: Phase represents the current phase of the TaskAction
+                  execution
+                type: string
+              stateJson:
+                description: StateJSON is the JSON serialized NodeStatus that was
+                  last sent to the State Service
+                type: string
             type: object
         required:
         - spec

@@ -25,7 +25,7 @@ __pycache__/
 .python-version
 dist/
 dist
-*.db
+**/*.db
 vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/

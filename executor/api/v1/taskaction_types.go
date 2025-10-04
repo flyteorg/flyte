@@ -69,6 +69,18 @@ type TaskActionStatus struct {
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 
+	// Phase represents the current phase of the TaskAction execution
+	// +optional
+	Phase string `json:"phase,omitempty"`
+
+	// StateJSON is the JSON serialized NodeStatus that was last sent to the State Service
+	// +optional
+	StateJSON string `json:"stateJson,omitempty"`
+
+	// Message provides additional information about the current state
+	// +optional
+	Message string `json:"message,omitempty"`
+
 	// conditions represent the current state of the TaskAction resource.
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
 	//
