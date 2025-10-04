@@ -12,16 +12,16 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"gorm.io/gorm"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	queueconfig "github.com/flyteorg/flyte/v2/queue/config"
-	"github.com/flyteorg/flyte/v2/queue/migrations"
-	"github.com/flyteorg/flyte/v2/queue/repository"
+	"github.com/flyteorg/flyte/v2/queue/k8s"
 	"github.com/flyteorg/flyte/v2/queue/service"
 )
 
@@ -57,31 +57,29 @@ func serve(ctx context.Context) error {
 	if err := logger.SetConfig(logConfig); err != nil {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
-	// Logger is already initialized via SetConfig
 
 	logger.Infof(ctx, "Starting Queue Service")
 
 	// Get configuration
 	cfg := queueconfig.GetConfig()
-	dbCfg := database.GetConfig()
 
-	// Initialize database
-	db, err := initDB(ctx, dbCfg)
+	// Initialize Kubernetes client
+	k8sClient, err := initKubernetesClient(ctx, &cfg.Kubernetes)
 	if err != nil {
-		return fmt.Errorf("failed to initialize database: %w", err)
+		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
 	}
 
-	// Run migrations
-	logger.Infof(ctx, "Running database migrations")
-	if err := migrations.RunMigrations(db); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
+	// Initialize the executor API scheme
+	if err := k8s.InitScheme(); err != nil {
+		return fmt.Errorf("failed to initialize scheme: %w", err)
 	}
 
-	// Create repository
-	repo := repository.NewPostgresRepository(db)
+	// Create queue client
+	queueClient := k8s.NewQueueClient(k8sClient, cfg.Kubernetes.Namespace)
+	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
 
 	// Create service
-	queueSvc := service.NewQueueService(repo)
+	queueSvc := service.NewQueueService(queueClient)
 
 	// Setup HTTP server with Connect handlers
 	mux := http.NewServeMux()
@@ -98,18 +96,7 @@ func serve(ctx context.Context) error {
 
 	// Add readiness check endpoint
 	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
-		// Check database connection
-		sqlDB, err := db.DB()
-		if err != nil {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte("Database connection error"))
-			return
-		}
-		if err := sqlDB.Ping(); err != nil {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte("Database ping failed"))
-			return
-		}
+		// Queue service is always ready (no database to check)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
@@ -163,15 +150,41 @@ func initConfig() error {
 	return configAccessor.UpdateConfig(context.Background())
 }
 
-func initDB(ctx context.Context, cfg *database.DbConfig) (*gorm.DB, error) {
-	logCfg := logger.GetConfig()
+func initKubernetesClient(ctx context.Context, cfg *queueconfig.KubernetesConfig) (client.Client, error) {
+	var restConfig *rest.Config
+	var err error
 
-	// Use flytestdlib's GetDB which handles both SQLite and PostgreSQL
-	db, err := database.GetDB(ctx, cfg, logCfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	if cfg.KubeConfig != "" {
+		// Use explicitly configured kubeconfig file
+		logger.Infof(ctx, "Using kubeconfig from: %s", cfg.KubeConfig)
+		restConfig, err = clientcmd.BuildConfigFromFlags("", cfg.KubeConfig)
+	} else {
+		// Try in-cluster config first
+		logger.Infof(ctx, "Attempting to use in-cluster Kubernetes configuration")
+		restConfig, err = rest.InClusterConfig()
+
+		if err != nil {
+			// Fall back to default kubeconfig location
+			logger.Infof(ctx, "In-cluster config not available, falling back to default kubeconfig")
+			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+			configOverrides := &clientcmd.ConfigOverrides{}
+			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+			restConfig, err = kubeConfig.ClientConfig()
+
+			if err != nil {
+				return nil, fmt.Errorf("failed to get Kubernetes config (tried in-cluster and default kubeconfig): %w", err)
+			}
+
+			logger.Infof(ctx, "Using default kubeconfig from standard locations (~/.kube/config)")
+		}
 	}
 
-	logger.Infof(ctx, "Database connection established")
-	return db, nil
+	// Create the controller-runtime client
+	k8sClient, err := client.New(restConfig, client.Options{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Kubernetes client: %w", err)
+	}
+
+	logger.Infof(ctx, "Kubernetes client initialized successfully")
+	return k8sClient, nil
 }

@@ -8,23 +8,23 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/queue/repository"
+	"github.com/flyteorg/flyte/v2/queue/k8s"
 )
 
 // QueueService implements the QueueServiceHandler interface
 type QueueService struct {
-	repo repository.Repository
+	k8sClient *k8s.QueueClient
 }
 
 // NewQueueService creates a new QueueService instance
-func NewQueueService(repo repository.Repository) *QueueService {
-	return &QueueService{repo: repo}
+func NewQueueService(k8sClient *k8s.QueueClient) *QueueService {
+	return &QueueService{k8sClient: k8sClient}
 }
 
 // Ensure we implement the interface
 var _ workflowconnect.QueueServiceHandler = (*QueueService)(nil)
 
-// EnqueueAction queues a new action for execution
+// EnqueueAction creates a TaskAction CR in Kubernetes
 func (s *QueueService) EnqueueAction(
 	ctx context.Context,
 	req *connect.Request[workflow.EnqueueActionRequest],
@@ -42,16 +42,16 @@ func (s *QueueService) EnqueueAction(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Persist to database
-	if err := s.repo.EnqueueAction(ctx, req.Msg); err != nil {
-		logger.Errorf(ctx, "Failed to enqueue action: %v", err)
+	// Create TaskAction CR in Kubernetes
+	if err := s.k8sClient.EnqueueAction(ctx, req.Msg); err != nil {
+		logger.Errorf(ctx, "Failed to create TaskAction CR: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	return connect.NewResponse(&workflow.EnqueueActionResponse{}), nil
 }
 
-// AbortQueuedRun aborts a queued run
+// AbortQueuedRun deletes all TaskAction CRs for a run
 func (s *QueueService) AbortQueuedRun(
 	ctx context.Context,
 	req *connect.Request[workflow.AbortQueuedRunRequest],
@@ -68,14 +68,8 @@ func (s *QueueService) AbortQueuedRun(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Get reason or use default
-	reason := "User requested abort"
-	if req.Msg.Reason != nil {
-		reason = *req.Msg.Reason
-	}
-
-	// Abort in database
-	if err := s.repo.AbortQueuedRun(ctx, req.Msg.RunId, reason); err != nil {
+	// Delete all TaskAction CRs for this run
+	if err := s.k8sClient.AbortQueuedRun(ctx, req.Msg.RunId, req.Msg.Reason); err != nil {
 		logger.Errorf(ctx, "Failed to abort queued run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -83,7 +77,7 @@ func (s *QueueService) AbortQueuedRun(
 	return connect.NewResponse(&workflow.AbortQueuedRunResponse{}), nil
 }
 
-// AbortQueuedAction aborts a queued action
+// AbortQueuedAction deletes a specific TaskAction CR
 func (s *QueueService) AbortQueuedAction(
 	ctx context.Context,
 	req *connect.Request[workflow.AbortQueuedActionRequest],
@@ -101,14 +95,8 @@ func (s *QueueService) AbortQueuedAction(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Get reason or use default
-	reason := "User requested abort"
-	if req.Msg.Reason != nil {
-		reason = *req.Msg.Reason
-	}
-
-	// Abort in database
-	if err := s.repo.AbortQueuedAction(ctx, req.Msg.ActionId, reason); err != nil {
+	// Delete the TaskAction CR
+	if err := s.k8sClient.AbortQueuedAction(ctx, req.Msg.ActionId, req.Msg.Reason); err != nil {
 		logger.Errorf(ctx, "Failed to abort queued action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
