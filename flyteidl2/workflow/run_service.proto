@@ -97,6 +97,9 @@ message CreateRunRequest {
 
   // The run spec to use.
   task.RunSpec run_spec = 5;
+
+  // True when run is created by some automation(schedule, webhook, etc.)
+  bool from_automation = 8;
 }
 
 // Response message for creating a run.
