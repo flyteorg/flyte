@@ -134,25 +134,26 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	// Replace namespace last, in case it was embedded in other templates
 	val = namespaceRegex.ReplaceAllString(val, params.TaskExecMetadata.GetNamespace())
 
-	inputs, err := params.Inputs.Get(ctx)
-	if err != nil {
-		return val, errors.Wrapf(err, "unable to read inputs")
-	}
-	if inputs == nil || inputs.Literals == nil {
-		return val, nil
-	}
-
 	var errs ErrorCollection
-	val = inputVarRegex.ReplaceAllStringFunc(val, func(s string) string {
-		matches := inputVarRegex.FindAllStringSubmatch(s, 1)
-		varName := matches[0][1]
-		replaced, err := transformVarNameToStringVal(ctx, varName, inputs)
+	if inputVarRegex.MatchString(val) {
+		inputs, err := params.Inputs.Get(ctx)
 		if err != nil {
-			errs.Errors = append(errs.Errors, errors.Wrapf(err, "input template [%s]", s))
-			return ""
+			return val, errors.Wrapf(err, "unable to read inputs")
 		}
-		return replaced
-	})
+		if inputs == nil || inputs.Literals == nil {
+			return val, nil
+		}
+		val = inputVarRegex.ReplaceAllStringFunc(val, func(s string) string {
+			matches := inputVarRegex.FindAllStringSubmatch(s, 1)
+			varName := matches[0][1]
+			replaced, err := transformVarNameToStringVal(ctx, varName, inputs)
+			if err != nil {
+				errs.Errors = append(errs.Errors, errors.Wrapf(err, "input template [%s]", s))
+				return ""
+			}
+			return replaced
+		})
+	}
 
 	if len(errs.Errors) > 0 {
 		return "", errs
