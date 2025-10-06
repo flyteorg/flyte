@@ -18,25 +18,13 @@ type Repository interface {
 	// Action operations
 	CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*Action, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*Action, error)
-	GetActionWithAttempts(ctx context.Context, actionID *common.ActionIdentifier) (*Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*Action, string, error)
 	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
-	// Action attempt operations
-	CreateActionAttempt(ctx context.Context, actionID uint, attemptNumber uint) (*ActionAttempt, error)
-	GetLatestAttempt(ctx context.Context, actionID uint) (*ActionAttempt, error)
-	UpdateAttempt(ctx context.Context, attemptID uint, updates map[string]interface{}) error
-
-	// Cluster events
-	AddClusterEvent(ctx context.Context, attemptID uint, occurredAt string, message string) error
-	GetClusterEvents(ctx context.Context, actionID *common.ActionIdentifier, attemptNumber uint) ([]*ClusterEvent, error)
-
-	// Phase transitions
-	AddPhaseTransition(ctx context.Context, attemptID uint, phase string, startTime string, endTime *string) error
-
 	// Watch operations (for streaming)
 	WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Run, errs chan<- error)
+	WatchAllRunUpdates(ctx context.Context, updates chan<- *Run, errs chan<- error)
 	WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Action, errs chan<- error)
 
 	// State operations

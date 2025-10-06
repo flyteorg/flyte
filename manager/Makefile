@@ -4,11 +4,11 @@
 build:
 	go build -o bin/flyte-manager cmd/main.go
 
-run: build # Run the manager
-	./bin/flyte-manager --config config.yaml
+run: # Run the manager
+	go run cmd/main.go --config config.yaml
 
-run-client: # Run the manager
-	go run client/main.go
+run-testclient: # Run the manager
+	go run testclient/main.go
 
 # Clean build artifacts
 clean:

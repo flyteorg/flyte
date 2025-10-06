@@ -83,7 +83,7 @@ curl http://localhost:8089/readyz
 
 # Run the test client
 cd queue
-go run client/main.go
+go run testclient/main.go
 ```
 
 Expected output:

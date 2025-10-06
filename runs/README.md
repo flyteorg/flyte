@@ -130,7 +130,7 @@ make test
 go run cmd/main.go --config config.yaml
 
 # Terminal 2: Run the test client
-go run client/main.go
+go run testclient/main.go
 ```
 
 **Or use make:**
@@ -370,7 +370,7 @@ runs/
 make build
 
 # Build client
-make build-client
+make build-testclient
 
 # Clean artifacts
 make clean

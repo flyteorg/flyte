@@ -13,8 +13,8 @@ run: build
 	./bin/queue-service serve --config config.yaml
 
 # Run the test client
-run-client:
-	go run client/main.go
+run-testclient:
+	go run testclient/main.go
 
 # Start PostgreSQL in Docker
 docker-postgres:

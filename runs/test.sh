@@ -46,7 +46,7 @@ fi
 # Check if the client binary exists
 if [ ! -f "bin/runs-client" ]; then
     echo "📦 Building test client..."
-    go build -o bin/runs-client ./client/main.go
+    go build -o bin/runs-testclient ./testclient/main.go
     echo "✓ Build complete"
     echo
 fi
@@ -93,7 +93,7 @@ echo
 # Run the test client
 echo "🧪 Running test client..."
 echo
-./bin/runs-client
+./bin/runs-testclient
 TEST_RESULT=$?
 
 echo

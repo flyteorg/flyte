@@ -6,7 +6,7 @@ build:
 
 # Build the client
 build-client:
-	go build -o bin/runs-client client/main.go
+	go build -o bin/runs-client testclient/main.go
 
 # Run tests
 test:
@@ -21,7 +21,7 @@ run-postgres: build
 	./bin/runs-service --config config-postgres.yaml
 
 # Run the test client
-run-client: build-client
+run-testclient: build-client
 	./bin/runs-client
 
 # Start PostgreSQL in Docker

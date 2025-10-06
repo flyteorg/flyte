@@ -63,7 +63,7 @@ echo
 # Run the test client
 echo "🧪 Running test client..."
 echo
-cd .. && go run queue/client/main.go
+cd .. && go run queue/testclient/main.go
 TEST_RESULT=$?
 cd queue
 

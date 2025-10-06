@@ -58,7 +58,7 @@ func (s *RunService) CreateRun(
 			Domain:  run.Domain,
 			Name:    run.Name,
 		},
-		Name: run.RootActionName,
+		Name: run.Name, // For root actions, action name = run name
 	}
 
 	// Build EnqueueActionRequest from CreateRunRequest
@@ -179,7 +179,7 @@ func (s *RunService) GetActionDetails(
 	}
 
 	// Get action from database
-	action, err := s.repo.GetActionWithAttempts(ctx, req.Msg.ActionId)
+	action, err := s.repo.GetAction(ctx, req.Msg.ActionId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get action: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
@@ -217,7 +217,7 @@ func (s *RunService) GetActionData(
 
 	// Return URIs only (not actual data)
 	resp := &workflow.GetActionDataResponse{
-		Inputs:  &task.Inputs{}, // Would populate from action.InputURI
+		Inputs:  &task.Inputs{},  // Would populate from action.InputURI
 		Outputs: &task.Outputs{}, // Would populate from outputs
 	}
 
@@ -256,7 +256,7 @@ func (s *RunService) ListRuns(
 						Domain:  run.Domain,
 						Name:    run.Name,
 					},
-					Name: run.RootActionName,
+					Name: run.Name, // For root actions, action name = run name
 				},
 			},
 		}
@@ -304,7 +304,7 @@ func (s *RunService) ListActions(
 					Org:     action.Org,
 					Project: action.Project,
 					Domain:  action.Domain,
-					Name:    action.RunName,
+					Name:    action.GetRunName(),
 				},
 				Name: action.Name,
 			},
@@ -410,7 +410,7 @@ func (s *RunService) WatchActionDetails(
 	logger.Infof(ctx, "Received WatchActionDetails request")
 
 	// Send initial state
-	action, err := s.repo.GetActionWithAttempts(ctx, req.Msg.ActionId)
+	action, err := s.repo.GetAction(ctx, req.Msg.ActionId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
@@ -440,9 +440,59 @@ func (s *RunService) WatchRuns(
 ) error {
 	logger.Infof(ctx, "Received WatchRuns request")
 
-	// TODO: Implement actual streaming with filtering
-	<-ctx.Done()
-	return nil
+	// Step 1: Send existing runs that match filter
+	listReq := s.convertWatchRequestToListRequest(req.Msg)
+
+	runs, _, err := s.repo.ListRuns(ctx, listReq)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to list runs: %v", err)
+		// Continue even if list fails - still watch for new updates
+	} else if len(runs) > 0 {
+		// Send existing runs
+		protoRuns := make([]*workflow.Run, len(runs))
+		for i, run := range runs {
+			protoRuns[i] = s.convertRunToProto(run)
+		}
+
+		if err := stream.Send(&workflow.WatchRunsResponse{
+			Runs: protoRuns,
+		}); err != nil {
+			return err
+		}
+	}
+
+	// Step 2: Watch for run updates using repository notifications
+	// Create channels for receiving updates
+	updatesCh := make(chan *repository.Run, 10)
+	errsCh := make(chan error, 1)
+
+	// Start watching for updates in a goroutine
+	go s.repo.WatchAllRunUpdates(ctx, updatesCh, errsCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+
+		case err := <-errsCh:
+			logger.Errorf(ctx, "Error watching runs: %v", err)
+			return err
+
+		case run := <-updatesCh:
+			// Filter the run based on the watch request criteria
+			if !s.runMatchesFilter(run, req.Msg) {
+				continue
+			}
+
+			// Convert and send the updated run
+			protoRun := s.convertRunToProto(run)
+			if err := stream.Send(&workflow.WatchRunsResponse{
+				Runs: []*workflow.Run{protoRun},
+			}); err != nil {
+				return err
+			}
+		}
+	}
 }
 
 // WatchActions streams action updates for a run
@@ -451,11 +501,54 @@ func (s *RunService) WatchActions(
 	req *connect.Request[workflow.WatchActionsRequest],
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	logger.Infof(ctx, "Received WatchActions request")
+	logger.Infof(ctx, "Received WatchActions request for run: %s", req.Msg.RunId.Name)
 
-	// TODO: Implement actual streaming
-	<-ctx.Done()
-	return nil
+	// Step 1: Send existing actions for this run
+	actions, _, err := s.repo.ListActions(ctx, req.Msg.RunId, 100, "")
+	if err != nil {
+		logger.Errorf(ctx, "Failed to list actions: %v", err)
+		// Continue even if list fails - still watch for new updates
+	} else if len(actions) > 0 {
+		// Send existing actions
+		enrichedActions := make([]*workflow.EnrichedAction, len(actions))
+		for i, action := range actions {
+			enrichedActions[i] = s.convertActionToEnrichedProto(action)
+		}
+
+		if err := stream.Send(&workflow.WatchActionsResponse{
+			EnrichedActions: enrichedActions,
+		}); err != nil {
+			return err
+		}
+	}
+
+	// Step 2: Watch for action updates using repository notifications
+	// Create channels for receiving updates
+	updatesCh := make(chan *repository.Action, 10)
+	errsCh := make(chan error, 1)
+
+	// Start watching for updates in a goroutine
+	go s.repo.WatchActionUpdates(ctx, req.Msg.RunId, updatesCh, errsCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+
+		case err := <-errsCh:
+			logger.Errorf(ctx, "Error watching actions: %v", err)
+			return err
+
+		case action := <-updatesCh:
+			// Convert and send the updated action
+			enrichedAction := s.convertActionToEnrichedProto(action)
+			if err := stream.Send(&workflow.WatchActionsResponse{
+				EnrichedActions: []*workflow.EnrichedAction{enrichedAction},
+			}); err != nil {
+				return err
+			}
+		}
+	}
 }
 
 // WatchClusterEvents streams cluster events for an action attempt
@@ -466,17 +559,13 @@ func (s *RunService) WatchClusterEvents(
 ) error {
 	logger.Infof(ctx, "Received WatchClusterEvents request")
 
-	// Get existing cluster events
-	events, err := s.repo.GetClusterEvents(ctx, req.Msg.Id, uint(req.Msg.Attempt))
-	if err != nil {
-		return connect.NewError(connect.CodeNotFound, err)
-	}
+	// TODO: Implement cluster events watching
+	// Cluster events are now stored in ActionDetails JSON
+	// Need to:
+	// 1. Get action using s.repo.GetAction(ctx, req.Msg.Id)
+	// 2. Unmarshal action.ActionDetails to extract cluster events for the specified attempt
+	// 3. Send existing events and watch for updates
 
-	// Send existing events
-	// TODO: Convert repository events to proto format
-	_ = events
-
-	// TODO: Watch for new events
 	<-ctx.Done()
 	return nil
 }
@@ -493,4 +582,134 @@ func buildInputURI(run *repository.Run) string {
 func buildRunOutputBase(run *repository.Run) string {
 	// TODO: In production, this should be a real storage path (e.g., s3://bucket/outputs/org/project/domain/run)
 	return ""
+}
+
+// convertRunToProto converts a repository Run to a proto Run
+func (s *RunService) convertRunToProto(run *repository.Run) *workflow.Run {
+	if run == nil {
+		return nil
+	}
+
+	// Build the action identifier from the run
+	runID := &common.RunIdentifier{
+		Org:     run.Org,
+		Project: run.Project,
+		Domain:  run.Domain,
+		Name:    run.Name,
+	}
+
+	// Create the root action with status
+	action := &workflow.Action{
+		Id: &common.ActionIdentifier{
+			Run:  runID,
+			Name: run.Name, // For root actions, action name = run name
+		},
+		Metadata: &workflow.ActionMetadata{
+			// TODO: Extract from ActionSpec JSON if needed
+		},
+		Status: &workflow.ActionStatus{
+			Phase: workflow.Phase(workflow.Phase_value[run.Phase]),
+			// TODO: Extract timestamps, error, etc. from ActionDetails JSON
+		},
+	}
+
+	return &workflow.Run{
+		Action: action,
+	}
+}
+
+// convertActionToEnrichedProto converts a repository Action to an EnrichedAction proto
+func (s *RunService) convertActionToEnrichedProto(action *repository.Action) *workflow.EnrichedAction {
+	if action == nil {
+		return nil
+	}
+
+	// Build the action identifier
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     action.Org,
+			Project: action.Project,
+			Domain:  action.Domain,
+			Name:    action.GetRunName(),
+		},
+		Name: action.Name,
+	}
+
+	// Build the action status
+	actionStatus := &workflow.ActionStatus{
+		Phase: workflow.Phase(workflow.Phase_value[action.Phase]),
+	}
+
+	// Build the action proto
+	actionProto := &workflow.Action{
+		Id:     actionID,
+		Status: actionStatus,
+	}
+
+	return &workflow.EnrichedAction{
+		Action:      actionProto,
+		MeetsFilter: true, // For now, all actions meet the filter
+	}
+}
+
+// convertWatchRequestToListRequest converts a WatchRunsRequest to a ListRunsRequest
+func (s *RunService) convertWatchRequestToListRequest(req *workflow.WatchRunsRequest) *workflow.ListRunsRequest {
+	listReq := &workflow.ListRunsRequest{
+		Request: &common.ListRequest{
+			Limit: 100,
+		},
+	}
+
+	// Convert the target filter to the appropriate ListRuns scope
+	switch target := req.Target.(type) {
+	case *workflow.WatchRunsRequest_Org:
+		listReq.ScopeBy = &workflow.ListRunsRequest_Org{
+			Org: target.Org,
+		}
+	case *workflow.WatchRunsRequest_ClusterId:
+		// Cluster filtering not directly supported in ListRuns, will filter client-side
+		// Could be added to ListRuns if needed
+	case *workflow.WatchRunsRequest_ProjectId:
+		listReq.ScopeBy = &workflow.ListRunsRequest_ProjectId{
+			ProjectId: target.ProjectId,
+		}
+	case *workflow.WatchRunsRequest_TaskId:
+		// Task filtering not directly supported in ListRuns, will filter client-side
+		// Could be added to ListRuns if needed
+	}
+
+	return listReq
+}
+
+// runMatchesFilter checks if a run matches the WatchRunsRequest filter criteria
+func (s *RunService) runMatchesFilter(run *repository.Run, req *workflow.WatchRunsRequest) bool {
+	if req.Target == nil {
+		// No filter, all runs match
+		return true
+	}
+
+	switch target := req.Target.(type) {
+	case *workflow.WatchRunsRequest_Org:
+		return run.Org == target.Org
+
+	case *workflow.WatchRunsRequest_ClusterId:
+		// TODO: Add cluster field to Run model if needed
+		// For now, accept all runs
+		return true
+
+	case *workflow.WatchRunsRequest_ProjectId:
+		return run.Org == target.ProjectId.Organization &&
+			run.Project == target.ProjectId.Name &&
+			run.Domain == target.ProjectId.Domain
+
+	case *workflow.WatchRunsRequest_TaskId:
+		// TODO: Need to check if the run was triggered by this task
+		// This would require storing task_id in the Run model or querying actions
+		// For now, accept all runs
+		return true
+
+	default:
+		// Unknown filter, accept all runs
+		return true
+	}
 }

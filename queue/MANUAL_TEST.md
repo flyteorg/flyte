@@ -60,7 +60,7 @@ curl http://localhost:8089/readyz
 
 ```bash
 cd /Users/haytham/src/github.com/flyteorg/flyte
-go run queue/client/main.go
+go run queue/testclient/main.go
 ```
 
 Expected output:
@@ -106,15 +106,6 @@ WHERE status = 'aborted';
 ## Alternative: Use SQLite for Quick Testing
 
 If PostgreSQL setup is complex, you can modify the code to use SQLite instead:
-
-1. Update `queue/config.yaml`:
-```yaml
-database:
-  sqlite:
-    file: "./queue.db"
-```
-
-2. Update `queue/cmd/main.go` to use SQLite (if needed)
 
 ## Troubleshooting
 

@@ -181,7 +181,7 @@ kubectl get taskaction <name> -n flyte -o yaml | grep -A 5 ownerReferences
 
 ```bash
 # Run the test client
-go run client/main.go
+go run testclient/main.go
 ```
 
 Expected flow:

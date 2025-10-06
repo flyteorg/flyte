@@ -18,11 +18,14 @@ package controller
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
+	"golang.org/x/net/http2"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -45,10 +48,17 @@ type TaskActionReconciler struct {
 
 // NewTaskActionReconciler creates a new TaskActionReconciler with initialized clients
 func NewTaskActionReconciler(c client.Client, scheme *runtime.Scheme, stateServiceURL string) *TaskActionReconciler {
-	// Create HTTP/2 client for buf connect
+	// Create HTTP/2 cleartext (h2c) client for buf connect
+	// This is required because the state service uses h2c (HTTP/2 without TLS)
 	httpClient := &http.Client{
-		Transport: &http.Transport{
-			ForceAttemptHTTP2: true,
+		Transport: &http2.Transport{
+			// Allow HTTP/2 without TLS (h2c)
+			AllowHTTP: true,
+			// Use HTTP/2 dialer
+			DialTLSContext: func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
+				// Dial without TLS for h2c
+				return net.Dial(network, addr)
+			},
 		},
 	}
 
@@ -105,6 +115,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	var nextPhase string
 	var requeueAfter time.Duration
 
+	//time.Sleep(2 * time.Second)
 	switch currentPhase {
 	case "":
 		// New TaskAction - transition to Queued

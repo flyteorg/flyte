@@ -124,8 +124,8 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 		for _, run := range msg.Runs {
 			if run.Action != nil && run.Action.Id != nil && run.Action.Id.Run != nil {
 				runID := run.Action.Id.Run
-				log.Printf("📥 [WatchRuns] Run Update: %s (org: %s, project: %s, domain: %s)",
-					runID.Name, runID.Org, runID.Project, runID.Domain)
+				log.Printf("📥 [WatchRuns] Run Update: %s (org: %s, project: %s, domain: %s. Action0 Phase: %v)",
+					runID.Name, runID.Org, runID.Project, runID.Domain, run.GetAction().GetStatus().GetPhase())
 			}
 		}
 	}

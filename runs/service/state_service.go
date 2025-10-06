@@ -339,23 +339,15 @@ func (s *StateService) actionToUpdate(action *repository.Action) *workflow.Actio
 				Org:     action.Org,
 				Project: action.Project,
 				Domain:  action.Domain,
-				Name:    action.RunName,
+				Name:    action.GetRunName(),
 			},
 			Name: action.Name,
 		},
 		Phase: s.stringToPhase(action.Phase),
 	}
 
-	// Add output URI if available
-	if action.OutputURI != nil {
-		update.OutputUri = *action.OutputURI
-	}
-
-	// Add error if available
-	if action.ErrorKind != nil && action.ErrorMessage != nil {
-		// Note: This is simplified - in production, you'd properly construct ExecutionError
-		// from the error fields in the action
-	}
+	// TODO: Extract output URI and error info from ActionDetails JSON
+	// This would require unmarshaling action.ActionDetails and extracting the fields
 
 	return update
 }
