@@ -157,8 +157,8 @@ func PhaseInfoSkip(info *ExecutionInfo, reason string) PhaseInfo {
 	return phaseInfo(EPhaseSkip, nil, info, reason)
 }
 
-func PhaseInfoTimedOut(info *ExecutionInfo, reason string) PhaseInfo {
-	return phaseInfo(EPhaseTimedout, nil, info, reason)
+func PhaseInfoTimedOut(info *ExecutionInfo, err *core.ExecutionError, reason string) PhaseInfo {
+	return phaseInfo(EPhaseTimedout, err, info, reason)
 }
 
 func PhaseInfoRecovered(info *ExecutionInfo) PhaseInfo {

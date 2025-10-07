@@ -1466,7 +1466,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 		{
 			name:              "retries-exhausted",
 			phaseInfo:         handler.PhaseInfoRunning(nil),
-			expectedPhase:     handler.EPhaseFailed,
+			expectedPhase:     handler.EPhaseTimedout,
 			activeDeadline:    time.Second * 15,
 			executionDeadline: time.Second * 5,
 			retries:           1,

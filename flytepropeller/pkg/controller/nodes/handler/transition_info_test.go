@@ -96,10 +96,11 @@ func TestPhaseInfo(t *testing.T) {
 
 	t.Run("timeout", func(t *testing.T) {
 		i := &ExecutionInfo{}
-		p := PhaseInfoTimedOut(i, "reason")
+		executionErr := &core.ExecutionError{Code: "TimeoutExpired", Message: "task timed out", Kind: core.ExecutionError_USER}
+		p := PhaseInfoTimedOut(i, executionErr, "reason")
 		assert.Equal(t, EPhaseTimedout, p.GetPhase())
 		assert.Equal(t, i, p.GetInfo())
-		assert.Nil(t, p.GetErr())
+		assert.Equal(t, executionErr, p.GetErr())
 		assert.NotNil(t, p.GetOccurredAt())
 		assert.Equal(t, "reason", p.GetReason())
 	})

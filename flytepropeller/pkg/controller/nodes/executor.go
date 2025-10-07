@@ -56,6 +56,7 @@ import (
 )
 
 const cacheSerializedReason = "waiting on serialized cache"
+const timeoutExpired = "TimeoutExpired"
 
 type nodeMetrics struct {
 	Scope                         promutils.Scope
@@ -854,7 +855,8 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 		}
 		if isTimeoutExpired(nodeStatus.GetQueuedAt(), activeDeadline) {
 			logger.Infof(ctx, "Node has timed out; timeout configured: %v", activeDeadline)
-			return handler.PhaseInfoTimedOut(nil, fmt.Sprintf("task active timeout [%s] expired", activeDeadline.String())), nil
+			executionErr := &core.ExecutionError{Code: timeoutExpired, Message: fmt.Sprintf("task active timeout [%s] expired", activeDeadline.String()), Kind: core.ExecutionError_USER}
+			return handler.PhaseInfoTimedOut(nil, executionErr, fmt.Sprintf("task active timeout [%s] expired", activeDeadline.String())), nil
 		}
 
 		// Execution timeout is a retry-able error
@@ -864,7 +866,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 		}
 		if isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
 			logger.Infof(ctx, "Current execution for the node timed out; timeout configured: %v", executionDeadline)
-			executionErr := &core.ExecutionError{Code: "TimeoutExpired", Message: fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), Kind: core.ExecutionError_USER}
+			executionErr := &core.ExecutionError{Code: timeoutExpired, Message: fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), Kind: core.ExecutionError_USER}
 			phase = handler.PhaseInfoRetryableFailureErr(executionErr, nil)
 		}
 	}
@@ -872,6 +874,13 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 	if phase.GetPhase() == handler.EPhaseRetryableFailure {
 		currentAttempt, maxAttempts, isEligible := c.isEligibleForRetry(nCtx, nodeStatus, phase.GetErr())
 		if !isEligible {
+			if phase.GetErr() != nil && phase.GetErr().Code == timeoutExpired {
+				return handler.PhaseInfoTimedOut(
+					phase.GetInfo(),
+					phase.GetErr(),
+					fmt.Sprintf("[%d/%d] currentAttempt done. Last Error: %s::%s", currentAttempt, maxAttempts, phase.GetErr().Kind.String(), phase.GetErr().Message),
+				), nil
+			}
 			return handler.PhaseInfoFailure(
 				core.ExecutionError_USER,
 				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().Code),
