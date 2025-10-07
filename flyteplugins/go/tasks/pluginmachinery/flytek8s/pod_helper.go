@@ -126,7 +126,7 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 // Specialized merging of overrides into a base *core.ExtendedResources object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.
-func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
+func ApplyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
 	// Handle case where base might be nil
 	var new *core.ExtendedResources
 	if base == nil {
@@ -209,16 +209,8 @@ func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedM
 }
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
-	// Short circuit if pod spec does not contain any containers that use GPUs
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
-	requiresGPUs := false
-	for _, cnt := range podSpec.Containers {
-		if _, ok := cnt.Resources.Limits[gpuResourceName]; ok {
-			requiresGPUs = true
-			break
-		}
-	}
-	if !requiresGPUs {
+	// Short circuit if pod spec does not contain any containers that use accelerators
+	if !podRequiresAccelerator(podSpec) {
 		return
 	}
 
@@ -227,19 +219,21 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 	}
 
 	// Apply changes for GPU device
-	device := gpuAccelerator.GetDevice()
-	if len(device) > 0 {
+	if device := gpuAccelerator.GetDevice(); len(device) > 0 {
+		// Normalize the device name
+		normalizedDevice := GetNormalizedAcceleratorDevice(device)
+
 		// Add node selector requirement for GPU device
 		deviceNsr := v1.NodeSelectorRequirement{
 			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{device},
+			Values:   []string{normalizedDevice},
 		}
 		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
 		// Add toleration for GPU device
 		deviceTol := v1.Toleration{
 			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-			Value:    device,
+			Value:    normalizedDevice,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
@@ -449,11 +443,17 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
+	// Merge overrides with base extended resources
+	extendedResources := ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
 		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index], extendedResources); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -466,7 +466,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 			resourceMode = ResourceCustomizationModeMergeExistingResources
 		}
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.Containers[index]); err != nil {
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.Containers[index], extendedResources); err != nil {
 			return nil, nil, err
 		}
 
@@ -515,13 +515,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
 		ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
 	}
-
-	// handling for extended resources
-	// Merge overrides with base extended resources
-	extendedResources := applyExtendedResourcesOverrides(
-		taskTemplate.GetExtendedResources(),
-		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
-	)
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {

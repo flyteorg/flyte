@@ -1,12 +1,15 @@
 package flytek8s
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginmachinery_core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
@@ -38,7 +41,7 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {
-				k8sResources[ResourceNvidiaGPU] = v
+				k8sResources[resourceGPU] = v
 			}
 		case core.Resources_EPHEMERAL_STORAGE:
 			if !v.IsZero() {
@@ -93,4 +96,59 @@ func GetServiceAccountNameFromTaskExecutionMetadata(taskExecutionMetadata plugin
 	}
 
 	return serviceAccount
+}
+
+// getNormalizedAcceleratorDevice returns the normalized name for the given device.
+// This should map to the node label that the corresponding nodes are provisioned with.
+// Falls back to the original device name if the device is not configured.
+func GetNormalizedAcceleratorDevice(device string) string {
+	cfg := config.GetK8sPluginConfig()
+	if normalized, ok := cfg.AcceleratorDevices[strings.ToUpper(device)]; ok {
+		return normalized
+	}
+	return device
+}
+
+// getAcceleratorResourceName returns the Kubernetes resource name for the given device class.
+// Falls back to the legacy GpuResourceName if the device class is not configured.
+func getAcceleratorResourceName(accelerator *core.GPUAccelerator) v1.ResourceName {
+	cfg := config.GetK8sPluginConfig()
+
+	// Try to get from the new mapping first
+	if accelerator != nil {
+		if resourceName, ok := cfg.AcceleratorResourceNames[accelerator.GetDeviceClass().String()]; ok {
+			return resourceName
+		}
+	}
+
+	// Fallback to legacy GPU resource name for backward compatibility
+	return cfg.GpuResourceName
+}
+
+// getAllAcceleratorResourceNames returns the Kubernetes resource names for all accelerator devices.
+func getAllAcceleratorResourceNames() map[v1.ResourceName]struct{} {
+	cfg := config.GetK8sPluginConfig()
+	acceleratorResourceNames := make(map[v1.ResourceName]struct{})
+
+	// Add the legacy GPU resource name for backward compatibility
+	acceleratorResourceNames[cfg.GpuResourceName] = struct{}{}
+
+	// Add to map to ensure uniqueness
+	for _, resourceName := range cfg.AcceleratorResourceNames {
+		acceleratorResourceNames[resourceName] = struct{}{}
+	}
+	return acceleratorResourceNames
+}
+
+// podRequiresAccelerator returns true if any container in the pod requires any accelerator devices.
+func podRequiresAccelerator(podSpec *v1.PodSpec) bool {
+	acceleratorResourceNames := getAllAcceleratorResourceNames()
+	for _, cnt := range podSpec.Containers {
+		for resourceName := range acceleratorResourceNames {
+			if _, ok := cnt.Resources.Limits[resourceName]; ok {
+				return true
+			}
+		}
+	}
+	return false
 }

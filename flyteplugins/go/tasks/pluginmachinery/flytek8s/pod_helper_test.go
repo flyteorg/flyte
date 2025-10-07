@@ -444,12 +444,12 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	}
 
 	t.Run("base and overrides are nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, nil)
+		final := ApplyExtendedResourcesOverrides(nil, nil)
 		assert.NotNil(t, final)
 	})
 
 	t.Run("base is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, t4)
+		final := ApplyExtendedResourcesOverrides(nil, t4)
 		assert.EqualValues(
 			t,
 			t4.GetGpuAccelerator(),
@@ -458,7 +458,7 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	})
 
 	t.Run("overrides is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(t4, nil)
+		final := ApplyExtendedResourcesOverrides(t4, nil)
 		assert.EqualValues(
 			t,
 			t4.GetGpuAccelerator(),
@@ -467,7 +467,7 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	})
 
 	t.Run("merging", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(partitionedA100, unpartitionedA100)
+		final := ApplyExtendedResourcesOverrides(partitionedA100, unpartitionedA100)
 		assert.EqualValues(
 			t,
 			unpartitionedA100.GetGpuAccelerator(),
@@ -692,6 +692,158 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 				gpuUnpartitionedToleration,
 			},
 			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("with friendly device name normalization - NVIDIA H100", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"H100": "nvidia-h100",
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "H100"}, // Friendly name
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-h100"}, // Normalized name
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "gpu-device",
+					Value:    "nvidia-h100", // Normalized name
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("with friendly device name normalization - case insensitive", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"H100": "nvidia-h100",
+			},
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "h100"}, // Lowercase friendly name
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-h100"}, // Still normalized correctly
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("with friendly device name normalization - Google TPU", func(t *testing.T) {
+		// Configure for TPU usage
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "google.com/tpu",
+			GpuDeviceNodeLabel:        "tpu-device",
+			GpuPartitionSizeNodeLabel: "tpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"V5E": "tpu-v5-lite-podslice",
+				"V5P": "tpu-v5p-slice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("4"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{Device: "V5E"}, // Friendly name for TPU
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "tpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5-lite-podslice"}, // Normalized TPU name
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("with unmapped device uses device name as-is", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices:        map[string]string{}, // Empty mapping
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "custom-gpu-device"},
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"custom-gpu-device"}, // Used as-is since not in mapping
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 		)
 	})
 }
@@ -2314,7 +2466,7 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 				},
 			}
 			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.includeConsoleURL, tt.consoleURL)
-			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container, nil)
 			assert.NoError(t, err)
 			if tt.expectedEnvVar == nil {
 				// Confirm that there is no env var FLYTE_EXECUTION_URL set
@@ -2461,7 +2613,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	}
 
 	t.Run("base is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, SharedMemory)
+		final := ApplyExtendedResourcesOverrides(nil, SharedMemory)
 		assert.EqualValues(
 			t,
 			SharedMemory.GetSharedMemory(),
@@ -2470,7 +2622,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	})
 
 	t.Run("overrides is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(SharedMemory, nil)
+		final := ApplyExtendedResourcesOverrides(SharedMemory, nil)
 		assert.EqualValues(
 			t,
 			SharedMemory.GetSharedMemory(),
@@ -2479,7 +2631,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	})
 
 	t.Run("merging", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
+		final := ApplyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
 		assert.EqualValues(
 			t,
 			newSharedMemory.GetSharedMemory(),

@@ -251,21 +251,150 @@ func TestApplyResourceOverrides_OverrideGpu(t *testing.T) {
 }
 
 func TestSanitizeGPUResourceRequirements(t *testing.T) {
-	gpuRequest := resource.MustParse("4")
-	requirements := v1.ResourceRequirements{
-		Requests: v1.ResourceList{
-			resourceGPU: gpuRequest,
-		},
-	}
+	t.Run("nil accelerator defaults to NVIDIA GPU", func(t *testing.T) {
+		gpuRequest := resource.MustParse("4")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: gpuRequest,
+			},
+		}
 
-	expectedRequirements := v1.ResourceRequirements{
-		Requests: v1.ResourceList{
-			ResourceNvidiaGPU: gpuRequest,
-		},
-	}
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				ResourceNvidiaGPU: gpuRequest,
+			},
+		}
 
-	SanitizeGPUResourceRequirements(&requirements)
-	assert.EqualValues(t, expectedRequirements, requirements)
+		SanitizeGPUResourceRequirements(&requirements, nil)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
+
+	t.Run("NVIDIA_GPU device class", func(t *testing.T) {
+		gpuRequest := resource.MustParse("2")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: gpuRequest,
+			},
+			Limits: v1.ResourceList{
+				resourceGPU: gpuRequest,
+			},
+		}
+
+		accelerator := &core.GPUAccelerator{
+			Device:      "nvidia-tesla-a100",
+			DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+		}
+
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceName("nvidia.com/gpu"): gpuRequest,
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceName("nvidia.com/gpu"): gpuRequest,
+			},
+		}
+
+		SanitizeGPUResourceRequirements(&requirements, accelerator)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
+
+	t.Run("GOOGLE_TPU device class", func(t *testing.T) {
+		tpuRequest := resource.MustParse("4")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: tpuRequest,
+			},
+			Limits: v1.ResourceList{
+				resourceGPU: tpuRequest,
+			},
+		}
+
+		accelerator := &core.GPUAccelerator{
+			Device:      "tpu-v4",
+			DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+		}
+
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceName("google.com/tpu"): tpuRequest,
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceName("google.com/tpu"): tpuRequest,
+			},
+		}
+
+		SanitizeGPUResourceRequirements(&requirements, accelerator)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
+
+	t.Run("AMAZON_NEURON device class", func(t *testing.T) {
+		neuronRequest := resource.MustParse("1")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: neuronRequest,
+			},
+		}
+
+		accelerator := &core.GPUAccelerator{
+			Device:      "inferentia2",
+			DeviceClass: core.GPUAccelerator_AMAZON_NEURON,
+		}
+
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceName("aws.amazon.com/neuron"): neuronRequest,
+			},
+		}
+
+		SanitizeGPUResourceRequirements(&requirements, accelerator)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
+
+	t.Run("AMD_GPU device class", func(t *testing.T) {
+		gpuRequest := resource.MustParse("1")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: gpuRequest,
+			},
+		}
+
+		accelerator := &core.GPUAccelerator{
+			Device:      "amd-mi250",
+			DeviceClass: core.GPUAccelerator_AMD_GPU,
+		}
+
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceName("amd.com/gpu"): gpuRequest,
+			},
+		}
+
+		SanitizeGPUResourceRequirements(&requirements, accelerator)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
+
+	t.Run("HABANA_GAUDI device class", func(t *testing.T) {
+		gpuRequest := resource.MustParse("1")
+		requirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				resourceGPU: gpuRequest,
+			},
+		}
+
+		accelerator := &core.GPUAccelerator{
+			Device:      "habana-gaudi-dl1",
+			DeviceClass: core.GPUAccelerator_HABANA_GAUDI,
+		}
+
+		expectedRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceName("habana.ai/gaudi"): gpuRequest,
+			},
+		}
+
+		SanitizeGPUResourceRequirements(&requirements, accelerator)
+		assert.EqualValues(t, expectedRequirements, requirements)
+	})
 }
 
 func TestMergeResources_EmptyIn(t *testing.T) {
@@ -394,6 +523,7 @@ func TestToK8sContainer(t *testing.T) {
 			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
 		},
 	})
+	mockTaskOverrides.OnGetExtendedResources().Return(nil)
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockTaskOverrides)
 	mockTaskExecutionID := mocks.TaskExecutionID{}
 	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{})
@@ -519,7 +649,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 			"{{ .OutputPrefix }}",
 		},
 	}
-	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container, nil)
 	assert.NoError(t, err)
 	assert.EqualValues(t, container.Args, []string{"s3://output/path"})
 	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
@@ -559,7 +689,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
 		}, false, "")
-		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, nil)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
 		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
@@ -582,7 +712,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
 		}, false, "")
-		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, nil)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
 		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
@@ -617,7 +747,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
 		}, false, "")
-		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, nil)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
 		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
@@ -655,10 +785,49 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits:   overrideLimits,
 		}, &v1.ResourceRequirements{}, false, "")
 
-		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, container.Resources.Requests[ResourceNvidiaGPU], overrideRequests[ResourceNvidiaGPU])
 		assert.Equal(t, container.Resources.Limits[ResourceNvidiaGPU], overrideLimits[ResourceNvidiaGPU])
+	})
+	t.Run("ensure ExtendedResources.gpu_accelerator.device_class is respected when setting gpu resources", func(t *testing.T) {
+		container := &v1.Container{
+			Command: []string{
+				"{{ .Input }}",
+			},
+			Args: []string{
+				"{{ .OutputPrefix }}",
+			},
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"),
+				},
+				Limits: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"),
+				},
+			},
+		}
+
+		tpuExtendedResources := &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device:      "tpu-v4",
+				DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+			},
+		}
+
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, false, "")
+
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, tpuExtendedResources)
+		assert.NoError(t, err)
+
+		// Verify generic "gpu" key is removed
+		_, hasGenericGPU := container.Resources.Requests[resourceGPU]
+		assert.False(t, hasGenericGPU)
+
+		// Verify TPU resource is set correctly
+		expectedTPU := resource.MustParse("2")
+		assert.Equal(t, expectedTPU, container.Resources.Requests[v1.ResourceName("google.com/tpu")])
+		assert.Equal(t, expectedTPU, container.Resources.Limits[v1.ResourceName("google.com/tpu")])
 	})
 }
 
@@ -689,7 +858,7 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 			v1.ResourceMemory: resource.MustParse("20"),
 		},
 	}, false, "")
-	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container, nil)
 	assert.NoError(t, err)
 
 	assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
@@ -725,7 +894,7 @@ func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 		},
 	}
 
-	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil, false, ""), ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil, false, ""), ResourceCustomizationModeEnsureExistingResourcesInRange, container, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, container.EnvFrom, 2)

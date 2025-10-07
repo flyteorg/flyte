@@ -64,6 +64,7 @@ func TestLaunchSubTasks(t *testing.T) {
 			v1.ResourceCPU: resource.MustParse("10"),
 		},
 	})
+	overrides.OnGetExtendedResources().Return(nil)
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

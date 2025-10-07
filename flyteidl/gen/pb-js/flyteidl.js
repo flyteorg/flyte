@@ -15639,6 +15639,7 @@
                  * @property {string|null} [device] GPUAccelerator device
                  * @property {boolean|null} [unpartitioned] GPUAccelerator unpartitioned
                  * @property {string|null} [partitionSize] GPUAccelerator partitionSize
+                 * @property {flyteidl.core.GPUAccelerator.DeviceClass|null} [deviceClass] GPUAccelerator deviceClass
                  */
     
                 /**
@@ -15679,6 +15680,14 @@
                  * @instance
                  */
                 GPUAccelerator.prototype.partitionSize = "";
+    
+                /**
+                 * GPUAccelerator deviceClass.
+                 * @member {flyteidl.core.GPUAccelerator.DeviceClass} deviceClass
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @instance
+                 */
+                GPUAccelerator.prototype.deviceClass = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -15724,6 +15733,8 @@
                         writer.uint32(/* id 2, wireType 0 =*/16).bool(message.unpartitioned);
                     if (message.partitionSize != null && message.hasOwnProperty("partitionSize"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.partitionSize);
+                    if (message.deviceClass != null && message.hasOwnProperty("deviceClass"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.deviceClass);
                     return writer;
                 };
     
@@ -15753,6 +15764,9 @@
                             break;
                         case 3:
                             message.partitionSize = reader.string();
+                            break;
+                        case 4:
+                            message.deviceClass = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15789,8 +15803,39 @@
                         if (!$util.isString(message.partitionSize))
                             return "partitionSize: string expected";
                     }
+                    if (message.deviceClass != null && message.hasOwnProperty("deviceClass"))
+                        switch (message.deviceClass) {
+                        default:
+                            return "deviceClass: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
                     return null;
                 };
+    
+                /**
+                 * DeviceClass enum.
+                 * @name flyteidl.core.GPUAccelerator.DeviceClass
+                 * @enum {string}
+                 * @property {number} NVIDIA_GPU=0 NVIDIA_GPU value
+                 * @property {number} GOOGLE_TPU=1 GOOGLE_TPU value
+                 * @property {number} AMAZON_NEURON=2 AMAZON_NEURON value
+                 * @property {number} AMD_GPU=3 AMD_GPU value
+                 * @property {number} HABANA_GAUDI=4 HABANA_GAUDI value
+                 */
+                GPUAccelerator.DeviceClass = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "NVIDIA_GPU"] = 0;
+                    values[valuesById[1] = "GOOGLE_TPU"] = 1;
+                    values[valuesById[2] = "AMAZON_NEURON"] = 2;
+                    values[valuesById[3] = "AMD_GPU"] = 3;
+                    values[valuesById[4] = "HABANA_GAUDI"] = 4;
+                    return values;
+                })();
     
                 return GPUAccelerator;
             })();

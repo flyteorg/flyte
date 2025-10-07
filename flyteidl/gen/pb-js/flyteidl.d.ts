@@ -6490,6 +6490,9 @@ export namespace flyteidl {
 
             /** GPUAccelerator partitionSize */
             partitionSize?: (string|null);
+
+            /** GPUAccelerator deviceClass */
+            deviceClass?: (flyteidl.core.GPUAccelerator.DeviceClass|null);
         }
 
         /** Represents a GPUAccelerator. */
@@ -6509,6 +6512,9 @@ export namespace flyteidl {
 
             /** GPUAccelerator partitionSize. */
             public partitionSize: string;
+
+            /** GPUAccelerator deviceClass. */
+            public deviceClass: flyteidl.core.GPUAccelerator.DeviceClass;
 
             /** GPUAccelerator partitionSizeValue. */
             public partitionSizeValue?: ("unpartitioned"|"partitionSize");
@@ -6544,6 +6550,18 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace GPUAccelerator {
+
+            /** DeviceClass enum. */
+            enum DeviceClass {
+                NVIDIA_GPU = 0,
+                GOOGLE_TPU = 1,
+                AMAZON_NEURON = 2,
+                AMD_GPU = 3,
+                HABANA_GAUDI = 4
+            }
         }
 
         /** Properties of a SharedMemory. */

@@ -153,6 +153,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 		Limits:   v12.ResourceList{},
 		Requests: v12.ResourceList{},
 	})
+	to.OnGetExtendedResources().Return(nil)
 
 	tMetadata := &mocks.TaskExecutionMetadata{}
 	tMetadata.OnGetAnnotations().Return(map[string]string{"aKey": "aVal"})

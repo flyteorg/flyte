@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/validation"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
@@ -129,17 +130,20 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 	resourceRequirements.Limits[resourceName] = resourceValue.Limit
 }
 
-// Convert GPU resource requirements named 'gpu' the recognized 'nvidia.com/gpu' identifier.
-func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements) {
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+// SanitizeGPUResourceRequirements converts generic 'gpu' resource requirements to the desired accelerator resource name.
+func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements, accelerator *core.GPUAccelerator) {
+	resourceName := config.GetK8sPluginConfig().GpuResourceName
+	if accelerator != nil {
+		resourceName = getAcceleratorResourceName(accelerator)
+	}
 
 	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[gpuResourceName] = res
+		resources.Requests[resourceName] = res
 		delete(resources.Requests, resourceGPU)
 	}
 
 	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[gpuResourceName] = res
+		resources.Limits[resourceName] = res
 		delete(resources.Limits, resourceGPU)
 	}
 }
@@ -174,16 +178,14 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
 
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
-	shouldAdjustGPU := false
-	_, gpuRequested := resources.Requests[gpuResourceName]
-	_, gpuLimited := resources.Limits[gpuResourceName]
-	if gpuRequested || gpuLimited {
-		shouldAdjustGPU = true
-	}
-
-	if shouldAdjustGPU {
-		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
+	// Check for accelerator resources (GPU, TPU, Neuron, etc.)
+	acceleratorResourceNames := getAllAcceleratorResourceNames()
+	for acceleratorResourceName := range acceleratorResourceNames {
+		_, requested := resources.Requests[acceleratorResourceName]
+		_, limited := resources.Limits[acceleratorResourceName]
+		if requested || limited {
+			adjustResourceRequirement(acceleratorResourceName, resources, platformResources, assignIfUnset)
+		}
 	}
 
 	return resources
@@ -241,6 +243,17 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		return nil, err
 	}
 
+	// extract task template and extended resources
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	extendedResources := ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
 	if container.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
 		container.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
 	}
@@ -253,7 +266,7 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		Task:             tCtx.TaskReader(),
 	}
 
-	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container); err != nil {
+	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container, extendedResources); err != nil {
 		return nil, err
 	}
 
@@ -279,7 +292,7 @@ const (
 // templated command and argument values, updates resources and decorates environment variables with platform and
 // task-specific customizations.
 func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.Parameters,
-	mode ResourceCustomizationMode, container *v1.Container) error {
+	mode ResourceCustomizationMode, container *v1.Container, extendedResources *core.ExtendedResources) error {
 	modifiedCommand, err := template.Render(ctx, container.Command, parameters)
 	if err != nil {
 		return err
@@ -314,7 +327,7 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 		overrideResources = &v1.ResourceRequirements{}
 	}
 
-	SanitizeGPUResourceRequirements(&container.Resources)
+	SanitizeGPUResourceRequirements(&container.Resources, extendedResources.GetGpuAccelerator())
 
 	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
 		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)

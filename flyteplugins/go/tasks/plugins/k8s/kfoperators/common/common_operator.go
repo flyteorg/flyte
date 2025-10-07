@@ -335,6 +335,22 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
 		}
+
+		// Get extended resources for GPU accelerator info
+		taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+		if err != nil {
+			return nil, err
+		}
+		extendedResources := flytek8s.ApplyExtendedResourcesOverrides(
+			taskTemplate.GetExtendedResources(),
+			taskCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+		)
+
+		// Normalize GPU resource names BEFORE applying overrides (e.g., "gpu" → "nvidia.com/gpu")
+		// This ensures ApplyK8sResourceOverrides can find GPU resources under the correct name and
+		// apply platform limits, and later toleration lookups succeed.
+		flytek8s.SanitizeGPUResourceRequirements(resources, extendedResources.GetGpuAccelerator())
+
 		*resources = flytek8s.ApplyK8sResourceOverrides(taskCtx.TaskExecutionMetadata(), resources)
 		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
 	}

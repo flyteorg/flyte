@@ -96,7 +96,13 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		platformResources = &v1.ResourceRequirements{}
 	}
 
-	flytek8s.SanitizeGPUResourceRequirements(res)
+	// Merge overrides with base extended resources
+	extendedResources := flytek8s.ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
+	flytek8s.SanitizeGPUResourceRequirements(res, extendedResources.GetGpuAccelerator())
 	resources := flytek8s.ApplyResourceOverrides(*res, *platformResources, assignResources)
 
 	submitJobInput := &batch.SubmitJobInput{}

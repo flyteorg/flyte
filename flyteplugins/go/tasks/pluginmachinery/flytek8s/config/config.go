@@ -62,6 +62,64 @@ var (
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName:           ResourceNvidiaGPU,
+		AcceleratorDevices: map[string]string{
+			// NVIDIA GPUs
+			"A10":           "nvidia-a10",
+			"A10G":          "nvidia-a10g",
+			"A100":          "nvidia-tesla-a100",
+			"A100 80G":      "nvidia-a100-80gb",
+			"A100G":         "nvidia-a100g",
+			"B200":          "nvidia-b200",
+			"GB200":         "nvidia-gb200",
+			"H100":          "nvidia-h100",
+			"H100 80G":      "nvidia-h100-80gb",
+			"H100 MEGA 80G": "nvidia-h100-mega-80gb",
+			"H200":          "nvidia-h200",
+			"K80":           "nvidia-tesla-k80",
+			"L4":            "nvidia-l4",
+			"L40s":          "nvidia-l40s",
+			"L4_VWS":        "nvidia-l4-vws",
+			"M60":           "nvidia-tesla-m60",
+			"P4":            "nvidia-tesla-p4",
+			"P100":          "nvidia-tesla-p100",
+			"RTX PRO 6000":  "nvidia-rtx-pro-6000",
+			"T4":            "nvidia-tesla-t4",
+			"V100":          "nvidia-tesla-v100",
+
+			// Google Cloud TPUs
+			"V5E": "tpu-v5-lite-podslice",
+			"V5P": "tpu-v5p-slice",
+			"V6E": "tpu-v6e-slice",
+
+			// AWS Neuron
+			"INF1":  "aws-neuron-inf1",
+			"INF2":  "aws-neuron-inf2",
+			"TRN1":  "aws-neuron-trn1",
+			"TRN1N": "aws-neuron-trn1n",
+			"TRN2":  "aws-neuron-trn2",
+			"TRN2U": "aws-neuron-trn2u",
+
+			// AMD GPUs
+			"MI100":  "amd-mi100",
+			"MI210":  "amd-mi210",
+			"MI250":  "amd-mi250",
+			"MI250X": "amd-mi250x",
+			"MI300A": "amd-mi300a",
+			"MI300X": "amd-mi300x",
+			"MI325X": "amd-mi325x",
+			"MI350X": "amd-mi350x",
+			"MI355X": "amd-mi355x",
+
+			// Habana Gaudi (Intel)
+			"GAUDI1": "habana-gaudi-dl1",
+		},
+		AcceleratorResourceNames: map[string]v1.ResourceName{
+			"NVIDIA_GPU":    "nvidia.com/gpu",
+			"GOOGLE_TPU":    "google.com/tpu",
+			"AMAZON_NEURON": "aws.amazon.com/neuron",
+			"AMD_GPU":       "amd.com/gpu",
+			"HABANA_GAUDI":  "habana.ai/gaudi",
+		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
@@ -180,8 +238,15 @@ type K8sPluginConfig struct {
 	// Toleration added to pods intended for unpartitioned GPU nodes.
 	GpuUnpartitionedToleration *v1.Toleration `json:"gpu-unpartitioned-toleration" pflag:"-,Toleration added to pods intended for unpartitioned GPU nodes."`
 
-	// The name of the GPU resource to use when the task resource requests GPUs.
+	// Deprecated: Use AcceleratorResourceNames instead. The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
+
+	// AcceleratorDevices maps accelerator devices to provisioned Kubernetes node labels.
+	AcceleratorDevices map[string]string `json:"accelerator-devices" pflag:"-,Maps accelerator devices to provisionedKubernetes node labels."`
+
+	// AcceleratorResourceNames maps accelerator device classes to their Kubernetes resource names.
+	// This allows configuring resource names for different accelerator types (NVIDIA GPU, Google TPU, Amazon Neuron, AMD GPU).
+	AcceleratorResourceNames map[string]v1.ResourceName `json:"accelerator-resource-names" pflag:"-,Maps accelerator device classes to Kubernetes resource names."`
 
 	// DefaultPodSecurityContext provides a default pod security context that should be applied for every pod that is launched by FlytePropeller. This may not be applicable to all plugins. For
 	// downstream plugins - i.e. TensorflowOperators may not support setting this, but Spark does.

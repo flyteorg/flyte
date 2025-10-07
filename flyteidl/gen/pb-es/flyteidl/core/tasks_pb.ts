@@ -197,6 +197,13 @@ export class GPUAccelerator extends Message<GPUAccelerator> {
     case: "partitionSize";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * The class of accelerator device. Defaults to NVIDIA_GPU if not specified.
+   *
+   * @generated from field: flyteidl.core.GPUAccelerator.DeviceClass device_class = 4;
+   */
+  deviceClass = GPUAccelerator_DeviceClass.NVIDIA_GPU;
+
   constructor(data?: PartialMessage<GPUAccelerator>) {
     super();
     proto3.util.initPartial(data, this);
@@ -208,6 +215,7 @@ export class GPUAccelerator extends Message<GPUAccelerator> {
     { no: 1, name: "device", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "unpartitioned", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_size_value" },
     { no: 3, name: "partition_size", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_size_value" },
+    { no: 4, name: "device_class", kind: "enum", T: proto3.getEnumType(GPUAccelerator_DeviceClass) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GPUAccelerator {
@@ -226,6 +234,56 @@ export class GPUAccelerator extends Message<GPUAccelerator> {
     return proto3.util.equals(GPUAccelerator, a, b);
   }
 }
+
+/**
+ * Specifies the class of accelerator device.
+ *
+ * @generated from enum flyteidl.core.GPUAccelerator.DeviceClass
+ */
+export enum GPUAccelerator_DeviceClass {
+  /**
+   * NVIDIA GPU devices (default for backward compatibility)
+   *
+   * @generated from enum value: NVIDIA_GPU = 0;
+   */
+  NVIDIA_GPU = 0,
+
+  /**
+   * Google TPU devices
+   *
+   * @generated from enum value: GOOGLE_TPU = 1;
+   */
+  GOOGLE_TPU = 1,
+
+  /**
+   * Amazon Neuron devices
+   *
+   * @generated from enum value: AMAZON_NEURON = 2;
+   */
+  AMAZON_NEURON = 2,
+
+  /**
+   * AMD GPU devices
+   *
+   * @generated from enum value: AMD_GPU = 3;
+   */
+  AMD_GPU = 3,
+
+  /**
+   * Habana Gaudi devices
+   *
+   * @generated from enum value: HABANA_GAUDI = 4;
+   */
+  HABANA_GAUDI = 4,
+}
+// Retrieve enum metadata with: proto3.getEnumType(GPUAccelerator_DeviceClass)
+proto3.util.setEnumType(GPUAccelerator_DeviceClass, "flyteidl.core.GPUAccelerator.DeviceClass", [
+  { no: 0, name: "NVIDIA_GPU" },
+  { no: 1, name: "GOOGLE_TPU" },
+  { no: 2, name: "AMAZON_NEURON" },
+  { no: 3, name: "AMD_GPU" },
+  { no: 4, name: "HABANA_GAUDI" },
+]);
 
 /**
  * Metadata associated with configuring a shared memory volume for a task.

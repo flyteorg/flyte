@@ -1309,11 +1309,55 @@ pub struct GpuAccelerator {
     /// use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
     #[prost(string, tag="1")]
     pub device: ::prost::alloc::string::String,
+    /// The class of accelerator device. Defaults to NVIDIA_GPU if not specified.
+    #[prost(enumeration="gpu_accelerator::DeviceClass", tag="4")]
+    pub device_class: i32,
     #[prost(oneof="gpu_accelerator::PartitionSizeValue", tags="2, 3")]
     pub partition_size_value: ::core::option::Option<gpu_accelerator::PartitionSizeValue>,
 }
 /// Nested message and enum types in `GPUAccelerator`.
 pub mod gpu_accelerator {
+    /// Specifies the class of accelerator device.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum DeviceClass {
+        /// NVIDIA GPU devices (default for backward compatibility)
+        NvidiaGpu = 0,
+        /// Google TPU devices
+        GoogleTpu = 1,
+        /// Amazon Neuron devices
+        AmazonNeuron = 2,
+        /// AMD GPU devices
+        AmdGpu = 3,
+        /// Habana Gaudi devices
+        HabanaGaudi = 4,
+    }
+    impl DeviceClass {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                DeviceClass::NvidiaGpu => "NVIDIA_GPU",
+                DeviceClass::GoogleTpu => "GOOGLE_TPU",
+                DeviceClass::AmazonNeuron => "AMAZON_NEURON",
+                DeviceClass::AmdGpu => "AMD_GPU",
+                DeviceClass::HabanaGaudi => "HABANA_GAUDI",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "NVIDIA_GPU" => Some(Self::NvidiaGpu),
+                "GOOGLE_TPU" => Some(Self::GoogleTpu),
+                "AMAZON_NEURON" => Some(Self::AmazonNeuron),
+                "AMD_GPU" => Some(Self::AmdGpu),
+                "HABANA_GAUDI" => Some(Self::HabanaGaudi),
+                _ => None,
+            }
+        }
+    }
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PartitionSizeValue {
