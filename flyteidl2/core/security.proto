@@ -50,6 +50,19 @@ message Secret {
   string env_var = 5;
 }
 
+message Connection {
+  // The task type that the connection is used for.
+  string task_type = 1;
+  // The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+  // The key is the name of the secret, and it's defined in the flytekit.
+  // flytekit uses the key to locate the desired secret within the map.
+  map<string, string> secrets = 2;
+
+  // The configuration to use for the connection, such as the endpoint, account name, etc.
+  // The key is the name of the config, and it's defined in the flytekit.
+  map<string, string> configs = 3;
+}
+
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
 message OAuth2Client {
   // client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
