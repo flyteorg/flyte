@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl2.plugin;
+package flyteidl2.plugins;
 
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
