@@ -7,10 +7,12 @@ import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/types.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -25,6 +27,74 @@ message RunDetails {
 
   // Detailed information about the root action.
   ActionDetails action = 2;
+}
+
+message TaskAction {
+  // a unique identifier for the task this action is associated with, if applicable.
+  task.TaskIdentifier id = 1;
+
+  // the definition of the task to be executed.
+  task.TaskSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Enables caching when set and specifies the cache version to use.
+  google.protobuf.StringValue cache_key = 3;
+
+  // the specific cluster that this action should be executed on. if not set, the cluster from the
+  // `RunSpec` will be used.
+  string cluster = 4;
+}
+
+// TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
+// by the local worker. This can be used to bring determinism to code that's otherwise not deterministic (e.g. current
+// time).
+message TraceAction {
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Last known phase.
+  Phase phase = 2;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 3;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 4;
+
+  // Output references.
+  task.OutputReferences outputs = 5;
+
+  // Task spec for the trace, useful for the typed interface inside.
+  task.TraceSpec spec = 6 [(buf.validate.field).required = true];
+}
+
+// ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
+// await a signal from an external system and can carry a value.
+message ConditionAction {
+  // Name is the unique identifier for the action. It must be unique within the defined scope below.
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  oneof scope {
+    option (buf.validate.oneof).required = true;
+    // RunId is the unique identifier for the run this action is associated with.
+    string run_id = 2 [(buf.validate.field).string.min_len = 1];
+
+    // ActionId is the unique identifier for the action this action is associated with.
+    string action_id = 3 [(buf.validate.field).string.min_len = 1];
+
+    // Global indicates the condition is global and can be used across all runs and actions.
+    bool global = 4;
+  }
+
+  // Type is the type of the value the condition is expected. This can be used to properly render
+  // a UI element for the condition or validate when a value is received that it is of the expected
+  // type.
+  flyteidl2.core.LiteralType type = 6;
+
+  // Prompt is the prompt that will be shown to the user when the condition is awaited.
+  string prompt = 7;
+
+  // Description is a description of the condition. This can be used to provide additional
+  // information to the user about the condition.
+  string description = 8;
 }
 
 message TaskActionMetadata {
@@ -311,4 +381,32 @@ message ActionEvent {
 
   // Timestamp when the event was observed and reported by the executor
   google.protobuf.Timestamp reported_time = 15;
+}
+
+message ActionSpec {
+  // the unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
+  // project, domain) will be the same as the action_id defined above.
+  optional string parent_action_name = 2;
+
+  // the run spec for this action
+  flyteidl2.task.RunSpec run_spec = 3;
+
+  // the path to the input data for this action.
+  string input_uri = 4 [(buf.validate.field).string.min_len = 1];
+
+  // the run base path this action should write its output to.
+  string run_output_base = 5 [(buf.validate.field).string.min_len = 1];
+
+  oneof spec {
+    option (buf.validate.oneof).required = true;
+    TaskAction task = 6;
+    ConditionAction condition = 7;
+    TraceAction trace = 10;
+  }
+
+  // group this action belongs to, if applicable.
+  string group = 8;
 }

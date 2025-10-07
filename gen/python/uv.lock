@@ -8,30 +8,6 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "bufbuild-protovalidate-protocolbuffers-pyi"
-version = "32.1.0.1.20240401165935+b983156c5e99"
-source = { registry = "https://buf.build/gen/python" }
-dependencies = [
-    { name = "protobuf" },
-    { name = "types-protobuf" },
-]
-wheels = [
-    { url = "https://buf.build/gen/python/bufbuild-protovalidate-protocolbuffers-pyi/bufbuild_protovalidate_protocolbuffers_pyi-32.1.0.1.20240401165935+b983156c5e99-py3-none-any.whl" },
-]
-
-[[package]]
-name = "bufbuild-protovalidate-protocolbuffers-python"
-version = "32.0.0.1.20250912141014+52f32327d4b0"
-source = { registry = "https://buf.build/gen/python" }
-dependencies = [
-    { name = "bufbuild-protovalidate-protocolbuffers-pyi" },
-    { name = "protobuf" },
-]
-wheels = [
-    { url = "https://buf.build/gen/python/bufbuild-protovalidate-protocolbuffers-python/bufbuild_protovalidate_protocolbuffers_python-32.0.0.1.20250912141014+52f32327d4b0-py3-none-any.whl" },
-]
-
-[[package]]
 name = "cel-python"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -52,8 +28,6 @@ wheels = [
 name = "flyteidl2"
 source = { editable = "." }
 dependencies = [
-    { name = "bufbuild-protovalidate-protocolbuffers-pyi" },
-    { name = "bufbuild-protovalidate-protocolbuffers-python" },
     { name = "googleapis-common-protos" },
     { name = "protobuf" },
     { name = "protoc-gen-openapiv2" },
@@ -62,8 +36,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bufbuild-protovalidate-protocolbuffers-pyi", specifier = "==32.1.0.1.20240401165935+b983156c5e99", index = "https://buf.build/gen/python" },
-    { name = "bufbuild-protovalidate-protocolbuffers-python", specifier = "==32.0.0.1.20250912141014+52f32327d4b0", index = "https://buf.build/gen/python" },
     { name = "googleapis-common-protos" },
     { name = "protobuf", specifier = ">=4.21.1" },
     { name = "protoc-gen-openapiv2" },
@@ -255,15 +227,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
-]
-
-[[package]]
-name = "types-protobuf"
-version = "6.30.2.20250914"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/36/d1/e12dad323fe6e2455b768828de288f60d5160f41dad5d31af8ef92a6acbb/types_protobuf-6.30.2.20250914.tar.gz", hash = "sha256:c2105326d0a52de3d33b84af0010d834ebbd4c17c50ff261fa82551ab75d9559", size = 62424, upload-time = "2025-09-14T02:56:00.798Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/c4/3fcb1f8e03456a8a33a5dfb9f9788b0a91023e5fad6a37d46fc6831629a7/types_protobuf-6.30.2.20250914-py3-none-any.whl", hash = "sha256:cfc24977c0f38cf2896d918a59faed7650eb983be6070343a6204ac8ac0a297e", size = 76546, upload-time = "2025-09-14T02:55:59.489Z" },
 ]
 
 [[package]]

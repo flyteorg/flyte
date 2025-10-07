@@ -226,6 +226,8 @@ func (m *GPUAccelerator) validate(all bool) error {
 
 	// no validation rules for Device
 
+	// no validation rules for DeviceClass
+
 	switch v := m.PartitionSizeValue.(type) {
 	case *GPUAccelerator_Unpartitioned:
 		if v == nil {
