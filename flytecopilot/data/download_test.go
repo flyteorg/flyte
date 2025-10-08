@@ -325,7 +325,7 @@ func TestRecursiveDownload(t *testing.T) {
 }
 
 func TestHandleScalar(t *testing.T) {
-	t.Run("Handles Union Scalar", func(t *testing.T) {
+	t.Run("Handles Union Scalar with scalar value", func(t *testing.T) {
 		d := Downloader{}
 
 		scalar := &core.Scalar{
@@ -348,8 +348,66 @@ func TestHandleScalar(t *testing.T) {
 			},
 		}
 
-		result, _, err := d.handleScalar(context.Background(), scalar, "/inputs", false)
+		resultValue, resultScalar, err := d.handleScalar(context.Background(), scalar, "./inputs", false)
 		assert.NoError(t, err)
-		assert.Equal(t, "string1", result)
+		assert.Equal(t, "string1", resultValue)
+		assert.Equal(t, scalar, resultScalar)
+	})
+	t.Run("Handles Union Scalar with collection value", func(t *testing.T) {
+		d := Downloader{}
+
+		toPath := "./inputs"
+		defer func() {
+			err := os.RemoveAll(toPath)
+			if err != nil {
+				t.Errorf("Failed to delete directory: %v", err)
+			}
+		}()
+
+		scalar := &core.Scalar{
+			Value: &core.Scalar_Union{
+				Union: &core.Union{
+					Value: &core.Literal{
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{
+									{
+										Value: &core.Literal_Scalar{
+											Scalar: &core.Scalar{
+												Value: &core.Scalar_Primitive{
+													Primitive: &core.Primitive{
+														Value: &core.Primitive_StringValue{
+															StringValue: "string1",
+														},
+													},
+												},
+											},
+										},
+									},
+									{
+										Value: &core.Literal_Scalar{
+											Scalar: &core.Scalar{
+												Value: &core.Scalar_Primitive{
+													Primitive: &core.Primitive{
+														Value: &core.Primitive_StringValue{
+															StringValue: "string2",
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		resultValue, resultScalar, err := d.handleScalar(context.Background(), scalar, toPath, false)
+		assert.NoError(t, err)
+		assert.Equal(t, []interface{}{"string1", "string2"}, resultValue)
+		assert.Equal(t, scalar, resultScalar)
 	})
 }
