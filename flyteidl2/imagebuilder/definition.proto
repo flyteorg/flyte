@@ -101,6 +101,14 @@ message Env {
   map<string, string> env_variables = 1;
 }
 
+message PoetryProject {
+  string pyproject = 1;
+  string poetry_lock = 2;
+  // Optional extra arguments for poetry install command
+  string extra_args = 3;
+  repeated flyteidl2.core.Secret secret_mounts = 4;
+}
+
 // Layer defines a layer in the image, which can be one of several types.
 message Layer {
   oneof layer {
@@ -122,6 +130,8 @@ message Layer {
     UVProject uv_project = 8;
     // Environment variables to set.
     Env env = 9;
+    // Poetry project configuration
+    PoetryProject poetry_project = 10;
   }
 }
 
