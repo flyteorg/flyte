@@ -112,12 +112,6 @@ pub async fn run_task(task: Task, run_pool: bool, locals: TaskLocals) -> Result<
         );
         let (_temp_dir, guard1, guard2) = make_test_guards();
         crate::executor::run_worker_pool(executor_args, locals, _temp_dir, guard1, guard2).await?;
-    } else {
-        println!(
-            "[Actor Core] Running executor with args: {:?}",
-            executor_args
-        );
-        crate::executor::run(executor_args, locals).await?;
     }
     // Create a new Python GIL token inside the async block
 

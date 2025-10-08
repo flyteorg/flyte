@@ -17,7 +17,7 @@ use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use tracing::{debug, error, info, trace, warn};
 use tracing_attributes::instrument;
 
-use crate::common::{Task, ToProstDuration, FAILED, SUCCEEDED};
+use crate::common::{Task, ToProstDuration, ABORTED, FAILED, FAILED_PERMANENT, SUCCEEDED};
 use crate::connection::{ConnectionBuilder, ConnectionRuntime};
 use crate::pb::fasttask::{
     heartbeat_response::Operation, Capacity, ExecutionIdentifier, HeartbeatRequest,
@@ -173,6 +173,7 @@ impl V2TaskManager {
         let tasks_in_progress = Arc::clone(&self.tasks_in_progress);
 
         // Channels for inter-task communication
+        // todo: this trigger_heartbeater should probably be a Notify.
         let (trigger_heartbeater_tx, trigger_heartbeater_rx) = async_channel::unbounded::<()>();
         let (heartbeat_tx, heartbeat_rx) = async_channel::bounded(5);
         let (operation_tx, operation_rx) = async_channel::bounded(self.max_parallelism as usize);
@@ -229,7 +230,9 @@ impl V2TaskManager {
 
         // This channel is used when an assign operation is received, and is used to actually send the Task down the
         // TCP stream. This channel exists because the sending of the Task to the TCP stream can be blocking.
-        let (assignment_tx, assignment_rx) = async_channel::bounded(self.max_parallelism as usize);
+        // 2x because delete and assign are different messages. 2x again for good measure.
+        let (assignment_tx, assignment_rx) =
+            async_channel::bounded(4 * self.max_parallelism as usize);
         self.assignment_tx = Some(assignment_tx);
 
         // Spawn operation handling task
@@ -248,15 +251,16 @@ impl V2TaskManager {
             .executor_stream_writer
             .take()
             .ok_or_else(|| anyhow!("Executor stream writer not available"))?;
-        let mut assignment_handler = tokio::spawn(
-            Self::read_and_send_assignments(stream_writer, assignment_rx)
-        );
+        let mut assignment_handler = tokio::spawn(Self::read_and_send_assignments(
+            stream_writer,
+            assignment_rx,
+        ));
 
         // Main orchestration - wait for any termination condition
         let loop_result = tokio::select! {
             // Handle executor process exit
             result = &mut executor_handler => {
-                match result {
+                match &result {
                     Ok(Ok(())) => {
                         warn!("Executor handler completed normally");
                     }
@@ -266,8 +270,8 @@ impl V2TaskManager {
                     Err(e) => {
                         error!("Executor handler panicked: {}", e);
                     }
-                }
-                Err(anyhow!("Executor process failed, terminating"))
+                };
+                result.map(|_| ()).map_err(|e| anyhow!("Executor error: {}", e))
             }
 
             // Handle connection task failures (should restart automatically)
@@ -373,6 +377,11 @@ impl V2TaskManager {
             }
         };
 
+        // Explicitly set cancellation token so all spawned tasks know to terminate.
+        if !cancellation_token.is_cancelled() {
+            cancellation_token.cancel();
+        }
+
         // Abort all tasks on shutdown
         let handles = [
             &mut executor_handler,
@@ -445,7 +454,7 @@ impl V2TaskManager {
     ) -> Result<()> {
         info!("Starting heartbeat timer task");
         let mut timer = interval(Duration::from_secs(heartbeat_interval_seconds));
-        
+
         loop {
             tokio::select! {
                 _ = timer.tick() => {
@@ -471,7 +480,7 @@ impl V2TaskManager {
         cancellation_token: tokio_util::sync::CancellationToken,
     ) -> Result<()> {
         info!("Starting heartbeat processing task");
-        
+
         loop {
             tokio::select! {
                 Ok(_) = trigger_rx.recv() => {
@@ -489,7 +498,7 @@ impl V2TaskManager {
                             }
                         }
                     }
-                    
+
                     let heartbeat_request = Self::create_heartbeat_request_static(
                         &tasks_in_progress,
                         &worker_id,
@@ -500,7 +509,7 @@ impl V2TaskManager {
                         running_tasks = heartbeat_request.capacity.as_ref().map(|c| c.execution_count).unwrap_or(0),
                         "Sending heartbeat"
                     );
-                    
+
                     if let Err(e) = heartbeat_tx.send(heartbeat_request).await {
                         error!(error = %e, "Failed to send heartbeat");
                     }
@@ -522,7 +531,7 @@ impl V2TaskManager {
         cancellation_token: tokio_util::sync::CancellationToken,
     ) -> Result<()> {
         info!("Starting operation handling task");
-        
+
         loop {
             tokio::select! {
                 Ok(operation) = operation_rx.recv() => {
@@ -555,10 +564,15 @@ impl V2TaskManager {
                 Ok(bytes) => {
                     // Try to deserialize as Response first (task completion)
                     if let Ok(response) = bincode::deserialize::<crate::common::Response>(&bytes) {
+                        if response.executor_corrupt {
+                            return Err(anyhow!("Terminating actor environment due to misbehaving task: {}",
+                                response.reason.unwrap_or("missing reason".to_string())));
+                        }
                         let task_updated = {
                             let mut tasks = tasks_in_progress
                                 .lock()
                                 .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
+
                             // if the task is in the map, then update its status
                             if let Some(task_info) = tasks.get_mut(&response.unique_task_id) {
                                 // Update task status
@@ -568,16 +582,25 @@ impl V2TaskManager {
                                     new_phase = response.phase,
                                     "Updating task phase"
                                 );
+                                // Always set phase and reason from the executor.
                                 task_info.phase = response.phase;
                                 task_info.reason = response.reason.clone();
+
                                 if response.phase == SUCCEEDED {
                                     info!(task.id = %response.unique_task_id, "Task completed successfully");
-                                } else if response.phase == FAILED || response.phase == 8 {
+                                } else if response.phase == FAILED || response.phase == FAILED_PERMANENT {
                                     warn!(
                                         task.id = %response.unique_task_id,
                                         phase = response.phase,
                                         reason = ?response.reason,
-                                        "Task failed"
+                                        "Failed task received in response!"
+                                    );
+                                } else if response.phase == ABORTED {
+                                    info!(
+                                        task.id = %response.unique_task_id,
+                                        phase = response.phase,
+                                        reason = ?response.reason,
+                                        "Aborted task response received!"
                                     );
                                 }
                                 true
@@ -618,11 +641,16 @@ impl V2TaskManager {
         let running_count = tasks
             .values()
             .filter(|task_info| {
-                task_info.phase != FAILED && task_info.phase != 8 && task_info.phase != SUCCEEDED
+                task_info.phase != FAILED && task_info.phase != FAILED_PERMANENT && task_info.phase != SUCCEEDED && task_info.phase != ABORTED
             })
             .count();
+
+        // This bridge does not send back aborted because it should be meaningless. Aborted is a state determined by the
+        // executor. Anything that the actor bridge/executor says should be irrelevant.
         let task_statuses: Vec<TaskStatus> =
-            tasks.values().map(|task_info| task_info.into()).collect();
+            tasks.values().filter(|task_info| {
+                task_info.phase != ABORTED
+            }).map(|task_info| task_info.into()).collect();
 
         HeartbeatRequest {
             worker_id: worker_id.to_string(),
@@ -647,7 +675,13 @@ impl V2TaskManager {
         match Operation::from_i32(hb_response.operation) {
             Some(Operation::Assign) => {
                 trace!("Received task assignment");
-                Self::try_assign_task_static(hb_response, assignment_tx, tasks_in_progress, max_parallelism).await
+                Self::try_assign_task_static(
+                    hb_response,
+                    assignment_tx,
+                    tasks_in_progress,
+                    max_parallelism,
+                )
+                .await
             }
             Some(Operation::Ack) => {
                 trace!("Received task ACK");
@@ -655,7 +689,9 @@ impl V2TaskManager {
             }
             Some(Operation::Delete) => {
                 trace!("Received task deletion request");
-                Self::delete_task_static(hb_response.task_id, tasks_in_progress).await
+                warn!("Received task deletion request {:?}", hb_response.task_id);
+                // Just send over cancellation notice regardless of what the state of the task is.
+                Self::try_send_cancellation_notice(assignment_tx, hb_response.task_id).await
             }
             None => {
                 warn!(operation_code = hb_response.operation, "Unknown operation");
@@ -680,6 +716,34 @@ impl V2TaskManager {
         Ok(())
     }
 
+    /// This sends a cancel notice over the TCP socket to the executor, which will do nothing except set a
+    /// cancellation token. If the task tied to the cancellation token is still running, it will be aborted.
+    async fn try_send_cancellation_notice(assignment_tx: &Sender<Task>, unique_task_id: String) -> Result<()> {
+        let _task = Task {
+            cmd: vec![],
+            additional_distribution: None,
+            fast_register_dir: None,
+            env_vars: None,
+            unique_task_id,
+            cancel: true,
+        };
+
+        match assignment_tx.try_send(_task) {
+            Ok(()) => {
+                info!("Task deletion sent");
+            }
+            Err(TrySendError::Full(_)) => {
+                error!("Assignment channel full - not sending cancellation notice");
+                return Err(anyhow!("Failed to send task cancellation - channel full"));
+            }
+            Err(e) => {
+                error!(error = %e, "Failed to send task cancellation");
+                return Err(anyhow!("Failed to send task cancellation"));
+            }
+        }
+        Ok(())
+    }
+
     async fn try_assign_task_static(
         operation: HeartbeatResponse,
         assignment_tx: &Sender<Task>,
@@ -697,11 +761,7 @@ impl V2TaskManager {
             })
             .count();
         if running_count >= max_parallelism as usize {
-            warn!(
-                running_count,
-                max_parallelism,
-                "Max parallelism reached"
-            );
+            warn!(running_count, max_parallelism, "Max parallelism reached");
             return Err(anyhow!("Max parallelism reached"));
         }
         let exec_id = operation
@@ -729,6 +789,7 @@ impl V2TaskManager {
             fast_register_dir: None,
             env_vars: Some(operation.env_vars),
             unique_task_id: operation.task_id.clone(),
+            cancel: false,
         };
 
         debug!(exec.name = %exec_id.name, "Submitting task to executor");
@@ -749,23 +810,6 @@ impl V2TaskManager {
                 error!(error = %e, "Failed to send task assignment");
                 return Err(anyhow!("Failed to send task assignment"));
             }
-        }
-
-        Ok(())
-    }
-
-    async fn delete_task_static(
-        task_id: String,
-        tasks_in_progress: &Arc<Mutex<HashMap<String, TaskInfo>>>,
-    ) -> Result<()> {
-        let mut tasks = tasks_in_progress.lock().unwrap();
-
-        // todo: check that the task is done before deleting it. if not done, we'll need to
-        //       send a cancelled error to the executor in the future.
-        if let Some(task_info) = tasks.remove(&task_id) {
-            info!(task.id = %task_id, phase = task_info.phase, "Task deleted");
-        } else {
-            warn!(task.id = %task_id, "Task not found for deletion");
         }
 
         Ok(())
@@ -799,7 +843,7 @@ impl V2TaskManager {
             &self.tasks_in_progress,
             &self.worker_id,
             &self.queue_id,
-            self.max_parallelism,
+            0, // instead of self.max_parallelism
         );
 
         // Attempt to create a new gRPC connection for the final heartbeat
@@ -846,8 +890,7 @@ impl V2TaskManager {
 }
 
 fn is_terminal(phase: i32) -> bool {
-    // 8 permanent failure
-    phase == FAILED || phase == 8 || phase == SUCCEEDED
+    phase == FAILED || phase == FAILED_PERMANENT || phase == SUCCEEDED || phase == ABORTED
 }
 
 #[cfg(test)]

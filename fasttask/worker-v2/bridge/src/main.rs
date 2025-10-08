@@ -23,6 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         args.worker_id.clone(),
         args.queue_id.clone(),
         args.heartbeat_interval_seconds,
+        // todo: args.last_ack_grace_period_seconds, // this is the reverse heartbeating
     );
 
     // Start the executor process and TCP listener
@@ -37,9 +38,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tokio::select! {
         res = manager.run(connection, cancellation_token.clone()) => {
+            manager.send_final_heartbeat(args.fasttask_url.clone()).await;
+            info!("Final heartbeat sent following manager run");
             if let Err(e) = res {
                 error!(error = %e, "Bridge run finished with error");
-                manager.send_final_heartbeat(args.fasttask_url.clone()).await;
                 return Err(e.into());
             } else {
                 info!("Bridge run completed normally");
@@ -60,6 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             manager.send_final_heartbeat(args.fasttask_url.clone()).await;
         }
     }
+    info!("Bridge run completed, exiting...");
 
     Ok(())
 }

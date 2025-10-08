@@ -14,6 +14,10 @@ path = "src/main.rs"
 name = "test_server"
 path = "src/bin/test_server.rs"
 
+[[bin]]
+name = "ping_test"
+path = "src/bin/ping_test.rs"
+
 [dependencies]
 anyhow = "1.0"
 async-channel = "2.1"

@@ -8,6 +8,14 @@ use pyo3::prelude::*;
 use std::env;
 use unionai_actor_bridge::common::Task;
 
+/// Custom Errors that can be returned by actor environment run
+#[derive(Debug)]
+enum TaskError {
+    Cancelled(String),
+    Python(PyErr),
+    CleanUpTimeoutPoisonPill(String),
+}
+
 #[pyfunction]
 #[pyo3(name = "executor")]
 fn executor_py(py: Python) -> PyResult<Bound<PyAny>> {
@@ -100,6 +108,7 @@ fn tester_py(py: Python) -> PyResult<Bound<PyAny>> {
         fast_register_dir: None,
         env_vars: Some(env_vars),
         unique_task_id: "unique_task_id".to_string(),
+        cancel: false,
     };
 
     // Capture env var to run pool or single executor
@@ -116,11 +125,10 @@ fn tester_py(py: Python) -> PyResult<Bound<PyAny>> {
         "Running task"
     );
 
-    pyo3_async_runtimes::tokio::future_into_py(py, {
-        // Create a new Python GIL token inside the async block
-        let locals = pyo3_async_runtimes::tokio::get_current_locals(py)?;
-        tester::run_task(task, run_pool, locals)
-    })
+    // Capture TaskLocals while the Python event loop is running
+    let locals = pyo3_async_runtimes::tokio::get_current_locals(py)?;
+
+    pyo3_async_runtimes::tokio::future_into_py(py, { tester::run_task(task, run_pool, locals) })
 }
 
 #[pymodule]

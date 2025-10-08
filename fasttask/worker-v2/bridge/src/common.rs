@@ -3,10 +3,14 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Duration;
 
-pub const FAILED: i32 = 7; // 7=retryable 8=permanent
+// Need to match plugin phases.
+// https://github.com/unionai/flyte/blob/4ffea501c15235960dbd58c593201e7a7d1bb02e/flyteplugins/go/tasks/pluginmachinery/core/phase.go#L19-L41
 pub const QUEUED: i32 = 3;
 pub const RUNNING: i32 = 5;
 pub const SUCCEEDED: i32 = 6;
+pub const FAILED: i32 = 7; // 7=retryable 8=permanent
+pub const FAILED_PERMANENT: i32 = 8;
+pub const ABORTED: i32 = 10;
 
 pub struct TaskContext {
     pub kill_tx: Sender<()>,
@@ -20,6 +24,7 @@ pub struct Task {
     pub fast_register_dir: Option<String>,
     pub env_vars: Option<HashMap<String, String>>,
     pub unique_task_id: String, // This maps to the task_id in HeartbeatResponse
+    pub cancel: bool,           // Indicates if the task should be cancelled
 }
 
 #[derive(Debug, Deserialize, Serialize)]

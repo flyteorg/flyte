@@ -168,3 +168,6 @@ testing/examples
 testing/fast*
 testing/*.yaml
 docker_cargo_cache/
+
+actor_logs_for_testing/
+

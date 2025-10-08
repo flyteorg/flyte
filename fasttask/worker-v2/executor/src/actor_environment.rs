@@ -1,12 +1,25 @@
 use crate::task_args::TaskArgs;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
+use pyo3_async_runtimes::tokio::{future_into_py_with_locals, get_current_locals};
+use pyo3_async_runtimes::into_future_with_locals;
 use pyo3_async_runtimes::TaskLocals;
 use std::collections::HashMap;
+use std::time::Duration;
+use pyo3::exceptions::PyValueError;
 use tokio::sync::Mutex;
-use tracing::{debug, info};
+use tokio::time::timeout;
+use tokio_util::sync::CancellationToken;
+use tracing::{debug, info, warn};
 use tracing_attributes::instrument;
 use unionai_actor_bridge::common::Task;
+use crate::TaskError;
+
+// todo: make this 180
+const GRACE: Duration = Duration::from_secs(10);
+
+pyo3::create_exception!(async_bridge, CleanupTimeoutError, pyo3::exceptions::PyRuntimeError);
+
 
 /// Temporary structure to hold the task and its associated code bundle.
 /// This is usually passed down to the runtime
@@ -196,7 +209,7 @@ impl ActorEnvironment {
         }))
     }
 
-    // Move instrument to past the guard.1
+    // Move instrument to past the guard.
     #[instrument(skip(self, task), fields(tgz))]
     async fn get_task_and_bundle_for_tgz(
         &self,
@@ -277,11 +290,11 @@ impl ActorEnvironment {
     }
 
     #[instrument(skip(self, task), fields(task.id = %task.unique_task_id), level = "info")]
-    pub async fn run(&self, task: Task) -> Result<Py<PyAny>, PyErr> {
+    pub async fn run(&self, task: Task, token: CancellationToken) -> Result<Py<PyAny>, TaskError> {
         let args = TaskArgs::from_command(&task.cmd)
-            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e))?;
+            .map_err(|e| TaskError::Python(PyErr::new::<pyo3::exceptions::PyValueError, _>(e)))?;
 
-        let task_and_bundle = self.load_task(&args).await?;
+        let task_and_bundle = self.load_task(&args).await.map_err(|e| TaskError::Python(e))?;
 
         let env_vars = task.env_vars.unwrap_or_default();
         let run_name = env_vars.get("RUN_NAME");
@@ -300,7 +313,7 @@ impl ActorEnvironment {
             "Running task with environment context"
         );
 
-        let fut = Python::with_gil(|py| {
+        let (py_task, fut) = Python::with_gil(|py| {
             let rusty = py.import("flyte._internal.runtime.rusty")?;
 
             let kwargs = PyDict::new(py);
@@ -340,20 +353,57 @@ impl ActorEnvironment {
                 args.prev_checkpoint.clone().into_pyobject(py).unwrap(),
             )?;
             kwargs.set_item("input_path", args.inputs.clone().into_pyobject(py).unwrap())?;
+            let el = self.locals.event_loop(py);
 
-            pyo3_async_runtimes::into_future_with_locals(
-                &self.locals,
-                rusty.call_method("run_task", (), Some(&kwargs))?,
-            )
-        })?;
-        debug!("Task invoked asynchronously");
+            let coro = rusty.call_method("run_task", (), Some(&kwargs))?;
+            let event_loop = self.locals.event_loop(py);
+            let task = event_loop.call_method1("create_task", (coro,))?;
+            let rust_fut = into_future_with_locals(&self.locals, task.clone())?;
+            Ok::<_, PyErr>((task.unbind(), rust_fut))
+        }).map_err(|e| TaskError::Python(e))?;
 
-        // TODO Support for task cancellation, using tokio::select
-        let result = fut.await?;
+        let mut fut = Box::pin(fut);
+        let result = tokio::select! {
+            result = &mut fut => {
+                debug!("Task future completed: {:?}", run_name);
+                result.map_err(|e| TaskError::Python(e))
+            }
+            _ = token.cancelled() => {
+                info!("Cancellation requested, canceling async Task for {:?}", run_name);
+                cancel_python_task(&self.locals, &py_task).await?;
 
-        info!("Task completed successfully");
-        Ok(result)
+                let msg = format!("Task was aborted: run {:?}, action {:?}", run_name, action_name);
+                Err(TaskError::Cancelled(msg))
+            }
+        };
+
+        result
     }
+}
+
+async fn cancel_python_task(locals: &TaskLocals, py_task: &PyObject) -> Result<(), TaskError> {
+    Python::with_gil(|py| -> PyResult<()> {
+        let task = py_task.bind(py);
+        let _ = task.call_method0("cancel")?;
+        Ok(())
+    }).map_err(|e| TaskError::Python(e))?;
+
+    let wait_cancel_future = Python::with_gil(|py| {
+        let task = py_task.bind(py);
+        into_future_with_locals(locals, task.clone())
+    }).map_err(|e| TaskError::Python(e))?;
+
+    // todo rather than swallowing the wait_cancel_future error we should capture it
+    if timeout(GRACE, wait_cancel_future).await.is_err() {
+        // Grace period expired - this indicates a serious problem
+        // Return a special error that should cause process termination
+        warn!("Python task cancellation failed to finish, returning poison pill and terminating actor worker...");
+
+        return Err(TaskError::CleanUpTimeoutPoisonPill(
+            "Python task failed to clean up within grace period - process should terminate".to_string()
+        ));
+    }
+    Ok(())
 }
 
 /// Creates a controller for task execution
