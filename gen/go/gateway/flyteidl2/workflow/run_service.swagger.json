@@ -2271,6 +2271,15 @@
       },
       "description": "Output payload for an action."
     },
+    "taskRawDataStorage": {
+      "type": "object",
+      "properties": {
+        "raw_data_prefix": {
+          "type": "string",
+          "title": "Prefix for where offloaded data from user actions will be written\ne.g. s3://bucket/key or s3://bucket/"
+        }
+      }
+    },
     "taskRunSpec": {
       "type": "object",
       "properties": {
@@ -2297,6 +2306,14 @@
         "cluster": {
           "type": "string",
           "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        },
+        "raw_data_storage": {
+          "$ref": "#/definitions/taskRawDataStorage",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "description": "SecurityContext holds security attributes that apply to tasks."
         }
       }
     },
