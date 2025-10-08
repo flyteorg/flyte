@@ -410,3 +410,10 @@ message ActionSpec {
   // group this action belongs to, if applicable.
   string group = 8;
 }
+
+enum RunSource {
+  RUN_SOURCE_UNSPECIFIED = 0;
+  RUN_SOURCE_WEB = 1;
+  RUN_SOURCE_CLI = 2;
+  RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+}
