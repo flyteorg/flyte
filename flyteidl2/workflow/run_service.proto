@@ -97,6 +97,9 @@ message CreateRunRequest {
 
   // The run spec to use.
   task.RunSpec run_spec = 5;
+
+  // Indicates client that created this run.
+  RunSource source = 8;
 }
 
 // Response message for creating a run.
