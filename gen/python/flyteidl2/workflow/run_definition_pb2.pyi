@@ -35,6 +35,13 @@ class ActionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ACTION_TYPE_TASK: _ClassVar[ActionType]
     ACTION_TYPE_TRACE: _ClassVar[ActionType]
     ACTION_TYPE_CONDITION: _ClassVar[ActionType]
+
+class RunSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    RUN_SOURCE_UNSPECIFIED: _ClassVar[RunSource]
+    RUN_SOURCE_WEB: _ClassVar[RunSource]
+    RUN_SOURCE_CLI: _ClassVar[RunSource]
+    RUN_SOURCE_SCHEDULE_TRIGGER: _ClassVar[RunSource]
 PHASE_UNSPECIFIED: Phase
 PHASE_QUEUED: Phase
 PHASE_WAITING_FOR_RESOURCES: Phase
@@ -48,6 +55,10 @@ ACTION_TYPE_UNSPECIFIED: ActionType
 ACTION_TYPE_TASK: ActionType
 ACTION_TYPE_TRACE: ActionType
 ACTION_TYPE_CONDITION: ActionType
+RUN_SOURCE_UNSPECIFIED: RunSource
+RUN_SOURCE_WEB: RunSource
+RUN_SOURCE_CLI: RunSource
+RUN_SOURCE_SCHEDULE_TRIGGER: RunSource
 
 class Run(_message.Message):
     __slots__ = ["action"]
