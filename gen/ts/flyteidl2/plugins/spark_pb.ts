@@ -11,7 +11,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/spark.proto.
  */
 export const file_flyteidl2_plugins_spark: GenFile = /*@__PURE__*/
-  fileDesc("Ch1mbHl0ZWlkbDIvcGx1Z2lucy9zcGFyay5wcm90bxIRZmx5dGVpZGwyLnBsdWdpbnMibAoQU3BhcmtBcHBsaWNhdGlvbiJYCgRUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABIPCgtUWVBFX1BZVEhPThABEg0KCVRZUEVfSkFWQRACEg4KClRZUEVfU0NBTEEQAxIKCgZUWVBFX1IQBCLeAwoIU3BhcmtKb2ISQQoPYXBwbGljYXRpb25UeXBlGAEgASgOMiguZmx5dGVpZGwyLnBsdWdpbnMuU3BhcmtBcHBsaWNhdGlvbi5UeXBlEhsKE21haW5BcHBsaWNhdGlvbkZpbGUYAiABKAkSEQoJbWFpbkNsYXNzGAMgASgJEj0KCXNwYXJrQ29uZhgEIAMoCzIqLmZseXRlaWRsMi5wbHVnaW5zLlNwYXJrSm9iLlNwYXJrQ29uZkVudHJ5Ej8KCmhhZG9vcENvbmYYBSADKAsyKy5mbHl0ZWlkbDIucGx1Z2lucy5TcGFya0pvYi5IYWRvb3BDb25mRW50cnkSFAoMZXhlY3V0b3JQYXRoGAYgASgJEi8KDmRhdGFicmlja3NDb25mGAcgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBIXCg9kYXRhYnJpY2tzVG9rZW4YCCABKAkSGgoSZGF0YWJyaWNrc0luc3RhbmNlGAkgASgJGjAKDlNwYXJrQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEaMQoPSGFkb29wQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCwAEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IKU3BhcmtQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_google_protobuf_struct]);
+  fileDesc("Ch1mbHl0ZWlkbDIvcGx1Z2lucy9zcGFyay5wcm90bxIRZmx5dGVpZGwyLnBsdWdpbnMiQgoQU3BhcmtBcHBsaWNhdGlvbiIuCgRUeXBlEgoKBlBZVEhPThAAEggKBEpBVkEQARIJCgVTQ0FMQRACEgUKAVIQAyLeAwoIU3BhcmtKb2ISQQoPYXBwbGljYXRpb25UeXBlGAEgASgOMiguZmx5dGVpZGwyLnBsdWdpbnMuU3BhcmtBcHBsaWNhdGlvbi5UeXBlEhsKE21haW5BcHBsaWNhdGlvbkZpbGUYAiABKAkSEQoJbWFpbkNsYXNzGAMgASgJEj0KCXNwYXJrQ29uZhgEIAMoCzIqLmZseXRlaWRsMi5wbHVnaW5zLlNwYXJrSm9iLlNwYXJrQ29uZkVudHJ5Ej8KCmhhZG9vcENvbmYYBSADKAsyKy5mbHl0ZWlkbDIucGx1Z2lucy5TcGFya0pvYi5IYWRvb3BDb25mRW50cnkSFAoMZXhlY3V0b3JQYXRoGAYgASgJEi8KDmRhdGFicmlja3NDb25mGAcgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBIXCg9kYXRhYnJpY2tzVG9rZW4YCCABKAkSGgoSZGF0YWJyaWNrc0luc3RhbmNlGAkgASgJGjAKDlNwYXJrQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEaMQoPSGFkb29wQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCwAEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IKU3BhcmtQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_google_protobuf_struct]);
 
 /**
  * @generated from message flyteidl2.plugins.SparkApplication
@@ -31,29 +31,24 @@ export const SparkApplicationSchema: GenMessage<SparkApplication> = /*@__PURE__*
  */
 export enum SparkApplication_Type {
   /**
-   * @generated from enum value: TYPE_UNSPECIFIED = 0;
+   * @generated from enum value: PYTHON = 0;
    */
-  UNSPECIFIED = 0,
+  PYTHON = 0,
 
   /**
-   * @generated from enum value: TYPE_PYTHON = 1;
+   * @generated from enum value: JAVA = 1;
    */
-  PYTHON = 1,
+  JAVA = 1,
 
   /**
-   * @generated from enum value: TYPE_JAVA = 2;
+   * @generated from enum value: SCALA = 2;
    */
-  JAVA = 2,
+  SCALA = 2,
 
   /**
-   * @generated from enum value: TYPE_SCALA = 3;
+   * @generated from enum value: R = 3;
    */
-  SCALA = 3,
-
-  /**
-   * @generated from enum value: TYPE_R = 4;
-   */
-  R = 4,
+  R = 3,
 }
 
 /**

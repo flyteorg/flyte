@@ -20,6 +20,7 @@ lint:
       - flyteidl2/core/types.proto
       - flyteidl2/logs/dataplane/payload.proto
       - flyteidl2/secret/definition.proto
+      - flyteidl2/plugins/spark.proto
     ENUM_ZERO_VALUE_SUFFIX:
       - flyteidl2/common/authorization.proto
       - flyteidl2/common/list.proto
@@ -34,3 +35,4 @@ lint:
       - flyteidl2/core/types.proto
       - flyteidl2/logs/dataplane/payload.proto
       - flyteidl2/secret/definition.proto
+      - flyteidl2/plugins/spark.proto

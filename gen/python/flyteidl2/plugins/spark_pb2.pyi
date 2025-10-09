@@ -11,16 +11,14 @@ class SparkApplication(_message.Message):
     __slots__ = []
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
-        TYPE_UNSPECIFIED: _ClassVar[SparkApplication.Type]
-        TYPE_PYTHON: _ClassVar[SparkApplication.Type]
-        TYPE_JAVA: _ClassVar[SparkApplication.Type]
-        TYPE_SCALA: _ClassVar[SparkApplication.Type]
-        TYPE_R: _ClassVar[SparkApplication.Type]
-    TYPE_UNSPECIFIED: SparkApplication.Type
-    TYPE_PYTHON: SparkApplication.Type
-    TYPE_JAVA: SparkApplication.Type
-    TYPE_SCALA: SparkApplication.Type
-    TYPE_R: SparkApplication.Type
+        PYTHON: _ClassVar[SparkApplication.Type]
+        JAVA: _ClassVar[SparkApplication.Type]
+        SCALA: _ClassVar[SparkApplication.Type]
+        R: _ClassVar[SparkApplication.Type]
+    PYTHON: SparkApplication.Type
+    JAVA: SparkApplication.Type
+    SCALA: SparkApplication.Type
+    R: SparkApplication.Type
     def __init__(self) -> None: ...
 
 class SparkJob(_message.Message):
