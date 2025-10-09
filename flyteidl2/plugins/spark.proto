@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.plugins;
 
+import "flyteidl2/core/tasks.proto";
 import "google/protobuf/struct.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl/plugins";
@@ -32,4 +33,10 @@ message SparkJob {
   // Domain name of your deployment. Use the form <account>.cloud.databricks.com.
   // This instance name can be set in either flytepropeller or flytekit.
   string databricksInstance = 9;
+
+  // Pod Spec for the Spark driver pod
+  core.K8sPod driverPod = 10;
+
+  // Pod Spec for the Spark executor pod
+  core.K8sPod executorPod = 11;
 }

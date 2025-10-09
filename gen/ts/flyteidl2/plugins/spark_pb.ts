@@ -4,6 +4,8 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { K8sPod } from "../core/tasks_pb.ts";
+import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import { file_google_protobuf_struct } from "@bufbuild/protobuf/wkt";
 import type { JsonObject, Message } from "@bufbuild/protobuf";
 
@@ -11,7 +13,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/spark.proto.
  */
 export const file_flyteidl2_plugins_spark: GenFile = /*@__PURE__*/
-  fileDesc("Ch1mbHl0ZWlkbDIvcGx1Z2lucy9zcGFyay5wcm90bxIRZmx5dGVpZGwyLnBsdWdpbnMiQgoQU3BhcmtBcHBsaWNhdGlvbiIuCgRUeXBlEgoKBlBZVEhPThAAEggKBEpBVkEQARIJCgVTQ0FMQRACEgUKAVIQAyLeAwoIU3BhcmtKb2ISQQoPYXBwbGljYXRpb25UeXBlGAEgASgOMiguZmx5dGVpZGwyLnBsdWdpbnMuU3BhcmtBcHBsaWNhdGlvbi5UeXBlEhsKE21haW5BcHBsaWNhdGlvbkZpbGUYAiABKAkSEQoJbWFpbkNsYXNzGAMgASgJEj0KCXNwYXJrQ29uZhgEIAMoCzIqLmZseXRlaWRsMi5wbHVnaW5zLlNwYXJrSm9iLlNwYXJrQ29uZkVudHJ5Ej8KCmhhZG9vcENvbmYYBSADKAsyKy5mbHl0ZWlkbDIucGx1Z2lucy5TcGFya0pvYi5IYWRvb3BDb25mRW50cnkSFAoMZXhlY3V0b3JQYXRoGAYgASgJEi8KDmRhdGFicmlja3NDb25mGAcgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBIXCg9kYXRhYnJpY2tzVG9rZW4YCCABKAkSGgoSZGF0YWJyaWNrc0luc3RhbmNlGAkgASgJGjAKDlNwYXJrQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEaMQoPSGFkb29wQ29uZkVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCwAEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IKU3BhcmtQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_google_protobuf_struct]);
+  fileDesc("Ch1mbHl0ZWlkbDIvcGx1Z2lucy9zcGFyay5wcm90bxIRZmx5dGVpZGwyLnBsdWdpbnMiQgoQU3BhcmtBcHBsaWNhdGlvbiIuCgRUeXBlEgoKBlBZVEhPThAAEggKBEpBVkEQARIJCgVTQ0FMQRACEgUKAVIQAyK2BAoIU3BhcmtKb2ISQQoPYXBwbGljYXRpb25UeXBlGAEgASgOMiguZmx5dGVpZGwyLnBsdWdpbnMuU3BhcmtBcHBsaWNhdGlvbi5UeXBlEhsKE21haW5BcHBsaWNhdGlvbkZpbGUYAiABKAkSEQoJbWFpbkNsYXNzGAMgASgJEj0KCXNwYXJrQ29uZhgEIAMoCzIqLmZseXRlaWRsMi5wbHVnaW5zLlNwYXJrSm9iLlNwYXJrQ29uZkVudHJ5Ej8KCmhhZG9vcENvbmYYBSADKAsyKy5mbHl0ZWlkbDIucGx1Z2lucy5TcGFya0pvYi5IYWRvb3BDb25mRW50cnkSFAoMZXhlY3V0b3JQYXRoGAYgASgJEi8KDmRhdGFicmlja3NDb25mGAcgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBIXCg9kYXRhYnJpY2tzVG9rZW4YCCABKAkSGgoSZGF0YWJyaWNrc0luc3RhbmNlGAkgASgJEikKCWRyaXZlclBvZBgKIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZBIrCgtleGVjdXRvclBvZBgLIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZBowCg5TcGFya0NvbmZFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBGjEKD0hhZG9vcENvbmZFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQsABChVjb20uZmx5dGVpZGwyLnBsdWdpbnNCClNwYXJrUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbC9wbHVnaW5zogIDRlBYqgIRRmx5dGVpZGwyLlBsdWdpbnPKAhFGbHl0ZWlkbDJcUGx1Z2luc+ICHUZseXRlaWRsMlxQbHVnaW5zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQbHVnaW5zYgZwcm90bzM", [file_flyteidl2_core_tasks, file_google_protobuf_struct]);
 
 /**
  * @generated from message flyteidl2.plugins.SparkApplication
@@ -118,6 +120,20 @@ export type SparkJob = Message<"flyteidl2.plugins.SparkJob"> & {
    * @generated from field: string databricksInstance = 9;
    */
   databricksInstance: string;
+
+  /**
+   * Pod Spec for the Spark driver pod
+   *
+   * @generated from field: flyteidl2.core.K8sPod driverPod = 10;
+   */
+  driverPod?: K8sPod;
+
+  /**
+   * Pod Spec for the Spark executor pod
+   *
+   * @generated from field: flyteidl2.core.K8sPod executorPod = 11;
+   */
+  executorPod?: K8sPod;
 };
 
 /**
