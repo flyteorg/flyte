@@ -1397,10 +1397,6 @@
     "triggerTriggerSpec": {
       "type": "object",
       "properties": {
-        "task_id": {
-          "$ref": "#/definitions/taskTaskIdentifier",
-          "description": "Identifies which task to trigger."
-        },
         "inputs": {
           "$ref": "#/definitions/taskInputs",
           "description": "Inputs for triggered task."
