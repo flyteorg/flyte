@@ -64,6 +64,7 @@ jobs:
             -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv \
             "$IMAGE" \
             bash -c "
+              git config --global --add safe.directory /workspace &&
               cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
               make download_tooling &&
               make gen &&

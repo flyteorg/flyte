@@ -13,8 +13,8 @@ ifdef BUF_TOKEN
 	DOCKER_ENV_FLAGS += -e BUF_TOKEN=$(BUF_TOKEN)
 endif
 
-DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE)
-DOCKER_RUN_LOCAL := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE)
+DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE)
+DOCKER_RUN_LOCAL := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE)
 
 SEPARATOR := \033[1;36m========================================\033[0m
 
@@ -139,35 +139,35 @@ docker-build-fast: ## Build Docker CI image locally with cache (no pull)
 .PHONY: docker-shell
 docker-shell: ## Start an interactive shell in the CI Docker container
 	@echo '🐳  Starting interactive shell in CI container'
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
 
 .PHONY: docker-shell-local
 docker-shell-local: ## Start an interactive shell in the locally built Docker container
 	@echo '🐳  Starting interactive shell in local container'
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE) bash
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
 
 .PHONY: docker-gen
 docker-gen: ## Run 'make gen' inside Docker container
 	@echo '🐳  Running make gen in CI container'
-	$(DOCKER_RUN) make gen
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make gen"
 	@$(MAKE) sep
 
 .PHONY: docker-gen-local
 docker-gen-local: ## Run 'make gen' inside locally built Docker container
 	@echo '🐳  Running make gen in local container'
-	$(DOCKER_RUN_LOCAL) make gen
+	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make gen"
 	@$(MAKE) sep
 
 .PHONY: docker-build-crate
 docker-build-crate: ## Build Rust crate inside Docker container
 	@echo '🐳  Building Rust crate in CI container'
-	$(DOCKER_RUN) make build-crate
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make build-crate"
 	@$(MAKE) sep
 
 .PHONY: docker-build-crate-local
 docker-build-crate-local: ## Build Rust crate inside locally built Docker container
 	@echo '🐳  Building Rust crate in local container'
-	$(DOCKER_RUN_LOCAL) make build-crate
+	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make build-crate"
 	@$(MAKE) sep
 
 # Combined workflow for fast iteration
