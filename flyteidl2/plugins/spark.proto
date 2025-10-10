@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package flyteidl2.plugins;
+
+import "flyteidl2/core/tasks.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
+
+message SparkApplication {
+  enum Type {
+    PYTHON = 0;
+    JAVA = 1;
+    SCALA = 2;
+    R = 3;
+  }
+}
+
+// Custom Proto for Spark Plugin.
+message SparkJob {
+  SparkApplication.Type applicationType = 1;
+  string mainApplicationFile = 2;
+  string mainClass = 3;
+  map<string, string> sparkConf = 4;
+  map<string, string> hadoopConf = 5;
+  string executorPath = 6; // Executor path for Python jobs.
+  // Databricks job configuration.
+  // Config structure can be found here. https://docs.databricks.com/dev-tools/api/2.0/jobs.html#request-structure.
+  google.protobuf.Struct databricksConf = 7;
+  // Databricks access token. https://docs.databricks.com/dev-tools/api/latest/authentication.html
+  // This token can be set in either flytepropeller or flytekit.
+  string databricksToken = 8;
+  // Domain name of your deployment. Use the form <account>.cloud.databricks.com.
+  // This instance name can be set in either flytepropeller or flytekit.
+  string databricksInstance = 9;
+
+  // Pod Spec for the Spark driver pod
+  core.K8sPod driverPod = 10;
+
+  // Pod Spec for the Spark executor pod
+  core.K8sPod executorPod = 11;
+}

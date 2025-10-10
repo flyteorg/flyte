@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/security.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -31,6 +32,12 @@ message Envs {
   repeated flyteidl2.core.KeyValuePair values = 1;
 }
 
+message RawDataStorage {
+  // Prefix for where offloaded data from user actions will be written
+  // e.g. s3://bucket/key or s3://bucket/
+  string raw_data_prefix = 1;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -47,9 +54,13 @@ message RunSpec {
   // If true, recompute outputs for this run and overwrite any existing cache.
   bool overwrite_cache = 5;
 
-  // Future: service account, security context, execution env, etc.
-
   // the specific cluster that this action should be executed on. this value will be used as the
   // default for all actions in the run unless overridden.
   string cluster = 6;
+
+  // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+  RawDataStorage raw_data_storage = 7;
+
+  // SecurityContext holds security attributes that apply to tasks.
+  flyteidl2.core.SecurityContext security_context = 8;
 }
