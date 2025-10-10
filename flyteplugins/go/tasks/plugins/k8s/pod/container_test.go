@@ -623,3 +623,87 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 		assert.Equal(t, &core.ExecutionError{Code: finalReason, Message: finalMessage, Kind: core.ExecutionError_USER}, phaseInfo.Err())
 	})
 }
+
+func TestContainerTaskExecutor_BuildResource_VscodePort(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{}))
+
+	command := []string{"command"}
+	args := []string{"{{.Input}}"}
+
+	testCases := []struct {
+		name         string
+		labels       map[string]string
+		expectedPort int32
+	}{
+		{
+			name:         "UnionV2Label true - port 6060",
+			labels:       map[string]string{"union.ai/v2": "true"},
+			expectedPort: 6060,
+		},
+		{
+			name:         "UnionV2Label false - port 8080",
+			labels:       map[string]string{"union.ai/v2": "false"},
+			expectedPort: 8080,
+		},
+		{
+			name:         "UnionV2Label absent - port 8080",
+			labels:       map[string]string{},
+			expectedPort: 8080,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a task template with VSCode enabled and labels in K8SPod metadata
+			podSpec := v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:    "test-image",
+						Command: command,
+						Args:    args,
+						Env: []v1.EnvVar{
+							{
+								Name:  flytek8s.FlyteEnableVscode,
+								Value: "true",
+							},
+						},
+					},
+				},
+			}
+
+			podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+			assert.NoError(t, err)
+
+			taskTemplate := &core.TaskTemplate{
+				Type: "test",
+				Target: &core.TaskTemplate_K8SPod{
+					K8SPod: &core.K8SPod{
+						PodSpec: podSpecPb,
+						Metadata: &core.K8SObjectMetadata{
+							Labels: tc.labels,
+						},
+					},
+				},
+				Config: map[string]string{
+					"primary_container_name": "test-image",
+				},
+			}
+
+			taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
+			taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+
+			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
+			assert.NoError(t, err)
+			assert.NotNil(t, r)
+
+			pod, ok := r.(*v1.Pod)
+			assert.True(t, ok)
+
+			// Verify the readiness probe port
+			assert.NotEmpty(t, pod.Spec.Containers)
+			assert.NotNil(t, pod.Spec.Containers[0].ReadinessProbe)
+			assert.NotNil(t, pod.Spec.Containers[0].ReadinessProbe.HTTPGet)
+			assert.Equal(t, tc.expectedPort, pod.Spec.Containers[0].ReadinessProbe.HTTPGet.Port.IntVal)
+		})
+	}
+}

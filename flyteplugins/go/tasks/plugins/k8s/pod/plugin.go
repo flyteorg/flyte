@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	transformer "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -128,11 +129,16 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		if !flytek8s.IsVscodeEnabled(ctx, podSpec.Containers[i].Env) {
 			break
 		}
+		port := 8080
+		if val, ok := objectMeta.Labels[transformer.UnionV2Label]; ok && val == "true" {
+			port = 6060
+		}
+
 		newContainer := c.DeepCopy()
 		newContainer.ReadinessProbe = &v1.Probe{
 			ProbeHandler: v1.ProbeHandler{
 				HTTPGet: &v1.HTTPGetAction{
-					Port: intstr.FromInt32(6060),
+					Port: intstr.FromInt32(int32(port)),
 				},
 			},
 			InitialDelaySeconds: 15,
