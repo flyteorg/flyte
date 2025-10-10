@@ -158,8 +158,8 @@ The Docker image includes these tools with pinned versions:
 | Tool     | Version | Purpose                          |
 |----------|---------|----------------------------------|
 | Go       | 1.24.6  | Go code generation               |
-| Python   | 3.12.9  | Python code generation           |
-| uv       | 0.8.4   | Fast Python package manager      |
+| Python   | 3.12.9  | Python code generation (installed via uv) |
+| uv       | 0.8.4   | Python version & package manager |
 | Node.js  | 20.18.3 | TypeScript code generation       |
 | Rust     | 1.84.0  | Rust code generation             |
 | Buf      | 1.58.0  | Protocol buffer tooling          |

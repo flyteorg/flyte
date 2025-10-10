@@ -55,17 +55,17 @@ RUN GOARCH=$(case ${TARGETARCH} in amd64) echo "amd64" ;; arm64) echo "arm64" ;;
 ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 ENV GOPATH="/root/go"
 
-# Install Python using pyenv for better version management
-RUN git clone --depth=1 https://github.com/pyenv/pyenv.git /root/.pyenv
-ENV PYENV_ROOT="/root/.pyenv"
-ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
-RUN pyenv install ${PYTHON_VERSION} && \
-    pyenv global ${PYTHON_VERSION} && \
-    pyenv rehash
-
-# Install uv (fast Python package manager)
+# Install uv (fast Python package manager and Python version manager)
 RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
 ENV PATH="/root/.local/bin:${PATH}"
+
+# Install Python using uv (much faster than pyenv)
+RUN uv python install ${PYTHON_VERSION}
+
+# Create symlinks to make Python available globally
+RUN UV_PYTHON=$(uv python find ${PYTHON_VERSION}) && \
+    ln -sf ${UV_PYTHON} /usr/local/bin/python3 && \
+    ln -sf ${UV_PYTHON} /usr/local/bin/python
 
 # Install Node.js
 RUN NODEARCH=$(case ${TARGETARCH} in amd64) echo "x64" ;; arm64) echo "arm64" ;; *) echo "x64" ;; esac) && \
