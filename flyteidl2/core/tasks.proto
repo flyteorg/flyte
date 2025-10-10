@@ -231,6 +231,9 @@ message TaskTemplate {
   // to use as required.
   // reserve the field numbers 1 through 15 for very frequently occurring message elements
   map<string, string> config = 16;
+
+  // Whether the task is able to run the debugger (vscode server) inside the task container.
+  bool debuggable = 19;
 }
 
 // ----------------- First class Plugins

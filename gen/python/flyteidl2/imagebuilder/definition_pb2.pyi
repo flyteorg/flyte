@@ -118,8 +118,20 @@ class Env(_message.Message):
     env_variables: _containers.ScalarMap[str, str]
     def __init__(self, env_variables: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
+class PoetryProject(_message.Message):
+    __slots__ = ["pyproject", "poetry_lock", "extra_args", "secret_mounts"]
+    PYPROJECT_FIELD_NUMBER: _ClassVar[int]
+    POETRY_LOCK_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_ARGS_FIELD_NUMBER: _ClassVar[int]
+    SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
+    pyproject: str
+    poetry_lock: str
+    extra_args: str
+    secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
+    def __init__(self, pyproject: _Optional[str] = ..., poetry_lock: _Optional[str] = ..., extra_args: _Optional[str] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
+
 class Layer(_message.Message):
-    __slots__ = ["apt_packages", "pip_packages", "commands", "requirements", "python_wheels", "workdir", "copy_config", "uv_project", "env"]
+    __slots__ = ["apt_packages", "pip_packages", "commands", "requirements", "python_wheels", "workdir", "copy_config", "uv_project", "env", "poetry_project"]
     APT_PACKAGES_FIELD_NUMBER: _ClassVar[int]
     PIP_PACKAGES_FIELD_NUMBER: _ClassVar[int]
     COMMANDS_FIELD_NUMBER: _ClassVar[int]
@@ -129,6 +141,7 @@ class Layer(_message.Message):
     COPY_CONFIG_FIELD_NUMBER: _ClassVar[int]
     UV_PROJECT_FIELD_NUMBER: _ClassVar[int]
     ENV_FIELD_NUMBER: _ClassVar[int]
+    POETRY_PROJECT_FIELD_NUMBER: _ClassVar[int]
     apt_packages: AptPackages
     pip_packages: PipPackages
     commands: Commands
@@ -138,7 +151,8 @@ class Layer(_message.Message):
     copy_config: CopyConfig
     uv_project: UVProject
     env: Env
-    def __init__(self, apt_packages: _Optional[_Union[AptPackages, _Mapping]] = ..., pip_packages: _Optional[_Union[PipPackages, _Mapping]] = ..., commands: _Optional[_Union[Commands, _Mapping]] = ..., requirements: _Optional[_Union[Requirements, _Mapping]] = ..., python_wheels: _Optional[_Union[PythonWheels, _Mapping]] = ..., workdir: _Optional[_Union[WorkDir, _Mapping]] = ..., copy_config: _Optional[_Union[CopyConfig, _Mapping]] = ..., uv_project: _Optional[_Union[UVProject, _Mapping]] = ..., env: _Optional[_Union[Env, _Mapping]] = ...) -> None: ...
+    poetry_project: PoetryProject
+    def __init__(self, apt_packages: _Optional[_Union[AptPackages, _Mapping]] = ..., pip_packages: _Optional[_Union[PipPackages, _Mapping]] = ..., commands: _Optional[_Union[Commands, _Mapping]] = ..., requirements: _Optional[_Union[Requirements, _Mapping]] = ..., python_wheels: _Optional[_Union[PythonWheels, _Mapping]] = ..., workdir: _Optional[_Union[WorkDir, _Mapping]] = ..., copy_config: _Optional[_Union[CopyConfig, _Mapping]] = ..., uv_project: _Optional[_Union[UVProject, _Mapping]] = ..., env: _Optional[_Union[Env, _Mapping]] = ..., poetry_project: _Optional[_Union[PoetryProject, _Mapping]] = ...) -> None: ...
 
 class ImageSpec(_message.Message):
     __slots__ = ["base_image", "python_version", "layers", "platform"]
