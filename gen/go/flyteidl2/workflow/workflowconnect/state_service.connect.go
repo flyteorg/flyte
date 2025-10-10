@@ -52,9 +52,9 @@ var (
 // StateServiceClient is a client for the flyteidl2.workflow.StateService service.
 type StateServiceClient interface {
 	// put the state of an action.
-	Put(context.Context) *connect.BidiStreamForClient[workflow.PutRequest, workflow.PutResponse]
+	Put(context.Context, *connect.Request[workflow.PutRequest]) (*connect.Response[workflow.PutResponse], error)
 	// get the state of an action.
-	Get(context.Context) *connect.BidiStreamForClient[workflow.GetRequest, workflow.GetResponse]
+	Get(context.Context, *connect.Request[workflow.GetRequest]) (*connect.Response[workflow.GetResponse], error)
 	// watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
 	Watch(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)
 }
@@ -98,13 +98,13 @@ type stateServiceClient struct {
 }
 
 // Put calls flyteidl2.workflow.StateService.Put.
-func (c *stateServiceClient) Put(ctx context.Context) *connect.BidiStreamForClient[workflow.PutRequest, workflow.PutResponse] {
-	return c.put.CallBidiStream(ctx)
+func (c *stateServiceClient) Put(ctx context.Context, req *connect.Request[workflow.PutRequest]) (*connect.Response[workflow.PutResponse], error) {
+	return c.put.CallUnary(ctx, req)
 }
 
 // Get calls flyteidl2.workflow.StateService.Get.
-func (c *stateServiceClient) Get(ctx context.Context) *connect.BidiStreamForClient[workflow.GetRequest, workflow.GetResponse] {
-	return c.get.CallBidiStream(ctx)
+func (c *stateServiceClient) Get(ctx context.Context, req *connect.Request[workflow.GetRequest]) (*connect.Response[workflow.GetResponse], error) {
+	return c.get.CallUnary(ctx, req)
 }
 
 // Watch calls flyteidl2.workflow.StateService.Watch.
@@ -115,9 +115,9 @@ func (c *stateServiceClient) Watch(ctx context.Context, req *connect.Request[wor
 // StateServiceHandler is an implementation of the flyteidl2.workflow.StateService service.
 type StateServiceHandler interface {
 	// put the state of an action.
-	Put(context.Context, *connect.BidiStream[workflow.PutRequest, workflow.PutResponse]) error
+	Put(context.Context, *connect.Request[workflow.PutRequest]) (*connect.Response[workflow.PutResponse], error)
 	// get the state of an action.
-	Get(context.Context, *connect.BidiStream[workflow.GetRequest, workflow.GetResponse]) error
+	Get(context.Context, *connect.Request[workflow.GetRequest]) (*connect.Response[workflow.GetResponse], error)
 	// watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
 	Watch(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error
 }
@@ -128,13 +128,13 @@ type StateServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewStateServiceHandler(svc StateServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	stateServicePutHandler := connect.NewBidiStreamHandler(
+	stateServicePutHandler := connect.NewUnaryHandler(
 		StateServicePutProcedure,
 		svc.Put,
 		connect.WithSchema(stateServicePutMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	stateServiceGetHandler := connect.NewBidiStreamHandler(
+	stateServiceGetHandler := connect.NewUnaryHandler(
 		StateServiceGetProcedure,
 		svc.Get,
 		connect.WithSchema(stateServiceGetMethodDescriptor),
@@ -163,12 +163,12 @@ func NewStateServiceHandler(svc StateServiceHandler, opts ...connect.HandlerOpti
 // UnimplementedStateServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedStateServiceHandler struct{}
 
-func (UnimplementedStateServiceHandler) Put(context.Context, *connect.BidiStream[workflow.PutRequest, workflow.PutResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Put is not implemented"))
+func (UnimplementedStateServiceHandler) Put(context.Context, *connect.Request[workflow.PutRequest]) (*connect.Response[workflow.PutResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Put is not implemented"))
 }
 
-func (UnimplementedStateServiceHandler) Get(context.Context, *connect.BidiStream[workflow.GetRequest, workflow.GetResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Get is not implemented"))
+func (UnimplementedStateServiceHandler) Get(context.Context, *connect.Request[workflow.GetRequest]) (*connect.Response[workflow.GetResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.StateService.Get is not implemented"))
 }
 
 func (UnimplementedStateServiceHandler) Watch(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error {
