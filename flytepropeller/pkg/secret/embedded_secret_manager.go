@@ -329,12 +329,11 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 		}
 		i.injectAsEnvVar(secret, stringValue, pod)
 	case core.Secret_FILE:
-		if secretValue.BinaryValue == nil {
-			return pod, false, fmt.Errorf(
-				"secret %q is attempted to be mounted as a file, but has no binary "+
-					"value; mount as an environment variable instead", secret.Key)
+		secretBytes := secretValue.BinaryValue
+		if len(secretValue.StringValue) > 0 {
+			secretBytes = []byte(secretValue.StringValue)
 		}
-		i.injectAsFile(secret, secretValue.BinaryValue, pod)
+		i.injectAsFile(secret, secretBytes, pod)
 	default:
 		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
 		logger.Error(ctx, err)
