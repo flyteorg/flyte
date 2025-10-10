@@ -1,11 +1,6 @@
 # Flyte CI/Development Docker Image
 # This image provides a consistent environment for both CI and local development
-# to eliminate "works on my machine" issues.
-
-FROM ubuntu:24.04
-
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Multi-stage build for parallel downloads and optimized caching
 
 # Get target architecture from buildx
 ARG TARGETARCH
@@ -20,8 +15,52 @@ ARG UV_VERSION=0.8.4
 ARG BUF_VERSION=1.58.0
 ARG MOCKERY_VERSION=2.53.5
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Stage 1: Download Go (parallel)
+FROM golang:${GO_VERSION}-alpine AS go-source
+# Just copy from official image
+
+# Stage 2: Download Node.js (parallel)
+FROM node:${NODE_VERSION}-alpine AS node-source
+# Just copy from official image
+
+# Stage 3: Download uv and Python (parallel)
+FROM ubuntu:24.04 AS python-installer
+ARG TARGETARCH
+ARG UV_VERSION
+ARG PYTHON_VERSION
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+ENV PATH="/root/.local/bin:${PATH}"
+RUN uv python install ${PYTHON_VERSION}
+
+# Stage 4: Download Buf (parallel)
+FROM alpine:latest AS buf-downloader
+ARG TARGETARCH
+ARG BUF_VERSION
+RUN apk add --no-cache curl tar
+RUN BUFARCH=$(case ${TARGETARCH} in amd64) echo "x86_64" ;; arm64) echo "aarch64" ;; *) echo "x86_64" ;; esac) && \
+    curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-${BUFARCH}.tar.gz" | \
+    tar -xzC /tmp
+
+# Stage 5: Final image
+FROM ubuntu:24.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set versions again for reference
+ARG GO_VERSION
+ARG PYTHON_VERSION
+ARG NODE_VERSION
+ARG RUST_VERSION
+ARG UV_VERSION
+ARG MOCKERY_VERSION
+
+# Install system dependencies with cache mount
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
     # Basic tools
     curl \
     wget \
@@ -32,57 +71,45 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     lsb-release \
     unzip \
-    # Python build dependencies
+    xz-utils \
+    jq \
+    # Minimal Python build deps (most come from official Python)
     libssl-dev \
     zlib1g-dev \
-    libbz2-dev \
-    libreadline-dev \
-    libsqlite3-dev \
-    libncursesw5-dev \
-    xz-utils \
-    tk-dev \
-    libxml2-dev \
-    libxmlsec1-dev \
-    libffi-dev \
-    liblzma-dev \
-    # Additional utilities
-    jq \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Go
-RUN GOARCH=$(case ${TARGETARCH} in amd64) echo "amd64" ;; arm64) echo "arm64" ;; *) echo "amd64" ;; esac) && \
-    curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${GOARCH}.tar.gz" | tar -C /usr/local -xz
+# Copy Go from official image
+COPY --from=go-source /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 ENV GOPATH="/root/go"
 
-# Install uv (fast Python package manager and Python version manager)
-RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+# Copy uv and Python from installer stage
+COPY --from=python-installer /root/.local /root/.local
+COPY --from=python-installer /root/.local/share/uv /root/.local/share/uv
 ENV PATH="/root/.local/bin:${PATH}"
-
-# Install Python using uv (much faster than pyenv)
-RUN uv python install ${PYTHON_VERSION}
-
-# Create symlinks to make Python available globally
 RUN UV_PYTHON=$(uv python find ${PYTHON_VERSION}) && \
     ln -sf ${UV_PYTHON} /usr/local/bin/python3 && \
     ln -sf ${UV_PYTHON} /usr/local/bin/python
 
-# Install Node.js
-RUN NODEARCH=$(case ${TARGETARCH} in amd64) echo "x64" ;; arm64) echo "arm64" ;; *) echo "x64" ;; esac) && \
-    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODEARCH}.tar.xz" | tar -C /usr/local --strip-components=1 -xJ
-RUN npm install -g npm@latest
+# Copy Node.js from official image
+COPY --from=node-source /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-source /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node-source /usr/local/bin/npx /usr/local/bin/npx
+COPY --from=node-source /usr/local/lib/node_modules /usr/local/lib/node_modules
 
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${RUST_VERSION}
+# Install Rust (still need to run installer for architecture detection)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${RUST_VERSION} --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Install Buf CLI
-RUN BUFARCH=$(case ${TARGETARCH} in amd64) echo "x86_64" ;; arm64) echo "aarch64" ;; *) echo "x86_64" ;; esac) && \
-    curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-${BUFARCH}.tar.gz" | \
-    tar -xzC /usr/local --strip-components 1
+# Copy Buf from downloader stage
+COPY --from=buf-downloader /tmp/buf/bin/buf /usr/local/bin/buf
+COPY --from=buf-downloader /tmp/buf/bin/protoc-gen-buf-breaking /usr/local/bin/protoc-gen-buf-breaking
+COPY --from=buf-downloader /tmp/buf/bin/protoc-gen-buf-lint /usr/local/bin/protoc-gen-buf-lint
 
-# Install Go tools
-RUN go install "github.com/vektra/mockery/v2@v${MOCKERY_VERSION}"
+# Install Go tools with cache mount
+RUN --mount=type=cache,target=/root/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go install "github.com/vektra/mockery/v2@v${MOCKERY_VERSION}"
 
 # Set working directory
 WORKDIR /workspace

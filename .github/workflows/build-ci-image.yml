@@ -86,9 +86,19 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+          # Multi-layer caching strategy for speed
+          cache-from: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.set-tag.outputs.tag }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2
+            type=gha
+          cache-to: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+            type=gha,mode=max
+          # Enable BuildKit features for better caching
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
 
       - name: Image digest
         run: echo "Image built with digest ${{ steps.meta.outputs.digest }}"
