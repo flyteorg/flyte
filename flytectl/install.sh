@@ -96,7 +96,7 @@ tag_to_version() {
     TAG="$REALTAG"
     VERSION=${TAG#v}
   elif [ "$STATUS_CODE" -eq 200 ]; then
-    log_crit "Tag '${TAG}' does not exist on GitHub. Check available releases at https://github.com/${OWNER}/${REPO}/releases"
+    TAG="flytectl/$TAG"
     VERSION=${TAG#v}
   else
     log_crit "unable to find '${TAG}' - use 'latest' or see https://github.com/${PREFIX}/releases for details"
