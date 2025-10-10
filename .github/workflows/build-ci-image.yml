@@ -63,7 +63,7 @@ jobs:
             # Use 'v2' tag for v2 branch
             type=raw,value=v2,enable=${{ github.ref == 'refs/heads/v2' }}
             # Add git sha as tag
-            type=sha,prefix=${{ github.branch }}-
+            type=sha,prefix=${{ github.head_ref }}-
 
       - name: Set image tag output
         id: set-tag
