@@ -1347,6 +1347,28 @@
       },
       "description": "TaskIdentifier is the unique identifier for a task."
     },
+    "taskTaskName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this task belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this task belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
+        }
+      },
+      "description": "Name of a task. It may have multiple versions deployed."
+    },
     "taskTriggerAutomationSpec": {
       "type": "object",
       "properties": {
@@ -1524,10 +1546,6 @@
     "triggerTriggerSpec": {
       "type": "object",
       "properties": {
-        "task_id": {
-          "$ref": "#/definitions/taskTaskIdentifier",
-          "description": "Identifies which task to trigger."
-        },
         "inputs": {
           "$ref": "#/definitions/taskInputs",
           "description": "Inputs for triggered task."

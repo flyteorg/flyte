@@ -115,6 +115,8 @@ func (m *CreateRunRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Source
+
 	switch v := m.Id.(type) {
 	case *CreateRunRequest_RunId:
 		if v == nil {

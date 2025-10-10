@@ -52,7 +52,14 @@ service TriggerService {
 
 // Request message for saving a trigger.
 message DeployTriggerRequest {
-  flyteidl2.common.TriggerIdentifier id = 1 [(buf.validate.field).required = true];
+  reserved 1;
+
+  flyteidl2.common.TriggerName name = 4 [(buf.validate.field).required = true];
+
+  // Revision of the trigger.
+  // Optional for the initial deploy of the trigger.
+  // Mandatory for updating existing trigger and should store latest previously deployed revision.
+  uint64 revision = 5;
 
   TriggerSpec spec = 2 [(buf.validate.field).required = true];
 
@@ -101,8 +108,11 @@ message ListTriggersRequest {
     // Project identifier for filtering.
     flyteidl2.common.ProjectIdentifier project_id = 3;
 
-    // List all triggers attached to a given task.
+    // List all triggers attached to a given version of a task .
     flyteidl2.task.TaskIdentifier task_id = 4;
+
+    // List all triggers attached to a given task.
+    flyteidl2.task.TaskName task_name = 5;
   }
 }
 
