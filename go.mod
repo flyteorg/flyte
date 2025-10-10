@@ -21,6 +21,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v5 v5.5.5
+	github.com/lib/pq v1.10.9
 	github.com/magiconair/properties v1.8.6
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.22.0
