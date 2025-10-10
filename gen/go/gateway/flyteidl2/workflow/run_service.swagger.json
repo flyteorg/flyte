@@ -2763,6 +2763,16 @@
         }
       }
     },
+    "workflowRunSource": {
+      "type": "string",
+      "enum": [
+        "RUN_SOURCE_UNSPECIFIED",
+        "RUN_SOURCE_WEB",
+        "RUN_SOURCE_CLI",
+        "RUN_SOURCE_SCHEDULE_TRIGGER"
+      ],
+      "default": "RUN_SOURCE_UNSPECIFIED"
+    },
     "workflowTaskActionMetadata": {
       "type": "object",
       "properties": {

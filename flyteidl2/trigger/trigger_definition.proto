@@ -7,7 +7,6 @@ import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
-import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
@@ -21,8 +20,7 @@ message TriggerMetadata {
 }
 
 message TriggerSpec {
-  // Identifies which task to trigger.
-  flyteidl2.task.TaskIdentifier task_id = 1 [(buf.validate.field).required = true];
+  reserved 1;
 
   // Inputs for triggered task.
   flyteidl2.task.Inputs inputs = 2;
