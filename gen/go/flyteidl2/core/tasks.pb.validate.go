@@ -1183,6 +1183,8 @@ func (m *TaskTemplate) validate(all bool) error {
 
 	// no validation rules for Config
 
+	// no validation rules for Debuggable
+
 	switch v := m.Target.(type) {
 	case *TaskTemplate_Container:
 		if v == nil {
