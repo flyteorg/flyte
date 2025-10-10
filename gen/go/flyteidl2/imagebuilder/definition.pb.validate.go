@@ -1596,6 +1596,146 @@ var _ interface {
 	ErrorName() string
 } = EnvValidationError{}
 
+// Validate checks the field values on PoetryProject with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PoetryProject) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PoetryProject with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PoetryProjectMultiError, or
+// nil if none found.
+func (m *PoetryProject) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PoetryProject) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Pyproject
+
+	// no validation rules for PoetryLock
+
+	// no validation rules for ExtraArgs
+
+	for idx, item := range m.GetSecretMounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PoetryProjectValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PoetryProjectValidationError{
+						field:  fmt.Sprintf("SecretMounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PoetryProjectValidationError{
+					field:  fmt.Sprintf("SecretMounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return PoetryProjectMultiError(errors)
+	}
+
+	return nil
+}
+
+// PoetryProjectMultiError is an error wrapping multiple validation errors
+// returned by PoetryProject.ValidateAll() if the designated constraints
+// aren't met.
+type PoetryProjectMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PoetryProjectMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PoetryProjectMultiError) AllErrors() []error { return m }
+
+// PoetryProjectValidationError is the validation error returned by
+// PoetryProject.Validate if the designated constraints aren't met.
+type PoetryProjectValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PoetryProjectValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PoetryProjectValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PoetryProjectValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PoetryProjectValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PoetryProjectValidationError) ErrorName() string { return "PoetryProjectValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PoetryProjectValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPoetryProject.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PoetryProjectValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PoetryProjectValidationError{}
+
 // Validate checks the field values on Layer with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -1981,6 +2121,47 @@ func (m *Layer) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return LayerValidationError{
 					field:  "Env",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Layer_PoetryProject:
+		if v == nil {
+			err := LayerValidationError{
+				field:  "Layer",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetPoetryProject()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LayerValidationError{
+						field:  "PoetryProject",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LayerValidationError{
+						field:  "PoetryProject",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPoetryProject()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LayerValidationError{
+					field:  "PoetryProject",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
