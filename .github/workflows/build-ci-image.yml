@@ -99,20 +99,22 @@ jobs:
         with:
           script: |
             const tag = '${{ steps.set-tag.outputs.tag }}';
-            const imageName = '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${tag}';
+            const registry = '${{ env.REGISTRY }}';
+            const imageName = '${{ env.IMAGE_NAME }}';
+            const fullImage = `${registry}/${imageName}:${tag}`;
 
             const comment = `## 🐳 Docker CI Image Built
 
             The CI Docker image has been built and pushed for this PR!
 
-            **Image:** \`${imageName}\`
+            **Image:** \`${fullImage}\`
 
             This image will be automatically used by CI workflows in this PR.
 
             To test locally:
             \`\`\`bash
-            docker pull ${imageName}
-            docker run --rm -it -v $(pwd):/workspace -w /workspace ${imageName} bash
+            docker pull ${fullImage}
+            docker run --rm -it -v $(pwd):/workspace -w /workspace ${fullImage} bash
             \`\`\`
             `;
 
