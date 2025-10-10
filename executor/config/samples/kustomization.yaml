@@ -1,4 +1,0 @@
-## Append samples of your project ##
-resources:
-- flyte.org_v1_taskaction.yaml
-# +kubebuilder:scaffold:manifestskustomizesamples

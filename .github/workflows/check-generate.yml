@@ -43,7 +43,7 @@ jobs:
         run: which mockery && make gen
       - name: Check for changes
         run: |
-          git diff --exit-code || (echo 'Generated files are out of date. Run make generate and commit changes.' && exit 1)
+          git diff --exit-code || (echo 'Generated files are out of date. Run `make gen` and commit changes.' && exit 1)
       - name: Check rust builds
         run: |
           make build-crate
