@@ -3,7 +3,6 @@ from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
-from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -34,18 +33,16 @@ class TriggerMetadata(_message.Message):
     def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., updated_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class TriggerSpec(_message.Message):
-    __slots__ = ["task_id", "inputs", "run_spec", "active", "task_version"]
-    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["inputs", "run_spec", "active", "task_version"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     TASK_VERSION_FIELD_NUMBER: _ClassVar[int]
-    task_id: _task_definition_pb2.TaskIdentifier
     inputs: _common_pb2.Inputs
     run_spec: _run_pb2.RunSpec
     active: bool
     task_version: str
-    def __init__(self, task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., active: bool = ..., task_version: _Optional[str] = ...) -> None: ...
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., active: bool = ..., task_version: _Optional[str] = ...) -> None: ...
 
 class TriggerStatus(_message.Message):
     __slots__ = ["deployed_at", "updated_at", "triggered_at", "deleted_at"]

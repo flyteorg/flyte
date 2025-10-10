@@ -100,10 +100,7 @@ message ListTriggersRequest {
     option (buf.validate.oneof).required = true;
 
     // Organization name for filtering.
-    string org = 2 [
-      (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
-      (buf.validate.field).string.min_len = 1
-    ];
+    string org = 2 [(buf.validate.field).string.min_len = 1];
 
     // Project identifier for filtering.
     flyteidl2.common.ProjectIdentifier project_id = 3;
