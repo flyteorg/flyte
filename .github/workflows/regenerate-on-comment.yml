@@ -58,6 +58,7 @@ jobs:
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
+            -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv \
             ${{ steps.docker-image.outputs.image }} \
             bash -c "cd gen/python && uv sync --all-groups --frozen && cd ../.. && make generate"
 
