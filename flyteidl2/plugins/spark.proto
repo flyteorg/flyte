@@ -5,7 +5,7 @@ package flyteidl2.plugins;
 import "flyteidl2/core/tasks.proto";
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 
 message SparkApplication {
   enum Type {
