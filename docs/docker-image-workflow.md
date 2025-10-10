@@ -218,9 +218,18 @@ If not modified:
 
 ### Wait Strategy
 
-For PRs with Dockerfile changes, workflows wait up to 10 minutes for the image:
-- Polls every 20 seconds
-- 30 attempts = 10 minutes total
-- Fails if image not available after timeout
+For PRs with Dockerfile changes, workflows intelligently wait for the build:
 
-This ensures the image build completes before tests run.
+1. **Check for build workflow**: Queries GitHub API for `build-ci-image.yml` runs
+2. **Find matching run**: Looks for run with same commit SHA
+3. **Wait for completion**: Polls every 20 seconds for up to 20 minutes
+4. **Verify success**: Ensures build succeeded before proceeding
+5. **Pull fresh image**: Downloads the newly built image
+
+**Benefits:**
+- Always waits for the actual build to complete (not just image existence)
+- Works correctly on subsequent pushes to the same PR
+- Provides clear feedback on build status
+- Fails fast if build fails
+
+This ensures tests always run with the freshly built image, even when pushing multiple commits to a PR.
