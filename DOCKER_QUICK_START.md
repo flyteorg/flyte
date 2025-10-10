@@ -87,11 +87,29 @@ gh auth token | docker login ghcr.io -u YOUR_USERNAME --password-stdin
 
 ## Updating the Docker Image
 
-If you're modifying `Dockerfile.ci`:
+### Fast Local Iteration (Recommended)
+
+If you're modifying `ci.Dockerfile`, build and test locally first:
+
+```bash
+# One command to build and test
+make docker-dev
+
+# Or step-by-step
+make docker-build          # Build image
+make docker-shell-local    # Test interactively
+make docker-gen-local      # Run generation
+```
+
+This is **much faster** than waiting for PR builds!
+
+### PR Testing (After Local Testing)
+
+Once your local changes work:
 
 1. **Create a PR** with your changes
 2. **Wait for build** - A bot will comment with the PR-specific image tag
-3. **Test locally** with the same image:
+3. **Test with PR image** to verify CI works:
    ```bash
    docker pull ghcr.io/flyteorg/flyte/ci:pr-123  # Use your PR number
    docker run --rm -it -v $(pwd):/workspace -w /workspace \
@@ -99,7 +117,24 @@ If you're modifying `Dockerfile.ci`:
    ```
 4. **CI automatically uses** your new image in the PR
 
-This ensures you can test and iterate on Docker image changes in the same PR!
+### Workflow Comparison
+
+**Local iteration** (seconds to minutes):
+```bash
+vim ci.Dockerfile
+make docker-dev           # Fast!
+# Repeat until it works
+```
+
+**PR iteration** (5-10 minutes per build):
+```bash
+git push
+# Wait for build...
+docker pull ghcr.io/flyteorg/flyte/ci:pr-123
+# Test
+```
+
+Use local iteration first, then validate with PR!
 
 ## More Information
 

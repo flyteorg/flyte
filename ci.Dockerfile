@@ -7,6 +7,10 @@ FROM ubuntu:24.04
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Get target architecture from buildx
+ARG TARGETARCH
+ARG TARGETOS
+
 # Set versions for all tools
 ARG GO_VERSION=1.24.6
 ARG PYTHON_VERSION=3.12.9
@@ -46,7 +50,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go
-RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -C /usr/local -xz
+RUN GOARCH=$(case ${TARGETARCH} in amd64) echo "amd64" ;; arm64) echo "arm64" ;; *) echo "amd64" ;; esac) && \
+    curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${GOARCH}.tar.gz" | tar -C /usr/local -xz
 ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 ENV GOPATH="/root/go"
 
@@ -63,7 +68,8 @@ RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Install Node.js
-RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" | tar -C /usr/local --strip-components=1 -xJ
+RUN NODEARCH=$(case ${TARGETARCH} in amd64) echo "x64" ;; arm64) echo "arm64" ;; *) echo "x64" ;; esac) && \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODEARCH}.tar.xz" | tar -C /usr/local --strip-components=1 -xJ
 RUN npm install -g npm@latest
 
 # Install Rust
@@ -71,7 +77,8 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --de
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Buf CLI
-RUN curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-x86_64.tar.gz" | \
+RUN BUFARCH=$(case ${TARGETARCH} in amd64) echo "x86_64" ;; arm64) echo "aarch64" ;; *) echo "x86_64" ;; esac) && \
+    curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-${BUFARCH}.tar.gz" | \
     tar -xzC /usr/local --strip-components 1
 
 # Install Go tools

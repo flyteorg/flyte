@@ -138,6 +138,33 @@ make docker-gen
 
 ### For Docker Image Updates
 
+#### Option 1: Local Development (Fastest - Recommended)
+
+```bash
+# Modify ci.Dockerfile
+vim ci.Dockerfile
+
+# Build and test locally
+make docker-dev
+
+# Iterate quickly
+vim ci.Dockerfile
+make docker-build-fast  # Uses cache, faster rebuilds
+make docker-gen-local
+
+# When it works, push to PR
+git commit -am "Update Python to 3.13"
+git push
+```
+
+**Benefits:**
+- ⚡ Fast iteration (seconds to minutes)
+- 🔄 No network dependency
+- 🧪 Test before pushing
+- 💰 No CI minutes wasted
+
+#### Option 2: PR-Based Testing
+
 ```bash
 # 1. Modify ci.Dockerfile
 vim ci.Dockerfile

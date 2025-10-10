@@ -165,6 +165,12 @@ The Docker image includes these tools with pinned versions:
 | Buf      | 1.58.0  | Protocol buffer tooling          |
 | mockery  | 2.53.5  | Go mock generation               |
 
+**Supported Architectures:**
+- `linux/amd64` (Intel/AMD x86_64)
+- `linux/arm64` (Apple Silicon, ARM64)
+
+The image is built as a multi-architecture image, so it will automatically pull the correct version for your platform.
+
 ## Advanced Usage
 
 ### Using Docker Compose
@@ -330,17 +336,85 @@ Always pull the latest image before reporting issues:
 docker pull ghcr.io/flyteorg/flyte/ci:v2
 ```
 
-## Contributing to the Docker Image
+## Developing the Docker Image
+
+### Fast Local Iteration
+
+When modifying `ci.Dockerfile`, you can build and test locally for faster iteration:
+
+#### Quick Start
+```bash
+# Build local image and run generation
+make docker-dev
+
+# Or step-by-step:
+make docker-build        # Build local image
+make docker-gen-local    # Run generation with local image
+make docker-shell-local  # Interactive shell with local image
+```
+
+#### Available Local Targets
+
+| Command | Description |
+|---------|-------------|
+| `make docker-build` | Build Docker image locally as `flyte-ci:local` |
+| `make docker-build-fast` | Build with cache (faster rebuilds) |
+| `make docker-gen-local` | Run `make gen` in local container |
+| `make docker-build-crate-local` | Build Rust crate in local container |
+| `make docker-shell-local` | Interactive shell in local container |
+| `make docker-dev` | Build + generate in one command (recommended) |
+
+#### Full Development Workflow
+
+```bash
+# 1. Modify the Dockerfile
+vim ci.Dockerfile  # e.g., update Go version
+
+# 2. Build and test locally (fast!)
+make docker-dev
+
+# 3. If it works, commit and push
+git add ci.Dockerfile
+git commit -m "Update Go to 1.25.0"
+git push origin update-go
+
+# 4. PR will build image as pr-XXX
+# 5. CI automatically uses your PR image
+# 6. Merge when ready
+```
+
+### Testing Different Approaches
+
+**Local testing** (fastest, no push needed):
+```bash
+make docker-build
+make docker-shell-local
+# Test inside container
+```
+
+**PR testing** (tests the exact CI image):
+```bash
+git push  # Triggers PR image build
+# Wait for build
+docker pull ghcr.io/flyteorg/flyte/ci:pr-123
+docker run --rm -v $(pwd):/workspace -w /workspace \
+  ghcr.io/flyteorg/flyte/ci:pr-123 bash
+```
+
+### Contributing to the Docker Image
 
 To modify the Docker image:
 
-1. Edit `Dockerfile.ci`
+1. Edit `ci.Dockerfile`
 2. Test locally:
    ```bash
-   docker build -f ci.Dockerfile -t flyte-ci-test .
-   docker run --rm -it flyte-ci-test bash
+   make docker-build
+   make docker-shell-local
+   # Or use docker commands directly:
+   # docker build -f ci.Dockerfile -t flyte-ci:local .
+   # docker run --rm -it flyte-ci:local bash
    ```
-3. Submit a PR - the image will be built automatically for testing
+3. Submit a PR - the image will be built automatically as `pr-XXX` for testing
 4. After merge, the new image will be available as `ghcr.io/flyteorg/flyte/ci:v2`
 
 ## Alternatives

@@ -2,7 +2,19 @@
 
 # Docker CI image configuration
 DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
-DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_CI_IMAGE)
+DOCKER_LOCAL_IMAGE := flyte-ci:local
+
+# Environment variable flags for Docker
+DOCKER_ENV_FLAGS :=
+ifdef GITHUB_TOKEN
+	DOCKER_ENV_FLAGS += -e GITHUB_TOKEN=$(GITHUB_TOKEN)
+endif
+ifdef BUF_TOKEN
+	DOCKER_ENV_FLAGS += -e BUF_TOKEN=$(BUF_TOKEN)
+endif
+
+DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE)
+DOCKER_RUN_LOCAL := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE)
 
 SEPARATOR := \033[1;36m========================================\033[0m
 ifeq ($(VERBOSE),1)
@@ -115,10 +127,29 @@ docker-pull: ## Pull the latest CI Docker image
 	docker pull $(DOCKER_CI_IMAGE)
 	@$(MAKE) sep
 
+.PHONY: docker-build
+docker-build: ## Build Docker CI image locally (faster iteration)
+	@echo '🔨  Building Docker CI image locally'
+	docker build -f ci.Dockerfile -t $(DOCKER_LOCAL_IMAGE) .
+	@echo '✅  Image built: $(DOCKER_LOCAL_IMAGE)'
+	@$(MAKE) sep
+
+.PHONY: docker-build-fast
+docker-build-fast: ## Build Docker CI image locally with cache (no pull)
+	@echo '🔨  Building Docker CI image locally (fast mode)'
+	docker build -f ci.Dockerfile -t $(DOCKER_LOCAL_IMAGE) --cache-from $(DOCKER_LOCAL_IMAGE) .
+	@echo '✅  Image built: $(DOCKER_LOCAL_IMAGE)'
+	@$(MAKE) sep
+
 .PHONY: docker-shell
 docker-shell: ## Start an interactive shell in the CI Docker container
 	@echo '🐳  Starting interactive shell in CI container'
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_CI_IMAGE) bash
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash
+
+.PHONY: docker-shell-local
+docker-shell-local: ## Start an interactive shell in the locally built Docker container
+	@echo '🐳  Starting interactive shell in local container'
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE) bash
 
 .PHONY: docker-gen
 docker-gen: ## Run 'make gen' inside Docker container
@@ -126,8 +157,26 @@ docker-gen: ## Run 'make gen' inside Docker container
 	$(DOCKER_RUN) make gen
 	@$(MAKE) sep
 
+.PHONY: docker-gen-local
+docker-gen-local: ## Run 'make gen' inside locally built Docker container
+	@echo '🐳  Running make gen in local container'
+	$(DOCKER_RUN_LOCAL) make gen
+	@$(MAKE) sep
+
 .PHONY: docker-build-crate
 docker-build-crate: ## Build Rust crate inside Docker container
 	@echo '🐳  Building Rust crate in CI container'
 	$(DOCKER_RUN) make build-crate
+	@$(MAKE) sep
+
+.PHONY: docker-build-crate-local
+docker-build-crate-local: ## Build Rust crate inside locally built Docker container
+	@echo '🐳  Building Rust crate in local container'
+	$(DOCKER_RUN_LOCAL) make build-crate
+	@$(MAKE) sep
+
+# Combined workflow for fast iteration
+.PHONY: docker-dev
+docker-dev: docker-build docker-gen-local ## Build local image and run generation (fast iteration)
+	@echo '✅  Local Docker image built and generation complete!'
 	@$(MAKE) sep
