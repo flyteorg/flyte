@@ -1,9 +1,0 @@
-other-component:
-  duration-value: 20s
-  int-val: 4
-  string-value: Hey there!
-  strings:
-  - hello
-  - world
-  - '!'
-  url-value: http://something.com
