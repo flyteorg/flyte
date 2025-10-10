@@ -1,4 +1,4 @@
-apiVersion: flyte.org.flyte.org/v1
+apiVersion: flyte.org/v1
 kind: TaskAction
 metadata:
   labels:

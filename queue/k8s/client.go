@@ -79,7 +79,7 @@ func (q *QueueClient) EnqueueAction(ctx context.Context, req *workflow.EnqueueAc
 		blockOwnerDeletion := true
 		taskAction.OwnerReferences = []metav1.OwnerReference{
 			{
-				APIVersion:         "flyte.org.flyte.org/v1",
+				APIVersion:         "flyte.org/v1",
 				Kind:               "TaskAction",
 				Name:               parentTaskAction.Name,
 				UID:                parentTaskAction.UID,

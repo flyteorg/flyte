@@ -1,7 +1,7 @@
 # This rule is not used by the project executor itself.
 # It is provided to allow the cluster admin to help manage permissions for users.
 #
-# Grants read-only access to flyte.org.flyte.org resources.
+# Grants read-only access to flyte.org resources.
 # This role is intended for users who need visibility into these resources
 # without permissions to modify them. It is ideal for monitoring purposes and limited-access viewing.
 
@@ -14,7 +14,7 @@ metadata:
   name: taskaction-viewer-role
 rules:
 - apiGroups:
-  - flyte.org.flyte.org
+  - flyte.org
   resources:
   - taskactions
   verbs:
@@ -22,7 +22,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - flyte.org.flyte.org
+  - flyte.org
   resources:
   - taskactions/status
   verbs:

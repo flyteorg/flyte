@@ -26,7 +26,7 @@ The Flyte Manager is a unified binary that runs all Flyte services in a single p
 ### Install TaskAction CRD
 
 ```bash
-kubectl apply -f ../executor/config/crd/bases/flyte.org.flyte.org_taskactions.yaml
+kubectl apply -f ../executor/config/crd/bases/flyte.org_taskactions.yaml
 ```
 
 ### Build and Run

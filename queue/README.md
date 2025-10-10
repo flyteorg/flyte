@@ -89,7 +89,7 @@ When `EnqueueAction` is called:
 
 **Example TaskAction CR:**
 ```yaml
-apiVersion: flyte.org.flyte.org/v1
+apiVersion: flyte.org/v1
 kind: TaskAction
 metadata:
   name: my-org-my-project-dev-run-001-task-001
@@ -107,7 +107,7 @@ spec:
 
 **Child action with OwnerReference:**
 ```yaml
-apiVersion: flyte.org.flyte.org/v1
+apiVersion: flyte.org/v1
 kind: TaskAction
 metadata:
   name: my-org-my-project-dev-run-001-task-002
@@ -115,7 +115,7 @@ metadata:
   labels:
     flyte.org/is-root: "false"
   ownerReferences:
-  - apiVersion: flyte.org.flyte.org/v1
+  - apiVersion: flyte.org/v1
     kind: TaskAction
     name: my-org-my-project-dev-run-001-task-001
     uid: <parent-uid>
@@ -220,7 +220,7 @@ metadata:
   name: queue-service
   namespace: flyte
 rules:
-- apiGroups: ["flyte.org.flyte.org"]
+- apiGroups: ["flyte.org"]
   resources: ["taskactions"]
   verbs: ["get", "list", "watch", "create", "delete"]
 ```

@@ -1,7 +1,7 @@
 # This rule is not used by the project executor itself.
 # It is provided to allow the cluster admin to help manage permissions for users.
 #
-# Grants full permissions ('*') over flyte.org.flyte.org.
+# Grants full permissions ('*') over flyte.org.
 # This role is intended for users authorized to modify roles and bindings within the cluster,
 # enabling them to delegate specific permissions to other users or groups as needed.
 
@@ -14,13 +14,13 @@ metadata:
   name: taskaction-admin-role
 rules:
 - apiGroups:
-  - flyte.org.flyte.org
+  - flyte.org
   resources:
   - taskactions
   verbs:
   - '*'
 - apiGroups:
-  - flyte.org.flyte.org
+  - flyte.org
   resources:
   - taskactions/status
   verbs:

@@ -80,9 +80,9 @@ const (
 	PhaseAborted      = "PHASE_ABORTED"
 )
 
-// +kubebuilder:rbac:groups=flyte.org.flyte.org,resources=taskactions,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=flyte.org.flyte.org,resources=taskactions/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=flyte.org.flyte.org,resources=taskactions/finalizers,verbs=update
+// +kubebuilder:rbac:groups=flyte.org,resources=taskactions,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=flyte.org,resources=taskactions/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=flyte.org,resources=taskactions/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -115,7 +115,9 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	var nextPhase string
 	var requeueAfter time.Duration
 
-	//time.Sleep(2 * time.Second)
+	// TODO (haytham): Remove when we add real code that executes plugins. For now this is here so that watchers can see
+	//  things transition between states.
+	time.Sleep(2 * time.Second)
 	switch currentPhase {
 	case "":
 		// New TaskAction - transition to Queued
