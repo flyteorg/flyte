@@ -1,0 +1,147 @@
+name: Build and Publish CI Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - v2
+    paths:
+      - '../../ci.Dockerfile'
+      - '.github/workflows/build-ci-image.yml'
+  pull_request:
+    paths:
+      - '../../ci.Dockerfile'
+      - '.github/workflows/build-ci-image.yml'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild of the image'
+        required: false
+        default: 'false'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/ci
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+
+    outputs:
+      image-tag: ${{ steps.set-tag.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # Use branch name for branch pushes
+            type=ref,event=branch
+            # Use PR number for pull requests
+            type=ref,event=pr
+            # Use 'latest' tag for main branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            # Use 'v2' tag for v2 branch
+            type=raw,value=v2,enable=${{ github.ref == 'refs/heads/v2' }}
+            # Add git sha as tag
+            type=sha,prefix={{branch}}-
+
+      - name: Set image tag output
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
+            echo "tag=v2" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          else
+            echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/heads\///')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./ci.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Image digest
+        run: echo "Image built with digest ${{ steps.meta.outputs.digest }}"
+
+      - name: Comment on PR with image tag
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = '${{ steps.set-tag.outputs.tag }}';
+            const imageName = '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${tag}';
+
+            const comment = `## 🐳 Docker CI Image Built
+
+            The CI Docker image has been built and pushed for this PR!
+
+            **Image:** \`${imageName}\`
+
+            This image will be automatically used by CI workflows in this PR.
+
+            To test locally:
+            \`\`\`bash
+            docker pull ${imageName}
+            docker run --rm -it -v $(pwd):/workspace -w /workspace ${imageName} bash
+            \`\`\`
+            `;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('🐳 Docker CI Image Built')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }

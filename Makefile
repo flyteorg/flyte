@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := help
 
+# Docker CI image configuration
+DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
+DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_CI_IMAGE)
+
 SEPARATOR := \033[1;36m========================================\033[0m
 ifeq ($(VERBOSE),1)
 	OUT_REDIRECT =
@@ -102,4 +106,28 @@ gen: buf mocks go_tidy ## Generates everything in the 'gen' directory
 build-crate: ## Builds the rust crate
 	@echo 'Cargo build the generated rust code'
 	cd gen/rust && cargo build
+	@$(MAKE) sep
+
+# Docker-based development targets
+.PHONY: docker-pull
+docker-pull: ## Pull the latest CI Docker image
+	@echo '📦  Pulling latest CI Docker image'
+	docker pull $(DOCKER_CI_IMAGE)
+	@$(MAKE) sep
+
+.PHONY: docker-shell
+docker-shell: ## Start an interactive shell in the CI Docker container
+	@echo '🐳  Starting interactive shell in CI container'
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace $(DOCKER_CI_IMAGE) bash
+
+.PHONY: docker-gen
+docker-gen: ## Run 'make gen' inside Docker container
+	@echo '🐳  Running make gen in CI container'
+	$(DOCKER_RUN) make gen
+	@$(MAKE) sep
+
+.PHONY: docker-build-crate
+docker-build-crate: ## Build Rust crate inside Docker container
+	@echo '🐳  Building Rust crate in CI container'
+	$(DOCKER_RUN) make build-crate
 	@$(MAKE) sep

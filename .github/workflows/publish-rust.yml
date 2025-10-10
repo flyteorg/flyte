@@ -8,6 +8,11 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flyteorg/flyte/ci:v2
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
         working-directory: ./gen/rust
@@ -16,6 +21,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -23,6 +29,7 @@ jobs:
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
+
       - name: Cache cargo git
         uses: actions/cache@v4
         with:
@@ -30,6 +37,7 @@ jobs:
           key: ${{ runner.os }}-cargo-git-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-git-
+
       - name: Cache cargo build
         uses: actions/cache@v4
         with:
@@ -37,8 +45,7 @@ jobs:
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-build-
-      - name: Temporarily modify the rust toolchain version
-        run: rustup override set stable
+
       - name: Output rust version for educational purposes
         run: rustup --version
       - name: Set Cargo.toml version from release tag

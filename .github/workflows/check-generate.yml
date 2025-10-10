@@ -12,39 +12,62 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set fallback version
-        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0" >> $GITHUB_ENV
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: '3.12'
-          working-directory: './gen/python'
-        env:
-          UV_PROJECT_ENVIRONMENT: /tmp/flyte2-venv
-      - name: Setup Buf CLI
-        uses: bufbuild/buf-setup-action@v1 # Install the Buf CLI
-        with:
-          version: 'latest' # Or specify a precise version like '1.56.0'
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        id: setup-uv
-        with:
-          enable-cache: 'false'
-          cache-suffix: 3.12
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-          working-directory: ./
-      - name: Add Go bin to PATH
-        run: echo "$HOME/go/bin" >> $GITHUB_PATH
-      - name: Run make download_tooling
-        run: make download_tooling && which mockery
-      - name: Run make gen
-        run: which mockery && make gen
-      - name: Check for changes
+
+      - name: Determine Docker image
+        id: docker-image
         run: |
-          git diff --exit-code || (echo 'Generated files are out of date. Run `make gen` and commit changes.' && exit 1)
-      - name: Check rust builds
+          # Check if Dockerfile.ci or build workflow was modified
+          git fetch origin ${{ github.base_ref }}
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^(Dockerfile\.ci|\.github/workflows/build-ci-image\.yml)$'; then
+            echo "modified=true" >> $GITHUB_OUTPUT
+            echo "image=ghcr.io/flyteorg/flyte/ci:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "📦 Dockerfile.ci modified - will use PR-specific image"
+          else
+            echo "modified=false" >> $GITHUB_OUTPUT
+            echo "image=ghcr.io/flyteorg/flyte/ci:v2" >> $GITHUB_OUTPUT
+            echo "📦 Using default v2 image"
+          fi
+
+      - name: Wait for Docker image (if modified)
+        if: steps.docker-image.outputs.modified == 'true'
         run: |
-          make build-crate
+          echo "⏳ Waiting for Docker image to be built..."
+          IMAGE="${{ steps.docker-image.outputs.image }}"
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
+
+          # Login to GHCR
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            if docker pull "$IMAGE" 2>/dev/null; then
+              echo "✅ Image is ready!"
+              exit 0
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: Image not ready yet, waiting 20 seconds..."
+            sleep 20
+          done
+
+          echo "❌ Timeout waiting for Docker image to be built"
+          exit 1
+
+      - name: Run checks in container
+        run: |
+          IMAGE="${{ steps.docker-image.outputs.image }}"
+          echo "Using image: $IMAGE"
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
+            "$IMAGE" \
+            bash -c "
+              cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
+              make download_tooling &&
+              make gen &&
+              git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
+              make build-crate
+            "
+
 
