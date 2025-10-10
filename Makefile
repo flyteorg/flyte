@@ -1,11 +1,6 @@
 .DEFAULT_GOAL := help
 
 SEPARATOR := \033[1;36m========================================\033[0m
-ifeq ($(VERBOSE),1)
-	OUT_REDIRECT =
-else
-	OUT_REDIRECT = > /dev/null
-endif
 
 .PHONY: help
 help: ## Show this help message
@@ -22,7 +17,7 @@ sep:
 .PHONY: buf-dep
 buf-dep: ## Update buf modules
 	@echo '📦  Updating buf modules'
-	buf dep update $(OUT_REDIRECT)
+	buf dep update
 	@$(MAKE) sep
 
 .PHONY: buf-format
@@ -39,26 +34,26 @@ buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts ## Generate a
 .PHONY: buf-lint
 buf-lint: ## Lint protocol buffer files
 	@echo '🧹  Linting protocol buffer files'
-	buf lint --exclude-path flytestdlib/ $(OUT_REDIRECT)
+	buf lint --exclude-path flytestdlib/
 	@$(MAKE) sep
 
 .PHONY: buf-ts
 buf-ts: ## Generate TypeScript protocol buffer files
 	@echo '🟦  Generating TypeScript protocol buffer files'
-	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/ $(OUT_REDIRECT)
+	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
 	@cp flyteidl2/gen_utils/ts/* gen/ts/
 	@$(MAKE) sep
 
 .PHONY: buf-go
 buf-go: ## Generate Go protocol buffer files
 	@echo '🟩  Generating Go protocol buffer files'
-	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/ $(OUT_REDIRECT)
+	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/
 	@$(MAKE) sep
 
 .PHONY: buf-rust
 buf-rust: ## Generate Rust protocol buffer files
 	@echo '🦀  Generating Rust protocol buffer files'
-	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/ $(OUT_REDIRECT)
+	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
 	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
 	@cd gen/rust && cargo update --aggressive
 	@$(MAKE) sep
@@ -67,7 +62,7 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python: ## Generate Python protocol buffer files
 	@echo '🐍  Generating Python protocol buffer files'
-	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/ $(OUT_REDIRECT)
+	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
 	@cp flyteidl2/gen_utils/python/* gen/python/
 	@find gen/python -type d -exec touch {}/__init__.py \;
 	@cd gen/python && uv lock
