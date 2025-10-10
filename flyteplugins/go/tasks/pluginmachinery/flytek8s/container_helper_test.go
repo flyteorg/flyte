@@ -865,6 +865,206 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 	assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
 }
 
+func TestAddFlyteCustomizationsToContainer_GPUResourceOverride(t *testing.T) {
+	type testCase struct {
+		name              string
+		initialResources  v1.ResourceRequirements
+		overrideResources v1.ResourceRequirements
+		extendedResources *core.ExtendedResources
+		customizationMode ResourceCustomizationMode
+		expectedRequests  v1.ResourceList
+		expectedLimits    v1.ResourceList
+	}
+
+	tests := []testCase{
+		{
+			name:             "override gpu: 1 translates to nvidia.com/gpu",
+			initialResources: v1.ResourceRequirements{},
+			overrideResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{resourceGPU: resource.MustParse("1")},
+				Limits:   v1.ResourceList{resourceGPU: resource.MustParse("1")},
+			},
+			extendedResources: nil,
+			customizationMode: ResourceCustomizationModeAssignResources,
+			expectedRequests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("1"),
+				v1.ResourceMemory: resource.MustParse("1Gi"),
+				ResourceNvidiaGPU: resource.MustParse("1"),
+			},
+			expectedLimits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("1"),
+				v1.ResourceMemory: resource.MustParse("1Gi"),
+				ResourceNvidiaGPU: resource.MustParse("1"),
+			},
+		},
+		{
+			name:             "override gpu: 1 with extended resources for TPU",
+			initialResources: v1.ResourceRequirements{},
+			overrideResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{resourceGPU: resource.MustParse("1")},
+			},
+			extendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device:      "tpu-v4",
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			customizationMode: ResourceCustomizationModeAssignResources,
+			expectedRequests: v1.ResourceList{
+				v1.ResourceCPU:                    resource.MustParse("1"),
+				v1.ResourceMemory:                 resource.MustParse("1Gi"),
+				v1.ResourceName("google.com/tpu"): resource.MustParse("1"),
+			},
+			expectedLimits: v1.ResourceList{
+				v1.ResourceCPU:                    resource.MustParse("1"),
+				v1.ResourceMemory:                 resource.MustParse("1Gi"),
+				v1.ResourceName("google.com/tpu"): resource.MustParse("1"),
+			},
+		},
+		{
+			name: "merge mode - override gpu on container with existing cpu/memory resources",
+			initialResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("2"),
+					v1.ResourceMemory: resource.MustParse("4Gi"),
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("4"),
+					v1.ResourceMemory: resource.MustParse("8Gi"),
+				},
+			},
+			overrideResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{resourceGPU: resource.MustParse("2")},
+				Limits:   v1.ResourceList{resourceGPU: resource.MustParse("2")},
+			},
+			extendedResources: nil,
+			customizationMode: ResourceCustomizationModeMergeExistingResources,
+			expectedRequests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("2"),
+				v1.ResourceMemory: resource.MustParse("4Gi"),
+				ResourceNvidiaGPU: resource.MustParse("2"),
+			},
+			expectedLimits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("4"),
+				v1.ResourceMemory: resource.MustParse("8Gi"),
+				ResourceNvidiaGPU: resource.MustParse("2"),
+			},
+		},
+		{
+			name: "merge mode - override gpu replaces existing gpu in container",
+			initialResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("2"),
+					v1.ResourceMemory: resource.MustParse("4Gi"),
+					resourceGPU:       resource.MustParse("1"),
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("4"),
+					v1.ResourceMemory: resource.MustParse("8Gi"),
+					resourceGPU:       resource.MustParse("1"),
+				},
+			},
+			overrideResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{resourceGPU: resource.MustParse("4")},
+				Limits:   v1.ResourceList{resourceGPU: resource.MustParse("4")},
+			},
+			extendedResources: nil,
+			customizationMode: ResourceCustomizationModeMergeExistingResources,
+			expectedRequests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("2"),
+				v1.ResourceMemory: resource.MustParse("4Gi"),
+				ResourceNvidiaGPU: resource.MustParse("4"),
+			},
+			expectedLimits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("4"),
+				v1.ResourceMemory: resource.MustParse("8Gi"),
+				ResourceNvidiaGPU: resource.MustParse("4"),
+			},
+		},
+		{
+			name: "merge mode - override gpu with TPU on container with existing resources",
+			initialResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("8"),
+					v1.ResourceMemory: resource.MustParse("16Gi"),
+					resourceGPU:       resource.MustParse("1"),
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU:    resource.MustParse("16"),
+					v1.ResourceMemory: resource.MustParse("32Gi"),
+					resourceGPU:       resource.MustParse("1"),
+				},
+			},
+			overrideResources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{resourceGPU: resource.MustParse("8")},
+				Limits:   v1.ResourceList{resourceGPU: resource.MustParse("8")},
+			},
+			extendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device:      "tpu-v5e",
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			customizationMode: ResourceCustomizationModeMergeExistingResources,
+			expectedRequests: v1.ResourceList{
+				v1.ResourceCPU:                    resource.MustParse("8"),
+				v1.ResourceMemory:                 resource.MustParse("16Gi"),
+				v1.ResourceName("google.com/tpu"): resource.MustParse("8"),
+			},
+			expectedLimits: v1.ResourceList{
+				v1.ResourceCPU:                    resource.MustParse("16"),
+				v1.ResourceMemory:                 resource.MustParse("32Gi"),
+				v1.ResourceName("google.com/tpu"): resource.MustParse("8"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			container := &v1.Container{
+				Command:   []string{"{{ .Input }}"},
+				Args:      []string{"{{ .OutputPrefix }}"},
+				Resources: tc.initialResources,
+			}
+
+			overrideResources := tc.overrideResources
+			templateParameters := getTemplateParametersForTest(
+				&overrideResources,
+				&v1.ResourceRequirements{},
+				false,
+				"",
+			)
+
+			err := AddFlyteCustomizationsToContainer(
+				context.TODO(),
+				templateParameters,
+				tc.customizationMode,
+				container,
+				tc.extendedResources,
+			)
+			assert.NoError(t, err)
+
+			// Verify requests match exactly
+			assert.Equal(t, len(tc.expectedRequests), len(container.Resources.Requests),
+				"requests should have exactly %d resources", len(tc.expectedRequests))
+			for resourceName, expectedQuantity := range tc.expectedRequests {
+				actualQuantity := container.Resources.Requests[resourceName]
+				assert.True(t, expectedQuantity.Equal(actualQuantity),
+					"expected %s=%s in requests, got %s", resourceName, expectedQuantity.String(), actualQuantity.String())
+			}
+
+			// Verify limits match exactly
+			assert.Equal(t, len(tc.expectedLimits), len(container.Resources.Limits),
+				"limits should have exactly %d resources", len(tc.expectedLimits))
+			for resourceName, expectedQuantity := range tc.expectedLimits {
+				actualQuantity := container.Resources.Limits[resourceName]
+				assert.True(t, expectedQuantity.Equal(actualQuantity),
+					"expected %s=%s in limits, got %s", resourceName, expectedQuantity.String(), actualQuantity.String())
+			}
+		})
+	}
+}
+
 func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 	configMapSource := v1.EnvFromSource{
 		ConfigMapRef: &v1.ConfigMapEnvSource{

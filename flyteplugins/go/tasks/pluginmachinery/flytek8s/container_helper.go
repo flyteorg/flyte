@@ -312,6 +312,10 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 	}
 	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, container.EnvFrom, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID(), consoleURL)
 
+	// Sanitize base container GPU resource requirements
+	// Overrides for extendedResources have already been applied at this point
+	SanitizeGPUResourceRequirements(&container.Resources, extendedResources.GetGpuAccelerator())
+
 	// retrieve platformResources and overrideResources to use when aggregating container resources
 	platformResources := parameters.TaskExecMetadata.GetPlatformResources().DeepCopy()
 	if platformResources == nil {
@@ -325,9 +329,10 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 
 	if overrideResources == nil {
 		overrideResources = &v1.ResourceRequirements{}
+	} else {
+		// Sanitize override resource requirements
+		SanitizeGPUResourceRequirements(overrideResources, extendedResources.GetGpuAccelerator())
 	}
-
-	SanitizeGPUResourceRequirements(&container.Resources, extendedResources.GetGpuAccelerator())
 
 	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
 		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)
