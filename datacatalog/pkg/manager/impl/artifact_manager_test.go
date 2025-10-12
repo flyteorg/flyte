@@ -15,6 +15,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"k8s.io/utils/clock"
+	testclock "k8s.io/utils/clock/testing"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
@@ -94,6 +97,40 @@ func getTestArtifact() *datacatalog.Artifact {
 			{Name: "test-tag", Dataset: datasetID, ArtifactId: "test-id"},
 		},
 		CreatedAt: createdAt,
+	}
+}
+
+func getTestArtifactWithTtl(ttl time.Duration) *datacatalog.Artifact {
+	datasetID := &datacatalog.DatasetID{
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "test-name",
+		Version: "test-version",
+		UUID:    "test-uuid",
+	}
+	createdAt, _ := ptypes.TimestampProto(getTestTimestamp())
+
+	return &datacatalog.Artifact{
+		Id:      "test-id",
+		Dataset: datasetID,
+		Metadata: &datacatalog.Metadata{
+			KeyMap: map[string]string{"key1": "value1"},
+		},
+		Data: []*datacatalog.ArtifactData{
+			{
+				Name:  "data1",
+				Value: getTestStringLiteral(),
+			},
+		},
+		Partitions: []*datacatalog.Partition{
+			{Key: "key1", Value: "value1"},
+			{Key: "key2", Value: "value2"},
+		},
+		Tags: []*datacatalog.Tag{
+			{Name: "test-tag", Dataset: datasetID, ArtifactId: "test-id"},
+		},
+		CreatedAt: createdAt,
+		Ttl:       durationpb.New(ttl),
 	}
 }
 
@@ -192,7 +229,7 @@ func TestCreateArtifact(t *testing.T) {
 		},
 	}
 
-	t.Run("HappyPath", func(t *testing.T) {
+	t.Run("Create Artifact Success", func(t *testing.T) {
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
 		expectedDataset := getTestDataset()
 
@@ -223,11 +260,66 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.Partitions[0].DatasetUUID == expectedDataset.GetId().GetUUID() &&
 					artifact.Partitions[1].Key == expectedArtifact.GetPartitions()[1].GetKey() &&
 					artifact.Partitions[1].Value == expectedArtifact.GetPartitions()[1].GetValue() &&
-					artifact.Partitions[1].DatasetUUID == expectedDataset.GetId().GetUUID()
+					artifact.Partitions[1].DatasetUUID == expectedDataset.GetId().GetUUID() &&
+					artifact.ExpiresAt == nil
 			})).Return(nil)
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
+		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
+		assert.NoError(t, err)
+		assert.NotNil(t, artifactResponse)
+
+		// check that the datastore has the artifactData
+		dataRef, err := getExpectedDatastoreLocation(ctx, datastore, testStoragePrefix, getTestArtifact(), 0)
+		assert.NoError(t, err)
+		var value core.Literal
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&value, getTestArtifact().GetData()[0].GetValue()))
+	})
+
+	t.Run("Create Artifact With TTL Success", func(t *testing.T) {
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		expectedDataset := getTestDataset()
+
+		testClock := testclock.NewFakeClock(time.Unix(0, 0))
+		ttl := time.Second
+
+		ctx := context.Background()
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
+			mock.MatchedBy(func(dataset models.DatasetKey) bool {
+				return dataset.Project == expectedDataset.GetId().GetProject() &&
+					dataset.Domain == expectedDataset.GetId().GetDomain() &&
+					dataset.Name == expectedDataset.GetId().GetName() &&
+					dataset.Version == expectedDataset.GetId().GetVersion()
+			})).Return(mockDatasetModel, nil)
+
+		expectedExpiration := testClock.Now().Add(ttl)
+		dcRepo.MockArtifactRepo.On("Create",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				expectedArtifact := getTestArtifactWithTtl(ttl)
+				return artifact.ArtifactID == expectedArtifact.GetId() &&
+					artifact.SerializedMetadata != nil &&
+					len(artifact.ArtifactData) == len(expectedArtifact.GetData()) &&
+					artifact.ArtifactKey.DatasetProject == expectedArtifact.GetDataset().GetProject() &&
+					artifact.ArtifactKey.DatasetDomain == expectedArtifact.GetDataset().GetDomain() &&
+					artifact.ArtifactKey.DatasetName == expectedArtifact.GetDataset().GetName() &&
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.GetDataset().GetVersion() &&
+					artifact.DatasetUUID == expectedArtifact.GetDataset().GetUUID() &&
+					artifact.Partitions[0].Key == expectedArtifact.GetPartitions()[0].GetKey() &&
+					artifact.Partitions[0].Value == expectedArtifact.GetPartitions()[0].GetValue() &&
+					artifact.Partitions[0].DatasetUUID == expectedDataset.GetId().GetUUID() &&
+					artifact.Partitions[1].Key == expectedArtifact.GetPartitions()[1].GetKey() &&
+					artifact.Partitions[1].Value == expectedArtifact.GetPartitions()[1].GetValue() &&
+					artifact.Partitions[1].DatasetUUID == expectedDataset.GetId().GetUUID() &&
+					reflect.DeepEqual(artifact.ExpiresAt, &expectedExpiration)
+			})).Return(nil)
+
+		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifactWithTtl(ttl)}
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), testClock)
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
@@ -246,7 +338,7 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(models.Dataset{}, status.Error(codes.NotFound, "not found"))
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -262,7 +354,7 @@ func TestCreateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(&mocks.DataCatalogRepo{}, createInmemoryDataStore(t, mockScope.NewTestScope()), testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(&mocks.DataCatalogRepo{}, createInmemoryDataStore(t, mockScope.NewTestScope()), testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		_, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		responseCode := status.Code(err)
@@ -278,7 +370,7 @@ func TestCreateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(&mocks.DataCatalogRepo{}, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(&mocks.DataCatalogRepo{}, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		_, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		responseCode := status.Code(err)
@@ -304,7 +396,7 @@ func TestCreateArtifact(t *testing.T) {
 			})).Return(status.Error(codes.AlreadyExists, "test already exists"))
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -325,7 +417,7 @@ func TestCreateArtifact(t *testing.T) {
 			})).Return(fmt.Errorf("Validation should happen before this happens"))
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -350,7 +442,7 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo.MockArtifactRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		_, err := artifactManager.CreateArtifact(ctx, request)
 		assert.NoError(t, err)
 	})
@@ -367,7 +459,7 @@ func TestCreateArtifact(t *testing.T) {
 			})).Return(fmt.Errorf("Validation should happen before this happens"))
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -390,7 +482,7 @@ func TestGetArtifact(t *testing.T) {
 	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
 	t.Run("Get by Id", func(t *testing.T) {
-		dcRepo.MockArtifactRepo.On("Get", mock.Anything,
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
 				return artifactKey.ArtifactID == expectedArtifact.GetId() &&
 					artifactKey.DatasetProject == expectedArtifact.GetDataset().GetProject() &&
@@ -399,7 +491,7 @@ func TestGetArtifact(t *testing.T) {
 					artifactKey.DatasetName == expectedArtifact.GetDataset().GetName()
 			})).Return(mockArtifactModel, nil)
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{
 			Dataset:     getTestDataset().GetId(),
 			QueryHandle: &datacatalog.GetArtifactRequest_ArtifactId{ArtifactId: expectedArtifact.GetId()},
@@ -432,7 +524,7 @@ func TestGetArtifact(t *testing.T) {
 			ArtifactID:  mockArtifactModel.ArtifactID,
 		}, nil)
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{
 			Dataset:     getTestDataset().GetId(),
 			QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: expectedTag.TagName},
@@ -442,7 +534,7 @@ func TestGetArtifact(t *testing.T) {
 	})
 
 	t.Run("Get missing input", func(t *testing.T) {
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{Dataset: getTestDataset().GetId()})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -453,7 +545,7 @@ func TestGetArtifact(t *testing.T) {
 	t.Run("Get does not exist", func(t *testing.T) {
 		dcRepo.MockTagRepo.On("Get", mock.Anything, mock.Anything).Return(
 			models.Tag{}, errors.NewDataCatalogError(codes.NotFound, "tag with artifact does not exist"))
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{Dataset: getTestDataset().GetId(), QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: "test"}})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
@@ -484,8 +576,8 @@ func TestListArtifact(t *testing.T) {
 	expectedArtifact := getTestArtifact()
 	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
-	t.Run("List Artifact on invalid filter", func(t *testing.T) {
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+	t.Run("ListAndFilterExpired Artifact on invalid filter", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		filter := &datacatalog.FilterExpression{
 			Filters: []*datacatalog.SinglePropertyFilter{
 				{
@@ -507,8 +599,8 @@ func TestListArtifact(t *testing.T) {
 		assert.Equal(t, codes.InvalidArgument, responseCode)
 	})
 
-	t.Run("List Artifacts with Partition and Tag", func(t *testing.T) {
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+	t.Run("ListAndFilterExpired Artifacts with Partition and Tag", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		filter := &datacatalog.FilterExpression{
 			Filters: []*datacatalog.SinglePropertyFilter{
 				{
@@ -554,7 +646,7 @@ func TestListArtifact(t *testing.T) {
 			mockArtifactModel,
 		}
 
-		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+		dcRepo.MockArtifactRepo.On("ListAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
 				return dataset.Project == expectedDataset.GetId().GetProject() &&
 					dataset.Domain == expectedDataset.GetId().GetDomain() &&
@@ -578,8 +670,8 @@ func TestListArtifact(t *testing.T) {
 		assert.NotEmpty(t, artifactResponse)
 	})
 
-	t.Run("List Artifacts with No Partition", func(t *testing.T) {
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+	t.Run("ListAndFilterExpired Artifacts with No Partition", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		filter := &datacatalog.FilterExpression{Filters: nil}
 
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
@@ -594,7 +686,7 @@ func TestListArtifact(t *testing.T) {
 			mockArtifactModel,
 			mockArtifactModel,
 		}
-		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+		dcRepo.MockArtifactRepo.On("ListAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
 				return dataset.Project == expectedDataset.GetId().GetProject() &&
 					dataset.Domain == expectedDataset.GetId().GetDomain() &&
@@ -631,7 +723,7 @@ func TestUpdateArtifact(t *testing.T) {
 		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
 		dcRepo := newMockDataCatalogRepo()
-		dcRepo.MockArtifactRepo.On("Get",
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
 				return artifactKey.ArtifactID == expectedArtifact.GetId() &&
@@ -678,7 +770,97 @@ func TestUpdateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
+		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
+		assert.NoError(t, err)
+		assert.NotNil(t, artifactResponse)
+		assert.Equal(t, expectedArtifact.GetId(), artifactResponse.GetArtifactId())
+		dcRepo.MockArtifactRepo.AssertExpectations(t)
+
+		// check that the datastore has the updated artifactData available
+		// data1 should contain updated value
+		dataRef, err := getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data1")
+		assert.NoError(t, err)
+		var value core.Literal
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value11")))
+
+		// data2 was not included in update payload, should be removed
+		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data2")
+		assert.NoError(t, err)
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.Error(t, err)
+		assert.True(t, stdErrors.Is(err, os.ErrNotExist))
+
+		// data3 did not exist before, should be present after update
+		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data3")
+		assert.NoError(t, err)
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value3")))
+	})
+
+	t.Run("Update by ID With TTL", func(t *testing.T) {
+		ctx := context.Background()
+		testClock := testclock.NewFakeClock(time.Unix(0, 0))
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.GetId() &&
+					artifactKey.DatasetProject == expectedArtifact.GetDataset().GetProject() &&
+					artifactKey.DatasetDomain == expectedArtifact.GetDataset().GetDomain() &&
+					artifactKey.DatasetName == expectedArtifact.GetDataset().GetName() &&
+					artifactKey.DatasetVersion == expectedArtifact.GetDataset().GetVersion()
+			})).Return(mockArtifactModel, nil)
+
+		metaData := &datacatalog.Metadata{
+			KeyMap: map[string]string{"key2": "value2"},
+		}
+		ttl := &durationpb.Duration{Seconds: 1}
+
+		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
+
+		expectedExpiration := testClock.Now().Add(ttl.AsDuration())
+		dcRepo.MockArtifactRepo.On("Update",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				return artifact.ArtifactID == expectedArtifact.GetId() &&
+					artifact.ArtifactKey.DatasetProject == expectedArtifact.GetDataset().GetProject() &&
+					artifact.ArtifactKey.DatasetDomain == expectedArtifact.GetDataset().GetDomain() &&
+					artifact.ArtifactKey.DatasetName == expectedArtifact.GetDataset().GetName() &&
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.GetDataset().GetVersion() &&
+					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata) &&
+					reflect.DeepEqual(artifact.ExpiresAt, &expectedExpiration)
+			})).Return(nil)
+
+		request := &datacatalog.UpdateArtifactRequest{
+			Dataset: expectedDataset.GetId(),
+			QueryHandle: &datacatalog.UpdateArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.GetId(),
+			},
+			Data: []*datacatalog.ArtifactData{
+				{
+					Name:  "data1",
+					Value: getTestStringLiteralWithValue("value11"),
+				},
+				{
+					Name:  "data3",
+					Value: getTestStringLiteralWithValue("value3"),
+				},
+			},
+			Metadata: &datacatalog.Metadata{
+				KeyMap: map[string]string{"key2": "value2"},
+			},
+			Ttl: ttl,
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), testClock)
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
@@ -772,7 +954,7 @@ func TestUpdateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
@@ -808,7 +990,7 @@ func TestUpdateArtifact(t *testing.T) {
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
 
 		dcRepo := newMockDataCatalogRepo()
-		dcRepo.MockArtifactRepo.On("Get", mock.Anything, mock.Anything).Return(models.Artifact{}, repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired", mock.Anything, mock.Anything).Return(models.Artifact{}, repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
 			Dataset: expectedDataset.GetId(),
 			Id:      expectedArtifact.GetId(),
 		}))
@@ -830,7 +1012,7 @@ func TestUpdateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.NotFound, status.Code(err))
@@ -858,7 +1040,7 @@ func TestUpdateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))
@@ -886,7 +1068,7 @@ func TestUpdateArtifact(t *testing.T) {
 			},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))
@@ -907,7 +1089,7 @@ func TestUpdateArtifact(t *testing.T) {
 			Data: nil,
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))
@@ -928,7 +1110,7 @@ func TestUpdateArtifact(t *testing.T) {
 			Data: []*datacatalog.ArtifactData{},
 		}
 
-		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope(), clock.RealClock{})
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))

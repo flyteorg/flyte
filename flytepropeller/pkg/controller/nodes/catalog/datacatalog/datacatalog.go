@@ -225,6 +225,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 		Dataset:  datasetID,
 		Data:     artifactDataList,
 		Metadata: GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+		Ttl:      key.CacheTtl,
 	}
 
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
@@ -287,6 +288,7 @@ func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, dat
 		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
 		Data:        artifactDataList,
 		Metadata:    GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+		Ttl:         key.CacheTtl,
 	}
 	resp, err := m.client.UpdateArtifact(ctx, updateArtifactRequest)
 	if err != nil {

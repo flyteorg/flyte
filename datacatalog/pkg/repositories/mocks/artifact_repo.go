@@ -70,12 +70,12 @@ func (_c *ArtifactRepo_Create_Call) RunAndReturn(run func(context.Context, model
 	return _c
 }
 
-// Get provides a mock function with given fields: ctx, in
-func (_m *ArtifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
+// GetAndFilterExpired provides a mock function with given fields: ctx, in
+func (_m *ArtifactRepo) GetAndFilterExpired(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
 	ret := _m.Called(ctx, in)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Get")
+		panic("no return value specified for GetAndFilterExpired")
 	}
 
 	var r0 models.Artifact
@@ -98,41 +98,41 @@ func (_m *ArtifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.
 	return r0, r1
 }
 
-// ArtifactRepo_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
-type ArtifactRepo_Get_Call struct {
+// ArtifactRepo_GetAndFilterExpired_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAndFilterExpired'
+type ArtifactRepo_GetAndFilterExpired_Call struct {
 	*mock.Call
 }
 
-// Get is a helper method to define mock.On call
+// GetAndFilterExpired is a helper method to define mock.On call
 //   - ctx context.Context
 //   - in models.ArtifactKey
-func (_e *ArtifactRepo_Expecter) Get(ctx interface{}, in interface{}) *ArtifactRepo_Get_Call {
-	return &ArtifactRepo_Get_Call{Call: _e.mock.On("Get", ctx, in)}
+func (_e *ArtifactRepo_Expecter) GetAndFilterExpired(ctx interface{}, in interface{}) *ArtifactRepo_GetAndFilterExpired_Call {
+	return &ArtifactRepo_GetAndFilterExpired_Call{Call: _e.mock.On("GetAndFilterExpired", ctx, in)}
 }
 
-func (_c *ArtifactRepo_Get_Call) Run(run func(ctx context.Context, in models.ArtifactKey)) *ArtifactRepo_Get_Call {
+func (_c *ArtifactRepo_GetAndFilterExpired_Call) Run(run func(ctx context.Context, in models.ArtifactKey)) *ArtifactRepo_GetAndFilterExpired_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(models.ArtifactKey))
 	})
 	return _c
 }
 
-func (_c *ArtifactRepo_Get_Call) Return(_a0 models.Artifact, _a1 error) *ArtifactRepo_Get_Call {
+func (_c *ArtifactRepo_GetAndFilterExpired_Call) Return(_a0 models.Artifact, _a1 error) *ArtifactRepo_GetAndFilterExpired_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ArtifactRepo_Get_Call) RunAndReturn(run func(context.Context, models.ArtifactKey) (models.Artifact, error)) *ArtifactRepo_Get_Call {
+func (_c *ArtifactRepo_GetAndFilterExpired_Call) RunAndReturn(run func(context.Context, models.ArtifactKey) (models.Artifact, error)) *ArtifactRepo_GetAndFilterExpired_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// List provides a mock function with given fields: ctx, datasetKey, in
-func (_m *ArtifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+// ListAndFilterExpired provides a mock function with given fields: ctx, datasetKey, in
+func (_m *ArtifactRepo) ListAndFilterExpired(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
 	ret := _m.Called(ctx, datasetKey, in)
 
 	if len(ret) == 0 {
-		panic("no return value specified for List")
+		panic("no return value specified for ListAndFilterExpired")
 	}
 
 	var r0 []models.Artifact
@@ -157,32 +157,32 @@ func (_m *ArtifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, 
 	return r0, r1
 }
 
-// ArtifactRepo_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
-type ArtifactRepo_List_Call struct {
+// ArtifactRepo_ListAndFilterExpired_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListAndFilterExpired'
+type ArtifactRepo_ListAndFilterExpired_Call struct {
 	*mock.Call
 }
 
-// List is a helper method to define mock.On call
+// ListAndFilterExpired is a helper method to define mock.On call
 //   - ctx context.Context
 //   - datasetKey models.DatasetKey
 //   - in models.ListModelsInput
-func (_e *ArtifactRepo_Expecter) List(ctx interface{}, datasetKey interface{}, in interface{}) *ArtifactRepo_List_Call {
-	return &ArtifactRepo_List_Call{Call: _e.mock.On("List", ctx, datasetKey, in)}
+func (_e *ArtifactRepo_Expecter) ListAndFilterExpired(ctx interface{}, datasetKey interface{}, in interface{}) *ArtifactRepo_ListAndFilterExpired_Call {
+	return &ArtifactRepo_ListAndFilterExpired_Call{Call: _e.mock.On("ListAndFilterExpired", ctx, datasetKey, in)}
 }
 
-func (_c *ArtifactRepo_List_Call) Run(run func(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput)) *ArtifactRepo_List_Call {
+func (_c *ArtifactRepo_ListAndFilterExpired_Call) Run(run func(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput)) *ArtifactRepo_ListAndFilterExpired_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(models.DatasetKey), args[2].(models.ListModelsInput))
 	})
 	return _c
 }
 
-func (_c *ArtifactRepo_List_Call) Return(_a0 []models.Artifact, _a1 error) *ArtifactRepo_List_Call {
+func (_c *ArtifactRepo_ListAndFilterExpired_Call) Return(_a0 []models.Artifact, _a1 error) *ArtifactRepo_ListAndFilterExpired_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ArtifactRepo_List_Call) RunAndReturn(run func(context.Context, models.DatasetKey, models.ListModelsInput) ([]models.Artifact, error)) *ArtifactRepo_List_Call {
+func (_c *ArtifactRepo_ListAndFilterExpired_Call) RunAndReturn(run func(context.Context, models.DatasetKey, models.ListModelsInput) ([]models.Artifact, error)) *ArtifactRepo_ListAndFilterExpired_Call {
 	_c.Call.Return(run)
 	return _c
 }

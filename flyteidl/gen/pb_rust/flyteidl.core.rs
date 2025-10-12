@@ -1431,6 +1431,9 @@ pub struct TaskMetadata {
     /// to the pod template spec of the CR object.
     #[prost(message, optional, tag="16")]
     pub metadata: ::core::option::Option<K8sObjectMetadata>,
+    /// Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled.
+    #[prost(message, optional, tag="17")]
+    pub cache_ttl: ::core::option::Option<::prost_types::Duration>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being

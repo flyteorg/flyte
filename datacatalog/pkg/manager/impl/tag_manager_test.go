@@ -75,7 +75,7 @@ func TestAddTag(t *testing.T) {
 			},
 		}
 
-		dcRepo.MockArtifactRepo.On("Get", mock.MatchedBy(func(ctx context.Context) bool { return true }),
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired", mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
 				return artifactKey.DatasetProject == expectedTag.DatasetProject &&
 					artifactKey.DatasetDomain == expectedTag.DatasetDomain &&
