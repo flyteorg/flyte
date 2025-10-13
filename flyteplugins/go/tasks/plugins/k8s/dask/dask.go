@@ -134,7 +134,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	// Set custom resources
 	resources := &primaryContainer.Resources
 	clusterResources := cluster.GetResources()
-	if len(clusterResources.Requests) >= 1 || len(clusterResources.Limits) >= 1 {
+	if len(clusterResources.GetRequests()) >= 1 || len(clusterResources.GetLimits()) >= 1 {
 		resources, err = flytek8s.ToK8sResourceRequirements(cluster.GetResources())
 		if err != nil {
 			return nil, err
@@ -199,7 +199,7 @@ func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, po
 	// Override resources if applicable
 	resources := &primaryContainer.Resources
 	schedulerResources := scheduler.GetResources()
-	if len(schedulerResources.Requests) >= 1 || len(schedulerResources.Limits) >= 1 {
+	if len(schedulerResources.GetRequests()) >= 1 || len(schedulerResources.GetLimits()) >= 1 {
 		resources, err = flytek8s.ToK8sResourceRequirements(scheduler.GetResources())
 		if err != nil {
 			return nil, err
