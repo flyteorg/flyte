@@ -219,13 +219,13 @@ docker-shell-local: ## Start an interactive shell in the locally built Docker co
 .PHONY: docker-gen
 docker-gen: ## Run 'make gen' inside Docker container
 	@echo '🐳  Running make gen in CI container'
-	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make gen"
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make gen-local"
 	@$(MAKE) sep
 
 .PHONY: docker-gen-local
 docker-gen-local: ## Run 'make gen' inside locally built Docker container
 	@echo '🐳  Running make gen in local container'
-	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make gen"
+	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make gen-local"
 	@$(MAKE) sep
 
 .PHONY: docker-build-crate
