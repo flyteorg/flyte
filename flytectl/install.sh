@@ -88,13 +88,20 @@ tag_to_version() {
     log_info "checking GitHub for tag '${TAG}'"
   fi
   REALTAG=$(github_release "$OWNER/$REPO" "${TAG}") && true
-  if test -z "$REALTAG"; then
+
+  RELEASE_URL="https://api.github.com/repos/${OWNER}/${REPO}/releases/tags/flytectl/${TAG}"
+  STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$RELEASE_URL")
+
+  if [ -n "$REALTAG" ]; then
+    TAG="$REALTAG"
+    VERSION=${TAG#v}
+  elif [ "$STATUS_CODE" -eq 200 ]; then
+    TAG="flytectl/$TAG"
+    VERSION=${TAG#v}
+  else
     log_crit "unable to find '${TAG}' - use 'latest' or see https://github.com/${PREFIX}/releases for details"
     exit 1
   fi
-  # if version starts with 'v', remove it
-  TAG="$REALTAG"
-  VERSION=${TAG#v}
 }
 
 adjust_format() {
