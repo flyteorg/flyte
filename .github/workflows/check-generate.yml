@@ -106,9 +106,9 @@ jobs:
             bash -c "
               git config --global --add safe.directory /workspace &&
               cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
-              make gen &&
+              make gen-local &&
               git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
-              make build-crate
+              make build-crate-local
             "
 
 
