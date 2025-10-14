@@ -30,89 +30,159 @@ help: ## Show this help message
 sep:
 	@echo "$(SEPARATOR)"
 
-.PHONY: buf-dep
-buf-dep: ## Update buf modules
-	@echo '📦  Updating buf modules'
+# =============================================================================
+# Local Tool Commands (require buf, go, cargo, uv installed locally)
+# =============================================================================
+
+.PHONY: buf-dep-local
+buf-dep-local:
+	@echo '📦  Updating buf modules (local)'
 	buf dep update
 	@$(MAKE) sep
 
-.PHONY: buf-format
-buf-format:
-	@echo 'Running buf format'
+.PHONY: buf-format-local
+buf-format-local:
+	@echo 'Running buf format (local)'
 	buf format -w
 	@$(MAKE) sep
 
-.PHONY: buf
-buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files for all languages
-	@echo '🛠️  Finished generating all protocol buffer files for all languages'
-	@$(MAKE) sep
-
-.PHONY: buf-lint
-buf-lint: ## Lint protocol buffer files
-	@echo '🧹  Linting protocol buffer files'
+.PHONY: buf-lint-local
+buf-lint-local:
+	@echo '🧹  Linting protocol buffer files (local)'
 	buf lint --exclude-path flytestdlib/
 	@$(MAKE) sep
 
-.PHONY: buf-ts
-buf-ts: ## Generate TypeScript protocol buffer files
-	@echo '🟦  Generating TypeScript protocol buffer files'
+.PHONY: buf-ts-local
+buf-ts-local:
+	@echo '🟦  Generating TypeScript protocol buffer files (local)'
 	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
 	@cp flyteidl2/gen_utils/ts/* gen/ts/
 	@$(MAKE) sep
 
-.PHONY: buf-go
-buf-go: ## Generate Go protocol buffer files
-	@echo '🟩  Generating Go protocol buffer files'
+.PHONY: buf-go-local
+buf-go-local:
+	@echo '🟩  Generating Go protocol buffer files (local)'
 	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/
 	@$(MAKE) sep
 
-.PHONY: buf-rust
-buf-rust: ## Generate Rust protocol buffer files
-	@echo '🦀  Generating Rust protocol buffer files'
+.PHONY: buf-rust-local
+buf-rust-local:
+	@echo '🦀  Generating Rust protocol buffer files (local)'
 	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
 	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
 	@cd gen/rust && cargo update --aggressive
 	@$(MAKE) sep
 
 export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
-.PHONY: buf-python
-buf-python: ## Generate Python protocol buffer files
-	@echo '🐍  Generating Python protocol buffer files'
+.PHONY: buf-python-local
+buf-python-local:
+	@echo '🐍  Generating Python protocol buffer files (local)'
 	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
 	@cp flyteidl2/gen_utils/python/* gen/python/
 	@find gen/python -type d -exec touch {}/__init__.py \;
 	@cd gen/python && uv lock
 	@$(MAKE) sep
 
-.PHONY: go_tidy
-go_tidy: ## Run go mod tidy
-	@echo '🧹  Running go mod tidy'
+.PHONY: buf-local
+buf-local: buf-dep-local buf-format-local buf-lint-local buf-rust-local buf-python-local buf-go-local buf-ts-local
+	@echo '🛠️  Finished generating all protocol buffer files (local)'
+	@$(MAKE) sep
+
+.PHONY: go-tidy-local
+go-tidy-local:
+	@echo '🧹  Running go mod tidy (local)'
 	@go mod tidy $(OUT_REDIRECT)
 	@$(MAKE) sep
 
-.PHONY: go-tidy
-go-tidy: go_tidy ## Run go mod tidy
-
-.PHONY: download_tooling
-download_tooling: ## Download necessary tooling (mockery, protoc-gen-go, etc.)
-	@echo '⬇️  Downloading necessary tooling'
-	go install github.com/vektra/mockery/v2@v2.53.5
-	@$(MAKE) sep
-
-.PHONY: mocks
-mocks: ## Generate go mocks
-	@echo "🧪  Generating go mocks"
+.PHONY: mocks-local
+mocks-local:
+	@echo "🧪  Generating go mocks (local)"
 	mockery $(OUT_REDIRECT)
 	@$(MAKE) sep
 
-.PHONY: gen
-gen: buf mocks go_tidy ## Generates everything in the 'gen' directory
-	@echo '⚡  Finished generating everything in the gen directory'
+.PHONY: gen-local
+gen-local: buf-local mocks-local go-tidy-local ## Generate everything using local tools (requires buf, go, cargo, uv)
+	@echo '⚡  Finished generating everything in the gen directory (local)'
 	@$(MAKE) sep
 
-build-crate: ## Builds the rust crate
-	@echo 'Cargo build the generated rust code'
+.PHONY: build-crate-local
+build-crate-local: ## Build Rust crate using local cargo
+	@echo 'Cargo build the generated rust code (local)'
 	cd gen/rust && cargo build
+	@$(MAKE) sep
+
+# =============================================================================
+# Default Commands (use Docker - no local tools required)
+# =============================================================================
+
+.PHONY: buf-dep
+buf-dep: ## Update buf modules (uses Docker)
+	@echo '📦  Updating buf modules (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf dep update"
+	@$(MAKE) sep
+
+.PHONY: buf-format
+buf-format: ## Format protocol buffer files (uses Docker)
+	@echo 'Running buf format (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf format -w"
+	@$(MAKE) sep
+
+.PHONY: buf-lint
+buf-lint: ## Lint protocol buffer files (uses Docker)
+	@echo '🧹  Linting protocol buffer files (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf lint --exclude-path flytestdlib/"
+	@$(MAKE) sep
+
+.PHONY: buf-ts
+buf-ts: ## Generate TypeScript protocol buffer files (uses Docker)
+	@echo '🟦  Generating TypeScript protocol buffer files (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/ && cp flyteidl2/gen_utils/ts/* gen/ts/"
+	@$(MAKE) sep
+
+.PHONY: buf-go
+buf-go: ## Generate Go protocol buffer files (uses Docker)
+	@echo '🟩  Generating Go protocol buffer files (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/"
+	@$(MAKE) sep
+
+.PHONY: buf-rust
+buf-rust: ## Generate Rust protocol buffer files (uses Docker)
+	@echo '🦀  Generating Rust protocol buffer files (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/ && cp -R flyteidl2/gen_utils/rust/* gen/rust/ && cd gen/rust && cargo update --aggressive"
+	@$(MAKE) sep
+
+.PHONY: buf-python
+buf-python: ## Generate Python protocol buffer files (uses Docker)
+	@echo '🐍  Generating Python protocol buffer files (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/ && cp flyteidl2/gen_utils/python/* gen/python/ && find gen/python -type d -exec touch {}/__init__.py \; && cd gen/python && uv lock"
+	@$(MAKE) sep
+
+.PHONY: buf
+buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts ## Generate all protocol buffer files (uses Docker - recommended)
+	@echo '🛠️  Finished generating all protocol buffer files (Docker)'
+	@$(MAKE) sep
+
+.PHONY: go-tidy
+go-tidy: ## Run go mod tidy (uses Docker)
+	@echo '🧹  Running go mod tidy (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && go mod tidy"
+	@$(MAKE) sep
+
+.PHONY: mocks
+mocks: ## Generate go mocks (uses Docker)
+	@echo "🧪  Generating go mocks (Docker)"
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && mockery"
+	@$(MAKE) sep
+
+.PHONY: gen
+gen: buf mocks go-tidy ## Generate everything (uses Docker - no local tools required)
+	@echo '⚡  Finished generating everything in the gen directory (Docker)'
+	@$(MAKE) sep
+
+.PHONY: build-crate
+build-crate: ## Build Rust crate (uses Docker)
+	@echo 'Cargo build the generated rust code (Docker)'
+	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && cd gen/rust && cargo build"
 	@$(MAKE) sep
 
 # Docker-based development targets

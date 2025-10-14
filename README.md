@@ -41,7 +41,7 @@ flyte/
 To generate code for all supported languages:
 
 ```bash
-make gen
+make docker-gen
 ```
 
 This will:
@@ -51,7 +51,7 @@ This will:
 4. Generate mocks for Go
 5. Run `go mod tidy`
 
-### Generate for Specific Languages
+### Generate for Specific Languages Locally
 
 ```bash
 make buf-go      # Generate Go code only
@@ -75,9 +75,7 @@ Edit `.proto` files in the `flyteidl2/` directory following these guidelines:
 After modifying proto files:
 
 ```bash
-make buf-format  # Format proto files
-make buf-lint    # Lint proto files
-make buf         # Generate all language bindings
+make docker-gen
 ```
 
 ### 3. Verify Your Changes
@@ -104,7 +102,7 @@ cd gen/ts && npm install
 If you've added or modified Go interfaces:
 
 ```bash
-make mocks
+make docker-gen
 ```
 
 ## Development Workflow
@@ -120,18 +118,8 @@ make mocks
 ### Update Buf Dependencies
 
 ```bash
-make buf-dep
+make docker-gen
 ```
-
-### Install Required Tooling
-
-```bash
-make download_tooling
-```
-
-This installs:
-- mockery (for Go mock generation)
-- protoc-gen-go (for Go protobuf generation)
 
 ### View Available Commands
 

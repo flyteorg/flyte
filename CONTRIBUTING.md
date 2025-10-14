@@ -38,14 +38,9 @@ Before contributing, ensure you have:
    git remote add upstream https://github.com/flyteorg/flyte.git
    ```
 
-4. **Install required tools**:
+4. **Verify your setup**:
    ```bash
-   make download_tooling
-   ```
-
-5. **Verify your setup**:
-   ```bash
-   make gen
+   make docker-gen
    ```
 
 ## Development Workflow
