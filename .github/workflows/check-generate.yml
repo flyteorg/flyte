@@ -108,7 +108,7 @@ jobs:
               cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
               make gen-local &&
               git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
-              make build-crate-local
+              make build-crate
             "
 
 
