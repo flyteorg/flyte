@@ -92,8 +92,8 @@ make docker-dev
 
 # Or step-by-step
 make docker-build          # Build image
-make docker-shell-local    # Test interactively
-make docker-gen-local      # Run generation
+make docker-shell    # Test interactively
+make gen      # Run generation
 ```
 
 This is **much faster** than waiting for PR builds!

@@ -150,7 +150,7 @@ make docker-dev
 # Iterate quickly
 vim gen.Dockerfile
 make docker-build  # Uses cache, faster rebuilds
-make docker-gen-local
+make gen
 
 # When it works, push to PR
 git commit -am "Update Python to 3.13"
