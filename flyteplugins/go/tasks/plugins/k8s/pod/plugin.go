@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	transformer "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -130,7 +129,11 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 			break
 		}
 		port := 8080
-		if val, ok := objectMeta.Labels[transformer.UnionV2Label]; ok && val == "true" {
+		// TODO: Will remove this logic once we have a better way to identify v2 tasks
+		for _, env := range podSpec.Containers[i].Env {
+			if env.Name != "ACTION_NAME" {
+				continue
+			}
 			port = 6060
 		}
 

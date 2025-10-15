@@ -632,41 +632,45 @@ func TestContainerTaskExecutor_BuildResource_VscodePort(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		labels       map[string]string
+		envVars      []v1.EnvVar
 		expectedPort int32
 	}{
 		{
-			name:         "UnionV2Label true - port 6060",
-			labels:       map[string]string{"union.ai/v2": "true"},
+			name: "ACTION_NAME env var present - port 6060",
+			envVars: []v1.EnvVar{
+				{
+					Name:  flytek8s.FlyteEnableVscode,
+					Value: "true",
+				},
+				{
+					Name:  "ACTION_NAME",
+					Value: "some-action",
+				},
+			},
 			expectedPort: 6060,
 		},
 		{
-			name:         "UnionV2Label false - port 8080",
-			labels:       map[string]string{"union.ai/v2": "false"},
-			expectedPort: 8080,
-		},
-		{
-			name:         "UnionV2Label absent - port 8080",
-			labels:       map[string]string{},
+			name: "ACTION_NAME env var absent - port 8080",
+			envVars: []v1.EnvVar{
+				{
+					Name:  flytek8s.FlyteEnableVscode,
+					Value: "true",
+				},
+			},
 			expectedPort: 8080,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Create a task template with VSCode enabled and labels in K8SPod metadata
+			// Create a task template with VSCode enabled and environment variables
 			podSpec := v1.PodSpec{
 				Containers: []v1.Container{
 					{
 						Name:    "test-image",
 						Command: command,
 						Args:    args,
-						Env: []v1.EnvVar{
-							{
-								Name:  flytek8s.FlyteEnableVscode,
-								Value: "true",
-							},
-						},
+						Env:     tc.envVars,
 					},
 				},
 			}
@@ -679,9 +683,6 @@ func TestContainerTaskExecutor_BuildResource_VscodePort(t *testing.T) {
 				Target: &core.TaskTemplate_K8SPod{
 					K8SPod: &core.K8SPod{
 						PodSpec: podSpecPb,
-						Metadata: &core.K8SObjectMetadata{
-							Labels: tc.labels,
-						},
 					},
 				},
 				Config: map[string]string{
