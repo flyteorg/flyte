@@ -149,7 +149,7 @@ make docker-dev
 
 # Iterate quickly
 vim gen.Dockerfile
-make docker-build-fast  # Uses cache, faster rebuilds
+make docker-build  # Uses cache, faster rebuilds
 make docker-gen-local
 
 # When it works, push to PR

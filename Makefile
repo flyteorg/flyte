@@ -2,7 +2,6 @@
 
 # Docker CI image configuration
 DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
-DOCKER_LOCAL_IMAGE := flyte-ci:local
 
 # Environment variable flags for Docker
 DOCKER_ENV_FLAGS :=
@@ -14,7 +13,6 @@ ifdef BUF_TOKEN
 endif
 
 DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE)
-DOCKER_RUN_LOCAL := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE)
 
 SEPARATOR := \033[1;36m========================================\033[0m
 
@@ -130,16 +128,9 @@ docker-pull: ## Pull the latest CI Docker image
 
 .PHONY: docker-build
 docker-build: ## Build Docker CI image locally (faster iteration)
-	@echo '🔨  Building Docker CI image locally'
-	docker build -f gen.Dockerfile -t $(DOCKER_LOCAL_IMAGE) .
-	@echo '✅  Image built: $(DOCKER_LOCAL_IMAGE)'
-	@$(MAKE) sep
-
-.PHONY: docker-build-fast
-docker-build-fast: ## Build Docker CI image locally with cache (no pull)
 	@echo '🔨  Building Docker CI image locally (fast mode)'
-	docker build -f gen.Dockerfile -t $(DOCKER_LOCAL_IMAGE) --cache-from $(DOCKER_LOCAL_IMAGE) .
-	@echo '✅  Image built: $(DOCKER_LOCAL_IMAGE)'
+	docker build -f gen.Dockerfile -t $(DOCKER_CI_IMAGE) --cache-from $(DOCKER_CI_IMAGE) .
+	@echo '✅  Image built: $(DOCKER_CI_IMAGE)'
 	@$(MAKE) sep
 
 .PHONY: docker-shell
@@ -147,19 +138,8 @@ docker-shell: ## Start an interactive shell in the CI Docker container
 	@echo '🐳  Starting interactive shell in CI container'
 	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
 
-.PHONY: docker-shell-local
-docker-shell-local: ## Start an interactive shell in the locally built Docker container
-	@echo '🐳  Starting interactive shell in local container'
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
-
-.PHONY: docker-gen-local
-docker-gen-local: ## Run 'make gen' inside locally built Docker container
-	@echo '🐳  Running make gen in local container'
-	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make gen-local"
-	@$(MAKE) sep
-
 # Combined workflow for fast iteration
 .PHONY: docker-dev
-docker-dev: docker-build docker-gen-local ## Build local image and run generation (fast iteration)
+docker-dev: docker-build gen ## Build local image and run generation (fast iteration)
 	@echo '✅  Local Docker image built and generation complete!'
 	@$(MAKE) sep
