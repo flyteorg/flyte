@@ -170,7 +170,16 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 		return "", "", "", err
 	}
 
-	return u.Scheme, u.Host, strings.Trim(u.Path, "/"), nil
+	// Handle storage URLs that use @ to separate container/bucket name from the storage endpoint.
+	// When url.Parse encounters the @ symbol, it treats the part before @ as User and the part after as Host.
+	// Example: Azure ADLS Gen2 uses abfs://container@storageaccount.dfs.core.windows.net/path format.
+	if u.User != nil && u.User.Username() != "" {
+		container = u.User.Username()
+	} else {
+		container = u.Host
+	}
+
+	return u.Scheme, container, strings.Trim(u.Path, "/"), nil
 }
 
 func (r DataReference) String() string {
