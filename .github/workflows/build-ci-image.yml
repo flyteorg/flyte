@@ -6,11 +6,11 @@ on:
       - main
       - v2
     paths:
-      - '../../ci.Dockerfile'
+      - 'ci.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
   pull_request:
     paths:
-      - '../../ci.Dockerfile'
+      - 'ci.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
   workflow_dispatch:
     inputs:
