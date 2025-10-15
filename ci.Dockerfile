@@ -114,7 +114,7 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
 # Set working directory
 WORKDIR /workspace
 
-# Verify installations
+# Verify installations & print versions
 RUN echo "=== Tool Versions ===" && \
     echo "Go: $(go version)" && \
     echo "Python: $(python --version)" && \
