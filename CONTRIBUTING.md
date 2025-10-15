@@ -40,7 +40,7 @@ Before contributing, ensure you have:
 
 4. **Verify your setup**:
    ```bash
-   make docker-gen
+   make gen
    ```
 
 ## Development Workflow

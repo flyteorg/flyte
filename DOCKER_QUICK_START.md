@@ -24,12 +24,12 @@ docker pull ghcr.io/flyteorg/flyte/ci:v2
 
 #### Generate Protocol Buffers
 ```bash
-make docker-gen
+make gen
 ```
 
 #### Build Rust Crate
 ```bash
-make docker-build-crate
+make build-crate
 ```
 
 #### Interactive Shell
@@ -62,8 +62,8 @@ make help
 Docker-specific targets:
 - `make docker-pull` - Pull the latest CI image
 - `make docker-shell` - Start interactive shell
-- `make docker-gen` - Run code generation
-- `make docker-build-crate` - Build Rust crate
+- `make gen` - Run code generation
+- `make build-crate` - Build Rust crate
 
 ## Troubleshooting
 

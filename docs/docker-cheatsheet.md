@@ -11,10 +11,10 @@ Quick reference for Docker-based development in Flyte.
 make docker-pull
 
 # Run generation
-make docker-gen
+make gen
 
 # Build Rust crate
-make docker-build-crate
+make build-crate
 
 # Interactive shell
 make docker-shell
@@ -29,7 +29,6 @@ make docker-dev
 # Or step by step:
 make docker-build           # Build local image
 make docker-gen-local       # Run generation
-make docker-build-crate-local  # Build Rust
 make docker-shell-local     # Interactive shell
 
 # Fast rebuilds (uses cache)
@@ -54,7 +53,7 @@ Are you modifying ci.Dockerfile?
 │   └─ make docker-dev (fastest!)
 │
 └─ NO → Use remote image
-    └─ make docker-gen
+    └─ make gen
 ```
 
 ## Quick Workflows
@@ -81,7 +80,7 @@ git push
 
 ```bash
 # With remote image
-make docker-gen
+make gen
 
 # With local image
 make docker-gen-local

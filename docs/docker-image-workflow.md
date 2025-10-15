@@ -133,7 +133,7 @@ This document explains how the Docker CI image is built and used across differen
 ```bash
 # Just use the standard v2 image
 make docker-pull
-make docker-gen
+make gen
 ```
 
 ### For Docker Image Updates

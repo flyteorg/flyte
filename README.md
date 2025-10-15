@@ -41,7 +41,7 @@ flyte/
 To generate code for all supported languages:
 
 ```bash
-make docker-gen
+make gen
 ```
 
 This will:
@@ -75,7 +75,7 @@ Edit `.proto` files in the `flyteidl2/` directory following these guidelines:
 After modifying proto files:
 
 ```bash
-make docker-gen
+make gen
 ```
 
 ### 3. Verify Your Changes
@@ -102,7 +102,7 @@ cd gen/ts && npm install
 If you've added or modified Go interfaces:
 
 ```bash
-make docker-gen
+make gen
 ```
 
 ## Development Workflow
@@ -118,7 +118,7 @@ make docker-gen
 ### Update Buf Dependencies
 
 ```bash
-make docker-gen
+make gen
 ```
 
 ### View Available Commands

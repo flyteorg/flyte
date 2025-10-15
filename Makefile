@@ -216,28 +216,10 @@ docker-shell-local: ## Start an interactive shell in the locally built Docker co
 	@echo '🐳  Starting interactive shell in local container'
 	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_LOCAL_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
 
-.PHONY: docker-gen
-docker-gen: ## Run 'make gen' inside Docker container
-	@echo '🐳  Running make gen in CI container'
-	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make gen-local"
-	@$(MAKE) sep
-
 .PHONY: docker-gen-local
 docker-gen-local: ## Run 'make gen' inside locally built Docker container
 	@echo '🐳  Running make gen in local container'
 	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make gen-local"
-	@$(MAKE) sep
-
-.PHONY: docker-build-crate
-docker-build-crate: ## Build Rust crate inside Docker container
-	@echo '🐳  Building Rust crate in CI container'
-	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make build-crate"
-	@$(MAKE) sep
-
-.PHONY: docker-build-crate-local
-docker-build-crate-local: ## Build Rust crate inside locally built Docker container
-	@echo '🐳  Building Rust crate in local container'
-	$(DOCKER_RUN_LOCAL) bash -c "git config --global --add safe.directory /workspace && make build-crate"
 	@$(MAKE) sep
 
 # Combined workflow for fast iteration

@@ -360,7 +360,6 @@ make docker-shell-local  # Interactive shell with local image
 | `make docker-build` | Build Docker image locally as `flyte-ci:local` |
 | `make docker-build-fast` | Build with cache (faster rebuilds) |
 | `make docker-gen-local` | Run `make gen` in local container |
-| `make docker-build-crate-local` | Build Rust crate in local container |
 | `make docker-shell-local` | Interactive shell in local container |
 | `make docker-dev` | Build + generate in one command (recommended) |
 
