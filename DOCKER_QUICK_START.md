@@ -133,4 +133,4 @@ Use local iteration first, then validate with PR!
 
 ## More Information
 
-See [docs/docker-image-workflow.md](docs/docker-dev-environment.md) for comprehensive documentation.
+See [docs/docker-image-workflow.md](docs/docker-image-workflow.md) for comprehensive documentation.
