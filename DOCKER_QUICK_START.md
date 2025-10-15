@@ -27,11 +27,6 @@ docker pull ghcr.io/flyteorg/flyte/ci:v2
 make gen
 ```
 
-#### Build Rust Crate
-```bash
-make build-crate
-```
-
 #### Interactive Shell
 ```bash
 make docker-shell
@@ -89,10 +84,10 @@ gh auth token | docker login ghcr.io -u YOUR_USERNAME --password-stdin
 
 ### Fast Local Iteration (Recommended)
 
-If you're modifying `ci.Dockerfile`, build and test locally first:
+If you're modifying `gen.Dockerfile`, build and test locally first:
 
 ```bash
-# One command to build and test
+# One command to build and generate
 make docker-dev
 
 # Or step-by-step
@@ -121,7 +116,7 @@ Once your local changes work:
 
 **Local iteration** (seconds to minutes):
 ```bash
-vim ci.Dockerfile
+vim gen.Dockerfile
 make docker-dev           # Fast!
 # Repeat until it works
 ```
@@ -138,4 +133,4 @@ Use local iteration first, then validate with PR!
 
 ## More Information
 
-See [docs/docker-dev-environment.md](docs/docker-dev-environment.md) for comprehensive documentation.
+See [docs/docker-image-workflow.md](docs/docker-dev-environment.md) for comprehensive documentation.

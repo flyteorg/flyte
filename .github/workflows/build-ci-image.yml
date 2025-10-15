@@ -6,11 +6,11 @@ on:
       - main
       - v2
     paths:
-      - 'ci.Dockerfile'
+      - '../../gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
   pull_request:
     paths:
-      - 'ci.Dockerfile'
+      - '../../gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
   workflow_dispatch:
     inputs:
@@ -82,7 +82,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./ci.Dockerfile
+          file: ./gen.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
