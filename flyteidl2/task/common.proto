@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/literals.proto";
 import "google/protobuf/timestamp.proto";
@@ -24,8 +25,10 @@ enum FixedRateUnit {
 
 // Option for schedules run at a certain frequency e.g. every 2 minutes.
 message FixedRate {
-  uint32 value = 1;
-  FixedRateUnit unit = 2;
+  uint32 value = 1 [(buf.validate.field).uint32.gt = 0];
+  FixedRateUnit unit = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 
   // Optional, timestamp after which rate should be calculated. Can be only in future.
   // E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
@@ -37,6 +40,8 @@ message FixedRate {
 // Defines complete set of information required to trigger an execution on a schedule.
 message Schedule {
   oneof expression {
+    option (buf.validate.oneof).required = true;
+
     // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
     // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
     FixedRate rate = 1;
@@ -56,7 +61,9 @@ message TriggerAutomationSpec {
   }
 
   // Explicitly defines trigger automation type.
-  Type type = 1;
+  Type type = 1 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 
   oneof automation {
     Schedule schedule = 2;
