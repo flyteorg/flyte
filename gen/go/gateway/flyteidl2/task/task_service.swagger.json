@@ -1565,10 +1565,6 @@
             "type": "string"
           },
           "title": "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system\nto use as required.\nreserve the field numbers 1 through 15 for very frequently occurring message elements"
-        },
-        "debuggable": {
-          "type": "boolean",
-          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
@@ -1872,6 +1868,10 @@
         "metadata": {
           "$ref": "#/definitions/coreK8sObjectMetadata",
           "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
+        },
+        "debuggable": {
+          "type": "boolean",
+          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
         }
       },
       "title": "Task Metadata"
