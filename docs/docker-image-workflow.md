@@ -8,13 +8,13 @@ This document explains how the Docker CI image is built and used across differen
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Developer creates PR (no Dockerfile.ci changes)             │
+│ Developer creates PR (no gen.Dockerfile changes)             │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ check-generate workflow triggers                            │
-│ • Checks if Dockerfile.ci modified: NO                      │
+│ • Checks if gen.Dockerfile modified: NO                      │
 │ • Uses image: ghcr.io/flyteorg/flyte/ci:v2                 │
 └─────────────────┬───────────────────────────────────────────┘
                   │
@@ -29,7 +29,7 @@ This document explains how the Docker CI image is built and used across differen
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Developer creates PR (modifies Dockerfile.ci)               │
+│ Developer creates PR (modifies gen.Dockerfile)               │
 └─────────────────┬───────────────────────────────────────────┘
                   │
                   ├──────────────────────┬─────────────────────┐
@@ -201,7 +201,7 @@ docker run --rm -v $(pwd):/workspace -w /workspace \
 
 ### Image Detection Logic
 
-Workflows check if `Dockerfile.ci` or `.github/workflows/build-ci-image.yml` were modified:
+Workflows check if `gen.Dockerfile` or `.github/workflows/build-ci-image.yml` were modified:
 
 ```bash
 git diff --name-only origin/$BASE_BRANCH...HEAD | \

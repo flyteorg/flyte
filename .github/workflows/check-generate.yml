@@ -20,12 +20,12 @@ jobs:
       - name: Determine Docker image
         id: docker-image
         run: |
-          # Check if Dockerfile.ci or build workflow was modified
+          # Check if gen.Dockerfile or build workflow was modified
           git fetch origin ${{ github.base_ref }}
           if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^(gen\.Dockerfile|Dockerfile\.ci|\.github/workflows/build-ci-image\.yml)$'; then
             echo "modified=true" >> $GITHUB_OUTPUT
             echo "image=ghcr.io/flyteorg/flyte/ci:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-            echo "📦 Dockerfile.ci modified - will use PR-specific image"
+            echo "📦 gen.Dockerfile modified - will use PR-specific image"
           else
             echo "modified=false" >> $GITHUB_OUTPUT
             echo "image=ghcr.io/flyteorg/flyte/ci:v2" >> $GITHUB_OUTPUT
