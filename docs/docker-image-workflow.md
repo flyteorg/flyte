@@ -180,9 +180,7 @@ git push origin update-python
 # Image: ghcr.io/flyteorg/flyte/ci:pr-456
 
 # 4. Test locally with YOUR image
-docker pull ghcr.io/flyteorg/flyte/ci:pr-456
-docker run --rm -v $(pwd):/workspace -w /workspace \
-  ghcr.io/flyteorg/flyte/ci:pr-456 make gen
+make docker-pull gen DOCKER_CI_IMAGE=ghcr.io/flyteorg/flyte/ci:pr-456
 
 # 5. CI automatically uses the same image!
 # No need to merge before testing
