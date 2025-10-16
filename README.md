@@ -75,6 +75,7 @@ Edit `.proto` files in the `flyteidl2/` directory following these guidelines:
 After modifying proto files:
 
 ```bash
+make docker-pull   # Pull the docker image for generation
 make gen
 ```
 
