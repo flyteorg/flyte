@@ -109,6 +109,21 @@
         }
       }
     },
+    "ListTasksResponseListTasksMetadata": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Total number of tasks without filters applied"
+        },
+        "filtered_total": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of tasks matching the applied filters."
+        }
+      }
+    },
     "ResourcesResourceEntry": {
       "type": "object",
       "properties": {
@@ -2073,6 +2088,10 @@
         "token": {
           "type": "string",
           "description": "Pagination token for the next page of tasks."
+        },
+        "metadata": {
+          "$ref": "#/definitions/ListTasksResponseListTasksMetadata",
+          "title": "Metadata for the ListTasksResponse"
         }
       }
     },
