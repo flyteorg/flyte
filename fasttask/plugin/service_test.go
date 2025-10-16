@@ -767,11 +767,14 @@ func TestPendingOwnerManagement(t *testing.T) {
 	// validate enqueuePendingOwners
 	assert.Equal(t, 0, ownerEnqueueCount)
 
-	fastTaskService.EnqueuePendingOwners(overflowTestQueueID)
+	fastTaskService.EnqueuePendingOwners(overflowTestQueueID, 3)
+	assert.Equal(t, 3, ownerEnqueueCount)
+
+	fastTaskService.EnqueuePendingOwners(overflowTestQueueID, maxPendingOwnersPerQueue)
 	assert.Equal(t, maxPendingOwnersPerQueue, ownerEnqueueCount)
 	assert.Equal(t, 0, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
-	fastTaskService.EnqueuePendingOwners(overflowTestQueueID) // call a second time to validate on empty queue
+	fastTaskService.EnqueuePendingOwners(overflowTestQueueID, maxPendingOwnersPerQueue) // call a second time to validate on empty queue
 	assert.Equal(t, maxPendingOwnersPerQueue, ownerEnqueueCount)
 
 	// remove workers

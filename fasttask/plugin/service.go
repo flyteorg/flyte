@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	maxPendingOwnersPerQueue = 1024 // TODO @hamersaw - default to 100? 512? 1024?
+	maxPendingOwnersPerQueue = 4096
 	queueIdLabel             = "queue_id"
 )
 
@@ -201,8 +201,9 @@ func (f *fastTaskServiceImpl) RemovePendingOwner(queueID, taskID string) {
 	}
 }
 
-// enqueuePendingOwners drains the pending owners list for the queue and enqueues them for reevaluation
-func (f *fastTaskServiceImpl) EnqueuePendingOwners(queueID string) {
+// EnqueuePendingOwners removes the specified number of pending owners for the queue and enqueues
+// them for reevaluation.
+func (f *fastTaskServiceImpl) EnqueuePendingOwners(queueID string, count int) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -211,20 +212,41 @@ func (f *fastTaskServiceImpl) EnqueuePendingOwners(queueID string) {
 		return
 	}
 
+	remainingCount := count
+	deleteOwners := make([]string, 0)
 	enqueued := make(map[string]bool)
-	for _, ownerLabels := range owners {
+	for owner, ownerLabels := range owners {
+		// decrement count and track owner as a deletion candidate
+		if remainingCount <= 0 {
+			break
+		}
+
+		remainingCount--
+		deleteOwners = append(deleteOwners, owner)
+
+		// avoid duplicate enqueues over the same labels (ie. v1 workflows)
 		hashedLabels := hashMapValues(ownerLabels)
 		if _, ok := enqueued[hashedLabels]; ok {
 			continue
 		}
+
+		// enqueue owner and track labels as enqueued
 		if err := f.enqueueOwner(ownerLabels); err != nil {
 			logger.Warnf(context.Background(), "failed to enqueue owner %v: %+v", ownerLabels, err)
 			f.metrics.enqueueOwnerFailure.Inc()
 		}
+
 		enqueued[hashedLabels] = true
 	}
 
-	delete(f.pendingTaskOwners, queueID)
+	// cleanup processed owners
+	for _, owner := range deleteOwners {
+		delete(owners, owner)
+	}
+
+	if len(owners) == 0 {
+		delete(f.pendingTaskOwners, queueID)
+	}
 }
 
 // CheckStatus checks the status of a task on a specific queue and worker.
@@ -348,8 +370,13 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 	}
 
 	worker := env.GetOrCreateWorker(heartbeatRequest.GetWorkerId())
-	worker.SetCapacity(heartbeatRequest.GetCapacity())
 	worker.SetState(interfaces.HEALTHY)
+
+	capacity := heartbeatRequest.GetCapacity()
+	worker.SetCapacity(capacity)
+	if executionCapacity := capacity.GetExecutionLimit() - capacity.GetExecutionCount(); executionCapacity > 0 {
+		f.EnqueuePendingOwners(heartbeatRequest.GetQueueId(), int(executionCapacity))
+	}
 
 	// if the worker disconnects, we transition state to `ORPHANED` to ensure no future tasks are
 	// assigned. if the worker reconnects, we will transition back to `HEALTHY`; otherwise, the
@@ -373,9 +400,6 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 		}
 	}()
 
-	// new worker available, enqueue owners
-	f.EnqueuePendingOwners(heartbeatRequest.GetQueueId())
-
 	// handle heartbeat requests
 	for {
 		heartbeatRequest, err := stream.Recv()
@@ -389,7 +413,11 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 		}
 
 		// update worker capacity
-		worker.SetCapacity(heartbeatRequest.GetCapacity())
+		capacity := heartbeatRequest.GetCapacity()
+		worker.SetCapacity(capacity)
+		if executionCapacity := capacity.GetExecutionLimit() - capacity.GetExecutionCount(); executionCapacity > 0 {
+			f.EnqueuePendingOwners(heartbeatRequest.GetQueueId(), int(executionCapacity))
+		}
 
 		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
 			// if the taskContext exists then send the taskStatus to the statusChannel
