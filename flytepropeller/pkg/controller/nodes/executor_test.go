@@ -2860,3 +2860,143 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 	}
 
 }
+
+func TestNodeExecutor_EventRecordingRetry(t *testing.T) {
+	tests := []struct {
+		name              string
+		eventErrors       []error
+		expectedPhase     v1alpha1.NodePhase
+		expectedCallCount int
+		expectError       bool
+	}{
+		{
+			name: "EventQueueFull_RetrySucceeds",
+			eventErrors: []error{
+				&eventsErr.EventError{Code: eventsErr.ResourceExhausted, Message: "Event Queue Full"},
+				nil,
+			},
+			expectedPhase:     v1alpha1.NodePhaseSucceeded,
+			expectedCallCount: 2,
+			expectError:       false,
+		},
+		{
+			name: "EventRecordingFails_NodeNotUpdated",
+			eventErrors: []error{
+				&eventsErr.EventError{Code: eventsErr.ResourceExhausted, Message: "Event Queue Full"},
+			},
+			expectedPhase:     v1alpha1.NodePhaseRunning,
+			expectedCallCount: 1,
+			expectError:       true,
+		},
+		{
+			name: "EventSucceeds_FirstAttempt",
+			eventErrors: []error{
+				nil,
+			},
+			expectedPhase:     v1alpha1.NodePhaseSucceeded,
+			expectedCallCount: 1,
+			expectError:       false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			enQWf := func(workflowID v1alpha1.WorkflowID) {}
+			mockEventSink := eventMocks.NewMockEventSink()
+			store := createInmemoryDataStore(t, promutils.NewTestScope())
+			adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+			hf := &nodemocks.HandlerFactory{}
+			hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+			execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+				"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			assert.NoError(t, err)
+			exec := execIface.(*recursiveNodeExecutor)
+
+			// Setup event recorder mock with sequential errors
+			evRecorder := &eventMocks.NodeEventRecorder{}
+			for _, eventErr := range tt.eventErrors {
+				evRecorder.On("RecordNodeEvent", mock.Anything, mock.Anything, mock.Anything).
+					Return(eventErr).Once()
+			}
+
+			nodeExec, ok := exec.nodeExecutor.(*nodeExecutor)
+			assert.True(t, ok)
+			nodeExec.nodeRecorder = evRecorder
+
+			taskID := "testTask"
+			nodeID := "n1"
+			taskNode := &v1alpha1.NodeSpec{
+				ID:      nodeID,
+				TaskRef: &taskID,
+				Kind:    v1alpha1.NodeKindTask,
+			}
+			nodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
+
+			mockWf := &v1alpha1.FlyteWorkflow{
+				Tasks: map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
+					taskID: {TaskTemplate: &core.TaskTemplate{}},
+				},
+				Status: v1alpha1.WorkflowStatus{
+					NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
+						nodeID:               nodeStatus,
+						v1alpha1.StartNodeID: {Phase: v1alpha1.NodePhaseSucceeded},
+					},
+					DataDir: "data",
+				},
+				WorkflowSpec: &v1alpha1.WorkflowSpec{
+					ID: "wf",
+					Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+						nodeID: taskNode,
+						v1alpha1.StartNodeID: {
+							Kind: v1alpha1.NodeKindStart,
+							ID:   v1alpha1.StartNodeID,
+						},
+					},
+					Connections: v1alpha1.Connections{
+						Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+							nodeID: {v1alpha1.StartNodeID},
+						},
+						Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+							v1alpha1.StartNodeID: {nodeID},
+						},
+					},
+				},
+				DataReferenceConstructor: store,
+			}
+
+			// Mock handler to transition task from Running -> Success
+			h := &nodemocks.NodeHandler{}
+			h.On("Handle", mock.Anything, mock.Anything).Return(
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+			h.On("FinalizeRequired").Return(false)
+			hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
+
+			execContext := executors.NewExecutionContext(mockWf, mockWf, nil, nil, executors.InitializeControlFlow())
+
+			// Execute reconciliation attempts
+			var lastErr error
+			for i := 0; i < len(tt.eventErrors); i++ {
+				_, lastErr = exec.RecursiveNodeHandler(ctx, execContext, mockWf, mockWf, taskNode)
+			}
+
+			// Verify error expectations
+			if tt.expectError {
+				assert.Error(t, lastErr)
+				assert.Contains(t, lastErr.Error(), "EventRecordingFailed")
+			} else {
+				assert.NoError(t, lastErr)
+			}
+
+			// Verify node status matches expected phase
+			// If event recording failed, status should NOT be updated
+			// If event recording succeeded, status should be updated
+			assert.Equal(t, tt.expectedPhase, nodeStatus.GetPhase(),
+				"Node status should match expected phase based on event recording success/failure")
+
+			// Verify correct number of event recording attempts
+			evRecorder.AssertNumberOfCalls(t, "RecordNodeEvent", tt.expectedCallCount)
+		})
+	}
+}

@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_event-queue-size", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("event-queue-size", testValue)
+			if vInt, err := cmdFlags.GetInt("event-queue-size"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.EventQueueSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_max-retries", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
