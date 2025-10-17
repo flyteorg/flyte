@@ -12,7 +12,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
 message TaskExecutionMetadata {
@@ -40,7 +40,7 @@ message TaskExecutionMetadata {
   // interruptible behavior will be activated.
   int32 interruptible_failure_threshold = 9;
   // Identity of user running this task execution
-  core.Identity identity = 10;
+  core.Identity identity = 11;
 }
 
 // Represents a request structure to create task.
@@ -82,38 +82,18 @@ message CreateRequestHeader {
   core.Connection connection = 5;
 }
 
-message ExecuteTaskSyncRequest {
-  oneof part {
-    CreateRequestHeader header = 1;
-    core.LiteralMap inputs = 2;
-  }
-}
-
-message ExecuteTaskSyncResponseHeader {
-  Resource resource = 1;
-}
-
-message ExecuteTaskSyncResponse {
-  // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
-  // Resource is for synchronous task execution.
-  oneof res {
-    ExecuteTaskSyncResponseHeader header = 1;
-    core.LiteralMap outputs = 2;
-  }
-}
-
 // A message used to fetch a job resource from flyte connector server.
 message GetTaskRequest {
   // Metadata about the resource to be pass to the connector.
-  bytes resource_meta = 1;
+  bytes resource_meta = 2;
   // A predefined yet extensible Task type identifier.
-  TaskCategory task_category = 2;
+  TaskCategory task_category = 3;
   // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
-  string output_prefix = 3;
+  string output_prefix = 4;
   // Connection (secret and config) required by the connector.
   // Connector will use the secret and config in the taskTemplate if it's None.
   // +optional
-  core.Connection connection = 4;
+  core.Connection connection = 5;
 }
 
 // Response to get an individual task resource.
@@ -125,27 +105,27 @@ message Resource {
   // The outputs of the execution. It's typically used by sql task. connector service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.LiteralMap outputs = 1;
+  core.LiteralMap outputs = 2;
   // A descriptive message for the current state. e.g. waiting for cluster.
-  string message = 2;
+  string message = 3;
   // log information for the task execution.
-  repeated core.TaskLog log_links = 3;
+  repeated core.TaskLog log_links = 4;
   // The phase of the execution is used to determine the phase of the plugin's execution.
-  core.TaskExecution.Phase phase = 4;
+  core.TaskExecution.Phase phase = 5;
   // Custom data specific to the connector.
-  google.protobuf.Struct custom_info = 5;
+  google.protobuf.Struct custom_info = 6;
 }
 
 // A message used to delete a task.
 message DeleteTaskRequest {
   // Metadata about the resource to be pass to the connector.
-  bytes resource_meta = 1;
+  bytes resource_meta = 2;
   // A predefined yet extensible Task type identifier.
-  TaskCategory task_category = 2;
+  TaskCategory task_category = 3;
   // Connection (secret and config) required by the connector.
   // Connector will use the secret and config in the taskTemplate if it's None.
   // +optional
-  core.Connection connection = 3;
+  core.Connection connection = 5;
 }
 
 // Response to delete a task.
@@ -156,7 +136,7 @@ message Connector {
   // Name is the developer-assigned name of the connector.
   string name = 1;
   // Supported_task_categories are the categories of the tasks that the connector can handle.
-  repeated TaskCategory supported_task_categories = 2;
+  repeated TaskCategory supported_task_categories = 4;
 }
 
 message TaskCategory {
@@ -188,18 +168,18 @@ message ListConnectorsResponse {
 // A request to get the metrics from a task execution.
 message GetTaskMetricsRequest {
   // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
-  bytes resource_meta = 1;
+  bytes resource_meta = 2;
   // The metrics to query. If empty, will return a default set of metrics.
   // e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
-  repeated string queries = 2;
+  repeated string queries = 3;
   // Start timestamp, inclusive.
-  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp start_time = 4;
   // End timestamp, inclusive..
-  google.protobuf.Timestamp end_time = 4;
+  google.protobuf.Timestamp end_time = 5;
   // Query resolution step width in duration format or float number of seconds.
-  google.protobuf.Duration step = 5;
+  google.protobuf.Duration step = 6;
   // A predefined yet extensible Task type identifier.
-  TaskCategory task_category = 6;
+  TaskCategory task_category = 7;
 }
 
 // A response containing a list of metrics for a task execution.
@@ -211,14 +191,14 @@ message GetTaskMetricsResponse {
 // A request to get the log from a task execution.
 message GetTaskLogsRequest {
   // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
-  bytes resource_meta = 1;
+  bytes resource_meta = 2;
   // Number of lines to return.
-  uint64 lines = 2;
+  uint64 lines = 3;
   // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
   // in a query. If there are no more results, this value will be empty.
-  string token = 3;
+  string token = 4;
   // A predefined yet extensible Task type identifier.
-  TaskCategory task_category = 4;
+  TaskCategory task_category = 5;
 }
 
 message GetTaskLogsResponseHeader {
