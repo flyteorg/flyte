@@ -2066,6 +2066,10 @@
         "metadata": {
           "$ref": "#/definitions/coreK8sObjectMetadata",
           "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
+        },
+        "debuggable": {
+          "type": "boolean",
+          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
         }
       },
       "title": "Task Metadata"
@@ -2271,6 +2275,15 @@
       },
       "description": "Output payload for an action."
     },
+    "taskRawDataStorage": {
+      "type": "object",
+      "properties": {
+        "raw_data_prefix": {
+          "type": "string",
+          "title": "Prefix for where offloaded data from user actions will be written\ne.g. s3://bucket/key or s3://bucket/"
+        }
+      }
+    },
     "taskRunSpec": {
       "type": "object",
       "properties": {
@@ -2297,6 +2310,14 @@
         "cluster": {
           "type": "string",
           "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        },
+        "raw_data_storage": {
+          "$ref": "#/definitions/taskRawDataStorage",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "description": "SecurityContext holds security attributes that apply to tasks."
         }
       }
     },
@@ -2762,6 +2783,16 @@
           "description": "Detailed information about the root action."
         }
       }
+    },
+    "workflowRunSource": {
+      "type": "string",
+      "enum": [
+        "RUN_SOURCE_UNSPECIFIED",
+        "RUN_SOURCE_WEB",
+        "RUN_SOURCE_CLI",
+        "RUN_SOURCE_SCHEDULE_TRIGGER"
+      ],
+      "default": "RUN_SOURCE_UNSPECIFIED"
     },
     "workflowTaskActionMetadata": {
       "type": "object",

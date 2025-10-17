@@ -12,10 +12,11 @@ _sym_db = _symbol_database.Default()
 
 
 from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
+from flyteidl2.core import security_pb2 as flyteidl2_dot_core_dot_security__pb2
 from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x66lyteidl2/task/run.proto\x12\x0e\x66lyteidl2.task\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x7f\n\x06Labels\x12:\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl2.task.Labels.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x89\x01\n\x0b\x41nnotations\x12?\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl2.task.Annotations.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"<\n\x04\x45nvs\x12\x34\n\x06values\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x06values\"\xa7\x02\n\x07RunSpec\x12.\n\x06labels\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.LabelsR\x06labels\x12=\n\x0b\x61nnotations\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.task.AnnotationsR\x0b\x61nnotations\x12(\n\x04\x65nvs\x18\x03 \x01(\x0b\x32\x14.flyteidl2.task.EnvsR\x04\x65nvs\x12@\n\rinterruptible\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.BoolValueR\rinterruptible\x12\'\n\x0foverwrite_cache\x18\x05 \x01(\x08R\x0eoverwriteCache\x12\x18\n\x07\x63luster\x18\x06 \x01(\tR\x07\x63lusterB\xad\x01\n\x12\x63om.flyteidl2.taskB\x08RunProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x66lyteidl2/task/run.proto\x12\x0e\x66lyteidl2.task\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1d\x66lyteidl2/core/security.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x7f\n\x06Labels\x12:\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl2.task.Labels.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x89\x01\n\x0b\x41nnotations\x12?\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl2.task.Annotations.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"<\n\x04\x45nvs\x12\x34\n\x06values\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x06values\"8\n\x0eRawDataStorage\x12&\n\x0fraw_data_prefix\x18\x01 \x01(\tR\rrawDataPrefix\"\xbd\x03\n\x07RunSpec\x12.\n\x06labels\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.LabelsR\x06labels\x12=\n\x0b\x61nnotations\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.task.AnnotationsR\x0b\x61nnotations\x12(\n\x04\x65nvs\x18\x03 \x01(\x0b\x32\x14.flyteidl2.task.EnvsR\x04\x65nvs\x12@\n\rinterruptible\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.BoolValueR\rinterruptible\x12\'\n\x0foverwrite_cache\x18\x05 \x01(\x08R\x0eoverwriteCache\x12\x18\n\x07\x63luster\x18\x06 \x01(\tR\x07\x63luster\x12H\n\x10raw_data_storage\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.task.RawDataStorageR\x0erawDataStorage\x12J\n\x10security_context\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.core.SecurityContextR\x0fsecurityContextB\xad\x01\n\x12\x63om.flyteidl2.taskB\x08RunProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -27,16 +28,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _LABELS_VALUESENTRY._serialized_options = b'8\001'
   _ANNOTATIONS_VALUESENTRY._options = None
   _ANNOTATIONS_VALUESENTRY._serialized_options = b'8\001'
-  _globals['_LABELS']._serialized_start=107
-  _globals['_LABELS']._serialized_end=234
-  _globals['_LABELS_VALUESENTRY']._serialized_start=177
-  _globals['_LABELS_VALUESENTRY']._serialized_end=234
-  _globals['_ANNOTATIONS']._serialized_start=237
-  _globals['_ANNOTATIONS']._serialized_end=374
-  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_start=177
-  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_end=234
-  _globals['_ENVS']._serialized_start=376
-  _globals['_ENVS']._serialized_end=436
-  _globals['_RUNSPEC']._serialized_start=439
-  _globals['_RUNSPEC']._serialized_end=734
+  _globals['_LABELS']._serialized_start=138
+  _globals['_LABELS']._serialized_end=265
+  _globals['_LABELS_VALUESENTRY']._serialized_start=208
+  _globals['_LABELS_VALUESENTRY']._serialized_end=265
+  _globals['_ANNOTATIONS']._serialized_start=268
+  _globals['_ANNOTATIONS']._serialized_end=405
+  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_start=208
+  _globals['_ANNOTATIONS_VALUESENTRY']._serialized_end=265
+  _globals['_ENVS']._serialized_start=407
+  _globals['_ENVS']._serialized_end=467
+  _globals['_RAWDATASTORAGE']._serialized_start=469
+  _globals['_RAWDATASTORAGE']._serialized_end=525
+  _globals['_RUNSPEC']._serialized_start=528
+  _globals['_RUNSPEC']._serialized_end=973
 # @@protoc_insertion_point(module_scope)

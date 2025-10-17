@@ -93,28 +93,6 @@ class CreateRequestHeader(_message.Message):
     connection: _security_pb2.Connection
     def __init__(self, template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., max_dataset_size_bytes: _Optional[int] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
-class ExecuteTaskSyncRequest(_message.Message):
-    __slots__ = ["header", "inputs"]
-    HEADER_FIELD_NUMBER: _ClassVar[int]
-    INPUTS_FIELD_NUMBER: _ClassVar[int]
-    header: CreateRequestHeader
-    inputs: _literals_pb2.LiteralMap
-    def __init__(self, header: _Optional[_Union[CreateRequestHeader, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
-
-class ExecuteTaskSyncResponseHeader(_message.Message):
-    __slots__ = ["resource"]
-    RESOURCE_FIELD_NUMBER: _ClassVar[int]
-    resource: Resource
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
-
-class ExecuteTaskSyncResponse(_message.Message):
-    __slots__ = ["header", "outputs"]
-    HEADER_FIELD_NUMBER: _ClassVar[int]
-    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    header: ExecuteTaskSyncResponseHeader
-    outputs: _literals_pb2.LiteralMap
-    def __init__(self, header: _Optional[_Union[ExecuteTaskSyncResponseHeader, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
-
 class GetTaskRequest(_message.Message):
     __slots__ = ["resource_meta", "task_category", "output_prefix", "connection"]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]

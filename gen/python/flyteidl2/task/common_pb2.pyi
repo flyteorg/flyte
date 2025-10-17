@@ -1,3 +1,4 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2

@@ -24,7 +24,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/connector.proto.
  */
 export const file_flyteidl2_plugins_connector: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jb25uZWN0b3IucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIqYFChVUYXNrRXhlY3V0aW9uTWV0YWRhdGESQgoRdGFza19leGVjdXRpb25faWQYASABKAsyJy5mbHl0ZWlkbDIuY29yZS5UYXNrRXhlY3V0aW9uSWRlbnRpZmllchIRCgluYW1lc3BhY2UYAiABKAkSRAoGbGFiZWxzGAMgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuVGFza0V4ZWN1dGlvbk1ldGFkYXRhLkxhYmVsc0VudHJ5Ek4KC2Fubm90YXRpb25zGAQgAygLMjkuZmx5dGVpZGwyLnBsdWdpbnMuVGFza0V4ZWN1dGlvbk1ldGFkYXRhLkFubm90YXRpb25zRW50cnkSGwoTazhzX3NlcnZpY2VfYWNjb3VudBgFIAEoCRJhChVlbnZpcm9ubWVudF92YXJpYWJsZXMYBiADKAsyQi5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrRXhlY3V0aW9uTWV0YWRhdGEuRW52aXJvbm1lbnRWYXJpYWJsZXNFbnRyeRIUCgxtYXhfYXR0ZW1wdHMYByABKAUSFQoNaW50ZXJydXB0aWJsZRgIIAEoCBInCh9pbnRlcnJ1cHRpYmxlX2ZhaWx1cmVfdGhyZXNob2xkGAkgASgFEioKCGlkZW50aXR5GAogASgLMhguZmx5dGVpZGwyLmNvcmUuSWRlbnRpdHkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEaOwoZRW52aXJvbm1lbnRWYXJpYWJsZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIoECChFDcmVhdGVUYXNrUmVxdWVzdBIqCgZpbnB1dHMYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsTWFwEi4KCHRlbXBsYXRlGAIgASgLMhwuZmx5dGVpZGwyLmNvcmUuVGFza1RlbXBsYXRlEhUKDW91dHB1dF9wcmVmaXgYAyABKAkSSQoXdGFza19leGVjdXRpb25fbWV0YWRhdGEYBCABKAsyKC5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrRXhlY3V0aW9uTWV0YWRhdGESLgoKY29ubmVjdGlvbhgFIAEoCzIaLmZseXRlaWRsMi5jb3JlLkNvbm5lY3Rpb24iKwoSQ3JlYXRlVGFza1Jlc3BvbnNlEhUKDXJlc291cmNlX21ldGEYASABKAwi9wEKE0NyZWF0ZVJlcXVlc3RIZWFkZXISLgoIdGVtcGxhdGUYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5UYXNrVGVtcGxhdGUSFQoNb3V0cHV0X3ByZWZpeBgCIAEoCRJJChd0YXNrX2V4ZWN1dGlvbl9tZXRhZGF0YRgDIAEoCzIoLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tFeGVjdXRpb25NZXRhZGF0YRIeChZtYXhfZGF0YXNldF9zaXplX2J5dGVzGAQgASgDEi4KCmNvbm5lY3Rpb24YBSABKAsyGi5mbHl0ZWlkbDIuY29yZS5Db25uZWN0aW9uIogBChZFeGVjdXRlVGFza1N5bmNSZXF1ZXN0EjgKBmhlYWRlchgBIAEoCzImLmZseXRlaWRsMi5wbHVnaW5zLkNyZWF0ZVJlcXVlc3RIZWFkZXJIABIsCgZpbnB1dHMYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsTWFwSABCBgoEcGFydCJOCh1FeGVjdXRlVGFza1N5bmNSZXNwb25zZUhlYWRlchItCghyZXNvdXJjZRgBIAEoCzIbLmZseXRlaWRsMi5wbHVnaW5zLlJlc291cmNlIpMBChdFeGVjdXRlVGFza1N5bmNSZXNwb25zZRJCCgZoZWFkZXIYASABKAsyMC5mbHl0ZWlkbDIucGx1Z2lucy5FeGVjdXRlVGFza1N5bmNSZXNwb25zZUhlYWRlckgAEi0KB291dHB1dHMYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsTWFwSABCBQoDcmVzIqYBCg5HZXRUYXNrUmVxdWVzdBIVCg1yZXNvdXJjZV9tZXRhGAEgASgMEjYKDXRhc2tfY2F0ZWdvcnkYAiABKAsyHy5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrQ2F0ZWdvcnkSFQoNb3V0cHV0X3ByZWZpeBgDIAEoCRIuCgpjb25uZWN0aW9uGAQgASgLMhouZmx5dGVpZGwyLmNvcmUuQ29ubmVjdGlvbiJACg9HZXRUYXNrUmVzcG9uc2USLQoIcmVzb3VyY2UYASABKAsyGy5mbHl0ZWlkbDIucGx1Z2lucy5SZXNvdXJjZSLWAQoIUmVzb3VyY2USKwoHb3V0cHV0cxgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxNYXASDwoHbWVzc2FnZRgCIAEoCRIqCglsb2dfbGlua3MYAyADKAsyFy5mbHl0ZWlkbDIuY29yZS5UYXNrTG9nEjIKBXBoYXNlGAQgASgOMiMuZmx5dGVpZGwyLmNvcmUuVGFza0V4ZWN1dGlvbi5QaGFzZRIsCgtjdXN0b21faW5mbxgFIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QikgEKEURlbGV0ZVRhc2tSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYASABKAwSNgoNdGFza19jYXRlZ29yeRgCIAEoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeRIuCgpjb25uZWN0aW9uGAMgASgLMhouZmx5dGVpZGwyLmNvcmUuQ29ubmVjdGlvbiIUChJEZWxldGVUYXNrUmVzcG9uc2UiXQoJQ29ubmVjdG9yEgwKBG5hbWUYASABKAkSQgoZc3VwcG9ydGVkX3Rhc2tfY2F0ZWdvcmllcxgCIAMoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeSItCgxUYXNrQ2F0ZWdvcnkSDAoEbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFIiMKE0dldENvbm5lY3RvclJlcXVlc3QSDAoEbmFtZRgBIAEoCSJHChRHZXRDb25uZWN0b3JSZXNwb25zZRIvCgljb25uZWN0b3IYASABKAsyHC5mbHl0ZWlkbDIucGx1Z2lucy5Db25uZWN0b3IiFwoVTGlzdENvbm5lY3RvcnNSZXF1ZXN0IkoKFkxpc3RDb25uZWN0b3JzUmVzcG9uc2USMAoKY29ubmVjdG9ycxgBIAMoCzIcLmZseXRlaWRsMi5wbHVnaW5zLkNvbm5lY3RvciL+AQoVR2V0VGFza01ldHJpY3NSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYASABKAwSDwoHcXVlcmllcxgCIAMoCRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJwoEc3RlcBgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhI2Cg10YXNrX2NhdGVnb3J5GAYgASgLMh8uZmx5dGVpZGwyLnBsdWdpbnMuVGFza0NhdGVnb3J5IlAKFkdldFRhc2tNZXRyaWNzUmVzcG9uc2USNgoHcmVzdWx0cxgBIAMoCzIlLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbk1ldHJpY1Jlc3VsdCKBAQoSR2V0VGFza0xvZ3NSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYASABKAwSDQoFbGluZXMYAiABKAQSDQoFdG9rZW4YAyABKAkSNgoNdGFza19jYXRlZ29yeRgEIAEoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeSIqChlHZXRUYXNrTG9nc1Jlc3BvbnNlSGVhZGVyEg0KBXRva2VuGAEgASgJIioKF0dldFRhc2tMb2dzUmVzcG9uc2VCb2R5Eg8KB3Jlc3VsdHMYASADKAkimQEKE0dldFRhc2tMb2dzUmVzcG9uc2USPgoGaGVhZGVyGAEgASgLMiwuZmx5dGVpZGwyLnBsdWdpbnMuR2V0VGFza0xvZ3NSZXNwb25zZUhlYWRlckgAEjoKBGJvZHkYAiABKAsyKi5mbHl0ZWlkbDIucGx1Z2lucy5HZXRUYXNrTG9nc1Jlc3BvbnNlQm9keUgAQgYKBHBhcnRCwgEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IOQ29ubmVjdG9yUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbC9hZG1pbqICA0ZQWKoCEUZseXRlaWRsMi5QbHVnaW5zygIRRmx5dGVpZGwyXFBsdWdpbnPiAh1GbHl0ZWlkbDJcUGx1Z2luc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6UGx1Z2luc2IGcHJvdG8z", [file_flyteidl2_core_execution, file_flyteidl2_core_identifier, file_flyteidl2_core_literals, file_flyteidl2_core_metrics, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
+  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jb25uZWN0b3IucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIqYFChVUYXNrRXhlY3V0aW9uTWV0YWRhdGESQgoRdGFza19leGVjdXRpb25faWQYASABKAsyJy5mbHl0ZWlkbDIuY29yZS5UYXNrRXhlY3V0aW9uSWRlbnRpZmllchIRCgluYW1lc3BhY2UYAiABKAkSRAoGbGFiZWxzGAMgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuVGFza0V4ZWN1dGlvbk1ldGFkYXRhLkxhYmVsc0VudHJ5Ek4KC2Fubm90YXRpb25zGAQgAygLMjkuZmx5dGVpZGwyLnBsdWdpbnMuVGFza0V4ZWN1dGlvbk1ldGFkYXRhLkFubm90YXRpb25zRW50cnkSGwoTazhzX3NlcnZpY2VfYWNjb3VudBgFIAEoCRJhChVlbnZpcm9ubWVudF92YXJpYWJsZXMYBiADKAsyQi5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrRXhlY3V0aW9uTWV0YWRhdGEuRW52aXJvbm1lbnRWYXJpYWJsZXNFbnRyeRIUCgxtYXhfYXR0ZW1wdHMYByABKAUSFQoNaW50ZXJydXB0aWJsZRgIIAEoCBInCh9pbnRlcnJ1cHRpYmxlX2ZhaWx1cmVfdGhyZXNob2xkGAkgASgFEioKCGlkZW50aXR5GAsgASgLMhguZmx5dGVpZGwyLmNvcmUuSWRlbnRpdHkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEaOwoZRW52aXJvbm1lbnRWYXJpYWJsZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIoECChFDcmVhdGVUYXNrUmVxdWVzdBIqCgZpbnB1dHMYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsTWFwEi4KCHRlbXBsYXRlGAIgASgLMhwuZmx5dGVpZGwyLmNvcmUuVGFza1RlbXBsYXRlEhUKDW91dHB1dF9wcmVmaXgYAyABKAkSSQoXdGFza19leGVjdXRpb25fbWV0YWRhdGEYBCABKAsyKC5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrRXhlY3V0aW9uTWV0YWRhdGESLgoKY29ubmVjdGlvbhgFIAEoCzIaLmZseXRlaWRsMi5jb3JlLkNvbm5lY3Rpb24iKwoSQ3JlYXRlVGFza1Jlc3BvbnNlEhUKDXJlc291cmNlX21ldGEYASABKAwi9wEKE0NyZWF0ZVJlcXVlc3RIZWFkZXISLgoIdGVtcGxhdGUYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5UYXNrVGVtcGxhdGUSFQoNb3V0cHV0X3ByZWZpeBgCIAEoCRJJChd0YXNrX2V4ZWN1dGlvbl9tZXRhZGF0YRgDIAEoCzIoLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tFeGVjdXRpb25NZXRhZGF0YRIeChZtYXhfZGF0YXNldF9zaXplX2J5dGVzGAQgASgDEi4KCmNvbm5lY3Rpb24YBSABKAsyGi5mbHl0ZWlkbDIuY29yZS5Db25uZWN0aW9uIqYBCg5HZXRUYXNrUmVxdWVzdBIVCg1yZXNvdXJjZV9tZXRhGAIgASgMEjYKDXRhc2tfY2F0ZWdvcnkYAyABKAsyHy5mbHl0ZWlkbDIucGx1Z2lucy5UYXNrQ2F0ZWdvcnkSFQoNb3V0cHV0X3ByZWZpeBgEIAEoCRIuCgpjb25uZWN0aW9uGAUgASgLMhouZmx5dGVpZGwyLmNvcmUuQ29ubmVjdGlvbiJACg9HZXRUYXNrUmVzcG9uc2USLQoIcmVzb3VyY2UYASABKAsyGy5mbHl0ZWlkbDIucGx1Z2lucy5SZXNvdXJjZSLWAQoIUmVzb3VyY2USKwoHb3V0cHV0cxgCIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxNYXASDwoHbWVzc2FnZRgDIAEoCRIqCglsb2dfbGlua3MYBCADKAsyFy5mbHl0ZWlkbDIuY29yZS5UYXNrTG9nEjIKBXBoYXNlGAUgASgOMiMuZmx5dGVpZGwyLmNvcmUuVGFza0V4ZWN1dGlvbi5QaGFzZRIsCgtjdXN0b21faW5mbxgGIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QikgEKEURlbGV0ZVRhc2tSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYAiABKAwSNgoNdGFza19jYXRlZ29yeRgDIAEoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeRIuCgpjb25uZWN0aW9uGAUgASgLMhouZmx5dGVpZGwyLmNvcmUuQ29ubmVjdGlvbiIUChJEZWxldGVUYXNrUmVzcG9uc2UiXQoJQ29ubmVjdG9yEgwKBG5hbWUYASABKAkSQgoZc3VwcG9ydGVkX3Rhc2tfY2F0ZWdvcmllcxgEIAMoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeSItCgxUYXNrQ2F0ZWdvcnkSDAoEbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFIiMKE0dldENvbm5lY3RvclJlcXVlc3QSDAoEbmFtZRgBIAEoCSJHChRHZXRDb25uZWN0b3JSZXNwb25zZRIvCgljb25uZWN0b3IYASABKAsyHC5mbHl0ZWlkbDIucGx1Z2lucy5Db25uZWN0b3IiFwoVTGlzdENvbm5lY3RvcnNSZXF1ZXN0IkoKFkxpc3RDb25uZWN0b3JzUmVzcG9uc2USMAoKY29ubmVjdG9ycxgBIAMoCzIcLmZseXRlaWRsMi5wbHVnaW5zLkNvbm5lY3RvciL+AQoVR2V0VGFza01ldHJpY3NSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYAiABKAwSDwoHcXVlcmllcxgDIAMoCRIuCgpzdGFydF90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRfdGltZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJwoEc3RlcBgGIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhI2Cg10YXNrX2NhdGVnb3J5GAcgASgLMh8uZmx5dGVpZGwyLnBsdWdpbnMuVGFza0NhdGVnb3J5IlAKFkdldFRhc2tNZXRyaWNzUmVzcG9uc2USNgoHcmVzdWx0cxgBIAMoCzIlLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbk1ldHJpY1Jlc3VsdCKBAQoSR2V0VGFza0xvZ3NSZXF1ZXN0EhUKDXJlc291cmNlX21ldGEYAiABKAwSDQoFbGluZXMYAyABKAQSDQoFdG9rZW4YBCABKAkSNgoNdGFza19jYXRlZ29yeRgFIAEoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRhc2tDYXRlZ29yeSIqChlHZXRUYXNrTG9nc1Jlc3BvbnNlSGVhZGVyEg0KBXRva2VuGAEgASgJIioKF0dldFRhc2tMb2dzUmVzcG9uc2VCb2R5Eg8KB3Jlc3VsdHMYASADKAkimQEKE0dldFRhc2tMb2dzUmVzcG9uc2USPgoGaGVhZGVyGAEgASgLMiwuZmx5dGVpZGwyLnBsdWdpbnMuR2V0VGFza0xvZ3NSZXNwb25zZUhlYWRlckgAEjoKBGJvZHkYAiABKAsyKi5mbHl0ZWlkbDIucGx1Z2lucy5HZXRUYXNrTG9nc1Jlc3BvbnNlQm9keUgAQgYKBHBhcnRCxQEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IOQ29ubmVjdG9yUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvcGx1Z2luc6ICA0ZQWKoCEUZseXRlaWRsMi5QbHVnaW5zygIRRmx5dGVpZGwyXFBsdWdpbnPiAh1GbHl0ZWlkbDJcUGx1Z2luc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6UGx1Z2luc2IGcHJvdG8z", [file_flyteidl2_core_execution, file_flyteidl2_core_identifier, file_flyteidl2_core_literals, file_flyteidl2_core_metrics, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
 
 /**
  * Represents a subset of runtime task execution metadata that are relevant to external plugins.
@@ -102,7 +102,7 @@ export type TaskExecutionMetadata = Message<"flyteidl2.plugins.TaskExecutionMeta
   /**
    * Identity of user running this task execution
    *
-   * @generated from field: flyteidl2.core.Identity identity = 10;
+   * @generated from field: flyteidl2.core.Identity identity = 11;
    */
   identity?: Identity;
 };
@@ -238,84 +238,6 @@ export const CreateRequestHeaderSchema: GenMessage<CreateRequestHeader> = /*@__P
   messageDesc(file_flyteidl2_plugins_connector, 3);
 
 /**
- * @generated from message flyteidl2.plugins.ExecuteTaskSyncRequest
- */
-export type ExecuteTaskSyncRequest = Message<"flyteidl2.plugins.ExecuteTaskSyncRequest"> & {
-  /**
-   * @generated from oneof flyteidl2.plugins.ExecuteTaskSyncRequest.part
-   */
-  part: {
-    /**
-     * @generated from field: flyteidl2.plugins.CreateRequestHeader header = 1;
-     */
-    value: CreateRequestHeader;
-    case: "header";
-  } | {
-    /**
-     * @generated from field: flyteidl2.core.LiteralMap inputs = 2;
-     */
-    value: LiteralMap;
-    case: "inputs";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.plugins.ExecuteTaskSyncRequest.
- * Use `create(ExecuteTaskSyncRequestSchema)` to create a new message.
- */
-export const ExecuteTaskSyncRequestSchema: GenMessage<ExecuteTaskSyncRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 4);
-
-/**
- * @generated from message flyteidl2.plugins.ExecuteTaskSyncResponseHeader
- */
-export type ExecuteTaskSyncResponseHeader = Message<"flyteidl2.plugins.ExecuteTaskSyncResponseHeader"> & {
-  /**
-   * @generated from field: flyteidl2.plugins.Resource resource = 1;
-   */
-  resource?: Resource;
-};
-
-/**
- * Describes the message flyteidl2.plugins.ExecuteTaskSyncResponseHeader.
- * Use `create(ExecuteTaskSyncResponseHeaderSchema)` to create a new message.
- */
-export const ExecuteTaskSyncResponseHeaderSchema: GenMessage<ExecuteTaskSyncResponseHeader> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 5);
-
-/**
- * @generated from message flyteidl2.plugins.ExecuteTaskSyncResponse
- */
-export type ExecuteTaskSyncResponse = Message<"flyteidl2.plugins.ExecuteTaskSyncResponse"> & {
-  /**
-   * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
-   * Resource is for synchronous task execution.
-   *
-   * @generated from oneof flyteidl2.plugins.ExecuteTaskSyncResponse.res
-   */
-  res: {
-    /**
-     * @generated from field: flyteidl2.plugins.ExecuteTaskSyncResponseHeader header = 1;
-     */
-    value: ExecuteTaskSyncResponseHeader;
-    case: "header";
-  } | {
-    /**
-     * @generated from field: flyteidl2.core.LiteralMap outputs = 2;
-     */
-    value: LiteralMap;
-    case: "outputs";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.plugins.ExecuteTaskSyncResponse.
- * Use `create(ExecuteTaskSyncResponseSchema)` to create a new message.
- */
-export const ExecuteTaskSyncResponseSchema: GenMessage<ExecuteTaskSyncResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 6);
-
-/**
  * A message used to fetch a job resource from flyte connector server.
  *
  * @generated from message flyteidl2.plugins.GetTaskRequest
@@ -324,21 +246,21 @@ export type GetTaskRequest = Message<"flyteidl2.plugins.GetTaskRequest"> & {
   /**
    * Metadata about the resource to be pass to the connector.
    *
-   * @generated from field: bytes resource_meta = 1;
+   * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta: Uint8Array;
 
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 2;
+   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 3;
    */
   taskCategory?: TaskCategory;
 
   /**
    * Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
    *
-   * @generated from field: string output_prefix = 3;
+   * @generated from field: string output_prefix = 4;
    */
   outputPrefix: string;
 
@@ -347,7 +269,7 @@ export type GetTaskRequest = Message<"flyteidl2.plugins.GetTaskRequest"> & {
    * Connector will use the secret and config in the taskTemplate if it's None.
    * +optional
    *
-   * @generated from field: flyteidl2.core.Connection connection = 4;
+   * @generated from field: flyteidl2.core.Connection connection = 5;
    */
   connection?: Connection;
 };
@@ -357,7 +279,7 @@ export type GetTaskRequest = Message<"flyteidl2.plugins.GetTaskRequest"> & {
  * Use `create(GetTaskRequestSchema)` to create a new message.
  */
 export const GetTaskRequestSchema: GenMessage<GetTaskRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 7);
+  messageDesc(file_flyteidl2_plugins_connector, 4);
 
 /**
  * Response to get an individual task resource.
@@ -376,7 +298,7 @@ export type GetTaskResponse = Message<"flyteidl2.plugins.GetTaskResponse"> & {
  * Use `create(GetTaskResponseSchema)` to create a new message.
  */
 export const GetTaskResponseSchema: GenMessage<GetTaskResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 8);
+  messageDesc(file_flyteidl2_plugins_connector, 5);
 
 /**
  * @generated from message flyteidl2.plugins.Resource
@@ -387,35 +309,35 @@ export type Resource = Message<"flyteidl2.plugins.Resource"> & {
    * Structured dataset pointing to the query result table.
    * +optional
    *
-   * @generated from field: flyteidl2.core.LiteralMap outputs = 1;
+   * @generated from field: flyteidl2.core.LiteralMap outputs = 2;
    */
   outputs?: LiteralMap;
 
   /**
    * A descriptive message for the current state. e.g. waiting for cluster.
    *
-   * @generated from field: string message = 2;
+   * @generated from field: string message = 3;
    */
   message: string;
 
   /**
    * log information for the task execution.
    *
-   * @generated from field: repeated flyteidl2.core.TaskLog log_links = 3;
+   * @generated from field: repeated flyteidl2.core.TaskLog log_links = 4;
    */
   logLinks: TaskLog[];
 
   /**
    * The phase of the execution is used to determine the phase of the plugin's execution.
    *
-   * @generated from field: flyteidl2.core.TaskExecution.Phase phase = 4;
+   * @generated from field: flyteidl2.core.TaskExecution.Phase phase = 5;
    */
   phase: TaskExecution_Phase;
 
   /**
    * Custom data specific to the connector.
    *
-   * @generated from field: google.protobuf.Struct custom_info = 5;
+   * @generated from field: google.protobuf.Struct custom_info = 6;
    */
   customInfo?: JsonObject;
 };
@@ -425,7 +347,7 @@ export type Resource = Message<"flyteidl2.plugins.Resource"> & {
  * Use `create(ResourceSchema)` to create a new message.
  */
 export const ResourceSchema: GenMessage<Resource> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 9);
+  messageDesc(file_flyteidl2_plugins_connector, 6);
 
 /**
  * A message used to delete a task.
@@ -436,14 +358,14 @@ export type DeleteTaskRequest = Message<"flyteidl2.plugins.DeleteTaskRequest"> &
   /**
    * Metadata about the resource to be pass to the connector.
    *
-   * @generated from field: bytes resource_meta = 1;
+   * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta: Uint8Array;
 
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 2;
+   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 3;
    */
   taskCategory?: TaskCategory;
 
@@ -452,7 +374,7 @@ export type DeleteTaskRequest = Message<"flyteidl2.plugins.DeleteTaskRequest"> &
    * Connector will use the secret and config in the taskTemplate if it's None.
    * +optional
    *
-   * @generated from field: flyteidl2.core.Connection connection = 3;
+   * @generated from field: flyteidl2.core.Connection connection = 5;
    */
   connection?: Connection;
 };
@@ -462,7 +384,7 @@ export type DeleteTaskRequest = Message<"flyteidl2.plugins.DeleteTaskRequest"> &
  * Use `create(DeleteTaskRequestSchema)` to create a new message.
  */
 export const DeleteTaskRequestSchema: GenMessage<DeleteTaskRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 10);
+  messageDesc(file_flyteidl2_plugins_connector, 7);
 
 /**
  * Response to delete a task.
@@ -477,7 +399,7 @@ export type DeleteTaskResponse = Message<"flyteidl2.plugins.DeleteTaskResponse">
  * Use `create(DeleteTaskResponseSchema)` to create a new message.
  */
 export const DeleteTaskResponseSchema: GenMessage<DeleteTaskResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 11);
+  messageDesc(file_flyteidl2_plugins_connector, 8);
 
 /**
  * A message containing the connector metadata.
@@ -495,7 +417,7 @@ export type Connector = Message<"flyteidl2.plugins.Connector"> & {
   /**
    * Supported_task_categories are the categories of the tasks that the connector can handle.
    *
-   * @generated from field: repeated flyteidl2.plugins.TaskCategory supported_task_categories = 2;
+   * @generated from field: repeated flyteidl2.plugins.TaskCategory supported_task_categories = 4;
    */
   supportedTaskCategories: TaskCategory[];
 };
@@ -505,7 +427,7 @@ export type Connector = Message<"flyteidl2.plugins.Connector"> & {
  * Use `create(ConnectorSchema)` to create a new message.
  */
 export const ConnectorSchema: GenMessage<Connector> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 12);
+  messageDesc(file_flyteidl2_plugins_connector, 9);
 
 /**
  * @generated from message flyteidl2.plugins.TaskCategory
@@ -531,7 +453,7 @@ export type TaskCategory = Message<"flyteidl2.plugins.TaskCategory"> & {
  * Use `create(TaskCategorySchema)` to create a new message.
  */
 export const TaskCategorySchema: GenMessage<TaskCategory> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 13);
+  messageDesc(file_flyteidl2_plugins_connector, 10);
 
 /**
  * A request to get an connector.
@@ -552,7 +474,7 @@ export type GetConnectorRequest = Message<"flyteidl2.plugins.GetConnectorRequest
  * Use `create(GetConnectorRequestSchema)` to create a new message.
  */
 export const GetConnectorRequestSchema: GenMessage<GetConnectorRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 14);
+  messageDesc(file_flyteidl2_plugins_connector, 11);
 
 /**
  * A response containing an connector.
@@ -571,7 +493,7 @@ export type GetConnectorResponse = Message<"flyteidl2.plugins.GetConnectorRespon
  * Use `create(GetConnectorResponseSchema)` to create a new message.
  */
 export const GetConnectorResponseSchema: GenMessage<GetConnectorResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 15);
+  messageDesc(file_flyteidl2_plugins_connector, 12);
 
 /**
  * A request to list all connectors.
@@ -586,7 +508,7 @@ export type ListConnectorsRequest = Message<"flyteidl2.plugins.ListConnectorsReq
  * Use `create(ListConnectorsRequestSchema)` to create a new message.
  */
 export const ListConnectorsRequestSchema: GenMessage<ListConnectorsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 16);
+  messageDesc(file_flyteidl2_plugins_connector, 13);
 
 /**
  * A response containing a list of connectors.
@@ -605,7 +527,7 @@ export type ListConnectorsResponse = Message<"flyteidl2.plugins.ListConnectorsRe
  * Use `create(ListConnectorsResponseSchema)` to create a new message.
  */
 export const ListConnectorsResponseSchema: GenMessage<ListConnectorsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 17);
+  messageDesc(file_flyteidl2_plugins_connector, 14);
 
 /**
  * A request to get the metrics from a task execution.
@@ -616,7 +538,7 @@ export type GetTaskMetricsRequest = Message<"flyteidl2.plugins.GetTaskMetricsReq
   /**
    * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    *
-   * @generated from field: bytes resource_meta = 1;
+   * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta: Uint8Array;
 
@@ -624,35 +546,35 @@ export type GetTaskMetricsRequest = Message<"flyteidl2.plugins.GetTaskMetricsReq
    * The metrics to query. If empty, will return a default set of metrics.
    * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
    *
-   * @generated from field: repeated string queries = 2;
+   * @generated from field: repeated string queries = 3;
    */
   queries: string[];
 
   /**
    * Start timestamp, inclusive.
    *
-   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   * @generated from field: google.protobuf.Timestamp start_time = 4;
    */
   startTime?: Timestamp;
 
   /**
    * End timestamp, inclusive..
    *
-   * @generated from field: google.protobuf.Timestamp end_time = 4;
+   * @generated from field: google.protobuf.Timestamp end_time = 5;
    */
   endTime?: Timestamp;
 
   /**
    * Query resolution step width in duration format or float number of seconds.
    *
-   * @generated from field: google.protobuf.Duration step = 5;
+   * @generated from field: google.protobuf.Duration step = 6;
    */
   step?: Duration;
 
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 6;
+   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 7;
    */
   taskCategory?: TaskCategory;
 };
@@ -662,7 +584,7 @@ export type GetTaskMetricsRequest = Message<"flyteidl2.plugins.GetTaskMetricsReq
  * Use `create(GetTaskMetricsRequestSchema)` to create a new message.
  */
 export const GetTaskMetricsRequestSchema: GenMessage<GetTaskMetricsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 18);
+  messageDesc(file_flyteidl2_plugins_connector, 15);
 
 /**
  * A response containing a list of metrics for a task execution.
@@ -683,7 +605,7 @@ export type GetTaskMetricsResponse = Message<"flyteidl2.plugins.GetTaskMetricsRe
  * Use `create(GetTaskMetricsResponseSchema)` to create a new message.
  */
 export const GetTaskMetricsResponseSchema: GenMessage<GetTaskMetricsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 19);
+  messageDesc(file_flyteidl2_plugins_connector, 16);
 
 /**
  * A request to get the log from a task execution.
@@ -694,14 +616,14 @@ export type GetTaskLogsRequest = Message<"flyteidl2.plugins.GetTaskLogsRequest">
   /**
    * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    *
-   * @generated from field: bytes resource_meta = 1;
+   * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta: Uint8Array;
 
   /**
    * Number of lines to return.
    *
-   * @generated from field: uint64 lines = 2;
+   * @generated from field: uint64 lines = 3;
    */
   lines: bigint;
 
@@ -709,14 +631,14 @@ export type GetTaskLogsRequest = Message<"flyteidl2.plugins.GetTaskLogsRequest">
    * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
    * in a query. If there are no more results, this value will be empty.
    *
-   * @generated from field: string token = 3;
+   * @generated from field: string token = 4;
    */
   token: string;
 
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 4;
+   * @generated from field: flyteidl2.plugins.TaskCategory task_category = 5;
    */
   taskCategory?: TaskCategory;
 };
@@ -726,7 +648,7 @@ export type GetTaskLogsRequest = Message<"flyteidl2.plugins.GetTaskLogsRequest">
  * Use `create(GetTaskLogsRequestSchema)` to create a new message.
  */
 export const GetTaskLogsRequestSchema: GenMessage<GetTaskLogsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 20);
+  messageDesc(file_flyteidl2_plugins_connector, 17);
 
 /**
  * @generated from message flyteidl2.plugins.GetTaskLogsResponseHeader
@@ -746,7 +668,7 @@ export type GetTaskLogsResponseHeader = Message<"flyteidl2.plugins.GetTaskLogsRe
  * Use `create(GetTaskLogsResponseHeaderSchema)` to create a new message.
  */
 export const GetTaskLogsResponseHeaderSchema: GenMessage<GetTaskLogsResponseHeader> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 21);
+  messageDesc(file_flyteidl2_plugins_connector, 18);
 
 /**
  * @generated from message flyteidl2.plugins.GetTaskLogsResponseBody
@@ -765,7 +687,7 @@ export type GetTaskLogsResponseBody = Message<"flyteidl2.plugins.GetTaskLogsResp
  * Use `create(GetTaskLogsResponseBodySchema)` to create a new message.
  */
 export const GetTaskLogsResponseBodySchema: GenMessage<GetTaskLogsResponseBody> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 22);
+  messageDesc(file_flyteidl2_plugins_connector, 19);
 
 /**
  * A response containing the logs for a task execution.
@@ -796,5 +718,5 @@ export type GetTaskLogsResponse = Message<"flyteidl2.plugins.GetTaskLogsResponse
  * Use `create(GetTaskLogsResponseSchema)` to create a new message.
  */
 export const GetTaskLogsResponseSchema: GenMessage<GetTaskLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_connector, 23);
+  messageDesc(file_flyteidl2_plugins_connector, 20);
 
