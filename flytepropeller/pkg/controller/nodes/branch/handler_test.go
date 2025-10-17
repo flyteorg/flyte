@@ -181,6 +181,8 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, true, ""},
 		{"childFailure", interfaces.NodeStatusFailed(expectedError), nil,
 			bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, true, ""},
+		{"childTimedOut", interfaces.NodeStatusTimedOut, nil,
+			bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseTimedOut, true, ""},
 		{"childComplete", interfaces.NodeStatusComplete, nil,
 			bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, true, ""},
 		{"childCompleteNoOutputs", interfaces.NodeStatusComplete, nil,
