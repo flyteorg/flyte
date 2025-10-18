@@ -112,17 +112,9 @@ func GetNormalizedAcceleratorDevice(device string) string {
 // getAcceleratorResourceName returns the Kubernetes resource name for the given device class.
 // Falls back to the legacy GpuResourceName if the device class is not configured.
 func getAcceleratorResourceName(accelerator *core.GPUAccelerator) v1.ResourceName {
-	cfg := config.GetK8sPluginConfig()
-
-	// Try to get from the new mapping first
-	if accelerator != nil {
-		if resourceName, ok := cfg.AcceleratorResourceNames[accelerator.GetDeviceClass().String()]; ok {
-			return resourceName
-		}
-	}
-
-	// Fallback to legacy GPU resource name for backward compatibility
-	return cfg.GpuResourceName
+	// Use the shared helper function to get the accelerator config
+	accelConfig := getAcceleratorConfig(accelerator)
+	return accelConfig.ResourceName
 }
 
 // getAllAcceleratorResourceNames returns the Kubernetes resource names for all accelerator devices.
@@ -133,9 +125,11 @@ func getAllAcceleratorResourceNames() map[v1.ResourceName]struct{} {
 	// Add the legacy GPU resource name for backward compatibility
 	acceleratorResourceNames[cfg.GpuResourceName] = struct{}{}
 
-	// Add to map to ensure uniqueness
-	for _, resourceName := range cfg.AcceleratorResourceNames {
-		acceleratorResourceNames[resourceName] = struct{}{}
+	// Add resource names from all configured accelerator device classes
+	for _, deviceClassConfig := range cfg.AcceleratorDeviceClasses {
+		if deviceClassConfig.ResourceName != "" {
+			acceleratorResourceNames[deviceClassConfig.ResourceName] = struct{}{}
+		}
 	}
 	return acceleratorResourceNames
 }
@@ -151,4 +145,13 @@ func podRequiresAccelerator(podSpec *v1.PodSpec) bool {
 		}
 	}
 	return false
+}
+
+// getConfiguredDeviceClasses returns a list of configured device class names for logging purposes.
+func getConfiguredDeviceClasses(deviceClasses map[string]config.AcceleratorDeviceClassConfig) []string {
+	classes := make([]string, 0, len(deviceClasses))
+	for k := range deviceClasses {
+		classes = append(classes, k)
+	}
+	return classes
 }

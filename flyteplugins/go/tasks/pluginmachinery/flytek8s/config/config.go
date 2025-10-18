@@ -11,6 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -113,12 +114,24 @@ var (
 			// Habana Gaudi (Intel)
 			"GAUDI1": "habana-gaudi-dl1",
 		},
-		AcceleratorResourceNames: map[string]v1.ResourceName{
-			"NVIDIA_GPU":    "nvidia.com/gpu",
-			"GOOGLE_TPU":    "google.com/tpu",
-			"AMAZON_NEURON": "aws.amazon.com/neuron",
-			"AMD_GPU":       "amd.com/gpu",
-			"HABANA_GAUDI":  "habana.ai/gaudi",
+		AcceleratorDeviceClasses: map[string]AcceleratorDeviceClassConfig{
+			core.GPUAccelerator_NVIDIA_GPU.String(): {
+				ResourceName: "nvidia.com/gpu",
+			},
+			core.GPUAccelerator_GOOGLE_TPU.String(): {
+				ResourceName:           "google.com/tpu",
+				DeviceNodeLabel:        "cloud.google.com/gke-tpu-accelerator",
+				PartitionSizeNodeLabel: "cloud.google.com/gke-tpu-topology",
+			},
+			core.GPUAccelerator_AMAZON_NEURON.String(): {
+				ResourceName: "aws.amazon.com/neuron",
+			},
+			core.GPUAccelerator_AMD_GPU.String(): {
+				ResourceName: "amd.com/gpu",
+			},
+			core.GPUAccelerator_HABANA_GAUDI.String(): {
+				ResourceName: "habana.ai/gaudi",
+			},
 		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -238,15 +251,15 @@ type K8sPluginConfig struct {
 	// Toleration added to pods intended for unpartitioned GPU nodes.
 	GpuUnpartitionedToleration *v1.Toleration `json:"gpu-unpartitioned-toleration" pflag:"-,Toleration added to pods intended for unpartitioned GPU nodes."`
 
-	// Deprecated: Use AcceleratorResourceNames instead. The name of the GPU resource to use when the task resource requests GPUs.
+	// Deprecated: Use AcceleratorDeviceClasses instead. The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
 
 	// AcceleratorDevices maps accelerator devices to provisioned Kubernetes node labels.
 	AcceleratorDevices map[string]string `json:"accelerator-devices" pflag:"-,Maps accelerator devices to provisionedKubernetes node labels."`
 
-	// AcceleratorResourceNames maps accelerator device classes to their Kubernetes resource names.
-	// This allows configuring resource names for different accelerator types (NVIDIA GPU, Google TPU, Amazon Neuron, AMD GPU).
-	AcceleratorResourceNames map[string]v1.ResourceName `json:"accelerator-resource-names" pflag:"-,Maps accelerator device classes to Kubernetes resource names."`
+	// AcceleratorDeviceClasses maps accelerator device classes to their configuration overrides.
+	// This allows configuring resource names, node labels, and tolerations for different accelerator types (NVIDIA GPU, Google TPU, Amazon Neuron, AMD GPU).
+	AcceleratorDeviceClasses map[string]AcceleratorDeviceClassConfig `json:"accelerator-device-classes" pflag:"-,Maps accelerator device classes to their configuration overrides."`
 
 	// DefaultPodSecurityContext provides a default pod security context that should be applied for every pod that is launched by FlytePropeller. This may not be applicable to all plugins. For
 	// downstream plugins - i.e. TensorflowOperators may not support setting this, but Spark does.
@@ -314,6 +327,23 @@ type FlyteCoPilotConfig struct {
 	Memory                string          `json:"memory" pflag:",Used to set memory for co-pilot containers"`
 	Storage               string          `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
+}
+
+type AcceleratorDeviceClassConfig struct {
+	// Kubernetes resource name for the accelerator device class.
+	ResourceName v1.ResourceName `json:"resource-name" pflag:",Kubernetes resource name for the accelerator device class."`
+
+	// The node label that specifies the attached accelerator device.
+	DeviceNodeLabel string `json:"device-node-label" pflag:"-,The node label that specifies the attached device."`
+
+	// The node label that specifies the attached accelerator partition size.
+	PartitionSizeNodeLabel string `json:"partition-size-node-label" pflag:"-,The node label that specifies the attached partition size."`
+
+	// Override for node selector requirement added to pods intended for unpartitioned nodes.
+	UnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned nodes."`
+
+	// Toleration added to pods intended for unpartitioned nodes.
+	UnpartitionedToleration *v1.Toleration `json:"unpartitioned-toleration" pflag:"-,Toleration added to pods intended for unpartitioned nodes."`
 }
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.

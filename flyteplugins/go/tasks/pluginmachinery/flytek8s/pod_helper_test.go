@@ -848,6 +848,443 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 	})
 }
 
+func TestApplyGPUNodeSelectors_DeviceClassOverrides(t *testing.T) {
+	// Test device class specific configuration overrides
+
+	t.Run("Google TPU with device class specific config", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName:           "google.com/tpu",
+					DeviceNodeLabel:        "cloud.google.com/gke-tpu-accelerator",
+					PartitionSizeNodeLabel: "cloud.google.com/gke-tpu-topology",
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"V5E": "tpu-v5-lite-podslice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("4"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{
+				Device:      "V5E",
+				DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+			},
+		)
+
+		// Verify it uses Google-specific node labels instead of AWS labels
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "cloud.google.com/gke-tpu-accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5-lite-podslice"},
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "cloud.google.com/gke-tpu-accelerator",
+					Value:    "tpu-v5-lite-podslice",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			tpuPodSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU fallback to global config", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					// DeviceNodeLabel not specified - should fallback to global
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+			},
+		)
+
+		// Verify it falls back to global GpuDeviceNodeLabel
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("TPU with partition size", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName:           "google.com/tpu",
+					DeviceNodeLabel:        "cloud.google.com/gke-tpu-accelerator",
+					PartitionSizeNodeLabel: "cloud.google.com/gke-tpu-topology",
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"V5P": "tpu-v5p-slice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("8"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{
+				Device:      "V5P",
+				DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "2x2x2",
+				},
+			},
+		)
+
+		// Verify it uses Google-specific topology label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "cloud.google.com/gke-tpu-accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5p-slice"},
+						},
+						{
+							Key:      "cloud.google.com/gke-tpu-topology",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"2x2x2"},
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "cloud.google.com/gke-tpu-accelerator",
+					Value:    "tpu-v5p-slice",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "cloud.google.com/gke-tpu-topology",
+					Value:    "2x2x2",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			tpuPodSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU unpartitioned with custom node selector and toleration", func(t *testing.T) {
+		gpuUnpartitionedNodeSelectorRequirement := v1.NodeSelectorRequirement{
+			Key:      "gpu-unpartitioned",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"true"},
+		}
+		gpuUnpartitionedToleration := v1.Toleration{
+			Key:      "gpu-unpartitioned",
+			Value:    "true",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:                         "nvidia.com/gpu",
+					DeviceNodeLabel:                      "k8s.amazonaws.com/accelerator",
+					PartitionSizeNodeLabel:               "k8s.amazonaws.com/gpu-partition-size",
+					UnpartitionedNodeSelectorRequirement: &gpuUnpartitionedNodeSelectorRequirement,
+					UnpartitionedToleration:              &gpuUnpartitionedToleration,
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{
+					Unpartitioned: true,
+				},
+			},
+		)
+
+		// Verify it uses device-class-specific unpartitioned config
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						gpuUnpartitionedNodeSelectorRequirement,
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "k8s.amazonaws.com/accelerator",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				gpuUnpartitionedToleration,
+			},
+			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU unpartitioned with fallback to default behavior", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:           "nvidia.com/gpu",
+					DeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+					PartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+					// No unpartitioned config - should use default DoesNotExist behavior
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{
+					Unpartitioned: true,
+				},
+			},
+		)
+
+		// Verify it uses default DoesNotExist behavior with GPU partition size label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						{
+							Key:      "k8s.amazonaws.com/gpu-partition-size",
+							Operator: v1.NodeSelectorOpDoesNotExist,
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("Partial device class config merges with global defaults", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:    "nvidia.com/gpu",
+					DeviceNodeLabel: "nvidia.com/gpu.present",
+					// PartitionSizeNodeLabel not specified - should fall back to global
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		)
+
+		// Verify it uses NVIDIA-specific device label but falls back to global partition label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "nvidia.com/gpu.present",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						{
+							// Falls back to global partition size label
+							Key:      "k8s.amazonaws.com/gpu-partition-size",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "nvidia.com/gpu.present",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "k8s.amazonaws.com/gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+	})
+}
+
 func updatePod(t *testing.T) {
 	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{

@@ -193,16 +193,128 @@ func TestGetNormalizedAcceleratorDevice(t *testing.T) {
 	})
 }
 
+func TestGetAcceleratorResourceName(t *testing.T) {
+	t.Run("returns device class specific resource name", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName: "nvidia.com/gpu",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+				},
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+				},
+				"AMAZON_NEURON": {
+					ResourceName: "aws.amazon.com/neuron",
+				},
+				"AMD_GPU": {
+					ResourceName: "amd.com/gpu",
+				},
+			},
+		}))
+
+		// Test NVIDIA GPU
+		result := getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+		})
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), result)
+
+		// Test Google TPU
+		result = getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+		})
+		assert.Equal(t, v1.ResourceName("google.com/tpu"), result)
+
+		// Test Amazon Neuron
+		result = getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_AMAZON_NEURON,
+		})
+		assert.Equal(t, v1.ResourceName("aws.amazon.com/neuron"), result)
+
+		// Test AMD GPU
+		result = getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_AMD_GPU,
+		})
+		assert.Equal(t, v1.ResourceName("amd.com/gpu"), result)
+	})
+
+	t.Run("falls back to legacy GpuResourceName when device class not configured", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:          "nvidia.com/gpu",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{},
+		}))
+
+		result := getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+		})
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), result)
+	})
+
+	t.Run("falls back to legacy GpuResourceName when device class config not found", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName: "custom.gpu.resource",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+				},
+			},
+		}))
+
+		// Use NVIDIA_GPU (default, value 0) but it's not in the config, so should fallback
+		result := getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+		})
+		assert.Equal(t, v1.ResourceName("custom.gpu.resource"), result)
+	})
+
+	t.Run("falls back to legacy GpuResourceName when accelerator is nil", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:          "nvidia.com/gpu",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{},
+		}))
+
+		result := getAcceleratorResourceName(nil)
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), result)
+	})
+
+	t.Run("uses device class config even when resource name is empty string", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName: "nvidia.com/gpu",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "", // Empty - should fallback
+				},
+			},
+		}))
+
+		result := getAcceleratorResourceName(&core.GPUAccelerator{
+			DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+		})
+		// Should fallback to global GpuResourceName when device class resource name is empty
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), result)
+	})
+}
+
 func TestGetAllAcceleratorResourceNames(t *testing.T) {
 	t.Run("returns all configured accelerator resource names", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			GpuResourceName: "nvidia.com/gpu",
-			AcceleratorResourceNames: map[string]v1.ResourceName{
-				"NVIDIA_GPU":    "nvidia.com/gpu",
-				"GOOGLE_TPU":    "google.com/tpu",
-				"AMAZON_NEURON": "aws.amazon.com/neuron",
-				"AMD_GPU":       "amd.com/gpu",
-				"HABANA_GAUDI":  "habana.ai/gaudi",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+				},
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+				},
+				"AMAZON_NEURON": {
+					ResourceName: "aws.amazon.com/neuron",
+				},
+				"AMD_GPU": {
+					ResourceName: "amd.com/gpu",
+				},
+				"HABANA_GAUDI": {
+					ResourceName: "habana.ai/gaudi",
+				},
 			},
 		}))
 
@@ -223,7 +335,7 @@ func TestGetAllAcceleratorResourceNames(t *testing.T) {
 	t.Run("includes legacy GpuResourceName for backward compatibility", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			GpuResourceName:          "custom.gpu.resource",
-			AcceleratorResourceNames: map[string]v1.ResourceName{},
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{},
 		}))
 
 		result := getAllAcceleratorResourceNames()
@@ -235,9 +347,13 @@ func TestGetAllAcceleratorResourceNames(t *testing.T) {
 	t.Run("ensures uniqueness when legacy and new map overlap", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			GpuResourceName: "nvidia.com/gpu",
-			AcceleratorResourceNames: map[string]v1.ResourceName{
-				"NVIDIA_GPU": "nvidia.com/gpu", // Duplicate of legacy
-				"GOOGLE_TPU": "google.com/tpu",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+				},
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+				},
 			},
 		}))
 
@@ -254,12 +370,22 @@ func TestPodRequiresAccelerator(t *testing.T) {
 	// Setup config with multiple accelerator types
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuResourceName: "nvidia.com/gpu",
-		AcceleratorResourceNames: map[string]v1.ResourceName{
-			"NVIDIA_GPU":    "nvidia.com/gpu",
-			"GOOGLE_TPU":    "google.com/tpu",
-			"AMAZON_NEURON": "aws.amazon.com/neuron",
-			"AMD_GPU":       "amd.com/gpu",
-			"HABANA_GAUDI":  "habana.ai/gaudi",
+		AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+			"NVIDIA_GPU": {
+				ResourceName: "nvidia.com/gpu",
+			},
+			"GOOGLE_TPU": {
+				ResourceName: "google.com/tpu",
+			},
+			"AMAZON_NEURON": {
+				ResourceName: "aws.amazon.com/neuron",
+			},
+			"AMD_GPU": {
+				ResourceName: "amd.com/gpu",
+			},
+			"HABANA_GAUDI": {
+				ResourceName: "habana.ai/gaudi",
+			},
 		},
 	}))
 

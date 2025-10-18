@@ -208,6 +208,55 @@ func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedM
 	return nil
 }
 
+// getAcceleratorConfig returns the configuration for the given accelerator device class.
+// It first attempts to get device-class-specific configuration from AcceleratorDeviceClasses.
+// If not found or incomplete, it falls back to the global GPU configuration fields for backward compatibility.
+func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.AcceleratorDeviceClassConfig {
+	cfg := config.GetK8sPluginConfig()
+
+	// Start with defaults from global GPU config
+	accelConfig := config.AcceleratorDeviceClassConfig{
+		ResourceName:                         cfg.GpuResourceName,
+		DeviceNodeLabel:                      cfg.GpuDeviceNodeLabel,
+		PartitionSizeNodeLabel:               cfg.GpuPartitionSizeNodeLabel,
+		UnpartitionedNodeSelectorRequirement: cfg.GpuUnpartitionedNodeSelectorRequirement,
+		UnpartitionedToleration:              cfg.GpuUnpartitionedToleration,
+	}
+
+	// Override with device-class-specific config if available
+	if gpuAccelerator != nil {
+		deviceClass := gpuAccelerator.GetDeviceClass().String()
+		if deviceClassConfig, ok := cfg.AcceleratorDeviceClasses[deviceClass]; ok {
+			logger.Debugf(context.TODO(), "Using device-class-specific configuration for accelerator class: %s", deviceClass)
+			// Override resource name if specified
+			if deviceClassConfig.ResourceName != "" {
+				accelConfig.ResourceName = deviceClassConfig.ResourceName
+			}
+			// Override device node label if specified
+			if deviceClassConfig.DeviceNodeLabel != "" {
+				accelConfig.DeviceNodeLabel = deviceClassConfig.DeviceNodeLabel
+			}
+			// Override partition size node label if specified
+			if deviceClassConfig.PartitionSizeNodeLabel != "" {
+				accelConfig.PartitionSizeNodeLabel = deviceClassConfig.PartitionSizeNodeLabel
+			}
+			// Override unpartitioned node selector requirement if specified
+			if deviceClassConfig.UnpartitionedNodeSelectorRequirement != nil {
+				accelConfig.UnpartitionedNodeSelectorRequirement = deviceClassConfig.UnpartitionedNodeSelectorRequirement
+			}
+			// Override unpartitioned toleration if specified
+			if deviceClassConfig.UnpartitionedToleration != nil {
+				accelConfig.UnpartitionedToleration = deviceClassConfig.UnpartitionedToleration
+			}
+		} else {
+			logger.Warnf(context.TODO(), "Device class '%s' not found in AcceleratorDeviceClasses configuration, falling back to global GPU config. Available device classes: %v",
+				deviceClass, getConfiguredDeviceClasses(cfg.AcceleratorDeviceClasses))
+		}
+	}
+
+	return accelConfig
+}
+
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
 	// Short circuit if pod spec does not contain any containers that use accelerators
 	if !podRequiresAccelerator(podSpec) {
@@ -218,6 +267,9 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		podSpec.Affinity = &v1.Affinity{}
 	}
 
+	// Get device-class-specific configuration
+	accelConfig := getAcceleratorConfig(gpuAccelerator)
+
 	// Apply changes for GPU device
 	if device := gpuAccelerator.GetDevice(); len(device) > 0 {
 		// Normalize the device name
@@ -225,14 +277,14 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 
 		// Add node selector requirement for GPU device
 		deviceNsr := v1.NodeSelectorRequirement{
-			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Key:      accelConfig.DeviceNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
 			Values:   []string{normalizedDevice},
 		}
 		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
 		// Add toleration for GPU device
 		deviceTol := v1.Toleration{
-			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Key:      accelConfig.DeviceNodeLabel,
 			Value:    normalizedDevice,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
@@ -254,25 +306,25 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		if !p.Unpartitioned {
 			break
 		}
-		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
-			partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+		if accelConfig.UnpartitionedNodeSelectorRequirement != nil {
+			partitionSizeNsr = accelConfig.UnpartitionedNodeSelectorRequirement
 		} else {
 			partitionSizeNsr = &v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Key:      accelConfig.PartitionSizeNodeLabel,
 				Operator: v1.NodeSelectorOpDoesNotExist,
 			}
 		}
-		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
-			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+		if accelConfig.UnpartitionedToleration != nil {
+			partitionSizeTol = accelConfig.UnpartitionedToleration
 		}
 	case *core.GPUAccelerator_PartitionSize:
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
-			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Key:      accelConfig.PartitionSizeNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
 			Values:   []string{p.PartitionSize},
 		}
 		partitionSizeTol = &v1.Toleration{
-			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Key:      accelConfig.PartitionSizeNodeLabel,
 			Value:    p.PartitionSize,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
