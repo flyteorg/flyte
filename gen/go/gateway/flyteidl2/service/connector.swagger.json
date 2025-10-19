@@ -1904,7 +1904,7 @@
       "type": "object",
       "properties": {
         "outputs": {
-          "$ref": "#/definitions/coreLiteralMap",
+          "$ref": "#/definitions/taskOutputs",
           "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
         },
         "message": {
@@ -1974,7 +1974,7 @@
       "type": "object",
       "properties": {
         "inputs": {
-          "$ref": "#/definitions/coreLiteralMap",
+          "$ref": "#/definitions/taskInputs",
           "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         },
         "template": {
@@ -2177,6 +2177,56 @@
       ],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "taskInputs": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskNamedLiteral"
+          },
+          "description": "Ordered inputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
+        }
+      },
+      "description": "Input payload for an action."
+    },
+    "taskNamedLiteral": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the literal."
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Literal value."
+        }
+      },
+      "description": "Named literal value."
+    },
+    "taskOutputs": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskNamedLiteral"
+          },
+          "description": "Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        }
+      },
+      "description": "Output payload for an action."
     }
   }
 }

@@ -1,9 +1,9 @@
 from flyteidl2.core import execution_pb2 as _execution_pb2
 from flyteidl2.core import identifier_pb2 as _identifier_pb2
-from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import metrics_pb2 as _metrics_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -66,12 +66,12 @@ class CreateTaskRequest(_message.Message):
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
     CONNECTION_FIELD_NUMBER: _ClassVar[int]
-    inputs: _literals_pb2.LiteralMap
+    inputs: _common_pb2.Inputs
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
     connection: _security_pb2.Connection
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]
@@ -118,12 +118,12 @@ class Resource(_message.Message):
     LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
-    outputs: _literals_pb2.LiteralMap
+    outputs: _common_pb2.Outputs
     message: str
     log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     phase: _execution_pb2.TaskExecution.Phase
     custom_info: _struct_pb2.Struct
-    def __init__(self, outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    def __init__(self, outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["resource_meta", "task_category", "connection"]

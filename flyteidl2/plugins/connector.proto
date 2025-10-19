@@ -4,10 +4,10 @@ package flyteidl2.plugins;
 
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
-import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/metrics.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/task/common.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -48,7 +48,7 @@ message CreateTaskRequest {
   // The inputs required to start the execution. All required inputs must be
   // included in this map. If not required and not provided, defaults apply.
   // +optional
-  core.LiteralMap inputs = 1;
+  task.Inputs inputs = 1;
   // Template of the task that encapsulates all the metadata of the task.
   core.TaskTemplate template = 2;
   // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
@@ -105,7 +105,7 @@ message Resource {
   // The outputs of the execution. It's typically used by sql task. connector service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.LiteralMap outputs = 2;
+  task.Outputs outputs = 2;
   // A descriptive message for the current state. e.g. waiting for cluster.
   string message = 3;
   // log information for the task execution.
