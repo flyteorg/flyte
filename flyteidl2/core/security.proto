@@ -145,4 +145,13 @@ message SecurityContext {
   // Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access
   // to the secret) and to pass it to the remote execution engine.
   repeated OAuth2TokenRequest tokens = 3;
+
+  // The name of the connection.
+  // The connection is defined in the externalResourceAttributes or configmap.
+  // The connection config take precedence in the following order:
+  // 1. connection in the externalResourceAttributes in the project-domain settings.
+  // 2. connection in the externalResourceAttributes in the project settings.
+  // 3. connection in the configmap.
+  // +optional
+  string connection_ref = 4;
 }
