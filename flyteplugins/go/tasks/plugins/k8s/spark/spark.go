@@ -8,8 +8,7 @@ import (
 	"strings"
 	"time"
 
-	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	sparkOpConfig "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/config"
+	sparkOp "github.com/kubeflow/spark-operator/v2/api/v1beta2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -32,6 +31,14 @@ import (
 const KindSparkApplication = "SparkApplication"
 const sparkDriverUI = "sparkDriverUI"
 const sparkHistoryUI = "sparkHistoryUI"
+
+// Spark configuration keys
+const (
+	SparkDriverCoreLimitKey      = "spark.kubernetes.driver.limit.cores"
+	SparkDriverCoreRequestKey    = "spark.kubernetes.driver.request.cores"
+	SparkExecutorCoreLimitKey    = "spark.kubernetes.executor.limit.cores"
+	SparkExecutorCoreRequestKey  = "spark.kubernetes.executor.request.cores"
+)
 
 var featureRegex = regexp.MustCompile(`^spark.((flyteorg)|(flyte)).(.+).enabled$`)
 
@@ -110,21 +117,21 @@ func getSparkConfig(taskCtx pluginsCore.TaskExecutionContext, sparkJob *plugins.
 	}
 
 	// Set pod limits.
-	if len(sparkConfig[sparkOpConfig.SparkDriverCoreLimitKey]) == 0 {
+	if len(sparkConfig[SparkDriverCoreLimitKey]) == 0 {
 		// spark.kubernetes.driver.request.cores takes precedence over spark.driver.cores
-		if len(sparkConfig[sparkOpConfig.SparkDriverCoreRequestKey]) != 0 {
-			sparkConfig[sparkOpConfig.SparkDriverCoreLimitKey] = sparkConfig[sparkOpConfig.SparkDriverCoreRequestKey]
+		if len(sparkConfig[SparkDriverCoreRequestKey]) != 0 {
+			sparkConfig[SparkDriverCoreLimitKey] = sparkConfig[SparkDriverCoreRequestKey]
 		} else if len(sparkConfig["spark.driver.cores"]) != 0 {
-			sparkConfig[sparkOpConfig.SparkDriverCoreLimitKey] = sparkConfig["spark.driver.cores"]
+			sparkConfig[SparkDriverCoreLimitKey] = sparkConfig["spark.driver.cores"]
 		}
 	}
 
-	if len(sparkConfig[sparkOpConfig.SparkExecutorCoreLimitKey]) == 0 {
+	if len(sparkConfig[SparkExecutorCoreLimitKey]) == 0 {
 		// spark.kubernetes.executor.request.cores takes precedence over spark.executor.cores
-		if len(sparkConfig[sparkOpConfig.SparkExecutorCoreRequestKey]) != 0 {
-			sparkConfig[sparkOpConfig.SparkExecutorCoreLimitKey] = sparkConfig[sparkOpConfig.SparkExecutorCoreRequestKey]
+		if len(sparkConfig[SparkExecutorCoreRequestKey]) != 0 {
+			sparkConfig[SparkExecutorCoreLimitKey] = sparkConfig[SparkExecutorCoreRequestKey]
 		} else if len(sparkConfig["spark.executor.cores"]) != 0 {
-			sparkConfig[sparkOpConfig.SparkExecutorCoreLimitKey] = sparkConfig["spark.executor.cores"]
+			sparkConfig[SparkExecutorCoreLimitKey] = sparkConfig["spark.executor.cores"]
 		}
 	}
 
@@ -171,17 +178,17 @@ func createSparkPodSpec(
 	sparkEnv = append(sparkEnv, v1.EnvVar{Name: "FLYTE_MAX_ATTEMPTS", Value: strconv.Itoa(int(taskCtx.TaskExecutionMetadata().GetMaxAttempts()))})
 
 	spec := sparkOp.SparkPodSpec{
-		Affinity:         podSpec.Affinity,
-		Annotations:      annotations,
-		Labels:           labels,
-		Env:              sparkEnv,
-		Image:            &container.Image,
-		SecurityContenxt: podSpec.SecurityContext.DeepCopy(),
-		DNSConfig:        podSpec.DNSConfig.DeepCopy(),
-		Tolerations:      podSpec.Tolerations,
-		SchedulerName:    &podSpec.SchedulerName,
-		NodeSelector:     podSpec.NodeSelector,
-		HostNetwork:      &podSpec.HostNetwork,
+		Affinity:           podSpec.Affinity,
+		Annotations:        annotations,
+		Labels:             labels,
+		Env:                sparkEnv,
+		Image:              &container.Image,
+		PodSecurityContext: podSpec.SecurityContext.DeepCopy(),
+		DNSConfig:          podSpec.DNSConfig.DeepCopy(),
+		Tolerations:        podSpec.Tolerations,
+		SchedulerName:      &podSpec.SchedulerName,
+		NodeSelector:       podSpec.NodeSelector,
+		HostNetwork:        &podSpec.HostNetwork,
 	}
 	return &spec
 }
@@ -226,10 +233,10 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	}
 	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer, driverPod)
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
+	sparkPodSpec.ServiceAccount = &serviceAccountName
 	spec := driverSpec{
 		&sparkOp.DriverSpec{
-			SparkPodSpec:   *sparkPodSpec,
-			ServiceAccount: &serviceAccountName,
+			SparkPodSpec: *sparkPodSpec,
 		},
 	}
 	if cores, err := strconv.ParseInt(sparkConfig["spark.driver.cores"], 10, 32); err == nil {
@@ -278,6 +285,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	}
 	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer, sparkJob.GetExecutorPod())
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
+	sparkPodSpec.ServiceAccount = &serviceAccountName
 	spec := executorSpec{
 		primaryContainer,
 		&sparkOp.ExecutorSpec{
@@ -300,23 +308,28 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 	// Hack: Retry submit failures in-case of resource limits hit.
 	submissionFailureRetries := int32(14)
 
+	sparkVersion := "3.0.0" // Default version
+	if v, ok := sparkConfig["spark.version"]; ok {
+		sparkVersion = v
+	}
+
 	app := &sparkOp.SparkApplication{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindSparkApplication,
 			APIVersion: sparkOp.SchemeGroupVersion.String(),
 		},
 		Spec: sparkOp.SparkApplicationSpec{
-			ServiceAccount: &executorSpec.serviceAccountName,
-			Type:           getApplicationType(sparkJob.GetApplicationType()),
-			Image:          &executorSpec.container.Image,
-			Arguments:      executorSpec.container.Args,
-			Driver:         *driverSpec.sparkSpec,
-			Executor:       *executorSpec.sparkSpec,
-			SparkConf:      sparkConfig,
-			HadoopConf:     sparkJob.GetHadoopConf(),
+			Type:         getApplicationType(sparkJob.GetApplicationType()),
+			SparkVersion: sparkVersion,
+			Image:        &executorSpec.container.Image,
+			Arguments:    executorSpec.container.Args,
+			Driver:       *driverSpec.sparkSpec,
+			Executor:     *executorSpec.sparkSpec,
+			SparkConf:    sparkConfig,
+			HadoopConf:   sparkJob.GetHadoopConf(),
 			// SubmissionFailures handled here. Task Failures handled at Propeller/Job level.
 			RestartPolicy: sparkOp.RestartPolicy{
-				Type:                       sparkOp.OnFailure,
+				Type:                       sparkOp.RestartPolicyOnFailure,
 				OnSubmissionFailureRetries: &submissionFailureRetries,
 			},
 		},
@@ -365,15 +378,15 @@ func addConfig(sparkConfig map[string]string, key string, value string) {
 func getApplicationType(applicationType plugins.SparkApplication_Type) sparkOp.SparkApplicationType {
 	switch applicationType {
 	case plugins.SparkApplication_PYTHON:
-		return sparkOp.PythonApplicationType
+		return sparkOp.SparkApplicationTypePython
 	case plugins.SparkApplication_JAVA:
-		return sparkOp.JavaApplicationType
+		return sparkOp.SparkApplicationTypeJava
 	case plugins.SparkApplication_SCALA:
-		return sparkOp.ScalaApplicationType
+		return sparkOp.SparkApplicationTypeScala
 	case plugins.SparkApplication_R:
-		return sparkOp.RApplicationType
+		return sparkOp.SparkApplicationTypeR
 	}
-	return sparkOp.PythonApplicationType
+	return sparkOp.SparkApplicationTypePython
 }
 
 func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
@@ -480,7 +493,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 	customInfoMap := make(map[string]string)
 
 	// Spark UI.
-	if sj.Status.AppState.State == sparkOp.FailedState || sj.Status.AppState.State == sparkOp.CompletedState {
+	if sj.Status.AppState.State == sparkOp.ApplicationStateFailed || sj.Status.AppState.State == sparkOp.ApplicationStateCompleted {
 		if sj.Status.SparkApplicationID != "" && GetSparkConfig().SparkHistoryServerURL != "" {
 			customInfoMap[sparkHistoryUI] = fmt.Sprintf("%s/history/%s", GetSparkConfig().SparkHistoryServerURL, sj.Status.SparkApplicationID)
 			// Custom doesn't work unless the UI has a custom plugin to parse this, hence add to Logs as well.
@@ -490,7 +503,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 				MessageFormat: core.TaskLog_JSON,
 			})
 		}
-	} else if sj.Status.AppState.State == sparkOp.RunningState && sj.Status.DriverInfo.WebUIIngressAddress != "" {
+	} else if sj.Status.AppState.State == sparkOp.ApplicationStateRunning && sj.Status.DriverInfo.WebUIIngressAddress != "" {
 		// Older versions of spark-operator does not append http:// but newer versions do.
 		uri := sj.Status.DriverInfo.WebUIIngressAddress
 		if !strings.HasPrefix(uri, "https://") && !strings.HasPrefix(uri, "http://") {
@@ -528,17 +541,17 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	var phaseInfo pluginsCore.PhaseInfo
 
 	switch app.Status.AppState.State {
-	case sparkOp.NewState:
+	case sparkOp.ApplicationStateNew:
 		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "job queued", info)
-	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
+	case sparkOp.ApplicationStateSubmitted:
 		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "job submitted", info)
-	case sparkOp.FailedSubmissionState:
+	case sparkOp.ApplicationStateFailedSubmission:
 		reason := fmt.Sprintf("Spark Job  Submission Failed with Error: %s", app.Status.AppState.ErrorMessage)
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)
-	case sparkOp.FailedState:
+	case sparkOp.ApplicationStateFailed:
 		reason := fmt.Sprintf("Spark Job Failed with Error: %s", app.Status.AppState.ErrorMessage)
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)
-	case sparkOp.CompletedState:
+	case sparkOp.ApplicationStateCompleted:
 		phaseInfo = pluginsCore.PhaseInfoSuccess(info)
 	default:
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
