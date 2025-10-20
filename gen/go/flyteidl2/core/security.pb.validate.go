@@ -770,8 +770,6 @@ func (m *SecurityContext) validate(all bool) error {
 
 	}
 
-	// no validation rules for ConnectionRef
-
 	if len(errors) > 0 {
 		return SecurityContextMultiError(errors)
 	}

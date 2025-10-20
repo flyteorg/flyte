@@ -1392,10 +1392,6 @@
             "$ref": "#/definitions/coreOAuth2TokenRequest"
           },
           "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        },
-        "connection_ref": {
-          "type": "string",
-          "title": "The name of the connection.\nThe connection is defined in the externalResourceAttributes or configmap.\nThe connection config take precedence in the following order:\n1. connection in the externalResourceAttributes in the project-domain settings.\n2. connection in the externalResourceAttributes in the project settings.\n3. connection in the configmap.\n+optional"
         }
       },
       "description": "SecurityContext holds security attributes that apply to tasks."
