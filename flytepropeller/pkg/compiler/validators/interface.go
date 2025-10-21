@@ -139,7 +139,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 				iface = &core.TypedInterface{
 					Inputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
 					Outputs: &core.VariableMap{Variables: map[string]*core.Variable{
-						signal.GetOutputVariableName(): &core.Variable{
+						signal.GetOutputVariableName(): {
 							Type: signal.GetType(),
 						},
 					}},

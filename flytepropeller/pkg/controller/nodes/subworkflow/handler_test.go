@@ -40,11 +40,11 @@ var eventConfig = &config.EventConfig{
 func (t *workflowNodeStateHolder) ClearNodeStatus() {
 }
 
-func (t *workflowNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
+func (t *workflowNodeStateHolder) PutTaskNodeState(handler.TaskNodeState) error {
 	panic("not implemented")
 }
 
-func (t workflowNodeStateHolder) PutBranchNode(s handler.BranchNodeState) error {
+func (t workflowNodeStateHolder) PutBranchNode(handler.BranchNodeState) error {
 	panic("not implemented")
 }
 
@@ -53,15 +53,15 @@ func (t *workflowNodeStateHolder) PutWorkflowNodeState(s handler.WorkflowNodeSta
 	return nil
 }
 
-func (t workflowNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) error {
+func (t workflowNodeStateHolder) PutDynamicNodeState(handler.DynamicNodeState) error {
 	panic("not implemented")
 }
 
-func (t workflowNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+func (t workflowNodeStateHolder) PutGateNodeState(handler.GateNodeState) error {
 	panic("not implemented")
 }
 
-func (t workflowNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
+func (t workflowNodeStateHolder) PutArrayNodeState(handler.ArrayNodeState) error {
 	panic("not implemented")
 }
 

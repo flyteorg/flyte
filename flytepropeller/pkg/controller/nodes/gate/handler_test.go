@@ -95,8 +95,8 @@ func createNodeExecutionContext(gateNode *v1alpha1.GateNodeSpec) *nodeMocks.Node
 	nm := &nodeMocks.NodeExecutionMetadata{}
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-	ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
+	ns.EXPECT().GetDataDir().Return("data-dir")
+	ns.EXPECT().GetOutputDir().Return("data-dir")
 
 	t := v1.NewTime(time.Now())
 	ns.EXPECT().GetLastAttemptStartedAt().Return(&t)

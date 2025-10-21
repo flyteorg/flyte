@@ -36,15 +36,15 @@ type dynamicNodeStateHolder struct {
 func (t *dynamicNodeStateHolder) ClearNodeStatus() {
 }
 
-func (t *dynamicNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
+func (t *dynamicNodeStateHolder) PutTaskNodeState(handler.TaskNodeState) error {
 	panic("not implemented")
 }
 
-func (t dynamicNodeStateHolder) PutBranchNode(s handler.BranchNodeState) error {
+func (t dynamicNodeStateHolder) PutBranchNode(handler.BranchNodeState) error {
 	panic("not implemented")
 }
 
-func (t dynamicNodeStateHolder) PutWorkflowNodeState(s handler.WorkflowNodeState) error {
+func (t dynamicNodeStateHolder) PutWorkflowNodeState(handler.WorkflowNodeState) error {
 	panic("not implemented")
 }
 
@@ -53,11 +53,11 @@ func (t *dynamicNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState)
 	return nil
 }
 
-func (t dynamicNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+func (t dynamicNodeStateHolder) PutGateNodeState(handler.GateNodeState) error {
 	panic("not implemented")
 }
 
-func (t dynamicNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
+func (t dynamicNodeStateHolder) PutArrayNodeState(handler.ArrayNodeState) error {
 	panic("not implemented")
 }
 
@@ -122,8 +122,8 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-		ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("data-dir")
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
