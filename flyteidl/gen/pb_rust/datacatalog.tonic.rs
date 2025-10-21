@@ -184,6 +184,85 @@ pub mod data_catalog_client {
                 .insert(GrpcMethod::new("datacatalog.DataCatalog", "GetArtifact"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn create_future_artifact(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateArtifactResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/datacatalog.DataCatalog/CreateFutureArtifact",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("datacatalog.DataCatalog", "CreateFutureArtifact"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_future_artifact(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetArtifactResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/datacatalog.DataCatalog/GetFutureArtifact",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("datacatalog.DataCatalog", "GetFutureArtifact"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn update_future_artifact(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateArtifactResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/datacatalog.DataCatalog/UpdateFutureArtifact",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("datacatalog.DataCatalog", "UpdateFutureArtifact"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn add_tag(
             &mut self,
             request: impl tonic::IntoRequest<super::AddTagRequest>,
@@ -370,6 +449,27 @@ pub mod data_catalog_server {
             request: tonic::Request<super::GetArtifactRequest>,
         ) -> std::result::Result<
             tonic::Response<super::GetArtifactResponse>,
+            tonic::Status,
+        >;
+        async fn create_future_artifact(
+            &self,
+            request: tonic::Request<super::CreateArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::CreateArtifactResponse>,
+            tonic::Status,
+        >;
+        async fn get_future_artifact(
+            &self,
+            request: tonic::Request<super::GetArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetArtifactResponse>,
+            tonic::Status,
+        >;
+        async fn update_future_artifact(
+            &self,
+            request: tonic::Request<super::UpdateArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::UpdateArtifactResponse>,
             tonic::Status,
         >;
         async fn add_tag(
@@ -660,6 +760,147 @@ pub mod data_catalog_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = GetArtifactSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/datacatalog.DataCatalog/CreateFutureArtifact" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateFutureArtifactSvc<T: DataCatalog>(pub Arc<T>);
+                    impl<
+                        T: DataCatalog,
+                    > tonic::server::UnaryService<super::CreateArtifactRequest>
+                    for CreateFutureArtifactSvc<T> {
+                        type Response = super::CreateArtifactResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateArtifactRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as DataCatalog>::create_future_artifact(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateFutureArtifactSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/datacatalog.DataCatalog/GetFutureArtifact" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetFutureArtifactSvc<T: DataCatalog>(pub Arc<T>);
+                    impl<
+                        T: DataCatalog,
+                    > tonic::server::UnaryService<super::GetArtifactRequest>
+                    for GetFutureArtifactSvc<T> {
+                        type Response = super::GetArtifactResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetArtifactRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as DataCatalog>::get_future_artifact(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetFutureArtifactSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/datacatalog.DataCatalog/UpdateFutureArtifact" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateFutureArtifactSvc<T: DataCatalog>(pub Arc<T>);
+                    impl<
+                        T: DataCatalog,
+                    > tonic::server::UnaryService<super::UpdateArtifactRequest>
+                    for UpdateFutureArtifactSvc<T> {
+                        type Response = super::UpdateArtifactResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateArtifactRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as DataCatalog>::update_future_artifact(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateFutureArtifactSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
