@@ -673,20 +673,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_node-config.default-deadlines.workflow-active-deadline", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.NodeConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline.String()
-
-			cmdFlags.Set("node-config.default-deadlines.workflow-active-deadline", testValue)
-			if vString, err := cmdFlags.GetString("node-config.default-deadlines.workflow-active-deadline"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_node-config.max-node-retries-system-failures", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

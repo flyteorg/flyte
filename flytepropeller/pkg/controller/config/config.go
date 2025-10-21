@@ -287,9 +287,8 @@ type NodeConfig struct {
 
 // DefaultDeadlines contains default values for timeouts
 type DefaultDeadlines struct {
-	DefaultNodeExecutionDeadline  config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout that includes the time spent to run the node/workflow"`
-	DefaultNodeActiveDeadline     config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout that includes the time spent queued."`
-	DefaultWorkflowActiveDeadline config.Duration `json:"workflow-active-deadline" pflag:",Default value of workflow timeout that includes the time spent queued."`
+	DefaultNodeExecutionDeadline config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout that includes the time spent to run the node/workflow"`
+	DefaultNodeActiveDeadline    config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout that includes the time spent queued."`
 }
 
 // LeaderElectionConfig Contains leader election configuration.
