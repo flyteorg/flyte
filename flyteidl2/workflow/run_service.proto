@@ -201,8 +201,11 @@ message ListRunsRequest {
     // List runs created from a trigger.
     common.TriggerName trigger_name = 6;
 
+    // Task name for filtering runs
+    task.TaskName task_name = 7;
+
     // Task identifier for filtering runs
-    task.TaskIdentifier task_id = 7;
+    task.TaskIdentifier task_id = 8;
   }
 }
 
