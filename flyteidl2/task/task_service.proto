@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 
@@ -82,4 +83,23 @@ message ListTasksResponse {
 
   // Pagination token for the next page of tasks.
   string token = 2;
+}
+
+// Request message for listing versions for a task.
+message ListVersionsRequest {
+  // Id of the task.
+  TaskName task_name = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for listing versions.
+message ListVersionsResponse {
+  message VersionResponse {
+    string version = 2;
+
+    // The time the task version was deployed
+    google.protobuf.Timestamp deployed_at = 3 [(buf.validate.field).required = true];
+  }
+
+  // Version with deployed_at
+  repeated VersionResponse versions = 1;
 }
