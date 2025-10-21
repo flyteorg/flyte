@@ -109,6 +109,19 @@
         }
       }
     },
+    "ListVersionsResponseVersionResponse": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "deployed_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time the task version was deployed"
+        }
+      }
+    },
     "ResourcesResourceEntry": {
       "type": "object",
       "properties": {
@@ -2076,6 +2089,20 @@
         }
       }
     },
+    "taskListVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ListVersionsResponseVersionResponse"
+          },
+          "title": "Version with deployed_at"
+        }
+      },
+      "description": "Response message for listing versions."
+    },
     "taskNamedLiteral": {
       "type": "object",
       "properties": {
@@ -2221,6 +2248,28 @@
         }
       },
       "description": "TaskIdentifier is the unique identifier for a task."
+    },
+    "taskTaskName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this task belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this task belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
+        }
+      },
+      "description": "Name of a task. It may have multiple versions deployed."
     },
     "taskTaskSpec": {
       "type": "object",

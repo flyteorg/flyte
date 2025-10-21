@@ -24,6 +24,11 @@ service TaskService {
   rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Lists all versions for a task.
+  rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // Request message for deploying a task.
