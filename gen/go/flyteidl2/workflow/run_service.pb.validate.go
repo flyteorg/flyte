@@ -2476,6 +2476,268 @@ var _ interface {
 	ErrorName() string
 } = ListRunsResponseValidationError{}
 
+// Validate checks the field values on GetLatestRunRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetLatestRunRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetLatestRunRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetLatestRunRequestMultiError, or nil if none found.
+func (m *GetLatestRunRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetLatestRunRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTaskName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetLatestRunRequestValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetLatestRunRequestValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTaskName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetLatestRunRequestValidationError{
+				field:  "TaskName",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetLatestRunRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetLatestRunRequestMultiError is an error wrapping multiple validation
+// errors returned by GetLatestRunRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetLatestRunRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetLatestRunRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetLatestRunRequestMultiError) AllErrors() []error { return m }
+
+// GetLatestRunRequestValidationError is the validation error returned by
+// GetLatestRunRequest.Validate if the designated constraints aren't met.
+type GetLatestRunRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetLatestRunRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetLatestRunRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetLatestRunRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetLatestRunRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetLatestRunRequestValidationError) ErrorName() string {
+	return "GetLatestRunRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetLatestRunRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetLatestRunRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetLatestRunRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetLatestRunRequestValidationError{}
+
+// Validate checks the field values on GetLatestRunResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetLatestRunResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetLatestRunResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetLatestRunResponseMultiError, or nil if none found.
+func (m *GetLatestRunResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetLatestRunResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRun()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetLatestRunResponseValidationError{
+					field:  "Run",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetLatestRunResponseValidationError{
+					field:  "Run",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRun()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetLatestRunResponseValidationError{
+				field:  "Run",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetLatestRunResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetLatestRunResponseMultiError is an error wrapping multiple validation
+// errors returned by GetLatestRunResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetLatestRunResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetLatestRunResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetLatestRunResponseMultiError) AllErrors() []error { return m }
+
+// GetLatestRunResponseValidationError is the validation error returned by
+// GetLatestRunResponse.Validate if the designated constraints aren't met.
+type GetLatestRunResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetLatestRunResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetLatestRunResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetLatestRunResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetLatestRunResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetLatestRunResponseValidationError) ErrorName() string {
+	return "GetLatestRunResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetLatestRunResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetLatestRunResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetLatestRunResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetLatestRunResponseValidationError{}
+
 // Validate checks the field values on WatchRunsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

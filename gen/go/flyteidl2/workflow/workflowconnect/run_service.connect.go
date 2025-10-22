@@ -54,6 +54,8 @@ const (
 	RunServiceGetActionDataProcedure = "/flyteidl2.workflow.RunService/GetActionData"
 	// RunServiceListRunsProcedure is the fully-qualified name of the RunService's ListRuns RPC.
 	RunServiceListRunsProcedure = "/flyteidl2.workflow.RunService/ListRuns"
+	// RunServiceGetLatestRunProcedure is the fully-qualified name of the RunService's GetLatestRun RPC.
+	RunServiceGetLatestRunProcedure = "/flyteidl2.workflow.RunService/GetLatestRun"
 	// RunServiceWatchRunsProcedure is the fully-qualified name of the RunService's WatchRuns RPC.
 	RunServiceWatchRunsProcedure = "/flyteidl2.workflow.RunService/WatchRuns"
 	// RunServiceListActionsProcedure is the fully-qualified name of the RunService's ListActions RPC.
@@ -78,6 +80,7 @@ var (
 	runServiceWatchActionDetailsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
 	runServiceGetActionDataMethodDescriptor      = runServiceServiceDescriptor.Methods().ByName("GetActionData")
 	runServiceListRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("ListRuns")
+	runServiceGetLatestRunMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetLatestRun")
 	runServiceWatchRunsMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
 	runServiceListActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("ListActions")
 	runServiceWatchActionsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("WatchActions")
@@ -103,6 +106,8 @@ type RunServiceClient interface {
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	// Get latest run for the provided task.
+	GetLatestRun(context.Context, *connect.Request[workflow.GetLatestRunRequest]) (*connect.Response[workflow.GetLatestRunResponse], error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error)
@@ -179,6 +184,13 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getLatestRun: connect.NewClient[workflow.GetLatestRunRequest, workflow.GetLatestRunResponse](
+			httpClient,
+			baseURL+RunServiceGetLatestRunProcedure,
+			connect.WithSchema(runServiceGetLatestRunMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 		watchRuns: connect.NewClient[workflow.WatchRunsRequest, workflow.WatchRunsResponse](
 			httpClient,
 			baseURL+RunServiceWatchRunsProcedure,
@@ -223,6 +235,7 @@ type runServiceClient struct {
 	watchActionDetails *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
 	getActionData      *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
 	listRuns           *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
+	getLatestRun       *connect.Client[workflow.GetLatestRunRequest, workflow.GetLatestRunResponse]
 	watchRuns          *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
 	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
@@ -270,6 +283,11 @@ func (c *runServiceClient) ListRuns(ctx context.Context, req *connect.Request[wo
 	return c.listRuns.CallUnary(ctx, req)
 }
 
+// GetLatestRun calls flyteidl2.workflow.RunService.GetLatestRun.
+func (c *runServiceClient) GetLatestRun(ctx context.Context, req *connect.Request[workflow.GetLatestRunRequest]) (*connect.Response[workflow.GetLatestRunResponse], error) {
+	return c.getLatestRun.CallUnary(ctx, req)
+}
+
 // WatchRuns calls flyteidl2.workflow.RunService.WatchRuns.
 func (c *runServiceClient) WatchRuns(ctx context.Context, req *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error) {
 	return c.watchRuns.CallServerStream(ctx, req)
@@ -313,6 +331,8 @@ type RunServiceHandler interface {
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	// Get latest run for the provided task.
+	GetLatestRun(context.Context, *connect.Request[workflow.GetLatestRunRequest]) (*connect.Response[workflow.GetLatestRunResponse], error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error
@@ -385,6 +405,13 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceGetLatestRunHandler := connect.NewUnaryHandler(
+		RunServiceGetLatestRunProcedure,
+		svc.GetLatestRun,
+		connect.WithSchema(runServiceGetLatestRunMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	runServiceWatchRunsHandler := connect.NewServerStreamHandler(
 		RunServiceWatchRunsProcedure,
 		svc.WatchRuns,
@@ -434,6 +461,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceGetActionDataHandler.ServeHTTP(w, r)
 		case RunServiceListRunsProcedure:
 			runServiceListRunsHandler.ServeHTTP(w, r)
+		case RunServiceGetLatestRunProcedure:
+			runServiceGetLatestRunHandler.ServeHTTP(w, r)
 		case RunServiceWatchRunsProcedure:
 			runServiceWatchRunsHandler.ServeHTTP(w, r)
 		case RunServiceListActionsProcedure:
@@ -483,6 +512,10 @@ func (UnimplementedRunServiceHandler) GetActionData(context.Context, *connect.Re
 
 func (UnimplementedRunServiceHandler) ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.ListRuns is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) GetLatestRun(context.Context, *connect.Request[workflow.GetLatestRunRequest]) (*connect.Response[workflow.GetLatestRunResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetLatestRun is not implemented"))
 }
 
 func (UnimplementedRunServiceHandler) WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error {

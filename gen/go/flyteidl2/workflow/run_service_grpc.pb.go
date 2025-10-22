@@ -27,6 +27,7 @@ const (
 	RunService_WatchActionDetails_FullMethodName = "/flyteidl2.workflow.RunService/WatchActionDetails"
 	RunService_GetActionData_FullMethodName      = "/flyteidl2.workflow.RunService/GetActionData"
 	RunService_ListRuns_FullMethodName           = "/flyteidl2.workflow.RunService/ListRuns"
+	RunService_GetLatestRun_FullMethodName       = "/flyteidl2.workflow.RunService/GetLatestRun"
 	RunService_WatchRuns_FullMethodName          = "/flyteidl2.workflow.RunService/WatchRuns"
 	RunService_ListActions_FullMethodName        = "/flyteidl2.workflow.RunService/ListActions"
 	RunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.RunService/WatchActions"
@@ -54,6 +55,8 @@ type RunServiceClient interface {
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error)
+	// Get latest run for the provided task.
+	GetLatestRun(ctx context.Context, in *GetLatestRunRequest, opts ...grpc.CallOption) (*GetLatestRunResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(ctx context.Context, in *WatchRunsRequest, opts ...grpc.CallOption) (RunService_WatchRunsClient, error)
@@ -194,6 +197,15 @@ func (c *runServiceClient) ListRuns(ctx context.Context, in *ListRunsRequest, op
 	return out, nil
 }
 
+func (c *runServiceClient) GetLatestRun(ctx context.Context, in *GetLatestRunRequest, opts ...grpc.CallOption) (*GetLatestRunResponse, error) {
+	out := new(GetLatestRunResponse)
+	err := c.cc.Invoke(ctx, RunService_GetLatestRun_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *runServiceClient) WatchRuns(ctx context.Context, in *WatchRunsRequest, opts ...grpc.CallOption) (RunService_WatchRunsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[2], RunService_WatchRuns_FullMethodName, opts...)
 	if err != nil {
@@ -328,6 +340,8 @@ type RunServiceServer interface {
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error)
+	// Get latest run for the provided task.
+	GetLatestRun(context.Context, *GetLatestRunRequest) (*GetLatestRunResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(*WatchRunsRequest, RunService_WatchRunsServer) error
@@ -369,6 +383,9 @@ func (UnimplementedRunServiceServer) GetActionData(context.Context, *GetActionDa
 }
 func (UnimplementedRunServiceServer) ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRuns not implemented")
+}
+func (UnimplementedRunServiceServer) GetLatestRun(context.Context, *GetLatestRunRequest) (*GetLatestRunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLatestRun not implemented")
 }
 func (UnimplementedRunServiceServer) WatchRuns(*WatchRunsRequest, RunService_WatchRunsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchRuns not implemented")
@@ -547,6 +564,24 @@ func _RunService_ListRuns_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RunService_GetLatestRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLatestRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunServiceServer).GetLatestRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RunService_GetLatestRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunServiceServer).GetLatestRun(ctx, req.(*GetLatestRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RunService_WatchRuns_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchRunsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -676,6 +711,10 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListRuns",
 			Handler:    _RunService_ListRuns_Handler,
+		},
+		{
+			MethodName: "GetLatestRun",
+			Handler:    _RunService_GetLatestRun_Handler,
 		},
 		{
 			MethodName: "ListActions",

@@ -55,6 +55,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
                 )
+        self.GetLatestRun = channel.unary_unary(
+                '/flyteidl2.workflow.RunService/GetLatestRun',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunResponse.FromString,
+                )
         self.WatchRuns = channel.unary_stream(
                 '/flyteidl2.workflow.RunService/WatchRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
@@ -142,6 +147,13 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetLatestRun(self, request, context):
+        """Get latest run for the provided task.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def WatchRuns(self, request, context):
         """Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
         runs or updates to existing ones from the point of invocation.
@@ -221,6 +233,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.ListRuns,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.SerializeToString,
+            ),
+            'GetLatestRun': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetLatestRun,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunResponse.SerializeToString,
             ),
             'WatchRuns': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchRuns,
@@ -391,6 +408,23 @@ class RunService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/ListRuns',
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetLatestRun(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetLatestRun',
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetLatestRunResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -46,6 +46,11 @@ service RunService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  // Get latest run for the provided task.
+  rpc GetLatestRun(GetLatestRunRequest) returns (GetLatestRunResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   // Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
   // runs or updates to existing ones from the point of invocation.
   rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
@@ -210,6 +215,18 @@ message ListRunsResponse {
 
   // Token for fetching the next page of results, if any.
   string token = 2;
+}
+
+// Request message for getting latest run for a task.
+message GetLatestRunRequest {
+  // task name to query.
+  task.TaskName task_name = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting latest run for a task.
+message GetLatestRunResponse {
+  // information about the run.
+  Run run = 1;
 }
 
 // Request message for watching runs.
