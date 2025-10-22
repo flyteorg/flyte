@@ -317,6 +317,65 @@ func (_c *RunServiceServer_GetActionDetails_Call) RunAndReturn(run func(context.
 	return _c
 }
 
+// GetLatestRun provides a mock function with given fields: _a0, _a1
+func (_m *RunServiceServer) GetLatestRun(_a0 context.Context, _a1 *workflow.GetLatestRunRequest) (*workflow.GetLatestRunResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLatestRun")
+	}
+
+	var r0 *workflow.GetLatestRunResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetLatestRunRequest) (*workflow.GetLatestRunResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetLatestRunRequest) *workflow.GetLatestRunResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*workflow.GetLatestRunResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.GetLatestRunRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RunServiceServer_GetLatestRun_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLatestRun'
+type RunServiceServer_GetLatestRun_Call struct {
+	*mock.Call
+}
+
+// GetLatestRun is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 *workflow.GetLatestRunRequest
+func (_e *RunServiceServer_Expecter) GetLatestRun(_a0 interface{}, _a1 interface{}) *RunServiceServer_GetLatestRun_Call {
+	return &RunServiceServer_GetLatestRun_Call{Call: _e.mock.On("GetLatestRun", _a0, _a1)}
+}
+
+func (_c *RunServiceServer_GetLatestRun_Call) Run(run func(_a0 context.Context, _a1 *workflow.GetLatestRunRequest)) *RunServiceServer_GetLatestRun_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*workflow.GetLatestRunRequest))
+	})
+	return _c
+}
+
+func (_c *RunServiceServer_GetLatestRun_Call) Return(_a0 *workflow.GetLatestRunResponse, _a1 error) *RunServiceServer_GetLatestRun_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *RunServiceServer_GetLatestRun_Call) RunAndReturn(run func(context.Context, *workflow.GetLatestRunRequest) (*workflow.GetLatestRunResponse, error)) *RunServiceServer_GetLatestRun_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRunDetails provides a mock function with given fields: _a0, _a1
 func (_m *RunServiceServer) GetRunDetails(_a0 context.Context, _a1 *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error) {
 	ret := _m.Called(_a0, _a1)

@@ -132,6 +132,18 @@ class ListRunsResponse(_message.Message):
     token: str
     def __init__(self, runs: _Optional[_Iterable[_Union[_run_definition_pb2.Run, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
+class GetLatestRunRequest(_message.Message):
+    __slots__ = ["task_name"]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    task_name: _task_definition_pb2.TaskName
+    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
+
+class GetLatestRunResponse(_message.Message):
+    __slots__ = ["run"]
+    RUN_FIELD_NUMBER: _ClassVar[int]
+    run: _run_definition_pb2.Run
+    def __init__(self, run: _Optional[_Union[_run_definition_pb2.Run, _Mapping]] = ...) -> None: ...
+
 class WatchRunsRequest(_message.Message):
     __slots__ = ["org", "cluster_id", "project_id", "task_id"]
     ORG_FIELD_NUMBER: _ClassVar[int]
