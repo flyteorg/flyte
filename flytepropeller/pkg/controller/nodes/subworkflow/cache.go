@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type injectedInputReader struct {
@@ -78,6 +79,7 @@ func (w *workflowNodeHandler) GetCatalogKey(ctx context.Context, nCtx interfaces
 		for inputName, inputVariable := range launchPlan.GetInterface().Inputs.Variables {
 			inputInterface[inputName] = inputVariable
 		}
+
 		if launchPlan.GetFixedInputs() != nil {
 			for inputName, inputLiteral := range launchPlan.GetFixedInputs().Literals {
 				inputInterface[inputName] = &core.Variable{
@@ -87,18 +89,32 @@ func (w *workflowNodeHandler) GetCatalogKey(ctx context.Context, nCtx interfaces
 		}
 
 		identifier = launchPlanRefID.Identifier
+
 		typedInterface = &core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: inputInterface,
 			},
 			Outputs: launchPlan.GetInterface().Outputs,
 		}
+
 		inputReader = &injectedInputReader{
 			InputReader:      nCtx.InputReader(),
 			injectedLiterals: launchPlan.GetFixedInputs(),
 		}
 	} else {
 		return catalog.Key{}, errors.Errorf(errors.BadSpecificationError, nCtx.NodeID(), notExistsErrMsg)
+	}
+
+	if w.cacheConfig.EnforceExecutionProjectDomain {
+		logger.Debugf(ctx, "Enforcing execution org, project, domain for cache key computation")
+		identifier = &core.Identifier{
+			ResourceType: identifier.GetResourceType(),
+			Org:          nCtx.ExecutionContext().GetExecutionID().GetOrg(),
+			Project:      nCtx.ExecutionContext().GetExecutionID().GetProject(),
+			Domain:       nCtx.ExecutionContext().GetExecutionID().GetDomain(),
+			Name:         identifier.GetName(),
+			Version:      identifier.GetVersion(),
+		}
 	}
 
 	return catalog.Key{

@@ -25,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	propellerCatalog "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/config"
 	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
@@ -43,6 +44,7 @@ type CacheClient struct {
 	inlineCache bool
 	lruMap      *lru.Cache
 	useV2Client bool
+	cfg         *propellerCatalog.Config
 }
 
 func (c *CacheClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*catalogIdl.Reservation, error) {
@@ -297,21 +299,19 @@ func (c *CacheClient) UpdateReservationCache(ownerID string, entry catalog.Reser
 	c.lruMap.Add(ownerID, entry)
 }
 
-func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
-	useAdminAuth bool, maxRetries uint, backoffScalar int, backoffJitter float64, inlineCache bool, defaultServiceConfig string,
-	reservationMaxCacheSize int, useV2Client bool, authOpt ...grpc.DialOption) (*CacheClient, error) {
+func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, cfg *propellerCatalog.Config, useV2Client bool, authOpt ...grpc.DialOption) (*CacheClient, error) {
 	var opts []grpc.DialOption
-	if useAdminAuth && authOpt != nil {
+	if cfg.UseAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
 	}
 
 	grpcOptions := []grpcRetry.CallOption{
-		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(backoffScalar)*time.Millisecond, backoffJitter)),
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(cfg.BackoffScalar)*time.Millisecond, cfg.GetBackoffJitter(ctx))),
 		grpcRetry.WithCodes(codes.DeadlineExceeded, codes.Unavailable, codes.Canceled),
-		grpcRetry.WithMax(maxRetries),
+		grpcRetry.WithMax(uint(cfg.MaxRetries)),
 	}
 
-	if insecureConnection {
+	if cfg.Insecure {
 		logger.Debug(ctx, "Establishing insecure connection to CacheService")
 		opts = append(opts, grpc.WithInsecure())
 	} else {
@@ -325,8 +325,8 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-	if defaultServiceConfig != "" {
-		opts = append(opts, grpc.WithDefaultServiceConfig(defaultServiceConfig))
+	if len(cfg.DefaultServiceConfig) > 0 {
+		opts = append(opts, grpc.WithDefaultServiceConfig(cfg.DefaultServiceConfig))
 	}
 
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
@@ -339,7 +339,7 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 			otelgrpc.WithPropagators(propagation.TraceContext{}),
 		),
 		retryInterceptor))
-	clientConn, err := grpc.Dial(endpoint, opts...)
+	clientConn, err := grpc.Dial(cfg.CacheEndpoint, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +347,7 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 	v2Client := cacheserviceV2.NewCacheServiceClient(clientConn)
 
 	var evictionFunction func(key interface{}, value interface{})
-	lruCache, err := lru.NewWithEvict(reservationMaxCacheSize, evictionFunction)
+	lruCache, err := lru.NewWithEvict(cfg.ReservationMaxCacheSize, evictionFunction)
 	if err != nil {
 		return nil, err
 	}
@@ -356,10 +356,10 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 		client:      client,
 		v2Client:    v2Client,
 		store:       dataStore,
-		maxCacheAge: maxCacheAge,
-		inlineCache: inlineCache,
+		maxCacheAge: cfg.MaxCacheAge.Duration,
+		inlineCache: cfg.InlineCache,
 		lruMap:      lruCache,
 		useV2Client: useV2Client,
+		cfg:         cfg,
 	}, nil
-
 }

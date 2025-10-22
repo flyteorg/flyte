@@ -12,6 +12,11 @@ var cfgSection = config.MustRegisterSubSection("catalogCache", defaultConfig)
 type Config struct {
 	ReaderWorkqueueConfig workqueue.Config `json:"reader" pflag:",Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
 	WriterWorkqueueConfig workqueue.Config `json:"writer" pflag:",Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
+	CacheKey              CacheKeyConfig   `json:"cacheKey" pflag:",Cache key configuration."`
+}
+
+type CacheKeyConfig struct {
+	EnforceExecutionProjectDomain bool `json:"enforceExecutionProjectDomain" pflag:", Use execution project domain when computing the cache key. This means that even if you reference tasks/launchplans from a different project, cache keys will be computed based on the execution project domain instead."`
 }
 
 var defaultConfig = &Config{

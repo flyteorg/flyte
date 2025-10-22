@@ -1,18 +1,11 @@
-package catalog
+package config
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
-	"google.golang.org/grpc"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/cacheservice"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 //go:generate pflags Config --default-var defaultConfig
@@ -82,45 +75,4 @@ func (c Config) GetBackoffJitter(ctx context.Context) float64 {
 // GetConfig gets loaded config for Discovery
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
-}
-
-func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, authOpt ...grpc.DialOption) (catalog.Client, error) {
-	catalogConfig := GetConfig()
-
-	switch catalogConfig.Type {
-	case CacheServiceType:
-		return cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
-			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, false, authOpt...)
-	case CacheServiceV2Type:
-		return cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
-			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, true, authOpt...)
-	case FallbackType:
-		cacheClient, err := cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
-			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, false, authOpt...)
-		if err != nil {
-			return nil, err
-		}
-		catalogClient, err := datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx),
-			catalogConfig.ReservationMaxCacheSize, authOpt...)
-		if err != nil {
-			return nil, err
-		}
-		return cacheservice.NewFallbackClient(cacheClient, catalogClient, dataStore)
-	case DataCatalogType:
-		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx),
-			catalogConfig.ReservationMaxCacheSize, authOpt...)
-	case NoOpDiscoveryType, "":
-		return NOOPCatalog{}, nil
-	}
-	return nil, fmt.Errorf("no such catalog type available: %s", catalogConfig.Type)
 }

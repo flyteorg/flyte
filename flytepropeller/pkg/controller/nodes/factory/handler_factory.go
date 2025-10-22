@@ -38,6 +38,7 @@ type handlerFactory struct {
 	literalOffloadingConfig config.LiteralOffloadingConfig
 	clusterID               string
 	signalClient            service.SignalServiceClient
+	cacheConfig             catalog.CacheKeyConfig
 	scope                   promutils.Scope
 }
 
@@ -63,7 +64,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 	f.handlers = map[v1alpha1.NodeKind]interfaces.NodeHandler{
 		v1alpha1.NodeKindBranch:   branch.New(executor, f.eventConfig, f.scope),
 		v1alpha1.NodeKindTask:     dynamic.New(t, executor, f.launchPlanReader, f.eventConfig, f.scope),
-		v1alpha1.NodeKindWorkflow: subworkflow.New(executor, f.workflowLauncher, f.recoveryClient, f.eventConfig, f.scope),
+		v1alpha1.NodeKindWorkflow: subworkflow.New(executor, f.workflowLauncher, f.recoveryClient, f.eventConfig, f.cacheConfig, f.scope),
 		v1alpha1.NodeKindGate:     gate.New(f.eventConfig, f.signalClient, f.scope),
 		v1alpha1.NodeKindArray:    arrayHandler,
 		v1alpha1.NodeKindStart:    start.New(),
@@ -80,7 +81,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 
 func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader,
 	kubeClient executors.Client, kubeClientset kubernetes.Interface, cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
-	literalOffloadingConfig config.LiteralOffloadingConfig, clusterID string, signalClient service.SignalServiceClient, scope promutils.Scope) (interfaces.HandlerFactory, error) {
+	literalOffloadingConfig config.LiteralOffloadingConfig, clusterID string, signalClient service.SignalServiceClient, cacheConfig catalog.CacheKeyConfig, scope promutils.Scope) (interfaces.HandlerFactory, error) {
 
 	return &handlerFactory{
 		workflowLauncher:        workflowLauncher,
@@ -93,6 +94,7 @@ func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor
 		literalOffloadingConfig: literalOffloadingConfig,
 		clusterID:               clusterID,
 		signalClient:            signalClient,
+		cacheConfig:             cacheConfig,
 		scope:                   scope,
 	}, nil
 }

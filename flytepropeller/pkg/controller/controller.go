@@ -32,6 +32,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	tokenCache "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	flyteK8sCatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytepropeller/events"
@@ -449,9 +450,10 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
 	}
 
+	cacheConfig := flyteK8sCatalog.GetConfig()
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
-		kubeClient, kubeClientset, cacheClient, recoveryClient, &cfg.EventConfig, cfg.LiteralOffloadingConfig, cfg.ClusterID, signalClient, scope)
+		kubeClient, kubeClientset, cacheClient, recoveryClient, &cfg.EventConfig, cfg.LiteralOffloadingConfig, cfg.ClusterID, signalClient, cacheConfig.CacheKey, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}

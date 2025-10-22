@@ -159,6 +159,13 @@ func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTempla
 	tCtx.OnTaskRefreshIndicator().Return(func(ctx context.Context) {
 		t.Log("Refresh called")
 	})
+	tCtxMeta := &pluginMocks.TaskExecutionMetadata{}
+	taskID := &pluginMocks.TaskExecutionID{}
+	taskID.OnGetID().Return(core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{},
+	})
+	tCtxMeta.OnGetTaskExecutionID().Return(taskID)
+	tCtx.OnTaskExecutionMetadata().Return(tCtxMeta)
 
 	state := &arrayCore.State{
 		CurrentPhase: arrayCore.PhaseStart,

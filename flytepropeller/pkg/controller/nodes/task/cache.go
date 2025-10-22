@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	errors2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
@@ -25,8 +26,23 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 		return catalog.Key{}, err
 	}
 
+	var identifier core.Identifier
+	if t.cacheConfig.EnforceExecutionProjectDomain {
+		logger.Debugf(ctx, "Enforcing execution org, project, domain for cache key computation")
+		identifier = core.Identifier{
+			ResourceType: taskTemplate.GetId().GetResourceType(),
+			Org:          nCtx.ExecutionContext().GetExecutionID().GetOrg(),
+			Project:      nCtx.ExecutionContext().GetExecutionID().GetProject(),
+			Domain:       nCtx.ExecutionContext().GetExecutionID().GetDomain(),
+			Name:         taskTemplate.GetId().GetName(),
+			Version:      taskTemplate.GetId().GetVersion(),
+		}
+	} else {
+		identifier = *taskTemplate.Id
+	}
+
 	return catalog.Key{
-		Identifier:           *taskTemplate.Id,
+		Identifier:           identifier,
 		CacheVersion:         taskTemplate.Metadata.DiscoveryVersion,
 		CacheIgnoreInputVars: taskTemplate.Metadata.CacheIgnoreInputVars,
 		TypedInterface:       *taskTemplate.Interface,

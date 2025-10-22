@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	iomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
@@ -167,7 +168,7 @@ func TestGetCatalogKey(t *testing.T) {
 			mockLaunchPlanExecutor := &launchplanmocks.Executor{}
 			mockRecoveryClient := &recoverymocks.Client{}
 
-			handler := New(nil, mockLaunchPlanExecutor, mockRecoveryClient, eventConfig, promutils.NewTestScope())
+			handler := New(nil, mockLaunchPlanExecutor, mockRecoveryClient, eventConfig, catalog.CacheKeyConfig{}, promutils.NewTestScope())
 			cacheableHandler, ok := handler.(interfaces.CacheableNodeHandler)
 			assert.True(t, ok)
 
@@ -192,7 +193,7 @@ func TestIsCacheable(t *testing.T) {
 	mockLaunchPlanExecutor := &launchplanmocks.Executor{}
 	mockRecoveryClient := &recoverymocks.Client{}
 
-	handler := New(nil, mockLaunchPlanExecutor, mockRecoveryClient, eventConfig, promutils.NewTestScope())
+	handler := New(nil, mockLaunchPlanExecutor, mockRecoveryClient, eventConfig, catalog.CacheKeyConfig{}, promutils.NewTestScope())
 	cacheableHandler, ok := handler.(interfaces.CacheableNodeHandler)
 	assert.True(t, ok)
 

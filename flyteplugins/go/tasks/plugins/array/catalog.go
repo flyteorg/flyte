@@ -148,7 +148,8 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// build work items from inputs and outputs
-	workItems, err := ConstructCatalogReaderWorkItems(ctx, tCtx.TaskReader(), inputReaders, outputWriters)
+	workItems, err := ConstructCatalogReaderWorkItems(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(),
+		tCtx.TaskReader(), inputReaders, outputWriters, cfg.CacheKey)
 	if err != nil {
 		return state, err
 	}
@@ -212,7 +213,9 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	return state, nil
 }
 
-func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State, phaseOnSuccess arrayCore.Phase, versionOnSuccess uint32) (*arrayCore.State, []*core.ExternalResource, error) {
+func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State,
+	phaseOnSuccess arrayCore.Phase, versionOnSuccess uint32) (*arrayCore.State, []*core.ExternalResource, error) {
+
 	var externalResources []*core.ExternalResource
 
 	// Check that the taskTemplate is valid
@@ -267,7 +270,23 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	}
 
 	// Create catalog put items, but only put the ones that were not originally cached (as read from the catalog results bitset)
-	catalogWriterItems, err := ConstructCatalogUploadRequests(*tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId,
+	var identifier *idlCore.Identifier
+	cfg := catalog.GetConfig()
+	identifier = tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId
+	if cfg.CacheKey.EnforceExecutionProjectDomain {
+		logger.Debugf(ctx, "Enforcing execution org, project, domain for cache key computation")
+		taskExecutionIdentifier := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+		identifier = &idlCore.Identifier{
+			ResourceType: identifier.GetResourceType(),
+			Org:          taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
+			Project:      taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetProject(),
+			Domain:       taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetDomain(),
+			Name:         identifier.GetName(),
+			Version:      identifier.GetVersion(),
+		}
+	}
+
+	catalogWriterItems, err := ConstructCatalogUploadRequests(identifier,
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), taskTemplate.Metadata.DiscoveryVersion,
 		taskTemplate.Metadata.CacheIgnoreInputVars, iface, &tasksToCache, inputReaders, outputReaders)
 
@@ -337,7 +356,7 @@ func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogCl
 	return false, nil
 }
 
-func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
+func ConstructCatalogUploadRequests(keyID *idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
 	cacheVersion string, cacheIgnoreInputVars []string, taskInterface idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
 	inputReaders []io.InputReader, outputReaders []io.OutputReader) ([]catalog.UploadRequest, error) {
 
@@ -355,7 +374,7 @@ func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore
 
 		wi := catalog.UploadRequest{
 			Key: catalog.Key{
-				Identifier:           keyID,
+				Identifier:           *keyID,
 				InputReader:          input,
 				CacheVersion:         cacheVersion,
 				CacheIgnoreInputVars: cacheIgnoreInputVars,
@@ -430,8 +449,9 @@ func makeSingularTaskInterface(varMap *idlCore.VariableMap) *idlCore.VariableMap
 
 }
 
-func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskReader, inputs []io.InputReader,
-	outputs []io.OutputWriter) ([]catalog.DownloadRequest, error) {
+func ConstructCatalogReaderWorkItems(ctx context.Context, taskExecutionID core.TaskExecutionID,
+	taskReader core.TaskReader, inputs []io.InputReader, outputs []io.OutputWriter,
+	cacheKeyConfig catalog.CacheKeyConfig) ([]catalog.DownloadRequest, error) {
 
 	t, err := taskReader.Read(ctx)
 	if err != nil {
@@ -445,15 +465,32 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 
 	for idx, inputReader := range inputs {
 		// TODO: Check if Identifier or Interface are empty and return err
+		var identifier idlCore.Identifier
+		if cacheKeyConfig.EnforceExecutionProjectDomain {
+			logger.Debugf(ctx, "Enforcing execution org, project, domain for cache key computation")
+			taskExecutionIdentifier := taskExecutionID.GetID()
+			identifier = idlCore.Identifier{
+				ResourceType: t.GetId().GetResourceType(),
+				Org:          taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
+				Project:      taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetProject(),
+				Domain:       taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Name:         t.GetId().GetName(),
+				Version:      t.GetId().GetVersion(),
+			}
+		} else {
+			identifier = *t.Id
+		}
+
 		item := catalog.DownloadRequest{
 			Key: catalog.Key{
-				Identifier:     *t.Id,
+				Identifier:     identifier,
 				CacheVersion:   t.GetMetadata().DiscoveryVersion,
 				InputReader:    inputReader,
 				TypedInterface: iface,
 			},
 			Target: outputs[idx],
 		}
+
 		workItems = append(workItems, item)
 	}
 

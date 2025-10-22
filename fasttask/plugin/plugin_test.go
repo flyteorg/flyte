@@ -6,18 +6,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/unionai/flyte/fasttask/plugin/interfaces"
-
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -35,6 +32,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 
+	"github.com/unionai/flyte/fasttask/plugin/interfaces"
 	interfaceMocks "github.com/unionai/flyte/fasttask/plugin/interfaces/mocks"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )

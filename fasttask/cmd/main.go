@@ -10,8 +10,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/unionai/flyte/fasttask/cmd/pb"
 	"google.golang.org/grpc"
+
+	"github.com/unionai/flyte/fasttask/cmd/pb"
 )
 
 type Task struct {
@@ -23,9 +24,9 @@ type Task struct {
 
 type FastTaskServer struct {
 	pb.UnimplementedFastTaskServer
-	tasks      []Task
-	taskQueue  chan Task
-	mu         sync.RWMutex
+	tasks         []Task
+	taskQueue     chan Task
+	mu            sync.RWMutex
 	assignedTasks map[string]*Task
 }
 
@@ -34,13 +35,13 @@ func NewFastTaskServer(tasksFile string) (*FastTaskServer, error) {
 		taskQueue:     make(chan Task, 100),
 		assignedTasks: make(map[string]*Task),
 	}
-	
+
 	if err := server.loadTasks(tasksFile); err != nil {
 		return nil, fmt.Errorf("failed to load tasks: %w", err)
 	}
-	
+
 	go server.fillTaskQueue()
-	
+
 	return server, nil
 }
 
@@ -49,11 +50,11 @@ func (s *FastTaskServer) loadTasks(filename string) error {
 	if err != nil {
 		return fmt.Errorf("failed to read tasks file: %w", err)
 	}
-	
+
 	if err := json.Unmarshal(data, &s.tasks); err != nil {
 		return fmt.Errorf("failed to parse tasks JSON: %w", err)
 	}
-	
+
 	log.Printf("Loaded %d tasks from %s", len(s.tasks), filename)
 	return nil
 }
@@ -66,7 +67,7 @@ func (s *FastTaskServer) fillTaskQueue() {
 
 func (s *FastTaskServer) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	log.Println("Client connected for heartbeat stream")
-	
+
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
@@ -77,24 +78,24 @@ func (s *FastTaskServer) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 			log.Printf("Error receiving heartbeat: %v", err)
 			return err
 		}
-		
+
 		log.Printf("Received heartbeat from worker %s, queue %s", req.WorkerId, req.QueueId)
-		log.Printf("Worker capacity: %d/%d active, %d/%d backlog", 
+		log.Printf("Worker capacity: %d/%d active, %d/%d backlog",
 			req.Capacity.ExecutionCount, req.Capacity.ExecutionLimit,
 			req.Capacity.BacklogCount, req.Capacity.BacklogLimit)
-		
+
 		// Process task statuses
 		for _, status := range req.TaskStatuses {
-			log.Printf("Task %s in namespace %s is in phase %d: %s", 
+			log.Printf("Task %s in namespace %s is in phase %d: %s",
 				status.TaskId, status.Namespace, status.Phase, status.Reason)
 		}
-		
+
 		// Send tasks based on available capacity
 		availableCapacity := req.Capacity.ExecutionLimit - req.Capacity.ExecutionCount
 		availableBacklog := req.Capacity.BacklogLimit - req.Capacity.BacklogCount
-		
+
 		totalAvailable := availableCapacity + availableBacklog
-		
+
 		for i := 0; i < int(totalAvailable); i++ {
 			select {
 			case task := <-s.taskQueue:
@@ -111,27 +112,27 @@ func (s *FastTaskServer) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 						Name:    task.TaskID,
 					},
 				}
-				
+
 				s.mu.Lock()
 				s.assignedTasks[task.TaskID] = &task
 				s.mu.Unlock()
-				
+
 				if err := stream.Send(response); err != nil {
 					log.Printf("Error sending task assignment: %v", err)
 					// Put task back in queue
 					s.taskQueue <- task
 					return err
 				}
-				
+
 				log.Printf("Assigned task %s to worker %s", task.TaskID, req.WorkerId)
-				
+
 			default:
 				// No more tasks available
 				goto done
 			}
 		}
-		
-		done:
+
+	done:
 		// Send ACK if no tasks were assigned
 		if totalAvailable == 0 {
 			ackResponse := &pb.HeartbeatResponse{
@@ -151,23 +152,23 @@ func main() {
 		tasksFile = flag.String("tasks", "testdata/tasks.json", "Path to tasks JSON file")
 	)
 	flag.Parse()
-	
+
 	server, err := NewFastTaskServer(*tasksFile)
 	if err != nil {
 		log.Fatalf("Failed to create FastTask server: %v", err)
 	}
-	
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
-	
+
 	grpcServer := grpc.NewServer()
 	pb.RegisterFastTaskServer(grpcServer, server)
-	
+
 	log.Printf("FastTask server starting on port %d", *port)
 	log.Printf("Loading tasks from: %s", *tasksFile)
-	
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}

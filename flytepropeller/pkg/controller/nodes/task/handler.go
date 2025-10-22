@@ -252,6 +252,7 @@ type Handler struct {
 	clusterID        string
 	agentService     *agent.AgentService
 	connectorService *connector.ConnectorService
+	cacheConfig      catalog.CacheKeyConfig
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -1010,8 +1011,10 @@ func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionCont
 
 func New(ctx context.Context, kubeClient executors.Client, kubeClientset kubernetes.Interface, client catalog.Client,
 	eventConfig *controllerConfig.EventConfig, clusterID string, scope promutils.Scope) (*Handler, error) {
+
+	cacheConfig := *catalog.GetConfig()
 	// TODO New should take a pointer
-	async, err := catalog.NewAsyncClient(client, *catalog.GetConfig(), scope.NewSubScope("async_catalog"))
+	async, err := catalog.NewAsyncClient(client, cacheConfig, scope.NewSubScope("async_catalog"))
 	if err != nil {
 		return nil, err
 	}
@@ -1051,5 +1054,6 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		clusterID:        clusterID,
 		agentService:     &agent.AgentService{},
 		connectorService: &connector.ConnectorService{},
+		cacheConfig:      cacheConfig.CacheKey,
 	}, nil
 }

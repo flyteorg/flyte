@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
@@ -21,6 +22,7 @@ const notExistsErrMsg = "workflow wfNode does not have a subworkflow or child wo
 type workflowNodeHandler struct {
 	lpHandler    launchPlanHandler
 	subWfHandler subworkflowHandler
+	cacheConfig  catalog.CacheKeyConfig
 	metrics      metrics
 }
 
@@ -126,7 +128,9 @@ func (w *workflowNodeHandler) Finalize(ctx context.Context, _ interfaces.NodeExe
 	return nil
 }
 
-func New(executor interfaces.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client, eventConfig *config.EventConfig, scope promutils.Scope) interfaces.NodeHandler {
+func New(executor interfaces.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client,
+	eventConfig *config.EventConfig, cacheConfig catalog.CacheKeyConfig, scope promutils.Scope) interfaces.NodeHandler {
+
 	workflowScope := scope.NewSubScope("workflow")
 	return &workflowNodeHandler{
 		subWfHandler: newSubworkflowHandler(executor, eventConfig),
@@ -135,6 +139,7 @@ func New(executor interfaces.Node, workflowLauncher launchplan.Executor, recover
 			recoveryClient: recoveryClient,
 			eventConfig:    eventConfig,
 		},
-		metrics: newMetrics(workflowScope),
+		cacheConfig: cacheConfig,
+		metrics:     newMetrics(workflowScope),
 	}
 }
