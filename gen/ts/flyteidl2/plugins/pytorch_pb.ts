@@ -14,7 +14,7 @@ export const file_flyteidl2_plugins_pytorch: GenFile = /*@__PURE__*/
 
 /**
  * Custom proto for torch elastic config for distributed training using
- * https://github.com/kubeflow/trainer/blob/e31d11faa9f6ce5111b60c01079d39295589e0ef/pkg/apis/kubeflow.org/v1/pytorch_types.go
+ * https://github.com/kubeflow/trainer/blob/e31d11faa9f6ce5111b60c01079d39295589e0ef/pkg/apis/kubeflow.org/v1/pytorch_types.go#L98
  *
  * @generated from message flyteidl2.plugins.ElasticConfig
  */
@@ -53,7 +53,7 @@ export const ElasticConfigSchema: GenMessage<ElasticConfig> = /*@__PURE__*/
   messageDesc(file_flyteidl2_plugins_pytorch, 0);
 
 /**
- * Custom proto for plugin that enables distributed training using https://github.com/kubeflow/pytorch-operator
+ * Custom proto for plugin that enables distributed training using https://github.com/kubeflow/trainer
  *
  * @generated from message flyteidl2.plugins.DistributedPyTorchTrainingTask
  */

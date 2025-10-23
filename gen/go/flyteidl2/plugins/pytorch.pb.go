@@ -21,7 +21,7 @@ const (
 )
 
 // Custom proto for torch elastic config for distributed training using
-// https://github.com/kubeflow/trainer/blob/e31d11faa9f6ce5111b60c01079d39295589e0ef/pkg/apis/kubeflow.org/v1/pytorch_types.go
+// https://github.com/kubeflow/trainer/blob/e31d11faa9f6ce5111b60c01079d39295589e0ef/pkg/apis/kubeflow.org/v1/pytorch_types.go#L98
 type ElasticConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -101,7 +101,7 @@ func (x *ElasticConfig) GetMaxRestarts() int32 {
 	return 0
 }
 
-// Custom proto for plugin that enables distributed training using https://github.com/kubeflow/pytorch-operator
+// Custom proto for plugin that enables distributed training using https://github.com/kubeflow/trainer
 type DistributedPyTorchTrainingTask struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
