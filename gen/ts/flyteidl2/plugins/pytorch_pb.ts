@@ -68,7 +68,6 @@ export type DistributedPyTorchTrainingTask = Message<"flyteidl2.plugins.Distribu
   /**
    * config for an elastic pytorch job
    *
-   *
    * @generated from field: flyteidl2.plugins.ElasticConfig elastic_config = 2;
    */
   elasticConfig?: ElasticConfig;

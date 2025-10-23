@@ -20,6 +20,5 @@ message DistributedPyTorchTrainingTask {
   int32 workers = 1;
 
   // config for an elastic pytorch job
-  //
   ElasticConfig elastic_config = 2;
 }
