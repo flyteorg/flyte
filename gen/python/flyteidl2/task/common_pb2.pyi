@@ -16,10 +16,19 @@ class FixedRateUnit(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     FIXED_RATE_UNIT_MINUTE: _ClassVar[FixedRateUnit]
     FIXED_RATE_UNIT_HOUR: _ClassVar[FixedRateUnit]
     FIXED_RATE_UNIT_DAY: _ClassVar[FixedRateUnit]
+
+class TriggerAutomationSpecType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpecType]
+    TYPE_NONE: _ClassVar[TriggerAutomationSpecType]
+    TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpecType]
 FIXED_RATE_UNIT_UNSPECIFIED: FixedRateUnit
 FIXED_RATE_UNIT_MINUTE: FixedRateUnit
 FIXED_RATE_UNIT_HOUR: FixedRateUnit
 FIXED_RATE_UNIT_DAY: FixedRateUnit
+TYPE_UNSPECIFIED: TriggerAutomationSpecType
+TYPE_NONE: TriggerAutomationSpecType
+TYPE_SCHEDULE: TriggerAutomationSpecType
 
 class NamedParameter(_message.Message):
     __slots__ = ["name", "parameter"]
@@ -51,19 +60,11 @@ class Schedule(_message.Message):
 
 class TriggerAutomationSpec(_message.Message):
     __slots__ = ["type", "schedule"]
-    class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpec.Type]
-        TYPE_NONE: _ClassVar[TriggerAutomationSpec.Type]
-        TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpec.Type]
-    TYPE_UNSPECIFIED: TriggerAutomationSpec.Type
-    TYPE_NONE: TriggerAutomationSpec.Type
-    TYPE_SCHEDULE: TriggerAutomationSpec.Type
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SCHEDULE_FIELD_NUMBER: _ClassVar[int]
-    type: TriggerAutomationSpec.Type
+    type: TriggerAutomationSpecType
     schedule: Schedule
-    def __init__(self, type: _Optional[_Union[TriggerAutomationSpec.Type, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
 
 class NamedLiteral(_message.Message):
     __slots__ = ["name", "value"]

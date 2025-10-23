@@ -52,16 +52,15 @@ message Schedule {
   string kickoff_time_input_arg = 3;
 }
 
-message TriggerAutomationSpec {
-  // Specifies type of the automation attached to trigger if any.
-  enum Type {
-    TYPE_UNSPECIFIED = 0;
-    TYPE_NONE = 1;
-    TYPE_SCHEDULE = 2;
-  }
+enum TriggerAutomationSpecType {
+  TYPE_UNSPECIFIED = 0;
+  TYPE_NONE = 1;
+  TYPE_SCHEDULE = 2;
+}
 
+message TriggerAutomationSpec {
   // Explicitly defines trigger automation type.
-  Type type = 1 [(buf.validate.field).enum = {
+  TriggerAutomationSpecType type = 1 [(buf.validate.field).enum = {
     not_in: [0]
   }];
 

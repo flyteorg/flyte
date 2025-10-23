@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIoUBCghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUITCgpleHByZXNzaW9uEgW6SAIIASLXAQoVVHJpZ2dlckF1dG9tYXRpb25TcGVjEkIKBHR5cGUYASABKA4yKi5mbHl0ZWlkbDIudGFzay5UcmlnZ2VyQXV0b21hdGlvblNwZWMuVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAIj4KBFR5cGUSFAoQVFlQRV9VTlNQRUNJRklFRBAAEg0KCVRZUEVfTk9ORRABEhEKDVRZUEVfU0NIRURVTEUQAkIMCgphdXRvbWF0aW9uIkQKDE5hbWVkTGl0ZXJhbBIMCgRuYW1lGAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbCI6ChBPdXRwdXRSZWZlcmVuY2VzEhIKCm91dHB1dF91cmkYASABKAkSEgoKcmVwb3J0X3VyaRgCIAEoCSJnCgZJbnB1dHMSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwSLQoHY29udGV4dBgCIAMoCzIcLmZseXRlaWRsMi5jb3JlLktleVZhbHVlUGFpciI5CgdPdXRwdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsKn8KDUZpeGVkUmF0ZVVuaXQSHwobRklYRURfUkFURV9VTklUX1VOU1BFQ0lGSUVEEAASGgoWRklYRURfUkFURV9VTklUX01JTlVURRABEhgKFEZJWEVEX1JBVEVfVU5JVF9IT1VSEAISFwoTRklYRURfUkFURV9VTklUX0RBWRADQrABChJjb20uZmx5dGVpZGwyLnRhc2tCC0NvbW1vblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIoUBCghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUITCgpleHByZXNzaW9uEgW6SAIIASKWAQoVVHJpZ2dlckF1dG9tYXRpb25TcGVjEkEKBHR5cGUYASABKA4yKS5mbHl0ZWlkbDIudGFzay5UcmlnZ2VyQXV0b21hdGlvblNwZWNUeXBlQgi6SAWCAQIgABIsCghzY2hlZHVsZRgCIAEoCzIYLmZseXRlaWRsMi50YXNrLlNjaGVkdWxlSABCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIiOQoHT3V0cHV0cxIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCp/Cg1GaXhlZFJhdGVVbml0Eh8KG0ZJWEVEX1JBVEVfVU5JVF9VTlNQRUNJRklFRBAAEhoKFkZJWEVEX1JBVEVfVU5JVF9NSU5VVEUQARIYChRGSVhFRF9SQVRFX1VOSVRfSE9VUhACEhcKE0ZJWEVEX1JBVEVfVU5JVF9EQVkQAypTChlUcmlnZ2VyQXV0b21hdGlvblNwZWNUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABINCglUWVBFX05PTkUQARIRCg1UWVBFX1NDSEVEVUxFEAJCsAEKEmNvbS5mbHl0ZWlkbDIudGFza0ILQ29tbW9uUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -123,9 +123,9 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
   /**
    * Explicitly defines trigger automation type.
    *
-   * @generated from field: flyteidl2.task.TriggerAutomationSpec.Type type = 1;
+   * @generated from field: flyteidl2.task.TriggerAutomationSpecType type = 1;
    */
-  type: TriggerAutomationSpec_Type;
+  type: TriggerAutomationSpecType;
 
   /**
    * @generated from oneof flyteidl2.task.TriggerAutomationSpec.automation
@@ -145,34 +145,6 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
  */
 export const TriggerAutomationSpecSchema: GenMessage<TriggerAutomationSpec> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_common, 3);
-
-/**
- * Specifies type of the automation attached to trigger if any.
- *
- * @generated from enum flyteidl2.task.TriggerAutomationSpec.Type
- */
-export enum TriggerAutomationSpec_Type {
-  /**
-   * @generated from enum value: TYPE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: TYPE_NONE = 1;
-   */
-  NONE = 1,
-
-  /**
-   * @generated from enum value: TYPE_SCHEDULE = 2;
-   */
-  SCHEDULE = 2,
-}
-
-/**
- * Describes the enum flyteidl2.task.TriggerAutomationSpec.Type.
- */
-export const TriggerAutomationSpec_TypeSchema: GenEnum<TriggerAutomationSpec_Type> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_task_common, 3, 0);
 
 /**
  * Named literal value.
@@ -316,4 +288,30 @@ export enum FixedRateUnit {
  */
 export const FixedRateUnitSchema: GenEnum<FixedRateUnit> = /*@__PURE__*/
   enumDesc(file_flyteidl2_task_common, 0);
+
+/**
+ * @generated from enum flyteidl2.task.TriggerAutomationSpecType
+ */
+export enum TriggerAutomationSpecType {
+  /**
+   * @generated from enum value: TYPE_UNSPECIFIED = 0;
+   */
+  TYPE_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TYPE_NONE = 1;
+   */
+  TYPE_NONE = 1,
+
+  /**
+   * @generated from enum value: TYPE_SCHEDULE = 2;
+   */
+  TYPE_SCHEDULE = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.task.TriggerAutomationSpecType.
+ */
+export const TriggerAutomationSpecTypeSchema: GenEnum<TriggerAutomationSpecType> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_task_common, 1);
 
