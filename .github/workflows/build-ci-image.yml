@@ -63,7 +63,7 @@ jobs:
             # Use 'v2' tag for v2 branch
             type=raw,value=v2,enable=${{ github.ref == 'refs/heads/v2' }}
             # Add git sha as tag
-            type=sha,prefix=${{ github.head_ref }}-
+            type=sha,prefix=${{ github.head_ref }}-,enable=${{ github.ref != 'refs/heads/v2' && github.ref != 'refs/heads/main' }}
 
       - name: Set image tag output
         id: set-tag
@@ -123,8 +123,7 @@ jobs:
 
             To test locally:
             \`\`\`bash
-            docker pull ${fullImage}
-            docker run --rm -it -v $(pwd):/workspace -w /workspace ${fullImage} bash
+            make gen DOCKER_CI_IMAGE=${fullImage}
             \`\`\`
             `;
 
