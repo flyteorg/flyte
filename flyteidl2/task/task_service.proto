@@ -82,4 +82,15 @@ message ListTasksResponse {
 
   // Pagination token for the next page of tasks.
   string token = 2;
+
+  message ListTasksMetadata {
+    // Total number of tasks without filters applied
+    uint32 total = 1;
+
+    // Total number of tasks matching the applied filters.
+    uint32 filtered_total = 2;
+  }
+
+  // Metadata for the ListTasksResponse
+  ListTasksMetadata metadata = 3;
 }
