@@ -2,7 +2,6 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -54,28 +53,18 @@ class ListTasksRequest(_message.Message):
     def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., known_filters: _Optional[_Iterable[_Union[ListTasksRequest.KnownFilter, _Mapping]]] = ...) -> None: ...
 
 class ListTasksResponse(_message.Message):
-    __slots__ = ["tasks", "token"]
+    __slots__ = ["tasks", "token", "metadata"]
+    class ListTasksMetadata(_message.Message):
+        __slots__ = ["total", "filtered_total"]
+        TOTAL_FIELD_NUMBER: _ClassVar[int]
+        FILTERED_TOTAL_FIELD_NUMBER: _ClassVar[int]
+        total: int
+        filtered_total: int
+        def __init__(self, total: _Optional[int] = ..., filtered_total: _Optional[int] = ...) -> None: ...
     TASKS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     tasks: _containers.RepeatedCompositeFieldContainer[_task_definition_pb2.Task]
     token: str
-    def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
-
-class ListVersionsRequest(_message.Message):
-    __slots__ = ["task_name"]
-    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
-    task_name: _task_definition_pb2.TaskName
-    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
-
-class ListVersionsResponse(_message.Message):
-    __slots__ = ["versions"]
-    class VersionResponse(_message.Message):
-        __slots__ = ["version", "deployed_at"]
-        VERSION_FIELD_NUMBER: _ClassVar[int]
-        DEPLOYED_AT_FIELD_NUMBER: _ClassVar[int]
-        version: str
-        deployed_at: _timestamp_pb2.Timestamp
-        def __init__(self, version: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-    VERSIONS_FIELD_NUMBER: _ClassVar[int]
-    versions: _containers.RepeatedCompositeFieldContainer[ListVersionsResponse.VersionResponse]
-    def __init__(self, versions: _Optional[_Iterable[_Union[ListVersionsResponse.VersionResponse, _Mapping]]] = ...) -> None: ...
+    metadata: ListTasksResponse.ListTasksMetadata
+    def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ..., metadata: _Optional[_Union[ListTasksResponse.ListTasksMetadata, _Mapping]] = ...) -> None: ...
