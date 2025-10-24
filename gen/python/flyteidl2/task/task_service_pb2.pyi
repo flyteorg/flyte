@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -68,3 +69,22 @@ class ListTasksResponse(_message.Message):
     token: str
     metadata: ListTasksResponse.ListTasksMetadata
     def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ..., metadata: _Optional[_Union[ListTasksResponse.ListTasksMetadata, _Mapping]] = ...) -> None: ...
+
+class ListVersionsRequest(_message.Message):
+    __slots__ = ["task_name"]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    task_name: _task_definition_pb2.TaskName
+    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
+
+class ListVersionsResponse(_message.Message):
+    __slots__ = ["versions"]
+    class VersionResponse(_message.Message):
+        __slots__ = ["version", "deployed_at"]
+        VERSION_FIELD_NUMBER: _ClassVar[int]
+        DEPLOYED_AT_FIELD_NUMBER: _ClassVar[int]
+        version: str
+        deployed_at: _timestamp_pb2.Timestamp
+        def __init__(self, version: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    VERSIONS_FIELD_NUMBER: _ClassVar[int]
+    versions: _containers.RepeatedCompositeFieldContainer[ListVersionsResponse.VersionResponse]
+    def __init__(self, versions: _Optional[_Iterable[_Union[ListVersionsResponse.VersionResponse, _Mapping]]] = ...) -> None: ...
