@@ -2118,6 +2118,10 @@
             "$ref": "#/definitions/ListVersionsResponseVersionResponse"
           },
           "title": "Version with deployed_at"
+        },
+        "token": {
+          "type": "string",
+          "description": "Pagination token for the next page of versions."
         }
       },
       "description": "Response message for listing versions."

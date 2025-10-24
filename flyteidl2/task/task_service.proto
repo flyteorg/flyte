@@ -103,19 +103,25 @@ message ListTasksResponse {
 
 // Request message for listing versions for a task.
 message ListVersionsRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
   // Id of the task.
-  TaskName task_name = 1 [(buf.validate.field).required = true];
+  TaskName task_name = 2 [(buf.validate.field).required = true];
 }
 
 // Response message for listing versions.
 message ListVersionsResponse {
   message VersionResponse {
-    string version = 2;
+    string version = 1;
 
     // The time the task version was deployed
-    google.protobuf.Timestamp deployed_at = 3 [(buf.validate.field).required = true];
+    google.protobuf.Timestamp deployed_at = 2 [(buf.validate.field).required = true];
   }
 
   // Version with deployed_at
   repeated VersionResponse versions = 1;
+
+  // Pagination token for the next page of versions.
+  string token = 2;
 }

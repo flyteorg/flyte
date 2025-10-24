@@ -71,13 +71,15 @@ class ListTasksResponse(_message.Message):
     def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ..., metadata: _Optional[_Union[ListTasksResponse.ListTasksMetadata, _Mapping]] = ...) -> None: ...
 
 class ListVersionsRequest(_message.Message):
-    __slots__ = ["task_name"]
+    __slots__ = ["request", "task_name"]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
     TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    request: _list_pb2.ListRequest
     task_name: _task_definition_pb2.TaskName
-    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ...) -> None: ...
 
 class ListVersionsResponse(_message.Message):
-    __slots__ = ["versions"]
+    __slots__ = ["versions", "token"]
     class VersionResponse(_message.Message):
         __slots__ = ["version", "deployed_at"]
         VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -86,5 +88,7 @@ class ListVersionsResponse(_message.Message):
         deployed_at: _timestamp_pb2.Timestamp
         def __init__(self, version: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
     VERSIONS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
     versions: _containers.RepeatedCompositeFieldContainer[ListVersionsResponse.VersionResponse]
-    def __init__(self, versions: _Optional[_Iterable[_Union[ListVersionsResponse.VersionResponse, _Mapping]]] = ...) -> None: ...
+    token: str
+    def __init__(self, versions: _Optional[_Iterable[_Union[ListVersionsResponse.VersionResponse, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
