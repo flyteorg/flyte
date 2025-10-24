@@ -2361,8 +2361,7 @@
         "TYPE_NONE",
         "TYPE_SCHEDULE"
       ],
-      "default": "TYPE_UNSPECIFIED",
-      "description": "Specifies type of the automation attached to trigger if any."
+      "default": "TYPE_UNSPECIFIED"
     }
   }
 }
