@@ -2304,11 +2304,25 @@
     "taskTaskTriggersSummary": {
       "type": "object",
       "properties": {
-        "automation_spec": {
-          "$ref": "#/definitions/taskTriggerAutomationSpec"
+        "details": {
+          "$ref": "#/definitions/taskTaskTriggersSummaryTriggerDetails"
         },
         "stats": {
           "$ref": "#/definitions/TaskTriggersSummaryTriggerStats"
+        }
+      }
+    },
+    "taskTaskTriggersSummaryTriggerDetails": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
         }
       }
     },
