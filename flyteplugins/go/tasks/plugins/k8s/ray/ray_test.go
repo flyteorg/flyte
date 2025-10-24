@@ -1369,3 +1369,128 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 	assert.Nil(t, err)
 	return s
 }
+
+func rayPluginContextWithPods(pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
+	pluginCtx := newPluginContext(pluginState)
+	reader := fake.NewFakeClient(pods...)
+	pluginCtx.OnK8sReader().Return(reader)
+	return pluginCtx
+}
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	rayJobName := "test-rayjob"
+	rayClusterName := "test-raycluster"
+	// Create a failed head pod - name must match pattern used in GetTaskPhase: {RayClusterName}-head
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rayClusterName + "-head",
+			Namespace: "ns",
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: RayHeadContainerName,
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: RayHeadContainerName,
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := rayPluginContextWithPods(k8s.PluginState{}, pod)
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rayJobName,
+			Namespace: "ns",
+		},
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:  RayHeadContainerName,
+									Image: "rayproject/ray:latest",
+									Env:   []corev1.EnvVar{},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusRunning,
+			RayClusterName:      rayClusterName,
+			StartTime:           &startTime,
+		},
+	}
+
+	// Even though RayJob status is running, should return failure due to pod status
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	assert.True(t, phaseInfo.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+	pluginCtx := rayPluginContext(k8s.PluginState{})
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:  RayHeadContainerName,
+									Image: "rayproject/ray:latest",
+									Env:   []corev1.EnvVar{},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusComplete,
+			RayClusterName:      "ray-clust",
+			StartTime:           &startTime,
+		},
+	}
+
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	assert.NotNil(t, phaseInfo.Info())
+	assert.NotNil(t, phaseInfo.Info().LogContext)
+
+	// Verify the constant is used for head container names
+	assert.Equal(t, 1, len(phaseInfo.Info().LogContext.Pods))
+	headPodLogContext := phaseInfo.Info().LogContext.Pods[0]
+	assert.Equal(t, RayHeadContainerName, headPodLogContext.PrimaryContainerName)
+	assert.Equal(t, 1, len(headPodLogContext.Containers))
+	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
+}

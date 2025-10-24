@@ -26,11 +26,13 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const KindSparkApplication = "SparkApplication"
 const sparkDriverUI = "sparkDriverUI"
 const sparkHistoryUI = "sparkHistoryUI"
+const defaultDriverPrimaryContainerName = "spark-kubernetes-driver"
 
 var featureRegex = regexp.MustCompile(`^spark.((flyteorg)|(flyte)).(.+).enabled$`)
 
@@ -375,9 +377,9 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 	logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
 		Namespace:            sj.Namespace,
 		PodName:              sj.Status.DriverInfo.PodName,
-		PrimaryContainerName: "spark-kubernetes-driver",
+		PrimaryContainerName: defaultDriverPrimaryContainerName,
 		Containers: []*core.ContainerContext{
-			{ContainerName: "spark-kubernetes-driver"},
+			{ContainerName: defaultDriverPrimaryContainerName},
 		},
 	})
 
@@ -490,8 +492,15 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *info, app.Namespace, app.Status.DriverInfo.PodName, defaultDriverPrimaryContainerName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for spark driver. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the spark driver pod is in a failure state, we can fail fast without checking the SparkJob status.
+		return phaseInfo, nil
+	}
 	occurredAt := time.Now()
-	var phaseInfo pluginsCore.PhaseInfo
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
 		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info)

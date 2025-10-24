@@ -700,7 +700,15 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
 	}
 
-	var phaseInfo pluginsCore.PhaseInfo
+	podName := fmt.Sprintf("%s-head", rayJob.Status.RayClusterName)
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *info, rayJob.Namespace, podName, RayHeadContainerName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for ray head node. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the ray head node is in a failure state, we can fail fast without checking the RayJob status.
+		return phaseInfo, nil
+	}
 
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {

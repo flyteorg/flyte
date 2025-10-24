@@ -29,8 +29,9 @@ import (
 )
 
 const (
-	daskTaskType = "dask"
-	KindDaskJob  = "DaskJob"
+	daskTaskType                             = "dask"
+	KindDaskJob                              = "DaskJob"
+	defaultDaskJobRunnerPrimaryContainerName = "job-runner"
 )
 
 func mergeMapInto(src map[string]string, dst map[string]string) {
@@ -349,14 +350,22 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 			{
 				Namespace:            job.ObjectMeta.Namespace,
 				PodName:              job.Status.JobRunnerPodName,
-				PrimaryContainerName: "job-runner",
+				PrimaryContainerName: defaultDaskJobRunnerPrimaryContainerName,
 				Containers: []*core.ContainerContext{
-					{ContainerName: "job-runner"},
+					{ContainerName: defaultDaskJobRunnerPrimaryContainerName},
 				},
 			},
 		},
 	}
-	var phaseInfo pluginsCore.PhaseInfo
+
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, info, job.ObjectMeta.Namespace, job.Status.JobRunnerPodName, defaultDaskJobRunnerPrimaryContainerName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for dask job-runner. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the job-runner pod is in a failure state, we can fail fast without checking the DaskJob status.
+		return phaseInfo, nil
+	}
 	switch status {
 	case "":
 		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info)

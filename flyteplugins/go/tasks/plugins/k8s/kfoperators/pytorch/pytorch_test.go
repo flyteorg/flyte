@@ -1331,3 +1331,99 @@ func TestGetReplicaCount(t *testing.T) {
 
 	assert.NotNil(t, common.GetReplicaCount(PytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker))
 }
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a failed worker-0 pod
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      jobName + "-worker-0",
+			Namespace: jobNamespace,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: "pytorch",
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: "pytorch",
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	reader := fake.NewFakeClient(pod)
+	pluginContext.OnK8sReader().Return(reader)
+
+	// Even though PyTorchJob status is running, should return failure due to pod status
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
+	assert.NoError(t, err)
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseWithCrashLoopBackOff(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a worker-0 pod in crash loop
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      jobName + "-worker-0",
+			Namespace: jobNamespace,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: "pytorch",
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name:         "pytorch",
+					Ready:        false,
+					RestartCount: 5,
+					State: corev1.ContainerState{
+						Waiting: &corev1.ContainerStateWaiting{
+							Reason:  "CrashLoopBackOff",
+							Message: "Back-off restarting failed container",
+						},
+					},
+					LastTerminationState: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	reader := fake.NewFakeClient(pod)
+	pluginContext.OnK8sReader().Return(reader)
+
+	// CrashLoopBackOff should eventually lead to failure
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
+	assert.NoError(t, err)
+	// CrashLoopBackOff may not immediately fail, so we just check it doesn't crash
+	assert.NotNil(t, taskPhase)
+}

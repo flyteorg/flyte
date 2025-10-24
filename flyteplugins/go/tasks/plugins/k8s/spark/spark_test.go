@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
@@ -14,6 +15,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -98,7 +101,7 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
+	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), k8s.PluginState{})
 	info, err := getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
@@ -206,7 +209,7 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 
 	ctx := context.TODO()
-	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, k8s.PluginState{})
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
@@ -288,7 +291,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		Reason:       "task submitted to K8s",
 	}
 
-	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), pluginState)
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
 
 	assert.NoError(t, err)
@@ -493,7 +496,11 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	return taskCtx
 }
 
-func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool, pluginState k8s.PluginState) k8s.PluginContext {
+func dummySparkPluginContext(taskTemplate *core.TaskTemplate, pluginState k8s.PluginState) k8s.PluginContext {
+	return dummySparkPluginContextWithPods(taskTemplate, pluginState)
+}
+
+func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginState k8s.PluginState, pods ...client.Object) k8s.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -545,7 +552,7 @@ func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool
 	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
-	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
+	taskExecutionMetadata.On("IsInterruptible").Return(false)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
 	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
@@ -563,6 +570,12 @@ func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool
 		func(v interface{}) error {
 			return nil
 		})
+
+	// Add K8sReader mock for pods
+	objs := make([]client.Object, len(pods))
+	copy(objs, pods)
+	reader := fake.NewClientBuilder().WithObjects(objs...).Build()
+	pCtx.OnK8sReader().Return(reader)
 
 	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
@@ -1051,4 +1064,119 @@ func TestGetPropertiesSpark(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, sparkResourceHandler.GetProperties())
+}
+
+func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+	assert.Equal(t, 2, len(taskPhase.Info().LogContext.Pods))
+
+	// Verify namespace is set in the driver pod log context
+	driverPodLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, "spark-namespace", driverPodLogContext.Namespace)
+	assert.Equal(t, "spark-pod", driverPodLogContext.PodName)
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.PrimaryContainerName)
+}
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a failed driver pod
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "spark-pod",
+			Namespace: "spark-namespace",
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: defaultDriverPrimaryContainerName,
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
+
+	// Even though SparkApplication status is running, should return failure due to pod status
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	assert.NoError(t, err)
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseWithPendingPodInvalidImage(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a pending driver pod with InvalidImageName - this should fail immediately
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "spark-pod",
+			Namespace: "spark-namespace",
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodPending,
+			Conditions: []corev1.PodCondition{
+				{
+					Type:               corev1.PodReady,
+					Status:             corev1.ConditionFalse,
+					LastTransitionTime: v1.Time{Time: time.Now()},
+					Reason:             "ContainersNotReady",
+					Message:            "containers with unready status: [spark-kubernetes-driver]",
+				},
+			},
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name:  defaultDriverPrimaryContainerName,
+					Ready: false,
+					State: corev1.ContainerState{
+						Waiting: &corev1.ContainerStateWaiting{
+							Reason:  "InvalidImageName",
+							Message: "Invalid image name",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
+
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+	assert.NoError(t, err)
+	// Should detect the InvalidImageName and return a failure phase
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
+
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+
+	// Verify the constant is used for driver container names
+	driverPodLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.PrimaryContainerName)
+	assert.Equal(t, 1, len(driverPodLogContext.Containers))
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.Containers[0].ContainerName)
 }

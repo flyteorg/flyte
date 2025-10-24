@@ -15,12 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -891,6 +893,37 @@ func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	}
 
 	return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", phaseInfo.Info()), nil
+}
+
+// DemystifyFailedOrPendingPod inspects the pod status of a failed or pending pod and attempts to determine the reason
+// for the failure or pending state. This function currently only handles pods in the Failed or Pending phase.
+// This is useful to check the specific error from the pod in the rayjob, sparkjob, etc.
+// For example, if the pod is in the Failed phase due to an image pull error, this function can return a more specific
+// error message indicating that the image could not be pulled.
+// Similarly, if the pod is in the Pending phase due to insufficient resources, this function can return an error
+// message indicating that the pod could not be scheduled due to lack of resources.
+func DemystifyFailedOrPendingPod(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	info pluginsCore.TaskInfo,
+	namespace string,
+	podName string,
+	primaryContainerName string,
+) (pluginsCore.PhaseInfo, error) {
+	pod := &v1.Pod{}
+	var phaseInfo pluginsCore.PhaseInfo
+
+	err := pluginContext.K8sReader().Get(ctx, client.ObjectKey{Namespace: namespace, Name: podName}, pod)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get pod %s in namespace %s. Error: %v", podName, namespace, err)
+	}
+	switch pod.Status.Phase {
+	case v1.PodFailed:
+		phaseInfo, err = DemystifyFailure(ctx, pod.Status, info, primaryContainerName)
+	case v1.PodPending:
+		phaseInfo, err = DemystifyPending(pod.Status, info)
+	}
+	return phaseInfo, err
 }
 
 func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, time.Time) {

@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type pytorchOperatorResourceHandler struct {
@@ -213,14 +214,27 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to list pytorch execution pods. Error: %w", err)
 	}
+	logger.Debugf(ctx, "podlist: %+v", podList)
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: logContextForPods(app.Name, podList.Items),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
-
-	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	var phaseInfo pluginsCore.PhaseInfo
+	podName := fmt.Sprintf("%s-%s", app.Name, "worker-0")
+	phaseInfo, err = flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, taskPhaseInfo, app.Namespace, podName, "pytorch")
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for pytorch worker-0/master. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the master node or worker-0 is in a failure state, we can fail fast without checking the PytorchJob status.
+		return phaseInfo, nil
+	}
+	logger.Debugf(ctx, "logcontext: %+v", taskPhaseInfo.LogContext)
+	logger.Debugf(ctx, "PyTorchJob phase is %s", phaseInfo.Phase())
+	logger.Debugf(ctx, "PytorchJob currentCondition: %v", currentCondition)
+	phaseInfo, err = common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {

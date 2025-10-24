@@ -14,6 +14,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -241,7 +242,11 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	return taskCtx
 }
 
-func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, isInterruptible bool, pluginState k8s.PluginState) *k8smocks.PluginContext {
+func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, pluginState k8s.PluginState) *k8smocks.PluginContext {
+	return dummyDaskPluginContextWithPods(taskTemplate, resources, pluginState)
+}
+
+func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -281,14 +286,14 @@ func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.Resou
 	taskExecutionMetadata.OnGetLabels().Return(testLabels)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
 	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
-	taskExecutionMetadata.OnIsInterruptible().Return(isInterruptible)
+	taskExecutionMetadata.OnIsInterruptible().Return(false)
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
 	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
+	overrides.OnGetExtendedResources().Return(nil)
 	overrides.OnGetContainerImage().Return("")
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
@@ -304,7 +309,7 @@ func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.Resou
 		})
 
 	// Add K8sReader mock
-	reader := fake.NewFakeClient()
+	reader := fake.NewFakeClient(pods...)
 	pCtx.OnK8sReader().Return(reader)
 
 	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
@@ -892,7 +897,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	ctx := context.TODO()
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, nil, false, k8s.PluginState{})
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, k8s.PluginState{})
 	expectedLogCtx := &core.LogContext{
 		PrimaryPodName: "job-runner-pod-name",
 		Pods: []*core.PodLogContext{
@@ -969,9 +974,129 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
 
-	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, nil, false, pluginState)
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, pluginState)
 	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobCreated))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
+func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.TODO()
+
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, k8s.PluginState{})
+
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobRunning))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+	assert.Equal(t, 1, len(taskPhase.Info().LogContext.Pods))
+
+	// Verify namespace is set in the pod log context
+	podLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, defaultNamespace, podLogContext.Namespace)
+	assert.Equal(t, "job-runner-pod-name", podLogContext.PodName)
+	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.PrimaryContainerName)
+}
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a failed pod in the fake client
+	pod := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "job-runner-pod-name",
+			Namespace: defaultNamespace,
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodFailed,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: defaultDaskJobRunnerPrimaryContainerName,
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	pluginContext := dummyDaskPluginContextWithPods(taskTemplate, &v1.ResourceRequirements{}, k8s.PluginState{}, pod)
+
+	// Even though DaskJob status is running, should return failure due to pod status
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobRunning))
+	assert.NoError(t, err)
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseWithPendingPodInvalidImage(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a pending pod with InvalidImageName - this should fail immediately
+	pod := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "job-runner-pod-name",
+			Namespace: defaultNamespace,
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodPending,
+			Conditions: []v1.PodCondition{
+				{
+					Type:               v1.PodReady,
+					Status:             v1.ConditionFalse,
+					LastTransitionTime: metav1.Time{Time: time.Now()},
+					Reason:             "ContainersNotReady",
+					Message:            "containers with unready status: [job-runner]",
+				},
+			},
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name:  defaultDaskJobRunnerPrimaryContainerName,
+					Ready: false,
+					State: v1.ContainerState{
+						Waiting: &v1.ContainerStateWaiting{
+							Reason:  "InvalidImageName",
+							Message: "Invalid image name",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	pluginContext := dummyDaskPluginContextWithPods(taskTemplate, &v1.ResourceRequirements{}, k8s.PluginState{}, pod)
+
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobClusterCreated))
+	assert.NoError(t, err)
+	// Should detect the InvalidImageName and return a failure phase
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.TODO()
+
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, k8s.PluginState{})
+
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobSuccessful))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+
+	// Verify the constant is used for container names
+	podLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.PrimaryContainerName)
+	assert.Equal(t, 1, len(podLogContext.Containers))
+	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.Containers[0].ContainerName)
 }
