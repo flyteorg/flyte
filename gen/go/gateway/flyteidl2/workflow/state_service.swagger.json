@@ -93,6 +93,24 @@
       },
       "description": "Represents the error message from the execution."
     },
+    "flyteidl2workflowGetResponse": {
+      "type": "object",
+      "properties": {
+        "action_id": {
+          "$ref": "#/definitions/commonActionIdentifier",
+          "description": "a unique identifier for the action."
+        },
+        "status": {
+          "$ref": "#/definitions/googlerpcStatus",
+          "description": "The result."
+        },
+        "state": {
+          "type": "string",
+          "description": "a json serialized `NodeStatus` object."
+        }
+      },
+      "description": "response message for getting the state of an action."
+    },
     "flyteidl2workflowPhase": {
       "type": "string",
       "enum": [
@@ -108,6 +126,18 @@
       ],
       "default": "PHASE_UNSPECIFIED",
       "title": "TODO: define phase transitions"
+    },
+    "flyteidl2workflowWatchResponse": {
+      "type": "object",
+      "properties": {
+        "action_update": {
+          "$ref": "#/definitions/workflowActionUpdate"
+        },
+        "control_message": {
+          "$ref": "#/definitions/workflowControlMessage"
+        }
+      },
+      "description": "response message for watching updates to the state of actions."
     },
     "googlerpcStatus": {
       "type": "object",
@@ -174,24 +204,6 @@
         }
       }
     },
-    "workflowGetResponse": {
-      "type": "object",
-      "properties": {
-        "action_id": {
-          "$ref": "#/definitions/commonActionIdentifier",
-          "description": "a unique identifier for the action."
-        },
-        "status": {
-          "$ref": "#/definitions/googlerpcStatus",
-          "description": "The result."
-        },
-        "state": {
-          "type": "string",
-          "description": "a json serialized `NodeStatus` object."
-        }
-      },
-      "description": "response message for getting the state of an action."
-    },
     "workflowPutResponse": {
       "type": "object",
       "properties": {
@@ -205,18 +217,6 @@
         }
       },
       "description": "response message for putting the state of an action."
-    },
-    "workflowWatchResponse": {
-      "type": "object",
-      "properties": {
-        "action_update": {
-          "$ref": "#/definitions/workflowActionUpdate"
-        },
-        "control_message": {
-          "$ref": "#/definitions/workflowControlMessage"
-        }
-      },
-      "description": "response message for watching updates to the state of actions."
     }
   }
 }

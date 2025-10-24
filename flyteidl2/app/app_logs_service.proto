@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "flyteidl2/app/app_logs_payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+service AppLogsService {
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}

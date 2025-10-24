@@ -1,0 +1,444 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/runtime_version.proto";
+import "flyteidl2/core/artifact_id.proto";
+import "flyteidl2/core/security.proto";
+import "flyteidl2/core/tasks.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+message Identifier {
+  // Org that the app belongs to.
+  string org = 1;
+
+  // Project that the app belongs to.
+  string project = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Domain that the app belongs to.
+  string domain = 3 [(buf.validate.field).string.min_len = 1];
+
+  // Name that the user provided for the app.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 30,
+    // Validate that the string is a valid DNS-1123 subdomain. This validation runs after
+    // the length validation, so it's safe to assume that the length is within the limits.
+    (buf.validate.field).string.pattern = "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"
+  ];
+}
+
+message Meta {
+  // ID of the app.
+  Identifier id = 1 [(buf.validate.field).required = true];
+
+  // Revision of the app object.
+  uint64 revision = 2 [(buf.validate.field).uint64.gte = 0];
+
+  // Labels for the app.
+  map<string, string> labels = 3;
+}
+
+// For internal usage only. This message is used to wrap the app message with the host.
+message AppWrapper {
+  string host = 1;
+  oneof payload {
+    App app = 2;
+    Identifier app_id = 3;
+  }
+}
+
+// Represents an app with its specification and status.
+message App {
+  // Metadata of the app.
+  Meta metadata = 1 [(buf.validate.field).required = true];
+
+  // Specification of the app.
+  Spec spec = 2 [(buf.validate.field).required = true];
+
+  // Status of the app.
+  Status status = 3;
+}
+
+/* State machine for the app status
+
+              ┌──────────────┐
+              │              │
+   ┌──────────►  Unassigned  │
+   │          │              │
+   │          └──────┬───────┘
+   │Lease            │
+   │Expired          │ Leased to a cluster
+   │                 │
+   │          ┌──────▼───────┐
+   │          │   Assigned   │
+   └──────────┼      +       │
+              │   Timeout    │
+              └──────┬───────┘
+                     │
+                     │ Acknowledged by cluster
+                     │
+              ┌──────▼───────┐
+   ┌──────────►   Pending    │
+   │          └──────┬───────┘
+   │New              │
+   │Revision         │ Action performed by cluster
+   │                 │
+   │     ┌───────────▼────────────┐
+   └─────┼ Stopped/Started/Failed │
+         └────────────────────────┘
+*/
+
+// Represents the condition of an app.
+message Condition {
+  // Last transition time of the condition.
+  google.protobuf.Timestamp last_transition_time = 1;
+
+  // Deployment status of the app.
+  Status.DeploymentStatus deployment_status = 2;
+
+  // Message for the condition.
+  string message = 3;
+
+  // Revision the Condition applies to. This can be used by consumers
+  // to introspect and visualize which revisions are up.
+  uint64 revision = 4 [(buf.validate.field).uint64.gte = 0];
+
+  // Actor is the principal that caused the condition.
+  common.EnrichedIdentity actor = 5;
+}
+
+// Represents the status of an app.
+message Status {
+  string assigned_cluster = 1;
+
+  // Enum for deployment status of the app.
+  enum DeploymentStatus {
+    // Unspecified deployment status.
+    DEPLOYMENT_STATUS_UNSPECIFIED = 0;
+    // Deployment is enabled but hasn't been assigned to a cluster yet.
+    DEPLOYMENT_STATUS_UNASSIGNED = 1;
+    // Deployment is assigned to a cluster but hasn't been acknowledged yet.
+    DEPLOYMENT_STATUS_ASSIGNED = 2;
+    // Deployment is picked up by a cluster but is awaiting deployment.
+    DEPLOYMENT_STATUS_PENDING = 3;
+    // Deployment is disabled.
+    DEPLOYMENT_STATUS_STOPPED = 4;
+    // Deployment is completed. Please use DEPLOYMENT_STATUS_ACTIVE instead.
+    DEPLOYMENT_STATUS_STARTED = 5 [deprecated = true];
+    // Deployment has failed.
+    DEPLOYMENT_STATUS_FAILED = 6;
+    // Deployment is completed.
+    DEPLOYMENT_STATUS_ACTIVE = 7;
+    // Triggered in response to desired app replicas > actual app replicas
+    DEPLOYMENT_STATUS_SCALING_UP = 8;
+    // Triggered in response to desired app replicas < actual app replicas
+    DEPLOYMENT_STATUS_SCALING_DOWN = 9;
+    // Triggered in response to the latest app spec changing
+    DEPLOYMENT_STATUS_DEPLOYING = 10;
+  }
+
+  // Current number of replicas.
+  uint32 current_replicas = 2 [(buf.validate.field).uint32.gte = 0];
+
+  // List of public URLs for the app.
+  Ingress ingress = 3;
+
+  // CreatedAt is the time when the app was first created
+  google.protobuf.Timestamp created_at = 4;
+
+  // LastUpdatedAt is the time when the app was last updated
+  google.protobuf.Timestamp last_updated_at = 5;
+
+  // Conditions for the app.
+  repeated Condition conditions = 6;
+
+  // LeaseExpiration refers to how long the app is leased to a cluster for it to start processing it. If the lease
+  // period expires, the cluster will no longer be allowed to update this app and another cluster can pick it up.
+  google.protobuf.Timestamp lease_expiration = 7;
+
+  // K8sMetadata contains metadata about the app in the K8s cluster.
+  K8sMetadata k8s_metadata = 8;
+
+  MaterializedInputs materialized_inputs = 9;
+}
+
+message K8sMetadata {
+  // Namespace points to the namespace the app is deployed in.
+  string namespace = 1;
+}
+
+message Ingress {
+  // Public URL of the app.
+  string public_url = 1 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // Canonical name (CNAME) URL of the app.
+  string cname_url = 2 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uri = true
+  ];
+
+  // VPC URL of the app.
+  string vpc_url = 3 [
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
+    (buf.validate.field).string.uri = true
+  ];
+}
+
+// Represents the specification of an app.
+message Spec {
+  // Payload of the app, which can be either a container or a K8s pod.
+  oneof app_payload {
+    option (buf.validate.oneof).required = true;
+
+    // Container payload.
+    flyteidl2.core.Container container = 1;
+
+    // K8s pod payload.
+    flyteidl2.core.K8sPod pod = 2;
+  }
+
+  // Autoscaling configuration for the app.
+  AutoscalingConfig autoscaling = 3;
+
+  // Ingress configuration for the app.
+  IngressConfig ingress = 4;
+
+  // Enum for deployment status of the app.
+  enum DesiredState {
+    // Unspecified state
+    DESIRED_STATE_UNSPECIFIED = 0;
+    // Deployment is disabled.
+    DESIRED_STATE_STOPPED = 1;
+    // Deployment is completed. Please use DESIRED_STATE_ACTIVE instead.
+    DESIRED_STATE_STARTED = 2 [deprecated = true];
+    // Deployment is completed.
+    DESIRED_STATE_ACTIVE = 3;
+  }
+
+  // Deployment status of the app.
+  DesiredState desired_state = 5;
+
+  // ClusterPool to place this app on. By default it'll use the default cluster pool.
+  string cluster_pool = 6;
+
+  // Set of image specifications for the app.
+  ImageSpecSet images = 7;
+
+  // security_context encapsulates security attributes requested to run this task.
+  SecurityContext security_context = 8;
+
+  // Encapsulates all non-standard resources, not captured by
+  // v1.ResourceRequirements, to allocate to a task.
+  flyteidl2.core.ExtendedResources extended_resources = 9;
+
+  // Runtime metadata for the app.
+  common.RuntimeMetadata runtime_metadata = 10;
+
+  // Profile of the app.
+  Profile profile = 11;
+
+  // Creator of the app is the first principal that provisioned this app. Other principals may
+  // interact with the app by updating its spec or stopping/starting it.
+  common.EnrichedIdentity creator = 12;
+
+  // Inputs of the app.
+  InputList inputs = 13;
+
+  repeated Link links = 14;
+
+  // Timeout configuration for the app.
+  TimeoutConfig timeouts = 15;
+}
+
+// Represents a link to an external resource (Arize project link, W&B dashboard, etc)
+message Link {
+  // URL of the external service.
+  // This can be an absolute or relative path.
+  string path = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Human readable name of the external service.
+  string title = 2;
+
+  // Whether the path is absolute (default) or relative.
+  bool is_relative = 3;
+}
+
+message Input {
+  // Name is a unique identifier of the input within the list of inputs of the app
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+
+    // StringValue is a plain string value for the input
+    string string_value = 2 [(buf.validate.field).string.min_len = 1];
+
+    // ArtifactQuery is that should result in a single artifact that will be used as the input to the app at runtime.
+    // The artifact will be pinned at the time of the app creation.
+    flyteidl2.core.ArtifactQuery artifact_query = 3;
+
+    // ArtifactId is an identifier of an artifact that will be used as the input to the app at runtime.
+    flyteidl2.core.ArtifactID artifact_id = 4;
+
+    // ID of the app.
+    Identifier app_id = 5;
+  }
+}
+
+message MaterializedInputs {
+  repeated MaterializedInput items = 1;
+
+  // Revision of the app object that we materialized the input for.
+  uint64 revision = 2 [(buf.validate.field).uint64.gte = 0];
+}
+
+message MaterializedInput {
+  // Name is a unique identifier of the input within the list of inputs of the app
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  oneof value {
+    option (buf.validate.oneof).required = true;
+
+    // ArtifactId is an identifier of an artifact that will be used as the input to the app at runtime.
+    flyteidl2.core.ArtifactID artifact_id = 2;
+  }
+}
+
+// InputList is a list of dependencies for the app.
+message InputList {
+  // Items is the list of inputs to fulfil for the app.
+  repeated Input items = 1;
+}
+
+message Profile {
+  // App Type (e.g. FastAPI, Flask, VLLM, NIM etc.)
+  string type = 1;
+
+  // Friendly name of the app.
+  string name = 2;
+
+  // Short description of the app.
+  string short_description = 3 [(buf.validate.field).string.max_len = 100];
+
+  // Icon URL of the app.
+  string icon_url = 4;
+}
+
+// SecurityContext holds security attributes that apply to tasks.
+message SecurityContext {
+  // run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the
+  // backend plugin to choose the appropriate identity for the execution engine the task will run on.
+  flyteidl2.core.Identity run_as = 1;
+
+  // secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the
+  // pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS
+  // Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access
+  // to the secret) and to pass it to the remote execution engine.
+  repeated flyteidl2.core.Secret secrets = 2;
+
+  reserved 3;
+  reserved 4;
+
+  // AllowAnonymous indicates if the app should be accessible without authentication. This assumes the app will handle
+  // its own authentication or that it's a public app.
+  bool allow_anonymous = 5;
+}
+
+message ImageSpec {
+  // Tag of the image.
+  string tag = 1;
+  // URL of the build job for the image.
+  string build_job_url = 2;
+}
+
+message ImageSpecSet {
+  // List of image specifications.
+  repeated ImageSpec images = 1;
+}
+
+// Represents the ingress configuration of an app.
+message IngressConfig {
+  // Indicates if the app should be private.
+  bool private = 1;
+
+  // Subdomain for the app. If not specified, a random subdomain will be generated.
+  string subdomain = 2;
+
+  // Canonical name (CNAME) for the app.
+  string cname = 3;
+}
+
+// Represents the autoscaling configuration of an app.
+message AutoscalingConfig {
+  // Configuration for the number of replicas.
+  Replicas replicas = 1;
+  // The period for scaling down the object.
+  google.protobuf.Duration scaledown_period = 2;
+  // Metric for scaling the app.
+  ScalingMetric scaling_metric = 3;
+}
+
+// ScalingMetric allows different scaling strategies for the app.
+// See: https://knative.dev/docs/serving/autoscaling/autoscaling-metrics/
+message ScalingMetric {
+  oneof metric {
+    option (buf.validate.oneof).required = true;
+
+    // Configuration for scaling based on request rate.
+    RequestRate request_rate = 1;
+    // Configuration for scaling based on concurrency.
+    Concurrency concurrency = 2;
+  }
+}
+
+// This section enables scaling based on the request concurrency. Concurrency calculates how many
+// requests are being processed at the same time. This is useful for apps that take longer to process
+// requests (e.g. seconds)
+// The autoscaler has a default window of 60 seconds to calculate the concurrency value. However, it has
+// panic mode that kicks in if the request rate jumps to 2x its value within 6 seconds. If that's
+// triggered, it'll start scaling up immediately instead of waiting for the full 60 seconds.
+message Concurrency {
+  // This is the target value for the scaling configuration.
+  // default=100
+  uint32 target_value = 1 [(buf.validate.field).uint32.gt = 0];
+}
+
+// RequestRate enables scaling based on the request rate. Request rate calculates how many requests
+// the app is receiving per second.
+// The autoscaler has a default window of 60 seconds to calculate the request rate. However, it has
+// panic mode that kicks in if the request rate jumps to 2x its value within 6 seconds. If that's
+// triggered, it'll start scaling up immediately instead of waiting for the full 60 seconds.
+message RequestRate {
+  // This is the target value for the scaling configuration.
+  // default=100
+  uint32 target_value = 1 [(buf.validate.field).uint32.gte = 0];
+}
+
+// Represents the configuration for the number of replicas.
+message Replicas {
+  // Minimum number of replicas.
+  uint32 min = 1 [(buf.validate.field).uint32.gte = 0];
+
+  // Maximum number of replicas.
+  uint32 max = 2 [(buf.validate.field).uint32.gte = 0];
+}
+
+message TimeoutConfig {
+  // This is the maximum duration that the request instance
+  // is allowed to respond to a request. If unspecified, a system default will
+  // be provided.
+  // default=300s
+  google.protobuf.Duration request_timeout = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+    lte: {seconds: 3600}
+  }];
+}
