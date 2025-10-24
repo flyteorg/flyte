@@ -53,9 +53,18 @@ class ListTasksRequest(_message.Message):
     def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., known_filters: _Optional[_Iterable[_Union[ListTasksRequest.KnownFilter, _Mapping]]] = ...) -> None: ...
 
 class ListTasksResponse(_message.Message):
-    __slots__ = ["tasks", "token"]
+    __slots__ = ["tasks", "token", "metadata"]
+    class ListTasksMetadata(_message.Message):
+        __slots__ = ["total", "filtered_total"]
+        TOTAL_FIELD_NUMBER: _ClassVar[int]
+        FILTERED_TOTAL_FIELD_NUMBER: _ClassVar[int]
+        total: int
+        filtered_total: int
+        def __init__(self, total: _Optional[int] = ..., filtered_total: _Optional[int] = ...) -> None: ...
     TASKS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     tasks: _containers.RepeatedCompositeFieldContainer[_task_definition_pb2.Task]
     token: str
-    def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+    metadata: ListTasksResponse.ListTasksMetadata
+    def __init__(self, tasks: _Optional[_Iterable[_Union[_task_definition_pb2.Task, _Mapping]]] = ..., token: _Optional[str] = ..., metadata: _Optional[_Union[ListTasksResponse.ListTasksMetadata, _Mapping]] = ...) -> None: ...

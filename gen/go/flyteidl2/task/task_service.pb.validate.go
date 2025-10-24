@@ -872,6 +872,35 @@ func (m *ListTasksResponse) validate(all bool) error {
 
 	// no validation rules for Token
 
+	if all {
+		switch v := interface{}(m.GetMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListTasksResponseValidationError{
+					field:  "Metadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListTasksResponseValidationError{
+					field:  "Metadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListTasksResponseValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ListTasksResponseMultiError(errors)
 	}
@@ -1071,3 +1100,112 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListTasksRequest_KnownFilterValidationError{}
+
+// Validate checks the field values on ListTasksResponse_ListTasksMetadata with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *ListTasksResponse_ListTasksMetadata) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTasksResponse_ListTasksMetadata
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// ListTasksResponse_ListTasksMetadataMultiError, or nil if none found.
+func (m *ListTasksResponse_ListTasksMetadata) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTasksResponse_ListTasksMetadata) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Total
+
+	// no validation rules for FilteredTotal
+
+	if len(errors) > 0 {
+		return ListTasksResponse_ListTasksMetadataMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListTasksResponse_ListTasksMetadataMultiError is an error wrapping multiple
+// validation errors returned by
+// ListTasksResponse_ListTasksMetadata.ValidateAll() if the designated
+// constraints aren't met.
+type ListTasksResponse_ListTasksMetadataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTasksResponse_ListTasksMetadataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTasksResponse_ListTasksMetadataMultiError) AllErrors() []error { return m }
+
+// ListTasksResponse_ListTasksMetadataValidationError is the validation error
+// returned by ListTasksResponse_ListTasksMetadata.Validate if the designated
+// constraints aren't met.
+type ListTasksResponse_ListTasksMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListTasksResponse_ListTasksMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListTasksResponse_ListTasksMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListTasksResponse_ListTasksMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListTasksResponse_ListTasksMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListTasksResponse_ListTasksMetadataValidationError) ErrorName() string {
+	return "ListTasksResponse_ListTasksMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListTasksResponse_ListTasksMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListTasksResponse_ListTasksMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListTasksResponse_ListTasksMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListTasksResponse_ListTasksMetadataValidationError{}
