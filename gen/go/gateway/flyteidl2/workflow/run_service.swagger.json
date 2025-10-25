@@ -397,7 +397,7 @@
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         },
         "actions": {
           "type": "array",
@@ -436,7 +436,7 @@
           "description": "The role designates the permitted set of actions which can be applied to the resource."
         },
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         }
       },
       "description": "A policy binding represents a role (a set of actions) defined on a resource."
@@ -475,29 +475,6 @@
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "commonResource": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "$ref": "#/definitions/commonOrganization"
-        },
-        "domain": {
-          "$ref": "#/definitions/commonDomain"
-        },
-        "project": {
-          "$ref": "#/definitions/commonProject"
-        },
-        "workflow": {
-          "$ref": "#/definitions/commonWorkflow"
-        },
-        "launch_plan": {
-          "$ref": "#/definitions/commonLaunchPlan"
-        },
-        "cluster": {
-          "$ref": "#/definitions/commonClusterIdentifier"
         }
       }
     },
@@ -1915,6 +1892,29 @@
       ],
       "default": "ACTION_NONE",
       "title": "- ACTION_VIEW_FLYTE_INVENTORY: Read Flyte workflows, tasks and launch plans\n - ACTION_VIEW_FLYTE_EXECUTIONS: View Flyte executions\n - ACTION_REGISTER_FLYTE_INVENTORY: Register new versions of Flyte workflows, tasks and launch plans\n - ACTION_CREATE_FLYTE_EXECUTIONS: Create new Flyte workflow and task executions\n - ACTION_ADMINISTER_PROJECT: Create new projects and update project descriptions\n - ACTION_MANAGE_PERMISSIONS: Add users, roles and update role assignments.\n - ACTION_ADMINISTER_ACCOUNT: Manage billing, account-wide settings\n - ACTION_MANAGE_CLUSTER: Operations for clusters\n - ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE\n - ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT\n - ACTION_EDIT_UNUSED_ATTRIBUTES: Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE\n - ACTION_SUPPORT_SYSTEM_LOGS: View system logs"
+    },
+    "flyteidl2commonResource": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/commonOrganization"
+        },
+        "domain": {
+          "$ref": "#/definitions/commonDomain"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        },
+        "workflow": {
+          "$ref": "#/definitions/commonWorkflow"
+        },
+        "launch_plan": {
+          "$ref": "#/definitions/commonLaunchPlan"
+        },
+        "cluster": {
+          "$ref": "#/definitions/commonClusterIdentifier"
+        }
+      }
     },
     "flyteidl2coreEnumType": {
       "type": "object",

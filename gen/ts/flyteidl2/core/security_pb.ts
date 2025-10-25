@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/security.proto.
  */
 export const file_flyteidl2_core_security: GenFile = /*@__PURE__*/
-  fileDesc("Ch1mbHl0ZWlkbDIvY29yZS9zZWN1cml0eS5wcm90bxIOZmx5dGVpZGwyLmNvcmUitgEKBlNlY3JldBINCgVncm91cBgBIAEoCRIVCg1ncm91cF92ZXJzaW9uGAIgASgJEgsKA2tleRgDIAEoCRI7ChFtb3VudF9yZXF1aXJlbWVudBgEIAEoDjIgLmZseXRlaWRsMi5jb3JlLlNlY3JldC5Nb3VudFR5cGUSDwoHZW52X3ZhchgFIAEoCSIrCglNb3VudFR5cGUSBwoDQU5ZEAASCwoHRU5WX1ZBUhABEggKBEZJTEUQAiJQCgxPQXV0aDJDbGllbnQSEQoJY2xpZW50X2lkGAEgASgJEi0KDWNsaWVudF9zZWNyZXQYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQiigEKCElkZW50aXR5EhAKCGlhbV9yb2xlGAEgASgJEhsKE2s4c19zZXJ2aWNlX2FjY291bnQYAiABKAkSMwoNb2F1dGgyX2NsaWVudBgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLk9BdXRoMkNsaWVudBIaChJleGVjdXRpb25faWRlbnRpdHkYBCABKAki3wEKEk9BdXRoMlRva2VuUmVxdWVzdBIMCgRuYW1lGAEgASgJEjUKBHR5cGUYAiABKA4yJy5mbHl0ZWlkbDIuY29yZS5PQXV0aDJUb2tlblJlcXVlc3QuVHlwZRIsCgZjbGllbnQYAyABKAsyHC5mbHl0ZWlkbDIuY29yZS5PQXV0aDJDbGllbnQSHgoWaWRwX2Rpc2NvdmVyeV9lbmRwb2ludBgEIAEoCRIWCg50b2tlbl9lbmRwb2ludBgFIAEoCSIeCgRUeXBlEhYKEkNMSUVOVF9DUkVERU5USUFMUxAAIpgBCg9TZWN1cml0eUNvbnRleHQSKAoGcnVuX2FzGAEgASgLMhguZmx5dGVpZGwyLmNvcmUuSWRlbnRpdHkSJwoHc2VjcmV0cxgCIAMoCzIWLmZseXRlaWRsMi5jb3JlLlNlY3JldBIyCgZ0b2tlbnMYAyADKAsyIi5mbHl0ZWlkbDIuY29yZS5PQXV0aDJUb2tlblJlcXVlc3RCsgEKEmNvbS5mbHl0ZWlkbDIuY29yZUINU2VjdXJpdHlQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM");
+  fileDesc("Ch1mbHl0ZWlkbDIvY29yZS9zZWN1cml0eS5wcm90bxIOZmx5dGVpZGwyLmNvcmUitgEKBlNlY3JldBINCgVncm91cBgBIAEoCRIVCg1ncm91cF92ZXJzaW9uGAIgASgJEgsKA2tleRgDIAEoCRI7ChFtb3VudF9yZXF1aXJlbWVudBgEIAEoDjIgLmZseXRlaWRsMi5jb3JlLlNlY3JldC5Nb3VudFR5cGUSDwoHZW52X3ZhchgFIAEoCSIrCglNb3VudFR5cGUSBwoDQU5ZEAASCwoHRU5WX1ZBUhABEggKBEZJTEUQAiLzAQoKQ29ubmVjdGlvbhIRCgl0YXNrX3R5cGUYASABKAkSOAoHc2VjcmV0cxgCIAMoCzInLmZseXRlaWRsMi5jb3JlLkNvbm5lY3Rpb24uU2VjcmV0c0VudHJ5EjgKB2NvbmZpZ3MYAyADKAsyJy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0aW9uLkNvbmZpZ3NFbnRyeRouCgxTZWNyZXRzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARouCgxDb25maWdzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJQCgxPQXV0aDJDbGllbnQSEQoJY2xpZW50X2lkGAEgASgJEi0KDWNsaWVudF9zZWNyZXQYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQiigEKCElkZW50aXR5EhAKCGlhbV9yb2xlGAEgASgJEhsKE2s4c19zZXJ2aWNlX2FjY291bnQYAiABKAkSMwoNb2F1dGgyX2NsaWVudBgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLk9BdXRoMkNsaWVudBIaChJleGVjdXRpb25faWRlbnRpdHkYBCABKAki3wEKEk9BdXRoMlRva2VuUmVxdWVzdBIMCgRuYW1lGAEgASgJEjUKBHR5cGUYAiABKA4yJy5mbHl0ZWlkbDIuY29yZS5PQXV0aDJUb2tlblJlcXVlc3QuVHlwZRIsCgZjbGllbnQYAyABKAsyHC5mbHl0ZWlkbDIuY29yZS5PQXV0aDJDbGllbnQSHgoWaWRwX2Rpc2NvdmVyeV9lbmRwb2ludBgEIAEoCRIWCg50b2tlbl9lbmRwb2ludBgFIAEoCSIeCgRUeXBlEhYKEkNMSUVOVF9DUkVERU5USUFMUxAAIpgBCg9TZWN1cml0eUNvbnRleHQSKAoGcnVuX2FzGAEgASgLMhguZmx5dGVpZGwyLmNvcmUuSWRlbnRpdHkSJwoHc2VjcmV0cxgCIAMoCzIWLmZseXRlaWRsMi5jb3JlLlNlY3JldBIyCgZ0b2tlbnMYAyADKAsyIi5mbHl0ZWlkbDIuY29yZS5PQXV0aDJUb2tlblJlcXVlc3RCsgEKEmNvbS5mbHl0ZWlkbDIuY29yZUINU2VjdXJpdHlQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM");
 
 /**
  * Secret encapsulates information about the secret a task needs to proceed. An environment variable
@@ -111,6 +111,42 @@ export const Secret_MountTypeSchema: GenEnum<Secret_MountType> = /*@__PURE__*/
   enumDesc(file_flyteidl2_core_security, 0, 0);
 
 /**
+ * @generated from message flyteidl2.core.Connection
+ */
+export type Connection = Message<"flyteidl2.core.Connection"> & {
+  /**
+   * The task type that the connection is used for.
+   *
+   * @generated from field: string task_type = 1;
+   */
+  taskType: string;
+
+  /**
+   * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+   * The key is the name of the secret, and it's defined in the flytekit.
+   * flytekit uses the key to locate the desired secret within the map.
+   *
+   * @generated from field: map<string, string> secrets = 2;
+   */
+  secrets: { [key: string]: string };
+
+  /**
+   * The configuration to use for the connection, such as the endpoint, account name, etc.
+   * The key is the name of the config, and it's defined in the flytekit.
+   *
+   * @generated from field: map<string, string> configs = 3;
+   */
+  configs: { [key: string]: string };
+};
+
+/**
+ * Describes the message flyteidl2.core.Connection.
+ * Use `create(ConnectionSchema)` to create a new message.
+ */
+export const ConnectionSchema: GenMessage<Connection> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_security, 1);
+
+/**
  * OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
  *
  * @generated from message flyteidl2.core.OAuth2Client
@@ -139,7 +175,7 @@ export type OAuth2Client = Message<"flyteidl2.core.OAuth2Client"> & {
  * Use `create(OAuth2ClientSchema)` to create a new message.
  */
 export const OAuth2ClientSchema: GenMessage<OAuth2Client> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_security, 1);
+  messageDesc(file_flyteidl2_core_security, 2);
 
 /**
  * Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the
@@ -183,7 +219,7 @@ export type Identity = Message<"flyteidl2.core.Identity"> & {
  * Use `create(IdentitySchema)` to create a new message.
  */
 export const IdentitySchema: GenMessage<Identity> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_security, 2);
+  messageDesc(file_flyteidl2_core_security, 3);
 
 /**
  * OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.
@@ -244,7 +280,7 @@ export type OAuth2TokenRequest = Message<"flyteidl2.core.OAuth2TokenRequest"> & 
  * Use `create(OAuth2TokenRequestSchema)` to create a new message.
  */
 export const OAuth2TokenRequestSchema: GenMessage<OAuth2TokenRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_security, 3);
+  messageDesc(file_flyteidl2_core_security, 4);
 
 /**
  * Type of the token requested.
@@ -264,7 +300,7 @@ export enum OAuth2TokenRequest_Type {
  * Describes the enum flyteidl2.core.OAuth2TokenRequest.Type.
  */
 export const OAuth2TokenRequest_TypeSchema: GenEnum<OAuth2TokenRequest_Type> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_security, 3, 0);
+  enumDesc(file_flyteidl2_core_security, 4, 0);
 
 /**
  * SecurityContext holds security attributes that apply to tasks.
@@ -306,5 +342,5 @@ export type SecurityContext = Message<"flyteidl2.core.SecurityContext"> & {
  * Use `create(SecurityContextSchema)` to create a new message.
  */
 export const SecurityContextSchema: GenMessage<SecurityContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_security, 4);
+  messageDesc(file_flyteidl2_core_security, 5);
 
