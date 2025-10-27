@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -301,12 +302,19 @@ func TestBuildPodTemplate(t *testing.T) {
 	}
 
 	customServiceAccount := "custom-sa"
+	customArgs := []string{"sleep", "300"}
 
 	customPodSpec :=
 		&core.K8SPod{
 			PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
 				Tolerations:        toleration,
 				ServiceAccountName: customServiceAccount,
+				Containers: []corev1.Container{
+					{
+						Name: "ray-head",
+						Args: customArgs,
+					},
+				},
 			}),
 			Metadata: &core.K8SObjectMetadata{
 				Labels:      map[string]string{"new-label-1": "val1"},
@@ -323,6 +331,7 @@ func TestBuildPodTemplate(t *testing.T) {
 	assert.Equal(t, expectedLabels, podSpec.Labels)
 	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
 	assert.Equal(t, customServiceAccount, podSpec.Spec.ServiceAccountName)
+	assert.Equal(t, customArgs, podSpec.Spec.Containers[0].Args)
 
 	workerGroupSpec := plugins.WorkerGroupSpec{K8SPod: customPodSpec}
 	podSpec, err = buildWorkerPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &workerGroupSpec)

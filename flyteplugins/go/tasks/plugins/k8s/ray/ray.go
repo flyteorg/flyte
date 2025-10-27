@@ -341,8 +341,6 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		},
 	}
 
-	primaryContainer.Args = []string{}
-
 	primaryContainer.Env = append(primaryContainer.Env, envs...)
 
 	ports := []v1.ContainerPort{
@@ -401,8 +399,6 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	// They should always be the same, so we could hard code here.
 
 	primaryContainer.Name = "ray-worker"
-
-	primaryContainer.Args = []string{}
 
 	envs := []v1.EnvVar{
 		{
