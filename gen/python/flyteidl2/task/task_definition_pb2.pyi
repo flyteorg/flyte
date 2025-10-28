@@ -41,7 +41,16 @@ class TaskIdentifier(_message.Message):
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class TaskTriggersSummary(_message.Message):
-    __slots__ = ["automation_spec", "stats"]
+    __slots__ = ["details", "stats"]
+    class TriggerDetails(_message.Message):
+        __slots__ = ["name", "active", "automation_spec"]
+        NAME_FIELD_NUMBER: _ClassVar[int]
+        ACTIVE_FIELD_NUMBER: _ClassVar[int]
+        AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
+        name: str
+        active: bool
+        automation_spec: _common_pb2.TriggerAutomationSpec
+        def __init__(self, name: _Optional[str] = ..., active: bool = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
     class TriggerStats(_message.Message):
         __slots__ = ["total", "active"]
         TOTAL_FIELD_NUMBER: _ClassVar[int]
@@ -49,11 +58,11 @@ class TaskTriggersSummary(_message.Message):
         total: int
         active: int
         def __init__(self, total: _Optional[int] = ..., active: _Optional[int] = ...) -> None: ...
-    AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
+    DETAILS_FIELD_NUMBER: _ClassVar[int]
     STATS_FIELD_NUMBER: _ClassVar[int]
-    automation_spec: _common_pb2.TriggerAutomationSpec
+    details: TaskTriggersSummary.TriggerDetails
     stats: TaskTriggersSummary.TriggerStats
-    def __init__(self, automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., stats: _Optional[_Union[TaskTriggersSummary.TriggerStats, _Mapping]] = ...) -> None: ...
+    def __init__(self, details: _Optional[_Union[TaskTriggersSummary.TriggerDetails, _Mapping]] = ..., stats: _Optional[_Union[TaskTriggersSummary.TriggerStats, _Mapping]] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
     __slots__ = ["deployed_by", "short_name", "deployed_at", "environment_name", "triggers_summary"]

@@ -109,6 +109,34 @@
         }
       }
     },
+    "ListTasksResponseListTasksMetadata": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Total number of tasks without filters applied"
+        },
+        "filtered_total": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of tasks matching the applied filters."
+        }
+      }
+    },
+    "ListVersionsResponseVersionResponse": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "deployed_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time the task version was deployed"
+        }
+      }
+    },
     "ResourcesResourceEntry": {
       "type": "object",
       "properties": {
@@ -2073,8 +2101,30 @@
         "token": {
           "type": "string",
           "description": "Pagination token for the next page of tasks."
+        },
+        "metadata": {
+          "$ref": "#/definitions/ListTasksResponseListTasksMetadata",
+          "title": "Metadata for the ListTasksResponse"
         }
       }
+    },
+    "taskListVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ListVersionsResponseVersionResponse"
+          },
+          "title": "Version with deployed_at"
+        },
+        "token": {
+          "type": "string",
+          "description": "Pagination token for the next page of versions."
+        }
+      },
+      "description": "Response message for listing versions."
     },
     "taskNamedLiteral": {
       "type": "object",
@@ -2222,6 +2272,28 @@
       },
       "description": "TaskIdentifier is the unique identifier for a task."
     },
+    "taskTaskName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this task belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this task belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
+        }
+      },
+      "description": "Name of a task. It may have multiple versions deployed."
+    },
     "taskTaskSpec": {
       "type": "object",
       "properties": {
@@ -2285,11 +2357,25 @@
     "taskTaskTriggersSummary": {
       "type": "object",
       "properties": {
-        "automation_spec": {
-          "$ref": "#/definitions/taskTriggerAutomationSpec"
+        "details": {
+          "$ref": "#/definitions/taskTaskTriggersSummaryTriggerDetails"
         },
         "stats": {
           "$ref": "#/definitions/TaskTriggersSummaryTriggerStats"
+        }
+      }
+    },
+    "taskTaskTriggersSummaryTriggerDetails": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec"
         }
       }
     },
