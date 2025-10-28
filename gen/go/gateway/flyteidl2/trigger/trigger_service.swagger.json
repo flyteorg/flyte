@@ -1111,6 +1111,28 @@
       },
       "description": "SecurityContext holds security attributes that apply to tasks."
     },
+    "flyteidl2triggerTriggerDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonTriggerIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/triggerTriggerMetadata"
+        },
+        "spec": {
+          "$ref": "#/definitions/triggerTriggerSpec"
+        },
+        "status": {
+          "$ref": "#/definitions/triggerTriggerStatus"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "description": "Optional automation spec."
+        }
+      },
+      "title": "Full details about a trigger stored in DB"
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -1398,7 +1420,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1407,7 +1429,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1416,7 +1438,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1476,28 +1498,6 @@
         }
       },
       "title": "Light-weight information about trigger for a list view"
-    },
-    "triggerTriggerDetails": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonTriggerIdentifier"
-        },
-        "metadata": {
-          "$ref": "#/definitions/triggerTriggerMetadata"
-        },
-        "spec": {
-          "$ref": "#/definitions/triggerTriggerSpec"
-        },
-        "status": {
-          "$ref": "#/definitions/triggerTriggerStatus"
-        },
-        "automation_spec": {
-          "$ref": "#/definitions/taskTriggerAutomationSpec",
-          "description": "Optional automation spec."
-        }
-      },
-      "title": "Full details about a trigger stored in DB"
     },
     "triggerTriggerMetadata": {
       "type": "object",
