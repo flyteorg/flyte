@@ -2666,7 +2666,7 @@
         },
         "duration_ms": {
           "type": "string",
-          "format": "int64",
+          "format": "uint64",
           "description": "Duration of the action in milliseconds."
         }
       },
