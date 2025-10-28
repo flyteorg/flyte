@@ -200,6 +200,10 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 
 	driverPod := sparkJob.GetDriverPod()
 	if driverPod != nil {
+		if driverPod.GetPrimaryContainerName() != "" {
+			primaryContainerName = driverPod.GetPrimaryContainerName()
+		}
+
 		if driverPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
@@ -209,15 +213,12 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
 			}
 
-			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
+			podSpec, err = flytek8s.MergeBasePodSpecOntoTemplate(podSpec, customPodSpec, primaryContainerName, flytek8s.PrimaryInitContainerTemplateName)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		if driverPod.GetPrimaryContainerName() != "" {
-			primaryContainerName = driverPod.GetPrimaryContainerName()
-		}
 	}
 
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
@@ -253,6 +254,10 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 
 	executorPod := sparkJob.GetExecutorPod()
 	if executorPod != nil {
+		if executorPod.GetPrimaryContainerName() != "" {
+			primaryContainerName = executorPod.GetPrimaryContainerName()
+		}
+
 		if executorPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
@@ -262,13 +267,10 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
 			}
 
-			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
+			podSpec, err = flytek8s.MergeBasePodSpecOntoTemplate(podSpec, customPodSpec, primaryContainerName, flytek8s.PrimaryInitContainerTemplateName)
 			if err != nil {
 				return nil, err
 			}
-		}
-		if executorPod.GetPrimaryContainerName() != "" {
-			primaryContainerName = executorPod.GetPrimaryContainerName()
 		}
 	}
 
