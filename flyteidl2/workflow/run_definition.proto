@@ -154,6 +154,18 @@ message ActionMetadata {
 
   // If this run was initiated by a trigger, this will store the trigger identifier.
   common.TriggerIdentifier trigger_id = 11;
+
+  // Environment name
+  string environment_name = 12;
+
+  // Function name
+  string funtion_name = 13;
+
+  // Trigger name
+  string trigger_name = 14;
+
+  // Trigger Type
+  task.TriggerAutomationSpec trigger_type = 15;
 }
 
 // TODO: define phase transitions
@@ -192,6 +204,9 @@ message ActionStatus {
 
   // cache status of the action's latest attempt
   flyteidl2.core.CatalogCacheStatus cache_status = 5;
+
+  // Duration of the action in milliseconds.
+  optional int64 duration_ms = 6;
 }
 
 // Lightweight representation of an action.
