@@ -116,6 +116,9 @@ type ApplicationConfig struct {
 
 	// Enabling this will instruct operator to use storage (s3/gcs/etc) to offload workflow execution inputs instead of storing them inline in the CRD.
 	UseOffloadedInputs bool `json:"useOffloadedInputs" pflag:",Use offloaded inputs for workflows."`
+
+	InjectUserAnnotations bool   `json:"injectUserAnnotations"`
+	UserAnnotationPrefix  string `json:"userAnnotationPrefix"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -199,6 +202,17 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 	return &admin.Envs{
 		Values: envs,
 	}
+}
+
+func (a *ApplicationConfig) GetInjectUserAnnotations() bool {
+	return a.InjectUserAnnotations
+}
+
+func (a *ApplicationConfig) GetUserAnnotationPrefix() string {
+	if a.UserAnnotationPrefix == "" {
+		return "flyte.ai/user-"
+	}
+	return a.UserAnnotationPrefix
 }
 
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object

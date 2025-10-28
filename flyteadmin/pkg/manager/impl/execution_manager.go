@@ -590,6 +590,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		annotations = executionConfig.GetAnnotations().GetValues()
 	}
 
+	annotations = m.addUserAnnotations(ctx, annotations)
+
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
 		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
@@ -1025,6 +1027,9 @@ func (m *ExecutionManager) launchExecution(
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
+	annotations = m.addUserAnnotations(ctx, annotations)
+
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
 		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
@@ -2048,6 +2053,36 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 		}
 	}
 	return initialLabels, nil
+}
+
+// addUserAnnotations automatically injects user identity information as annotations when enabled in config.
+// This allows tracking which user submitted each workflow execution and enables user-based authorization.
+func (m *ExecutionManager) addUserAnnotations(ctx context.Context, initialAnnotations map[string]string) map[string]string {
+	// Check if user annotation injection is enabled
+	if !m.config.ApplicationConfiguration().GetTopLevelConfig().GetInjectUserAnnotations() {
+		return initialAnnotations
+	}
+
+	// Get user identity from authentication context
+	principal := getUser(ctx)
+	if principal == "" {
+		// If no user context exists, return annotations unchanged
+		logger.Debugf(ctx, "No user principal found in context, skipping user annotation injection")
+		return initialAnnotations
+	}
+
+	if initialAnnotations == nil {
+		initialAnnotations = make(map[string]string)
+	}
+
+	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetUserAnnotationPrefix()
+	principalKey := prefix + "principal"
+	if _, exists := initialAnnotations[principalKey]; !exists {
+		initialAnnotations[principalKey] = principal
+		logger.Debugf(ctx, "Injected user annotation %s=%s", principalKey, principal)
+	}
+
+	return initialAnnotations
 }
 
 func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error) {

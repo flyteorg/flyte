@@ -61,6 +61,8 @@ flyteadmin:
     - "metadata"
     - "admin"
   useOffloadedWorkflowClosure: false
+  injectUserAnnotations: false
+  userAnnotationPrefix: "flyte.ai/user-"
 database:
   postgres:
     port: 30001

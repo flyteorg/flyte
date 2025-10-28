@@ -6332,3 +6332,56 @@ func TestQueryTemplate(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestAddUserAnnotations(t *testing.T) {
+	principal := "test-user@example.com"
+
+	t.Run("enabled with user context", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = "flyte.ai/user-"
+
+		manager := ExecutionManager{config: mockConfig}
+
+		identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-principal"])
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("disabled", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = false
+
+		manager := ExecutionManager{config: mockConfig}
+
+		identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.NotContains(t, result, "flyte.ai/user-principal")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("no user context", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+
+		manager := ExecutionManager{config: mockConfig}
+		ctx := context.Background()
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.NotContains(t, result, "flyte.ai/user-principal")
+		assert.Equal(t, "value", result["existing"])
+	})
+}
