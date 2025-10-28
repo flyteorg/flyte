@@ -77,11 +77,11 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkConfig := getSparkConfig(taskCtx, &sparkJob)
-	driverSpec, err := createDriverSpec(ctx, taskCtx, sparkConfig)
+	driverSpec, err := createDriverSpec(ctx, taskCtx, sparkConfig, &sparkJob)
 	if err != nil {
 		return nil, err
 	}
-	executorSpec, err := createExecutorSpec(ctx, taskCtx, sparkConfig)
+	executorSpec, err := createExecutorSpec(ctx, taskCtx, sparkConfig, &sparkJob)
 	if err != nil {
 		return nil, err
 	}
@@ -173,13 +173,36 @@ type driverSpec struct {
 	sparkSpec *sparkOp.DriverSpec
 }
 
-func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*driverSpec, error) {
+func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*driverSpec, error) {
 	// Spark driver pods should always run as non-interruptible
 	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
 	}
+
+	driverPod := sparkJob.GetDriverPod()
+	if driverPod != nil {
+		if driverPod.GetPodSpec() != nil {
+			var customPodSpec *v1.PodSpec
+
+			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
+			if err != nil {
+				return nil, errors.Errorf(errors.BadTaskSpecification,
+					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
+			}
+
+			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if driverPod.GetPrimaryContainerName() != "" {
+			primaryContainerName = driverPod.GetPrimaryContainerName()
+		}
+	}
+
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
@@ -205,11 +228,33 @@ type executorSpec struct {
 	serviceAccountName string
 }
 
-func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*executorSpec, error) {
+func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*executorSpec, error) {
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, err
 	}
+
+	executorPod := sparkJob.GetExecutorPod()
+	if executorPod != nil {
+		if executorPod.GetPodSpec() != nil {
+			var customPodSpec *v1.PodSpec
+
+			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
+			if err != nil {
+				return nil, errors.Errorf(errors.BadTaskSpecification,
+					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
+			}
+
+			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if executorPod.GetPrimaryContainerName() != "" {
+			primaryContainerName = executorPod.GetPrimaryContainerName()
+		}
+	}
+
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err

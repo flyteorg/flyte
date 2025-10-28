@@ -3,6 +3,7 @@ package flytek8s
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -2692,7 +2693,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podSpec, *resultPodSpec))
 		assert.True(t, reflect.DeepEqual(objectMeta, *resultObjectMeta))
@@ -2702,6 +2703,11 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
 			Name:                   primaryContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-termination-log",
+		}
+
+		primaryInitContainerTemplate := v1.Container{
+			Name:                   primaryInitContainerTemplateName,
+			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
 		podTemplate := v1.PodTemplate{
@@ -2719,6 +2725,9 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						primaryContainerTemplate,
+					},
+					InitContainers: []v1.Container{
+						primaryInitContainerTemplate,
 					},
 				},
 			},
@@ -2746,7 +2755,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 
 		// test that template podSpec is merged
@@ -2762,99 +2771,451 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 	})
 }
 
-func TestMergePodSpecs(t *testing.T) {
-	var priority int32 = 1
+func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 
-	podSpec1, _ := mergePodSpecs(nil, nil, "foo")
-	assert.Nil(t, podSpec1)
+	baseContainer1 := v1.Container{
+		Name:  "task-1",
+		Image: "task-image",
+	}
 
-	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo")
-	assert.Nil(t, podSpec2)
+	baseContainer2 := v1.Container{
+		Name:  "task-2",
+		Image: "task-image",
+	}
 
-	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo")
-	assert.Nil(t, podSpec3)
+	initContainer1 := v1.Container{
+		Name:  "task-init-1",
+		Image: "task-init-image",
+	}
 
-	podSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			v1.Container{
-				Name: "primary",
-				VolumeMounts: []v1.VolumeMount{
+	initContainer2 := v1.Container{
+		Name:  "task-init-2",
+		Image: "task-init-image",
+	}
+
+	tests := []struct {
+		name                     string
+		templatePodSpec          *v1.PodSpec
+		basePodSpec              *v1.PodSpec
+		primaryContainerName     string
+		primaryInitContainerName string
+		expectedResult           *v1.PodSpec
+		expectedError            error
+	}{
+		{
+			name:            "nil template",
+			templatePodSpec: nil,
+			basePodSpec:     &v1.PodSpec{},
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name:            "nil base",
+			templatePodSpec: &v1.PodSpec{},
+			basePodSpec:     nil,
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name:            "nil template and base",
+			templatePodSpec: nil,
+			basePodSpec:     nil,
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name: "template and base with no overlap",
+			templatePodSpec: &v1.PodSpec{
+				SchedulerName: "templateScheduler",
+			},
+			basePodSpec: &v1.PodSpec{
+				ServiceAccountName: "baseServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "templateScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+		},
+		{
+			name: "template and base with overlap",
+			templatePodSpec: &v1.PodSpec{
+				SchedulerName: "templateScheduler",
+			},
+			basePodSpec: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+		},
+		{
+			name: "template with default containers and base with no containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
 					{
-						Name:      "nccl",
-						MountPath: "abc",
+						Name:  "default",
+						Image: "default-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "default-init-image",
 					},
 				},
 			},
-			v1.Container{
-				Name: "bar",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
 			},
 		},
-		NodeSelector: map[string]string{
-			"baz": "bar",
-		},
-		Priority:      &priority,
-		SchedulerName: "overrideScheduler",
-		Tolerations: []v1.Toleration{
-			v1.Toleration{
-				Key: "bar",
+		{
+			name:            "template with no default containers and base containers",
+			templatePodSpec: &v1.PodSpec{},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
 			},
-			v1.Toleration{
-				Key: "baz",
+			expectedResult: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+		},
+		{
+			name: "template and base with matching containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			primaryContainerName:     "task-1",
+			primaryInitContainerName: "task-init-1",
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+				SchedulerName: "baseScheduler",
+			},
+		},
+		{
+			name: "template and base with no matching containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "not-matching",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "not-matching-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+		},
+		{
+			name: "template with default containers and base with containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "default",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "default-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1, baseContainer2},
+				InitContainers: []v1.Container{initContainer1, initContainer2},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+					{
+						Name:                   "task-2",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+					{
+						Name:                   "task-init-2",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+				SchedulerName: "baseScheduler",
+			},
+		},
+		{
+			name: "template with primary containers and base with containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "primary",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "primary-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1, baseContainer2},
+				InitContainers: []v1.Container{initContainer1, initContainer2},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+					baseContainer2,
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+					initContainer2,
+				},
+				SchedulerName: "baseScheduler",
+			},
+			primaryContainerName:     "task-1",
+			primaryInitContainerName: "task-init-1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, mergeErr := MergeBasePodSpecOntoTemplate(tt.templatePodSpec, tt.basePodSpec, tt.primaryContainerName, tt.primaryInitContainerName)
+			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, mergeErr)
+		})
+	}
+}
+
+func TestMergeOverlayPodSpecOntoBase(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		basePodSpec    *v1.PodSpec
+		overlayPodSpec *v1.PodSpec
+		expectedResult *v1.PodSpec
+		expectedError  error
+	}{
+		{
+			name:           "nil overlay",
+			basePodSpec:    &v1.PodSpec{},
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base",
+			basePodSpec:    nil,
+			overlayPodSpec: &v1.PodSpec{},
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base and overlay",
+			basePodSpec:    nil,
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name: "base and overlay no overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+		},
+		{
+			name: "base and overlay with no matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "overlay-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "overlay-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
 			},
 		},
 	}
 
-	defaultContainerTemplate := v1.Container{
-		Name:                   defaultContainerTemplateName,
-		TerminationMessagePath: "/dev/default-termination-log",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, mergeErr := MergeOverlayPodSpecOntoBase(tt.basePodSpec, tt.overlayPodSpec)
+			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, mergeErr)
+		})
 	}
-
-	primaryContainerTemplate := v1.Container{
-		Name:                   primaryContainerTemplateName,
-		TerminationMessagePath: "/dev/primary-termination-log",
-	}
-
-	podTemplateSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			defaultContainerTemplate,
-			primaryContainerTemplate,
-		},
-		HostNetwork: true,
-		NodeSelector: map[string]string{
-			"foo": "bar",
-		},
-		SchedulerName: "defaultScheduler",
-		Tolerations: []v1.Toleration{
-			v1.Toleration{
-				Key: "foo",
-			},
-		},
-	}
-
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary")
-	assert.Nil(t, err)
-
-	// validate a PodTemplate-only field
-	assert.Equal(t, podTemplateSpec.HostNetwork, mergedPodSpec.HostNetwork)
-	// validate a PodSpec-only field
-	assert.Equal(t, podSpec.Priority, mergedPodSpec.Priority)
-	// validate an overwritten PodTemplate field
-	assert.Equal(t, podSpec.SchedulerName, mergedPodSpec.SchedulerName)
-	// validate a merged map
-	assert.Equal(t, len(podTemplateSpec.NodeSelector)+len(podSpec.NodeSelector), len(mergedPodSpec.NodeSelector))
-	// validate an appended array
-	assert.Equal(t, len(podTemplateSpec.Tolerations)+len(podSpec.Tolerations), len(mergedPodSpec.Tolerations))
-
-	// validate primary container
-	primaryContainer := mergedPodSpec.Containers[0]
-	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
-	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
-	assert.Equal(t, 1, len(primaryContainer.VolumeMounts))
-
-	// validate default container
-	defaultContainer := mergedPodSpec.Containers[1]
-	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
-	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
 }
 
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
