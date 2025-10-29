@@ -6,6 +6,7 @@
 package config
 
 import (
+	"strings"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -344,11 +345,47 @@ type AcceleratorDeviceClassConfig struct {
 
 	// Toleration added to pods intended for unpartitioned nodes.
 	UnpartitionedToleration *v1.Toleration `json:"unpartitioned-toleration" pflag:"-,Toleration added to pods intended for unpartitioned nodes."`
+
+	// PodTemplate provides device-class-specific defaults for pods using this accelerator.
+	// Platform operators can define pod-level and container-level configuration that serves
+	// as a base template for tasks using this device class. Task-specific configurations
+	// can override these defaults.
+	//
+	// Precedence (lowest to highest):
+	//   1. Base PodTemplate (cluster/namespace defaults)
+	//   2. Device Class PodTemplate (this config) - device-specific defaults
+	//   3. Task PodSpec - task-specific values override device class for scalars
+	//
+	// Merge behavior (BASE semantics):
+	//   - Scalar fields: Task values WIN (device class provides defaults only)
+	//     Examples: schedulerName, dnsPolicy, hostNetwork
+	//   - Slice fields: Appended (device class values + task values)
+	//     Examples: tolerations, volumes, env vars
+	//   - Map fields: Merged (union with task values winning on conflicts)
+	//     Examples: nodeSelector, labels, annotations
+	//
+	// Container (and init container) template support:
+	//   - Containers named "default" provide defaults for ALL containers
+	//   - Containers named "primary" provide defaults for the primary container only
+	//   - Primary template is applied after default (primary wins for conflicts)
+	//   - Containers with other names are merged into containers in the base PodSpec with the same name
+	//   - Uses the same container template merging as base PodTemplates
+	PodTemplate *v1.PodTemplate `json:"pod-template" pflag:"-,PodTemplate providing defaults for this accelerator device class."`
 }
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.
 func GetK8sPluginConfig() *K8sPluginConfig {
-	return K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
+	cfg := K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
+
+	// Viper casts all keys in YAML configs to lowercase, but all the accelerator device classes should be uppercase.
+	// See: https://github.com/spf13/viper/issues/260
+	acceleratorDeviceClasses := make(map[string]AcceleratorDeviceClassConfig)
+	for key, value := range cfg.AcceleratorDeviceClasses {
+		acceleratorDeviceClasses[strings.ToUpper(key)] = value
+	}
+	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
+
+	return cfg
 }
 
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.

@@ -252,6 +252,10 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 			if deviceClassConfig.UnpartitionedToleration != nil {
 				accelConfig.UnpartitionedToleration = deviceClassConfig.UnpartitionedToleration
 			}
+			// Override PodTemplate if specified
+			if deviceClassConfig.PodTemplate != nil {
+				accelConfig.PodTemplate = deviceClassConfig.PodTemplate
+			}
 		} else {
 			logger.Warnf(context.TODO(), "Device class '%s' not found in AcceleratorDeviceClasses configuration, falling back to global GPU config. Available device classes: %v",
 				deviceClass, getConfiguredDeviceClasses(cfg.AcceleratorDeviceClasses))
@@ -562,6 +566,13 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	UpdatePod(tCtx.TaskExecutionMetadata(), resourceRequests, podSpec)
 	if primaryContainer.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
 		primaryContainer.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
+	}
+
+	// Apply device-class-specific PodTemplate (if applicable)
+	// This provides device-specific defaults while allowing task configs to override
+	podSpec, err = applyAcceleratorDeviceClassPodTemplate(ctx, podSpec, extendedResources, primaryContainerName, primaryInitContainerName)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	// merge PodSpec and ObjectMeta with configuration pod template (if exists)
@@ -964,6 +975,48 @@ func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.Pod
 	}
 
 	mergedPodSpec.InitContainers = mergedInitContainers
+
+	return mergedPodSpec, nil
+}
+
+// applyAcceleratorDeviceClassPodTemplate applies device-class-specific PodTemplate configuration
+// to the provided PodSpec using MergeBasePodSpecOntoTemplate. The device class PodTemplate serves as a base,
+// with task PodSpec values taking precedence.
+//
+// See AcceleratorDeviceClassConfig.PodTemplate documentation for detailed merge semantics,
+// precedence rules, and container template support.
+func applyAcceleratorDeviceClassPodTemplate(
+	ctx context.Context,
+	podSpec *v1.PodSpec,
+	extendedResources *core.ExtendedResources,
+	primaryContainerName string,
+	primaryInitContainerName string,
+) (*v1.PodSpec, error) {
+	if extendedResources == nil || extendedResources.GetGpuAccelerator() == nil {
+		return podSpec, nil
+	}
+
+	gpuAccelerator := extendedResources.GetGpuAccelerator()
+	accelConfig := getAcceleratorConfig(gpuAccelerator)
+
+	if accelConfig.PodTemplate == nil {
+		return podSpec, nil
+	}
+
+	deviceClass := gpuAccelerator.GetDeviceClass().String()
+	logger.Infof(ctx, "Applying PodTemplate for accelerator device class: %s", deviceClass)
+
+	// Use MergeBasePodSpecOntoTemplate with device class pod template as base
+	mergedPodSpec, err := MergeBasePodSpecOntoTemplate(&accelConfig.PodTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	if err != nil {
+		return nil, pluginserrors.Wrapf(
+			pluginserrors.DownstreamSystemError,
+			err,
+			"Failed to merge PodTemplate for accelerator device class '%s'. "+
+				"Check k8s.accelerator-device-classes[%s].pod-template configuration.",
+			deviceClass, deviceClass,
+		)
+	}
 
 	return mergedPodSpec, nil
 }

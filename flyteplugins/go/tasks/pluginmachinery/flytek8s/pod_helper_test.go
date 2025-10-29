@@ -1286,6 +1286,367 @@ func TestApplyGPUNodeSelectors_DeviceClassOverrides(t *testing.T) {
 	})
 }
 
+func TestApplyAcceleratorDeviceClassPodTemplate(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("nil handling", func(t *testing.T) {
+		// Sub-test: Nil extendedResources returns immediately
+		t.Run("nil extendedResources", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				nil, // nil extendedResources
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Nil accelerator returns immediately
+		t.Run("nil accelerator", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Nil PodTemplate does nothing
+		t.Run("nil PodTemplate", func(t *testing.T) {
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+					"NVIDIA_GPU": {
+						ResourceName: "nvidia.com/gpu",
+						// PodTemplate: nil
+					},
+				},
+			}))
+
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+	})
+
+	t.Run("scalar field merge behavior", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								SchedulerName: "volcano", // Device class default
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		// Sub-test: Task value overrides device class default
+		t.Run("task overrides device class", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "default-scheduler"} // Task-specific value
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			// Task value should win (BASE semantics)
+			assert.Equal(t, "default-scheduler", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Device class default applies when task doesn't set value
+		t.Run("device class applies when task unset", func(t *testing.T) {
+			podSpec := &v1.PodSpec{} // Task doesn't set schedulerName
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			// Device class default should apply
+			assert.Equal(t, "volcano", podSpec.SchedulerName)
+		})
+	})
+
+	t.Run("merge semantics validation", func(t *testing.T) {
+		// Single comprehensive test validating slice append and map merge behaviors
+		overrideToleration := v1.Toleration{
+			Key:      "tpu-topology",
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Tolerations: []v1.Toleration{overrideToleration},
+								NodeSelector: map[string]string{
+									"new-key":      "new-value",
+									"existing-key": "default-value",
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		existingToleration := v1.Toleration{
+			Key:      "interruptible",
+			Value:    "true",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		podSpec := &v1.PodSpec{
+			Tolerations: []v1.Toleration{existingToleration},
+			NodeSelector: map[string]string{
+				"existing-key": "task-value",
+				"keep-key":     "keep-value",
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			"primary",
+			"primary-init",
+		)
+		assert.NoError(t, err)
+
+		// Validate slice append: tolerations from both device class and task
+		assert.Len(t, podSpec.Tolerations, 2)
+		assert.Contains(t, podSpec.Tolerations, existingToleration)
+		assert.Contains(t, podSpec.Tolerations, overrideToleration)
+
+		// Validate map merge: task values win for conflicts, device class adds new keys
+		assert.Len(t, podSpec.NodeSelector, 3)
+		assert.Equal(t, "task-value", podSpec.NodeSelector["existing-key"]) // Task wins
+		assert.Equal(t, "keep-value", podSpec.NodeSelector["keep-key"])     // Task only
+		assert.Equal(t, "new-value", podSpec.NodeSelector["new-key"])       // Device class adds
+	})
+
+	t.Run("default container template affects all containers", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "default",
+										Env: []v1.EnvVar{
+											{Name: "NVIDIA_VISIBLE_DEVICES", Value: "all"},
+											{Name: "NCCL_DEBUG", Value: "INFO"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "main", Image: "app:1.0"},
+				{Name: "sidecar", Image: "monitor:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				},
+			},
+			"main",
+			"main-init",
+		)
+		assert.NoError(t, err)
+
+		// Both containers should have the env vars from the default template
+		assert.Len(t, podSpec.Containers, 2)
+		for i, container := range podSpec.Containers {
+			assert.Contains(t, container.Env, v1.EnvVar{Name: "NVIDIA_VISIBLE_DEVICES", Value: "all"},
+				"Container %d (%s) missing env var", i, container.Name)
+			assert.Contains(t, container.Env, v1.EnvVar{Name: "NCCL_DEBUG", Value: "INFO"},
+				"Container %d (%s) missing env var", i, container.Name)
+		}
+	})
+
+	t.Run("primary container template affects only primary container", func(t *testing.T) {
+		gpuLimit := resource.MustParse("8")
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "primary",
+										Env: []v1.EnvVar{
+											{Name: "CUDA_VISIBLE_DEVICES", Value: "all"},
+										},
+										Resources: v1.ResourceRequirements{
+											Limits: v1.ResourceList{
+												v1.ResourceName("nvidia.com/gpu"): gpuLimit,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "workload", Image: "gpu-app:1.0"},
+				{Name: "metrics", Image: "prometheus:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				},
+			},
+			"workload",
+			"workload-init",
+		)
+		assert.NoError(t, err)
+
+		// Primary container should have the template applied
+		assert.Contains(t, podSpec.Containers[0].Env, v1.EnvVar{Name: "CUDA_VISIBLE_DEVICES", Value: "all"})
+		gpuResource := podSpec.Containers[0].Resources.Limits[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "8", gpuResource.String())
+
+		// Sidecar should NOT have the template
+		assert.NotContains(t, podSpec.Containers[1].Env, v1.EnvVar{Name: "CUDA_VISIBLE_DEVICES", Value: "all"})
+		assert.Empty(t, podSpec.Containers[1].Resources.Limits)
+	})
+
+	t.Run("both default and primary templates merge correctly", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "default",
+										Env: []v1.EnvVar{
+											{Name: "BASE_VAR", Value: "from-default"},
+											{Name: "SHARED_VAR", Value: "shared"},
+										},
+										ImagePullPolicy: v1.PullAlways,
+									},
+									{
+										Name: "primary",
+										Env: []v1.EnvVar{
+											{Name: "BASE_VAR", Value: "from-primary"},
+											{Name: "PRIMARY_ONLY", Value: "primary-value"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "trainer", Image: "tpu-trainer:1.0"},
+				{Name: "logger", Image: "log-collector:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			"trainer",
+			"trainer-init",
+		)
+		assert.NoError(t, err)
+
+		// Primary container: primary template overrides default for BASE_VAR
+		primaryContainer := podSpec.Containers[0]
+		assert.Equal(t, v1.PullAlways, primaryContainer.ImagePullPolicy)                                  // from default
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "BASE_VAR", Value: "from-primary"})      // primary wins
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "SHARED_VAR", Value: "shared"})          // from default
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "PRIMARY_ONLY", Value: "primary-value"}) // from primary
+
+		// Non-primary container: only gets default template
+		sidecarContainer := podSpec.Containers[1]
+		assert.Equal(t, v1.PullAlways, sidecarContainer.ImagePullPolicy)
+		assert.Contains(t, sidecarContainer.Env, v1.EnvVar{Name: "BASE_VAR", Value: "from-default"})
+		assert.Contains(t, sidecarContainer.Env, v1.EnvVar{Name: "SHARED_VAR", Value: "shared"})
+		assert.NotContains(t, sidecarContainer.Env, v1.EnvVar{Name: "PRIMARY_ONLY", Value: "primary-value"})
+	})
+}
+
 func updatePod(t *testing.T) {
 	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
@@ -1841,6 +2202,127 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 			)
 		})
 	}
+}
+
+// TestToK8sPodDeviceClass validates the complete three-way merge order through ToK8sPodSpec:
+// Task PodSpec > Device Class PodTemplate > Base PodTemplate
+func TestToK8sPodDeviceClass(t *testing.T) {
+	t.Run("device class template merge", func(t *testing.T) {
+		// 1. Configure base PodTemplate in DefaultPodTemplateStore
+		basePodTemplate := v1.PodTemplate{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "base-template",
+				Namespace: "test-namespace",
+			},
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					SchedulerName: "base-scheduler",
+					DNSPolicy:     v1.DNSClusterFirst,
+					Tolerations: []v1.Toleration{
+						{Key: "base-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+					},
+					NodeSelector: map[string]string{
+						"base-key": "base-value",
+					},
+				},
+			},
+		}
+		DefaultPodTemplateStore.Store(&basePodTemplate)
+
+		// 2. Configure device class PodTemplate for AMAZON_NEURON
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"AMAZON_NEURON": {
+					ResourceName: "aws.amazon.com/neuron",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								SchedulerName:     "device-scheduler", // Overrides base
+								PriorityClassName: "device-priority",
+								Tolerations: []v1.Toleration{
+									{Key: "device-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+								},
+								NodeSelector: map[string]string{
+									"device-key": "device-value",
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		// 3. Configure task-level K8SPod override
+		taskPodSpec := v1.PodSpec{
+			PriorityClassName: "task-priority",
+			Tolerations: []v1.Toleration{
+				{Key: "task-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+			},
+			NodeSelector: map[string]string{
+				"task-key": "task-value",
+			},
+			Containers: []v1.Container{
+				{
+					Name: "primary-container",
+				},
+			},
+		}
+		taskPodSpecStruct, err := utils.MarshalObjToStruct(taskPodSpec)
+		assert.NoError(t, err)
+
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.Metadata = &core.TaskMetadata{
+			PodTemplateName: "base-template",
+		}
+		taskTemplate.ExtendedResources = &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				DeviceClass: core.GPUAccelerator_AMAZON_NEURON,
+			},
+		}
+
+		k8sPod := &core.K8SPod{
+			PodSpec:              taskPodSpecStruct,
+			PrimaryContainerName: "primary-container",
+		}
+
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{}, nil, "", k8sPod)
+		podSpec, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+
+		// 4. Validate merge order: Task > Device Class > Base Template
+
+		// Scalars: Device class scalar overrides base
+		assert.Equal(t, "device-scheduler", podSpec.SchedulerName,
+			"Device class SchedulerName should override base")
+
+		// Device class scalar overridden by task
+		assert.Equal(t, "task-priority", podSpec.PriorityClassName,
+			"Task PriorityClassName should override device class")
+
+		// Base scalar preserved (not in task or device class)
+		assert.Equal(t, v1.DNSClusterFirst, podSpec.DNSPolicy,
+			"Base DNSPolicy should be preserved")
+
+		// Slices: All tolerations should be appended
+		tolerationKeys := make([]string, 0)
+		for _, tol := range podSpec.Tolerations {
+			tolerationKeys = append(tolerationKeys, tol.Key)
+		}
+		assert.Contains(t, tolerationKeys, "base-tol",
+			"Base toleration should be present")
+		assert.Contains(t, tolerationKeys, "device-tol",
+			"Device class toleration should be present")
+		assert.Contains(t, tolerationKeys, "task-tol",
+			"Task toleration should be present")
+
+		// Maps: All node selector entries should be merged
+		assert.Equal(t, "base-value", podSpec.NodeSelector["base-key"],
+			"Base node selector should be present")
+		assert.Equal(t, "device-value", podSpec.NodeSelector["device-key"],
+			"Device class node selector should be present")
+		assert.Equal(t, "task-value", podSpec.NodeSelector["task-key"],
+			"Task node selector should be present")
+	})
 }
 
 func TestDemystifyPending(t *testing.T) {
