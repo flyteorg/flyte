@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/workflow/run_logs_service.proto",
+    "title": "flyteidl2/app/app_logs_service.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "RunLogsService"
+      "name": "AppLogsService"
     }
   ],
   "consumes": [
@@ -17,55 +17,51 @@
   ],
   "paths": {},
   "definitions": {
-    "TailLogsResponseLogs": {
+    "appReplicaIdentifier": {
       "type": "object",
       "properties": {
-        "lines": {
+        "app_id": {
+          "$ref": "#/definitions/flyteidl2appIdentifier",
+          "description": "ID of the app."
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "appReplicaIdentifierList": {
+      "type": "object",
+      "properties": {
+        "replicas": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/dataplaneLogLine"
-          },
-          "description": "Structured log lines."
+            "$ref": "#/definitions/appReplicaIdentifier"
+          }
         }
-      },
-      "description": "A batch of logs."
+      }
     },
-    "commonActionIdentifier": {
+    "dataplaneContainerIdentifier": {
       "type": "object",
       "properties": {
-        "run": {
-          "$ref": "#/definitions/commonRunIdentifier",
-          "description": "Identifier for the run."
-        },
-        "name": {
+        "cluster_name": {
           "type": "string",
-          "description": "Name of the action. Must be unique within the run."
+          "description": "The name of the cluster."
+        },
+        "kubernetes_namespace": {
+          "type": "string",
+          "description": "The namespace in Kubernetes."
+        },
+        "kubernetes_pod_name": {
+          "type": "string",
+          "description": "The name of the pod in Kubernetes."
+        },
+        "kubernetes_container_name": {
+          "type": "string",
+          "description": "The name of the container in Kubernetes."
         }
       },
-      "description": "Unique identifier of an action."
-    },
-    "commonRunIdentifier": {
-      "type": "object",
-      "properties": {
-        "org": {
-          "type": "string",
-          "description": "Org this run belongs to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Project this run belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain this run belongs to."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing."
-        }
-      },
-      "description": "Unique identifier of a run."
+      "description": "Parameters of environment in which logs were collected. Should contain everything\nnecessary to identify location of task execution logs in cloud providers."
     },
     "dataplaneLogLine": {
       "type": "object",
@@ -93,19 +89,76 @@
       "default": "UNKNOWN",
       "description": " - UNKNOWN: The originator of the log line is unknown.\n - USER: The originator of the log line is the user application.\n - SYSTEM: The originator of the log line is the system."
     },
-    "flyteidl2workflowTailLogsResponse": {
+    "flyteidl2appIdentifier": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org that the app belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project that the app belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain that the app belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name that the user provided for the app."
+        }
+      }
+    },
+    "flyteidl2appLogLines": {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replica_id": {
+          "$ref": "#/definitions/appReplicaIdentifier"
+        },
+        "structured_lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/dataplaneLogLine"
+          }
+        }
+      }
+    },
+    "flyteidl2appLogLinesBatch": {
       "type": "object",
       "properties": {
         "logs": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/TailLogsResponseLogs"
-          },
-          "description": "One or more batches of logs."
+            "$ref": "#/definitions/flyteidl2appLogLines"
+          }
         }
-      },
-      "description": "Reponse message for tailing logs."
+      }
+    },
+    "flyteidl2appTailLogsResponse": {
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "$ref": "#/definitions/appReplicaIdentifierList",
+          "description": "Replicas lists the replicas that the logs are being tailed for. This is expected to be the first\nmessage to be sent in the stream but also can be sent at any later time to update the list of\nreplicas being tailed."
+        },
+        "log_lines": {
+          "$ref": "#/definitions/logsdataplaneLogLines",
+          "description": "The latest log lines for the application.\nDeprecated, use batches instead."
+        },
+        "batches": {
+          "$ref": "#/definitions/flyteidl2appLogLinesBatch",
+          "description": "The latest log lines for the application."
+        }
+      }
     },
     "googlerpcStatus": {
       "type": "object",
@@ -129,6 +182,35 @@
         }
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "logsdataplaneLogLines": {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Each line is separated by either CRLF, CR or LF, which are included\nat the ends of the lines. This lets clients know whether log emitter\nwanted to overwrite the previous line (LF) or append a new line (CRLF)."
+        },
+        "container_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The index of the container in the list of containers. If the request was made with a single container identifier,\nthis value will always be 0. Otherwise, it'll be an index into the last list of containers sent in the stream."
+        },
+        "container": {
+          "$ref": "#/definitions/dataplaneContainerIdentifier",
+          "description": "The container identifier."
+        },
+        "structured_lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/dataplaneLogLine"
+          },
+          "description": "Each line is separated by either CRLF, CR or LF, which are included\nat the ends of the lines. This lets clients know whether log emitter\nwanted to overwrite the previous line (LF) or append a new line (CRLF)."
+        }
+      }
     },
     "protobufAny": {
       "type": "object",

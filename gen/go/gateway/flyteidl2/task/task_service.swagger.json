@@ -338,47 +338,6 @@
         }
       }
     },
-    "commonListRequest": {
-      "type": "object",
-      "properties": {
-        "limit": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Indicates the number of resources to be returned.\n+required"
-        },
-        "token": {
-          "type": "string",
-          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
-        },
-        "sort_by": {
-          "$ref": "#/definitions/commonSort",
-          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonFilter"
-          },
-          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
-        },
-        "raw_filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
-        },
-        "sort_by_fields": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonSort"
-          },
-          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
-        }
-      }
-    },
     "commonOrganization": {
       "type": "object",
       "properties": {
@@ -952,36 +911,6 @@
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
     "coreInputBindingData": {
       "type": "object",
       "properties": {
@@ -1421,32 +1350,6 @@
       },
       "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
     },
-    "coreSecurityContext": {
-      "type": "object",
-      "properties": {
-        "run_as": {
-          "$ref": "#/definitions/flyteidl2coreIdentity",
-          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
-        },
-        "secrets": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidl2coreSecret"
-          },
-          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        },
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreOAuth2TokenRequest"
-          },
-          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        }
-      },
-      "description": "SecurityContext holds security attributes that apply to tasks."
-    },
     "coreSharedMemory": {
       "type": "object",
       "properties": {
@@ -1546,7 +1449,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidl2coreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -1580,7 +1483,7 @@
           "description": "This can be used to customize task handling at execution time for the same task type."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
         },
         "extended_resources": {
@@ -1746,6 +1649,47 @@
       "default": "ACTION_NONE",
       "title": "- ACTION_VIEW_FLYTE_INVENTORY: Read Flyte workflows, tasks and launch plans\n - ACTION_VIEW_FLYTE_EXECUTIONS: View Flyte executions\n - ACTION_REGISTER_FLYTE_INVENTORY: Register new versions of Flyte workflows, tasks and launch plans\n - ACTION_CREATE_FLYTE_EXECUTIONS: Create new Flyte workflow and task executions\n - ACTION_ADMINISTER_PROJECT: Create new projects and update project descriptions\n - ACTION_MANAGE_PERMISSIONS: Add users, roles and update role assignments.\n - ACTION_ADMINISTER_ACCOUNT: Manage billing, account-wide settings\n - ACTION_MANAGE_CLUSTER: Operations for clusters\n - ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE\n - ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT\n - ACTION_EDIT_UNUSED_ATTRIBUTES: Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE\n - ACTION_SUPPORT_SYSTEM_LOGS: View system logs"
     },
+    "flyteidl2commonListRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Indicates the number of resources to be returned.\n+required"
+        },
+        "token": {
+          "type": "string",
+          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
+        },
+        "sort_by": {
+          "$ref": "#/definitions/commonSort",
+          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonFilter"
+          },
+          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
+        },
+        "raw_filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
+        },
+        "sort_by_fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonSort"
+          },
+          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
+        }
+      }
+    },
     "flyteidl2coreEnumType": {
       "type": "object",
       "properties": {
@@ -1758,6 +1702,36 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidl2coreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
     "flyteidl2coreIdentity": {
       "type": "object",
@@ -1832,6 +1806,32 @@
         }
       },
       "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
+    },
+    "flyteidl2coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
     },
     "flyteidl2coreTaskMetadata": {
       "type": "object",
@@ -2192,7 +2192,7 @@
           "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
         }
       }
