@@ -752,7 +752,7 @@
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         },
         "actions": {
           "type": "array",
@@ -791,7 +791,7 @@
           "description": "The role designates the permitted set of actions which can be applied to the resource."
         },
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         }
       },
       "description": "A policy binding represents a role (a set of actions) defined on a resource."
@@ -830,29 +830,6 @@
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "commonResource": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "$ref": "#/definitions/commonOrganization"
-        },
-        "domain": {
-          "$ref": "#/definitions/commonDomain"
-        },
-        "project": {
-          "$ref": "#/definitions/commonProject"
-        },
-        "workflow": {
-          "$ref": "#/definitions/commonWorkflow"
-        },
-        "launch_plan": {
-          "$ref": "#/definitions/commonLaunchPlan"
-        },
-        "cluster": {
-          "$ref": "#/definitions/commonClusterIdentifier"
         }
       }
     },
@@ -1630,6 +1607,29 @@
             "$ref": "#/definitions/commonSort"
           },
           "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
+        }
+      }
+    },
+    "flyteidl2commonResource": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/commonOrganization"
+        },
+        "domain": {
+          "$ref": "#/definitions/commonDomain"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        },
+        "workflow": {
+          "$ref": "#/definitions/commonWorkflow"
+        },
+        "launch_plan": {
+          "$ref": "#/definitions/commonLaunchPlan"
+        },
+        "cluster": {
+          "$ref": "#/definitions/commonClusterIdentifier"
         }
       }
     },
