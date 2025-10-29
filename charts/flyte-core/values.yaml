@@ -976,7 +976,7 @@ configmap:
         - "admin"
       eventVersion: 2
       injectUserAnnotations: false
-      userAnnotationPrefix: "flyte.ai/user-"
+      userAnnotationPrefix: "flyte.ai"
       testing:
         host: http://flyteadmin
 

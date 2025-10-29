@@ -2064,10 +2064,15 @@ func (m *ExecutionManager) addUserAnnotations(ctx context.Context, initialAnnota
 	}
 
 	// Get user identity from authentication context
-	principal := getUser(ctx)
+	identityContext := auth.IdentityContextFromContext(ctx)
+	var principal string
+	if identityContext.UserInfo() != nil {
+		principal = identityContext.UserInfo().GetEmail()
+	}
+
 	if principal == "" {
-		// If no user context exists, return annotations unchanged
-		logger.Debugf(ctx, "No user principal found in context, skipping user annotation injection")
+		// If no email is available, skip annotation injection
+		logger.Debugf(ctx, "No user email found in context, skipping user annotation injection")
 		return initialAnnotations
 	}
 
@@ -2076,10 +2081,10 @@ func (m *ExecutionManager) addUserAnnotations(ctx context.Context, initialAnnota
 	}
 
 	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetUserAnnotationPrefix()
-	principalKey := prefix + "principal"
-	if _, exists := initialAnnotations[principalKey]; !exists {
-		initialAnnotations[principalKey] = principal
-		logger.Debugf(ctx, "Injected user annotation %s=%s", principalKey, principal)
+	userKey := prefix + "/user"
+	if _, exists := initialAnnotations[userKey]; !exists {
+		initialAnnotations[userKey] = principal
+		logger.Debugf(ctx, "Injected user annotation %s=%s", userKey, principal)
 	}
 
 	return initialAnnotations

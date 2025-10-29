@@ -62,7 +62,7 @@ flyteadmin:
     - "admin"
   useOffloadedWorkflowClosure: false
   injectUserAnnotations: false
-  userAnnotationPrefix: "flyte.ai/user-"
+  userAnnotationPrefix: "flyte.ai"
 database:
   postgres:
     port: 30001

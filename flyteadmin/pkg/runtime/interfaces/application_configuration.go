@@ -210,7 +210,7 @@ func (a *ApplicationConfig) GetInjectUserAnnotations() bool {
 
 func (a *ApplicationConfig) GetUserAnnotationPrefix() string {
 	if a.UserAnnotationPrefix == "" {
-		return "flyte.ai/user-"
+		return "flyte.ai"
 	}
 	return a.UserAnnotationPrefix
 }
