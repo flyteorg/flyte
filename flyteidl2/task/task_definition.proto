@@ -75,13 +75,21 @@ message TaskIdentifier {
 }
 
 message TaskTriggersSummary {
+  reserved 1;
+
+  message TriggerDetails {
+    string name = 1;
+    bool active = 2;
+    TriggerAutomationSpec automation_spec = 3;
+  }
+
   message TriggerStats {
     uint32 total = 1;
     uint32 active = 2;
   }
 
   oneof summary {
-    TriggerAutomationSpec automation_spec = 1;
+    TriggerDetails details = 3;
     TriggerStats stats = 2;
   }
 }

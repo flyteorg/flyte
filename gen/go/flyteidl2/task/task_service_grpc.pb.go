@@ -22,6 +22,7 @@ const (
 	TaskService_DeployTask_FullMethodName     = "/flyteidl2.task.TaskService/DeployTask"
 	TaskService_GetTaskDetails_FullMethodName = "/flyteidl2.task.TaskService/GetTaskDetails"
 	TaskService_ListTasks_FullMethodName      = "/flyteidl2.task.TaskService/ListTasks"
+	TaskService_ListVersions_FullMethodName   = "/flyteidl2.task.TaskService/ListVersions"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -34,6 +35,8 @@ type TaskServiceClient interface {
 	GetTaskDetails(ctx context.Context, in *GetTaskDetailsRequest, opts ...grpc.CallOption) (*GetTaskDetailsResponse, error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
+	// Lists all versions for a task.
+	ListVersions(ctx context.Context, in *ListVersionsRequest, opts ...grpc.CallOption) (*ListVersionsResponse, error)
 }
 
 type taskServiceClient struct {
@@ -71,6 +74,15 @@ func (c *taskServiceClient) ListTasks(ctx context.Context, in *ListTasksRequest,
 	return out, nil
 }
 
+func (c *taskServiceClient) ListVersions(ctx context.Context, in *ListVersionsRequest, opts ...grpc.CallOption) (*ListVersionsResponse, error) {
+	out := new(ListVersionsResponse)
+	err := c.cc.Invoke(ctx, TaskService_ListVersions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations should embed UnimplementedTaskServiceServer
 // for forward compatibility
@@ -81,6 +93,8 @@ type TaskServiceServer interface {
 	GetTaskDetails(context.Context, *GetTaskDetailsRequest) (*GetTaskDetailsResponse, error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
+	// Lists all versions for a task.
+	ListVersions(context.Context, *ListVersionsRequest) (*ListVersionsResponse, error)
 }
 
 // UnimplementedTaskServiceServer should be embedded to have forward compatible implementations.
@@ -95,6 +109,9 @@ func (UnimplementedTaskServiceServer) GetTaskDetails(context.Context, *GetTaskDe
 }
 func (UnimplementedTaskServiceServer) ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTasks not implemented")
+}
+func (UnimplementedTaskServiceServer) ListVersions(context.Context, *ListVersionsRequest) (*ListVersionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListVersions not implemented")
 }
 
 // UnsafeTaskServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -162,6 +179,24 @@ func _TaskService_ListTasks_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskService_ListVersions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListVersionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).ListVersions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_ListVersions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).ListVersions(ctx, req.(*ListVersionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -180,6 +215,10 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListTasks",
 			Handler:    _TaskService_ListTasks_Handler,
+		},
+		{
+			MethodName: "ListVersions",
+			Handler:    _TaskService_ListVersions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

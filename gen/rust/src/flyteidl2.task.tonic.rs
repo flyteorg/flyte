@@ -159,6 +159,31 @@ pub mod task_service_client {
                 .insert(GrpcMethod::new("flyteidl2.task.TaskService", "ListTasks"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn list_versions(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListVersionsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListVersionsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.task.TaskService/ListVersions",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.task.TaskService", "ListVersions"));
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -187,6 +212,13 @@ pub mod task_service_server {
             request: tonic::Request<super::ListTasksRequest>,
         ) -> std::result::Result<
             tonic::Response<super::ListTasksResponse>,
+            tonic::Status,
+        >;
+        async fn list_versions(
+            &self,
+            request: tonic::Request<super::ListVersionsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListVersionsResponse>,
             tonic::Status,
         >;
     }
@@ -386,6 +418,51 @@ pub mod task_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = ListTasksSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.task.TaskService/ListVersions" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListVersionsSvc<T: TaskService>(pub Arc<T>);
+                    impl<
+                        T: TaskService,
+                    > tonic::server::UnaryService<super::ListVersionsRequest>
+                    for ListVersionsSvc<T> {
+                        type Response = super::ListVersionsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListVersionsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as TaskService>::list_versions(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = ListVersionsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
