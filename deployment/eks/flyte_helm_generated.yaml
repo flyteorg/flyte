@@ -178,6 +178,7 @@ data:
           - openid
     flyteadmin:
       eventVersion: 2
+      injectUserAnnotations: false
       metadataStoragePrefix:
       - metadata
       - admin
@@ -186,6 +187,7 @@ data:
       roleNameKey: iam.amazonaws.com/role
       testing:
         host: http://flyteadmin
+      userAnnotationPrefix: flyte.ai
     server:
       grpc:
         port: 8089
@@ -917,7 +919,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
+        configChecksum: "92eb8185e329f235bc30c58f192a9ab6a2840f64a379ef53fe2571bc468ab22"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1343,7 +1345,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
+        configChecksum: "92eb8185e329f235bc30c58f192a9ab6a2840f64a379ef53fe2571bc468ab22"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
