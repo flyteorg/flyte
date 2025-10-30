@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -30,7 +31,7 @@ func (in *MutableStruct) ResetDirty() {
 	in.isDirty = false
 }
 
-func (in MutableStruct) IsDirty() bool {
+func (in *MutableStruct) IsDirty() bool {
 	return in.isDirty
 }
 
@@ -157,7 +158,8 @@ func (in *DynamicNodeStatus) Equals(o *DynamicNodeStatus) bool {
 	if in == nil || o == nil {
 		return false
 	}
-	return in.Phase == o.Phase && in.Reason == o.Reason
+
+	return in.Phase == o.Phase && in.Reason == o.Reason && in.IsFailurePermanent == o.IsFailurePermanent && in.Error.Equals(o.Error)
 }
 
 type WorkflowNodePhase int
@@ -196,6 +198,25 @@ func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
 	}
 }
 
+func (in *WorkflowNodeStatus) Equals(other *WorkflowNodeStatus) bool {
+	if in == nil && other == nil {
+		return true
+	}
+	if in == nil || other == nil {
+		return false
+	}
+
+	if in.ExecutionError != nil && other.ExecutionError != nil {
+		if !proto.Equal(in.ExecutionError, other.ExecutionError) {
+			return false
+		}
+	} else if in.ExecutionError != other.ExecutionError {
+		return false
+	}
+
+	return in.Phase == other.Phase
+}
+
 type GateNodePhase int
 
 const (
@@ -217,6 +238,18 @@ func (in *GateNodeStatus) SetGateNodePhase(phase GateNodePhase) {
 		in.SetDirty()
 		in.Phase = phase
 	}
+}
+
+func (in *GateNodeStatus) Equals(other *GateNodeStatus) bool {
+	if in == nil && other == nil {
+		return true
+	}
+
+	if in == nil || other == nil {
+		return false
+	}
+
+	return in.Phase == other.Phase
 }
 
 type ArrayNodePhase int
@@ -328,7 +361,7 @@ func (in *ArrayNodeStatus) SetTaskPhaseVersion(taskPhaseVersion uint32) {
 	}
 }
 
-func (in *ArrayNodeStatus) DeepCopyInto(out *ArrayNodeStatus) {
+func (in *ArrayNodeStatus) deepCopyInto(out *ArrayNodeStatus) {
 	*out = *in
 	out.MutableStruct = in.MutableStruct
 
@@ -345,8 +378,34 @@ func (in *ArrayNodeStatus) DeepCopy() *ArrayNodeStatus {
 	}
 
 	out := &ArrayNodeStatus{}
-	in.DeepCopyInto(out)
+	in.deepCopyInto(out)
 	return out
+}
+
+func (in *ArrayNodeStatus) Equals(other *ArrayNodeStatus) bool {
+	if in == nil && other == nil {
+		return true
+	}
+
+	if in == nil || other == nil {
+		return false
+	}
+
+	if in.ExecutionError != nil && other.ExecutionError != nil {
+		if !proto.Equal(in.ExecutionError, other.ExecutionError) {
+			return false
+		}
+	} else if in.ExecutionError != other.ExecutionError {
+		return false
+	}
+
+	return in.Phase == other.Phase &&
+		reflect.DeepEqual(in.SubNodePhases, other.SubNodePhases) &&
+		reflect.DeepEqual(in.SubNodeTaskPhases, other.SubNodeTaskPhases) &&
+		reflect.DeepEqual(in.SubNodeRetryAttempts, other.SubNodeRetryAttempts) &&
+		reflect.DeepEqual(in.SubNodeSystemFailures, other.SubNodeSystemFailures) &&
+		reflect.DeepEqual(in.SubNodeDeltaTimestamps, other.SubNodeDeltaTimestamps) &&
+		in.TaskPhaseVersion == other.TaskPhaseVersion
 }
 
 type NodeStatus struct {
@@ -358,7 +417,6 @@ type NodeStatus struct {
 	LastUpdatedAt        *metav1.Time  `json:"lastUpdatedAt,omitempty"`
 	LastAttemptStartedAt *metav1.Time  `json:"laStartedAt,omitempty"`
 	Message              string        `json:"message,omitempty"`
-	DataDir              DataReference `json:"-"`
 	OutputDir            DataReference `json:"outputDir,omitempty"`
 	Attempts             uint32        `json:"attempts,omitempty"`
 	SystemFailures       uint32        `json:"systemFailures,omitempty"`
@@ -368,13 +426,11 @@ type NodeStatus struct {
 	CacheStatus *core.CatalogCacheStatus `json:"cacheStatus,omitempty"`
 
 	// This is useful only for branch nodes. If this is set, then it can be used to determine if execution can proceed
-	ParentNode    *NodeID                  `json:"parentNode,omitempty"`
-	ParentTask    *TaskExecutionIdentifier `json:"-"`
-	BranchStatus  *BranchNodeStatus        `json:"branchStatus,omitempty"`
-	SubNodeStatus map[NodeID]*NodeStatus   `json:"subNodeStatus,omitempty"`
+	ParentNode    *NodeID                `json:"parentNode,omitempty"`
+	BranchStatus  *BranchNodeStatus      `json:"branchStatus,omitempty"`
+	SubNodeStatus map[NodeID]*NodeStatus `json:"subNodeStatus,omitempty"`
 	// We can store the outputs at this layer
 
-	// TODO not used delete
 	WorkflowNodeStatus *WorkflowNodeStatus `json:"workflowNodeStatus,omitempty"`
 
 	TaskNodeStatus    *TaskNodeStatus    `json:",omitempty"`
@@ -386,6 +442,8 @@ type NodeStatus struct {
 
 	// Not Persisted
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
+	DataDir                  DataReference                `json:"-"`
+	ParentTask               *TaskExecutionIdentifier     `json:"-"`
 }
 
 func (in *NodeStatus) IsDirty() bool {
@@ -470,13 +528,13 @@ func (in *NodeStatus) GetArrayNodeStatus() MutableArrayNodeStatus {
 	return in.ArrayNodeStatus
 }
 
-func (in NodeStatus) VisitNodeStatuses(visitor NodeStatusVisitFn) {
+func (in *NodeStatus) VisitNodeStatuses(visitor NodeStatusVisitFn) {
 	for n, s := range in.SubNodeStatus {
 		visitor(n, s)
 	}
 }
 
-func (in NodeStatus) GetDynamicNodeStatus() MutableDynamicNodeStatus {
+func (in *NodeStatus) GetDynamicNodeStatus() MutableDynamicNodeStatus {
 	if in.DynamicNodeStatus == nil {
 		return nil
 	}
@@ -760,7 +818,7 @@ func (in *NodeStatus) GetOrCreateWorkflowStatus() MutableWorkflowNodeStatus {
 	return in.WorkflowNodeStatus
 }
 
-func (in NodeStatus) GetTaskNodeStatus() ExecutableTaskNodeStatus {
+func (in *NodeStatus) GetTaskNodeStatus() ExecutableTaskNodeStatus {
 	// Explicitly return nil here to avoid a misleading non-nil interface.
 	if in.TaskNodeStatus == nil {
 		return nil
@@ -838,13 +896,11 @@ func (in *NodeStatus) SetOutputDir(d DataReference) {
 	in.OutputDir = d
 }
 
+// Equals compares this node status against another node status.
+// Note: The comparison omits unserialized values like parentTask, dataDir, outputDir
 func (in *NodeStatus) Equals(other *NodeStatus) bool {
 	// Assuming in is never nil
 	if other == nil {
-		return false
-	}
-
-	if in.IsDirty() != other.IsDirty() {
 		return false
 	}
 
@@ -852,6 +908,54 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		if in.Phase == NodePhaseSucceeded || in.Phase == NodePhaseFailed {
 			return true
 		}
+	}
+
+	if in.Phase != other.Phase {
+		return false
+	}
+
+	if in.QueuedAt != nil && other.QueuedAt != nil {
+		if *in.QueuedAt != *other.QueuedAt {
+			return false
+		}
+	} else if in.QueuedAt != other.QueuedAt {
+		return false
+	}
+
+	if in.StartedAt != nil && other.StartedAt != nil {
+		if *in.StartedAt != *other.StartedAt {
+			return false
+		}
+	} else if in.StartedAt != other.StartedAt {
+		return false
+	}
+
+	if in.StoppedAt != nil && other.StoppedAt != nil {
+		if *in.StoppedAt != *other.StoppedAt {
+			return false
+		}
+	} else if in.StoppedAt != other.StoppedAt {
+		return false
+	}
+
+	if in.LastUpdatedAt != nil && other.LastUpdatedAt != nil {
+		if *in.LastUpdatedAt != *other.LastUpdatedAt {
+			return false
+		}
+	} else if in.LastUpdatedAt != other.LastUpdatedAt {
+		return false
+	}
+
+	if in.LastAttemptStartedAt != nil && other.LastAttemptStartedAt != nil {
+		if *in.LastAttemptStartedAt != *other.LastAttemptStartedAt {
+			return false
+		}
+	} else if in.LastAttemptStartedAt != other.LastAttemptStartedAt {
+		return false
+	}
+
+	if in.Message != other.Message {
+		return false
 	}
 
 	if in.Attempts != other.Attempts {
@@ -862,19 +966,7 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		return false
 	}
 
-	if in.Phase != other.Phase {
-		return false
-	}
-
-	if !in.TaskNodeStatus.Equals(other.TaskNodeStatus) {
-		return false
-	}
-
-	if in.DataDir != other.DataDir {
-		return false
-	}
-
-	if in.OutputDir != other.OutputDir {
+	if in.Cached != other.Cached {
 		return false
 	}
 
@@ -884,10 +976,6 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		}
 	} else if !(in.ParentNode == other.ParentNode) {
 		// Both are not nil
-		return false
-	}
-
-	if !reflect.DeepEqual(in.ParentTask, other.ParentTask) {
 		return false
 	}
 
@@ -905,7 +993,23 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		}
 	}
 
-	return in.BranchStatus.Equals(other.BranchStatus) && in.DynamicNodeStatus.Equals(other.DynamicNodeStatus)
+	if !in.WorkflowNodeStatus.Equals(other.WorkflowNodeStatus) {
+		return false
+	}
+
+	if in.Error != nil && other.Error != nil {
+		if !proto.Equal(in.Error, other.Error) {
+			return false
+		}
+	} else if in.Error != other.Error {
+		return false
+	}
+
+	return in.BranchStatus.Equals(other.BranchStatus) &&
+		in.TaskNodeStatus.Equals(other.TaskNodeStatus) &&
+		in.DynamicNodeStatus.Equals(other.DynamicNodeStatus) &&
+		in.GateNodeStatus.Equals(other.GateNodeStatus) &&
+		in.ArrayNodeStatus.Equals(other.ArrayNodeStatus)
 }
 
 func (in *NodeStatus) GetExecutionError() *core.ExecutionError {
@@ -913,33 +1017,6 @@ func (in *NodeStatus) GetExecutionError() *core.ExecutionError {
 		return in.Error.ExecutionError
 	}
 	return nil
-}
-
-// THIS IS NOT AUTO GENERATED
-func (in *CustomState) DeepCopyInto(out *CustomState) {
-	if in == nil || *in == nil {
-		return
-	}
-
-	raw, err := json.Marshal(in)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(raw, out)
-	if err != nil {
-		return
-	}
-}
-
-func (in *CustomState) DeepCopy() *CustomState {
-	if in == nil || *in == nil {
-		return nil
-	}
-
-	out := &CustomState{}
-	in.DeepCopyInto(out)
-	return out
 }
 
 type TaskNodeStatus struct {
@@ -1005,23 +1082,23 @@ func (in *TaskNodeStatus) SetPhaseVersion(version uint32) {
 	in.SetDirty()
 }
 
-func (in TaskNodeStatus) GetPhase() int {
+func (in *TaskNodeStatus) GetPhase() int {
 	return in.Phase
 }
 
-func (in TaskNodeStatus) GetLastPhaseUpdatedAt() time.Time {
+func (in *TaskNodeStatus) GetLastPhaseUpdatedAt() time.Time {
 	return in.LastPhaseUpdatedAt
 }
 
-func (in TaskNodeStatus) GetPreviousNodeExecutionCheckpointPath() DataReference {
+func (in *TaskNodeStatus) GetPreviousNodeExecutionCheckpointPath() DataReference {
 	return in.PreviousNodeExecutionCheckpointPath
 }
 
-func (in TaskNodeStatus) GetPhaseVersion() uint32 {
+func (in *TaskNodeStatus) GetPhaseVersion() uint32 {
 	return in.PhaseVersion
 }
 
-func (in TaskNodeStatus) GetCleanupOnFailure() bool {
+func (in *TaskNodeStatus) GetCleanupOnFailure() bool {
 	return in.CleanupOnFailure
 }
 
@@ -1034,7 +1111,7 @@ func (in *TaskNodeStatus) UpdatePhase(phase int, phaseVersion uint32) {
 	in.PhaseVersion = phaseVersion
 }
 
-func (in *TaskNodeStatus) DeepCopyInto(out *TaskNodeStatus) {
+func (in *TaskNodeStatus) deepCopyInto(out *TaskNodeStatus) {
 	if in == nil {
 		return
 	}
@@ -1056,7 +1133,7 @@ func (in *TaskNodeStatus) DeepCopy() *TaskNodeStatus {
 	}
 
 	out := &TaskNodeStatus{}
-	in.DeepCopyInto(out)
+	in.deepCopyInto(out)
 	return out
 }
 
@@ -1067,5 +1144,13 @@ func (in *TaskNodeStatus) Equals(other *TaskNodeStatus) bool {
 	if in == nil || other == nil {
 		return false
 	}
-	return in.Phase == other.Phase && in.PhaseVersion == other.PhaseVersion && in.PluginStateVersion == other.PluginStateVersion && bytes.Equal(in.PluginState, other.PluginState) && in.BarrierClockTick == other.BarrierClockTick
+
+	return in.Phase == other.Phase &&
+		in.PhaseVersion == other.PhaseVersion &&
+		bytes.Equal(in.PluginState, other.PluginState) &&
+		in.PluginStateVersion == other.PluginStateVersion &&
+		in.BarrierClockTick == other.BarrierClockTick &&
+		in.LastPhaseUpdatedAt == other.LastPhaseUpdatedAt &&
+		in.PreviousNodeExecutionCheckpointPath == other.PreviousNodeExecutionCheckpointPath &&
+		in.CleanupOnFailure == other.CleanupOnFailure
 }

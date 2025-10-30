@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
@@ -21,4 +23,24 @@ func (in *ExecutionError) UnmarshalJSON(b []byte) error {
 
 func (in *ExecutionError) DeepCopyInto(out *ExecutionError) {
 	*out = *in
+}
+
+func (in *ExecutionError) Equals(other *ExecutionError) bool {
+	if in == nil && other == nil {
+		return true
+	}
+
+	if in == nil || other == nil {
+		return false
+	}
+
+	if in.ExecutionError != nil && other.ExecutionError != nil {
+		if !proto.Equal(in.ExecutionError, other.ExecutionError) {
+			return false
+		}
+	} else if in.ExecutionError != other.ExecutionError {
+		return false
+	}
+
+	return true
 }
