@@ -51,6 +51,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -6330,5 +6331,137 @@ func TestQueryTemplate(t *testing.T) {
 
 		_, err := m.fillInTemplateArgs(ctx, q, otherInputs.GetLiterals())
 		assert.Error(t, err)
+	})
+}
+
+func TestAddUserAnnotations(t *testing.T) {
+	principal := "test-user@example.com"
+
+	t.Run("enabled with user context", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = "flyte.ai"
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.Equal(t, "test-user@example.com", result["flyte.ai/user"])
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("disabled", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = false
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.NotContains(t, result, "flyte.ai/user")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("no user context", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+
+		manager := ExecutionManager{config: mockConfig}
+		ctx := context.Background()
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.NotContains(t, result, "flyte.ai/user")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("enabled but no email", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = "flyte.ai"
+
+		manager := ExecutionManager{config: mockConfig}
+
+		// UserInfo with no email set
+		userInfo := &service.UserInfoResponse{}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		assert.NotContains(t, result, "flyte.ai/user")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("enabled with nil annotations map", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = "flyte.ai"
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, nil)
+
+		assert.Equal(t, "test-user@example.com", result["flyte.ai/user"])
+	})
+
+	t.Run("annotation already exists", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = "flyte.ai"
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"flyte.ai/user": "existing@example.com"})
+
+		// Should preserve existing annotation value
+		assert.Equal(t, "existing@example.com", result["flyte.ai/user"])
+	})
+
+	t.Run("uses default prefix when not configured", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectUserAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().UserAnnotationPrefix = ""
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addUserAnnotations(ctx, map[string]string{"existing": "value"})
+
+		// Should use default prefix "flyte.ai"
+		assert.Equal(t, "test-user@example.com", result["flyte.ai/user"])
+		assert.Equal(t, "value", result["existing"])
 	})
 }
