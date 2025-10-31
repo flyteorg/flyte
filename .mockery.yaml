@@ -30,3 +30,13 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'gen/go/flyteidl2/common/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/plugins/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/service/mocks'

@@ -45,7 +45,8 @@ jobs:
           key: ${{ runner.os }}-cargo-build-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-build-
-
+      - name: Temporarily modify the rust toolchain version
+        run: rustup override set stable
       - name: Output rust version for educational purposes
         run: rustup --version
       - name: Set Cargo.toml version from release tag
