@@ -36,7 +36,7 @@ func (i *InmemoryWorkflowStore) Delete(ctx context.Context, namespace, name stri
 	return nil
 }
 
-func (i *InmemoryWorkflowStore) Get(ctx context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error) {
+func (i *InmemoryWorkflowStore) Get(_ context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error) {
 	if m, ok := i.store[namespace]; ok {
 		if v, ok := m[name]; ok {
 			return v, nil
@@ -45,7 +45,7 @@ func (i *InmemoryWorkflowStore) Get(ctx context.Context, namespace, name string)
 	return nil, ErrWorkflowNotFound
 }
 
-func (i *InmemoryWorkflowStore) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
+func (i *InmemoryWorkflowStore) Update(_ context.Context, w *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
 	if w != nil {
 		if w.Name != "" && w.Namespace != "" {
 			if m, ok := i.store[w.Namespace]; ok {

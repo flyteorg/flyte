@@ -54,11 +54,11 @@ func (s staticNodeLookup) GetNodeExecutionStatus(_ context.Context, id v1alpha1.
 	return s.status[id]
 }
 
-func (s staticNodeLookup) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+func (s staticNodeLookup) ToNode(v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	return nil, nil
 }
 
-func (s staticNodeLookup) FromNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+func (s staticNodeLookup) FromNode(v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	return nil, nil
 }
 

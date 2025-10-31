@@ -19,6 +19,6 @@ func (t taskReader) GetTaskID() *core.Identifier {
 	return t.Id
 }
 
-func (t taskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
+func (t taskReader) Read(context.Context) (*core.TaskTemplate, error) {
 	return t.TaskTemplate, nil
 }

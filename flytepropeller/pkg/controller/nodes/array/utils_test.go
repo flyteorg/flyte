@@ -12,11 +12,11 @@ import (
 func TestAppendLiteral(t *testing.T) {
 	outputLiterals := make(map[string]*idlcore.Literal)
 	literalMaps := []map[string]*idlcore.Literal{
-		map[string]*idlcore.Literal{
+		{
 			"foo": nilLiteral,
 			"bar": nilLiteral,
 		},
-		map[string]*idlcore.Literal{
+		{
 			"foo": nilLiteral,
 			"bar": nilLiteral,
 		},
