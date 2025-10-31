@@ -11,6 +11,7 @@ import "flyteidl2/core/types.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -416,4 +417,34 @@ enum RunSource {
   RUN_SOURCE_WEB = 1;
   RUN_SOURCE_CLI = 2;
   RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+}
+
+// TaskGroup represents a group of runs for a specific task.
+message TaskGroup {
+  // Task name.
+  string task_name = 1;
+
+  // Environment name.
+  string environment_name = 2;
+
+  // Total number of runs for this task.
+  int64 total_runs = 3;
+
+  // Timestamp of the most recent run.
+  google.protobuf.Timestamp latest_run_time = 4;
+
+  // Recent run statuses, ordered from newest to oldest. Number of statuses determined by request.
+  repeated Phase recent_statuses = 5;
+
+  // Average failure rate of runs in this group (0.0 to 1.0).
+  // Computed as number of root actions with phase FAILED divided by total root actions.
+  double average_failure_rate = 6;
+
+  // Average duration of runs in this group.
+  google.protobuf.Duration average_duration = 7;
+
+  // Timestamp of the most recent finished run (terminal phase).
+  google.protobuf.Timestamp latest_finished_time = 8;
+
+  bool should_delete = 9;
 }
