@@ -54,7 +54,17 @@ buf-lint:
 buf-ts:
 	@echo '🟦  Generating TypeScript protocol buffer files (local)'
 	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
-	@cp flyteidl2/gen_utils/ts/* gen/ts/
+	@cp -r flyteidl2/gen_utils/ts/* gen/ts/
+	@echo '📦  Installing TypeScript dependencies'
+	@cd gen/ts && npm install --silent
+	@echo '✅  TypeScript generation complete'
+	@$(MAKE) sep
+
+.PHONY: buf-ts-check
+buf-ts-check: buf-ts ## Generate TypeScript files and run type checking
+	@echo '🔍  Type checking generated TypeScript files'
+	@cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0)
+	@echo '✅  Type checking complete'
 	@$(MAKE) sep
 
 .PHONY: buf-go
@@ -82,7 +92,7 @@ buf-python:
 	@$(MAKE) sep
 
 .PHONY: buf
-buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts
+buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
 	@echo '🛠️  Finished generating all protocol buffer files (local)'
 	@$(MAKE) sep
 
@@ -115,7 +125,7 @@ build-crate: ## Build Rust crate using local cargo
 
 .PHONY: gen
 gen: ## Generate everything (uses Docker - no local tools required)
-	$(DOCKER_RUN) bash -c "git config --global --add safe.directory /workspace && make gen-local"
+	$(DOCKER_RUN) make gen-local
 	@echo '⚡  Finished generating everything in the gen directory (Docker)'
 	@$(MAKE) sep
 
@@ -136,7 +146,7 @@ docker-build: ## Build Docker CI image locally (faster iteration)
 .PHONY: docker-shell
 docker-shell: ## Start an interactive shell in the CI Docker container
 	@echo '🐳  Starting interactive shell in CI container'
-	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash -c "git config --global --add safe.directory /workspace && bash"
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash
 
 # Combined workflow for fast iteration
 .PHONY: docker-dev

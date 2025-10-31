@@ -44,3 +44,4 @@ empty-config.yaml
 **/flyteidl_new.egg-info
 **/flyteidl.egg-info
 **/flyteidl2.egg-info
+node_modules
