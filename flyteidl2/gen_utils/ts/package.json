@@ -13,7 +13,9 @@
     "flyte2"
   ],
   "files": [
-    "flyteidl2"
+    "flyteidl2",
+    "buf",
+    "google"
   ],
   "dependencies": {
     "@bufbuild/protobuf": "^2.10.0"
