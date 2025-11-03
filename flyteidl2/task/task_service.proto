@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
 
@@ -21,6 +22,11 @@ service TaskService {
 
   // Lists tasks, one per task name, returning the latest version and who it was deployed by.
   rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists all versions for a task.
+  rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -93,4 +99,29 @@ message ListTasksResponse {
 
   // Metadata for the ListTasksResponse
   ListTasksMetadata metadata = 3;
+}
+
+// Request message for listing versions for a task.
+message ListVersionsRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  // Id of the task.
+  TaskName task_name = 2 [(buf.validate.field).required = true];
+}
+
+// Response message for listing versions.
+message ListVersionsResponse {
+  message VersionResponse {
+    string version = 1;
+
+    // The time the task version was deployed
+    google.protobuf.Timestamp deployed_at = 2 [(buf.validate.field).required = true];
+  }
+
+  // Version with deployed_at
+  repeated VersionResponse versions = 1;
+
+  // Pagination token for the next page of versions.
+  string token = 2;
 }

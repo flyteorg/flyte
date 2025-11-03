@@ -28,6 +28,30 @@ class Secret(_message.Message):
     env_var: str
     def __init__(self, group: _Optional[str] = ..., group_version: _Optional[str] = ..., key: _Optional[str] = ..., mount_requirement: _Optional[_Union[Secret.MountType, str]] = ..., env_var: _Optional[str] = ...) -> None: ...
 
+class Connection(_message.Message):
+    __slots__ = ["task_type", "secrets", "configs"]
+    class SecretsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class ConfigsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    SECRETS_FIELD_NUMBER: _ClassVar[int]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
+    secrets: _containers.ScalarMap[str, str]
+    configs: _containers.ScalarMap[str, str]
+    def __init__(self, task_type: _Optional[str] = ..., secrets: _Optional[_Mapping[str, str]] = ..., configs: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class OAuth2Client(_message.Message):
     __slots__ = ["client_id", "client_secret"]
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]

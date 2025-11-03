@@ -20,8 +20,9 @@ FROM golang:${GO_VERSION}-alpine AS go-source
 # Just copy from official image
 
 # Stage 2: Download Node.js (parallel)
-FROM node:${NODE_VERSION}-alpine AS node-source
-# Just copy from official image
+FROM node:${NODE_VERSION}-bookworm-slim AS node-source
+# Using Debian-based image for glibc compatibility with Ubuntu
+RUN npm install -g pnpm
 
 # Stage 3: Download uv and Python (parallel)
 FROM ubuntu:24.04 AS python-installer
@@ -91,11 +92,9 @@ RUN UV_PYTHON=$(uv python find ${PYTHON_VERSION}) && \
     ln -sf ${UV_PYTHON} /usr/local/bin/python3 && \
     ln -sf ${UV_PYTHON} /usr/local/bin/python
 
-# Copy Node.js from official image
-COPY --from=node-source /usr/local/bin/node /usr/local/bin/node
-COPY --from=node-source /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node-source /usr/local/bin/npx /usr/local/bin/npx
-COPY --from=node-source /usr/local/lib/node_modules /usr/local/lib/node_modules
+# Copy Node.js from official image (using Debian-based for glibc compatibility)
+# Copy the entire /usr/local structure to preserve npm/pnpm directory layout
+COPY --from=node-source /usr/local /usr/local
 
 # Install Rust (still need to run installer for architecture detection)
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${RUST_VERSION} --profile minimal
@@ -121,6 +120,7 @@ RUN echo "=== Tool Versions ===" && \
     echo "uv: $(uv --version)" && \
     echo "Node: $(node --version)" && \
     echo "npm: $(npm --version)" && \
+    echo "pnpm: $(pnpm --version)" && \
     echo "Rust: $(rustc --version)" && \
     echo "Cargo: $(cargo --version)" && \
     echo "Buf: $(buf --version)" && \
