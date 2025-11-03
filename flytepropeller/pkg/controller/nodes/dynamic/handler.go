@@ -98,7 +98,7 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
 			return handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoFailure(core.ExecutionError_USER, "DynamicWorkflowBuildFailed", err.Error(), nil),
-			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
+			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error(), IsFailurePermanent: true}, nil
 		}
 		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
