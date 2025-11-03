@@ -2336,10 +2336,6 @@
         "automation_spec": {
           "$ref": "#/definitions/taskTriggerAutomationSpec",
           "description": "Optional automation spec."
-        },
-        "description": {
-          "type": "string",
-          "title": "Optional description"
         }
       },
       "description": "Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint."
@@ -2358,6 +2354,10 @@
         "run_spec": {
           "$ref": "#/definitions/taskRunSpec",
           "description": "The run spec for triggered task."
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description"
         }
       },
       "description": "TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.\nThis is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id."
