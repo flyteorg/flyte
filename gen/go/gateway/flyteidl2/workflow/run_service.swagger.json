@@ -2169,6 +2169,10 @@
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description of environment"
         }
       },
       "description": "Environment for a task."

@@ -168,6 +168,9 @@ message TaskTrigger {
 
   // Optional automation spec.
   flyteidl2.task.TriggerAutomationSpec automation_spec = 3;
+
+  //  Optional description
+  optional string description = 4;
 }
 
 // TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.

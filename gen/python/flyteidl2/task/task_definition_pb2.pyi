@@ -115,14 +115,16 @@ class TaskDetails(_message.Message):
     def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., spec: _Optional[_Union[TaskSpec, _Mapping]] = ...) -> None: ...
 
 class TaskTrigger(_message.Message):
-    __slots__ = ["name", "spec", "automation_spec"]
+    __slots__ = ["name", "spec", "automation_spec", "description"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     name: str
     spec: TaskTriggerSpec
     automation_spec: _common_pb2.TriggerAutomationSpec
-    def __init__(self, name: _Optional[str] = ..., spec: _Optional[_Union[TaskTriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
+    description: str
+    def __init__(self, name: _Optional[str] = ..., spec: _Optional[_Union[TaskTriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...
 
 class TaskTriggerSpec(_message.Message):
     __slots__ = ["active", "inputs", "run_spec"]

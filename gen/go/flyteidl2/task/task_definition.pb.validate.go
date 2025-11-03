@@ -1376,6 +1376,10 @@ func (m *TaskTrigger) validate(all bool) error {
 		}
 	}
 
+	if m.Description != nil {
+		// no validation rules for Description
+	}
+
 	if len(errors) > 0 {
 		return TaskTriggerMultiError(errors)
 	}
