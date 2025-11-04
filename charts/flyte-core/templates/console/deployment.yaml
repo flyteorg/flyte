@@ -40,7 +40,7 @@ spec:
       priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
       {{- end }}
       containers:
-      - image: "{{ .Values.flyteconsole.image.repository }}:{{ .Values.flyteconsole.image.tag }}"
+      - image: "{{ tpl .Values.flyteconsole.image.repository . }}:{{ tpl .Values.flyteconsole.image.tag . }}"
         imagePullPolicy: "{{ .Values.flyteconsole.image.pullPolicy }}"
         name: flyteconsole
         envFrom:

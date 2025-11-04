@@ -34,7 +34,7 @@ template:
         valueFrom:
           fieldRef:
             fieldPath: metadata.name
-      image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+      image: "{{ tpl .Values.flytepropeller.image.repository . }}:{{ tpl .Values.flytepropeller.image.tag . }}"
       imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
       name: {{ index .Values.configmap.core.manager "pod-template-container-name" }}
       ports:

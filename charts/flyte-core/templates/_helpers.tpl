@@ -176,7 +176,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 
 {{- define "databaseSecret.volume" -}}
 {{- $secretName := tpl (.Values.common.databaseSecret.name | default "") . -}}
-{{- if $secretName }}
+{{- if $secretName -}}
 - name: {{ $secretName }}
   secret:
     secretName: {{ $secretName }}
@@ -185,7 +185,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 
 {{- define "databaseSecret.volumeMount" -}}
 {{- $secretName := tpl (.Values.common.databaseSecret.name | default "") . -}}
-{{- if $secretName }}
+{{- if $secretName -}}
 - mountPath: /etc/db
   name: {{ $secretName }}
 {{- end }}

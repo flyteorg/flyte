@@ -45,7 +45,7 @@ spec:
             {{- toYaml . | nindent 10 }}
             {{- end }}
           {{- end }}
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
           {{- with .Values.cluster_resource_manager.resources }}
