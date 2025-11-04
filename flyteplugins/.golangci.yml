@@ -1,0 +1,33 @@
+run:
+  skip-dirs:
+    - pkg/client
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosec
+    - gci
+    - goconst
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - protogetter
+linters-settings:
+  gci:
+    custom-order: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/flyteorg)
+    skip-generated: true
+issues:
+  exclude:
+    - copylocks

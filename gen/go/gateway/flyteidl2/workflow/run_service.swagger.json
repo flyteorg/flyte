@@ -62,15 +62,6 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
-    "ErrorInfoKind": {
-      "type": "string",
-      "enum": [
-        "KIND_UNSPECIFIED",
-        "KIND_USER",
-        "KIND_SYSTEM"
-      ],
-      "default": "KIND_UNSPECIFIED"
-    },
     "FilterFunction": {
       "type": "string",
       "enum": [
@@ -2667,11 +2658,20 @@
           "description": "Error message."
         },
         "kind": {
-          "$ref": "#/definitions/ErrorInfoKind",
+          "$ref": "#/definitions/workflowErrorInfoKind",
           "description": "Error kind."
         }
       },
       "description": "ErrorInfo captures details of an error."
+    },
+    "workflowErrorInfoKind": {
+      "type": "string",
+      "enum": [
+        "KIND_UNSPECIFIED",
+        "KIND_USER",
+        "KIND_SYSTEM"
+      ],
+      "default": "KIND_UNSPECIFIED"
     },
     "workflowGetActionDataResponse": {
       "type": "object",
