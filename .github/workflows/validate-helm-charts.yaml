@@ -21,7 +21,9 @@ jobs:
           sparse-checkout: charts
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v4.3.1
+        with:
+          version: v3.19.0
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -53,7 +55,7 @@ jobs:
             --chart-repos spark-operator=https://kubeflow.github.io/spark-operator \
             --chart-repos dask=https://helm.dask.org \
             --chart-repos bitnami=https://charts.bitnami.com/bitnami \
-            --chart-repos twuni=https://helm.twun.io \
+            --chart-repos twuni=https://twuni.github.io/docker-registry.helm \
             --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
 
   validate-manifests:
@@ -76,7 +78,9 @@ jobs:
             docker/sandbox-bundled/manifests
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v4.3.1
+        with:
+          version: v3.19.0
 
       - name: Install kubeconform
         run: |

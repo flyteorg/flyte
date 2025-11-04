@@ -42,7 +42,7 @@ spec:
           - {{ .Values.flyteadmin.configPath }}
           - migrate
           - run
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: run-migrations
           securityContext:
@@ -74,7 +74,7 @@ spec:
           {{- range .Values.flyteadmin.initialProjects }}
           - {{ . }}
           {{- end }}
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: seed-projects
           securityContext:
@@ -98,7 +98,7 @@ spec:
           - {{ .Values.flyteadmin.configPath }}
           - clusterresource
           - sync
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
           securityContext:
@@ -125,7 +125,7 @@ spec:
             {{- end }}
         {{- end }}
         - name: generate-secrets
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           command: ["/bin/sh", "-c"]
           args:
@@ -164,7 +164,7 @@ spec:
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
         {{- end }}
-        image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+        image: "{{ tpl .Values.flyteadmin.image.repository . }}:{{ tpl .Values.flyteadmin.image.tag . }}"
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin
         ports:

@@ -175,17 +175,19 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 # Optional blocks for secret mount
 
 {{- define "databaseSecret.volume" -}}
-{{- with .Values.common.databaseSecret.name -}}
-- name: {{ . }}
+{{- $secretName := tpl (.Values.common.databaseSecret.name | default "") . -}}
+{{- if $secretName -}}
+- name: {{ $secretName }}
   secret:
-    secretName: {{ . }}
+    secretName: {{ $secretName }}
 {{- end }}
 {{- end }}
 
 {{- define "databaseSecret.volumeMount" -}}
-{{- with .Values.common.databaseSecret.name -}}
+{{- $secretName := tpl (.Values.common.databaseSecret.name | default "") . -}}
+{{- if $secretName -}}
 - mountPath: /etc/db
-  name: {{ . }}
+  name: {{ $secretName }}
 {{- end }}
 {{- end }}
 

@@ -10,7 +10,7 @@ export HELM_INSTALL_DIR=${TMPDIR}
 
 if [ "${HELM_SKIP_INSTALL}" != "true" ]; then
 	# See https://github.com/helm/helm/issues/13324 for a breaking change in latest version of helm
-	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.4 HELM_INSTALL_DIR=$HELM_INSTALL_DIR bash
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.19.0 HELM_INSTALL_DIR=$HELM_INSTALL_DIR bash
 fi
 
 export PATH=$HELM_INSTALL_DIR:$PATH
