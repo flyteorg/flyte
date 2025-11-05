@@ -554,6 +554,8 @@ func (m *TaskMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ShortDescription
+
 	if len(errors) > 0 {
 		return TaskMetadataMultiError(errors)
 	}
@@ -787,6 +789,242 @@ var _ interface {
 	ErrorName() string
 } = TaskValidationError{}
 
+// Validate checks the field values on SourceCode with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SourceCode) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SourceCode with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SourceCodeMultiError, or
+// nil if none found.
+func (m *SourceCode) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SourceCode) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Link
+
+	if len(errors) > 0 {
+		return SourceCodeMultiError(errors)
+	}
+
+	return nil
+}
+
+// SourceCodeMultiError is an error wrapping multiple validation errors
+// returned by SourceCode.ValidateAll() if the designated constraints aren't met.
+type SourceCodeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SourceCodeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SourceCodeMultiError) AllErrors() []error { return m }
+
+// SourceCodeValidationError is the validation error returned by
+// SourceCode.Validate if the designated constraints aren't met.
+type SourceCodeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SourceCodeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SourceCodeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SourceCodeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SourceCodeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SourceCodeValidationError) ErrorName() string { return "SourceCodeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SourceCodeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSourceCode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SourceCodeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SourceCodeValidationError{}
+
+// Validate checks the field values on DescriptionEntity with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DescriptionEntity) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DescriptionEntity with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DescriptionEntityMultiError, or nil if none found.
+func (m *DescriptionEntity) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DescriptionEntity) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ShortDescription
+
+	// no validation rules for LongDescription
+
+	if all {
+		switch v := interface{}(m.GetSourceCode()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DescriptionEntityValidationError{
+					field:  "SourceCode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DescriptionEntityValidationError{
+					field:  "SourceCode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSourceCode()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DescriptionEntityValidationError{
+				field:  "SourceCode",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DescriptionEntityMultiError(errors)
+	}
+
+	return nil
+}
+
+// DescriptionEntityMultiError is an error wrapping multiple validation errors
+// returned by DescriptionEntity.ValidateAll() if the designated constraints
+// aren't met.
+type DescriptionEntityMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DescriptionEntityMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DescriptionEntityMultiError) AllErrors() []error { return m }
+
+// DescriptionEntityValidationError is the validation error returned by
+// DescriptionEntity.Validate if the designated constraints aren't met.
+type DescriptionEntityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DescriptionEntityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DescriptionEntityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DescriptionEntityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DescriptionEntityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DescriptionEntityValidationError) ErrorName() string {
+	return "DescriptionEntityValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DescriptionEntityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDescriptionEntity.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DescriptionEntityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DescriptionEntityValidationError{}
+
 // Validate checks the field values on TaskSpec with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -897,6 +1135,35 @@ func (m *TaskSpec) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return TaskSpecValidationError{
 				field:  "Environment",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDescription()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskSpecValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskSpecValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskSpecValidationError{
+				field:  "Description",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
