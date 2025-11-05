@@ -1345,6 +1345,9 @@
         "rate": {
           "$ref": "#/definitions/taskFixedRate"
         },
+        "cron_expression": {
+          "type": "string"
+        },
         "cron": {
           "$ref": "#/definitions/taskCron"
         },
