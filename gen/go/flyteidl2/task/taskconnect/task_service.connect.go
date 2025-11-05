@@ -40,6 +40,9 @@ const (
 	TaskServiceGetTaskDetailsProcedure = "/flyteidl2.task.TaskService/GetTaskDetails"
 	// TaskServiceListTasksProcedure is the fully-qualified name of the TaskService's ListTasks RPC.
 	TaskServiceListTasksProcedure = "/flyteidl2.task.TaskService/ListTasks"
+	// TaskServiceListVersionsProcedure is the fully-qualified name of the TaskService's ListVersions
+	// RPC.
+	TaskServiceListVersionsProcedure = "/flyteidl2.task.TaskService/ListVersions"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -48,6 +51,7 @@ var (
 	taskServiceDeployTaskMethodDescriptor     = taskServiceServiceDescriptor.Methods().ByName("DeployTask")
 	taskServiceGetTaskDetailsMethodDescriptor = taskServiceServiceDescriptor.Methods().ByName("GetTaskDetails")
 	taskServiceListTasksMethodDescriptor      = taskServiceServiceDescriptor.Methods().ByName("ListTasks")
+	taskServiceListVersionsMethodDescriptor   = taskServiceServiceDescriptor.Methods().ByName("ListVersions")
 )
 
 // TaskServiceClient is a client for the flyteidl2.task.TaskService service.
@@ -58,6 +62,8 @@ type TaskServiceClient interface {
 	GetTaskDetails(context.Context, *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
 	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
+	// Lists all versions for a task.
+	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
 }
 
 // NewTaskServiceClient constructs a client for the flyteidl2.task.TaskService service. By default,
@@ -90,6 +96,13 @@ func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		listVersions: connect.NewClient[task.ListVersionsRequest, task.ListVersionsResponse](
+			httpClient,
+			baseURL+TaskServiceListVersionsProcedure,
+			connect.WithSchema(taskServiceListVersionsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -98,6 +111,7 @@ type taskServiceClient struct {
 	deployTask     *connect.Client[task.DeployTaskRequest, task.DeployTaskResponse]
 	getTaskDetails *connect.Client[task.GetTaskDetailsRequest, task.GetTaskDetailsResponse]
 	listTasks      *connect.Client[task.ListTasksRequest, task.ListTasksResponse]
+	listVersions   *connect.Client[task.ListVersionsRequest, task.ListVersionsResponse]
 }
 
 // DeployTask calls flyteidl2.task.TaskService.DeployTask.
@@ -115,6 +129,11 @@ func (c *taskServiceClient) ListTasks(ctx context.Context, req *connect.Request[
 	return c.listTasks.CallUnary(ctx, req)
 }
 
+// ListVersions calls flyteidl2.task.TaskService.ListVersions.
+func (c *taskServiceClient) ListVersions(ctx context.Context, req *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
+	return c.listVersions.CallUnary(ctx, req)
+}
+
 // TaskServiceHandler is an implementation of the flyteidl2.task.TaskService service.
 type TaskServiceHandler interface {
 	// Deploy a task.
@@ -123,6 +142,8 @@ type TaskServiceHandler interface {
 	GetTaskDetails(context.Context, *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
 	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
+	// Lists all versions for a task.
+	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
 }
 
 // NewTaskServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -151,6 +172,13 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	taskServiceListVersionsHandler := connect.NewUnaryHandler(
+		TaskServiceListVersionsProcedure,
+		svc.ListVersions,
+		connect.WithSchema(taskServiceListVersionsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.task.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TaskServiceDeployTaskProcedure:
@@ -159,6 +187,8 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 			taskServiceGetTaskDetailsHandler.ServeHTTP(w, r)
 		case TaskServiceListTasksProcedure:
 			taskServiceListTasksHandler.ServeHTTP(w, r)
+		case TaskServiceListVersionsProcedure:
+			taskServiceListVersionsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -178,4 +208,8 @@ func (UnimplementedTaskServiceHandler) GetTaskDetails(context.Context, *connect.
 
 func (UnimplementedTaskServiceHandler) ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListTasks is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListVersions is not implemented"))
 }
