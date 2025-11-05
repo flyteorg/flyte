@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	workqueue "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	workqueue "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"sync"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	internalRemote "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	internalRemote "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 

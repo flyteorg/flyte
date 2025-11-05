@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginMachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	pluginMachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const failFastExecutorName = "fail-fast"

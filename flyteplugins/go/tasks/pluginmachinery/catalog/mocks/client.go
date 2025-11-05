@@ -5,11 +5,11 @@ package mocks
 import (
 	context "context"
 
-	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 
 	datacatalog "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/datacatalog"
 
-	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	io "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 
 	mock "github.com/stretchr/testify/mock"
 

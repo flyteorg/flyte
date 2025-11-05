@@ -1,8 +1,8 @@
 package logs
 
 import (
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 //go:generate pflags LogConfig --default-var=DefaultConfig

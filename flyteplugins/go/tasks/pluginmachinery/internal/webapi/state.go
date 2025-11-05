@@ -3,7 +3,7 @@ package webapi
 import (
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 //go:generate enumer -type=Phase -trimprefix=Phase

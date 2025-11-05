@@ -10,7 +10,7 @@ import (
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
-	pluginsCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginsCoreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"

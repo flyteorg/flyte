@@ -7,9 +7,9 @@ import (
 
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 
-	k8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 
 	mock "github.com/stretchr/testify/mock"
 )

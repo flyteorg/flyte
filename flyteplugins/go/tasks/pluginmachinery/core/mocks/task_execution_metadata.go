@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	corev1 "k8s.io/api/core/v1"
 
 	flyteidlcore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"

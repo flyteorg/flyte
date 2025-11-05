@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	io "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	mock "github.com/stretchr/testify/mock"
 
 	storage "github.com/flyteorg/flyte/flytestdlib/storage"

@@ -5,7 +5,7 @@ import (
 
 	"gotest.tools/assert"
 
-	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginmachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 func TestLoadConfig(t *testing.T) {

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	mock "github.com/stretchr/testify/mock"
 )
 

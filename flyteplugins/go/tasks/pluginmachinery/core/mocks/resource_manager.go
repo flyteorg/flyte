@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	mock "github.com/stretchr/testify/mock"
 )
 

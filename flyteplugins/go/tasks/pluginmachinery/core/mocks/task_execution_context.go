@@ -3,10 +3,10 @@
 package mocks
 
 import (
-	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	catalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 
-	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	io "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 
 	mock "github.com/stretchr/testify/mock"
 

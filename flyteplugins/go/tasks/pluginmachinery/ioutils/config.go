@@ -1,7 +1,7 @@
 package ioutils
 
 import (
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

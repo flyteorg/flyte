@@ -5,10 +5,10 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginmachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 

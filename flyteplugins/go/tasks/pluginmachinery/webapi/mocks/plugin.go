@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	webapi "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	webapi "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	mock "github.com/stretchr/testify/mock"
 )
 

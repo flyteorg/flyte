@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	mock "github.com/stretchr/testify/mock"
 
 	promutils "github.com/flyteorg/flyte/flytestdlib/promutils"

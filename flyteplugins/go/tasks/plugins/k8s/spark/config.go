@@ -1,8 +1,8 @@
 package spark
 
 import (
-	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

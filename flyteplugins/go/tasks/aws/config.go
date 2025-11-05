@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 
-	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
