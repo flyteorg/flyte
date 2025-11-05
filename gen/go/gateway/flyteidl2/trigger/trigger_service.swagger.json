@@ -1192,6 +1192,19 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "taskCron": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "default is UTC"
+        }
+      }
+    },
     "taskEnvs": {
       "type": "object",
       "properties": {
@@ -1334,11 +1347,10 @@
       "type": "object",
       "properties": {
         "rate": {
-          "$ref": "#/definitions/taskFixedRate",
-          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+          "$ref": "#/definitions/taskFixedRate"
         },
-        "cron_expression": {
-          "type": "string"
+        "cron": {
+          "$ref": "#/definitions/taskCron"
         },
         "kickoff_time_input_arg": {
           "type": "string",
