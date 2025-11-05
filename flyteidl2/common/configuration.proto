@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// The source of an attribute. We may have other sources in the future.
+enum AttributesSource {
+  // The source is unspecified.
+  SOURCE_UNSPECIFIED = 0;
+
+  // The configuration is a global configuration.
+  GLOBAL = 1;
+
+  // The configuration is a domain configuration.
+  DOMAIN = 2;
+
+  // The configuration is a project configuration.
+  PROJECT = 3;
+
+  // The configuration is a project-domain configuration.
+  PROJECT_DOMAIN = 4;
+
+  // The configuration is a org configuration.
+  ORG = 5;
+}

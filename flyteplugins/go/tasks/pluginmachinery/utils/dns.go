@@ -7,7 +7,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var dns1123InvalidRegex = regexp.MustCompile("[^-.a-z0-9]")
@@ -23,9 +22,12 @@ func ConvertToDNS1123SubdomainCompatibleString(name string) string {
 	name = dns1123InvalidRegex.ReplaceAllString(name, "")
 	name = strings.Trim(name, ".-")
 	if len(name) > validation.DNS1123SubdomainMaxLength {
-		fixedLengthID, err := encoding.FixedLengthUniqueID(name, utils.MaxUniqueIDLength)
+		// TODO @pvditt
+		//fixedLengthID, err := encoding.FixedLengthUniqueID(name, utils.MaxUniqueIDLength)
+		fixedLengthID, err := encoding.FixedLengthUniqueID(name, 30)
 		if err == nil {
-			name = name[:validation.DNS1123SubdomainMaxLength-utils.MaxUniqueIDLength-1] + "-" + fixedLengthID
+			//name = name[:validation.DNS1123SubdomainMaxLength-utils.MaxUniqueIDLength-1] + "-" + fixedLengthID
+			name = name[:validation.DNS1123SubdomainMaxLength-30-1] + "-" + fixedLengthID
 		} else {
 			name = name[:validation.DNS1123SubdomainMaxLength]
 		}

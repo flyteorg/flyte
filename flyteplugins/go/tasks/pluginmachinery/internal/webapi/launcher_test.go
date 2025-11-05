@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	mocks2 "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 )
 
 func Test_launch(t *testing.T) {
@@ -29,7 +29,7 @@ func Test_launch(t *testing.T) {
 			Phase:        PhaseResourcesCreated,
 			PhaseVersion: 2,
 		}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
 		plgn.OnCreate(ctx, tCtx).Return("abc", nil, nil)
@@ -77,7 +77,7 @@ func Test_launch(t *testing.T) {
 
 		c := &mocks2.AutoRefresh{}
 		s := State{}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
 		plgn.OnCreate(ctx, tCtx).Return("", nil, fmt.Errorf("error creating"))
@@ -101,7 +101,7 @@ func Test_launch(t *testing.T) {
 			PhaseVersion: 2,
 			ResourceMeta: "my-id",
 		}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, fmt.Errorf("failed to cache"))
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, fmt.Errorf("failed to cache"))
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
 		plgn.OnCreate(ctx, tCtx).Return("my-id", nil, nil)

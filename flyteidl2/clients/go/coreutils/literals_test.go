@@ -18,8 +18,8 @@ import (
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestMakePrimitive(t *testing.T) {

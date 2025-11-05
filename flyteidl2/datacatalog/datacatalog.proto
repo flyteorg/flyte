@@ -1,12 +1,14 @@
 syntax = "proto3";
 
-package datacatalog;
+package flyteidl2.datacatalog;
 
-import "flyteidl/core/literals.proto";
+import "flyteidl2/core/literals.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/datacatalog";
+
+// TODO @pvditt clean this up
 
 /*
  * Data Catalog service definition
@@ -312,7 +314,7 @@ message Artifact {
  */
 message ArtifactData {
     string name = 1;
-    flyteidl.core.Literal value = 2;
+    flyteidl2.core.Literal value = 2;
 }
 
 /*

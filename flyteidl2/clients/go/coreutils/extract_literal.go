@@ -24,7 +24,7 @@ package coreutils
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {

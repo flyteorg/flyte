@@ -11,12 +11,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	internalMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func Test_monitor(t *testing.T) {
@@ -35,14 +35,14 @@ func Test_monitor(t *testing.T) {
 
 	wg := sync.WaitGroup{}
 	wg.Add(8)
-	cacheObj, err := autorefreshcache.NewAutoRefreshCache(rand.String(5), func(ctx context.Context, batch autorefreshcache.Batch) (updatedBatch []autorefreshcache.ItemSyncResponse, err error) {
+	cacheObj, err := cache.NewAutoRefreshCache(rand.String(5), func(ctx context.Context, batch cache.Batch) (updatedBatch []cache.ItemSyncResponse, err error) {
 		wg.Done()
 		t.Logf("Syncing Item [%+v]", batch[0])
-		return []autorefreshcache.ItemSyncResponse{
+		return []cache.ItemSyncResponse{
 			{
 				ID:     batch[0].GetID(),
 				Item:   batch[0].GetItem(),
-				Action: autorefreshcache.Update,
+				Action: cache.Update,
 			},
 		}, nil
 	}, workqueue.DefaultControllerRateLimiter(), time.Second, 1, 10, promutils.NewTestScope())

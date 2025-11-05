@@ -29,11 +29,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
+	idlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")

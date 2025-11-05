@@ -62,15 +62,6 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
-    "ErrorInfoKind": {
-      "type": "string",
-      "enum": [
-        "KIND_UNSPECIFIED",
-        "KIND_USER",
-        "KIND_SYSTEM"
-      ],
-      "default": "KIND_UNSPECIFIED"
-    },
     "FilterFunction": {
       "type": "string",
       "enum": [
@@ -828,7 +819,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
@@ -836,7 +827,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
@@ -1032,20 +1023,6 @@
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
-    },
-    "coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
     },
     "coreLabelValue": {
       "type": "object",
@@ -1925,6 +1902,20 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
+    "flyteidl2coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
     "flyteidl2coreRuntimeMetadata": {
       "type": "object",
       "properties": {
@@ -2180,7 +2171,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Map of custom environment variables to be applied to the execution resource."
         }
@@ -2202,7 +2193,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
         }
@@ -2667,11 +2658,20 @@
           "description": "Error message."
         },
         "kind": {
-          "$ref": "#/definitions/ErrorInfoKind",
+          "$ref": "#/definitions/workflowErrorInfoKind",
           "description": "Error kind."
         }
       },
       "description": "ErrorInfo captures details of an error."
+    },
+    "workflowErrorInfoKind": {
+      "type": "string",
+      "enum": [
+        "KIND_UNSPECIFIED",
+        "KIND_USER",
+        "KIND_SYSTEM"
+      ],
+      "default": "KIND_UNSPECIFIED"
     },
     "workflowGetActionDataResponse": {
       "type": "object",

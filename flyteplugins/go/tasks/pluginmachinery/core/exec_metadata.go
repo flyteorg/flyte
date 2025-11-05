@@ -7,8 +7,8 @@ import (
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
@@ -23,7 +23,7 @@ type TaskOverrides interface {
 
 type ConnectionWrapper struct {
 	Connection core.Connection
-	Source     admin.AttributesSource
+	Source     common.AttributesSource
 }
 
 // ExternalResourceAttributes is a wrapper around ExternalResourceAttributes to expose the source of the attributes
@@ -31,11 +31,11 @@ type ExternalResourceAttributes struct {
 	Connections map[string]ConnectionWrapper
 }
 
-func (e ExternalResourceAttributes) GetConnection(name string) (*core.Connection, admin.AttributesSource, error) {
+func (e ExternalResourceAttributes) GetConnection(name string) (*core.Connection, common.AttributesSource, error) {
 	if connWrapper, ok := e.Connections[name]; ok {
 		return &connWrapper.Connection, connWrapper.Source, nil
 	}
-	return nil, admin.AttributesSource_SOURCE_UNSPECIFIED, fmt.Errorf("connection [%s] not found", name)
+	return nil, common.AttributesSource_SOURCE_UNSPECIFIED, fmt.Errorf("connection [%s] not found", name)
 }
 
 func (e ExternalResourceAttributes) GetConnections() map[string]ConnectionWrapper {

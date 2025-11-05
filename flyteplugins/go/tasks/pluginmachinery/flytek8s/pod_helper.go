@@ -17,15 +17,16 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	// TODO @pvditt fix
+	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const PodKind = "pod"
@@ -581,9 +582,10 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
-		ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
-	}
+	// TODO @pvditt
+	//if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
+	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
+	//}
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
@@ -1021,28 +1023,29 @@ func applyAcceleratorDeviceClassPodTemplate(
 	return mergedPodSpec, nil
 }
 
-func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
-	cfg := propellerCfg.GetConfig().AcceleratedInputs
-	hostPathType := v1.HostPathDirectory
-	spec.Volumes = append(spec.Volumes, v1.Volume{
-		Name: "union-persistent-data-volume",
-		VolumeSource: v1.VolumeSource{
-			HostPath: &v1.HostPathVolumeSource{
-				Path: cfg.VolumePath,
-				Type: &hostPathType,
-			},
-		},
-	})
-	for i, cont := range spec.Containers {
-		if cont.Name == primaryName {
-			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
-				Name:      "union-persistent-data-volume",
-				ReadOnly:  true,
-				MountPath: cfg.LocalPathPrefix,
-			})
-		}
-	}
-}
+// TODO @pvditt
+//func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
+//	cfg := propellerCfg.GetConfig().AcceleratedInputs
+//	hostPathType := v1.HostPathDirectory
+//	spec.Volumes = append(spec.Volumes, v1.Volume{
+//		Name: "union-persistent-data-volume",
+//		VolumeSource: v1.VolumeSource{
+//			HostPath: &v1.HostPathVolumeSource{
+//				Path: cfg.VolumePath,
+//				Type: &hostPathType,
+//			},
+//		},
+//	})
+//	for i, cont := range spec.Containers {
+//		if cont.Name == primaryName {
+//			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
+//				Name:      "union-persistent-data-volume",
+//				ReadOnly:  true,
+//				MountPath: cfg.LocalPathPrefix,
+//			})
+//		}
+//	}
+//}
 
 func BuildIdentityPod() *v1.Pod {
 	return &v1.Pod{
