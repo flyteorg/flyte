@@ -590,7 +590,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		annotations = executionConfig.GetAnnotations().GetValues()
 	}
 
-	annotations = m.addUserAnnotations(ctx, annotations)
+	annotations = m.addIdentityAnnotations(ctx, annotations)
 
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
@@ -1028,7 +1028,7 @@ func (m *ExecutionManager) launchExecution(
 		return nil, nil, nil, err
 	}
 
-	annotations = m.addUserAnnotations(ctx, annotations)
+	annotations = m.addIdentityAnnotations(ctx, annotations)
 
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
@@ -2055,36 +2055,77 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 	return initialLabels, nil
 }
 
-// addUserAnnotations automatically injects user identity information as annotations when enabled in config.
-// This allows tracking which user submitted each workflow execution and enables user-based authorization.
-func (m *ExecutionManager) addUserAnnotations(ctx context.Context, initialAnnotations map[string]string) map[string]string {
-	// Check if user annotation injection is enabled
-	if !m.config.ApplicationConfiguration().GetTopLevelConfig().GetInjectUserAnnotations() {
+// addIdentityAnnotations automatically injects identity information (user or app) as annotations when enabled in config.
+// This allows tracking which identity submitted each workflow execution and enables identity-based authorization.
+func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAnnotations map[string]string) map[string]string {
+	// Check if identity annotation injection is enabled
+	if !m.config.ApplicationConfiguration().GetTopLevelConfig().GetInjectIdentityAnnotations() {
 		return initialAnnotations
 	}
 
-	// Get user identity from authentication context
+	// Get identity from authentication context
 	identityContext := auth.IdentityContextFromContext(ctx)
-	var principal string
-	if identityContext.UserInfo() != nil {
-		principal = identityContext.UserInfo().GetEmail()
-	}
-
-	if principal == "" {
-		// If no email is available, skip annotation injection
-		logger.Debugf(ctx, "No user email found in context, skipping user annotation injection")
-		return initialAnnotations
-	}
 
 	if initialAnnotations == nil {
 		initialAnnotations = make(map[string]string)
 	}
 
-	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetUserAnnotationPrefix()
-	userKey := prefix + "/user"
-	if _, exists := initialAnnotations[userKey]; !exists {
-		initialAnnotations[userKey] = principal
-		logger.Debugf(ctx, "Injected user annotation %s=%s", userKey, principal)
+	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationPrefix()
+	keys := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationKeys()
+
+	// Determine if this is an app or user identity
+	isAppIdentity := identityContext.AppID() != ""
+	isUserIdentity := identityContext.UserInfo() != nil
+
+	if !isAppIdentity && !isUserIdentity {
+		logger.Debugf(ctx, "No identity information found in context, skipping identity annotation injection")
+		return initialAnnotations
+	}
+
+	// Add annotations based on identity type
+	if isAppIdentity {
+		// Handle app-based identity
+		appID := identityContext.AppID()
+		for _, key := range keys {
+			annotationKey := prefix + "/app-" + key
+			if _, exists := initialAnnotations[annotationKey]; !exists {
+				var value string
+				switch key {
+				case "email", "sub", "id":
+					// For app identities, use the app ID for these fields
+					value = appID
+				default:
+					// Skip unknown keys for app identities
+					continue
+				}
+				if value != "" {
+					initialAnnotations[annotationKey] = value
+					logger.Debugf(ctx, "Injected app identity annotation %s=%s", annotationKey, value)
+				}
+			}
+		}
+	} else if isUserIdentity {
+		// Handle user-based identity
+		userInfo := identityContext.UserInfo()
+		for _, key := range keys {
+			annotationKey := prefix + "/user-" + key
+			if _, exists := initialAnnotations[annotationKey]; !exists {
+				var value string
+				switch key {
+				case "email":
+					value = userInfo.GetEmail()
+				case "sub":
+					value = userInfo.GetSubject()
+				default:
+					// Skip unknown keys
+					continue
+				}
+				if value != "" {
+					initialAnnotations[annotationKey] = value
+					logger.Debugf(ctx, "Injected user identity annotation %s=%s", annotationKey, value)
+				}
+			}
+		}
 	}
 
 	return initialAnnotations
