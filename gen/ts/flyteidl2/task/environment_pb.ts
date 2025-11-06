@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/environment.proto.
  */
 export const file_flyteidl2_task_environment: GenFile = /*@__PURE__*/
-  fileDesc("CiBmbHl0ZWlkbDIvdGFzay9lbnZpcm9ubWVudC5wcm90bxIOZmx5dGVpZGwyLnRhc2siUAoLRW52aXJvbm1lbnQSFwoEbmFtZRgBIAEoCUIJukgGcgQQARg/EhgKC2Rlc2NyaXB0aW9uGAQgASgJSACIAQFCDgoMX2Rlc2NyaXB0aW9uQrUBChJjb20uZmx5dGVpZGwyLnRhc2tCEEVudmlyb25tZW50UHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate]);
+  fileDesc("CiBmbHl0ZWlkbDIvdGFzay9lbnZpcm9ubWVudC5wcm90bxIOZmx5dGVpZGwyLnRhc2siUAoLRW52aXJvbm1lbnQSFwoEbmFtZRgBIAEoCUIJukgGcgQQARg/EhgKC2Rlc2NyaXB0aW9uGAIgASgJSACIAQFCDgoMX2Rlc2NyaXB0aW9uQrUBChJjb20uZmx5dGVpZGwyLnRhc2tCEEVudmlyb25tZW50UHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate]);
 
 /**
  * Environment for a task.
@@ -29,7 +29,7 @@ export type Environment = Message<"flyteidl2.task.Environment"> & {
   /**
    * Optional description of environment
    *
-   * @generated from field: optional string description = 4;
+   * @generated from field: optional string description = 2;
    */
   description?: string;
 };

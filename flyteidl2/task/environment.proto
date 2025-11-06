@@ -15,5 +15,5 @@ message Environment {
   ];
 
   // Optional description of environment
-  optional string description = 4;
+  optional string description = 2;
 }
