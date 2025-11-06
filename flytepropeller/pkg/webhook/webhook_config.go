@@ -113,6 +113,10 @@ func (wc *WebhookConfig) CreateMutationWebhookConfiguration(namespace string) (*
 	}
 
 	return &admissionregistrationv1.MutatingWebhookConfiguration{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: admissionregistrationv1.SchemeGroupVersion.String(),
+			Kind:       "MutatingWebhookConfiguration",
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      wc.cfg.ServiceName,
 			Namespace: namespace,

@@ -93,7 +93,8 @@ var (
 		ImageBuilderConfig: ImageBuilderConfig{
 			ExcludedContainerNames: []string{EmbeddedSecretsFileMountInitContainerName},
 		},
-		WebhookTimeout: 30, // default timeout for webhook calls in seconds
+		WebhookTimeout:                     30, // default timeout for webhook calls in seconds
+		DisableCreateMutatingWebhookConfig: false,
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
@@ -158,8 +159,9 @@ type Config struct {
 	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
-	ImageBuilderConfig ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
-	WebhookTimeout     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
+	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
+	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType

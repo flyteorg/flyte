@@ -2,19 +2,22 @@ package webhook
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	errors2 "errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/ghodss/yaml"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	secretConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -25,7 +28,7 @@ const (
 	PodNamespaceEnvVar = "POD_NAMESPACE"
 )
 
-func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+func Run(ctx context.Context, propellerCfg *config.Config, cfg *secretConfig.Config,
 	defaultNamespace string, scope *promutils.Scope, mgr manager.Manager) error {
 	err := RunWebhook(ctx, propellerCfg, cfg,
 		defaultNamespace, scope, mgr)
@@ -39,7 +42,7 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	return nil
 }
 
-func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *secretConfig.Config,
 	defaultNamespace string, scope *promutils.Scope, mgr manager.Manager) error {
 	raw, err := json.Marshal(cfg)
 	if err != nil {
@@ -71,10 +74,32 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 		return err
 	}
 
-	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
-	err = createMutationConfig(ctx, kubeClient, webhookConfig, defaultNamespace)
+	mutateConfigCR, err := webhookConfig.CreateMutationWebhookConfiguration(defaultNamespace)
 	if err != nil {
 		return err
+	}
+
+	// It's the responsibility of the platform engineer to create the MutatingWebhookConfiguration otherwise.
+	if !cfg.DisableCreateMutatingWebhookConfig {
+		// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
+		err = createMutationConfig(ctx, kubeClient, mutateConfigCR, defaultNamespace)
+		if err != nil {
+			return err
+		}
+	} else {
+		logger.Info(ctx, "Skipping create mutation webhook configuration. Enable debug logs to output the raw"+
+			" yaml configuration that must exist to use this webhook if you wish to create it manually. Or disable"+
+			" disableCreateMutatingWebhookConfig setting.")
+		if logger.IsLoggable(ctx, logger.DebugLevel) {
+			raw, err := yaml.Marshal(mutateConfigCR)
+			if err != nil {
+				logger.Warnf(ctx, "Failed to marshal mutateConfigCR to yaml format. Error: %v", err)
+			} else {
+				logger.Debugf(ctx, "Since disableCreateMutatingWebhookConfig is set to True, I'll not create"+
+					" the object. Ensure that a MutatingWebhookConfiguration with the following base64 encoded spec is created:"+
+					" [%s]", base64.StdEncoding.EncodeToString(raw))
+			}
+		}
 	}
 
 	err = webhookConfig.Register(ctx, K8sRuntimeHTTPHookRegisterer{mgr: mgr})
@@ -88,16 +113,13 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *WebhookConfig, podNamespace string) error {
+func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset,
+	mutateConfig *admissionregistrationv1.MutatingWebhookConfiguration, podNamespace string) error {
+
 	shouldAddOwnerRef := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {
 		shouldAddOwnerRef = false
-	}
-
-	mutateConfig, err := webhookObj.CreateMutationWebhookConfiguration(podNamespace)
-	if err != nil {
-		return err
 	}
 
 	if shouldAddOwnerRef {
@@ -113,7 +135,7 @@ func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset,
 
 	logger.Infof(ctx, "Creating MutatingWebhookConfiguration [%v/%v]", mutateConfig.GetNamespace(), mutateConfig.GetName())
 
-	_, err = kubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().Create(ctx, mutateConfig, v1.CreateOptions{})
+	_, err := kubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().Create(ctx, mutateConfig, v1.CreateOptions{})
 	var statusErr *errors.StatusError
 	if err != nil && errors2.As(err, &statusErr) && statusErr.Status().Reason == v1.StatusReasonAlreadyExists {
 		logger.Infof(ctx, "Failed to create MutatingWebhookConfiguration. Will attempt to update. Error: %v", err)

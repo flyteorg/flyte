@@ -70,5 +70,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.imagePullSecrets.enabled"), DefaultConfig.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled, "Whether to enable image pull secrets for the webhook pod.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "azureSecretManager.sidecarImage"), DefaultConfig.AzureSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "webhookTimeout"), DefaultConfig.WebhookTimeout, "Timeout for webhook calls in seconds. Defaults to 30 seconds.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "disableCreateMutatingWebhookConfig"), DefaultConfig.DisableCreateMutatingWebhookConfig, "")
 	return cmdFlags
 }
