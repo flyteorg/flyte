@@ -277,11 +277,12 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	t1 := s.metrics.ListLatency.Start(ctx)
 	t2 := s.metrics.ListLatencyHist.Start(ctx)
 	var stowCursor string
-	if cursor.cursorState == AtStartCursorState {
+	switch cursor.cursorState {
+	case AtStartCursorState:
 		stowCursor = stow.CursorStart
-	} else if cursor.cursorState == AtEndCursorState {
+	case AtEndCursorState:
 		return nil, NewCursorAtEnd(), fmt.Errorf("Cursor cannot be at end for the List call")
-	} else {
+	default:
 		stowCursor = cursor.customPosition
 	}
 	items, stowCursor, err := container.Items(key, stowCursor, maxItems)

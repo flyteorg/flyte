@@ -13,12 +13,18 @@ import (
 
 // QueueService implements the QueueServiceHandler interface
 type QueueService struct {
-	k8sClient *k8s.QueueClient
+	k8sClient QueueClientInterface
 }
 
 // NewQueueService creates a new QueueService instance
 func NewQueueService(k8sClient *k8s.QueueClient) *QueueService {
 	return &QueueService{k8sClient: k8sClient}
+}
+
+// NewQueueServiceWithClient creates a new QueueService with a custom client implementation
+// This is useful for testing
+func NewQueueServiceWithClient(client QueueClientInterface) *QueueService {
+	return &QueueService{k8sClient: client}
 }
 
 // Ensure we implement the interface

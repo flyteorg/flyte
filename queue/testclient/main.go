@@ -95,7 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to enqueue second action: %v", err)
 	}
-	fmt.Println("✓ Second action enqueued successfully\n")
+	fmt.Println("✓ Second action enqueued successfully")
 
 	// Test 3: Abort a specific action
 	fmt.Println("Test 3: Aborting a specific action...")
@@ -116,7 +116,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to abort action: %v", err)
 	}
-	fmt.Println("✓ Action aborted successfully\n")
+	fmt.Println("✓ Action aborted successfully")
 
 	// Test 4: Enqueue action for a different run
 	fmt.Println("Test 4: Enqueuing action for a different run...")
@@ -152,7 +152,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to enqueue third action: %v", err)
 	}
-	fmt.Println("✓ Action for run-002 enqueued successfully\n")
+	fmt.Println("✓ Action for run-002 enqueued successfully")
 
 	// Test 5: Abort entire run
 	fmt.Println("Test 5: Aborting entire run-001...")
@@ -170,7 +170,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to abort run: %v", err)
 	}
-	fmt.Println("✓ Run aborted successfully\n")
+	fmt.Println("✓ Run aborted successfully")
 
 	fmt.Println("All tests completed successfully! 🎉")
 }

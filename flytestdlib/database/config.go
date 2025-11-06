@@ -111,7 +111,7 @@ func GetConfig() *DbConfig {
 	if len(databaseConfig.DeprecatedExtraOptions) > 0 {
 		databaseConfig.Postgres.ExtraOptions = databaseConfig.DeprecatedExtraOptions
 	}
-	if databaseConfig.DeprecatedDebug != false {
+	if databaseConfig.DeprecatedDebug {
 		databaseConfig.Postgres.Debug = databaseConfig.DeprecatedDebug
 	}
 	return databaseConfig

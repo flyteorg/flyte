@@ -168,18 +168,18 @@ func serve(ctx context.Context) error {
 		// Health checks
 		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+			_, _ = w.Write([]byte("OK"))
 		})
 
 		mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
 			sqlDB, err := db.DB()
 			if err != nil || sqlDB.Ping() != nil {
 				w.WriteHeader(http.StatusServiceUnavailable)
-				w.Write([]byte("Database unavailable"))
+				_, _ = w.Write([]byte("Database unavailable"))
 				return
 			}
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+			_, _ = w.Write([]byte("OK"))
 		})
 
 		addr := fmt.Sprintf("%s:%d", cfg.RunsService.Host, cfg.RunsService.Port)
@@ -213,12 +213,18 @@ func serve(ctx context.Context) error {
 		// Health checks
 		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+			_, err = w.Write([]byte("OK"))
+			if err != nil {
+				logger.Info(ctx, err)
+			}
 		})
 
 		mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+			_, err = w.Write([]byte("OK"))
+			if err != nil {
+				logger.Info(ctx, err)
+			}
 		})
 
 		addr := fmt.Sprintf("%s:%d", cfg.QueueService.Host, cfg.QueueService.Port)
@@ -322,6 +328,9 @@ func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConf
 		// Use explicitly configured kubeconfig file
 		logger.Infof(ctx, "Using kubeconfig from: %s", cfg.KubeConfig)
 		restConfig, err = clientcmd.BuildConfigFromFlags("", cfg.KubeConfig)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to build k8s config from flags: %w", err)
+		}
 	} else {
 		// Try in-cluster config first
 		logger.Infof(ctx, "Attempting to use in-cluster Kubernetes configuration")

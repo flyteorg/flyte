@@ -32,7 +32,7 @@ type PostgresRepository struct {
 // NewPostgresRepository creates a new PostgreSQL/SQLite repository
 func NewPostgresRepository(db *gorm.DB) Repository {
 	// Detect database type
-	dbName := db.Dialector.Name()
+	dbName := db.Name()
 	isPostgres := dbName == "postgres"
 
 	repo := &PostgresRepository{
@@ -275,7 +275,7 @@ func (r *PostgresRepository) ListActions(ctx context.Context, runID *common.RunI
 
 	query := r.db.WithContext(ctx).Model(&Action{}).
 		Where("org = ? AND project = ? AND domain = ?",
-			runID.Org, runID.Project, runID.Domain).
+							runID.Org, runID.Project, runID.Domain).
 		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
 
 	// Apply pagination token
@@ -664,7 +664,7 @@ func (r *PostgresRepository) startPostgresListener() {
 	// This is a simplified approach - in production, get from config
 	row = sqlDB.QueryRow("SHOW server_version")
 	var version string
-	row.Scan(&version) // Ignore error, just need a connection
+	_ = row.Scan(&version) // Ignore error, just need a connection
 
 	// Create listener with a simple connection string
 	// In production, get this from the database config

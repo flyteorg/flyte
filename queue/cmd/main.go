@@ -91,14 +91,14 @@ func serve(ctx context.Context) error {
 	// Add health check endpoint
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	// Add readiness check endpoint
 	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
 		// Queue service is always ready (no database to check)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	// Setup HTTP/2 support (required for gRPC)
@@ -158,6 +158,9 @@ func initKubernetesClient(ctx context.Context, cfg *queueconfig.KubernetesConfig
 		// Use explicitly configured kubeconfig file
 		logger.Infof(ctx, "Using kubeconfig from: %s", cfg.KubeConfig)
 		restConfig, err = clientcmd.BuildConfigFromFlags("", cfg.KubeConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to build k8s config from flags: %w", err)
+		}
 	} else {
 		// Try in-cluster config first
 		logger.Infof(ctx, "Attempting to use in-cluster Kubernetes configuration")

@@ -143,9 +143,10 @@ func (w *autoRefreshCache) sync(ctx context.Context) {
 				logger.Errorf(ctx, "failed to get latest copy of the item %v, error: %s", k, err)
 			}
 
-			if result == Update {
+			switch result {
+			case Update:
 				w.lruMap.Add(k, newItem)
-			} else if result == Delete {
+			case Delete:
 				w.lruMap.Remove(k)
 			}
 		}

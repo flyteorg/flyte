@@ -1,48 +1,53 @@
-.PHONY: build test run clean docker-postgres
+# Queue Service Makefile
+# This Makefile includes common Go targets from ../go.Makefile
 
-# Build the queue service
-build:
-	go build -o bin/queue-service cmd/main.go
+# Service configuration
+SERVICE_NAME := queue-service
+BIN_NAME := queue-service
+CMD_PATH := cmd/main.go
+RUN_ARGS ?= serve --config config.yaml
 
-# Run tests
-test:
-	go test -v ./...
+# Include common Go targets
+include ../go.Makefile
 
-# Run the service (requires PostgreSQL)
-run: build
-	./bin/queue-service serve --config config.yaml
+##@ Queue Specific
 
-# Run the test client
-run-testclient:
-	go run testclient/main.go
+.PHONY: run-testclient
+run-testclient: ## Run the test client
+	@echo "Running test client..."
+	@go run testclient/main.go
 
-# Start PostgreSQL in Docker
-docker-postgres:
-	docker run --name flyte-queue-postgres \
+##@ Docker - PostgreSQL
+
+.PHONY: docker-postgres
+docker-postgres: ## Start PostgreSQL in Docker
+	@echo "Starting PostgreSQL container..."
+	@docker run --name flyte-queue-postgres \
 		-e POSTGRES_PASSWORD=postgres \
 		-e POSTGRES_DB=flyte_queue \
 		-p 5432:5432 \
 		-d postgres:15
 
-# Stop and remove PostgreSQL container
-docker-postgres-stop:
-	docker stop flyte-queue-postgres || true
-	docker rm flyte-queue-postgres || true
+.PHONY: docker-postgres-stop
+docker-postgres-stop: ## Stop and remove PostgreSQL container
+	@echo "Stopping PostgreSQL container..."
+	@docker stop flyte-queue-postgres || true
+	@docker rm flyte-queue-postgres || true
 
-# Clean build artifacts
-clean:
-	rm -rf bin/
+##@ Integration Tests
 
-# Full integration test
-integration-test: docker-postgres-stop docker-postgres
+.PHONY: integration-test
+integration-test: docker-postgres-stop docker-postgres ## Run integration test with PostgreSQL
 	@echo "Waiting for PostgreSQL to start..."
 	@sleep 3
+	@echo "Building service..."
+	@$(MAKE) build-fast
 	@echo "Running service..."
-	@./bin/queue-service serve --config config.yaml &
-	@SERVER_PID=$$!; \
+	@./bin/queue-service serve --config config.yaml & \
+	SERVER_PID=$$!; \
 	sleep 2; \
 	echo "Running client tests..."; \
-	go run client/main.go; \
+	go run testclient/main.go; \
 	kill $$SERVER_PID; \
 	docker stop flyte-queue-postgres; \
 	docker rm flyte-queue-postgres

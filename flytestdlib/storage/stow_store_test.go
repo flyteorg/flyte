@@ -343,9 +343,10 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
-				if id == container {
+				switch id {
+				case container:
 					return newMockStowContainer(container), nil
-				} else if id == "bad-container" {
+				case "bad-container":
 					return newMockStowContainer("bad-container"), nil
 				}
 				return nil, fmt.Errorf("container is not supported")
@@ -764,9 +765,10 @@ func TestStowStore_Delete(t *testing.T) {
 
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
-				if id == container {
+				switch id {
+				case container:
 					return newMockStowContainer(container), nil
-				} else if id == "bad-container" {
+				case "bad-container":
 					return newMockStowContainer("bad-container"), nil
 				}
 				return nil, fmt.Errorf("container is not supported")

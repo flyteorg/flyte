@@ -159,7 +159,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to abort action: %v", err)
 		}
-		fmt.Println("✓ Action aborted successfully\n")
+		fmt.Println("✓ Action aborted successfully")
 	}
 
 	// Test 7: Abort a run
@@ -178,7 +178,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to abort run: %v", err)
 	}
-	fmt.Println("✓ Run aborted successfully\n")
+	fmt.Println("✓ Run aborted successfully")
 
 	fmt.Println("All tests completed successfully! 🎉")
 }

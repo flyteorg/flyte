@@ -1,34 +1,28 @@
-.PHONY: build run clean test
+# Manager Service Makefile
+# This Makefile includes common Go targets from ../go.Makefile
 
-.PHONY: help
-help: ## Show this help message
-	@echo '🆘  Showing help message'
-	@echo 'Usage: make [target]'
-	@echo ''
-	@echo 'Available targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+# Service configuration
+SERVICE_NAME := flyte-manager
+BIN_NAME := flyte-manager
+CMD_PATH := cmd/main.go
+RUN_ARGS ?= --config config.yaml
 
-# Build the unified manager binary
-build:
-	go build -o bin/flyte-manager cmd/main.go
+# Include common Go targets
+include ../go.Makefile
 
-run: # Run the manager
-	go run cmd/main.go --config config.yaml
+##@ Manager Specific
 
-run-testclient: # Run the manager
-	go run testclient/main.go
+.PHONY: run-testclient
+run-testclient: ## Run the test client
+	@echo "Running test client..."
+	@go run testclient/main.go
 
-# Clean build artifacts
-clean:
-	rm -rf bin/
-	rm -f flyte.db
+.PHONY: clean-db
+clean-db: ## Remove local database file
+	@echo "Removing flyte.db..."
+	@rm -f flyte.db
 
-# Test the manager
-test:
-	go test ./...
-
-# Build and install
-install: build
-	cp bin/flyte-manager /usr/local/bin/
-
-.DEFAULT_GOAL := build
+# Override clean to also remove database
+clean: clean-db ## Remove build artifacts and database
+	@echo "Cleaning build artifacts..."
+	@rm -rf bin/

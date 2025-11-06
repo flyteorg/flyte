@@ -123,7 +123,7 @@ func TestLabeledStopWatch(t *testing.T) {
 			`testscope_stopwatch:s2_unlabeled_m_sum`:              0.0,
 			`testscope_stopwatch:s2_unlabeled_m_count`:            1,
 		}
-		assertMetrics(t, s.StopWatch.Observer.(prometheus.Summary), "testscope_stopwatch:s2_unlabeled_m", header, expectedMetrics)
+		assertMetrics(t, s.Observer.(prometheus.Summary), "testscope_stopwatch:s2_unlabeled_m", header, expectedMetrics)
 	})
 
 	t.Run("AdditionalLabels", func(t *testing.T) {

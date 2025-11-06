@@ -107,7 +107,7 @@ func serve(ctx context.Context) error {
 	// Add health check endpoint
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	// Add readiness check endpoint
@@ -116,16 +116,16 @@ func serve(ctx context.Context) error {
 		sqlDB, err := db.DB()
 		if err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte("Database connection error"))
+			_, _ = w.Write([]byte("Database connection error"))
 			return
 		}
 		if err := sqlDB.Ping(); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte("Database ping failed"))
+			_, _ = w.Write([]byte("Database ping failed"))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	// Setup HTTP/2 support (required for gRPC)

@@ -22,7 +22,7 @@ type Counter struct {
 // Inc increments the counter by 1. Use Add to increment it by arbitrary non-negative values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Inc(ctx context.Context) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	counter, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -36,7 +36,7 @@ func (c Counter) Inc(ctx context.Context) {
 // Add adds the given value to the counter. It panics if the value is < 0.. The data point will be labeled with values
 // from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Add(ctx context.Context, v float64) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	counter, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}

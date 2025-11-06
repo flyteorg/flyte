@@ -24,12 +24,12 @@ type StopWatch struct {
 
 // Start creates a new Instance of the StopWatch called a Timer that is closeable/stoppable.
 func (c StopWatch) Start(ctx context.Context) Timer {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	w, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
 
-	if c.StopWatch.Observer == nil {
+	if c.Observer == nil {
 		return w.Start()
 	}
 
@@ -44,13 +44,13 @@ func (c StopWatch) Start(ctx context.Context) Timer {
 // Observe observes specified duration between the start and end time. The data point will be labeled with values from context.
 // See labeled.SetMetricsKeys for information about how to configure that.
 func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	w, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
 	w.Observe(start, end)
 
-	if c.StopWatch.Observer != nil {
+	if c.Observer != nil {
 		c.StopWatch.Observe(start, end)
 	}
 }
