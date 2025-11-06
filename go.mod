@@ -11,7 +11,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.26.1
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/flyteorg/flyte/flytepropeller v1.16.1
-	github.com/flyteorg/flyte/flytestdlib v1.16.1
 	github.com/go-test/deep v1.1.1
 	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
@@ -158,6 +157,10 @@ require (
 )
 
 replace (
+	github.com/flyteorg/flyte/v2 => ./
+	github.com/flyteorg/flyte/flyteidl => ./flyteidl2
+	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins
+	github.com/flyteorg/flyte/flytestdlib => ./flytestdlib
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 	k8s.io/api => k8s.io/api v0.28.2
