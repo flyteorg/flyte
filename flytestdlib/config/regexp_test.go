@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 )
 
 func TestRegexp_MarshalJSON(t *testing.T) {

@@ -4,14 +4,12 @@ import (
 	"context"
 	"testing"
 
+	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/runtime/protoiface"
-
-	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type MemoryMetadata struct {
@@ -55,14 +53,14 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
-			incomingErrorDoc := msg
+		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
-		store.EXPECT().Head(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -91,8 +89,8 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
-			incomingErrorDoc := msg
+		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error

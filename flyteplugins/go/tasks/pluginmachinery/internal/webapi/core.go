@@ -11,9 +11,9 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
+	stdErrs "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 const (
@@ -33,7 +33,7 @@ const (
 type CorePlugin struct {
 	id             string
 	p              webapi.AsyncPlugin
-	cache          cache.AutoRefresh
+	cache          autorefreshcache.AutoRefresh
 	tokenAllocator tokenAllocator
 	metrics        Metrics
 }

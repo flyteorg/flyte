@@ -10,10 +10,10 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 //go:generate mockery -all -case=underscore
@@ -36,7 +36,7 @@ type Client interface {
 // A generic AutoRefresh cache that uses a client to fetch items' status.
 type ResourceCache struct {
 	// AutoRefresh
-	cache.AutoRefresh
+	autorefreshcache.AutoRefresh
 	client Client
 	cfg    webapi.CachingConfig
 }
@@ -58,10 +58,10 @@ func (c CacheItem) IsTerminal() bool {
 
 // This basically grab an updated status from Client and store it in the cache
 // All other handling should be in the synchronous loop.
-func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
-	updatedBatch []cache.ItemSyncResponse, err error) {
+func (q *ResourceCache) SyncResource(ctx context.Context, batch autorefreshcache.Batch) (
+	updatedBatch []autorefreshcache.ItemSyncResponse, err error) {
 
-	resp := make([]cache.ItemSyncResponse, 0, len(batch))
+	resp := make([]autorefreshcache.ItemSyncResponse, 0, len(batch))
 	for _, resource := range batch {
 		// Cast the item back to the thing we want to work with.
 		cacheItem, ok := resource.GetItem().(CacheItem)
@@ -72,10 +72,10 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 
 		if len(resource.GetID()) == 0 {
 			logger.Warnf(ctx, "Sync loop - ResourceKey is blank for [%s] skipping", resource.GetID())
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   resource.GetItem(),
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -87,10 +87,10 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		if cacheItem.IsTerminal() {
 			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
 				resource.GetID())
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -100,10 +100,10 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 			logger.Debugf(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
 				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
 			cacheItem.State.Phase = PhaseSystemFailure
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 
 			continue
@@ -117,11 +117,11 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 			cacheItem.SyncFailureCount++
 			cacheItem.ErrorMessage = err.Error()
 
-			// Make sure we don't return nil for the first argument, because that deletes it from the cache.
-			resp = append(resp, cache.ItemSyncResponse{
+			// Make sure we don't return nil for the first argument, because that deletes it from the autorefreshcache.
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 
 			continue
@@ -129,10 +129,10 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 
 		cacheItem.Resource = newResource
 
-		resp = append(resp, cache.ItemSyncResponse{
+		resp = append(resp, autorefreshcache.ItemSyncResponse{
 			ID:     resource.GetID(),
 			Item:   cacheItem,
-			Action: cache.Update,
+			Action: autorefreshcache.Update,
 		})
 	}
 
@@ -175,15 +175,15 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 		cfg:    cfg,
 	}
 
-	autoRefreshCache, err := cache.NewAutoRefreshCache(name, q.SyncResource,
+	autoRefreshCache, err := autorefreshcache.NewAutoRefreshCache(name, q.SyncResource,
 		workqueue.NewMaxOfRateLimiter(
 			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
-		), cfg.ResyncInterval.Duration, uint(cfg.Workers), uint(cfg.Size),
+		), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
 		scope.NewSubScope("cache"))
 
 	if err != nil {
-		logger.Errorf(ctx, "Could not create cache. Error: [%s]", err)
+		logger.Errorf(ctx, "Could not create autorefreshcache. Error: [%s]", err)
 		return q, errors.Wrapf(errors.CacheFailed, err, "Error creating AutoRefreshCache")
 	}
 

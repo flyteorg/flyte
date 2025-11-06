@@ -25,7 +25,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	// TODO @pvditt fix
 	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

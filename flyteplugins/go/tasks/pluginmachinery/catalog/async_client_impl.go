@@ -8,9 +8,9 @@ import (
 	"reflect"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

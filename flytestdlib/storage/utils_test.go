@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	flyteerrors "github.com/flyteorg/flyte/flytestdlib/errors"
+	flyteerrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/stow"
 )
 

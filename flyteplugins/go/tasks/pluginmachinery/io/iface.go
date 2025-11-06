@@ -3,7 +3,7 @@ package io
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

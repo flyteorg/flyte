@@ -12,9 +12,9 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	testingclock "k8s.io/utils/clock/testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 const fakeCacheItemValueLimit = 10

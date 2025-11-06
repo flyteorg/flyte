@@ -9,7 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate enumer --type=Type -json -yaml -trimprefix=Type

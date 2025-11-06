@@ -10,10 +10,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 )
 
 const (
@@ -129,28 +129,29 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 }
 
 func GetLiteralOffloadingEnvVars() []v1.EnvVar {
-	propellerConfig := propellerCfg.GetConfig()
-	if !propellerConfig.LiteralOffloadingConfig.Enabled {
-		return []v1.EnvVar{}
-	}
+	// TODO @pvditt fix
+	//propellerConfig := propellerCfg.GetConfig()
+	//if !propellerConfig.LiteralOffloadingConfig.Enabled {
+	//	return []v1.EnvVar{}
+	//}
 
 	envVars := []v1.EnvVar{}
-	if propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading > 0 {
-		envVars = append(envVars,
-			v1.EnvVar{
-				Name:  "_F_L_MIN_SIZE_MB",
-				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, 10),
-			},
-		)
-	}
-	if propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading > 0 {
-		envVars = append(envVars,
-			v1.EnvVar{
-				Name:  "_F_L_MAX_SIZE_MB",
-				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, 10),
-			},
-		)
-	}
+	//if propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading > 0 {
+	//	envVars = append(envVars,
+	//		v1.EnvVar{
+	//			Name:  "_F_L_MIN_SIZE_MB",
+	//			Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, 10),
+	//		},
+	//	)
+	//}
+	//if propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading > 0 {
+	//	envVars = append(envVars,
+	//		v1.EnvVar{
+	//			Name:  "_F_L_MAX_SIZE_MB",
+	//			Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, 10),
+	//		},
+	//	)
+	//}
 	return envVars
 }
 

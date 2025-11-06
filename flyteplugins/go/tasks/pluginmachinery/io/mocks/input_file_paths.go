@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	storage "github.com/flyteorg/flyte/flytestdlib/storage"
+	storage "github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	mock "github.com/stretchr/testify/mock"
 )
 

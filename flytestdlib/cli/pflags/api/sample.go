@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 var DefaultTestType = &TestType{

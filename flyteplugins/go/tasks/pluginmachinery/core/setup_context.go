@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // When a change is observed, the owning entity can be triggered for re-validation

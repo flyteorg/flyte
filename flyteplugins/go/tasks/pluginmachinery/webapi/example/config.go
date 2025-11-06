@@ -6,7 +6,7 @@ import (
 	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

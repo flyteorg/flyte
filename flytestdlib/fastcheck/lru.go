@@ -5,7 +5,7 @@ import (
 
 	cache "github.com/hashicorp/golang-lru"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // validate that it conforms to the interface

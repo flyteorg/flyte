@@ -6,7 +6,7 @@ import (
 
 	"k8s.io/utils/strings/slices"
 
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

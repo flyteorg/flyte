@@ -29,10 +29,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	idlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

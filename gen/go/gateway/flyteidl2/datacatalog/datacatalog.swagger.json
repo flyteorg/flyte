@@ -505,7 +505,7 @@
           "title": "A list of data that is associated with the artifact"
         },
         "metadata": {
-          "$ref": "#/definitions/datacatalogMetadata",
+          "$ref": "#/definitions/flyteidl2datacatalogMetadata",
           "title": "Free-form metadata associated with the artifact"
         },
         "partitions": {
@@ -566,7 +566,7 @@
           "$ref": "#/definitions/datacatalogDatasetID"
         },
         "metadata": {
-          "$ref": "#/definitions/datacatalogMetadata"
+          "$ref": "#/definitions/flyteidl2datacatalogMetadata"
         },
         "partitionKeys": {
           "type": "array",
@@ -660,16 +660,6 @@
       },
       "description": "Response message for retrieving a Dataset. The response will include the metadata for the\nDataset."
     },
-    "datacatalogGetOrExtendReservationResponse": {
-      "type": "object",
-      "properties": {
-        "reservation": {
-          "$ref": "#/definitions/datacatalogReservation",
-          "title": "The reservation to be acquired or extended"
-        }
-      },
-      "title": "Response including either a newly minted reservation or the existing reservation"
-    },
     "datacatalogListArtifactsResponse": {
       "type": "object",
       "properties": {
@@ -705,19 +695,6 @@
         }
       },
       "title": "List the datasets response with token for next pagination"
-    },
-    "datacatalogMetadata": {
-      "type": "object",
-      "properties": {
-        "key_map": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "key map is a dictionary of key/val strings that represent metadata"
-        }
-      },
-      "title": "Metadata representation for artifacts and datasets"
     },
     "datacatalogPaginationOptions": {
       "type": "object",
@@ -762,37 +739,6 @@
         }
       },
       "title": "Partition properties we can filter by"
-    },
-    "datacatalogReleaseReservationResponse": {
-      "type": "object",
-      "title": "Response to release reservation"
-    },
-    "datacatalogReservation": {
-      "type": "object",
-      "properties": {
-        "reservation_id": {
-          "$ref": "#/definitions/datacatalogReservationID",
-          "title": "The unique ID for the reservation"
-        },
-        "owner_id": {
-          "type": "string",
-          "title": "The unique ID of the owner for the reservation"
-        },
-        "heartbeat_interval": {
-          "type": "string",
-          "title": "Recommended heartbeat interval to extend reservation"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Expiration timestamp of this reservation"
-        },
-        "metadata": {
-          "$ref": "#/definitions/datacatalogMetadata",
-          "title": "Free-form metadata associated with the artifact"
-        }
-      },
-      "description": "A reservation including owner, heartbeat interval, expiration timestamp, and various metadata."
     },
     "datacatalogReservationID": {
       "type": "object",
@@ -880,6 +826,16 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "flyteidl2datacatalogGetOrExtendReservationResponse": {
+      "type": "object",
+      "properties": {
+        "reservation": {
+          "$ref": "#/definitions/flyteidl2datacatalogReservation",
+          "title": "The reservation to be acquired or extended"
+        }
+      },
+      "title": "Response including either a newly minted reservation or the existing reservation"
+    },
     "flyteidl2datacatalogKeyValuePair": {
       "type": "object",
       "properties": {
@@ -890,6 +846,50 @@
           "type": "string"
         }
       }
+    },
+    "flyteidl2datacatalogMetadata": {
+      "type": "object",
+      "properties": {
+        "key_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "key map is a dictionary of key/val strings that represent metadata"
+        }
+      },
+      "title": "Metadata representation for artifacts and datasets"
+    },
+    "flyteidl2datacatalogReleaseReservationResponse": {
+      "type": "object",
+      "title": "Response to release reservation"
+    },
+    "flyteidl2datacatalogReservation": {
+      "type": "object",
+      "properties": {
+        "reservation_id": {
+          "$ref": "#/definitions/datacatalogReservationID",
+          "title": "The unique ID for the reservation"
+        },
+        "owner_id": {
+          "type": "string",
+          "title": "The unique ID of the owner for the reservation"
+        },
+        "heartbeat_interval": {
+          "type": "string",
+          "title": "Recommended heartbeat interval to extend reservation"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration timestamp of this reservation"
+        },
+        "metadata": {
+          "$ref": "#/definitions/flyteidl2datacatalogMetadata",
+          "title": "Free-form metadata associated with the artifact"
+        }
+      },
+      "description": "A reservation including owner, heartbeat interval, expiration timestamp, and various metadata."
     },
     "googlerpcStatus": {
       "type": "object",

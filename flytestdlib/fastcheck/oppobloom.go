@@ -19,7 +19,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 var ErrSizeTooLarge = errors.New("oppobloom: size given too large to round to a power of 2")

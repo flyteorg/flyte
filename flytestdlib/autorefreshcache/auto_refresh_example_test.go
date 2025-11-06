@@ -8,8 +8,8 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 type ExampleItemStatus string

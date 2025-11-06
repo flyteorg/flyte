@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

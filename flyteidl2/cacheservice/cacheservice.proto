@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package flyteidl2.cacheservice;
+
+import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/types.proto";
+import "flyteidl2/core/identifier.proto";
+import "flyteidl2/core/interface.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice";
+
+/*
+ * CacheService defines operations for cache management including retrieval, storage, and deletion of cached task/workflow outputs.
+ */
+service CacheService {
+  // Retrieves cached data by key.
+  rpc Get (GetCacheRequest) returns (GetCacheResponse);
+
+  // Stores or updates cached data by key.
+  rpc Put (PutCacheRequest) returns (PutCacheResponse);
+
+  // Deletes cached data by key.
+  rpc Delete (DeleteCacheRequest) returns (DeleteCacheResponse);
+
+  // Get or extend a reservation for a cache key
+  rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
+
+  // Release the reservation for a cache key
+  rpc ReleaseReservation (ReleaseReservationRequest) returns (ReleaseReservationResponse);
+}
+
+/*
+ * Additional metadata as key-value pairs
+ */
+message KeyMapMetadata {
+  map<string, string> values = 1; // Additional metadata as key-value pairs
+}
+
+/*
+ * Metadata for cached outputs, including the source identifier and timestamps.
+ */
+message Metadata {
+  core.Identifier source_identifier = 1; // Source task or workflow identifier
+  KeyMapMetadata key_map = 2; // Additional metadata as key-value pairs
+  google.protobuf.Timestamp created_at = 3; // Creation timestamp
+  google.protobuf.Timestamp last_updated_at = 4; // Last update timestamp
+}
+
+/*
+ * Represents cached output, either as literals or an URI, with associated metadata.
+ */
+message CachedOutput {
+  oneof output {
+    flyteidl2.core.LiteralMap output_literals = 1; // Output literals
+    string output_uri = 2; // URI to output data
+  }
+  Metadata metadata = 3; // Associated metadata
+}
+
+/*
+ * Request to retrieve cached data by key.
+ */
+message GetCacheRequest {
+  string key = 1; // Cache key
+}
+
+/*
+ * Response with cached data for a given key.
+ */
+message GetCacheResponse {
+  CachedOutput output = 1; // Cached output
+}
+
+message OverwriteOutput {
+  bool overwrite = 1; // Overwrite flag
+  bool delete_blob = 2; // Delete existing blob
+  google.protobuf.Duration max_age = 3; // Maximum age of the cached output since last update
+}
+
+/*
+ * Request to store/update cached data by key.
+ */
+message PutCacheRequest {
+  string key = 1; // Cache key
+  CachedOutput output = 2; // Output to cache
+  OverwriteOutput overwrite = 3; // Overwrite flag if exists
+}
+
+/*
+ * Response message of cache store/update operation.
+ */
+message PutCacheResponse {
+  // Empty, success indicated by no errors
+}
+
+/*
+ * Request to delete cached data by key.
+ */
+message DeleteCacheRequest {
+  string key = 1; // Cache key
+}
+
+/*
+ * Response message of cache deletion operation.
+ */
+message DeleteCacheResponse {
+  // Empty, success indicated by no errors
+}
+
+// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
+message Reservation {
+  string key = 1; // The unique ID for the reservation - same as the cache key
+  string owner_id = 2; // The unique ID of the owner for the reservation
+  google.protobuf.Duration heartbeat_interval = 3; // Requested reservation extension heartbeat interval
+  google.protobuf.Timestamp expires_at = 4; // Expiration timestamp of this reservation
+}
+
+/*
+ * Request to get or extend a reservation for a cache key
+ */
+message GetOrExtendReservationRequest {
+  string key = 1; // The unique ID for the reservation - same as the cache key
+  string owner_id = 2; // The unique ID of the owner for the reservation
+  google.protobuf.Duration heartbeat_interval = 3; // Requested reservation extension heartbeat interval
+}
+
+/*
+ * Request to get or extend a reservation for a cache key
+ */
+message GetOrExtendReservationResponse {
+  Reservation reservation = 1; // The reservation that was created or extended
+}
+
+/*
+ * Request to release the reservation for a cache key
+ */
+message ReleaseReservationRequest {
+  string key = 1; // The unique ID for the reservation - same as the cache key
+  string owner_id = 2; // The unique ID of the owner for the reservation
+}
+
+/*
+ * Response message of release reservation operation.
+ */
+message ReleaseReservationResponse {
+  // Empty, success indicated by no errors
+}

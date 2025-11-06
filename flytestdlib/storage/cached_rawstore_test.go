@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/ioutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/ioutils"
 )
 
 func TestNewCachedStore(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	pluginmachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

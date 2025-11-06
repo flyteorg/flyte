@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	autorefreshcache "github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	autorefreshcache "github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
 
 	mock "github.com/stretchr/testify/mock"
 )

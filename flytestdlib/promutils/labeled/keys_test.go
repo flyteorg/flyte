@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 )
 
 func TestMetricKeys(t *testing.T) {

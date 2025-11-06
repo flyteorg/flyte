@@ -3,8 +3,8 @@ package ioutils
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 const (

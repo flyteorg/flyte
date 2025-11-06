@@ -10,10 +10,10 @@ import (
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flyte/flytestdlib/ioutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/otelutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/ioutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 type protoMetrics struct {

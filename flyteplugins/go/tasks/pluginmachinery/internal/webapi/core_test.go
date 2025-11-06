@@ -9,7 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 func Test_validateConfig(t *testing.T) {

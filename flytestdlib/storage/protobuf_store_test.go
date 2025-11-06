@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"math/rand"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/stow/s3"
 )
 
@@ -148,13 +148,13 @@ func TestDefaultProtobufStore_HardErrors(t *testing.T) {
 	dummyReadErrorMsg := "Dummy read error"
 	store := &dummyStore{
 		HeadCb: func(ctx context.Context, reference DataReference) (Metadata, error) {
-			return MemoryMetadata{}, fmt.Errorf(dummyHeadErrorMsg)
+			return MemoryMetadata{}, errors.New(dummyHeadErrorMsg)
 		},
 		WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
-			return fmt.Errorf(dummyWriteErrorMsg)
+			return errors.New(dummyWriteErrorMsg)
 		},
 		ReadRawCb: func(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
-			return nil, fmt.Errorf(dummyReadErrorMsg)
+			return nil, errors.New(dummyReadErrorMsg)
 		},
 	}
 	pbErroneousStore := NewDefaultProtobufStoreWithMetrics(store, metrics.protoMetrics)

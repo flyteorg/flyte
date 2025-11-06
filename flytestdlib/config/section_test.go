@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 )
 
 // Make sure existing config file(s) parse correctly before overriding them with this flag!

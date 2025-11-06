@@ -7,7 +7,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 var DefaultPodTemplateStore PodTemplateStore = NewPodTemplateStore()

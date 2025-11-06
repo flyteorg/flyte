@@ -21,8 +21,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	k8sRand "k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 )
 
 type accessorCreatorFn func(registry config.Section, configPath string) config.Accessor

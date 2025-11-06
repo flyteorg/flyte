@@ -8,8 +8,8 @@ import (
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 )
 
 func fromHashToByteArray(input [32]byte) []byte {

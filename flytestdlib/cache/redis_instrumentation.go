@@ -6,9 +6,9 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/metrics"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/metrics"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // A hook that adds metrics around redis operations.

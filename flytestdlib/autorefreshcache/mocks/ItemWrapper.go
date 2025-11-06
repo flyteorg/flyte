@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	autorefreshcache "github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	autorefreshcache "github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
 	mock "github.com/stretchr/testify/mock"
 )
 

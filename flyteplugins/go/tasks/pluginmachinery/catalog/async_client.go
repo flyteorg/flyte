@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
 
 type ResponseStatus uint8

@@ -13,8 +13,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	config2 "github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

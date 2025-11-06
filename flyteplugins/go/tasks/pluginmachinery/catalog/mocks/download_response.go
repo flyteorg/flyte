@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	bitarray "github.com/flyteorg/flyte/flytestdlib/bitarray"
+	bitarray "github.com/flyteorg/flyte/v2/flytestdlib/bitarray"
 
 	mock "github.com/stretchr/testify/mock"
 )

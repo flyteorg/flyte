@@ -10,7 +10,7 @@ import (
 	"github.com/ernesto-jimenez/gogen/gogenutil"
 	"golang.org/x/tools/go/packages"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 const (
@@ -226,6 +226,9 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 		if isPtr {
 			typ = ptr.Elem()
 		}
+
+		// Unwrap type aliases (e.g., type Foo = string) introduced in Go 1.22+
+		typ = types.Unalias(typ)
 
 		switch t := typ.(type) {
 		case *types.Basic:

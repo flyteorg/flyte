@@ -8,7 +8,7 @@ import (
 	internalRemote "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 type taskPluginRegistry struct {

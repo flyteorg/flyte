@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/go-test/deep"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -18,7 +19,6 @@ import (
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

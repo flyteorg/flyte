@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/vmihailenco/msgpack/v5"
 
-	"github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/v2/flytestdlib/cache/mocks"
 )
 
 type DummyType struct {

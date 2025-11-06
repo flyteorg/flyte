@@ -17,7 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 

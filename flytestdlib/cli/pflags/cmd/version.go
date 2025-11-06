@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/flyteorg/flyte/v2/flytestdlib/version"
 )
 
 var versionCmd = &cobra.Command{
