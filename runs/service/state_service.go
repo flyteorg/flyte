@@ -26,172 +26,124 @@ func NewStateService(repo repository.Repository) *StateService {
 	}
 }
 
-// Put handles the bidirectional streaming Put RPC
-// Client sends PutRequest messages, server responds with PutResponse for each
-func (s *StateService) Put(ctx context.Context, stream *connect.BidiStream[workflow.PutRequest, workflow.PutResponse]) error {
-	logger.Infof(ctx, "StateService.Put stream started")
+// Put handles the unary Put RPC
+// Client sends a single PutRequest, server responds with PutResponse
+func (s *StateService) Put(ctx context.Context, req *connect.Request[workflow.PutRequest]) (*connect.Response[workflow.PutResponse], error) {
+	logger.Infof(ctx, "StateService.Put called")
 
-	for {
-		// Receive request from client
-		req, err := stream.Receive()
-		if err != nil {
-			// Stream closed by client
-			logger.Infof(ctx, "StateService.Put stream closed: %v", err)
-			return nil
-		}
+	msg := req.Msg
 
-		// Validate request
-		if req.ActionId == nil {
-			resp := &workflow.PutResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeInvalidArgument),
-					Message: "action_id is required",
-				},
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		if req.State == "" {
-			resp := &workflow.PutResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeInvalidArgument),
-					Message: "state is required",
-				},
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Validate that state is valid JSON
-		var stateObj map[string]interface{}
-		if err := json.Unmarshal([]byte(req.State), &stateObj); err != nil {
-			resp := &workflow.PutResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeInvalidArgument),
-					Message: fmt.Sprintf("state must be valid JSON: %v", err),
-				},
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Update action state in database
-		if err := s.repo.UpdateActionState(ctx, req.ActionId, req.State); err != nil {
-			logger.Warnf(ctx, "Failed to update action state: %v", err)
-			resp := &workflow.PutResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeInternal),
-					Message: fmt.Sprintf("failed to update state: %v", err),
-				},
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Send notification
-		if err := s.repo.NotifyStateUpdate(ctx, req.ActionId); err != nil {
-			logger.Warnf(ctx, "Failed to send state update notification: %v", err)
-			// Continue anyway - the update was saved
-		}
-
-		// Send success response
-		resp := &workflow.PutResponse{
-			ActionId: req.ActionId,
+	// Validate request
+	if msg.ActionId == nil {
+		return connect.NewResponse(&workflow.PutResponse{
+			ActionId: msg.ActionId,
 			Status: &status.Status{
-				Code:    0, // OK
-				Message: "state updated successfully",
+				Code:    int32(connect.CodeInvalidArgument),
+				Message: "action_id is required",
 			},
-		}
-
-		if err := stream.Send(resp); err != nil {
-			return err
-		}
-
-		logger.Infof(ctx, "Updated state for action: %s/%s/%s/%s/%s",
-			req.ActionId.Run.Org, req.ActionId.Run.Project, req.ActionId.Run.Domain,
-			req.ActionId.Run.Name, req.ActionId.Name)
+		}), nil
 	}
+
+	if msg.State == "" {
+		return connect.NewResponse(&workflow.PutResponse{
+			ActionId: msg.ActionId,
+			Status: &status.Status{
+				Code:    int32(connect.CodeInvalidArgument),
+				Message: "state is required",
+			},
+		}), nil
+	}
+
+	// Validate that state is valid JSON
+	var stateObj map[string]interface{}
+	if err := json.Unmarshal([]byte(msg.State), &stateObj); err != nil {
+		return connect.NewResponse(&workflow.PutResponse{
+			ActionId: msg.ActionId,
+			Status: &status.Status{
+				Code:    int32(connect.CodeInvalidArgument),
+				Message: fmt.Sprintf("state must be valid JSON: %v", err),
+			},
+		}), nil
+	}
+
+	// Update action state in database
+	if err := s.repo.UpdateActionState(ctx, msg.ActionId, msg.State); err != nil {
+		logger.Warnf(ctx, "Failed to update action state: %v", err)
+		return connect.NewResponse(&workflow.PutResponse{
+			ActionId: msg.ActionId,
+			Status: &status.Status{
+				Code:    int32(connect.CodeInternal),
+				Message: fmt.Sprintf("failed to update state: %v", err),
+			},
+		}), nil
+	}
+
+	// Send notification
+	if err := s.repo.NotifyStateUpdate(ctx, msg.ActionId); err != nil {
+		logger.Warnf(ctx, "Failed to send state update notification: %v", err)
+		// Continue anyway - the update was saved
+	}
+
+	logger.Infof(ctx, "Updated state for action: %s/%s/%s/%s/%s",
+		msg.ActionId.Run.Org, msg.ActionId.Run.Project, msg.ActionId.Run.Domain,
+		msg.ActionId.Run.Name, msg.ActionId.Name)
+
+	// Return success response
+	return connect.NewResponse(&workflow.PutResponse{
+		ActionId: msg.ActionId,
+		Status: &status.Status{
+			Code:    0, // OK
+			Message: "state updated successfully",
+		},
+	}), nil
 }
 
-// Get handles the bidirectional streaming Get RPC
-// Client sends GetRequest messages, server responds with GetResponse for each
-func (s *StateService) Get(ctx context.Context, stream *connect.BidiStream[workflow.GetRequest, workflow.GetResponse]) error {
-	logger.Infof(ctx, "StateService.Get stream started")
+// Get handles the unary Get RPC
+// Client sends a single GetRequest, server responds with GetResponse
+func (s *StateService) Get(ctx context.Context, req *connect.Request[workflow.GetRequest]) (*connect.Response[workflow.GetResponse], error) {
+	logger.Infof(ctx, "StateService.Get called")
 
-	for {
-		// Receive request from client
-		req, err := stream.Receive()
-		if err != nil {
-			// Stream closed by client
-			logger.Infof(ctx, "StateService.Get stream closed: %v", err)
-			return nil
-		}
+	msg := req.Msg
 
-		// Validate request
-		if req.ActionId == nil {
-			resp := &workflow.GetResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeInvalidArgument),
-					Message: "action_id is required",
-				},
-				State: "",
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Get action state from database
-		state, err := s.repo.GetActionState(ctx, req.ActionId)
-		if err != nil {
-			logger.Warnf(ctx, "Failed to get action state: %v", err)
-			resp := &workflow.GetResponse{
-				ActionId: req.ActionId,
-				Status: &status.Status{
-					Code:    int32(connect.CodeNotFound),
-					Message: fmt.Sprintf("failed to get state: %v", err),
-				},
-				State: "",
-			}
-			if err := stream.Send(resp); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Send success response
-		resp := &workflow.GetResponse{
-			ActionId: req.ActionId,
+	// Validate request
+	if msg.ActionId == nil {
+		return connect.NewResponse(&workflow.GetResponse{
+			ActionId: msg.ActionId,
 			Status: &status.Status{
-				Code:    0, // OK
-				Message: "state retrieved successfully",
+				Code:    int32(connect.CodeInvalidArgument),
+				Message: "action_id is required",
 			},
-			State: state,
-		}
-
-		if err := stream.Send(resp); err != nil {
-			return err
-		}
-
-		logger.Infof(ctx, "Retrieved state for action: %s/%s/%s/%s/%s",
-			req.ActionId.Run.Org, req.ActionId.Run.Project, req.ActionId.Run.Domain,
-			req.ActionId.Run.Name, req.ActionId.Name)
+			State: "",
+		}), nil
 	}
+
+	// Get action state from database
+	state, err := s.repo.GetActionState(ctx, msg.ActionId)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to get action state: %v", err)
+		return connect.NewResponse(&workflow.GetResponse{
+			ActionId: msg.ActionId,
+			Status: &status.Status{
+				Code:    int32(connect.CodeNotFound),
+				Message: fmt.Sprintf("failed to get state: %v", err),
+			},
+			State: "",
+		}), nil
+	}
+
+	logger.Infof(ctx, "Retrieved state for action: %s/%s/%s/%s/%s",
+		msg.ActionId.Run.Org, msg.ActionId.Run.Project, msg.ActionId.Run.Domain,
+		msg.ActionId.Run.Name, msg.ActionId.Name)
+
+	// Return success response
+	return connect.NewResponse(&workflow.GetResponse{
+		ActionId: msg.ActionId,
+		Status: &status.Status{
+			Code:    0, // OK
+			Message: "state retrieved successfully",
+		},
+		State: state,
+	}), nil
 }
 
 // Watch handles the server-side streaming Watch RPC

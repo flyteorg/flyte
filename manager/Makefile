@@ -1,5 +1,13 @@
 .PHONY: build run clean test
 
+.PHONY: help
+help: ## Show this help message
+	@echo '🆘  Showing help message'
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Available targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
 # Build the unified manager binary
 build:
 	go build -o bin/flyte-manager cmd/main.go

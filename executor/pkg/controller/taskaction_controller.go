@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"time"
 
+	"connectrpc.com/connect"
 	"golang.org/x/net/http2"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -203,36 +204,24 @@ func (r *TaskActionReconciler) createStateJSON(actionSpec *workflow.ActionSpec, 
 	return string(stateBytes)
 }
 
-// updateStateService sends a state update to the State Service via bidirectional streaming
+// updateStateService sends a state update to the State Service via unary RPC
 func (r *TaskActionReconciler) updateStateService(ctx context.Context, actionID *common.ActionIdentifier, parentActionName *string, stateJSON string) error {
-	// Create a bidirectional stream
-	stream := r.stateServiceClient.Put(ctx)
-
-	// Send PutRequest
-	req := &workflow.PutRequest{
+	// Create PutRequest
+	reqMsg := &workflow.PutRequest{
 		ActionId:         actionID,
 		ParentActionName: parentActionName,
 		State:            stateJSON,
 	}
 
-	if err := stream.Send(req); err != nil {
-		return fmt.Errorf("failed to send put request: %w", err)
-	}
-
-	// Receive PutResponse
-	resp, err := stream.Receive()
+	// Make unary Put call
+	resp, err := r.stateServiceClient.Put(ctx, connect.NewRequest(reqMsg))
 	if err != nil {
-		return fmt.Errorf("failed to receive put response: %w", err)
+		return fmt.Errorf("failed to call put: %w", err)
 	}
 
 	// Check response status
-	if resp.Status.Code != 0 {
-		return fmt.Errorf("state service returned error: %s", resp.Status.Message)
-	}
-
-	// Close the stream
-	if err := stream.CloseRequest(); err != nil {
-		return fmt.Errorf("failed to close request stream: %w", err)
+	if resp.Msg.Status.Code != 0 {
+		return fmt.Errorf("state service returned error: %s", resp.Msg.Status.Message)
 	}
 
 	return nil
