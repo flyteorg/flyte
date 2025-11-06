@@ -466,6 +466,18 @@ func (m *Schedule) validate(all bool) error {
 			}
 		}
 
+	case *Schedule_CronExpression:
+		if v == nil {
+			err := ScheduleValidationError{
+				field:  "Expression",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for CronExpression
 	case *Schedule_Cron:
 		if v == nil {
 			err := ScheduleValidationError{
