@@ -6524,4 +6524,48 @@ func TestAddIdentityAnnotations(t *testing.T) {
 		assert.NotContains(t, result, "flyte.ai/user-sub")
 		assert.Equal(t, "value", result["existing"])
 	})
+
+	t.Run("app identity with unknown key", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "unknown-key"}
+
+		manager := ExecutionManager{config: mockConfig}
+
+		// App identity
+		identity, err := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
+
+		// Should only add email (known key), not unknown-key
+		assert.Equal(t, "app-123", result["flyte.ai/app-email"])
+		assert.NotContains(t, result, "flyte.ai/app-unknown-key")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("user identity with unknown key", func(t *testing.T) {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "unknown-key"}
+
+		manager := ExecutionManager{config: mockConfig}
+
+		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
+		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		assert.NoError(t, err)
+		ctx := identity.WithContext(context.Background())
+
+		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
+
+		// Should only add email (known key), not unknown-key
+		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
+		assert.NotContains(t, result, "flyte.ai/user-unknown-key")
+		assert.Equal(t, "value", result["existing"])
+	})
 }
