@@ -534,6 +534,8 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 
 	// add task to worker
 	f.metrics.taskAssigned.Inc()
+	f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
+
 	worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
 		TaskId: taskID,
 		ExecId: &pb.ExecutionIdentifier{
@@ -549,6 +551,7 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 		EnqueueLabels: enqueueLabels,
 	})
 	worker.SetLastAccessedAt(time.Now().Unix())
+
 	return worker, nil
 }
 
