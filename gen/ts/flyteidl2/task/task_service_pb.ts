@@ -9,15 +9,17 @@ import type { ProjectIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { ListRequest } from "../common/list_pb.ts";
 import { file_flyteidl2_common_list } from "../common/list_pb.ts";
-import type { Task, TaskDetails, TaskIdentifier, TaskSpec, TaskTrigger } from "./task_definition_pb.ts";
+import type { Task, TaskDetails, TaskIdentifier, TaskName, TaskSpec, TaskTrigger } from "./task_definition_pb.ts";
 import { file_flyteidl2_task_task_definition } from "./task_definition_pb.ts";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/task/task_service.proto.
  */
 export const file_flyteidl2_task_task_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvdGFzay90YXNrX3NlcnZpY2UucHJvdG8SDmZseXRlaWRsMi50YXNrIqsBChFEZXBsb3lUYXNrUmVxdWVzdBI3Cgd0YXNrX2lkGAEgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJCBrpIA8gBARIuCgRzcGVjGAIgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNCBrpIA8gBARItCgh0cmlnZ2VycxgDIAMoCzIbLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2VyIhQKEkRlcGxveVRhc2tSZXNwb25zZSJQChVHZXRUYXNrRGV0YWlsc1JlcXVlc3QSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQEiRgoWR2V0VGFza0RldGFpbHNSZXNwb25zZRIsCgdkZXRhaWxzGAEgASgLMhsuZmx5dGVpZGwyLnRhc2suVGFza0RldGFpbHMiowIKEExpc3RUYXNrc1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSGQoDb3JnGAIgASgJQgq6SAfYAQFyAhABSAASOQoKcHJvamVjdF9pZBgDIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABJDCg1rbm93bl9maWx0ZXJzGAQgAygLMiwuZmx5dGVpZGwyLnRhc2suTGlzdFRhc2tzUmVxdWVzdC5Lbm93bkZpbHRlchoxCgtLbm93bkZpbHRlchIVCgtkZXBsb3llZF9ieRgBIAEoCUgAQgsKCWZpbHRlcl9ieUIRCghzY29wZV9ieRIFukgCCAEiRwoRTGlzdFRhc2tzUmVzcG9uc2USIwoFdGFza3MYASADKAsyFC5mbHl0ZWlkbDIudGFzay5UYXNrEg0KBXRva2VuGAIgASgJMqECCgtUYXNrU2VydmljZRJVCgpEZXBsb3lUYXNrEiEuZmx5dGVpZGwyLnRhc2suRGVwbG95VGFza1JlcXVlc3QaIi5mbHl0ZWlkbDIudGFzay5EZXBsb3lUYXNrUmVzcG9uc2UiABJkCg5HZXRUYXNrRGV0YWlscxIlLmZseXRlaWRsMi50YXNrLkdldFRhc2tEZXRhaWxzUmVxdWVzdBomLmZseXRlaWRsMi50YXNrLkdldFRhc2tEZXRhaWxzUmVzcG9uc2UiA5ACARJVCglMaXN0VGFza3MSIC5mbHl0ZWlkbDIudGFzay5MaXN0VGFza3NSZXF1ZXN0GiEuZmx5dGVpZGwyLnRhc2suTGlzdFRhc2tzUmVzcG9uc2UiA5ACAUK1AQoSY29tLmZseXRlaWRsMi50YXNrQhBUYXNrU2VydmljZVByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_task_task_definition]);
+  fileDesc("CiFmbHl0ZWlkbDIvdGFzay90YXNrX3NlcnZpY2UucHJvdG8SDmZseXRlaWRsMi50YXNrIqsBChFEZXBsb3lUYXNrUmVxdWVzdBI3Cgd0YXNrX2lkGAEgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJCBrpIA8gBARIuCgRzcGVjGAIgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNCBrpIA8gBARItCgh0cmlnZ2VycxgDIAMoCzIbLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2VyIhQKEkRlcGxveVRhc2tSZXNwb25zZSJQChVHZXRUYXNrRGV0YWlsc1JlcXVlc3QSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQEiRgoWR2V0VGFza0RldGFpbHNSZXNwb25zZRIsCgdkZXRhaWxzGAEgASgLMhsuZmx5dGVpZGwyLnRhc2suVGFza0RldGFpbHMioAIKEExpc3RUYXNrc1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSFgoDb3JnGAIgASgJQge6SARyAhABSAASOQoKcHJvamVjdF9pZBgDIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABJDCg1rbm93bl9maWx0ZXJzGAQgAygLMiwuZmx5dGVpZGwyLnRhc2suTGlzdFRhc2tzUmVxdWVzdC5Lbm93bkZpbHRlchoxCgtLbm93bkZpbHRlchIVCgtkZXBsb3llZF9ieRgBIAEoCUgAQgsKCWZpbHRlcl9ieUIRCghzY29wZV9ieRIFukgCCAEiygEKEUxpc3RUYXNrc1Jlc3BvbnNlEiMKBXRhc2tzGAEgAygLMhQuZmx5dGVpZGwyLnRhc2suVGFzaxINCgV0b2tlbhgCIAEoCRJFCghtZXRhZGF0YRgDIAEoCzIzLmZseXRlaWRsMi50YXNrLkxpc3RUYXNrc1Jlc3BvbnNlLkxpc3RUYXNrc01ldGFkYXRhGjoKEUxpc3RUYXNrc01ldGFkYXRhEg0KBXRvdGFsGAEgASgNEhYKDmZpbHRlcmVkX3RvdGFsGAIgASgNInoKE0xpc3RWZXJzaW9uc1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSMwoJdGFza19uYW1lGAIgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza05hbWVCBrpIA8gBASLKAQoUTGlzdFZlcnNpb25zUmVzcG9uc2USRgoIdmVyc2lvbnMYASADKAsyNC5mbHl0ZWlkbDIudGFzay5MaXN0VmVyc2lvbnNSZXNwb25zZS5WZXJzaW9uUmVzcG9uc2USDQoFdG9rZW4YAiABKAkaWwoPVmVyc2lvblJlc3BvbnNlEg8KB3ZlcnNpb24YASABKAkSNwoLZGVwbG95ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQEygQMKC1Rhc2tTZXJ2aWNlElUKCkRlcGxveVRhc2sSIS5mbHl0ZWlkbDIudGFzay5EZXBsb3lUYXNrUmVxdWVzdBoiLmZseXRlaWRsMi50YXNrLkRlcGxveVRhc2tSZXNwb25zZSIAEmQKDkdldFRhc2tEZXRhaWxzEiUuZmx5dGVpZGwyLnRhc2suR2V0VGFza0RldGFpbHNSZXF1ZXN0GiYuZmx5dGVpZGwyLnRhc2suR2V0VGFza0RldGFpbHNSZXNwb25zZSIDkAIBElUKCUxpc3RUYXNrcxIgLmZseXRlaWRsMi50YXNrLkxpc3RUYXNrc1JlcXVlc3QaIS5mbHl0ZWlkbDIudGFzay5MaXN0VGFza3NSZXNwb25zZSIDkAIBEl4KDExpc3RWZXJzaW9ucxIjLmZseXRlaWRsMi50YXNrLkxpc3RWZXJzaW9uc1JlcXVlc3QaJC5mbHl0ZWlkbDIudGFzay5MaXN0VmVyc2lvbnNSZXNwb25zZSIDkAIBQrUBChJjb20uZmx5dGVpZGwyLnRhc2tCEFRhc2tTZXJ2aWNlUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_task_task_definition, file_google_protobuf_timestamp]);
 
 /**
  * Request message for deploying a task.
@@ -198,6 +200,13 @@ export type ListTasksResponse = Message<"flyteidl2.task.ListTasksResponse"> & {
    * @generated from field: string token = 2;
    */
   token: string;
+
+  /**
+   * Metadata for the ListTasksResponse
+   *
+   * @generated from field: flyteidl2.task.ListTasksResponse.ListTasksMetadata metadata = 3;
+   */
+  metadata?: ListTasksResponse_ListTasksMetadata;
 };
 
 /**
@@ -206,6 +215,112 @@ export type ListTasksResponse = Message<"flyteidl2.task.ListTasksResponse"> & {
  */
 export const ListTasksResponseSchema: GenMessage<ListTasksResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_task_service, 5);
+
+/**
+ * @generated from message flyteidl2.task.ListTasksResponse.ListTasksMetadata
+ */
+export type ListTasksResponse_ListTasksMetadata = Message<"flyteidl2.task.ListTasksResponse.ListTasksMetadata"> & {
+  /**
+   * Total number of tasks without filters applied
+   *
+   * @generated from field: uint32 total = 1;
+   */
+  total: number;
+
+  /**
+   * Total number of tasks matching the applied filters.
+   *
+   * @generated from field: uint32 filtered_total = 2;
+   */
+  filteredTotal: number;
+};
+
+/**
+ * Describes the message flyteidl2.task.ListTasksResponse.ListTasksMetadata.
+ * Use `create(ListTasksResponse_ListTasksMetadataSchema)` to create a new message.
+ */
+export const ListTasksResponse_ListTasksMetadataSchema: GenMessage<ListTasksResponse_ListTasksMetadata> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_service, 5, 0);
+
+/**
+ * Request message for listing versions for a task.
+ *
+ * @generated from message flyteidl2.task.ListVersionsRequest
+ */
+export type ListVersionsRequest = Message<"flyteidl2.task.ListVersionsRequest"> & {
+  /**
+   * Common list request parameters.
+   *
+   * @generated from field: flyteidl2.common.ListRequest request = 1;
+   */
+  request?: ListRequest;
+
+  /**
+   * Id of the task.
+   *
+   * @generated from field: flyteidl2.task.TaskName task_name = 2;
+   */
+  taskName?: TaskName;
+};
+
+/**
+ * Describes the message flyteidl2.task.ListVersionsRequest.
+ * Use `create(ListVersionsRequestSchema)` to create a new message.
+ */
+export const ListVersionsRequestSchema: GenMessage<ListVersionsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_service, 6);
+
+/**
+ * Response message for listing versions.
+ *
+ * @generated from message flyteidl2.task.ListVersionsResponse
+ */
+export type ListVersionsResponse = Message<"flyteidl2.task.ListVersionsResponse"> & {
+  /**
+   * Version with deployed_at
+   *
+   * @generated from field: repeated flyteidl2.task.ListVersionsResponse.VersionResponse versions = 1;
+   */
+  versions: ListVersionsResponse_VersionResponse[];
+
+  /**
+   * Pagination token for the next page of versions.
+   *
+   * @generated from field: string token = 2;
+   */
+  token: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.ListVersionsResponse.
+ * Use `create(ListVersionsResponseSchema)` to create a new message.
+ */
+export const ListVersionsResponseSchema: GenMessage<ListVersionsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_service, 7);
+
+/**
+ * @generated from message flyteidl2.task.ListVersionsResponse.VersionResponse
+ */
+export type ListVersionsResponse_VersionResponse = Message<"flyteidl2.task.ListVersionsResponse.VersionResponse"> & {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version: string;
+
+  /**
+   * The time the task version was deployed
+   *
+   * @generated from field: google.protobuf.Timestamp deployed_at = 2;
+   */
+  deployedAt?: Timestamp;
+};
+
+/**
+ * Describes the message flyteidl2.task.ListVersionsResponse.VersionResponse.
+ * Use `create(ListVersionsResponse_VersionResponseSchema)` to create a new message.
+ */
+export const ListVersionsResponse_VersionResponseSchema: GenMessage<ListVersionsResponse_VersionResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_service, 7, 0);
 
 /**
  * TaskService provides an interface for managing tasks.
@@ -242,6 +357,16 @@ export const TaskService: GenService<{
     methodKind: "unary";
     input: typeof ListTasksRequestSchema;
     output: typeof ListTasksResponseSchema;
+  },
+  /**
+   * Lists all versions for a task.
+   *
+   * @generated from rpc flyteidl2.task.TaskService.ListVersions
+   */
+  listVersions: {
+    methodKind: "unary";
+    input: typeof ListVersionsRequestSchema;
+    output: typeof ListVersionsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_task_task_service, 0);

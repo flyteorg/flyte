@@ -275,7 +275,7 @@ func (m *TaskTriggersSummary) validate(all bool) error {
 	var errors []error
 
 	switch v := m.Summary.(type) {
-	case *TaskTriggersSummary_AutomationSpec:
+	case *TaskTriggersSummary_Details:
 		if v == nil {
 			err := TaskTriggersSummaryValidationError{
 				field:  "Summary",
@@ -288,11 +288,11 @@ func (m *TaskTriggersSummary) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetAutomationSpec()).(type) {
+			switch v := interface{}(m.GetDetails()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, TaskTriggersSummaryValidationError{
-						field:  "AutomationSpec",
+						field:  "Details",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -300,16 +300,16 @@ func (m *TaskTriggersSummary) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, TaskTriggersSummaryValidationError{
-						field:  "AutomationSpec",
+						field:  "Details",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetAutomationSpec()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetDetails()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TaskTriggersSummaryValidationError{
-					field:  "AutomationSpec",
+					field:  "Details",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1612,6 +1612,144 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskTriggerSpecValidationError{}
+
+// Validate checks the field values on TaskTriggersSummary_TriggerDetails with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *TaskTriggersSummary_TriggerDetails) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskTriggersSummary_TriggerDetails
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// TaskTriggersSummary_TriggerDetailsMultiError, or nil if none found.
+func (m *TaskTriggersSummary_TriggerDetails) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskTriggersSummary_TriggerDetails) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Active
+
+	if all {
+		switch v := interface{}(m.GetAutomationSpec()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskTriggersSummary_TriggerDetailsValidationError{
+					field:  "AutomationSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskTriggersSummary_TriggerDetailsValidationError{
+					field:  "AutomationSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAutomationSpec()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskTriggersSummary_TriggerDetailsValidationError{
+				field:  "AutomationSpec",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return TaskTriggersSummary_TriggerDetailsMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskTriggersSummary_TriggerDetailsMultiError is an error wrapping multiple
+// validation errors returned by
+// TaskTriggersSummary_TriggerDetails.ValidateAll() if the designated
+// constraints aren't met.
+type TaskTriggersSummary_TriggerDetailsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskTriggersSummary_TriggerDetailsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskTriggersSummary_TriggerDetailsMultiError) AllErrors() []error { return m }
+
+// TaskTriggersSummary_TriggerDetailsValidationError is the validation error
+// returned by TaskTriggersSummary_TriggerDetails.Validate if the designated
+// constraints aren't met.
+type TaskTriggersSummary_TriggerDetailsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskTriggersSummary_TriggerDetailsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskTriggersSummary_TriggerDetailsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskTriggersSummary_TriggerDetailsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskTriggersSummary_TriggerDetailsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskTriggersSummary_TriggerDetailsValidationError) ErrorName() string {
+	return "TaskTriggersSummary_TriggerDetailsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskTriggersSummary_TriggerDetailsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskTriggersSummary_TriggerDetails.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskTriggersSummary_TriggerDetailsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskTriggersSummary_TriggerDetailsValidationError{}
 
 // Validate checks the field values on TaskTriggersSummary_TriggerStats with
 // the rules defined in the proto definition for this message. If any rules

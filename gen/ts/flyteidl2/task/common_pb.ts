@@ -4,6 +4,7 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Parameter } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
 import type { KeyValuePair, Literal } from "../core/literals_pb.ts";
@@ -16,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIncKCUZpeGVkUmF0ZRINCgV2YWx1ZRgBIAEoDRIrCgR1bml0GAIgASgOMh0uZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlVW5pdBIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJ+CghTY2hlZHVsZRIpCgRyYXRlGAEgASgLMhkuZmx5dGVpZGwyLnRhc2suRml4ZWRSYXRlSAASGQoPY3Jvbl9leHByZXNzaW9uGAIgASgJSAASHgoWa2lja29mZl90aW1lX2lucHV0X2FyZxgDIAEoCUIMCgpleHByZXNzaW9uIs0BChVUcmlnZ2VyQXV0b21hdGlvblNwZWMSOAoEdHlwZRgBIAEoDjIqLmZseXRlaWRsMi50YXNrLlRyaWdnZXJBdXRvbWF0aW9uU3BlYy5UeXBlEiwKCHNjaGVkdWxlGAIgASgLMhguZmx5dGVpZGwyLnRhc2suU2NoZWR1bGVIACI+CgRUeXBlEhQKEFRZUEVfVU5TUEVDSUZJRUQQABINCglUWVBFX05PTkUQARIRCg1UWVBFX1NDSEVEVUxFEAJCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIiOQoHT3V0cHV0cxIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCp/Cg1GaXhlZFJhdGVVbml0Eh8KG0ZJWEVEX1JBVEVfVU5JVF9VTlNQRUNJRklFRBAAEhoKFkZJWEVEX1JBVEVfVU5JVF9NSU5VVEUQARIYChRGSVhFRF9SQVRFX1VOSVRfSE9VUhACEhcKE0ZJWEVEX1JBVEVfVU5JVF9EQVkQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjUKBENyb24SGwoKZXhwcmVzc2lvbhgBIAEoCUIHukgEcgIQARIQCgh0aW1lem9uZRgCIAEoCSKvAQoIU2NoZWR1bGUSKQoEcmF0ZRgBIAEoCzIZLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZUgAEh0KD2Nyb25fZXhwcmVzc2lvbhgCIAEoCUICGAFIABIkCgRjcm9uGAQgASgLMhQuZmx5dGVpZGwyLnRhc2suQ3JvbkgAEh4KFmtpY2tvZmZfdGltZV9pbnB1dF9hcmcYAyABKAlCEwoKZXhwcmVzc2lvbhIFukgCCAEilgEKFVRyaWdnZXJBdXRvbWF0aW9uU3BlYxJBCgR0eXBlGAEgASgOMikuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAQgwKCmF1dG9tYXRpb24iRAoMTmFtZWRMaXRlcmFsEgwKBG5hbWUYASABKAkSJgoFdmFsdWUYAiABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsIjoKEE91dHB1dFJlZmVyZW5jZXMSEgoKb3V0cHV0X3VyaRgBIAEoCRISCgpyZXBvcnRfdXJpGAIgASgJImcKBklucHV0cxIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbBItCgdjb250ZXh0GAIgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIjkKB091dHB1dHMSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwqfwoNRml4ZWRSYXRlVW5pdBIfChtGSVhFRF9SQVRFX1VOSVRfVU5TUEVDSUZJRUQQABIaChZGSVhFRF9SQVRFX1VOSVRfTUlOVVRFEAESGAoURklYRURfUkFURV9VTklUX0hPVVIQAhIXChNGSVhFRF9SQVRFX1VOSVRfREFZEAMqUwoZVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASDQoJVFlQRV9OT05FEAESEQoNVFlQRV9TQ0hFRFVMRRACQrABChJjb20uZmx5dGVpZGwyLnRhc2tCC0NvbW1vblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -75,6 +76,33 @@ export const FixedRateSchema: GenMessage<FixedRate> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_common, 1);
 
 /**
+ * @generated from message flyteidl2.task.Cron
+ */
+export type Cron = Message<"flyteidl2.task.Cron"> & {
+  /**
+   * Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+   * e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+   *
+   * @generated from field: string expression = 1;
+   */
+  expression: string;
+
+  /**
+   * default is UTC
+   *
+   * @generated from field: string timezone = 2;
+   */
+  timezone: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.Cron.
+ * Use `create(CronSchema)` to create a new message.
+ */
+export const CronSchema: GenMessage<Cron> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 2);
+
+/**
  * Defines complete set of information required to trigger an execution on a schedule.
  *
  * @generated from message flyteidl2.task.Schedule
@@ -85,19 +113,23 @@ export type Schedule = Message<"flyteidl2.task.Schedule"> & {
    */
   expression: {
     /**
-     * Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
-     * e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
-     *
      * @generated from field: flyteidl2.task.FixedRate rate = 1;
      */
     value: FixedRate;
     case: "rate";
   } | {
     /**
-     * @generated from field: string cron_expression = 2;
+     * @generated from field: string cron_expression = 2 [deprecated = true];
+     * @deprecated
      */
     value: string;
     case: "cronExpression";
+  } | {
+    /**
+     * @generated from field: flyteidl2.task.Cron cron = 4;
+     */
+    value: Cron;
+    case: "cron";
   } | { case: undefined; value?: undefined };
 
   /**
@@ -113,7 +145,7 @@ export type Schedule = Message<"flyteidl2.task.Schedule"> & {
  * Use `create(ScheduleSchema)` to create a new message.
  */
 export const ScheduleSchema: GenMessage<Schedule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 2);
+  messageDesc(file_flyteidl2_task_common, 3);
 
 /**
  * @generated from message flyteidl2.task.TriggerAutomationSpec
@@ -122,9 +154,9 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
   /**
    * Explicitly defines trigger automation type.
    *
-   * @generated from field: flyteidl2.task.TriggerAutomationSpec.Type type = 1;
+   * @generated from field: flyteidl2.task.TriggerAutomationSpecType type = 1;
    */
-  type: TriggerAutomationSpec_Type;
+  type: TriggerAutomationSpecType;
 
   /**
    * @generated from oneof flyteidl2.task.TriggerAutomationSpec.automation
@@ -143,35 +175,7 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
  * Use `create(TriggerAutomationSpecSchema)` to create a new message.
  */
 export const TriggerAutomationSpecSchema: GenMessage<TriggerAutomationSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 3);
-
-/**
- * Specifies type of the automation attached to trigger if any.
- *
- * @generated from enum flyteidl2.task.TriggerAutomationSpec.Type
- */
-export enum TriggerAutomationSpec_Type {
-  /**
-   * @generated from enum value: TYPE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: TYPE_NONE = 1;
-   */
-  NONE = 1,
-
-  /**
-   * @generated from enum value: TYPE_SCHEDULE = 2;
-   */
-  SCHEDULE = 2,
-}
-
-/**
- * Describes the enum flyteidl2.task.TriggerAutomationSpec.Type.
- */
-export const TriggerAutomationSpec_TypeSchema: GenEnum<TriggerAutomationSpec_Type> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_task_common, 3, 0);
+  messageDesc(file_flyteidl2_task_common, 4);
 
 /**
  * Named literal value.
@@ -199,7 +203,7 @@ export type NamedLiteral = Message<"flyteidl2.task.NamedLiteral"> & {
  * Use `create(NamedLiteralSchema)` to create a new message.
  */
 export const NamedLiteralSchema: GenMessage<NamedLiteral> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 4);
+  messageDesc(file_flyteidl2_task_common, 5);
 
 /**
  * Output references.
@@ -227,7 +231,7 @@ export type OutputReferences = Message<"flyteidl2.task.OutputReferences"> & {
  * Use `create(OutputReferencesSchema)` to create a new message.
  */
 export const OutputReferencesSchema: GenMessage<OutputReferences> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 5);
+  messageDesc(file_flyteidl2_task_common, 6);
 
 /**
  * Input payload for an action.
@@ -260,7 +264,7 @@ export type Inputs = Message<"flyteidl2.task.Inputs"> & {
  * Use `create(InputsSchema)` to create a new message.
  */
 export const InputsSchema: GenMessage<Inputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 6);
+  messageDesc(file_flyteidl2_task_common, 7);
 
 /**
  * Output payload for an action.
@@ -281,7 +285,7 @@ export type Outputs = Message<"flyteidl2.task.Outputs"> & {
  * Use `create(OutputsSchema)` to create a new message.
  */
 export const OutputsSchema: GenMessage<Outputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 7);
+  messageDesc(file_flyteidl2_task_common, 8);
 
 /**
  * Represents a frequency at which to run a schedule.
@@ -315,4 +319,30 @@ export enum FixedRateUnit {
  */
 export const FixedRateUnitSchema: GenEnum<FixedRateUnit> = /*@__PURE__*/
   enumDesc(file_flyteidl2_task_common, 0);
+
+/**
+ * @generated from enum flyteidl2.task.TriggerAutomationSpecType
+ */
+export enum TriggerAutomationSpecType {
+  /**
+   * @generated from enum value: TYPE_UNSPECIFIED = 0;
+   */
+  TYPE_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TYPE_NONE = 1;
+   */
+  TYPE_NONE = 1,
+
+  /**
+   * @generated from enum value: TYPE_SCHEDULE = 2;
+   */
+  TYPE_SCHEDULE = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.task.TriggerAutomationSpecType.
+ */
+export const TriggerAutomationSpecTypeSchema: GenEnum<TriggerAutomationSpecType> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_task_common, 1);
 

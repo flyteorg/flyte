@@ -199,6 +199,65 @@ func (_c *TaskServiceServer_ListTasks_Call) RunAndReturn(run func(context.Contex
 	return _c
 }
 
+// ListVersions provides a mock function with given fields: _a0, _a1
+func (_m *TaskServiceServer) ListVersions(_a0 context.Context, _a1 *task.ListVersionsRequest) (*task.ListVersionsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListVersions")
+	}
+
+	var r0 *task.ListVersionsResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *task.ListVersionsRequest) *task.ListVersionsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*task.ListVersionsResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *task.ListVersionsRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TaskServiceServer_ListVersions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListVersions'
+type TaskServiceServer_ListVersions_Call struct {
+	*mock.Call
+}
+
+// ListVersions is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 *task.ListVersionsRequest
+func (_e *TaskServiceServer_Expecter) ListVersions(_a0 interface{}, _a1 interface{}) *TaskServiceServer_ListVersions_Call {
+	return &TaskServiceServer_ListVersions_Call{Call: _e.mock.On("ListVersions", _a0, _a1)}
+}
+
+func (_c *TaskServiceServer_ListVersions_Call) Run(run func(_a0 context.Context, _a1 *task.ListVersionsRequest)) *TaskServiceServer_ListVersions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*task.ListVersionsRequest))
+	})
+	return _c
+}
+
+func (_c *TaskServiceServer_ListVersions_Call) Return(_a0 *task.ListVersionsResponse, _a1 error) *TaskServiceServer_ListVersions_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TaskServiceServer_ListVersions_Call) RunAndReturn(run func(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error)) *TaskServiceServer_ListVersions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewTaskServiceServer creates a new instance of TaskServiceServer. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewTaskServiceServer(t interface {

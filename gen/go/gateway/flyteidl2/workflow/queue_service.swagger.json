@@ -507,36 +507,6 @@
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
     "coreInputBindingData": {
       "type": "object",
       "properties": {
@@ -976,32 +946,6 @@
       },
       "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
     },
-    "coreSecurityContext": {
-      "type": "object",
-      "properties": {
-        "run_as": {
-          "$ref": "#/definitions/flyteidl2coreIdentity",
-          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
-        },
-        "secrets": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidl2coreSecret"
-          },
-          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        },
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreOAuth2TokenRequest"
-          },
-          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        }
-      },
-      "description": "SecurityContext holds security attributes that apply to tasks."
-    },
     "coreSharedMemory": {
       "type": "object",
       "properties": {
@@ -1101,7 +1045,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidl2coreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -1135,7 +1079,7 @@
           "description": "This can be used to customize task handling at execution time for the same task type."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
         },
         "extended_resources": {
@@ -1290,6 +1234,36 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "flyteidl2coreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
+    },
     "flyteidl2coreIdentity": {
       "type": "object",
       "properties": {
@@ -1364,6 +1338,32 @@
       },
       "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
     },
+    "flyteidl2coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
+    },
     "flyteidl2coreTaskMetadata": {
       "type": "object",
       "properties": {
@@ -1427,6 +1427,10 @@
         "metadata": {
           "$ref": "#/definitions/coreK8sObjectMetadata",
           "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
+        },
+        "debuggable": {
+          "type": "boolean",
+          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
         }
       },
       "title": "Task Metadata"
@@ -1564,6 +1568,15 @@
       },
       "description": "Output references."
     },
+    "taskRawDataStorage": {
+      "type": "object",
+      "properties": {
+        "raw_data_prefix": {
+          "type": "string",
+          "title": "Prefix for where offloaded data from user actions will be written\ne.g. s3://bucket/key or s3://bucket/"
+        }
+      }
+    },
     "taskRunSpec": {
       "type": "object",
       "properties": {
@@ -1590,6 +1603,14 @@
         "cluster": {
           "type": "string",
           "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        },
+        "raw_data_storage": {
+          "$ref": "#/definitions/taskRawDataStorage",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+        },
+        "security_context": {
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
+          "description": "SecurityContext holds security attributes that apply to tasks."
         }
       }
     },

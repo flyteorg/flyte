@@ -68,6 +68,16 @@
         }
       }
     },
+    "SecretMountType": {
+      "type": "string",
+      "enum": [
+        "ANY",
+        "ENV_VAR",
+        "FILE"
+      ],
+      "default": "ANY",
+      "description": " - ANY: Default case, indicates the client can tolerate either mounting options.\n - ENV_VAR: ENV_VAR indicates the secret needs to be mounted as an environment variable.\n - FILE: FILE indicates the secret needs to be mounted as a file."
+    },
     "SortDirection": {
       "type": "string",
       "enum": [
@@ -183,47 +193,6 @@
         }
       }
     },
-    "commonListRequest": {
-      "type": "object",
-      "properties": {
-        "limit": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Indicates the number of resources to be returned.\n+required"
-        },
-        "token": {
-          "type": "string",
-          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
-        },
-        "sort_by": {
-          "$ref": "#/definitions/commonSort",
-          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonFilter"
-          },
-          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
-        },
-        "raw_filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
-        },
-        "sort_by_fields": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonSort"
-          },
-          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
-        }
-      }
-    },
     "commonOrganization": {
       "type": "object",
       "properties": {
@@ -236,7 +205,7 @@
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         },
         "actions": {
           "type": "array",
@@ -275,7 +244,7 @@
           "description": "The role designates the permitted set of actions which can be applied to the resource."
         },
         "resource": {
-          "$ref": "#/definitions/commonResource"
+          "$ref": "#/definitions/flyteidl2commonResource"
         }
       },
       "description": "A policy binding represents a role (a set of actions) defined on a resource."
@@ -314,29 +283,6 @@
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "commonResource": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "$ref": "#/definitions/commonOrganization"
-        },
-        "domain": {
-          "$ref": "#/definitions/commonDomain"
-        },
-        "project": {
-          "$ref": "#/definitions/commonProject"
-        },
-        "workflow": {
-          "$ref": "#/definitions/commonWorkflow"
-        },
-        "launch_plan": {
-          "$ref": "#/definitions/commonLaunchPlan"
-        },
-        "cluster": {
-          "$ref": "#/definitions/commonClusterIdentifier"
         }
       }
     },
@@ -736,6 +682,54 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
+    "coreOAuth2Client": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "title": "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the\nsecret requested matches the client_id indicated here.\n+required"
+        },
+        "client_secret": {
+          "$ref": "#/definitions/flyteidl2coreSecret",
+          "title": "client_secret is a reference to the secret used to authenticate the OAuth2 client.\n+required"
+        }
+      },
+      "description": "OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task."
+    },
+    "coreOAuth2TokenRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for\nenvironment variables and as a filename for mounting tokens as files.\n+required"
+        },
+        "type": {
+          "$ref": "#/definitions/coreOAuth2TokenRequestType",
+          "title": "type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.\n+required"
+        },
+        "client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "title": "client references the client_id/secret to use to request the OAuth2 token.\n+required"
+        },
+        "idp_discovery_endpoint": {
+          "type": "string",
+          "title": "idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related\ninformation.\n+optional"
+        },
+        "token_endpoint": {
+          "type": "string",
+          "title": "token_endpoint references the token issuance endpoint. If idp_discovery_endpoint is not provided, this parameter is\nmandatory.\n+optional"
+        }
+      },
+      "description": "OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.\nFLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\ntokens are passed through environment variables.\nFLYTE_TOKENS_PATH_PREFIX will be passed to indicate the prefix of the path where secrets will be mounted if tokens\nare passed through file mounts."
+    },
+    "coreOAuth2TokenRequestType": {
+      "type": "string",
+      "enum": [
+        "CLIENT_CREDENTIALS"
+      ],
+      "default": "CLIENT_CREDENTIALS",
+      "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -966,6 +960,70 @@
       "default": "ACTION_NONE",
       "title": "- ACTION_VIEW_FLYTE_INVENTORY: Read Flyte workflows, tasks and launch plans\n - ACTION_VIEW_FLYTE_EXECUTIONS: View Flyte executions\n - ACTION_REGISTER_FLYTE_INVENTORY: Register new versions of Flyte workflows, tasks and launch plans\n - ACTION_CREATE_FLYTE_EXECUTIONS: Create new Flyte workflow and task executions\n - ACTION_ADMINISTER_PROJECT: Create new projects and update project descriptions\n - ACTION_MANAGE_PERMISSIONS: Add users, roles and update role assignments.\n - ACTION_ADMINISTER_ACCOUNT: Manage billing, account-wide settings\n - ACTION_MANAGE_CLUSTER: Operations for clusters\n - ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE\n - ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT\n - ACTION_EDIT_UNUSED_ATTRIBUTES: Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE\n - ACTION_SUPPORT_SYSTEM_LOGS: View system logs"
     },
+    "flyteidl2commonListRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Indicates the number of resources to be returned.\n+required"
+        },
+        "token": {
+          "type": "string",
+          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
+        },
+        "sort_by": {
+          "$ref": "#/definitions/commonSort",
+          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonFilter"
+          },
+          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
+        },
+        "raw_filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
+        },
+        "sort_by_fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonSort"
+          },
+          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
+        }
+      }
+    },
+    "flyteidl2commonResource": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/commonOrganization"
+        },
+        "domain": {
+          "$ref": "#/definitions/commonDomain"
+        },
+        "project": {
+          "$ref": "#/definitions/commonProject"
+        },
+        "workflow": {
+          "$ref": "#/definitions/commonWorkflow"
+        },
+        "launch_plan": {
+          "$ref": "#/definitions/commonLaunchPlan"
+        },
+        "cluster": {
+          "$ref": "#/definitions/commonClusterIdentifier"
+        }
+      }
+    },
     "flyteidl2coreEnumType": {
       "type": "object",
       "properties": {
@@ -978,6 +1036,102 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidl2coreIdentity": {
+      "type": "object",
+      "properties": {
+        "iam_role": {
+          "type": "string",
+          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "description": "k8s_service_account references a kubernetes service account to impersonate."
+        },
+        "oauth2_client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
+        },
+        "execution_identity": {
+          "type": "string",
+          "title": "execution_identity references the subject who makes the execution"
+        }
+      },
+      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
+    },
+    "flyteidl2coreSecret": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "string",
+          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
+        },
+        "group_version": {
+          "type": "string",
+          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
+        },
+        "key": {
+          "type": "string",
+          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
+        },
+        "mount_requirement": {
+          "$ref": "#/definitions/SecretMountType",
+          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        },
+        "env_var": {
+          "type": "string",
+          "title": "env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,\nthen the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.\n+optional"
+        }
+      },
+      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
+    },
+    "flyteidl2coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
+    },
+    "flyteidl2triggerTriggerDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/commonTriggerIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/triggerTriggerMetadata"
+        },
+        "spec": {
+          "$ref": "#/definitions/triggerTriggerSpec"
+        },
+        "status": {
+          "$ref": "#/definitions/triggerTriggerStatus"
+        },
+        "automation_spec": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "description": "Optional automation spec."
+        }
+      },
+      "title": "Full details about a trigger stored in DB"
     },
     "googlerpcStatus": {
       "type": "object",
@@ -1033,6 +1187,19 @@
         }
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
+    },
+    "taskCron": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "default is UTC"
+        }
+      }
     },
     "taskEnvs": {
       "type": "object",
@@ -1126,6 +1293,15 @@
       },
       "description": "Named literal value."
     },
+    "taskRawDataStorage": {
+      "type": "object",
+      "properties": {
+        "raw_data_prefix": {
+          "type": "string",
+          "title": "Prefix for where offloaded data from user actions will be written\ne.g. s3://bucket/key or s3://bucket/"
+        }
+      }
+    },
     "taskRunSpec": {
       "type": "object",
       "properties": {
@@ -1152,6 +1328,14 @@
         "cluster": {
           "type": "string",
           "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
+        },
+        "raw_data_storage": {
+          "$ref": "#/definitions/taskRawDataStorage",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+        },
+        "security_context": {
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
+          "description": "SecurityContext holds security attributes that apply to tasks."
         }
       }
     },
@@ -1159,11 +1343,13 @@
       "type": "object",
       "properties": {
         "rate": {
-          "$ref": "#/definitions/taskFixedRate",
-          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+          "$ref": "#/definitions/taskFixedRate"
         },
         "cron_expression": {
           "type": "string"
+        },
+        "cron": {
+          "$ref": "#/definitions/taskCron"
         },
         "kickoff_time_input_arg": {
           "type": "string",
@@ -1239,8 +1425,7 @@
         "TYPE_NONE",
         "TYPE_SCHEDULE"
       ],
-      "default": "TYPE_UNSPECIFIED",
-      "description": "Specifies type of the automation attached to trigger if any."
+      "default": "TYPE_UNSPECIFIED"
     },
     "triggerDeleteTriggersResponse": {
       "type": "object",
@@ -1250,7 +1435,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1259,7 +1444,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1268,7 +1453,7 @@
       "type": "object",
       "properties": {
         "trigger": {
-          "$ref": "#/definitions/triggerTriggerDetails"
+          "$ref": "#/definitions/flyteidl2triggerTriggerDetails"
         }
       },
       "description": "Response message for saving a trigger."
@@ -1328,28 +1513,6 @@
         }
       },
       "title": "Light-weight information about trigger for a list view"
-    },
-    "triggerTriggerDetails": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonTriggerIdentifier"
-        },
-        "metadata": {
-          "$ref": "#/definitions/triggerTriggerMetadata"
-        },
-        "spec": {
-          "$ref": "#/definitions/triggerTriggerSpec"
-        },
-        "status": {
-          "$ref": "#/definitions/triggerTriggerStatus"
-        },
-        "automation_spec": {
-          "$ref": "#/definitions/taskTriggerAutomationSpec",
-          "description": "Optional automation spec."
-        }
-      },
-      "title": "Full details about a trigger stored in DB"
     },
     "triggerTriggerMetadata": {
       "type": "object",

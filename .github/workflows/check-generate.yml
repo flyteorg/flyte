@@ -7,44 +7,108 @@ on:
 jobs:
   check-generate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set fallback version
-        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0" >> $GITHUB_ENV
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: '3.12'
-          working-directory: './gen/python'
-        env:
-          UV_PROJECT_ENVIRONMENT: /tmp/flyte2-venv
-      - name: Setup Buf CLI
-        uses: bufbuild/buf-setup-action@v1 # Install the Buf CLI
-        with:
-          version: 'latest' # Or specify a precise version like '1.56.0'
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        id: setup-uv
-        with:
-          enable-cache: 'false'
-          cache-suffix: 3.12
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-          working-directory: ./
-      - name: Add Go bin to PATH
-        run: echo "$HOME/go/bin" >> $GITHUB_PATH
-      - name: Run make download_tooling
-        run: make download_tooling && which mockery
-      - name: Run make gen
-        run: which mockery && make gen
-      - name: Check for changes
+
+      - name: Determine Docker image
+        id: docker-image
         run: |
-          git diff --exit-code || (echo 'Generated files are out of date. Run make generate and commit changes.' && exit 1)
-      - name: Check rust builds
+          # Check if gen.Dockerfile or build workflow was modified
+          git fetch origin ${{ github.base_ref }}
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^(gen\.Dockerfile|Dockerfile\.ci|\.github/workflows/build-ci-image\.yml)$'; then
+            echo "modified=true" >> $GITHUB_OUTPUT
+            echo "image=ghcr.io/flyteorg/flyte/ci:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "📦 gen.Dockerfile modified - will use PR-specific image"
+          else
+            echo "modified=false" >> $GITHUB_OUTPUT
+            echo "image=ghcr.io/flyteorg/flyte/ci:v2" >> $GITHUB_OUTPUT
+            echo "📦 Using default v2 image"
+          fi
+
+      - name: Wait for Docker image build workflow
+        if: steps.docker-image.outputs.modified == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const maxAttempts = 60; // 20 minutes max
+            const delaySeconds = 20;
+
+            console.log('⏳ Waiting for Docker image build workflow to complete...');
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              // Get workflow runs for this PR
+              const { data: runs } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'build-ci-image.yml',
+                event: 'pull_request',
+                per_page: 10
+              });
+
+              // Find the run for this PR
+              const prRun = runs.workflow_runs.find(run =>
+                run.head_sha === context.payload.pull_request.head.sha
+              );
+
+              if (prRun) {
+                console.log(`Found workflow run: ${prRun.html_url}`);
+                console.log(`Status: ${prRun.status}, Conclusion: ${prRun.conclusion}`);
+
+                if (prRun.status === 'completed') {
+                  if (prRun.conclusion === 'success') {
+                    console.log('✅ Docker image build completed successfully!');
+                    return;
+                  } else {
+                    core.setFailed(`❌ Docker image build failed with conclusion: ${prRun.conclusion}`);
+                    return;
+                  }
+                }
+
+                console.log(`Attempt ${attempt + 1}/${maxAttempts}: Build still running, waiting ${delaySeconds} seconds...`);
+              } else {
+                console.log(`Attempt ${attempt + 1}/${maxAttempts}: Build not started yet, waiting ${delaySeconds} seconds...`);
+              }
+
+              await new Promise(resolve => setTimeout(resolve, delaySeconds * 1000));
+            }
+
+            core.setFailed('❌ Timeout waiting for Docker image build to complete');
+
+      - name: Login to GHCR
+        if: steps.docker-image.outputs.modified == 'true'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        if: steps.docker-image.outputs.modified == 'true'
         run: |
-          make build-crate
+          IMAGE="${{ steps.docker-image.outputs.image }}"
+          echo "📦 Pulling image: $IMAGE"
+          docker pull "$IMAGE"
+
+      - name: Run checks in container
+        run: |
+          IMAGE="${{ steps.docker-image.outputs.image }}"
+          echo "Using image: $IMAGE"
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
+            -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv \
+            "$IMAGE" \
+            bash -c "
+              git config --global --add safe.directory /workspace &&
+              cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
+              make gen-local &&
+              git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
+              make build-crate
+            "
+
 

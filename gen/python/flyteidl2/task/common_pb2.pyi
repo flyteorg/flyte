@@ -1,3 +1,4 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -15,10 +16,19 @@ class FixedRateUnit(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     FIXED_RATE_UNIT_MINUTE: _ClassVar[FixedRateUnit]
     FIXED_RATE_UNIT_HOUR: _ClassVar[FixedRateUnit]
     FIXED_RATE_UNIT_DAY: _ClassVar[FixedRateUnit]
+
+class TriggerAutomationSpecType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpecType]
+    TYPE_NONE: _ClassVar[TriggerAutomationSpecType]
+    TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpecType]
 FIXED_RATE_UNIT_UNSPECIFIED: FixedRateUnit
 FIXED_RATE_UNIT_MINUTE: FixedRateUnit
 FIXED_RATE_UNIT_HOUR: FixedRateUnit
 FIXED_RATE_UNIT_DAY: FixedRateUnit
+TYPE_UNSPECIFIED: TriggerAutomationSpecType
+TYPE_NONE: TriggerAutomationSpecType
+TYPE_SCHEDULE: TriggerAutomationSpecType
 
 class NamedParameter(_message.Message):
     __slots__ = ["name", "parameter"]
@@ -38,31 +48,33 @@ class FixedRate(_message.Message):
     start_time: _timestamp_pb2.Timestamp
     def __init__(self, value: _Optional[int] = ..., unit: _Optional[_Union[FixedRateUnit, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
+class Cron(_message.Message):
+    __slots__ = ["expression", "timezone"]
+    EXPRESSION_FIELD_NUMBER: _ClassVar[int]
+    TIMEZONE_FIELD_NUMBER: _ClassVar[int]
+    expression: str
+    timezone: str
+    def __init__(self, expression: _Optional[str] = ..., timezone: _Optional[str] = ...) -> None: ...
+
 class Schedule(_message.Message):
-    __slots__ = ["rate", "cron_expression", "kickoff_time_input_arg"]
+    __slots__ = ["rate", "cron_expression", "cron", "kickoff_time_input_arg"]
     RATE_FIELD_NUMBER: _ClassVar[int]
     CRON_EXPRESSION_FIELD_NUMBER: _ClassVar[int]
+    CRON_FIELD_NUMBER: _ClassVar[int]
     KICKOFF_TIME_INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
     rate: FixedRate
     cron_expression: str
+    cron: Cron
     kickoff_time_input_arg: str
-    def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
+    def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
 class TriggerAutomationSpec(_message.Message):
     __slots__ = ["type", "schedule"]
-    class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpec.Type]
-        TYPE_NONE: _ClassVar[TriggerAutomationSpec.Type]
-        TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpec.Type]
-    TYPE_UNSPECIFIED: TriggerAutomationSpec.Type
-    TYPE_NONE: TriggerAutomationSpec.Type
-    TYPE_SCHEDULE: TriggerAutomationSpec.Type
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SCHEDULE_FIELD_NUMBER: _ClassVar[int]
-    type: TriggerAutomationSpec.Type
+    type: TriggerAutomationSpecType
     schedule: Schedule
-    def __init__(self, type: _Optional[_Union[TriggerAutomationSpec.Type, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
 
 class NamedLiteral(_message.Message):
     __slots__ = ["name", "value"]

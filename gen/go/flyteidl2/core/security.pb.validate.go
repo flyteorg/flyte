@@ -143,6 +143,111 @@ var _ interface {
 	ErrorName() string
 } = SecretValidationError{}
 
+// Validate checks the field values on Connection with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Connection) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Connection with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ConnectionMultiError, or
+// nil if none found.
+func (m *Connection) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Connection) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TaskType
+
+	// no validation rules for Secrets
+
+	// no validation rules for Configs
+
+	if len(errors) > 0 {
+		return ConnectionMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConnectionMultiError is an error wrapping multiple validation errors
+// returned by Connection.ValidateAll() if the designated constraints aren't met.
+type ConnectionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConnectionMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConnectionMultiError) AllErrors() []error { return m }
+
+// ConnectionValidationError is the validation error returned by
+// Connection.Validate if the designated constraints aren't met.
+type ConnectionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConnectionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConnectionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConnectionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConnectionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConnectionValidationError) ErrorName() string { return "ConnectionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ConnectionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConnection.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConnectionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConnectionValidationError{}
+
 // Validate checks the field values on OAuth2Client with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
