@@ -188,8 +188,12 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx interfaces.
 	case v1alpha1.DynamicNodePhaseFailing:
 		err = d.Abort(ctx, nCtx, ds.Reason)
 		if err != nil {
-			logger.Errorf(ctx, "Failing to abort dynamic workflow")
-			return trns, err
+			if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
+				logger.Error(ctx, "Go to retry or failing handling")
+			} else {
+				logger.Errorf(ctx, "Failing to abort dynamic workflow")
+				return trns, err
+			}
 		}
 
 		// if DynamicNodeStatus is noted with permanent failures we report a non-recoverable failure

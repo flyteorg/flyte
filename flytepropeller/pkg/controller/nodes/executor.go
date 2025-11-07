@@ -1230,6 +1230,10 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 	}
 	finalStatus := interfaces.NodeStatusRunning
+	if np == v1alpha1.NodePhaseFailing {
+		np = v1alpha1.NodePhaseFailed
+		finalStatus = interfaces.NodeStatusFailed(p.GetErr())
+	}
 	if np == v1alpha1.NodePhaseFailing && !h.FinalizeRequired() {
 		logger.Infof(ctx, "Finalize not required, moving node to Failed")
 		np = v1alpha1.NodePhaseFailed
@@ -1375,7 +1379,8 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 	if currentPhase == v1alpha1.NodePhaseFailing {
 		logger.Debugf(ctx, "node failing")
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
-			return interfaces.NodeStatusUndefined, err
+			return c.handleQueuedOrRunningNode(ctx, nCtx, h)
+			//return interfaces.NodeStatusUndefined, err
 		}
 		t := metav1.Now()
 

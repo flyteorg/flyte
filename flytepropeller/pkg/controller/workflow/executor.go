@@ -252,7 +252,7 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 	if err := c.cleanupRunningNodes(ctx, w, "Some node execution failed, auto-abort."); err != nil {
 		logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v",
 			w.ExecutionID.WorkflowExecutionIdentifier, err)
-		return StatusFailing(execErr), err
+		//return StatusFailing(execErr), err
 	}
 
 	failureNode := w.GetOnFailureNode()
