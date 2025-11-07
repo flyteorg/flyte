@@ -2066,6 +2066,12 @@ func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAn
 	// Get identity from authentication context
 	identityContext := auth.IdentityContextFromContext(ctx)
 
+	// Check if identity context is empty
+	if identityContext.IsEmpty() {
+		logger.Debugf(ctx, "No identity information found in context, skipping identity annotation injection")
+		return initialAnnotations
+	}
+
 	if initialAnnotations == nil {
 		initialAnnotations = make(map[string]string)
 	}
@@ -2075,12 +2081,7 @@ func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAn
 
 	// Determine if this is an app or user identity
 	isAppIdentity := identityContext.AppID() != ""
-	isUserIdentity := identityContext.UserInfo() != nil
-
-	if !isAppIdentity && !isUserIdentity {
-		logger.Debugf(ctx, "No identity information found in context, skipping identity annotation injection")
-		return initialAnnotations
-	}
+	isUserIdentity := identityContext.UserInfo() != nil && !isAppIdentity
 
 	// Add annotations based on identity type
 	if isAppIdentity {
