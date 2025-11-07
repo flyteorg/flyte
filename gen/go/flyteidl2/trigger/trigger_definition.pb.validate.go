@@ -277,9 +277,7 @@ func (m *TriggerSpec) validate(all bool) error {
 
 	// no validation rules for TaskVersion
 
-	if m.Description != nil {
-		// no validation rules for Description
-	}
+	// no validation rules for Description
 
 	if len(errors) > 0 {
 		return TriggerSpecMultiError(errors)

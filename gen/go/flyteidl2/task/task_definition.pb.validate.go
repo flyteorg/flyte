@@ -1802,9 +1802,7 @@ func (m *TaskTriggerSpec) validate(all bool) error {
 		}
 	}
 
-	if m.Description != nil {
-		// no validation rules for Description
-	}
+	// no validation rules for Description
 
 	if len(errors) > 0 {
 		return TaskTriggerSpecMultiError(errors)

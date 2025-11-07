@@ -38,7 +38,7 @@ message TriggerSpec {
   ];
 
   //  Optional description
-  optional string description = 6;
+  string description = 6;
 }
 
 message TriggerStatus {

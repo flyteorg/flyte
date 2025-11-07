@@ -203,5 +203,5 @@ message TaskTriggerSpec {
   flyteidl2.task.RunSpec run_spec = 3;
 
   //  Optional description
-  optional string description = 4;
+  string description = 4;
 }

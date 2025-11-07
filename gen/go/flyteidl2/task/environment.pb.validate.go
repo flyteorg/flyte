@@ -59,9 +59,7 @@ func (m *Environment) validate(all bool) error {
 
 	// no validation rules for Name
 
-	if m.Description != nil {
-		// no validation rules for Description
-	}
+	// no validation rules for Description
 
 	if len(errors) > 0 {
 		return EnvironmentMultiError(errors)
