@@ -1441,12 +1441,33 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskDescriptionEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description of environment"
         }
       },
       "description": "Environment for a task."
@@ -1476,6 +1497,15 @@
         }
       }
     },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "taskTaskSpec": {
       "type": "object",
       "properties": {
@@ -1498,6 +1528,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "description": {
+          "$ref": "#/definitions/taskDescriptionEntity",
+          "title": "The description entity for the task"
         }
       },
       "description": "Specification for a task."

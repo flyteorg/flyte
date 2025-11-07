@@ -33,16 +33,18 @@ class TriggerMetadata(_message.Message):
     def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., updated_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class TriggerSpec(_message.Message):
-    __slots__ = ["inputs", "run_spec", "active", "task_version"]
+    __slots__ = ["inputs", "run_spec", "active", "task_version", "description"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     TASK_VERSION_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     inputs: _common_pb2.Inputs
     run_spec: _run_pb2.RunSpec
     active: bool
     task_version: str
-    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., active: bool = ..., task_version: _Optional[str] = ...) -> None: ...
+    description: str
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., active: bool = ..., task_version: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
 
 class TriggerStatus(_message.Message):
     __slots__ = ["deployed_at", "updated_at", "triggered_at", "deleted_at"]
@@ -69,18 +71,20 @@ class TriggerRevision(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TriggerMetadata, _Mapping]] = ..., status: _Optional[_Union[TriggerStatus, _Mapping]] = ..., action: _Optional[_Union[TriggerRevisionAction, str]] = ...) -> None: ...
 
 class TriggerDetails(_message.Message):
-    __slots__ = ["id", "metadata", "spec", "status", "automation_spec"]
+    __slots__ = ["id", "metadata", "spec", "status", "automation_spec", "description"]
     ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     AUTOMATION_SPEC_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.TriggerIdentifier
     metadata: TriggerMetadata
     spec: TriggerSpec
     status: TriggerStatus
     automation_spec: _common_pb2.TriggerAutomationSpec
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TriggerMetadata, _Mapping]] = ..., spec: _Optional[_Union[TriggerSpec, _Mapping]] = ..., status: _Optional[_Union[TriggerStatus, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
+    description: str
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TriggerMetadata, _Mapping]] = ..., spec: _Optional[_Union[TriggerSpec, _Mapping]] = ..., status: _Optional[_Union[TriggerStatus, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...
 
 class Trigger(_message.Message):
     __slots__ = ["id", "metadata", "status", "active", "automation_spec"]

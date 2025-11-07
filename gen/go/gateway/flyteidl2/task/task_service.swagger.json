@@ -1927,6 +1927,10 @@
         "triggers_summary": {
           "$ref": "#/definitions/taskTaskTriggersSummary",
           "description": "Brief overview of attached triggers if any."
+        },
+        "short_description": {
+          "type": "string",
+          "title": "The short description for this task"
         }
       },
       "description": "TaskMetadata is static, lightweight metadata about a task."
@@ -1990,12 +1994,33 @@
       "type": "object",
       "description": "Response message for deploying a task."
     },
+    "taskDescriptionEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description of environment"
         }
       },
       "description": "Environment for a task."
@@ -2214,6 +2239,15 @@
       },
       "description": "Defines complete set of information required to trigger an execution on a schedule."
     },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "taskTask": {
       "type": "object",
       "properties": {
@@ -2316,6 +2350,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "description": {
+          "$ref": "#/definitions/taskDescriptionEntity",
+          "title": "The description entity for the task"
         }
       },
       "description": "Specification for a task."
@@ -2350,6 +2388,10 @@
         "run_spec": {
           "$ref": "#/definitions/taskRunSpec",
           "description": "The run spec for triggered task."
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description"
         }
       },
       "description": "TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.\nThis is supposed to be used only in DeployTask endpoint where 'task_version' is already provided in task_id."
