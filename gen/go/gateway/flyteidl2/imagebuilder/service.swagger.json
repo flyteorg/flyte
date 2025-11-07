@@ -17,6 +17,20 @@
   ],
   "paths": {},
   "definitions": {
+    "commonProjectIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
