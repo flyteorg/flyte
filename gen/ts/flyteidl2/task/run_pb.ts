@@ -218,16 +218,27 @@ export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
  */
 export enum CacheLookupScope {
   /**
+   * CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured
+   * otherwise)
+   *
    * @generated from enum value: CACHE_LOOKUP_SCOPE_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
+   * CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).
+   * This has traditionally been the default behavior. It requires all workloads running in all projects/domains
+   * to have access to the same artifacts/buckets. Otherwise it risks runtime failures.
+   *
    * @generated from enum value: CACHE_LOOKUP_SCOPE_GLOBAL = 1;
    */
   GLOBAL = 1,
 
   /**
+   * CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures
+   * data access success at the expense of potentially more cache misses and recomputation happening. This should not
+   * be considered a security enforcement (that can happen through the system-wide config).
+   *
    * @generated from enum value: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN = 2;
    */
   PROJECT_DOMAIN = 2,

@@ -1209,7 +1209,8 @@
         "CACHE_LOOKUP_SCOPE_GLOBAL",
         "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
       ],
-      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED"
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
     },
     "taskCron": {
       "type": "object",

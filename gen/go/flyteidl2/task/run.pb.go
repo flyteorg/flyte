@@ -25,8 +25,16 @@ const (
 type CacheLookupScope int32
 
 const (
-	CacheLookupScope_CACHE_LOOKUP_SCOPE_UNSPECIFIED    CacheLookupScope = 0
-	CacheLookupScope_CACHE_LOOKUP_SCOPE_GLOBAL         CacheLookupScope = 1
+	// CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured
+	// otherwise)
+	CacheLookupScope_CACHE_LOOKUP_SCOPE_UNSPECIFIED CacheLookupScope = 0
+	// CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).
+	// This has traditionally been the default behavior. It requires all workloads running in all projects/domains
+	// to have access to the same artifacts/buckets. Otherwise it risks runtime failures.
+	CacheLookupScope_CACHE_LOOKUP_SCOPE_GLOBAL CacheLookupScope = 1
+	// CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures
+	// data access success at the expense of potentially more cache misses and recomputation happening. This should not
+	// be considered a security enforcement (that can happen through the system-wide config).
 	CacheLookupScope_CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN CacheLookupScope = 2
 )
 
