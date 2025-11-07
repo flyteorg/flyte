@@ -1986,6 +1986,29 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "taskCacheConfig": {
+      "type": "object",
+      "properties": {
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cache_lookup_scope": {
+          "$ref": "#/definitions/taskCacheLookupScope",
+          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
+        }
+      },
+      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
+    },
+    "taskCacheLookupScope": {
+      "type": "string",
+      "enum": [
+        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+        "CACHE_LOOKUP_SCOPE_GLOBAL",
+        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
+      ],
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED"
+    },
     "taskCron": {
       "type": "object",
       "properties": {
@@ -2194,7 +2217,7 @@
         },
         "overwrite_cache": {
           "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
         },
         "cluster": {
           "type": "string",
@@ -2207,6 +2230,10 @@
         "security_context": {
           "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
+        },
+        "cache_config": {
+          "$ref": "#/definitions/taskCacheConfig",
+          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
         }
       }
     },

@@ -38,6 +38,22 @@ message RawDataStorage {
   string raw_data_prefix = 1;
 }
 
+enum CacheLookupScope {
+  CACHE_LOOKUP_SCOPE_UNSPECIFIED = 0;
+  CACHE_LOOKUP_SCOPE_GLOBAL = 1;
+  CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN = 2;
+}
+
+// CacheConfig contains configurations that influence the behavior of cache reads and writes
+message CacheConfig {
+  // If true, recompute outputs for this run and overwrite any existing cache.
+  bool overwrite_cache = 1;
+
+  // CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config
+  // will be used (global unless configured otherwise).
+  CacheLookupScope cache_lookup_scope = 2;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -52,7 +68,8 @@ message RunSpec {
   google.protobuf.BoolValue interruptible = 4;
 
   // If true, recompute outputs for this run and overwrite any existing cache.
-  bool overwrite_cache = 5;
+  // Deprecated, please use CacheConfig.OverwriteCache instead
+  bool overwrite_cache = 5 [deprecated = true];
 
   // the specific cluster that this action should be executed on. this value will be used as the
   // default for all actions in the run unless overridden.
@@ -63,4 +80,7 @@ message RunSpec {
 
   // SecurityContext holds security attributes that apply to tasks.
   flyteidl2.core.SecurityContext security_context = 8;
+
+  // CacheConfig contains configurations that influence the behavior of cache reads and writes
+  CacheConfig cache_config = 9;
 }
