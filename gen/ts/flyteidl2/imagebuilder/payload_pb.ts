@@ -5,6 +5,8 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { ProjectIdentifier } from "../common/identifier_pb.ts";
+import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { Image, ImageIdentifier } from "./definition_pb.ts";
 import { file_flyteidl2_imagebuilder_definition } from "./definition_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/imagebuilder/payload.proto.
  */
 export const file_flyteidl2_imagebuilder_payload: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIiZAoPR2V0SW1hZ2VSZXF1ZXN0EjsKAmlkGAEgASgLMicuZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZUlkZW50aWZpZXJCBrpIA8gBARIUCgxvcmdhbml6YXRpb24YAiABKAkiQAoQR2V0SW1hZ2VSZXNwb25zZRIsCgVpbWFnZRgBIAEoCzIdLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuSW1hZ2VC4QEKGmNvbS5mbHl0ZWlkbDIuaW1hZ2VidWlsZGVyQgxQYXlsb2FkUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvaW1hZ2VidWlsZGVyogIDRklYqgIWRmx5dGVpZGwyLkltYWdlYnVpbGRlcsoCFkZseXRlaWRsMlxJbWFnZWJ1aWxkZXLiAiJGbHl0ZWlkbDJcSW1hZ2VidWlsZGVyXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpJbWFnZWJ1aWxkZXJiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_imagebuilder_definition]);
+  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIioQEKD0dldEltYWdlUmVxdWVzdBI7CgJpZBgBIAEoCzInLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuSW1hZ2VJZGVudGlmaWVyQga6SAPIAQESGAoMb3JnYW5pemF0aW9uGAIgASgJQgIYARI3Cgpwcm9qZWN0X2lkGAMgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllciJAChBHZXRJbWFnZVJlc3BvbnNlEiwKBWltYWdlGAEgASgLMh0uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZULhAQoaY29tLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXJCDFBheWxvYWRQcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9pbWFnZWJ1aWxkZXKiAgNGSViqAhZGbHl0ZWlkbDIuSW1hZ2VidWlsZGVyygIWRmx5dGVpZGwyXEltYWdlYnVpbGRlcuICIkZseXRlaWRsMlxJbWFnZWJ1aWxkZXJcR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6OkltYWdlYnVpbGRlcmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_imagebuilder_definition]);
 
 /**
  * @generated from message flyteidl2.imagebuilder.GetImageRequest
@@ -28,10 +30,21 @@ export type GetImageRequest = Message<"flyteidl2.imagebuilder.GetImageRequest"> 
 
   /**
    * Optional organization that dictates which dataplane registry to reference
+   * Deprecated, please use the full ProjectIdentifier instead
    *
-   * @generated from field: string organization = 2;
+   * @generated from field: string organization = 2 [deprecated = true];
+   * @deprecated
    */
   organization: string;
+
+  /**
+   * The scope in which to look for the image. Images maybe accessible in different project-domain pairs through
+   * different container registries (i.e. different image FQDNs)
+   * TODO: This scope will be made required after updating all clients/servers to respect it.
+   *
+   * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 3;
+   */
+  projectId?: ProjectIdentifier;
 };
 
 /**
