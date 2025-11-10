@@ -95,7 +95,7 @@ func TestLoadPlugin(t *testing.T) {
 
 }
 
-// TODO @ pvditt re-add after re-adding webapi
+// TODO @pvditt re-add after re-adding webapi
 //func TestAgentService(t *testing.T) {
 //	agentService := agent.AgentService{}
 //	taskTypes := []core.TaskType{"sensor", "chatgpt"}
