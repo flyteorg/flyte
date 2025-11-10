@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n flyteidl2/task/environment.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\"N\n\x0b\x45nvironment\x12\x1d\n\x04name\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x04name\x12 \n\x0b\x64\x65scription\x18\x02 \x01(\tR\x0b\x64\x65scriptionB\xb5\x01\n\x12\x63om.flyteidl2.taskB\x10\x45nvironmentProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n flyteidl2/task/environment.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\"Z\n\x0b\x45nvironment\x12\x1d\n\x04name\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x04name\x12,\n\x0b\x64\x65scription\x18\x02 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x0b\x64\x65scriptionB\xb5\x01\n\x12\x63om.flyteidl2.taskB\x10\x45nvironmentProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,6 +24,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.taskB\020EnvironmentProtoH\002P\001Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\242\002\003FTX\252\002\016Flyteidl2.Task\312\002\016Flyteidl2\\Task\342\002\032Flyteidl2\\Task\\GPBMetadata\352\002\017Flyteidl2::Task'
   _ENVIRONMENT.fields_by_name['name']._options = None
   _ENVIRONMENT.fields_by_name['name']._serialized_options = b'\272H\006r\004\020\001\030?'
+  _ENVIRONMENT.fields_by_name['description']._options = None
+  _ENVIRONMENT.fields_by_name['description']._serialized_options = b'\272H\007r\005\020\001\030\377\001'
   _globals['_ENVIRONMENT']._serialized_start=81
-  _globals['_ENVIRONMENT']._serialized_end=159
+  _globals['_ENVIRONMENT']._serialized_end=171
 # @@protoc_insertion_point(module_scope)

@@ -2020,7 +2020,7 @@
         },
         "description": {
           "type": "string",
-          "title": "Optional description of environment"
+          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."

@@ -14,6 +14,9 @@ message Environment {
     (buf.validate.field).string.max_len = 63
   ];
 
-  // Optional description of environment
-  string description = 2;
+  // Description of environment
+  string description = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
 }

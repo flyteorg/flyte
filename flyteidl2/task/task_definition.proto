@@ -127,13 +127,21 @@ message Task {
 // Link to source code used to define this entity
 message SourceCode {
   string link = 1;
+
+  // Todo(alex): We should add remote, file path, and line number in the future for the backend to construct uri of Github or Gitlab
 }
 
 message DescriptionEntity {
   // One-liner overview of the entity.
-  string short_description = 1;
+  string short_description = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
   // Full user description with formatting preserved.
-  string long_description = 2;
+  string long_description = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 2048
+  ];
   // Optional link to source code used to define this entity.
   SourceCode source_code = 3;
 }
