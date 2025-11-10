@@ -6,7 +6,6 @@
 package config
 
 import (
-	"strings"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -375,17 +374,7 @@ type AcceleratorDeviceClassConfig struct {
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.
 func GetK8sPluginConfig() *K8sPluginConfig {
-	cfg := K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
-
-	// Viper casts all keys in YAML configs to lowercase, but all the accelerator device classes should be uppercase.
-	// See: https://github.com/spf13/viper/issues/260
-	acceleratorDeviceClasses := make(map[string]AcceleratorDeviceClassConfig)
-	for key, value := range cfg.AcceleratorDeviceClasses {
-		acceleratorDeviceClasses[strings.ToUpper(key)] = value
-	}
-	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
-
-	return cfg
+	return K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
 }
 
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.
