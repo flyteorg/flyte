@@ -89,10 +89,7 @@ message TriggerDetails {
   flyteidl2.task.TriggerAutomationSpec automation_spec = 5;
 
   // Trigger description
-  optional string description = 6 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
+  optional string description = 6 [(buf.validate.field).string.max_len = 255];
 }
 
 // Light-weight information about trigger for a list view

@@ -133,15 +133,9 @@ message SourceCode {
 
 message DescriptionEntity {
   // One-liner overview of the entity.
-  string short_description = 1 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
+  string short_description = 1 [(buf.validate.field).string.max_len = 255];
   // Full user description with formatting preserved.
-  string long_description = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 2048
-  ];
+  string long_description = 2 [(buf.validate.field).string.max_len = 2048];
   // Optional link to source code used to define this entity.
   SourceCode source_code = 3;
 }
