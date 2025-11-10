@@ -202,7 +202,7 @@ func TestLabeledHistogramStopWatch(t *testing.T) {
 			`testscope_hist_stopwatch:s2_unlabeled_sum`:                0.0,
 			`testscope_hist_stopwatch:s2_unlabeled_count`:              1,
 		}
-		assertMetrics(t, s.HistogramStopWatch.Observer.(prometheus.Histogram), "testscope_hist_stopwatch:s2_unlabeled", header, expectedMetrics)
+		assertMetrics(t, s.Observer.(prometheus.Histogram), "testscope_hist_stopwatch:s2_unlabeled", header, expectedMetrics)
 	})
 
 	t.Run("AdditionalLabels", func(t *testing.T) {

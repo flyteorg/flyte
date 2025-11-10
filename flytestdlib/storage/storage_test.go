@@ -11,46 +11,22 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
+func TestDataReference_New(t *testing.T) {
+	scheme := "s3"
+	container := "container"
+	key := "path/to/file"
+	dataReference := NewDataReference(scheme, container, key)
+	assert.Equal(t, DataReference("s3://container/path/to/file"), dataReference)
+}
+
 func TestDataReference_Split(t *testing.T) {
-	t.Run("S3 URL", func(t *testing.T) {
-		input := DataReference("s3://container/path/to/file")
-		scheme, container, key, err := input.Split()
+	input := DataReference("s3://container/path/to/file")
+	scheme, container, key, err := input.Split()
 
-		assert.NoError(t, err)
-		assert.Equal(t, "s3", scheme)
-		assert.Equal(t, "container", container)
-		assert.Equal(t, "path/to/file", key)
-	})
-
-	t.Run("Azure ADLS Gen2 URL with storage account", func(t *testing.T) {
-		input := DataReference("abfs://mycontainer@mystorageaccount.dfs.core.windows.net/path/to/file")
-		scheme, container, key, err := input.Split()
-
-		assert.NoError(t, err)
-		assert.Equal(t, "abfs", scheme)
-		assert.Equal(t, "mycontainer", container)
-		assert.Equal(t, "path/to/file", key)
-	})
-
-	t.Run("Azure ADLS Gen2 URL without path", func(t *testing.T) {
-		input := DataReference("abfs://mycontainer@mystorageaccount.dfs.core.windows.net")
-		scheme, container, key, err := input.Split()
-
-		assert.NoError(t, err)
-		assert.Equal(t, "abfs", scheme)
-		assert.Equal(t, "mycontainer", container)
-		assert.Equal(t, "", key)
-	})
-
-	t.Run("GCS URL", func(t *testing.T) {
-		input := DataReference("gs://bucket/path/to/object")
-		scheme, container, key, err := input.Split()
-
-		assert.NoError(t, err)
-		assert.Equal(t, "gs", scheme)
-		assert.Equal(t, "bucket", container)
-		assert.Equal(t, "path/to/object", key)
-	})
+	assert.NoError(t, err)
+	assert.Equal(t, "s3", scheme)
+	assert.Equal(t, "container", container)
+	assert.Equal(t, "path/to/file", key)
 }
 
 func ExampleNewDataStore() {

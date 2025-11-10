@@ -21,7 +21,7 @@ type Summary struct {
 
 // Observe adds a single observation to the summary.
 func (s Summary) Observe(ctx context.Context, v float64) {
-	summary, err := s.SummaryVec.GetMetricWith(contextutils.Values(ctx, s.labels...))
+	summary, err := s.GetMetricWith(contextutils.Values(ctx, s.labels...))
 	if err != nil {
 		panic(err.Error())
 	}

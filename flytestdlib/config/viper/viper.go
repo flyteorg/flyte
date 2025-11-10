@@ -112,7 +112,7 @@ func (v viperAccessor) bindViperConfigsEnvDepth(m map[string]interface{}, prefix
 		if asMap, ok := val.(map[string]interface{}); ok {
 			errs.Append(v.bindViperConfigsEnvDepth(asMap, subKey+keyDelim))
 		} else {
-			errs.Append(v.viper.BindEnv(subKey, strings.ToUpper(strings.Replace(subKey, "-", "_", -1))))
+			errs.Append(v.viper.BindEnv(subKey, strings.ToUpper(strings.ReplaceAll(subKey, "-", "_"))))
 		}
 	}
 

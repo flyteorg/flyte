@@ -106,7 +106,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	return gorm.Open(dialector, gormConfig)
 }
 
-// CreatePostgresDbConnection creates DB connection and returns the gorm.DB object and error
+// CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the gorm.DB object and error
 func CreatePostgresReadOnlyDbConnection(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
 	dialector := postgres.Open(getPostgresReadDsn(ctx, pgConfig))
 	return gorm.Open(dialector, gormConfig)

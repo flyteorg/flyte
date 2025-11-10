@@ -102,7 +102,7 @@ func TestUnmarshalStructToPb(t *testing.T) {
 			} else if tt.expected == nil {
 				assert.Nil(t, tt.args.msg)
 			} else {
-				assert.Equal(t, (tt.expected.(*prototest.TestProto)).StringValue, (tt.args.msg.(*prototest.TestProto)).StringValue)
+				assert.Equal(t, (tt.expected.(*prototest.TestProto)).GetStringValue(), (tt.args.msg.(*prototest.TestProto)).GetStringValue())
 			}
 		})
 	}
@@ -133,10 +133,10 @@ func TestMarshalPbToStruct(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got, err := MarshalPbToStruct(tt.args.in); (err != nil) != tt.wantErr {
 				t.Errorf("MarshalPbToStruct() error = %v, wantErr %v", err, tt.wantErr)
-			} else if len(tt.expected.Fields) == 0 {
-				assert.Empty(t, got.Fields)
+			} else if len(tt.expected.GetFields()) == 0 {
+				assert.Empty(t, got.GetFields())
 			} else {
-				assert.Equal(t, tt.expected.Fields["stringValue"].Kind, got.Fields["stringValue"].Kind)
+				assert.Equal(t, tt.expected.GetFields()["stringValue"].GetKind(), got.GetFields()["stringValue"].GetKind())
 			}
 		})
 	}

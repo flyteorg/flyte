@@ -3,18 +3,16 @@ package otelutils
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/jaeger" // nolint:staticcheck
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.34.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	rawtrace "go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
@@ -23,28 +21,19 @@ import (
 )
 
 const (
-	AdminClientTracer        = "admin-client"
-	AdminGormTracer          = "admin-gorm"
-	AdminServerTracer        = "admin-server"
-	BlobstoreClientTracer    = "blobstore-client"
-	DataCatalogClientTracer  = "datacatalog-client"
-	DataCatalogGormTracer    = "datacatalog-gorm"
-	DataCatalogServerTracer  = "datacatalog-server"
-	CacheServiceClientTracer = "cacheservice-client"
-	CacheServiceGormTracer   = "cacheservice-gorm"
-	CacheServiceServerTracer = "cacheservice-server"
-	FlytePropellerTracer     = "flytepropeller"
-	K8sClientTracer          = "k8s-client"
+	AdminClientTracer       = "admin-client"
+	AdminGormTracer         = "admin-gorm"
+	AdminServerTracer       = "admin-server"
+	BlobstoreClientTracer   = "blobstore-client"
+	DataCatalogClientTracer = "datacatalog-client"
+	DataCatalogGormTracer   = "datacatalog-gorm"
+	DataCatalogServerTracer = "datacatalog-server"
+	FlytePropellerTracer    = "flytepropeller"
+	K8sClientTracer         = "k8s-client"
 )
 
 var tracerProviders = make(map[string]*trace.TracerProvider)
 var noopTracerProvider = noop.NewTracerProvider()
-
-// Deprecated: RegisterTracerProvider registers a tracer provider for the given service name. It uses a default context if necessary.
-// Instead, use RegisterTracerProviderWithContext.
-func RegisterTracerProvider(serviceName string, config *Config) error {
-	return RegisterTracerProviderWithContext(context.Background(), serviceName, config)
-}
 
 // RegisterTracerProviderWithContext registers a tracer provider for the given service name.
 func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, config *Config) error {
@@ -83,7 +72,7 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		}
 	case OtlpGrpcExporter:
 		exporter, err = otlptracegrpc.New(
-			context.Background(),
+			ctx,
 			otlptracegrpc.WithEndpointURL(config.OtlpGrpcConfig.Endpoint),
 		)
 		if err != nil {
@@ -91,7 +80,7 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		}
 	case OtlpHttpExporter:
 		exporter, err = otlptracehttp.New(
-			context.Background(),
+			ctx,
 			otlptracehttp.WithEndpointURL(config.OtlpHttpConfig.Endpoint),
 		)
 		if err != nil {
@@ -101,15 +90,10 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
 
-	schemaURL := config.SchemaURL
-	if len(schemaURL) == 0 {
-		schemaURL = semconv.SchemaURL
-	}
-
 	telemetryResource, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
-			schemaURL,
+			semconv.SchemaURL,
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.ServiceVersionKey.String(version.Version),
 		),
@@ -147,19 +131,8 @@ func GetTracerProvider(serviceName string) rawtrace.TracerProvider {
 	return noopTracerProvider
 }
 
-type SpanWrapper struct {
-	rawtrace.Span
-}
-
-func (s SpanWrapper) EndErr(err error) {
-	if err != nil && err != io.EOF {
-		s.Span.SetStatus(codes.Error, err.Error())
-	}
-	s.Span.End()
-}
-
 // NewSpan creates a new span with the given service name and span name.
-func NewSpan(ctx context.Context, serviceName string, spanName string) (context.Context, SpanWrapper) {
+func NewSpan(ctx context.Context, serviceName string, spanName string) (context.Context, rawtrace.Span) {
 	var attributes []attribute.KeyValue
 	for key, value := range contextutils.GetLogFields(ctx) {
 		if value, ok := value.(string); ok {
@@ -168,6 +141,5 @@ func NewSpan(ctx context.Context, serviceName string, spanName string) (context.
 	}
 
 	tracerProvider := GetTracerProvider(serviceName)
-	ctx, span := tracerProvider.Tracer("default").Start(ctx, spanName, rawtrace.WithAttributes(attributes...))
-	return ctx, SpanWrapper{Span: span}
+	return tracerProvider.Tracer("default").Start(ctx, spanName, rawtrace.WithAttributes(attributes...))
 }

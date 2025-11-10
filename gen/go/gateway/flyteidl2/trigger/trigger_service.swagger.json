@@ -1188,6 +1188,30 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "taskCacheConfig": {
+      "type": "object",
+      "properties": {
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cache_lookup_scope": {
+          "$ref": "#/definitions/taskCacheLookupScope",
+          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
+        }
+      },
+      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
+    },
+    "taskCacheLookupScope": {
+      "type": "string",
+      "enum": [
+        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+        "CACHE_LOOKUP_SCOPE_GLOBAL",
+        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
+      ],
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
+    },
     "taskCron": {
       "type": "object",
       "properties": {
@@ -1323,7 +1347,7 @@
         },
         "overwrite_cache": {
           "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
         },
         "cluster": {
           "type": "string",
@@ -1336,6 +1360,10 @@
         "security_context": {
           "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
+        },
+        "cache_config": {
+          "$ref": "#/definitions/taskCacheConfig",
+          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
         }
       }
     },
@@ -1344,6 +1372,9 @@
       "properties": {
         "rate": {
           "$ref": "#/definitions/taskFixedRate"
+        },
+        "cron_expression": {
+          "type": "string"
         },
         "cron": {
           "$ref": "#/definitions/taskCron"

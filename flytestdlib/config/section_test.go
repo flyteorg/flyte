@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -72,11 +71,11 @@ func TestMarshal(t *testing.T) {
 		t.Log("Updating config file.")
 		raw, err := yaml.Marshal(expected)
 		assert.NoError(t, err)
-		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm))
+		assert.NoError(t, os.WriteFile(configPath, raw, os.ModePerm)) // #nosec G306
 	}
 
 	r := TestConfig{}
-	raw, err := ioutil.ReadFile(configPath)
+	raw, err := os.ReadFile(configPath)
 	assert.NoError(t, err)
 	assert.NoError(t, yaml.Unmarshal(raw, &r))
 	assert.True(t, reflect.DeepEqual(expected, r))

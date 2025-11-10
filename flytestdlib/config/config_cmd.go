@@ -204,7 +204,7 @@ func printSection(name string, dataType string, defaultValue string, description
 		fmt.Printf("%s\n\n", description)
 	}
 	if defaultValue != "" {
-		val := strings.Replace(defaultValue, "\n", "\n  ", -1)
+		val := strings.ReplaceAll(defaultValue, "\n", "\n  ")
 		val = ".. code-block:: yaml\n\n  " + val
 		fmt.Printf("**Default Value**: \n\n%s\n", val)
 	}

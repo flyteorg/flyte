@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/go-logr/logr"
 	"github.com/sirupsen/logrus"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
@@ -24,7 +23,7 @@ const (
 var noopLogger = NoopLogger{}
 
 func onConfigUpdated(cfg Config) {
-	logrus.SetLevel(logrus.Level(cfg.Level))
+	logrus.SetLevel(logrus.Level(cfg.Level)) // #nosec G115
 
 	switch cfg.Formatter.Type {
 	case FormatterText:
@@ -80,7 +79,7 @@ func getLogger(ctx context.Context) logrus.FieldLogger {
 		entry = entry.WithField(sourceCodeKey, getSourceLocation())
 	}
 
-	entry.Level = logrus.Level(cfg.Level)
+	entry.Level = logrus.Level(cfg.Level) // #nosec G115
 
 	return entry
 }
@@ -320,31 +319,4 @@ func (NoopLogger) Panicf(string, ...interface{}) {
 }
 
 func (NoopLogger) Panicln(...interface{}) {
-}
-
-// LoggerSink is a logger adapter for controller manager to log using flytestdlib's Logger interface.
-type LoggerSink struct {
-}
-
-func (l LoggerSink) Init(info logr.RuntimeInfo) {
-}
-
-func (l LoggerSink) Enabled(level int) bool {
-	return IsLoggable(context.TODO(), level)
-}
-
-func (l LoggerSink) Info(level int, msg string, keysAndValues ...any) {
-	Info(context.TODO(), msg, keysAndValues)
-}
-
-func (l LoggerSink) Error(err error, msg string, keysAndValues ...any) {
-	Error(context.TODO(), fmt.Sprintf("Msg: %v. Error: %v", fmt.Sprintf(msg, keysAndValues...), err))
-}
-
-func (l LoggerSink) WithValues(keysAndValues ...any) logr.LogSink {
-	return l
-}
-
-func (l LoggerSink) WithName(name string) logr.LogSink {
-	return l
 }

@@ -114,12 +114,13 @@ func TestCachedRawStore(t *testing.T) {
 				assert.FailNow(t, "Should not be writeCalled")
 			}
 			writeCalled = true
-			if reference == "k2" {
+			switch reference {
+			case "k2":
 				b, err := ioutil.ReadAll(raw)
 				assert.NoError(t, err)
 				assert.Equal(t, d2, b)
 				return nil
-			} else if reference == "bigK" {
+			case "bigK":
 				b, err := ioutil.ReadAll(raw)
 				assert.NoError(t, err)
 				assert.Equal(t, bigD, b)
@@ -132,9 +133,10 @@ func TestCachedRawStore(t *testing.T) {
 				assert.FailNow(t, "Should not be invoked again")
 			}
 			readCalled = true
-			if reference == "k1" {
+			switch reference {
+			case "k1":
 				return ioutils.NewBytesReadCloser(d1), nil
-			} else if reference == "bigK" {
+			case "bigK":
 				return ioutils.NewBytesReadCloser(bigD), nil
 			}
 			return nil, fmt.Errorf("err")
@@ -205,10 +207,10 @@ func TestCachedRawStore(t *testing.T) {
 		readCalled = false
 		err := cStore.WriteRaw(ctx, bigK, int64(len(bigD)), Options{}, bytes.NewReader(bigD))
 		assert.True(t, writeCalled)
-		assert.NoError(t, err)
+		assert.True(t, IsFailedWriteToCache(err))
 
 		o, err := cStore.ReadRaw(ctx, bigK)
-		assert.NoError(t, err)
+		assert.True(t, IsFailedWriteToCache(err))
 		b, err := ioutil.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, b)

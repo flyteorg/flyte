@@ -8,6 +8,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -28,8 +29,6 @@ var emptyStore = DataStore{}
 type Options struct {
 	Metadata map[string]interface{}
 }
-
-//go:generate mockery -name Metadata -output=./mocks -case=underscore
 
 // Metadata is a placeholder for data reference metadata.
 type Metadata interface {
@@ -106,7 +105,7 @@ type SignedURLResponse struct {
 	RequiredRequestHeaders map[string]string
 }
 
-//go:generate mockery -name RawStore -case=underscore
+//go:generate mockery --name RawStore --case=underscore --with-expecter
 
 // RawStore defines a low level interface for accessing and storing bytes.
 type RawStore interface {
@@ -119,7 +118,7 @@ type RawStore interface {
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
 
-	// List gets a list of items given a prefix, using a paginated API
+	// List gets a list of items (relative path to the reference input) given a prefix, using a paginated API
 	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error
@@ -135,7 +134,7 @@ type RawStore interface {
 	Delete(ctx context.Context, reference DataReference) error
 }
 
-//go:generate mockery -name ReferenceConstructor -case=underscore
+//go:generate mockery --name ReferenceConstructor --case=underscore --with-expecter
 
 // ReferenceConstructor defines an interface for building data reference paths.
 type ReferenceConstructor interface {
@@ -155,7 +154,7 @@ type ProtobufStore interface {
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
 
-//go:generate mockery -name ComposedProtobufStore -case=underscore
+//go:generate mockery --name ComposedProtobufStore --case=underscore --with-expecter
 
 // ComposedProtobufStore interface includes all the necessary data to allow a ProtobufStore to interact with storage
 // through a RawStore.
@@ -171,18 +170,13 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 		return "", "", "", err
 	}
 
-	// Handle storage URLs that use @ to separate container/bucket name from the storage endpoint.
-	// When url.Parse encounters the @ symbol, it treats the part before @ as User and the part after as Host.
-	// Example: Azure ADLS Gen2 uses abfs://container@storageaccount.dfs.core.windows.net/path format.
-	if u.User != nil && u.User.Username() != "" {
-		container = u.User.Username()
-	} else {
-		container = u.Host
-	}
-
-	return u.Scheme, container, strings.Trim(u.Path, "/"), nil
+	return u.Scheme, u.Host, strings.Trim(u.Path, "/"), nil
 }
 
 func (r DataReference) String() string {
 	return string(r)
+}
+
+func NewDataReference(scheme string, container string, key string) DataReference {
+	return DataReference(fmt.Sprintf("%s://%s/%s", scheme, container, key))
 }

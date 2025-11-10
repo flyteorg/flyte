@@ -38,7 +38,9 @@ func isPFlagValue(t types.Type) bool {
 	return implementsAllOfMethods(t, "String", "Set", "Type")
 }
 
-func hasStringConstructor(t *types.Named) bool {
+func hasStringConstructor(t interface {
+	Obj() *types.TypeName
+}) bool {
 	return t.Obj().Parent().Lookup(fmt.Sprintf("%sString", t.Obj().Name())) != nil
 }
 

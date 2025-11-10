@@ -1,20 +1,14 @@
-# WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
-# ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
-# 
-# TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
-
-issues:
-  exclude-dirs:
+run:
+  skip-dirs:
     - pkg/client
-
 linters:
   disable-all: true
   enable:
     - errcheck
+    - gosec
     - gci
     - goconst
     - goimports
-    - gosec
     - gosimple
     - govet
     - ineffassign
@@ -24,7 +18,7 @@ linters:
     - typecheck
     - unconvert
     - unused
-
+    - protogetter
 linters-settings:
   gci:
     custom-order: true
@@ -33,3 +27,5 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
+  goconst:
+    ignore-tests: true

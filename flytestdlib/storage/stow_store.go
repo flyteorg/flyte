@@ -93,18 +93,17 @@ type stowMetrics struct {
 	HeadLatency     labeled.StopWatch
 	HeadLatencyHist labeled.HistogramStopWatch
 
-	ListFailure labeled.Counter
-	ListLatency labeled.StopWatch
+	ListFailure     labeled.Counter
+	ListLatency     labeled.StopWatch
+	ListLatencyHist labeled.HistogramStopWatch
 
 	ReadFailure         labeled.Counter
 	ReadOpenLatency     labeled.StopWatch
 	ReadOpenLatencyHist labeled.HistogramStopWatch
-	ReadBytes           labeled.Counter
 
 	WriteFailure     labeled.Counter
 	WriteLatency     labeled.StopWatch
 	WriteLatencyHist labeled.HistogramStopWatch
-	WriteBytes       labeled.Counter
 
 	DeleteFailure     labeled.Counter
 	DeleteLatency     labeled.StopWatch
@@ -264,34 +263,36 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 }
 
 func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
-	_, c, k, err := reference.Split()
+	_, containerName, key, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
 		return nil, NewCursorAtEnd(), err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, containerName)
 	if err != nil {
 		return nil, NewCursorAtEnd(), err
 	}
 
-	t := s.metrics.ListLatency.Start(ctx)
+	t1 := s.metrics.ListLatency.Start(ctx)
+	t2 := s.metrics.ListLatencyHist.Start(ctx)
 	var stowCursor string
-	if cursor.cursorState == AtStartCursorState {
+	switch cursor.cursorState {
+	case AtStartCursorState:
 		stowCursor = stow.CursorStart
-	} else if cursor.cursorState == AtEndCursorState {
+	case AtEndCursorState:
 		return nil, NewCursorAtEnd(), fmt.Errorf("Cursor cannot be at end for the List call")
-	} else {
+	default:
 		stowCursor = cursor.customPosition
 	}
-	items, stowCursor, err := container.Items(k, stowCursor, maxItems)
+	items, stowCursor, err := container.Items(key, stowCursor, maxItems)
+	t1.Stop()
+	t2.Stop()
+
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			// It appears that stow items behave differently for different stores. The cases below have been tested
-			// for S3 and GCS. S3's path comes with https:// prepended, GCS does not. Also GCS's scheme is 'google',
-			// not 'gs', so it's best to just construct the proper https path.
-			logger.Debugf(ctx, "Stow store appending k=%s url=[%v]", k, item.URL())
+			logger.Debugf(ctx, "Stow store appending k=%s url=[%v]", key, item.URL())
 			urlPath := item.URL().Path
 			if strings.HasPrefix(urlPath, "http") {
 				results[index] = DataReference(urlPath)
@@ -308,12 +309,11 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 		} else {
 			cursor = NewCursorFromCustomPosition(stowCursor)
 		}
-		t.Stop()
 		return results, cursor, nil
 	}
 
 	incFailureCounterForError(ctx, s.metrics.ListFailure, err)
-	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", k)
+	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", key)
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
@@ -350,14 +350,7 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		}
 	}
 
-	readCloser, err := item.Open()
-	if err != nil {
-		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
-		return nil, err
-	}
-
-	s.metrics.ReadBytes.Add(ctx, float64(sizeBytes))
-	return readCloser, err
+	return item.Open()
 }
 
 func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
@@ -392,7 +385,6 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		}
 	}
 
-	s.metrics.WriteBytes.Add(ctx, float64(size))
 	return nil
 }
 
@@ -464,7 +456,8 @@ const (
 )
 
 func (l locationID) String() string {
-	return strconv.Itoa(int(l))
+	return strconv.Itoa(int(l)) // #nosec G115
+
 }
 
 func (s *StowStore) getLocation(id locationID) stow.Location {
@@ -513,18 +506,17 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 		HeadLatency:     labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		HeadLatencyHist: labeled.NewHistogramStopWatch("head", "Indicates time to fetch metadata using the Head API", scope, labeled.EmitUnlabeledMetric),
 
-		ListFailure: labeled.NewCounter("list_failure", "Indicates failure in item listing for a given reference", scope, labeled.EmitUnlabeledMetric),
-		ListLatency: labeled.NewStopWatch("list", "Indicates time to fetch item listing using the List API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ListFailure:     labeled.NewCounter("list_failure", "Indicates failure in item listing for a given reference", scope, labeled.EmitUnlabeledMetric),
+		ListLatency:     labeled.NewStopWatch("list", "Indicates time to fetch item listing using the List API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ListLatencyHist: labeled.NewHistogramStopWatch("list", "Indicates time to fetch item listing using the List API", scope, labeled.EmitUnlabeledMetric),
 
 		ReadFailure:         labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		ReadOpenLatency:     labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		ReadOpenLatencyHist: labeled.NewHistogramStopWatch("read_open", "Indicates time to first byte when reading", scope, labeled.EmitUnlabeledMetric),
-		ReadBytes:           labeled.NewCounter("read_bytes_total", "Indicates number of bytes read", scope, labeled.EmitUnlabeledMetric),
 
 		WriteFailure:     labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		WriteLatency:     labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		WriteLatencyHist: labeled.NewHistogramStopWatch("write", "Time to write an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
-		WriteBytes:       labeled.NewCounter("write_bytes_total", "Indicates number of bytes written", scope, labeled.EmitUnlabeledMetric),
 
 		DeleteFailure:     labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		DeleteLatency:     labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),

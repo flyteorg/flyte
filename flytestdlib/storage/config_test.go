@@ -2,7 +2,6 @@ package storage
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -35,11 +34,11 @@ func TestMarshal(t *testing.T) {
 		t.Log("Updating config file.")
 		raw, err := yaml.Marshal(expected)
 		assert.NoError(t, err)
-		assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "config.yaml"), raw, os.ModePerm))
+		assert.NoError(t, os.WriteFile(filepath.Join("testdata", "config.yaml"), raw, os.ModePerm)) // #nosec G306
 	}
 
 	actual := Config{}
-	raw, err := ioutil.ReadFile(filepath.Join("testdata", "config.yaml"))
+	raw, err := os.ReadFile(filepath.Join("testdata", "config.yaml"))
 	assert.NoError(t, err)
 	assert.NoError(t, yaml.Unmarshal(raw, &actual))
 	assert.True(t, reflect.DeepEqual(expected, actual))

@@ -52,7 +52,6 @@ var (
 )
 
 type Config struct {
-	SchemaURL      string         `json:"schemaUrl" pflag:",Sets the schema URL for the telemetry traces"`
 	ExporterType   ExporterType   `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]."`
 	FileConfig     FileConfig     `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
 	JaegerConfig   JaegerConfig   `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`

@@ -6,11 +6,13 @@ import (
 	"encoding/base64"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 )
+
+var marshaller = &jsonpb.Marshaler{}
 
 func fromHashToByteArray(input [32]byte) []byte {
 	output := make([]byte, 32)
@@ -27,7 +29,7 @@ func ComputeHash(ctx context.Context, pb proto.Message) ([]byte, error) {
 	// - omitting empty values which supports backwards compatibility of old protobuf definitions
 	// We do not use protobuf marshalling because it does not guarantee stable output because of how it handles
 	// unknown fields and ordering of fields. https://github.com/protocolbuffers/protobuf/issues/2830
-	pbJSON, err := utils.MarshalPbToString(pb)
+	pbJSON, err := marshaller.MarshalToString(pb)
 	if err != nil {
 		logger.Warning(ctx, "failed to marshal pb [%+v] to JSON with err %v", pb, err)
 		return nil, err
@@ -51,5 +53,5 @@ func ComputeHashString(ctx context.Context, pb proto.Message) (string, error) {
 		return "", err
 	}
 
-	return base64.StdEncoding.EncodeToString(hashBytes), err
+	return base64.StdEncoding.EncodeToString(hashBytes), nil
 }

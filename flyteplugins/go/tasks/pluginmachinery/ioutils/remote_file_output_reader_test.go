@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 )
 
 type MemoryMetadata struct {
@@ -53,14 +54,13 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-			incomingErrorDoc := args.Get(2)
-			assert.NotNil(t, incomingErrorDoc)
-			casted := incomingErrorDoc.(*core.ErrorDocument)
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
+			assert.NotNil(t, msg)
+			casted := msg.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
-		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -89,10 +89,9 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-			incomingErrorDoc := args.Get(2)
-			assert.NotNil(t, incomingErrorDoc)
-			casted := incomingErrorDoc.(*core.ErrorDocument)
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
+			assert.NotNil(t, msg)
+			casted := msg.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 

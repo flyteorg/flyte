@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -121,8 +120,7 @@ type kResolver struct {
 	cc        resolver.ClientConn
 	k8sClient kubernetes.Interface
 	// wg is used to enforce Close() to return after the watcher() goroutine has finished.
-	wg                  sync.WaitGroup
-	lastResourceVersion string
+	wg sync.WaitGroup
 }
 
 // ResolveNow is a no-op at this point.
@@ -160,12 +158,7 @@ func (k *kResolver) run() {
 
 	logger.Infof(k.ctx, "Starting k8s resolver for target: [%s], service namespace: [%s], service name: [%s]", k.target, k.target.serviceNamespace, k.target.serviceName)
 
-	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(
-		k.ctx, metav1.ListOptions{
-			FieldSelector:       "metadata.name=" + k.target.serviceName,
-			ResourceVersion:     k.lastResourceVersion,
-			AllowWatchBookmarks: true,
-		})
+	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{FieldSelector: "metadata.name=" + k.target.serviceName})
 	if err != nil {
 		logger.Errorf(
 			k.ctx,
@@ -194,33 +187,7 @@ func (k *kResolver) run() {
 			if event.Object == nil {
 				continue
 			}
-
-			if metadata, ok := event.Object.(metav1.Object); ok {
-				k.lastResourceVersion = metadata.GetResourceVersion()
-			}
-
-			switch event.Type {
-			case watch.Added, watch.Modified:
-				// The endpoints object were added or modified, so we need to update the addresses.
-				k.resolve(event.Object.(*v1.Endpoints))
-			case watch.Deleted:
-				// The endpoints object were deleted, so we have no addresses.
-				err := k.cc.UpdateState(resolver.State{Addresses: []resolver.Address{}})
-				if err != nil {
-					grpclog.Errorf("k8s resolver: failed to clear addresses: %v", err)
-				}
-			case watch.Bookmark:
-				// The lastResourceVersion is already updated, no further action needed
-			case watch.Error:
-				status, ok := event.Object.(*metav1.Status)
-				if !ok {
-					logger.Errorf(k.ctx, "k8s resolver: watcher received an error but couldn't parse it")
-					return
-				}
-				logger.Errorf(k.ctx, "k8s resolver: watcher error: %s (%v)", status.Message, status.Code)
-				watcher.Stop()
-				return
-			}
+			k.resolve(event.Object.(*v1.Endpoints))
 		}
 	}
 }

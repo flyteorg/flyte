@@ -34,9 +34,9 @@ type cachedRawStore struct {
 }
 
 // Head gets metadata about the reference. This should generally be a lightweight operation.
-func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (_ Metadata, err error) {
+func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/Head")
-	defer span.EndErr(err)
+	defer span.End()
 
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -51,9 +51,9 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (_ M
 }
 
 // ReadRaw retrieves a byte array from the Blob store or an error
-func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (_ io.ReadCloser, err error) {
+func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/ReadRaw")
-	defer span.EndErr(err)
+	defer span.End()
 
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -81,22 +81,21 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 
 	err = s.cache.Set(key, b, 0)
 	if err != nil {
-		s.metrics.CacheWriteError.Inc()
+		logger.Debugf(ctx, "Failed to Cache the metadata")
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
-		logger.Warn(ctx, err.Error())
 	}
 
-	return ioutils.NewBytesReadCloser(b), nil
+	return ioutils.NewBytesReadCloser(b), err
 }
 
 // WriteRaw stores a raw byte array.
-func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) (err error) {
+func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/WriteRaw")
-	defer span.EndErr(err)
+	defer span.End()
 
 	var buf bytes.Buffer
 	teeReader := io.TeeReader(raw, &buf)
-	err = s.RawStore.WriteRaw(ctx, reference, size, opts, teeReader)
+	err := s.RawStore.WriteRaw(ctx, reference, size, opts, teeReader)
 	if err != nil {
 		return err
 	}
@@ -105,14 +104,13 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 	if err != nil {
 		s.metrics.CacheWriteError.Inc()
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
-		logger.Warn(ctx, err.Error())
 	}
 
-	return nil
+	return err
 }
 
 // Delete removes the referenced data from the cache as well as underlying store.
-func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) (err error) {
+func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) error {
 	key := []byte(reference)
 	if deleted := s.cache.Del(key); deleted {
 		s.metrics.CacheHit.Inc()

@@ -2,7 +2,7 @@ package storage
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -148,13 +148,13 @@ func TestDefaultProtobufStore_HardErrors(t *testing.T) {
 	dummyReadErrorMsg := "Dummy read error"
 	store := &dummyStore{
 		HeadCb: func(ctx context.Context, reference DataReference) (Metadata, error) {
-			return MemoryMetadata{}, errors.New(dummyHeadErrorMsg)
+			return MemoryMetadata{}, fmt.Errorf("%s", dummyHeadErrorMsg) //nolint:govet,staticcheck
 		},
 		WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
-			return errors.New(dummyWriteErrorMsg)
+			return fmt.Errorf("%s", dummyWriteErrorMsg) //nolint:govet,staticcheck
 		},
 		ReadRawCb: func(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
-			return nil, errors.New(dummyReadErrorMsg)
+			return nil, fmt.Errorf("%s", dummyReadErrorMsg) //nolint:govet,staticcheck
 		},
 	}
 	pbErroneousStore := NewDefaultProtobufStoreWithMetrics(store, metrics.protoMetrics)

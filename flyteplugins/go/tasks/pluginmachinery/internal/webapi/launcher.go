@@ -7,11 +7,11 @@ import (
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
+	"github.com/flyteorg/flyte/v2/flytestdlib/cache"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
-func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, cache autorefreshcache.AutoRefresh,
+func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, cache cache.AutoRefresh,
 	state *State) (newState *State, phaseInfo core.PhaseInfo, err error) {
 	rMeta, r, err := p.Create(ctx, tCtx)
 	if err != nil {
