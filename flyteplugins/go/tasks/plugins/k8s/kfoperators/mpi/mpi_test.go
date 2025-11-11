@@ -742,7 +742,7 @@ func TestBuildResourceMPIV1(t *testing.T) {
 		},
 		{
 			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Image: testImage,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -758,7 +758,7 @@ func TestBuildResourceMPIV1(t *testing.T) {
 				Command: launcherCommand,
 			},
 			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -844,7 +844,7 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -941,7 +941,7 @@ func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
 		},
 		{
 			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
 							{Name: core.Resources_CPU, Value: "250m"},
@@ -955,7 +955,7 @@ func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{

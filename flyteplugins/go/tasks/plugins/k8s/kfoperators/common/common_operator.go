@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	pluginsIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 	kfplugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow"
 )
 
@@ -248,11 +249,11 @@ func ParseCleanPodPolicy(flyteCleanPodPolicy kfplugins.CleanPodPolicy) kubeflowv
 }
 
 // Get k8s restart policy from flyte kubeflow plugins restart policy.
-func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) kubeflowv1.RestartPolicy {
-	restartPolicyMap := map[kfplugins.RestartPolicy]kubeflowv1.RestartPolicy{
-		kfplugins.RestartPolicy_RESTART_POLICY_NEVER:      kubeflowv1.RestartPolicyNever,
-		kfplugins.RestartPolicy_RESTART_POLICY_ON_FAILURE: kubeflowv1.RestartPolicyOnFailure,
-		kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS:     kubeflowv1.RestartPolicyAlways,
+func ParseRestartPolicy(flyteRestartPolicy pluginsIdl.RestartPolicy) kubeflowv1.RestartPolicy {
+	restartPolicyMap := map[pluginsIdl.RestartPolicy]kubeflowv1.RestartPolicy{
+		pluginsIdl.RestartPolicy_RESTART_POLICY_NEVER:      kubeflowv1.RestartPolicyNever,
+		pluginsIdl.RestartPolicy_RESTART_POLICY_ON_FAILURE: kubeflowv1.RestartPolicyOnFailure,
+		pluginsIdl.RestartPolicy_RESTART_POLICY_ALWAYS:     kubeflowv1.RestartPolicyAlways,
 	}
 	return restartPolicyMap[flyteRestartPolicy]
 }
@@ -300,8 +301,8 @@ type kfDistributedReplicaSpec interface {
 	GetReplicas() int32
 	GetImage() string
 	GetResources() *core.Resources
-	GetRestartPolicy() kfplugins.RestartPolicy
-	GetCommon() *kfplugins.CommonReplicaSpec
+	GetRestartPolicy() pluginsIdl.RestartPolicy
+	GetCommon() *pluginsIdl.CommonReplicaSpec
 }
 
 type allowsCommandOverride interface {
@@ -312,7 +313,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	var replicas int32
 	var image string
 	var resources *core.Resources
-	var restartPolicy kfplugins.RestartPolicy
+	var restartPolicy pluginsIdl.RestartPolicy
 
 	// replicas, image, resources, restartPolicy are deprecated since the common replica spec is introduced.
 	// Therefore, if the common replica spec is set, use that to get the common fields

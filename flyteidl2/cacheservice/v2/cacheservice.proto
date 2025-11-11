@@ -1,32 +1,30 @@
 syntax = "proto3";
 
-package flyteidl3.cacheservice.v2;
+package flyteidl2.cacheservice.v2;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/cacheservice/cacheservice.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2";
-
-import "flyteidl2/core/identifier.proto";
-import "flyteidl2/cacheservice/cacheservice.proto";
-import "buf/validate/validate.proto";
-
 
 /*
  * CacheService defines operations for cache management including retrieval, storage, and deletion of cached task/workflow outputs.
  */
 service CacheService {
   // Retrieves cached data by key.
-  rpc Get (GetCacheRequest) returns (flyteidl2.cacheservice.GetCacheResponse);
+  rpc Get(GetCacheRequest) returns (flyteidl2.cacheservice.GetCacheResponse);
 
   // Stores or updates cached data by key.
-  rpc Put (PutCacheRequest) returns (flyteidl2.cacheservice.PutCacheResponse);
+  rpc Put(PutCacheRequest) returns (flyteidl2.cacheservice.PutCacheResponse);
 
   // Deletes cached data by key.
-  rpc Delete (DeleteCacheRequest) returns (flyteidl2.cacheservice.DeleteCacheResponse);
+  rpc Delete(DeleteCacheRequest) returns (flyteidl2.cacheservice.DeleteCacheResponse);
 
   // Get or extend a reservation for a cache key
-  rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (flyteidl2.cacheservice.GetOrExtendReservationResponse);
+  rpc GetOrExtendReservation(GetOrExtendReservationRequest) returns (flyteidl2.cacheservice.GetOrExtendReservationResponse);
 
   // Release the reservation for a cache key
-  rpc ReleaseReservation (ReleaseReservationRequest) returns (flyteidl2.cacheservice.ReleaseReservationResponse);
+  rpc ReleaseReservation(ReleaseReservationRequest) returns (flyteidl2.cacheservice.ReleaseReservationResponse);
 }
 
 /*

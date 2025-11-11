@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package flyteidl2.plugins;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
-
 import "flyteidl2/core/tasks.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 
 enum RestartPolicy {
   RESTART_POLICY_NEVER = 0;

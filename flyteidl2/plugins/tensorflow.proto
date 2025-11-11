@@ -15,4 +15,4 @@ message DistributedTensorflowTrainingTask {
   int32 chief_replicas = 3;
   // number of evaluator replicas spawned in the cluster for this job
   int32 evaluator_replicas = 4;
-} 
+}

@@ -20,11 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CacheService_Get_FullMethodName                    = "/flyteidl3.cacheservice.v2.CacheService/Get"
-	CacheService_Put_FullMethodName                    = "/flyteidl3.cacheservice.v2.CacheService/Put"
-	CacheService_Delete_FullMethodName                 = "/flyteidl3.cacheservice.v2.CacheService/Delete"
-	CacheService_GetOrExtendReservation_FullMethodName = "/flyteidl3.cacheservice.v2.CacheService/GetOrExtendReservation"
-	CacheService_ReleaseReservation_FullMethodName     = "/flyteidl3.cacheservice.v2.CacheService/ReleaseReservation"
+	CacheService_Get_FullMethodName                    = "/flyteidl2.cacheservice.v2.CacheService/Get"
+	CacheService_Put_FullMethodName                    = "/flyteidl2.cacheservice.v2.CacheService/Put"
+	CacheService_Delete_FullMethodName                 = "/flyteidl2.cacheservice.v2.CacheService/Delete"
+	CacheService_GetOrExtendReservation_FullMethodName = "/flyteidl2.cacheservice.v2.CacheService/GetOrExtendReservation"
+	CacheService_ReleaseReservation_FullMethodName     = "/flyteidl2.cacheservice.v2.CacheService/ReleaseReservation"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -237,7 +237,7 @@ func _CacheService_ReleaseReservation_Handler(srv interface{}, ctx context.Conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CacheService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl3.cacheservice.v2.CacheService",
+	ServiceName: "flyteidl2.cacheservice.v2.CacheService",
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

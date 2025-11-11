@@ -23,7 +23,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// CacheServiceName is the fully-qualified name of the CacheService service.
-	CacheServiceName = "flyteidl3.cacheservice.v2.CacheService"
+	CacheServiceName = "flyteidl2.cacheservice.v2.CacheService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -35,17 +35,17 @@ const (
 // period.
 const (
 	// CacheServiceGetProcedure is the fully-qualified name of the CacheService's Get RPC.
-	CacheServiceGetProcedure = "/flyteidl3.cacheservice.v2.CacheService/Get"
+	CacheServiceGetProcedure = "/flyteidl2.cacheservice.v2.CacheService/Get"
 	// CacheServicePutProcedure is the fully-qualified name of the CacheService's Put RPC.
-	CacheServicePutProcedure = "/flyteidl3.cacheservice.v2.CacheService/Put"
+	CacheServicePutProcedure = "/flyteidl2.cacheservice.v2.CacheService/Put"
 	// CacheServiceDeleteProcedure is the fully-qualified name of the CacheService's Delete RPC.
-	CacheServiceDeleteProcedure = "/flyteidl3.cacheservice.v2.CacheService/Delete"
+	CacheServiceDeleteProcedure = "/flyteidl2.cacheservice.v2.CacheService/Delete"
 	// CacheServiceGetOrExtendReservationProcedure is the fully-qualified name of the CacheService's
 	// GetOrExtendReservation RPC.
-	CacheServiceGetOrExtendReservationProcedure = "/flyteidl3.cacheservice.v2.CacheService/GetOrExtendReservation"
+	CacheServiceGetOrExtendReservationProcedure = "/flyteidl2.cacheservice.v2.CacheService/GetOrExtendReservation"
 	// CacheServiceReleaseReservationProcedure is the fully-qualified name of the CacheService's
 	// ReleaseReservation RPC.
-	CacheServiceReleaseReservationProcedure = "/flyteidl3.cacheservice.v2.CacheService/ReleaseReservation"
+	CacheServiceReleaseReservationProcedure = "/flyteidl2.cacheservice.v2.CacheService/ReleaseReservation"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -58,7 +58,7 @@ var (
 	cacheServiceReleaseReservationMethodDescriptor     = cacheServiceServiceDescriptor.Methods().ByName("ReleaseReservation")
 )
 
-// CacheServiceClient is a client for the flyteidl3.cacheservice.v2.CacheService service.
+// CacheServiceClient is a client for the flyteidl2.cacheservice.v2.CacheService service.
 type CacheServiceClient interface {
 	// Retrieves cached data by key.
 	Get(context.Context, *connect.Request[v2.GetCacheRequest]) (*connect.Response[cacheservice.GetCacheResponse], error)
@@ -72,7 +72,7 @@ type CacheServiceClient interface {
 	ReleaseReservation(context.Context, *connect.Request[v2.ReleaseReservationRequest]) (*connect.Response[cacheservice.ReleaseReservationResponse], error)
 }
 
-// NewCacheServiceClient constructs a client for the flyteidl3.cacheservice.v2.CacheService service.
+// NewCacheServiceClient constructs a client for the flyteidl2.cacheservice.v2.CacheService service.
 // By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
 // responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
@@ -124,32 +124,32 @@ type cacheServiceClient struct {
 	releaseReservation     *connect.Client[v2.ReleaseReservationRequest, cacheservice.ReleaseReservationResponse]
 }
 
-// Get calls flyteidl3.cacheservice.v2.CacheService.Get.
+// Get calls flyteidl2.cacheservice.v2.CacheService.Get.
 func (c *cacheServiceClient) Get(ctx context.Context, req *connect.Request[v2.GetCacheRequest]) (*connect.Response[cacheservice.GetCacheResponse], error) {
 	return c.get.CallUnary(ctx, req)
 }
 
-// Put calls flyteidl3.cacheservice.v2.CacheService.Put.
+// Put calls flyteidl2.cacheservice.v2.CacheService.Put.
 func (c *cacheServiceClient) Put(ctx context.Context, req *connect.Request[v2.PutCacheRequest]) (*connect.Response[cacheservice.PutCacheResponse], error) {
 	return c.put.CallUnary(ctx, req)
 }
 
-// Delete calls flyteidl3.cacheservice.v2.CacheService.Delete.
+// Delete calls flyteidl2.cacheservice.v2.CacheService.Delete.
 func (c *cacheServiceClient) Delete(ctx context.Context, req *connect.Request[v2.DeleteCacheRequest]) (*connect.Response[cacheservice.DeleteCacheResponse], error) {
 	return c.delete.CallUnary(ctx, req)
 }
 
-// GetOrExtendReservation calls flyteidl3.cacheservice.v2.CacheService.GetOrExtendReservation.
+// GetOrExtendReservation calls flyteidl2.cacheservice.v2.CacheService.GetOrExtendReservation.
 func (c *cacheServiceClient) GetOrExtendReservation(ctx context.Context, req *connect.Request[v2.GetOrExtendReservationRequest]) (*connect.Response[cacheservice.GetOrExtendReservationResponse], error) {
 	return c.getOrExtendReservation.CallUnary(ctx, req)
 }
 
-// ReleaseReservation calls flyteidl3.cacheservice.v2.CacheService.ReleaseReservation.
+// ReleaseReservation calls flyteidl2.cacheservice.v2.CacheService.ReleaseReservation.
 func (c *cacheServiceClient) ReleaseReservation(ctx context.Context, req *connect.Request[v2.ReleaseReservationRequest]) (*connect.Response[cacheservice.ReleaseReservationResponse], error) {
 	return c.releaseReservation.CallUnary(ctx, req)
 }
 
-// CacheServiceHandler is an implementation of the flyteidl3.cacheservice.v2.CacheService service.
+// CacheServiceHandler is an implementation of the flyteidl2.cacheservice.v2.CacheService service.
 type CacheServiceHandler interface {
 	// Retrieves cached data by key.
 	Get(context.Context, *connect.Request[v2.GetCacheRequest]) (*connect.Response[cacheservice.GetCacheResponse], error)
@@ -199,7 +199,7 @@ func NewCacheServiceHandler(svc CacheServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(cacheServiceReleaseReservationMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl3.cacheservice.v2.CacheService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.cacheservice.v2.CacheService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case CacheServiceGetProcedure:
 			cacheServiceGetHandler.ServeHTTP(w, r)
@@ -221,21 +221,21 @@ func NewCacheServiceHandler(svc CacheServiceHandler, opts ...connect.HandlerOpti
 type UnimplementedCacheServiceHandler struct{}
 
 func (UnimplementedCacheServiceHandler) Get(context.Context, *connect.Request[v2.GetCacheRequest]) (*connect.Response[cacheservice.GetCacheResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl3.cacheservice.v2.CacheService.Get is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cacheservice.v2.CacheService.Get is not implemented"))
 }
 
 func (UnimplementedCacheServiceHandler) Put(context.Context, *connect.Request[v2.PutCacheRequest]) (*connect.Response[cacheservice.PutCacheResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl3.cacheservice.v2.CacheService.Put is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cacheservice.v2.CacheService.Put is not implemented"))
 }
 
 func (UnimplementedCacheServiceHandler) Delete(context.Context, *connect.Request[v2.DeleteCacheRequest]) (*connect.Response[cacheservice.DeleteCacheResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl3.cacheservice.v2.CacheService.Delete is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cacheservice.v2.CacheService.Delete is not implemented"))
 }
 
 func (UnimplementedCacheServiceHandler) GetOrExtendReservation(context.Context, *connect.Request[v2.GetOrExtendReservationRequest]) (*connect.Response[cacheservice.GetOrExtendReservationResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl3.cacheservice.v2.CacheService.GetOrExtendReservation is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cacheservice.v2.CacheService.GetOrExtendReservation is not implemented"))
 }
 
 func (UnimplementedCacheServiceHandler) ReleaseReservation(context.Context, *connect.Request[v2.ReleaseReservationRequest]) (*connect.Response[cacheservice.ReleaseReservationResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl3.cacheservice.v2.CacheService.ReleaseReservation is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cacheservice.v2.CacheService.ReleaseReservation is not implemented"))
 }

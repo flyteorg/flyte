@@ -2,12 +2,13 @@ syntax = "proto3";
 
 package flyteidl2.plugins.kubeflow;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
-
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/plugins/common.proto";
 import "flyteidl2/plugins/kubeflow/common.proto";
 
-// Custom proto for torch elastic config for distributed training using 
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
+
+// Custom proto for torch elastic config for distributed training using
 // https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go
 message ElasticConfig {
   string rdzv_backend = 1;

@@ -890,7 +890,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 						{Name: core.Resources_MEMORY, Value: "500Mi"},
 					},
 				},
-				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+				RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
 				Replicas: 100,
@@ -908,7 +908,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		},
 		{
 			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Image: testImageMaster,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -920,11 +920,11 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 							{Name: core.Resources_MEMORY, Value: "500Mi"},
 						},
 					},
-					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+					RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1012,7 +1012,7 @@ func TestBuildResourcePytorchV1WithRunPolicy(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 				},
 			},
@@ -1065,7 +1065,7 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1182,7 +1182,7 @@ func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
 		},
 		{
 			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
 							{Name: core.Resources_CPU, Value: "250m"},
@@ -1196,7 +1196,7 @@ func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1243,7 +1243,7 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 2,
 				},
 			},
@@ -1293,7 +1293,7 @@ func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 0,
 				},
 			},

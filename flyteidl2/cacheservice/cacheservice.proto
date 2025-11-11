@@ -2,10 +2,8 @@ syntax = "proto3";
 
 package flyteidl2.cacheservice;
 
-import "flyteidl2/core/literals.proto";
-import "flyteidl2/core/types.proto";
 import "flyteidl2/core/identifier.proto";
-import "flyteidl2/core/interface.proto";
+import "flyteidl2/core/literals.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -16,19 +14,19 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
  */
 service CacheService {
   // Retrieves cached data by key.
-  rpc Get (GetCacheRequest) returns (GetCacheResponse);
+  rpc Get(GetCacheRequest) returns (GetCacheResponse);
 
   // Stores or updates cached data by key.
-  rpc Put (PutCacheRequest) returns (PutCacheResponse);
+  rpc Put(PutCacheRequest) returns (PutCacheResponse);
 
   // Deletes cached data by key.
-  rpc Delete (DeleteCacheRequest) returns (DeleteCacheResponse);
+  rpc Delete(DeleteCacheRequest) returns (DeleteCacheResponse);
 
   // Get or extend a reservation for a cache key
-  rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
+  rpc GetOrExtendReservation(GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
 
   // Release the reservation for a cache key
-  rpc ReleaseReservation (ReleaseReservationRequest) returns (ReleaseReservationResponse);
+  rpc ReleaseReservation(ReleaseReservationRequest) returns (ReleaseReservationResponse);
 }
 
 /*

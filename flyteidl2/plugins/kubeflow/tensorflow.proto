@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package flyteidl2.plugins.kubeflow;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
-
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/plugins/common.proto";
 import "flyteidl2/plugins/kubeflow/common.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
 
 // Proto for plugin that enables distributed training using https://github.com/kubeflow/tf-operator
 message DistributedTensorflowTrainingTask {

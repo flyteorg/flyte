@@ -560,22 +560,22 @@ func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
 		}),
 		dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
 			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 1,
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 				},
 			},
 			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 50,
 				},
 			},
 			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 1,
 				},
 			},
@@ -781,7 +781,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 						{Name: core.Resources_MEMORY, Value: "2Gi"},
 					},
 				},
-				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+				RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 			},
 			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
 				Replicas: 100,
@@ -824,7 +824,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 						{Name: core.Resources_MEMORY, Value: "2Gi"},
 					},
 				},
-				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+				RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 			},
 			RunPolicy: &kfplugins.RunPolicy{
 				CleanPodPolicy:        kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL,
@@ -833,7 +833,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 		},
 		{
 			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 1,
 					Image:    testImage,
 					Resources: &core.Resources{
@@ -846,11 +846,11 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 							{Name: core.Resources_MEMORY, Value: "2Gi"},
 						},
 					},
-					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+					RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -867,7 +867,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 				},
 			},
 			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 50,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -882,7 +882,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 				},
 			},
 			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 1,
 					Image:    testImage,
 					Resources: &core.Resources{
@@ -895,7 +895,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 							{Name: core.Resources_MEMORY, Value: "2Gi"},
 						},
 					},
-					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+					RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 				},
 			},
 			RunPolicy: &kfplugins.RunPolicy{
@@ -1005,7 +1005,7 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1117,7 +1117,7 @@ func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
 		},
 		{
 			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 1,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1132,7 +1132,7 @@ func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{

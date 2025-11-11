@@ -2,14 +2,12 @@ syntax = "proto3";
 
 package flyteidl2.event;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/event";
-
-import "flyteidl2/event/event.proto";
-import "flyteidl2/core/literals.proto";
-import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/identifier.proto";
-import "google/protobuf/timestamp.proto";
+import "flyteidl2/core/interface.proto";
+import "flyteidl2/event/event.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/event";
 
 // This is the cloud event parallel to the raw WorkflowExecutionEvent message. It's filled in with additional
 // information that downstream consumers may find useful.
@@ -30,7 +28,7 @@ message CloudEventWorkflowExecution {
   core.Identifier launch_plan_id = 6;
 
   // We can't have the ExecutionMetadata object directly because of import cycle
-  map<string,string> labels = 7;
+  map<string, string> labels = 7;
 }
 
 message CloudEventNodeExecution {
@@ -53,13 +51,13 @@ message CloudEventNodeExecution {
   core.Identifier launch_plan_id = 6;
 
   // We can't have the ExecutionMetadata object directly because of import cycle
-  map<string,string> labels = 7;
+  map<string, string> labels = 7;
 }
 
 message CloudEventTaskExecution {
   event.TaskExecutionEvent raw_event = 1;
   // We can't have the ExecutionMetadata object directly because of import cycle
-  map<string,string> labels = 2;
+  map<string, string> labels = 2;
 }
 
 // This event is to be sent by Admin after it creates an execution.

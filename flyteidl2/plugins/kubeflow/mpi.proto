@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package flyteidl2.plugins.kubeflow;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
-
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/plugins/common.proto";
 import "flyteidl2/plugins/kubeflow/common.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow";
 
 // Proto for plugin that enables distributed training using https://github.com/kubeflow/mpi-operator
 message DistributedMPITrainingTask {
@@ -14,14 +15,14 @@ message DistributedMPITrainingTask {
 
   // Master replicas spec
   DistributedMPITrainingReplicaSpec launcher_replicas = 2;
-  
+
   // RunPolicy encapsulates various runtime policies of the distributed training
   // job, for example how to clean up resources and how long the job can stay
   // active.
   RunPolicy run_policy = 3;
 
   // Number of slots per worker
-  int32 slots = 4; 
+  int32 slots = 4;
 }
 
 // Replica specification for distributed MPI training
