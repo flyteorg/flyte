@@ -1,8 +1,8 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.6-alpine AS builder
 
-# Install build dependencies
-RUN apk add --no-cache git make
+# Install dependencies
+RUN apk add --no-cache git make build-base
 
 WORKDIR /workspace
 
@@ -10,12 +10,12 @@ WORKDIR /workspace
 COPY ../go.mod ../go.sum ./
 RUN go mod download
 
-# Copy the runs service code
-COPY . ./runs/
+# Copy the entire repository
+COPY . /workspace
 
 # Build the service
 WORKDIR /workspace/runs
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o runs-service ./cmd/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -tags "sqlite_omit_load_extension" -a -o /workspace/runs/runs-service ./cmd/main.go
 
 # Final stage
 FROM alpine:latest
