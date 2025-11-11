@@ -77,7 +77,7 @@ type Plugin struct {
 
 type ResourceWrapper struct {
 	Phase          flyteIdl.TaskExecution_Phase
-	Outputs        *flyteIdl.LiteralMap
+	Outputs        *task.Outputs
 	Message        string
 	LogLinks       []*flyteIdl.TaskLog
 	CustomInfo     *structpb.Struct
