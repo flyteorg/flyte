@@ -1,0 +1,139 @@
+package ioutils
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/pkg/errors"
+
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+)
+
+type RemoteFileOutputReader struct {
+	OutPath        io.OutputFilePaths
+	store          storage.ComposedProtobufStore
+	maxPayloadSize int64
+}
+
+var _ io.OutputReader = RemoteFileOutputReader{}
+
+func (r RemoteFileOutputReader) IsError(ctx context.Context) (bool, error) {
+	metadata, err := r.store.Head(ctx, r.OutPath.GetErrorPath())
+	if err != nil {
+		return false, errors.Wrapf(err, "failed to read error file @[%s]", r.OutPath.GetErrorPath())
+	}
+	if metadata.Exists() {
+		if metadata.Size() > r.maxPayloadSize {
+			return false, errors.Wrapf(err, "error file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.OutPath.GetErrorPath(), metadata.Size(), r.maxPayloadSize)
+		}
+		return true, nil
+	}
+	return false, nil
+}
+
+func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionError, error) {
+	errorDoc := &core.ErrorDocument{}
+	err := r.store.ReadProtobuf(ctx, r.OutPath.GetErrorPath(), errorDoc)
+	if err != nil {
+		if storage.IsNotFound(err) {
+			return io.ExecutionError{
+				IsRecoverable: true,
+				ExecutionError: &core.ExecutionError{
+					Code:    "ErrorFileNotFound",
+					Message: err.Error(),
+					Kind:    core.ExecutionError_SYSTEM,
+				},
+			}, nil
+		}
+		return io.ExecutionError{}, errors.Wrapf(err, "failed to read error data from task @[%s]", r.OutPath.GetErrorPath())
+	}
+
+	if errorDoc.Error == nil {
+		return io.ExecutionError{
+			IsRecoverable: true,
+			ExecutionError: &core.ExecutionError{
+				Code:    "ErrorFileBadFormat",
+				Message: fmt.Sprintf("error not formatted correctly, nil error @path [%s]", r.OutPath.GetErrorPath()),
+				Kind:    core.ExecutionError_SYSTEM,
+			},
+		}, nil
+	}
+
+	ee := io.ExecutionError{
+		ExecutionError: &core.ExecutionError{
+			Code:    errorDoc.Error.Code,
+			Message: errorDoc.Error.Message,
+			Kind:    errorDoc.Error.Origin,
+		},
+	}
+
+	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
+		ee.IsRecoverable = true
+	}
+
+	return ee, nil
+}
+
+func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
+	md, err := r.store.Head(ctx, r.OutPath.GetOutputPath())
+	if err != nil {
+		return false, err
+	}
+	if md.Exists() {
+		if md.Size() > r.maxPayloadSize {
+			return false, errors.Errorf("output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.OutPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
+		}
+		return true, nil
+	}
+	return false, nil
+}
+
+func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.LiteralMap, *io.ExecutionError, error) {
+
+	d := &core.LiteralMap{}
+	if err := r.store.ReadProtobuf(ctx, r.OutPath.GetOutputPath(), d); err != nil {
+		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
+		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.OutPath.GetOutputPath(), err)
+	}
+
+	if d.Literals == nil {
+		return nil, &io.ExecutionError{
+			IsRecoverable: true,
+			ExecutionError: &core.ExecutionError{
+				Code:    "No outputs produced",
+				Message: fmt.Sprintf("outputs not found at [%s]", r.OutPath.GetOutputPath()),
+			},
+		}, nil
+	}
+
+	return d, nil, nil
+}
+
+func (r RemoteFileOutputReader) IsFile(ctx context.Context) bool {
+	return true
+}
+
+func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
+	md, err := r.store.Head(ctx, r.OutPath.GetDeckPath())
+	if err != nil {
+		return false, err
+	}
+
+	return md.Exists(), nil
+}
+
+func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
+	// Note: even though the data store retrieval checks against GetLimitMegabytes, there might be external
+	// storage implementations, so we keep this check here as well.
+	maxPayloadSize := maxDatasetSize
+	if maxPayloadSize == 0 {
+		maxPayloadSize = storage.GetConfig().Limits.GetLimitMegabytes * 1024 * 1024
+	}
+	return RemoteFileOutputReader{
+		OutPath:        outPaths,
+		store:          store,
+		maxPayloadSize: maxPayloadSize,
+	}
+}

@@ -1,0 +1,5 @@
+plugins:
+  admin:
+    webApi:
+      resourceQuotas:
+        - "test": 1000
