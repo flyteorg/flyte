@@ -25,6 +25,7 @@ import (
 	flyteIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
 
 const ID = "connector-service"
@@ -119,7 +120,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read task template with error: %v", err)
 	}
-	inputs, err := taskCtx.InputReader().Get(ctx)
+	literalMap, err := taskCtx.InputReader().Get(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read inputs with error: %v", err)
 	}
@@ -161,6 +162,14 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, err
 	}
+	var inputs *task.Inputs
+	if literalMap != nil {
+		var literals []task.NamedLiteral
+		for name, val := range literalMap.Literals {
+			literals = append(literals, task.NamedLiteral{Name: name, Value: val})
+		}
+	}
+
 	request := &plugins.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
