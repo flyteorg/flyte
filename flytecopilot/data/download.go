@@ -392,6 +392,10 @@ func (d Downloader) handleScalar(ctx context.Context, scalar *core.Scalar, toFil
 		b := scalar.GetGeneric()
 		i, err := d.handleGeneric(ctx, b, toFilePath, writeToFile)
 		return i, scalar, err
+	case *core.Scalar_Union:
+		b := scalar.GetUnion()
+		i, lit, err := d.handleLiteral(ctx, b.GetValue(), toFilePath, writeToFile)
+		return i, &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Type: b.GetType(), Value: lit}}}, err
 	case *core.Scalar_NoneType:
 		if writeToFile {
 			return nil, scalar, os.WriteFile(toFilePath, []byte("null"), os.ModePerm) // #nosec G306
