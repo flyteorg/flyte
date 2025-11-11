@@ -89,10 +89,18 @@ class Task(_message.Message):
     def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ...) -> None: ...
 
 class SourceCode(_message.Message):
-    __slots__ = ["link"]
-    LINK_FIELD_NUMBER: _ClassVar[int]
-    link: str
-    def __init__(self, link: _Optional[str] = ...) -> None: ...
+    __slots__ = ["remote_url", "file_path", "line_number", "is_git_tree_clean", "commit_sha"]
+    REMOTE_URL_FIELD_NUMBER: _ClassVar[int]
+    FILE_PATH_FIELD_NUMBER: _ClassVar[int]
+    LINE_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    IS_GIT_TREE_CLEAN_FIELD_NUMBER: _ClassVar[int]
+    COMMIT_SHA_FIELD_NUMBER: _ClassVar[int]
+    remote_url: str
+    file_path: str
+    line_number: int
+    is_git_tree_clean: bool
+    commit_sha: str
+    def __init__(self, remote_url: _Optional[str] = ..., file_path: _Optional[str] = ..., line_number: _Optional[int] = ..., is_git_tree_clean: bool = ..., commit_sha: _Optional[str] = ...) -> None: ...
 
 class DescriptionEntity(_message.Message):
     __slots__ = ["short_description", "long_description", "source_code"]

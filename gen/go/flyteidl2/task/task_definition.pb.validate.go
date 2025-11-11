@@ -811,7 +811,15 @@ func (m *SourceCode) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Link
+	// no validation rules for RemoteUrl
+
+	// no validation rules for FilePath
+
+	// no validation rules for LineNumber
+
+	// no validation rules for IsGitTreeClean
+
+	// no validation rules for CommitSha
 
 	if len(errors) > 0 {
 		return SourceCodeMultiError(errors)

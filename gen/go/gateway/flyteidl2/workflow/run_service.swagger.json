@@ -2345,8 +2345,26 @@
     "taskSourceCode": {
       "type": "object",
       "properties": {
-        "link": {
-          "type": "string"
+        "remote_url": {
+          "type": "string",
+          "title": "Url of git remote"
+        },
+        "file_path": {
+          "type": "string",
+          "title": "File path relative to git repo absolute path"
+        },
+        "line_number": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The line number of the flyte task in code file"
+        },
+        "is_git_tree_clean": {
+          "type": "boolean",
+          "title": "Whether the git tree is clean"
+        },
+        "commit_sha": {
+          "type": "string",
+          "title": "Latest git commit sha"
         }
       },
       "title": "Link to source code used to define this entity"
