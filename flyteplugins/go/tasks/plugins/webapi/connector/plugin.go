@@ -294,10 +294,18 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource.Outputs)
-		if err != nil {
-			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
-			return core.PhaseInfoUndefined, err
+		if resource.Outputs != nil {
+			var literalMap *flyteIdl.LiteralMap
+			literalMap = &flyteIdl.LiteralMap{Literals: make(map[string]*flyteIdl.Literal)}
+			for _, val := range resource.Outputs.Literals {
+				literalMap.Literals[val.Name] = val.Value
+			}
+			// TODO: Add support writing outputs proto.
+			err = writeOutput(ctx, taskCtx, literalMap)
+			if err != nil {
+				logger.Errorf(ctx, "failed to write output with err %s", err.Error())
+				return core.PhaseInfoUndefined, err
+			}
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
@@ -306,10 +314,7 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
 	// The default phase is undefined.
-	if resource.Phase != flyteIdl.TaskExecution_UNDEFINED {
-		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
-	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
 }
 
 func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (service.AsyncConnectorServiceClient, error) {

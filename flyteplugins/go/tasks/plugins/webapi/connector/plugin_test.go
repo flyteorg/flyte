@@ -122,8 +122,8 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+		assert.NotNil(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
 
 	t.Run("test TaskExecution_QUEUED Status", func(t *testing.T) {
@@ -270,14 +270,15 @@ func getMockMetadataServiceClient() *connectorMocks.ConnectorMetadataServiceClie
 		},
 	}
 
-	mockMetadataServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	mockMetadataServiceClient.On("ListConnectors", mock.Anything, mockRequest).Return(mockResponse, nil)
 	return mockMetadataServiceClient
 }
 
 func TestInitializeConnectorRegistry(t *testing.T) {
 	connectorClients := make(map[string]service.AsyncConnectorServiceClient)
 	connectorMetadataClients := make(map[string]service.ConnectorMetadataServiceClient)
-	connectorClients[defaultConnectorEndpoint] = &connectorMocks.AsyncConnectorServiceClient{}
+	client := &connectorMocks.AsyncConnectorServiceClient{}
+	connectorClients[defaultConnectorEndpoint] = client
 	connectorMetadataClients[defaultConnectorEndpoint] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{

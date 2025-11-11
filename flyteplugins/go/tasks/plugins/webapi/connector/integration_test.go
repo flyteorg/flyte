@@ -13,9 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/utils/strings/slices"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -28,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service"
 	connectorMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service/mocks"
@@ -232,21 +231,21 @@ func newMockAsyncConnectorPlugin() webapi.PluginEntry {
 	registryKey := RegistryKey{domain: "", taskTypeName: "spark", taskTypeVersion: defaultTaskTypeVersion}
 	connectorRegistry := Registry{registryKey: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}}}
 
-	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
+	mockCreateRequestMatcher := mock.MatchedBy(func(request *plugins.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
 		return slices.Equal(request.Template.GetContainer().Args, expectedArgs)
 	})
-	asyncConnectorClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
+	asyncConnectorClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&plugins.CreateTaskResponse{
 		ResourceMeta: []byte{1, 2, 3, 4}}, nil)
 
-	mockGetRequestMatcher := mock.MatchedBy(func(request *admin.GetTaskRequest) bool {
+	mockGetRequestMatcher := mock.MatchedBy(func(request *plugins.GetTaskRequest) bool {
 		return request.GetTaskCategory().GetName() == "spark"
 	})
 	asyncConnectorClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
-		&admin.GetTaskResponse{Resource: &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)
+		&plugins.GetTaskResponse{Resource: &plugins.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)
 
 	asyncConnectorClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
-		&admin.DeleteTaskResponse{}, nil)
+		&plugins.DeleteTaskResponse{}, nil)
 
 	cfg := defaultConfig
 	cfg.DefaultConnector.Endpoint = "localhost:8000"
