@@ -8,7 +8,7 @@ import type { Identifier } from "./identifier_pb.ts";
 import { file_flyteidl2_core_identifier } from "./identifier_pb.ts";
 import type { TypedInterface } from "./interface_pb.ts";
 import { file_flyteidl2_core_interface } from "./interface_pb.ts";
-import type { KeyValuePair, RetryStrategy } from "./literals_pb.ts";
+import type { Binding, KeyValuePair, RetryStrategy } from "./literals_pb.ts";
 import { file_flyteidl2_core_literals } from "./literals_pb.ts";
 import type { SecurityContext } from "./security_pb.ts";
 import { file_flyteidl2_core_security } from "./security_pb.ts";
@@ -20,7 +20,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/tasks.proto.
  */
 export const file_flyteidl2_core_tasks: GenFile = /*@__PURE__*/
-  fileDesc("ChpmbHl0ZWlkbDIvY29yZS90YXNrcy5wcm90bxIOZmx5dGVpZGwyLmNvcmUitAIKCVJlc291cmNlcxI5CghyZXF1ZXN0cxgBIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjcKBmxpbWl0cxgCIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5GlQKDVJlc291cmNlRW50cnkSNAoEbmFtZRgBIAEoDjImLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZU5hbWUSDQoFdmFsdWUYAiABKAkiXQoMUmVzb3VyY2VOYW1lEgsKB1VOS05PV04QABIHCgNDUFUQARIHCgNHUFUQAhIKCgZNRU1PUlkQAxILCgdTVE9SQUdFEAQSFQoRRVBIRU1FUkFMX1NUT1JBR0UQBSKOAgoOR1BVQWNjZWxlcmF0b3ISDgoGZGV2aWNlGAEgASgJEhcKDXVucGFydGl0aW9uZWQYAiABKAhIABIYCg5wYXJ0aXRpb25fc2l6ZRgDIAEoCUgAEkAKDGRldmljZV9jbGFzcxgEIAEoDjIqLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yLkRldmljZUNsYXNzIl8KC0RldmljZUNsYXNzEg4KCk5WSURJQV9HUFUQABIOCgpHT09HTEVfVFBVEAESEQoNQU1BWk9OX05FVVJPThACEgsKB0FNRF9HUFUQAxIQCgxIQUJBTkFfR0FVREkQBEIWChRwYXJ0aXRpb25fc2l6ZV92YWx1ZSJKCgxTaGFyZWRNZW1vcnkSEgoKbW91bnRfcGF0aBgBIAEoCRISCgptb3VudF9uYW1lGAIgASgJEhIKCnNpemVfbGltaXQYAyABKAkigQEKEUV4dGVuZGVkUmVzb3VyY2VzEjcKD2dwdV9hY2NlbGVyYXRvchgBIAEoCzIeLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yEjMKDXNoYXJlZF9tZW1vcnkYAiABKAsyHC5mbHl0ZWlkbDIuY29yZS5TaGFyZWRNZW1vcnkilgEKD1J1bnRpbWVNZXRhZGF0YRI5CgR0eXBlGAEgASgOMisuZmx5dGVpZGwyLmNvcmUuUnVudGltZU1ldGFkYXRhLlJ1bnRpbWVUeXBlEg8KB3ZlcnNpb24YAiABKAkSDgoGZmxhdm9yGAMgASgJIicKC1J1bnRpbWVUeXBlEgkKBU9USEVSEAASDQoJRkxZVEVfU0RLEAEi7wQKDFRhc2tNZXRhZGF0YRIUCgxkaXNjb3ZlcmFibGUYASABKAgSMAoHcnVudGltZRgCIAEoCzIfLmZseXRlaWRsMi5jb3JlLlJ1bnRpbWVNZXRhZGF0YRIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi4KB3JldHJpZXMYBSABKAsyHS5mbHl0ZWlkbDIuY29yZS5SZXRyeVN0cmF0ZWd5EhkKEWRpc2NvdmVyeV92ZXJzaW9uGAYgASgJEiAKGGRlcHJlY2F0ZWRfZXJyb3JfbWVzc2FnZRgHIAEoCRIXCg1pbnRlcnJ1cHRpYmxlGAggASgISAASGgoSY2FjaGVfc2VyaWFsaXphYmxlGAkgASgIEjQKBHRhZ3MYCyADKAsyJi5mbHl0ZWlkbDIuY29yZS5UYXNrTWV0YWRhdGEuVGFnc0VudHJ5EhkKEXBvZF90ZW1wbGF0ZV9uYW1lGAwgASgJEh8KF2NhY2hlX2lnbm9yZV9pbnB1dF92YXJzGA0gAygJEhAKCGlzX2VhZ2VyGA4gASgIEjIKDmdlbmVyYXRlc19kZWNrGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIzCghtZXRhZGF0YRgQIAEoCzIhLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhEhIKCmRlYnVnZ2FibGUYESABKAgaKwoJVGFnc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCFQoTaW50ZXJydXB0aWJsZV92YWx1ZUoECAoQCyLXBAoMVGFza1RlbXBsYXRlEiYKAmlkGAEgASgLMhouZmx5dGVpZGwyLmNvcmUuSWRlbnRpZmllchIMCgR0eXBlGAIgASgJEi4KCG1ldGFkYXRhGAMgASgLMhwuZmx5dGVpZGwyLmNvcmUuVGFza01ldGFkYXRhEjEKCWludGVyZmFjZRgEIAEoCzIeLmZseXRlaWRsMi5jb3JlLlR5cGVkSW50ZXJmYWNlEicKBmN1c3RvbRgFIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSLgoJY29udGFpbmVyGAYgASgLMhkuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVySAASKQoHazhzX3BvZBgRIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZEgAEiIKA3NxbBgSIAEoCzITLmZseXRlaWRsMi5jb3JlLlNxbEgAEhkKEXRhc2tfdHlwZV92ZXJzaW9uGAcgASgFEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAkgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMSOAoGY29uZmlnGBAgAygLMiguZmx5dGVpZGwyLmNvcmUuVGFza1RlbXBsYXRlLkNvbmZpZ0VudHJ5Gi0KC0NvbmZpZ0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCCAoGdGFyZ2V0IjUKDUNvbnRhaW5lclBvcnQSFgoOY29udGFpbmVyX3BvcnQYASABKA0SDAoEbmFtZRgCIAEoCSKzAwoJQ29udGFpbmVyEg0KBWltYWdlGAEgASgJEg8KB2NvbW1hbmQYAiADKAkSDAoEYXJncxgDIAMoCRIsCglyZXNvdXJjZXMYBCABKAsyGS5mbHl0ZWlkbDIuY29yZS5SZXNvdXJjZXMSKQoDZW52GAUgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyEjAKBmNvbmZpZxgGIAMoCzIcLmZseXRlaWRsMi5jb3JlLktleVZhbHVlUGFpckICGAESLAoFcG9ydHMYByADKAsyHS5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJQb3J0EjYKC2RhdGFfY29uZmlnGAkgASgLMiEuZmx5dGVpZGwyLmNvcmUuRGF0YUxvYWRpbmdDb25maWcSPAoMYXJjaGl0ZWN0dXJlGAogASgOMiYuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyLkFyY2hpdGVjdHVyZSJJCgxBcmNoaXRlY3R1cmUSCwoHVU5LTk9XThAAEgkKBUFNRDY0EAESCQoFQVJNNjQQAhIKCgZBUk1fVjYQAxIKCgZBUk1fVjcQBCKdAgoKSU9TdHJhdGVneRI+Cg1kb3dubG9hZF9tb2RlGAEgASgOMicuZmx5dGVpZGwyLmNvcmUuSU9TdHJhdGVneS5Eb3dubG9hZE1vZGUSOgoLdXBsb2FkX21vZGUYAiABKA4yJS5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5LlVwbG9hZE1vZGUiTAoMRG93bmxvYWRNb2RlEhIKDkRPV05MT0FEX0VBR0VSEAASEwoPRE9XTkxPQURfU1RSRUFNEAESEwoPRE9fTk9UX0RPV05MT0FEEAIiRQoKVXBsb2FkTW9kZRISCg5VUExPQURfT05fRVhJVBAAEhAKDFVQTE9BRF9FQUdFUhABEhEKDURPX05PVF9VUExPQUQQAiL1AQoRRGF0YUxvYWRpbmdDb25maWcSDwoHZW5hYmxlZBgBIAEoCBISCgppbnB1dF9wYXRoGAIgASgJEhMKC291dHB1dF9wYXRoGAMgASgJEkIKBmZvcm1hdBgEIAEoDjIyLmZseXRlaWRsMi5jb3JlLkRhdGFMb2FkaW5nQ29uZmlnLkxpdGVyYWxNYXBGb3JtYXQSLwoLaW9fc3RyYXRlZ3kYBSABKAsyGi5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5IjEKEExpdGVyYWxNYXBGb3JtYXQSCAoESlNPThAAEggKBFlBTUwQARIJCgVQUk9UTxACIsABCgZLOHNQb2QSMwoIbWV0YWRhdGEYASABKAsyIS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YRIpCghwb2Rfc3BlYxgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSNgoLZGF0YV9jb25maWcYAyABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxIeChZwcmltYXJ5X2NvbnRhaW5lcl9uYW1lGAQgASgJIv4BChFLOHNPYmplY3RNZXRhZGF0YRI9CgZsYWJlbHMYASADKAsyLS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YS5MYWJlbHNFbnRyeRJHCgthbm5vdGF0aW9ucxgCIAMoCzIyLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhLkFubm90YXRpb25zRW50cnkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEifwoDU3FsEhEKCXN0YXRlbWVudBgBIAEoCRIsCgdkaWFsZWN0GAIgASgOMhsuZmx5dGVpZGwyLmNvcmUuU3FsLkRpYWxlY3QiNwoHRGlhbGVjdBINCglVTkRFRklORUQQABIICgRBTlNJEAESCAoESElWRRACEgkKBU9USEVSEAMiNQoTUmF3T3V0cHV0RGF0YUNvbmZpZxIeChZvdXRwdXRfbG9jYXRpb25fcHJlZml4GAEgASgJQq8BChJjb20uZmx5dGVpZGwyLmNvcmVCClRhc2tzUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_flyteidl2_core_identifier, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers]);
+  fileDesc("ChpmbHl0ZWlkbDIvY29yZS90YXNrcy5wcm90bxIOZmx5dGVpZGwyLmNvcmUitAIKCVJlc291cmNlcxI5CghyZXF1ZXN0cxgBIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjcKBmxpbWl0cxgCIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5GlQKDVJlc291cmNlRW50cnkSNAoEbmFtZRgBIAEoDjImLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZU5hbWUSDQoFdmFsdWUYAiABKAkiXQoMUmVzb3VyY2VOYW1lEgsKB1VOS05PV04QABIHCgNDUFUQARIHCgNHUFUQAhIKCgZNRU1PUlkQAxILCgdTVE9SQUdFEAQSFQoRRVBIRU1FUkFMX1NUT1JBR0UQBSKOAgoOR1BVQWNjZWxlcmF0b3ISDgoGZGV2aWNlGAEgASgJEhcKDXVucGFydGl0aW9uZWQYAiABKAhIABIYCg5wYXJ0aXRpb25fc2l6ZRgDIAEoCUgAEkAKDGRldmljZV9jbGFzcxgEIAEoDjIqLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yLkRldmljZUNsYXNzIl8KC0RldmljZUNsYXNzEg4KCk5WSURJQV9HUFUQABIOCgpHT09HTEVfVFBVEAESEQoNQU1BWk9OX05FVVJPThACEgsKB0FNRF9HUFUQAxIQCgxIQUJBTkFfR0FVREkQBEIWChRwYXJ0aXRpb25fc2l6ZV92YWx1ZSJKCgxTaGFyZWRNZW1vcnkSEgoKbW91bnRfcGF0aBgBIAEoCRISCgptb3VudF9uYW1lGAIgASgJEhIKCnNpemVfbGltaXQYAyABKAkigQEKEUV4dGVuZGVkUmVzb3VyY2VzEjcKD2dwdV9hY2NlbGVyYXRvchgBIAEoCzIeLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yEjMKDXNoYXJlZF9tZW1vcnkYAiABKAsyHC5mbHl0ZWlkbDIuY29yZS5TaGFyZWRNZW1vcnkilgEKD1J1bnRpbWVNZXRhZGF0YRI5CgR0eXBlGAEgASgOMisuZmx5dGVpZGwyLmNvcmUuUnVudGltZU1ldGFkYXRhLlJ1bnRpbWVUeXBlEg8KB3ZlcnNpb24YAiABKAkSDgoGZmxhdm9yGAMgASgJIicKC1J1bnRpbWVUeXBlEgkKBU9USEVSEAASDQoJRkxZVEVfU0RLEAEi7wQKDFRhc2tNZXRhZGF0YRIUCgxkaXNjb3ZlcmFibGUYASABKAgSMAoHcnVudGltZRgCIAEoCzIfLmZseXRlaWRsMi5jb3JlLlJ1bnRpbWVNZXRhZGF0YRIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi4KB3JldHJpZXMYBSABKAsyHS5mbHl0ZWlkbDIuY29yZS5SZXRyeVN0cmF0ZWd5EhkKEWRpc2NvdmVyeV92ZXJzaW9uGAYgASgJEiAKGGRlcHJlY2F0ZWRfZXJyb3JfbWVzc2FnZRgHIAEoCRIXCg1pbnRlcnJ1cHRpYmxlGAggASgISAASGgoSY2FjaGVfc2VyaWFsaXphYmxlGAkgASgIEjQKBHRhZ3MYCyADKAsyJi5mbHl0ZWlkbDIuY29yZS5UYXNrTWV0YWRhdGEuVGFnc0VudHJ5EhkKEXBvZF90ZW1wbGF0ZV9uYW1lGAwgASgJEh8KF2NhY2hlX2lnbm9yZV9pbnB1dF92YXJzGA0gAygJEhAKCGlzX2VhZ2VyGA4gASgIEjIKDmdlbmVyYXRlc19kZWNrGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIzCghtZXRhZGF0YRgQIAEoCzIhLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhEhIKCmRlYnVnZ2FibGUYESABKAgaKwoJVGFnc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCFQoTaW50ZXJydXB0aWJsZV92YWx1ZUoECAoQCyLXBAoMVGFza1RlbXBsYXRlEiYKAmlkGAEgASgLMhouZmx5dGVpZGwyLmNvcmUuSWRlbnRpZmllchIMCgR0eXBlGAIgASgJEi4KCG1ldGFkYXRhGAMgASgLMhwuZmx5dGVpZGwyLmNvcmUuVGFza01ldGFkYXRhEjEKCWludGVyZmFjZRgEIAEoCzIeLmZseXRlaWRsMi5jb3JlLlR5cGVkSW50ZXJmYWNlEicKBmN1c3RvbRgFIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSLgoJY29udGFpbmVyGAYgASgLMhkuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVySAASKQoHazhzX3BvZBgRIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZEgAEiIKA3NxbBgSIAEoCzITLmZseXRlaWRsMi5jb3JlLlNxbEgAEhkKEXRhc2tfdHlwZV92ZXJzaW9uGAcgASgFEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAkgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMSOAoGY29uZmlnGBAgAygLMiguZmx5dGVpZGwyLmNvcmUuVGFza1RlbXBsYXRlLkNvbmZpZ0VudHJ5Gi0KC0NvbmZpZ0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCCAoGdGFyZ2V0IjUKDUNvbnRhaW5lclBvcnQSFgoOY29udGFpbmVyX3BvcnQYASABKA0SDAoEbmFtZRgCIAEoCSKzAwoJQ29udGFpbmVyEg0KBWltYWdlGAEgASgJEg8KB2NvbW1hbmQYAiADKAkSDAoEYXJncxgDIAMoCRIsCglyZXNvdXJjZXMYBCABKAsyGS5mbHl0ZWlkbDIuY29yZS5SZXNvdXJjZXMSKQoDZW52GAUgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyEjAKBmNvbmZpZxgGIAMoCzIcLmZseXRlaWRsMi5jb3JlLktleVZhbHVlUGFpckICGAESLAoFcG9ydHMYByADKAsyHS5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJQb3J0EjYKC2RhdGFfY29uZmlnGAkgASgLMiEuZmx5dGVpZGwyLmNvcmUuRGF0YUxvYWRpbmdDb25maWcSPAoMYXJjaGl0ZWN0dXJlGAogASgOMiYuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyLkFyY2hpdGVjdHVyZSJJCgxBcmNoaXRlY3R1cmUSCwoHVU5LTk9XThAAEgkKBUFNRDY0EAESCQoFQVJNNjQQAhIKCgZBUk1fVjYQAxIKCgZBUk1fVjcQBCKdAgoKSU9TdHJhdGVneRI+Cg1kb3dubG9hZF9tb2RlGAEgASgOMicuZmx5dGVpZGwyLmNvcmUuSU9TdHJhdGVneS5Eb3dubG9hZE1vZGUSOgoLdXBsb2FkX21vZGUYAiABKA4yJS5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5LlVwbG9hZE1vZGUiTAoMRG93bmxvYWRNb2RlEhIKDkRPV05MT0FEX0VBR0VSEAASEwoPRE9XTkxPQURfU1RSRUFNEAESEwoPRE9fTk9UX0RPV05MT0FEEAIiRQoKVXBsb2FkTW9kZRISCg5VUExPQURfT05fRVhJVBAAEhAKDFVQTE9BRF9FQUdFUhABEhEKDURPX05PVF9VUExPQUQQAiL1AQoRRGF0YUxvYWRpbmdDb25maWcSDwoHZW5hYmxlZBgBIAEoCBISCgppbnB1dF9wYXRoGAIgASgJEhMKC291dHB1dF9wYXRoGAMgASgJEkIKBmZvcm1hdBgEIAEoDjIyLmZseXRlaWRsMi5jb3JlLkRhdGFMb2FkaW5nQ29uZmlnLkxpdGVyYWxNYXBGb3JtYXQSLwoLaW9fc3RyYXRlZ3kYBSABKAsyGi5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5IjEKEExpdGVyYWxNYXBGb3JtYXQSCAoESlNPThAAEggKBFlBTUwQARIJCgVQUk9UTxACIsABCgZLOHNQb2QSMwoIbWV0YWRhdGEYASABKAsyIS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YRIpCghwb2Rfc3BlYxgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSNgoLZGF0YV9jb25maWcYAyABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxIeChZwcmltYXJ5X2NvbnRhaW5lcl9uYW1lGAQgASgJIv4BChFLOHNPYmplY3RNZXRhZGF0YRI9CgZsYWJlbHMYASADKAsyLS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YS5MYWJlbHNFbnRyeRJHCgthbm5vdGF0aW9ucxgCIAMoCzIyLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhLkFubm90YXRpb25zRW50cnkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEifwoDU3FsEhEKCXN0YXRlbWVudBgBIAEoCRIsCgdkaWFsZWN0GAIgASgOMhsuZmx5dGVpZGwyLmNvcmUuU3FsLkRpYWxlY3QiNwoHRGlhbGVjdBINCglVTkRFRklORUQQABIICgRBTlNJEAESCAoESElWRRACEgkKBU9USEVSEAMiNQoTUmF3T3V0cHV0RGF0YUNvbmZpZxIeChZvdXRwdXRfbG9jYXRpb25fcHJlZml4GAEgASgJIpgBCgROb2RlEgoKAmlkGAEgASgJEi4KCG1ldGFkYXRhGAIgASgLMhwuZmx5dGVpZGwyLmNvcmUuTm9kZU1ldGFkYXRhEicKBmlucHV0cxgDIAMoCzIXLmZseXRlaWRsMi5jb3JlLkJpbmRpbmcSKwoJdGFza19ub2RlGAQgASgLMhguZmx5dGVpZGwyLmNvcmUuVGFza05vZGUigQEKCFRhc2tOb2RlEjIKDHJlZmVyZW5jZV9pZBgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLklkZW50aWZpZXJIABI0CglvdmVycmlkZXMYAiABKAsyIS5mbHl0ZWlkbDIuY29yZS5UYXNrTm9kZU92ZXJyaWRlc0ILCglyZWZlcmVuY2UixwEKEVRhc2tOb2RlT3ZlcnJpZGVzEiwKCXJlc291cmNlcxgBIAEoCzIZLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcxI9ChJleHRlbmRlZF9yZXNvdXJjZXMYAiABKAsyIS5mbHl0ZWlkbDIuY29yZS5FeHRlbmRlZFJlc291cmNlcxIXCg9jb250YWluZXJfaW1hZ2UYAyABKAkSLAoMcG9kX3RlbXBsYXRlGAQgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kIqMDCgxOb2RlTWV0YWRhdGESDAoEbmFtZRgBIAEoCRIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi4KB3JldHJpZXMYBSABKAsyHS5mbHl0ZWlkbDIuY29yZS5SZXRyeVN0cmF0ZWd5EhcKDWludGVycnVwdGlibGUYBiABKAhIABITCgljYWNoZWFibGUYByABKAhIARIXCg1jYWNoZV92ZXJzaW9uGAggASgJSAISHAoSY2FjaGVfc2VyaWFsaXphYmxlGAkgASgISAMSOAoGY29uZmlnGAogAygLMiguZmx5dGVpZGwyLmNvcmUuTm9kZU1ldGFkYXRhLkNvbmZpZ0VudHJ5Gi0KC0NvbmZpZ0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCFQoTaW50ZXJydXB0aWJsZV92YWx1ZUIRCg9jYWNoZWFibGVfdmFsdWVCFQoTY2FjaGVfdmVyc2lvbl92YWx1ZUIaChhjYWNoZV9zZXJpYWxpemFibGVfdmFsdWUiowEKDkR5bmFtaWNKb2JTcGVjEiMKBW5vZGVzGAEgAygLMhQuZmx5dGVpZGwyLmNvcmUuTm9kZRIVCg1taW5fc3VjY2Vzc2VzGAIgASgDEigKB291dHB1dHMYAyADKAsyFy5mbHl0ZWlkbDIuY29yZS5CaW5kaW5nEisKBXRhc2tzGAQgAygLMhwuZmx5dGVpZGwyLmNvcmUuVGFza1RlbXBsYXRlQq8BChJjb20uZmx5dGVpZGwyLmNvcmVCClRhc2tzUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_flyteidl2_core_identifier, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers]);
 
 /**
  * A customizable interface to convey resources requested for a container. This can be interpreted differently for different
@@ -1108,4 +1108,267 @@ export type RawOutputDataConfig = Message<"flyteidl2.core.RawOutputDataConfig"> 
  */
 export const RawOutputDataConfigSchema: GenMessage<RawOutputDataConfig> = /*@__PURE__*/
   messageDesc(file_flyteidl2_core_tasks, 14);
+
+/**
+ * A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
+ * node.
+ *
+ * @generated from message flyteidl2.core.Node
+ */
+export type Node = Message<"flyteidl2.core.Node"> & {
+  /**
+   * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
+   * node ids that cannot be used by other nodes.
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * Extra metadata about the node.
+   *
+   * @generated from field: flyteidl2.core.NodeMetadata metadata = 2;
+   */
+  metadata?: NodeMetadata;
+
+  /**
+   * Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
+   * must be fulfilled.
+   *
+   * @generated from field: repeated flyteidl2.core.Binding inputs = 3;
+   */
+  inputs: Binding[];
+
+  /**
+   * @generated from field: flyteidl2.core.TaskNode task_node = 4;
+   */
+  taskNode?: TaskNode;
+};
+
+/**
+ * Describes the message flyteidl2.core.Node.
+ * Use `create(NodeSchema)` to create a new message.
+ */
+export const NodeSchema: GenMessage<Node> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_tasks, 15);
+
+/**
+ * Refers to the task that the Node is to execute.
+ *
+ * @generated from message flyteidl2.core.TaskNode
+ */
+export type TaskNode = Message<"flyteidl2.core.TaskNode"> & {
+  /**
+   * @generated from oneof flyteidl2.core.TaskNode.reference
+   */
+  reference: {
+    /**
+     * A globally unique identifier for the task.
+     *
+     * @generated from field: flyteidl2.core.Identifier reference_id = 1;
+     */
+    value: Identifier;
+    case: "referenceId";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Optional overrides applied at task execution time.
+   *
+   * @generated from field: flyteidl2.core.TaskNodeOverrides overrides = 2;
+   */
+  overrides?: TaskNodeOverrides;
+};
+
+/**
+ * Describes the message flyteidl2.core.TaskNode.
+ * Use `create(TaskNodeSchema)` to create a new message.
+ */
+export const TaskNodeSchema: GenMessage<TaskNode> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_tasks, 16);
+
+/**
+ * Optional task node overrides that will be applied at task execution time.
+ *
+ * @generated from message flyteidl2.core.TaskNodeOverrides
+ */
+export type TaskNodeOverrides = Message<"flyteidl2.core.TaskNodeOverrides"> & {
+  /**
+   * A customizable interface to convey resources requested for a task container.
+   *
+   * @generated from field: flyteidl2.core.Resources resources = 1;
+   */
+  resources?: Resources;
+
+  /**
+   * Overrides for all non-standard resources, not captured by
+   * v1.ResourceRequirements, to allocate to a task.
+   *
+   * @generated from field: flyteidl2.core.ExtendedResources extended_resources = 2;
+   */
+  extendedResources?: ExtendedResources;
+
+  /**
+   * Override for the image used by task pods.
+   *
+   * @generated from field: string container_image = 3;
+   */
+  containerImage: string;
+
+  /**
+   * Override for the pod template used by task pods
+   * +optional
+   *
+   * @generated from field: flyteidl2.core.K8sPod pod_template = 4;
+   */
+  podTemplate?: K8sPod;
+};
+
+/**
+ * Describes the message flyteidl2.core.TaskNodeOverrides.
+ * Use `create(TaskNodeOverridesSchema)` to create a new message.
+ */
+export const TaskNodeOverridesSchema: GenMessage<TaskNodeOverrides> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_tasks, 17);
+
+/**
+ * Defines extra information about the Node.
+ *
+ * @generated from message flyteidl2.core.NodeMetadata
+ */
+export type NodeMetadata = Message<"flyteidl2.core.NodeMetadata"> & {
+  /**
+   * A friendly name for the Node
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * The overall timeout of a task.
+   *
+   * @generated from field: google.protobuf.Duration timeout = 4;
+   */
+  timeout?: Duration;
+
+  /**
+   * Number of retries per task.
+   *
+   * @generated from field: flyteidl2.core.RetryStrategy retries = 5;
+   */
+  retries?: RetryStrategy;
+
+  /**
+   * Identify whether node is interruptible
+   *
+   * @generated from oneof flyteidl2.core.NodeMetadata.interruptible_value
+   */
+  interruptibleValue: {
+    /**
+     * @generated from field: bool interruptible = 6;
+     */
+    value: boolean;
+    case: "interruptible";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Identify whether a node should have it's outputs cached.
+   *
+   * @generated from oneof flyteidl2.core.NodeMetadata.cacheable_value
+   */
+  cacheableValue: {
+    /**
+     * @generated from field: bool cacheable = 7;
+     */
+    value: boolean;
+    case: "cacheable";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * The version of the cache to use.
+   *
+   * @generated from oneof flyteidl2.core.NodeMetadata.cache_version_value
+   */
+  cacheVersionValue: {
+    /**
+     * @generated from field: string cache_version = 8;
+     */
+    value: string;
+    case: "cacheVersion";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Identify whether caching operations involving this node should be serialized.
+   *
+   * @generated from oneof flyteidl2.core.NodeMetadata.cache_serializable_value
+   */
+  cacheSerializableValue: {
+    /**
+     * @generated from field: bool cache_serializable = 9;
+     */
+    value: boolean;
+    case: "cacheSerializable";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+   *
+   * @generated from field: map<string, string> config = 10;
+   */
+  config: { [key: string]: string };
+};
+
+/**
+ * Describes the message flyteidl2.core.NodeMetadata.
+ * Use `create(NodeMetadataSchema)` to create a new message.
+ */
+export const NodeMetadataSchema: GenMessage<NodeMetadata> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_tasks, 18);
+
+/**
+ * TODO @pvditt delete
+ * Describes a set of tasks to execute and how the final outputs are produced.
+ *
+ * @generated from message flyteidl2.core.DynamicJobSpec
+ */
+export type DynamicJobSpec = Message<"flyteidl2.core.DynamicJobSpec"> & {
+  /**
+   * A collection of nodes to execute.
+   *
+   * @generated from field: repeated flyteidl2.core.Node nodes = 1;
+   */
+  nodes: Node[];
+
+  /**
+   * An absolute number of successful completions of nodes required to mark this job as succeeded. As soon as this
+   * criteria is met, the dynamic job will be marked as successful and outputs will be computed. If this number
+   * becomes impossible to reach (e.g. number of currently running tasks + number of already succeeded tasks <
+   * min_successes) the task will be aborted immediately and marked as failed. The default value of this field, if not
+   * specified, is the count of nodes repeated field.
+   *
+   * @generated from field: int64 min_successes = 2;
+   */
+  minSuccesses: bigint;
+
+  /**
+   * Describes how to bind the final output of the dynamic job from the outputs of executed nodes. The referenced ids
+   * in bindings should have the generated id for the subtask.
+   *
+   * @generated from field: repeated flyteidl2.core.Binding outputs = 3;
+   */
+  outputs: Binding[];
+
+  /**
+   * [Optional] A complete list of task specs referenced in nodes.
+   *
+   * @generated from field: repeated flyteidl2.core.TaskTemplate tasks = 4;
+   */
+  tasks: TaskTemplate[];
+};
+
+/**
+ * Describes the message flyteidl2.core.DynamicJobSpec.
+ * Use `create(DynamicJobSpecSchema)` to create a new message.
+ */
+export const DynamicJobSpecSchema: GenMessage<DynamicJobSpec> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_tasks, 19);
 
