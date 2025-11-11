@@ -36,7 +36,7 @@ pygments==2.18.0
     #   furo
     #   sphinx
     #   sphinx-prompt
-requests==2.32.3
+requests==2.32.4
     # via
     #   sphinx
     #   sphinxcontrib-youtube
