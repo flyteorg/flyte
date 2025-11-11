@@ -164,10 +164,11 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	}
 	var inputs *task.Inputs
 	if literalMap != nil {
-		var literals []task.NamedLiteral
+		var literals []*task.NamedLiteral
 		for name, val := range literalMap.Literals {
-			literals = append(literals, task.NamedLiteral{Name: name, Value: val})
+			literals = append(literals, &task.NamedLiteral{Name: name, Value: val})
 		}
+		inputs = &task.Inputs{Literals: literals}
 	}
 
 	request := &plugins.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
