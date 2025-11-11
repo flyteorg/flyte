@@ -37,15 +37,22 @@ message FixedRate {
   google.protobuf.Timestamp start_time = 3;
 }
 
+message Cron {
+  // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+  // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+  string expression = 1 [(buf.validate.field).string.min_len = 1];
+
+  string timezone = 2; // default is UTC
+}
+
 // Defines complete set of information required to trigger an execution on a schedule.
 message Schedule {
   oneof expression {
     option (buf.validate.oneof).required = true;
 
-    // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
-    // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
     FixedRate rate = 1;
-    string cron_expression = 2;
+    string cron_expression = 2 [deprecated = true];
+    Cron cron = 4;
   }
 
   // Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.

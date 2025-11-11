@@ -16,6 +16,9 @@ DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJEC
 
 SEPARATOR := \033[1;36m========================================\033[0m
 
+# Include common Go targets
+include go.Makefile
+
 .PHONY: help
 help: ## Show this help message
 	@echo '🆘  Showing help message'

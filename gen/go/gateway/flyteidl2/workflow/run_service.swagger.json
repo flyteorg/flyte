@@ -2163,22 +2163,29 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
-    "taskDescriptionEntity": {
+    "taskCacheConfig": {
       "type": "object",
       "properties": {
-        "short_description": {
-          "type": "string",
-          "description": "One-liner overview of the entity."
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
         },
-        "long_description": {
-          "type": "string",
-          "description": "Full user description with formatting preserved."
-        },
-        "source_code": {
-          "$ref": "#/definitions/taskSourceCode",
-          "description": "Optional link to source code used to define this entity."
+        "cache_lookup_scope": {
+          "$ref": "#/definitions/taskCacheLookupScope",
+          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
         }
-      }
+      },
+      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
+    },
+    "taskCacheLookupScope": {
+      "type": "string",
+      "enum": [
+        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+        "CACHE_LOOKUP_SCOPE_GLOBAL",
+        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
+      ],
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
     },
     "taskEnvironment": {
       "type": "object",
@@ -2186,10 +2193,6 @@
         "name": {
           "type": "string",
           "description": "Name of the environment."
-        },
-        "description": {
-          "type": "string",
-          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."
@@ -2326,7 +2329,7 @@
         },
         "overwrite_cache": {
           "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
         },
         "cluster": {
           "type": "string",
@@ -2339,35 +2342,12 @@
         "security_context": {
           "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
+        },
+        "cache_config": {
+          "$ref": "#/definitions/taskCacheConfig",
+          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
         }
       }
-    },
-    "taskSourceCode": {
-      "type": "object",
-      "properties": {
-        "remote_url": {
-          "type": "string",
-          "title": "Url of git remote"
-        },
-        "file_path": {
-          "type": "string",
-          "title": "File path relative to git repo absolute path"
-        },
-        "line_number": {
-          "type": "integer",
-          "format": "int32",
-          "title": "The line number of the flyte task in code file"
-        },
-        "is_git_tree_clean": {
-          "type": "boolean",
-          "title": "Whether the git tree is clean"
-        },
-        "commit_sha": {
-          "type": "string",
-          "title": "Latest git commit sha"
-        }
-      },
-      "title": "Link to source code used to define this entity"
     },
     "taskTaskIdentifier": {
       "type": "object",
@@ -2417,10 +2397,6 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
-        },
-        "description": {
-          "$ref": "#/definitions/taskDescriptionEntity",
-          "title": "The description entity for the task"
         }
       },
       "description": "Specification for a task."
