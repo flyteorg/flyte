@@ -315,3 +315,9 @@ class Sql(_message.Message):
     statement: str
     dialect: Sql.Dialect
     def __init__(self, statement: _Optional[str] = ..., dialect: _Optional[_Union[Sql.Dialect, str]] = ...) -> None: ...
+
+class RawOutputDataConfig(_message.Message):
+    __slots__ = ["output_location_prefix"]
+    OUTPUT_LOCATION_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    output_location_prefix: str
+    def __init__(self, output_location_prefix: _Optional[str] = ...) -> None: ...

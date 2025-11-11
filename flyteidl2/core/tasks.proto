@@ -408,3 +408,11 @@ message Sql {
   }
   Dialect dialect = 2;
 }
+
+// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+// See https://github.com/flyteorg/flyte/issues/211 for more background information.
+message RawOutputDataConfig {
+  // Prefix for where offloaded data from user workflows will be written
+  // e.g. s3://bucket/key or s3://bucket/
+  string output_location_prefix = 1;
+}
