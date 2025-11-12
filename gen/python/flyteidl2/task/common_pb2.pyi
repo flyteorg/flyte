@@ -57,14 +57,16 @@ class Cron(_message.Message):
     def __init__(self, expression: _Optional[str] = ..., timezone: _Optional[str] = ...) -> None: ...
 
 class Schedule(_message.Message):
-    __slots__ = ["rate", "cron", "kickoff_time_input_arg"]
+    __slots__ = ["rate", "cron_expression", "cron", "kickoff_time_input_arg"]
     RATE_FIELD_NUMBER: _ClassVar[int]
+    CRON_EXPRESSION_FIELD_NUMBER: _ClassVar[int]
     CRON_FIELD_NUMBER: _ClassVar[int]
     KICKOFF_TIME_INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
     rate: FixedRate
+    cron_expression: str
     cron: Cron
     kickoff_time_input_arg: str
-    def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
+    def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
 class TriggerAutomationSpec(_message.Message):
     __slots__ = ["type", "schedule"]

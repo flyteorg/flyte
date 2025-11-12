@@ -47,12 +47,11 @@ message Cron {
 
 // Defines complete set of information required to trigger an execution on a schedule.
 message Schedule {
-  reserved 2;
-
   oneof expression {
     option (buf.validate.oneof).required = true;
 
     FixedRate rate = 1;
+    string cron_expression = 2 [deprecated = true];
     Cron cron = 4;
   }
 
