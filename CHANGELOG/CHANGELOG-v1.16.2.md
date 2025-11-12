@@ -31,4 +31,8 @@
 - Updated docker images to use Bitnami legacy repo ([#6631](https://github.com/flyteorg/flyte/pull/6631))
 - Updated helm charts to use new twun.io helm repo ([#6726](https://github.com/flyteorg/flyte/pull/6726))
 
+## Contributors
+
+Special thanks to new contributors: @hefeiyun ([#6629](https://github.com/flyteorg/flyte/pull/6629)), @ihvol-freenome ([#6672](https://github.com/flyteorg/flyte/pull/6672)), @Sally-Yang-Jing-Ou ([#6725](https://github.com/flyteorg/flyte/pull/6725)), along with all returning contributors who made this release possible.
+
 Full Changelog: https://github.com/flyteorg/flyte/compare/v1.16.1...v1.16.2
