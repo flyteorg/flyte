@@ -65,8 +65,6 @@ const (
 	RunServiceWatchClusterEventsProcedure = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	// RunServiceAbortActionProcedure is the fully-qualified name of the RunService's AbortAction RPC.
 	RunServiceAbortActionProcedure = "/flyteidl2.workflow.RunService/AbortAction"
-	// RunServiceWatchGroupsProcedure is the fully-qualified name of the RunService's WatchGroups RPC.
-	RunServiceWatchGroupsProcedure = "/flyteidl2.workflow.RunService/WatchGroups"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -85,7 +83,6 @@ var (
 	runServiceWatchActionsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("WatchActions")
 	runServiceWatchClusterEventsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
 	runServiceAbortActionMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("AbortAction")
-	runServiceWatchGroupsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
@@ -118,8 +115,6 @@ type RunServiceClient interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
-	// Stream updates for task groups based on the provided filter criteria.
-	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
 }
 
 // NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. By
@@ -215,12 +210,6 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceAbortActionMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		watchGroups: connect.NewClient[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse](
-			httpClient,
-			baseURL+RunServiceWatchGroupsProcedure,
-			connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -239,7 +228,6 @@ type runServiceClient struct {
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
 	watchClusterEvents *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
 	abortAction        *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
-	watchGroups        *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.RunService.CreateRun.
@@ -307,11 +295,6 @@ func (c *runServiceClient) AbortAction(ctx context.Context, req *connect.Request
 	return c.abortAction.CallUnary(ctx, req)
 }
 
-// WatchGroups calls flyteidl2.workflow.RunService.WatchGroups.
-func (c *runServiceClient) WatchGroups(ctx context.Context, req *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error) {
-	return c.watchGroups.CallServerStream(ctx, req)
-}
-
 // RunServiceHandler is an implementation of the flyteidl2.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
@@ -342,8 +325,6 @@ type RunServiceHandler interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
-	// Stream updates for task groups based on the provided filter criteria.
-	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
 }
 
 // NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -435,12 +416,6 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceAbortActionMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	runServiceWatchGroupsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchGroupsProcedure,
-		svc.WatchGroups,
-		connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/flyteidl2.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunServiceCreateRunProcedure:
@@ -469,8 +444,6 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
 		case RunServiceAbortActionProcedure:
 			runServiceAbortActionHandler.ServeHTTP(w, r)
-		case RunServiceWatchGroupsProcedure:
-			runServiceWatchGroupsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -530,8 +503,4 @@ func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *conne
 
 func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.AbortAction is not implemented"))
-}
-
-func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchGroups is not implemented"))
 }
