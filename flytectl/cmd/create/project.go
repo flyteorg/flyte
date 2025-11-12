@@ -2,6 +2,7 @@ package create
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyte/flytectl/clierrors"
@@ -50,10 +51,10 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 		return err
 	}
 	if projectSpec.GetId() == "" {
-		return fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
+		return errors.New(clierrors.ErrProjectNotPassed)
 	}
 	if projectSpec.GetName() == "" {
-		return fmt.Errorf(clierrors.ErrProjectNameNotPassed) //nolint
+		return errors.New(clierrors.ErrProjectNameNotPassed)
 	}
 
 	if project.DefaultProjectConfig.DryRun {
