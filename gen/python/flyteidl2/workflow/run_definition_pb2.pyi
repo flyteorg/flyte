@@ -7,6 +7,7 @@ from flyteidl2.core import types_pb2 as _types_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from google.protobuf.internal import containers as _containers
@@ -354,3 +355,25 @@ class ActionSpec(_message.Message):
     trace: TraceAction
     group: str
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., task: _Optional[_Union[TaskAction, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., trace: _Optional[_Union[TraceAction, _Mapping]] = ..., group: _Optional[str] = ...) -> None: ...
+
+class TaskGroup(_message.Message):
+    __slots__ = ["task_name", "environment_name", "total_runs", "latest_run_time", "recent_statuses", "average_failure_rate", "average_duration", "latest_finished_time", "should_delete"]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_NAME_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_RUNS_FIELD_NUMBER: _ClassVar[int]
+    LATEST_RUN_TIME_FIELD_NUMBER: _ClassVar[int]
+    RECENT_STATUSES_FIELD_NUMBER: _ClassVar[int]
+    AVERAGE_FAILURE_RATE_FIELD_NUMBER: _ClassVar[int]
+    AVERAGE_DURATION_FIELD_NUMBER: _ClassVar[int]
+    LATEST_FINISHED_TIME_FIELD_NUMBER: _ClassVar[int]
+    SHOULD_DELETE_FIELD_NUMBER: _ClassVar[int]
+    task_name: str
+    environment_name: str
+    total_runs: int
+    latest_run_time: _timestamp_pb2.Timestamp
+    recent_statuses: _containers.RepeatedScalarFieldContainer[Phase]
+    average_failure_rate: float
+    average_duration: _duration_pb2.Duration
+    latest_finished_time: _timestamp_pb2.Timestamp
+    should_delete: bool
+    def __init__(self, task_name: _Optional[str] = ..., environment_name: _Optional[str] = ..., total_runs: _Optional[int] = ..., latest_run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., recent_statuses: _Optional[_Iterable[_Union[Phase, str]]] = ..., average_failure_rate: _Optional[float] = ..., average_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., latest_finished_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., should_delete: bool = ...) -> None: ...
