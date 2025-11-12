@@ -66,7 +66,7 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 		return nil, err
 	}
 
-	if token.Valid() {
+	if utils.Valid(token) {
 		return token, nil
 	}
 
@@ -77,7 +77,7 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 
 	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
-	if !token.Valid() {
+	if !utils.Valid(token) {
 		return nil, fmt.Errorf("refreshed token is invalid")
 	}
 
