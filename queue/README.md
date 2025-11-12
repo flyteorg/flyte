@@ -24,7 +24,7 @@ The Queue Service implements the `QueueService` gRPC interface using buf connect
 ### Prerequisites
 
 1. **Kubernetes cluster** (k3d, kind, minikube, or any K8s cluster)
-2. **Go 1.21 or later**
+2. **Go 1.24 or later**
 3. **TaskAction CRD** installed in the cluster
 4. **Kubeconfig** configured (or running in-cluster)
 

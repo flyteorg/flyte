@@ -19,6 +19,11 @@ type RunService struct {
 	queueClient workflowconnect.QueueServiceClient
 }
 
+func (s *RunService) WatchGroups(ctx context.Context, c *connect.Request[workflow.WatchGroupsRequest], c2 *connect.ServerStream[workflow.WatchGroupsResponse]) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewRunService creates a new RunService instance
 func NewRunService(repo repository.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
 	return &RunService{
