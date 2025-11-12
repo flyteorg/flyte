@@ -2341,12 +2341,25 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
 					},
 				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "default-task-init-image",
+						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
+					},
+				},
 			},
 			basePodSpec: &v1.PodSpec{
 				Containers: []v1.Container{
 					{
 						Name:  "default",
 						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "task-init-image",
 					},
 				},
 			},
@@ -2360,8 +2373,18 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 						},
 					},
 				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "task-init-image",
+						Env: []v1.EnvVar{
+							{Name: "INIT_FOO", Value: "INIT_BAR"},
+						},
+					},
+				},
 			},
-			primaryContainerName: "primary",
+			primaryContainerName:     "primary",
+			primaryInitContainerName: "primary-init",
 		},
 		{
 			name: "template with primary container with env vars, base with primary container",
@@ -2373,12 +2396,25 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
 					},
 				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "default-task-init-image",
+						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
+					},
+				},
 			},
 			basePodSpec: &v1.PodSpec{
 				Containers: []v1.Container{
 					{
 						Name:  "primary",
 						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
 					},
 				},
 			},
@@ -2392,8 +2428,18 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 						},
 					},
 				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
+						Env: []v1.EnvVar{
+							{Name: "INIT_FOO", Value: "INIT_BAR"},
+						},
+					},
+				},
 			},
-			primaryContainerName: "primary",
+			primaryContainerName:     "primary",
+			primaryInitContainerName: "primary-init",
 		},
 	}
 

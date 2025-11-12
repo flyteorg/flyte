@@ -815,7 +815,8 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 		// Check for any name matching template containers
 		for _, templateInitContainer := range templatePodSpec.InitContainers {
-			if templateInitContainer.Name != initContainer.Name {
+			// skip default and primary template init containers as they are handled above
+			if initContainer.Name == primaryInitContainerName || initContainer.Name == defaultInitContainerTemplateName || templateInitContainer.Name != initContainer.Name {
 				continue
 			}
 
