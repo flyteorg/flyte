@@ -164,7 +164,7 @@ func ServeInsecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.CacheServiceServerTracer)
 
-	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
+	otelStatsHandler := otelgrpc.NewServerHandler(
 		otelgrpc.WithTracerProvider(tracerProvider),
 		otelgrpc.WithPropagators(propagation.TraceContext{}),
 	)
@@ -173,7 +173,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	interceptors := []grpc.UnaryServerInterceptor{
 		srvMetrics.UnaryServerInterceptor(),
-		otelUnaryServerInterceptor,
 	}
 	middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
 	if middlewareInterceptors != nil {
@@ -183,6 +182,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	chainedUnaryInterceptors := grpcmiddleware.ChainUnaryServer(interceptors...)
 
 	serverOpts := []grpc.ServerOption{
+		grpc.StatsHandler(otelStatsHandler),
 		grpc.StreamInterceptor(srvMetrics.StreamServerInterceptor()),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
@@ -238,13 +238,12 @@ func ServeDummy(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCDummyServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.CacheServiceClientTracer)
+	otelStatsHandler := otelgrpc.NewServerHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			otelgrpc.UnaryServerInterceptor(
-				otelgrpc.WithTracerProvider(tracerProvider),
-				otelgrpc.WithPropagators(propagation.TraceContext{}),
-			),
-		),
+		grpc.StatsHandler(otelStatsHandler),
 	)
 	cacheservice.RegisterCacheServiceServer(grpcServer, &CacheService{})
 	cacheserviceV2.RegisterCacheServiceServer(grpcServer, &V2CacheService{})

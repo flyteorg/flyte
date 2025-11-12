@@ -96,7 +96,15 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	unaryIntr := unaryInterceptor(ctx, pluginRegistry, recoveryInterceptor, srvMetrics, authCtx)
 	streamIntr := streamInterceptor(recoveryInterceptor, srvMetrics)
 
+	// Create OpenTelemetry stats handler for tracing
+	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
+	otelStatsHandler := otelgrpc.NewServerHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
+
 	serverOpts := []grpc.ServerOption{
+		grpc.StatsHandler(otelStatsHandler),
 		grpc.UnaryInterceptor(unaryIntr),
 		grpc.StreamInterceptor(streamIntr),
 	}
@@ -539,19 +547,11 @@ func unaryInterceptor(ctx context.Context,
 		),
 	)
 
-	// Not yet implemented for streaming
-	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
-	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
-		otelgrpc.WithTracerProvider(tracerProvider),
-		otelgrpc.WithPropagators(propagation.TraceContext{}),
-	)
-
 	interceptors := []grpc.UnaryServerInterceptor{
 		// recovery interceptor should always be first in order to handle any panics in the middleware or server
 		recovery.UnaryServerInterceptor(),
 		grpcrecovery.UnaryServerInterceptor(),
 		srvMetrics.UnaryServerInterceptor(),
-		otelUnaryServerInterceptor,
 	}
 	serverConfig := config.GetConfig()
 

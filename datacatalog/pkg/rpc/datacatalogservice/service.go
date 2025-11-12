@@ -135,15 +135,16 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
+	otelStatsHandler := otelgrpc.NewServerHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
 	srvMetrics := grpcutils.GrpcServerMetrics()
 	serverOpts := []grpc.ServerOption{
+		grpc.StatsHandler(otelStatsHandler),
 		grpc.StreamInterceptor(srvMetrics.StreamServerInterceptor()),
 		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
 			srvMetrics.UnaryServerInterceptor(),
-			otelgrpc.UnaryServerInterceptor(
-				otelgrpc.WithTracerProvider(tracerProvider),
-				otelgrpc.WithPropagators(propagation.TraceContext{}),
-			),
 		)),
 	}
 	grpcServer := grpc.NewServer(serverOpts...)
@@ -195,13 +196,12 @@ func Serve(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCDummyServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
+	otelStatsHandler := otelgrpc.NewServerHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			otelgrpc.UnaryServerInterceptor(
-				otelgrpc.WithTracerProvider(tracerProvider),
-				otelgrpc.WithPropagators(propagation.TraceContext{}),
-			),
-		),
+		grpc.StatsHandler(otelStatsHandler),
 	)
 	catalog.RegisterDataCatalogServer(grpcServer, &DataCatalogService{})
 	if cfg.GrpcServerReflection {

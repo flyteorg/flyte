@@ -143,15 +143,15 @@ func initializeAdminClientFromConfig(ctx context.Context, config *Config) (clien
 		grpcRetry.WithMax(uint(config.MaxRetries)),
 	}
 
-	opt := grpc.WithChainUnaryInterceptor(
-		otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithPropagators(propagation.TraceContext{}),
-		),
-		grpcRetry.UnaryClientInterceptor(grpcOptions...),
+	otelStatsHandler := otelgrpc.NewClientHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
 	)
 
-	clients, err := admin2.NewClientsetBuilder().WithDialOptions(opt).WithConfig(cfg).Build(ctx)
+	clients, err := admin2.NewClientsetBuilder().WithDialOptions(
+		grpc.WithStatsHandler(otelStatsHandler),
+		grpc.WithChainUnaryInterceptor(grpcRetry.UnaryClientInterceptor(grpcOptions...)),
+	).WithConfig(cfg).Build(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}

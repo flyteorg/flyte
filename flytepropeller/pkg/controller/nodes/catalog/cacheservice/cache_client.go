@@ -332,13 +332,15 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, cfg *prop
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
 	tracerProvider := otelutils.GetTracerProvider(otelutils.CacheServiceClientTracer)
-	opts = append(opts, grpc.WithChainUnaryInterceptor(
-		grpcutils.GrpcClientMetrics().UnaryClientInterceptor(),
-		otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithPropagators(propagation.TraceContext{}),
-		),
-		retryInterceptor))
+	otelStatsHandler := otelgrpc.NewClientHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
+	opts = append(opts,
+		grpc.WithStatsHandler(otelStatsHandler),
+		grpc.WithChainUnaryInterceptor(
+			grpcutils.GrpcClientMetrics().UnaryClientInterceptor(),
+			retryInterceptor))
 	clientConn, err := grpc.Dial(cfg.CacheEndpoint, opts...)
 	if err != nil {
 		return nil, err
