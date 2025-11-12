@@ -2331,6 +2331,70 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 			primaryContainerName:     "task-1",
 			primaryInitContainerName: "task-init-1",
 		},
+		{
+			name: "template with default container with env vars, base with default container",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "default-task-image",
+						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "task-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "task-image",
+						Env: []v1.EnvVar{
+							{Name: "FOO", Value: "BAR"},
+						},
+					},
+				},
+			},
+			primaryContainerName: "primary",
+		},
+		{
+			name: "template with primary container with env vars, base with primary container",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "default-task-image",
+						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+						Env: []v1.EnvVar{
+							{Name: "FOO", Value: "BAR"},
+						},
+					},
+				},
+			},
+			primaryContainerName: "primary",
+		},
 	}
 
 	for _, tt := range tests {
