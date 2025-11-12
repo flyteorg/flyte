@@ -126,20 +126,7 @@ message Task {
 
 // Link to source code used to define this entity
 message SourceCode {
-  // Url of git remote
-  string remote_url = 1;
-
-  // File path relative to git repo absolute path
-  string file_path = 2;
-
-  // The line number of the flyte task in code file
-  int32 line_number = 3;
-
-  // Whether the git tree is clean
-  bool is_git_tree_clean = 4;
-
-  // Latest git commit sha
-  string commit_sha = 5;
+  string link = 1;
 }
 
 message DescriptionEntity {
