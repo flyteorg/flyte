@@ -5598,7 +5598,6 @@ config for a workflow node
   default-deadlines:
     node-active-deadline: 0s
     node-execution-deadline: 0s
-    workflow-active-deadline: 0s
   default-max-attempts: 1
   enable-cr-debug-metadata: false
   ignore-retry-cause: false
@@ -6337,7 +6336,6 @@ Default value for timeouts
 
   node-active-deadline: 0s
   node-execution-deadline: 0s
-  workflow-active-deadline: 0s
   
 
 max-node-retries-system-failures (int64)
@@ -6419,18 +6417,6 @@ node-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Default value of node timeout that includes the time spent queued.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  0s
-  
-
-workflow-active-deadline (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Default value of workflow timeout that includes the time spent queued.
 
 **Default Value**: 
 
