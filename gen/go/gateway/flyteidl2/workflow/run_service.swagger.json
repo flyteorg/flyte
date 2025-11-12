@@ -2163,6 +2163,30 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "taskCacheConfig": {
+      "type": "object",
+      "properties": {
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cache_lookup_scope": {
+          "$ref": "#/definitions/taskCacheLookupScope",
+          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
+        }
+      },
+      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
+    },
+    "taskCacheLookupScope": {
+      "type": "string",
+      "enum": [
+        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+        "CACHE_LOOKUP_SCOPE_GLOBAL",
+        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
+      ],
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
@@ -2334,7 +2358,7 @@
         },
         "overwrite_cache": {
           "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
         },
         "cluster": {
           "type": "string",
@@ -2347,6 +2371,10 @@
         "security_context": {
           "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
+        },
+        "cache_config": {
+          "$ref": "#/definitions/taskCacheConfig",
+          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
         }
       }
     },
@@ -2899,6 +2927,54 @@
         }
       }
     },
+    "workflowTaskGroup": {
+      "type": "object",
+      "properties": {
+        "task_name": {
+          "type": "string",
+          "description": "Task name."
+        },
+        "environment_name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "total_runs": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of runs for this task."
+        },
+        "latest_run_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent run."
+        },
+        "recent_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flyteidl2workflowPhase"
+          },
+          "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
+        },
+        "average_failure_rate": {
+          "type": "number",
+          "format": "double",
+          "description": "Average failure rate of runs in this group (0.0 to 1.0).\nComputed as number of root actions with phase FAILED divided by total root actions."
+        },
+        "average_duration": {
+          "type": "string",
+          "description": "Average duration of runs in this group."
+        },
+        "latest_finished_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent finished run (terminal phase)."
+        },
+        "should_delete": {
+          "type": "boolean"
+        }
+      },
+      "description": "TaskGroup represents a group of runs for a specific task."
+    },
     "workflowTraceActionMetadata": {
       "type": "object",
       "properties": {
@@ -2942,6 +3018,24 @@
           }
         }
       }
+    },
+    "workflowWatchGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "task_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workflowTaskGroup"
+          },
+          "description": "List of task groups matching the filter criteria.\nFor the initial response, this contains all groups.\nFor subsequent updates, this contains only changed groups."
+        },
+        "sentinel": {
+          "type": "boolean",
+          "description": "Indicates when the initial List call is complete, and subsequent messages are updates."
+        }
+      },
+      "description": "Response message for watching task groups."
     },
     "workflowWatchRunDetailsResponse": {
       "type": "object",

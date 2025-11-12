@@ -635,6 +635,53 @@ func (_c *RunServiceServer_WatchClusterEvents_Call) RunAndReturn(run func(*workf
 	return _c
 }
 
+// WatchGroups provides a mock function with given fields: _a0, _a1
+func (_m *RunServiceServer) WatchGroups(_a0 *workflow.WatchGroupsRequest, _a1 workflow.RunService_WatchGroupsServer) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WatchGroups")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*workflow.WatchGroupsRequest, workflow.RunService_WatchGroupsServer) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RunServiceServer_WatchGroups_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchGroups'
+type RunServiceServer_WatchGroups_Call struct {
+	*mock.Call
+}
+
+// WatchGroups is a helper method to define mock.On call
+//   - _a0 *workflow.WatchGroupsRequest
+//   - _a1 workflow.RunService_WatchGroupsServer
+func (_e *RunServiceServer_Expecter) WatchGroups(_a0 interface{}, _a1 interface{}) *RunServiceServer_WatchGroups_Call {
+	return &RunServiceServer_WatchGroups_Call{Call: _e.mock.On("WatchGroups", _a0, _a1)}
+}
+
+func (_c *RunServiceServer_WatchGroups_Call) Run(run func(_a0 *workflow.WatchGroupsRequest, _a1 workflow.RunService_WatchGroupsServer)) *RunServiceServer_WatchGroups_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*workflow.WatchGroupsRequest), args[1].(workflow.RunService_WatchGroupsServer))
+	})
+	return _c
+}
+
+func (_c *RunServiceServer_WatchGroups_Call) Return(_a0 error) *RunServiceServer_WatchGroups_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *RunServiceServer_WatchGroups_Call) RunAndReturn(run func(*workflow.WatchGroupsRequest, workflow.RunService_WatchGroupsServer) error) *RunServiceServer_WatchGroups_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WatchRunDetails provides a mock function with given fields: _a0, _a1
 func (_m *RunServiceServer) WatchRunDetails(_a0 *workflow.WatchRunDetailsRequest, _a1 workflow.RunService_WatchRunDetailsServer) error {
 	ret := _m.Called(_a0, _a1)
