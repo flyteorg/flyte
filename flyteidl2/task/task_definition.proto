@@ -129,7 +129,7 @@ message SourceCode {
   string link = 1;
 }
 
-message DescriptionEntity {
+message DocumentationEntity {
   // One-liner overview of the entity.
   string short_description = 1 [(buf.validate.field).string.max_len = 255];
   // Full user description with formatting preserved.
@@ -155,8 +155,8 @@ message TaskSpec {
   // Optional environment for this task. Note, some tasks may not be run in the context of an environment.
   Environment environment = 4;
 
-  // The description entity for the task
-  DescriptionEntity description = 5;
+  // The documentation entity for the task
+  DocumentationEntity documentation = 5;
 }
 
 // Specification for a trace action.

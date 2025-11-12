@@ -94,7 +94,7 @@ class SourceCode(_message.Message):
     link: str
     def __init__(self, link: _Optional[str] = ...) -> None: ...
 
-class DescriptionEntity(_message.Message):
+class DocumentationEntity(_message.Message):
     __slots__ = ["short_description", "long_description", "source_code"]
     SHORT_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     LONG_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -105,18 +105,18 @@ class DescriptionEntity(_message.Message):
     def __init__(self, short_description: _Optional[str] = ..., long_description: _Optional[str] = ..., source_code: _Optional[_Union[SourceCode, _Mapping]] = ...) -> None: ...
 
 class TaskSpec(_message.Message):
-    __slots__ = ["task_template", "default_inputs", "short_name", "environment", "description"]
+    __slots__ = ["task_template", "default_inputs", "short_name", "environment", "documentation"]
     TASK_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     DEFAULT_INPUTS_FIELD_NUMBER: _ClassVar[int]
     SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
-    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    DOCUMENTATION_FIELD_NUMBER: _ClassVar[int]
     task_template: _tasks_pb2.TaskTemplate
     default_inputs: _containers.RepeatedCompositeFieldContainer[_common_pb2.NamedParameter]
     short_name: str
     environment: _environment_pb2.Environment
-    description: DescriptionEntity
-    def __init__(self, task_template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., default_inputs: _Optional[_Iterable[_Union[_common_pb2.NamedParameter, _Mapping]]] = ..., short_name: _Optional[str] = ..., environment: _Optional[_Union[_environment_pb2.Environment, _Mapping]] = ..., description: _Optional[_Union[DescriptionEntity, _Mapping]] = ...) -> None: ...
+    documentation: DocumentationEntity
+    def __init__(self, task_template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., default_inputs: _Optional[_Iterable[_Union[_common_pb2.NamedParameter, _Mapping]]] = ..., short_name: _Optional[str] = ..., environment: _Optional[_Union[_environment_pb2.Environment, _Mapping]] = ..., documentation: _Optional[_Union[DocumentationEntity, _Mapping]] = ...) -> None: ...
 
 class TraceSpec(_message.Message):
     __slots__ = ["interface"]

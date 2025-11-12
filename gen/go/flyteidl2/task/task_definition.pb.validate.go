@@ -890,22 +890,22 @@ var _ interface {
 	ErrorName() string
 } = SourceCodeValidationError{}
 
-// Validate checks the field values on DescriptionEntity with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *DescriptionEntity) Validate() error {
+// Validate checks the field values on DocumentationEntity with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DocumentationEntity) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on DescriptionEntity with the rules
+// ValidateAll checks the field values on DocumentationEntity with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// DescriptionEntityMultiError, or nil if none found.
-func (m *DescriptionEntity) ValidateAll() error {
+// DocumentationEntityMultiError, or nil if none found.
+func (m *DocumentationEntity) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *DescriptionEntity) validate(all bool) error {
+func (m *DocumentationEntity) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -920,7 +920,7 @@ func (m *DescriptionEntity) validate(all bool) error {
 		switch v := interface{}(m.GetSourceCode()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, DescriptionEntityValidationError{
+				errors = append(errors, DocumentationEntityValidationError{
 					field:  "SourceCode",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -928,7 +928,7 @@ func (m *DescriptionEntity) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, DescriptionEntityValidationError{
+				errors = append(errors, DocumentationEntityValidationError{
 					field:  "SourceCode",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -937,7 +937,7 @@ func (m *DescriptionEntity) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetSourceCode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return DescriptionEntityValidationError{
+			return DocumentationEntityValidationError{
 				field:  "SourceCode",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -946,19 +946,19 @@ func (m *DescriptionEntity) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return DescriptionEntityMultiError(errors)
+		return DocumentationEntityMultiError(errors)
 	}
 
 	return nil
 }
 
-// DescriptionEntityMultiError is an error wrapping multiple validation errors
-// returned by DescriptionEntity.ValidateAll() if the designated constraints
-// aren't met.
-type DescriptionEntityMultiError []error
+// DocumentationEntityMultiError is an error wrapping multiple validation
+// errors returned by DocumentationEntity.ValidateAll() if the designated
+// constraints aren't met.
+type DocumentationEntityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m DescriptionEntityMultiError) Error() string {
+func (m DocumentationEntityMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -967,11 +967,11 @@ func (m DescriptionEntityMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m DescriptionEntityMultiError) AllErrors() []error { return m }
+func (m DocumentationEntityMultiError) AllErrors() []error { return m }
 
-// DescriptionEntityValidationError is the validation error returned by
-// DescriptionEntity.Validate if the designated constraints aren't met.
-type DescriptionEntityValidationError struct {
+// DocumentationEntityValidationError is the validation error returned by
+// DocumentationEntity.Validate if the designated constraints aren't met.
+type DocumentationEntityValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -979,24 +979,24 @@ type DescriptionEntityValidationError struct {
 }
 
 // Field function returns field value.
-func (e DescriptionEntityValidationError) Field() string { return e.field }
+func (e DocumentationEntityValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DescriptionEntityValidationError) Reason() string { return e.reason }
+func (e DocumentationEntityValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DescriptionEntityValidationError) Cause() error { return e.cause }
+func (e DocumentationEntityValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DescriptionEntityValidationError) Key() bool { return e.key }
+func (e DocumentationEntityValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DescriptionEntityValidationError) ErrorName() string {
-	return "DescriptionEntityValidationError"
+func (e DocumentationEntityValidationError) ErrorName() string {
+	return "DocumentationEntityValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e DescriptionEntityValidationError) Error() string {
+func (e DocumentationEntityValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1008,14 +1008,14 @@ func (e DescriptionEntityValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDescriptionEntity.%s: %s%s",
+		"invalid %sDocumentationEntity.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DescriptionEntityValidationError{}
+var _ error = DocumentationEntityValidationError{}
 
 var _ interface {
 	Field() string
@@ -1023,7 +1023,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DescriptionEntityValidationError{}
+} = DocumentationEntityValidationError{}
 
 // Validate checks the field values on TaskSpec with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -1142,11 +1142,11 @@ func (m *TaskSpec) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetDescription()).(type) {
+		switch v := interface{}(m.GetDocumentation()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, TaskSpecValidationError{
-					field:  "Description",
+					field:  "Documentation",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -1154,16 +1154,16 @@ func (m *TaskSpec) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, TaskSpecValidationError{
-					field:  "Description",
+					field:  "Documentation",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDocumentation()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TaskSpecValidationError{
-				field:  "Description",
+				field:  "Documentation",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
