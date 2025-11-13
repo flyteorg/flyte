@@ -7,15 +7,15 @@ RUN apk add --no-cache git make build-base
 WORKDIR /workspace
 
 # Copy go mod files
-COPY ../go.mod ../go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the entire repository
-COPY . /workspace
+COPY . ./
 
 # Build the service
 WORKDIR /workspace/runs
-RUN CGO_ENABLED=1 GOOS=linux go build -tags "sqlite_omit_load_extension" -a -o /workspace/runs/runs-service ./cmd/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -a -o runs-service ./cmd/main.go
 
 # Final stage
 FROM alpine:latest
