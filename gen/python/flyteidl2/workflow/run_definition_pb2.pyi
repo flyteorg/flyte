@@ -148,7 +148,7 @@ class ConditionActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ..., run_id: _Optional[str] = ..., action_id: _Optional[str] = ..., **kwargs) -> None: ...
 
 class ActionMetadata(_message.Message):
-    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id"]
+    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type"]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     EXECUTED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -157,6 +157,10 @@ class ActionMetadata(_message.Message):
     CONDITION_FIELD_NUMBER: _ClassVar[int]
     ACTION_TYPE_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_NAME_FIELD_NUMBER: _ClassVar[int]
+    FUNTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_TYPE_FIELD_NUMBER: _ClassVar[int]
     parent: str
     group: str
     executed_by: _identity_pb2.EnrichedIdentity
@@ -165,21 +169,27 @@ class ActionMetadata(_message.Message):
     condition: ConditionActionMetadata
     action_type: ActionType
     trigger_id: _identifier_pb2.TriggerIdentifier
-    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ...) -> None: ...
+    environment_name: str
+    funtion_name: str
+    trigger_name: str
+    trigger_type: _common_pb2.TriggerAutomationSpec
+    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
 
 class ActionStatus(_message.Message):
-    __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status"]
+    __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status", "duration_ms"]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
     CACHE_STATUS_FIELD_NUMBER: _ClassVar[int]
+    DURATION_MS_FIELD_NUMBER: _ClassVar[int]
     phase: Phase
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     attempts: int
     cache_status: _catalog_pb2.CatalogCacheStatus
-    def __init__(self, phase: _Optional[_Union[Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., attempts: _Optional[int] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ...) -> None: ...
+    duration_ms: int
+    def __init__(self, phase: _Optional[_Union[Phase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., attempts: _Optional[int] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., duration_ms: _Optional[int] = ...) -> None: ...
 
 class Action(_message.Message):
     __slots__ = ["id", "metadata", "status"]
