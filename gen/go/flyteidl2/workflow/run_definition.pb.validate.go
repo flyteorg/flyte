@@ -1380,6 +1380,41 @@ func (m *ActionMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for EnvironmentName
+
+	// no validation rules for FuntionName
+
+	// no validation rules for TriggerName
+
+	if all {
+		switch v := interface{}(m.GetTriggerType()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "TriggerType",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "TriggerType",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTriggerType()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionMetadataValidationError{
+				field:  "TriggerType",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:
 		if v == nil {
@@ -1674,6 +1709,10 @@ func (m *ActionStatus) validate(all bool) error {
 			}
 		}
 
+	}
+
+	if m.DurationMs != nil {
+		// no validation rules for DurationMs
 	}
 
 	if len(errors) > 0 {

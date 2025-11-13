@@ -15,7 +15,7 @@ import type { LogContext, TaskLog } from "../core/execution_pb.ts";
 import { file_flyteidl2_core_execution } from "../core/execution_pb.ts";
 import type { LiteralType } from "../core/types_pb.ts";
 import { file_flyteidl2_core_types } from "../core/types_pb.ts";
-import type { OutputReferences } from "../task/common_pb.ts";
+import type { OutputReferences, TriggerAutomationSpec } from "../task/common_pb.ts";
 import { file_flyteidl2_task_common } from "../task/common_pb.ts";
 import type { RunSpec } from "../task/run_pb.ts";
 import { file_flyteidl2_task_run } from "../task/run_pb.ts";
@@ -413,6 +413,34 @@ export type ActionMetadata = Message<"flyteidl2.workflow.ActionMetadata"> & {
    * @generated from field: flyteidl2.common.TriggerIdentifier trigger_id = 11;
    */
   triggerId?: TriggerIdentifier;
+
+  /**
+   * Environment name
+   *
+   * @generated from field: string environment_name = 12;
+   */
+  environmentName: string;
+
+  /**
+   * Function name
+   *
+   * @generated from field: string funtion_name = 13;
+   */
+  funtionName: string;
+
+  /**
+   * Trigger name
+   *
+   * @generated from field: string trigger_name = 14;
+   */
+  triggerName: string;
+
+  /**
+   * Trigger Type
+   *
+   * @generated from field: flyteidl2.task.TriggerAutomationSpec trigger_type = 15;
+   */
+  triggerType?: TriggerAutomationSpec;
 };
 
 /**
@@ -462,6 +490,13 @@ export type ActionStatus = Message<"flyteidl2.workflow.ActionStatus"> & {
    * @generated from field: flyteidl2.core.CatalogCacheStatus cache_status = 5;
    */
   cacheStatus: CatalogCacheStatus;
+
+  /**
+   * Duration of the action in milliseconds.
+   *
+   * @generated from field: optional uint64 duration_ms = 6;
+   */
+  durationMs?: bigint;
 };
 
 /**
