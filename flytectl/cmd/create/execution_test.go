@@ -72,7 +72,7 @@ func (s *createSuite) onGetTask() {
 			},
 		},
 	}
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, mock.Anything).Return(task1, nil)
+	s.MockAdminClient.On("GetTask", s.Ctx, mock.Anything).Return(task1, nil)
 }
 
 func (s *createSuite) onGetLaunchPlan() {
@@ -150,7 +150,7 @@ func (s *createSuite) onGetLaunchPlan() {
 			Version:      "v3",
 		},
 	}
-	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(launchPlan1, nil).Once()
+	s.MockAdminClient.On("GetLaunchPlan", s.Ctx, objectGetRequest).Return(launchPlan1, nil).Once()
 }
 
 func (s *createSuite) Test_CreateTaskExecution() {
@@ -189,7 +189,7 @@ func (s *createSuite) Test_CreateTaskExecution() {
 		},
 	}
 	s.MockAdminClient.
-		OnCreateExecutionMatch(s.Ctx, mock.Anything).
+		On("CreateExecution", s.Ctx, mock.Anything).
 		Run(func(args mock.Arguments) {
 			actual := args.Get(1).(*admin.ExecutionCreateRequest)
 			actual.Name = ""
@@ -208,7 +208,7 @@ func (s *createSuite) Test_CreateTaskExecution() {
 
 func (s *createSuite) Test_CreateTaskExecution_GetTaskError() {
 	expected := fmt.Errorf("error")
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, mock.Anything).Return(nil, expected).Once()
+	s.MockAdminClient.On("GetTask", s.Ctx, mock.Anything).Return(nil, expected).Once()
 	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
 
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
@@ -219,7 +219,7 @@ func (s *createSuite) Test_CreateTaskExecution_GetTaskError() {
 func (s *createSuite) Test_CreateTaskExecution_CreateExecutionError() {
 	s.onGetTask()
 	s.MockAdminClient.
-		OnCreateExecutionMatch(s.Ctx, mock.Anything).
+		On("CreateExecution", s.Ctx, mock.Anything).
 		Return(nil, fmt.Errorf("error launching task")).
 		Once()
 	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
@@ -238,7 +238,7 @@ func (s *createSuite) Test_CreateLaunchPlanExecution() {
 		},
 	}
 	s.onGetLaunchPlan()
-	s.MockAdminClient.OnCreateExecutionMatch(s.Ctx, mock.Anything).Return(executionCreateResponseLP, nil)
+	s.MockAdminClient.On("CreateExecution", s.Ctx, mock.Anything).Return(executionCreateResponseLP, nil)
 	executionConfig.ExecFile = testDataFolder + "launchplan_execution_spec.yaml"
 
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
@@ -249,7 +249,7 @@ func (s *createSuite) Test_CreateLaunchPlanExecution() {
 
 func (s *createSuite) Test_CreateLaunchPlan_GetLaunchPlanError() {
 	expected := fmt.Errorf("error")
-	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, mock.Anything).Return(nil, expected).Once()
+	s.MockAdminClient.On("GetLaunchPlan", s.Ctx, mock.Anything).Return(nil, expected).Once()
 	executionConfig.ExecFile = testDataFolder + "launchplan_execution_spec.yaml"
 
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
@@ -273,7 +273,7 @@ func (s *createSuite) Test_CreateRelaunchExecution() {
 			Domain:  config.GetConfig().Domain,
 		},
 	}
-	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(relaunchExecResponse, nil).Once()
+	s.MockAdminClient.On("RelaunchExecution", s.Ctx, relaunchRequest).Return(relaunchExecResponse, nil).Once()
 
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 
@@ -298,7 +298,7 @@ func (s *createSuite) Test_CreateRecoverExecution() {
 			Domain:  config.GetConfig().Domain,
 		},
 	}
-	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(recoverExecResponse, nil).Once()
+	s.MockAdminClient.On("RecoverExecution", s.Ctx, recoverRequest).Return(recoverExecResponse, nil).Once()
 
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 

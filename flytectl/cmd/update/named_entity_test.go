@@ -22,12 +22,12 @@ func testNamedEntityUpdate(
 		resourceType,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
-				OnGetNamedEntityMatch(
+				On("GetNamedEntity",
 					s.Ctx,
 					mock.Anything).
 				Return(namedEntity, nil)
 			s.MockAdminClient.
-				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).
+				On("UpdateNamedEntity", s.Ctx, mock.Anything).
 				Return(&admin.NamedEntityUpdateResponse{}, nil)
 		},
 		setup,

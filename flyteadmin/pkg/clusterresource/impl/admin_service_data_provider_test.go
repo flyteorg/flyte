@@ -25,7 +25,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 			"K2": "V2",
 		}
 		mockAdmin := mocks.AdminServiceClient{}
-		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
+		mockAdmin.On("GetProjectDomainAttributes", ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
 			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{
 			Attributes: &admin.ProjectDomainAttributes{
@@ -48,7 +48,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 	})
 	t.Run("admin service error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
-		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
+		mockAdmin.On("GetProjectDomainAttributes", ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
 			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{}, errFoo)
 
@@ -60,7 +60,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 	})
 	t.Run("wonky admin service response", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
-		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
+		mockAdmin.On("GetProjectDomainAttributes", ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
 			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{
 			Attributes: &admin.ProjectDomainAttributes{
@@ -91,7 +91,7 @@ func TestServiceGetProjects(t *testing.T) {
 
 	t.Run("happy case", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
-		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
+		mockAdmin.On("ListProjects", ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
 			res := req.Limit == 100 && req.Filters == "value_not_in(state,1;3)" && req.SortBy.Key == "updated_at"
 			return res
 		})).Return(&admin.Projects{
@@ -113,7 +113,7 @@ func TestServiceGetProjects(t *testing.T) {
 	})
 	t.Run("admin error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
-		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
+		mockAdmin.On("ListProjects", ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
 			return req.Limit == 100 && req.Filters == "value_not_in(state,1;3)" && req.SortBy.Key == "updated_at"
 		})).Return(nil, errFoo)
 		provider := serviceAdminProvider{

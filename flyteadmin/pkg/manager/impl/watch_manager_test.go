@@ -132,7 +132,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_Success() {
 		Return(expectedExecutions, nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey1.Project,
 				Domain:  execKey1.Domain,
@@ -144,7 +144,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_Success() {
 		Return(nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey2.Project,
 				Domain:  execKey2.Domain,
@@ -208,7 +208,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_Pagination() {
 		Return(expectedExecutions, nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey1.Project,
 				Domain:  execKey1.Domain,
@@ -220,7 +220,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_Pagination() {
 		Return(nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey2.Project,
 				Domain:  execKey2.Domain,
@@ -231,7 +231,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_Pagination() {
 		Return(nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey3.Project,
 				Domain:  execKey3.Domain,
@@ -328,7 +328,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_SkipAlreadySent() {
 		Return(expectedExecutions[3:], nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey1.Project,
 				Domain:  execKey1.Domain,
@@ -340,7 +340,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_SkipAlreadySent() {
 		Return(nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey4.Project,
 				Domain:  execKey4.Domain,
@@ -351,7 +351,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_SkipAlreadySent() {
 		Return(nil).
 		Once()
 	s.srv.
-		OnSend(&watch.WatchExecutionStatusUpdatesResponse{
+		On("Send", &watch.WatchExecutionStatusUpdatesResponse{
 			Id: &core.WorkflowExecutionIdentifier{
 				Project: execKey5.Project,
 				Domain:  execKey5.Domain,
@@ -416,7 +416,7 @@ func (s *watchManagerSuite) Test_readAndSendExecutions_FindTerminalStatusUpdates
 }
 
 func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_MissingCluster() {
-	s.srv.OnContext().Return(s.ctx).Once()
+	s.srv.On("Context").Return(s.ctx).Once()
 
 	err := s.manager.WatchExecutionStatusUpdates(&watch.WatchExecutionStatusUpdatesRequest{}, s.srv)
 
@@ -424,7 +424,7 @@ func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_MissingCluster() {
 }
 
 func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindFirstStatusUpdatesCheckpointError() {
-	s.srv.OnContext().Return(s.ctx).Once()
+	s.srv.On("Context").Return(s.ctx).Once()
 	expected := errors.New("fail")
 	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(0)).Return(uint(0), expected).Once()
 
@@ -434,7 +434,7 @@ func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindFirstStatusUpda
 }
 
 func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindNextStatusUpdatesCheckpointError() {
-	s.srv.OnContext().Return(s.ctx).Once()
+	s.srv.On("Context").Return(s.ctx).Once()
 	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(0)).Return(uint(42), nil).Once()
 	expected := errors.New("fail")
 	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(42)).Return(uint(0), expected).Once()

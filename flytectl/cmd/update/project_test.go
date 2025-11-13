@@ -140,7 +140,7 @@ func TestProjectUpdateFailsWhenProjectDoesNotExist(t *testing.T) {
 				OnGetProjectByID(s.Ctx, project.Id).
 				Return(nil, ext.NewNotFoundError("project not found"))
 			s.MockAdminClient.
-				OnUpdateProjectMatch(s.Ctx, mock.Anything).
+				On("UpdateProject", s.Ctx, mock.Anything).
 				Return(&admin.ProjectUpdateResponse{}, nil)
 		},
 		/* setup */ nil,
@@ -158,7 +158,7 @@ func TestProjectUpdateFailsWhenAdminClientFails(t *testing.T) {
 				OnGetProjectByID(s.Ctx, project.Id).
 				Return(project, nil)
 			s.MockAdminClient.
-				OnUpdateProjectMatch(s.Ctx, mock.Anything).
+				On("UpdateProject", s.Ctx, mock.Anything).
 				Return(nil, fmt.Errorf("network error"))
 		},
 		/* setup */ func(s *testutils.TestStruct, config *project.ConfigProject, project *admin.Project) {
@@ -213,7 +213,7 @@ func testProjectUpdate(
 				OnGetProjectByID(s.Ctx, project.Id).
 				Return(project, nil)
 			s.MockAdminClient.
-				OnUpdateProjectMatch(s.Ctx, mock.Anything).
+				On("UpdateProject", s.Ctx, mock.Anything).
 				Return(&admin.ProjectUpdateResponse{}, nil)
 		},
 		setup,

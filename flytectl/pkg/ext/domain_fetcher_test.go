@@ -30,7 +30,7 @@ func TestAdminFetcherExtClient_GetDomains(t *testing.T) {
 	adminClient := new(mocks.AdminServiceClient)
 	adminFetcherExt := AdminFetcherExtClient{AdminClient: adminClient}
 
-	adminClient.OnGetDomainsMatch(mock.Anything, mock.Anything).Return(domains, nil)
+	adminClient.On("GetDomains", mock.Anything, mock.Anything).Return(domains, nil)
 	_, err := adminFetcherExt.GetDomains(ctx)
 	assert.Nil(t, err)
 }

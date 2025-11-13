@@ -137,12 +137,12 @@ func TestEndToEnd(t *testing.T) {
 
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(&template, nil)
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(&template, nil)
+		tCtx.On("TaskReader").Return(tr)
 		inputReader := &ioMocks.InputReader{}
-		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-		inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
+		inputReader.On("GetInputPrefixPath").Return(basePrefix)
+		inputReader.On("GetInputPath").Return(basePrefix + "/inputs.pb")
+		inputReader.On("Get", mock.Anything).Return(inputs, nil)
 		tCtx.OnInputReader().Return(inputReader)
 
 		trns, err := plugin.Handle(context.Background(), tCtx)
@@ -155,8 +155,8 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to read task template", func(t *testing.T) {
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(nil, fmt.Errorf("read fail"))
+		tCtx.On("TaskReader").Return(tr)
 
 		connectorPlugin := newMockAsyncConnectorPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(connectorPlugin)
@@ -171,12 +171,12 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to read inputs", func(t *testing.T) {
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(&template, nil)
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(&template, nil)
+		tCtx.On("TaskReader").Return(tr)
 		inputReader := &ioMocks.InputReader{}
-		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
+		inputReader.On("GetInputPrefixPath").Return(basePrefix)
+		inputReader.On("GetInputPath").Return(basePrefix + "/inputs.pb")
+		inputReader.On("Get", mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnInputReader().Return(inputReader)
 
 		connectorPlugin := newMockAsyncConnectorPlugin()
@@ -193,14 +193,14 @@ func TestEndToEnd(t *testing.T) {
 func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	latestKnownState := atomic.Value{}
 	pluginStateReader := &pluginCoreMocks.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+	pluginStateReader.On("Get", mock.Anything).Return(uint8(0), nil).Run(func(args mock.Arguments) {
 		o := args.Get(0)
 		x, err := json.Marshal(latestKnownState.Load())
 		assert.NoError(t, err)
 		assert.NoError(t, json.Unmarshal(x, &o))
 	})
 	pluginStateWriter := &pluginCoreMocks.PluginStateWriter{}
-	pluginStateWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+	pluginStateWriter.On("Put", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		latestKnownState.Store(args.Get(1))
 	})
 
@@ -240,17 +240,17 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 		RunAs: &flyteIdlCore.Identity{ExecutionIdentity: "execution-identity"},
 	})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
-	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
-	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	resourceManager.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
+	resourceManager.On("ReleaseResource", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	basePrefix := storage.DataReference("fake://bucket/prefix/" + execID)
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnGetRawOutputPrefix().Return("/sandbox/")
+	outputWriter.OnGetRawOutputPrefix().Return(storage.DataReference("/sandbox/"))
 	outputWriter.OnGetOutputPrefixPath().Return(basePrefix)
 	outputWriter.OnGetErrorPath().Return(basePrefix + "/error.pb")
 	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
-	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.OnGetCheckpointPrefix().Return(storage.DataReference("/checkpoint"))
+	outputWriter.OnGetPreviousCheckpointsPrefix().Return(storage.DataReference("/prev"))
 
 	tCtx := &pluginCoreMocks.TaskExecutionContext{}
 	tCtx.OnOutputWriter().Return(outputWriter)
@@ -312,7 +312,7 @@ func newMockSyncConnectorPlugin() webapi.PluginEntry {
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
 
 	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
-	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+	stream.On("Recv").Return(&admin.ExecuteTaskSyncResponse{
 		Res: &admin.ExecuteTaskSyncResponse_Header{
 			Header: &admin.ExecuteTaskSyncResponseHeader{
 				Resource: resource,
@@ -320,11 +320,11 @@ func newMockSyncConnectorPlugin() webapi.PluginEntry {
 		},
 	}, nil).Once()
 
-	stream.OnRecv().Return(nil, io.EOF).Once()
-	stream.OnSendMatch(mock.Anything).Return(nil)
-	stream.OnCloseSendMatch(mock.Anything).Return(nil)
+	stream.On("Recv").Return(nil, io.EOF).Once()
+	stream.On("Send", mock.Anything).Return(nil)
+	stream.On("CloseSend", mock.Anything).Return(nil)
 
-	syncConnectorClient.OnExecuteTaskSyncMatch(mock.Anything).Return(stream, nil)
+	syncConnectorClient.On("ExecuteTaskSync", mock.Anything).Return(stream, nil)
 
 	cfg := defaultConfig
 	cfg.DefaultConnector.Endpoint = defaultConnectorEndpoint

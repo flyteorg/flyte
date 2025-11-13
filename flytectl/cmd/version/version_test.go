@@ -60,7 +60,7 @@ func TestVersionCommandFunc(t *testing.T) {
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion
-	s.MockClient.AdminClient().(*mocks.AdminServiceClient).OnGetVersionMatch(ctx, versionRequest).Return(versionResponse, nil)
+	s.MockClient.AdminClient().(*mocks.AdminServiceClient).On("GetVersion", ctx, versionRequest).Return(versionResponse, nil)
 	err := getVersion(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockClient.AdminClient().(*mocks.AdminServiceClient).AssertCalled(t, "GetVersion", ctx, versionRequest)
@@ -73,7 +73,7 @@ func TestVersionCommandFuncError(t *testing.T) {
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = "v"
-	s.MockClient.AdminClient().(*mocks.AdminServiceClient).OnGetVersionMatch(ctx, versionRequest).Return(versionResponse, nil)
+	s.MockClient.AdminClient().(*mocks.AdminServiceClient).On("GetVersion", ctx, versionRequest).Return(versionResponse, nil)
 	err := getVersion(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockClient.AdminClient().(*mocks.AdminServiceClient).AssertCalled(t, "GetVersion", ctx, versionRequest)
@@ -86,7 +86,7 @@ func TestVersionCommandFuncErr(t *testing.T) {
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion
-	s.MockAdminClient.OnGetVersionMatch(ctx, versionRequest).Return(versionResponse, errors.New("error"))
+	s.MockAdminClient.On("GetVersion", ctx, versionRequest).Return(versionResponse, errors.New("error"))
 	err := getVersion(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "GetVersion", ctx, versionRequest)
@@ -102,7 +102,7 @@ func TestVersionUtilFunc(t *testing.T) {
 		adminClient := mockClient.AdminClient().(*mocks.AdminServiceClient)
 		mockOutStream := new(io.Writer)
 		cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-		adminClient.OnGetVersionMatch(ctx, &admin.GetVersionRequest{}).Return(nil, fmt.Errorf("error"))
+		adminClient.On("GetVersion", ctx, &admin.GetVersionRequest{}).Return(nil, fmt.Errorf("error"))
 		err := getControlPlaneVersion(ctx, cmdCtx)
 		assert.NotNil(t, err)
 	})
@@ -112,7 +112,7 @@ func TestVersionUtilFunc(t *testing.T) {
 		adminClient := mockClient.AdminClient().(*mocks.AdminServiceClient)
 		mockOutStream := new(io.Writer)
 		cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-		adminClient.OnGetVersionMatch(ctx, &admin.GetVersionRequest{}).Return(nil, fmt.Errorf("error"))
+		adminClient.On("GetVersion", ctx, &admin.GetVersionRequest{}).Return(nil, fmt.Errorf("error"))
 		err := getVersion(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})

@@ -137,13 +137,13 @@ func TestEndToEnd(t *testing.T) {
 
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(&template, nil)
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(&template, nil)
+		tCtx.On("TaskReader").Return(tr)
 		inputReader := &ioMocks.InputReader{}
-		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-		inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
-		tCtx.OnInputReader().Return(inputReader)
+		inputReader.On("GetInputPrefixPath").Return(basePrefix)
+		inputReader.On("GetInputPath").Return(basePrefix + "/inputs.pb")
+		inputReader.On("Get", mock.Anything).Return(inputs, nil)
+		tCtx.On("InputReader").Return(inputReader)
 
 		trns, err := plugin.Handle(context.Background(), tCtx)
 		assert.Nil(t, err)
@@ -155,8 +155,8 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to read task template", func(t *testing.T) {
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(nil, fmt.Errorf("read fail"))
+		tCtx.On("TaskReader").Return(tr)
 
 		agentPlugin := newMockAsyncAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
@@ -171,13 +171,13 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to read inputs", func(t *testing.T) {
 		tCtx := getTaskContext(t)
 		tr := &pluginCoreMocks.TaskReader{}
-		tr.OnRead(context.Background()).Return(&template, nil)
-		tCtx.OnTaskReader().Return(tr)
+		tr.On("Read", context.Background()).Return(&template, nil)
+		tCtx.On("TaskReader").Return(tr)
 		inputReader := &ioMocks.InputReader{}
-		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
-		tCtx.OnInputReader().Return(inputReader)
+		inputReader.On("GetInputPrefixPath").Return(basePrefix)
+		inputReader.On("GetInputPath").Return(basePrefix + "/inputs.pb")
+		inputReader.On("Get", mock.Anything).Return(nil, fmt.Errorf("read fail"))
+		tCtx.On("InputReader").Return(inputReader)
 
 		agentPlugin := newMockAsyncAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
@@ -193,25 +193,25 @@ func TestEndToEnd(t *testing.T) {
 func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	latestKnownState := atomic.Value{}
 	pluginStateReader := &pluginCoreMocks.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+	pluginStateReader.On("Get", mock.Anything).Return(uint8(0), nil).Run(func(args mock.Arguments) {
 		o := args.Get(0)
 		x, err := json.Marshal(latestKnownState.Load())
 		assert.NoError(t, err)
 		assert.NoError(t, json.Unmarshal(x, &o))
 	})
 	pluginStateWriter := &pluginCoreMocks.PluginStateWriter{}
-	pluginStateWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+	pluginStateWriter.On("Put", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		latestKnownState.Store(args.Get(1))
 	})
 
-	pluginStateWriter.OnReset().Return(nil).Run(func(args mock.Arguments) {
+	pluginStateWriter.On("Reset").Return(nil).Run(func(args mock.Arguments) {
 		latestKnownState.Store(nil)
 	})
 
 	execID := rand.String(3)
 	tID := &pluginCoreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return(execID + "-my-task-1")
-	tID.OnGetID().Return(flyteIdlCore.TaskExecutionIdentifier{
+	tID.On("GetGeneratedName").Return(execID + "-my-task-1")
+	tID.On("GetID").Return(flyteIdlCore.TaskExecutionIdentifier{
 		TaskId: &flyteIdlCore.Identifier{
 			ResourceType: flyteIdlCore.ResourceType_TASK,
 			Project:      "a",
@@ -230,34 +230,34 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 		RetryAttempt: 0,
 	})
 	tMeta := &pluginCoreMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetNamespace().Return("test-namespace")
-	tMeta.OnGetLabels().Return(map[string]string{"foo": "bar"})
-	tMeta.OnGetAnnotations().Return(map[string]string{"foo": "bar"})
-	tMeta.OnGetK8sServiceAccount().Return("k8s-account")
-	tMeta.OnGetEnvironmentVariables().Return(map[string]string{"foo": "bar"})
-	tMeta.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{
+	tMeta.On("GetTaskExecutionID").Return(tID)
+	tMeta.On("GetNamespace").Return("test-namespace")
+	tMeta.On("GetLabels").Return(map[string]string{"foo": "bar"})
+	tMeta.On("GetAnnotations").Return(map[string]string{"foo": "bar"})
+	tMeta.On("GetK8sServiceAccount").Return("k8s-account")
+	tMeta.On("GetEnvironmentVariables").Return(map[string]string{"foo": "bar"})
+	tMeta.On("GetSecurityContext").Return(flyteIdlCore.SecurityContext{
 		RunAs: &flyteIdlCore.Identity{ExecutionIdentity: "execution-identity"},
 	})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
-	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
-	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	resourceManager.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
+	resourceManager.On("ReleaseResource", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	basePrefix := storage.DataReference("fake://bucket/prefix/" + execID)
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnGetRawOutputPrefix().Return("/sandbox/")
-	outputWriter.OnGetOutputPrefixPath().Return(basePrefix)
-	outputWriter.OnGetErrorPath().Return(basePrefix + "/error.pb")
-	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
-	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.On("GetRawOutputPrefix").Return(storage.DataReference("/sandbox/"))
+	outputWriter.On("GetOutputPrefixPath").Return(basePrefix)
+	outputWriter.On("GetErrorPath").Return(basePrefix + "/error.pb")
+	outputWriter.On("GetOutputPath").Return(basePrefix + "/outputs.pb")
+	outputWriter.On("GetCheckpointPrefix").Return(storage.DataReference("/checkpoint"))
+	outputWriter.On("GetPreviousCheckpointsPrefix").Return(storage.DataReference("/prev"))
 
 	tCtx := &pluginCoreMocks.TaskExecutionContext{}
-	tCtx.OnOutputWriter().Return(outputWriter)
-	tCtx.OnResourceManager().Return(resourceManager)
-	tCtx.OnPluginStateReader().Return(pluginStateReader)
-	tCtx.OnPluginStateWriter().Return(pluginStateWriter)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.On("OutputWriter").Return(outputWriter)
+	tCtx.On("ResourceManager").Return(resourceManager)
+	tCtx.On("PluginStateReader").Return(pluginStateReader)
+	tCtx.On("PluginStateWriter").Return(pluginStateWriter)
+	tCtx.On("TaskExecutionMetadata").Return(tMeta)
 	return tCtx
 }
 
@@ -312,7 +312,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
 
 	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
-	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+	stream.On("Recv").Return(&admin.ExecuteTaskSyncResponse{
 		Res: &admin.ExecuteTaskSyncResponse_Header{
 			Header: &admin.ExecuteTaskSyncResponseHeader{
 				Resource: resource,
@@ -320,11 +320,11 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 		},
 	}, nil).Once()
 
-	stream.OnRecv().Return(nil, io.EOF).Once()
-	stream.OnSendMatch(mock.Anything).Return(nil)
-	stream.OnCloseSendMatch(mock.Anything).Return(nil)
+	stream.On("Recv").Return(nil, io.EOF).Once()
+	stream.On("Send", mock.Anything).Return(nil)
+	stream.On("CloseSend", mock.Anything).Return(nil)
 
-	syncAgentClient.OnExecuteTaskSyncMatch(mock.Anything).Return(stream, nil)
+	syncAgentClient.On("ExecuteTaskSync", mock.Anything).Return(stream, nil)
 
 	cfg := defaultConfig
 	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
@@ -353,8 +353,8 @@ func newFakeSetupContext(name string) *pluginCoreMocks.SetupContext {
 	labeled.SetMetricKeys(contextutils.NamespaceKey)
 
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope(name))
-	fakeSetupContext.OnResourceRegistrar().Return(&fakeResourceRegistrar)
+	fakeSetupContext.On("MetricsScope").Return(promutils.NewScope(name))
+	fakeSetupContext.On("ResourceRegistrar").Return(&fakeResourceRegistrar)
 
 	return &fakeSetupContext
 }

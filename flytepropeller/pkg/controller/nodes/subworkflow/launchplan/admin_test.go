@@ -103,7 +103,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			},
 		}
 		mockClient.
-			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
+			On("GetExecution", mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
 				done()
 			}).
@@ -115,7 +115,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			},
 		}
 		mockClient.
-			OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: id}).
+			On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: id}).
 			Return(execData, nil).
 			Once()
 
@@ -177,7 +177,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.NoError(t, exec.Initialize(initCtx))
 
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil
@@ -186,7 +186,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			Return(nil, nil).
 			Once()
 		mockClient.
-			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
+			On("GetExecution", mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
 				done()
 			}).
@@ -231,7 +231,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.NoError(t, exec.Initialize(initCtx))
 
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil
@@ -240,7 +240,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			Return(nil, nil).
 			Once()
 		mockClient.
-			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
+			On("GetExecution", mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
 				done()
 			}).
@@ -297,7 +297,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		defer mockClient.AssertExpectations(t)
 
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil &&
@@ -350,7 +350,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		}
 		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
-			OnRecoverExecutionMatch(
+			On("RecoverExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
 					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Id.Org == "o" && o.Name == "n" &&
@@ -396,7 +396,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 
 		recoveryErr := status.Error(codes.NotFound, "foo")
 		mockClient.
-			OnRecoverExecutionMatch(
+			On("RecoverExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
 					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Id.Org == "o" && o.Name == "n" &&
@@ -408,7 +408,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 
 		var createCalled = false
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 					createCalled = true
@@ -445,7 +445,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 
 		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool { return true }),
 			).
@@ -480,7 +480,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 
 		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
-			OnCreateExecutionMatch(
+			On("CreateExecution",
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool { return true }),
 			).
@@ -581,7 +581,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
 		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
-		mockClient.OnGetLaunchPlanMatch(
+		mockClient.On("GetLaunchPlan",
 			ctx,
 			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
 		).Return(&admin.LaunchPlan{Id: id}, nil)
@@ -594,7 +594,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
 		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
-		mockClient.OnGetLaunchPlanMatch(
+		mockClient.On("GetLaunchPlan",
 			ctx,
 			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
 		).Return(nil, status.Error(codes.NotFound, ""))
@@ -633,7 +633,7 @@ func (s *LPExecutorSuite) SetupTest() {
 	cfg := ctrlConfig.GetConfig()
 	cfg.ClusterID = "foo-cluster"
 	s.watchServiceClient.
-		OnWatchExecutionStatusUpdatesMatch(s.ctx, &watch.WatchExecutionStatusUpdatesRequest{Cluster: cfg.ClusterID}, mock.Anything).
+		On("WatchExecutionStatusUpdates", s.ctx, &watch.WatchExecutionStatusUpdatesRequest{Cluster: cfg.ClusterID}, mock.Anything).
 		Return(s.adminEventsSrv, nil).
 		Maybe()
 
@@ -671,11 +671,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		}}, nil).
@@ -687,7 +687,7 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED() {
 		},
 	}
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
 	labels := map[string]string{
@@ -716,12 +716,12 @@ func (s *LPExecutorSuite) Test_syncItem_FAILED() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	expectedErr := &core.ExecutionError{Code: "fail"}
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase:        core.WorkflowExecution_FAILED,
 			OutputResult: &admin.ExecutionClosure_Error{Error: expectedErr},
@@ -754,11 +754,11 @@ func (s *LPExecutorSuite) Test_syncItem_RUNNING() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}}, nil).
@@ -787,7 +787,7 @@ func (s *LPExecutorSuite) Test_syncItem_AlreadyTerminal() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
 
 	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
@@ -806,7 +806,7 @@ func (s *LPExecutorSuite) Test_syncItem_RecentlyUpdated() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
 
 	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
@@ -825,12 +825,12 @@ func (s *LPExecutorSuite) Test_syncItem_SyncError() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	expectedErr := fmt.Errorf("get exec fail")
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(nil, expectedErr).
 		Once()
 
@@ -856,11 +856,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_SyncDataError() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		}}, nil).
@@ -868,7 +868,7 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_SyncDataError() {
 
 	expectedErr := fmt.Errorf("sync error")
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(nil, expectedErr).
 		Once()
 	labels := map[string]string{
@@ -898,11 +898,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_Exhausted() {
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -912,13 +912,13 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_Exhausted() {
 		Once()
 
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(nil, status.Error(codes.ResourceExhausted, "")).
 		Once()
 	expectedOutputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{"foo": nil},
 	}
-	s.pbStore.OnReadProtobufMatch(s.ctx, storage.DataReference(testURI), mock.Anything).
+	s.pbStore.On("ReadProtobuf", s.ctx, storage.DataReference(testURI), mock.Anything).
 		Run(func(args mock.Arguments) {
 			lm := args[2].(*core.LiteralMap)
 			*lm = *expectedOutputs
@@ -952,11 +952,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_MissingOutput
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -971,13 +971,13 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_MissingOutput
 		},
 	}
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
 	expectedOutputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{"foo": nil},
 	}
-	s.pbStore.OnReadProtobufMatch(s.ctx, storage.DataReference(testURI), mock.Anything).
+	s.pbStore.On("ReadProtobuf", s.ctx, storage.DataReference(testURI), mock.Anything).
 		Run(func(args mock.Arguments) {
 			lm := args[2].(*core.LiteralMap)
 			*lm = *expectedOutputs
@@ -1011,11 +1011,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_ReadProtoErro
 
 	itemWrapper := &cacheMocks.ItemWrapper{}
 	defer itemWrapper.AssertExpectations(s.T())
-	itemWrapper.OnGetItem().Return(cacheItem).Once()
-	itemWrapper.OnGetID().Return("id").Once()
+	itemWrapper.On("GetItem").Return(cacheItem).Once()
+	itemWrapper.On("GetID").Return("id").Once()
 
 	s.adminClient.
-		OnGetExecutionMatch(s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
+		On("GetExecution", s.ctx, &admin.WorkflowExecutionGetRequest{Id: execID}).
 		Return(&admin.Execution{Closure: &admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -1030,11 +1030,11 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_ReadProtoErro
 		},
 	}
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
 	expectedErr := fmt.Errorf("fail proto")
-	s.pbStore.OnReadProtobufMatch(s.ctx, storage.DataReference(testURI), mock.Anything).
+	s.pbStore.On("ReadProtobuf", s.ctx, storage.DataReference(testURI), mock.Anything).
 		Return(expectedErr).
 		Once()
 	labels := map[string]string{
@@ -1055,7 +1055,7 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_ReadProtoErro
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 	s.adminClient.
-		OnCreateExecutionMatch(
+		On("CreateExecution",
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
@@ -1077,7 +1077,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 	)
 	s.NoError(err)
 	s.adminEventsSrv.
-		OnRecv().
+		On("Recv").
 		Run(func(_ mock.Arguments) {
 			s.cancel()
 		}).
@@ -1089,14 +1089,14 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 		},
 	}
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
 	labels := map[string]string{
 		k8s.WorkflowID: parentWorkflowID,
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
-	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
+	s.adminEventsSrv.On("CloseSend").Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)
 
@@ -1110,7 +1110,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_RUNNING() {
 	s.adminClient.
-		OnCreateExecutionMatch(
+		On("CreateExecution",
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
@@ -1132,13 +1132,13 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_RUNNING() {
 	)
 	s.NoError(err)
 	s.adminEventsSrv.
-		OnRecv().
+		On("Recv").
 		Run(func(_ mock.Arguments) {
 			s.cancel()
 		}).
 		Return(&watch.WatchExecutionStatusUpdatesResponse{Id: execID, Phase: core.WorkflowExecution_RUNNING}, nil).
 		Once()
-	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
+	s.adminEventsSrv.On("CloseSend").Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)
 
@@ -1152,13 +1152,13 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_RUNNING() {
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionNotFoundInCache() {
 	s.adminEventsSrv.
-		OnRecv().
+		On("Recv").
 		Run(func(_ mock.Arguments) {
 			s.cancel()
 		}).
 		Return(&watch.WatchExecutionStatusUpdatesResponse{Id: execID, Phase: core.WorkflowExecution_RUNNING}, nil).
 		Once()
-	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
+	s.adminEventsSrv.On("CloseSend").Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)
 
@@ -1169,13 +1169,13 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionNotFoundInCa
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionAlreadyTerminated() {
 	s.adminEventsSrv.
-		OnRecv().
+		On("Recv").
 		Run(func(_ mock.Arguments) {
 			s.cancel()
 		}).
 		Return(&watch.WatchExecutionStatusUpdatesResponse{Id: execID, Phase: core.WorkflowExecution_SUCCEEDED}, nil).
 		Once()
-	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
+	s.adminEventsSrv.On("CloseSend").Return(nil).Once()
 	_, err := s.executor.cache.GetOrCreate(execID.String(), executionCacheItem{
 		Phase: core.WorkflowExecution_FAILED,
 	})
@@ -1191,7 +1191,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionAlreadyTermi
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_FetchExecutionDataError() {
 	s.adminClient.
-		OnCreateExecutionMatch(
+		On("CreateExecution",
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
@@ -1213,7 +1213,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_FetchExecutionDataErr
 	)
 	s.NoError(err)
 	s.adminEventsSrv.
-		OnRecv().
+		On("Recv").
 		Run(func(_ mock.Arguments) {
 			s.cancel()
 		}).
@@ -1221,14 +1221,14 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_FetchExecutionDataErr
 		Once()
 	expectedErr := fmt.Errorf("exec data fail")
 	s.adminClient.
-		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
+		On("GetExecutionData", mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(nil, expectedErr).
 		Once()
 	labels := map[string]string{
 		k8s.WorkflowID: parentWorkflowID,
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
-	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
+	s.adminEventsSrv.On("CloseSend").Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)
 

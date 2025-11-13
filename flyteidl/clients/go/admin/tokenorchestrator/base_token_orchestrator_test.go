@@ -50,8 +50,8 @@ func TestFetchFromCache(t *testing.T) {
 		RedirectUri:              "http://localhost:8089/redirect",
 	}
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
-	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
+	mockAuthClient.On("GetOAuth2Metadata", mock.Anything, mock.Anything).Return(metadata, nil)
+	mockAuthClient.On("GetPublicClientConfig", mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("no token in cache", func(t *testing.T) {
 		tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
@@ -93,8 +93,8 @@ func TestFetchFromCache(t *testing.T) {
 		orchestrator, err := NewBaseTokenOrchestrator(ctx, mockTokenCacheProvider, mockAuthClient)
 		assert.NoError(t, err)
 		tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(20*time.Minute))
-		mockTokenCacheProvider.OnGetTokenMatch(mock.Anything).Return(tokenData, nil)
-		mockTokenCacheProvider.OnSaveTokenMatch(mock.Anything).Return(nil)
+		mockTokenCacheProvider.On("GetToken", mock.Anything).Return(tokenData, nil)
+		mockTokenCacheProvider.On("SaveToken", mock.Anything).Return(nil)
 		assert.Nil(t, err)
 		refreshedToken, err := orchestrator.FetchTokenFromCacheOrRefreshIt(ctx, config.Duration{Duration: 5 * time.Minute})
 		assert.Nil(t, err)
@@ -107,7 +107,7 @@ func TestFetchFromCache(t *testing.T) {
 		orchestrator, err := NewBaseTokenOrchestrator(ctx, mockTokenCacheProvider, mockAuthClient)
 		assert.NoError(t, err)
 		tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(20*time.Minute))
-		mockTokenCacheProvider.OnGetTokenMatch(mock.Anything).Return(tokenData, nil)
+		mockTokenCacheProvider.On("GetToken", mock.Anything).Return(tokenData, nil)
 		assert.Nil(t, err)
 		refreshedToken, err := orchestrator.FetchTokenFromCacheOrRefreshIt(ctx, config.Duration{Duration: 5 * time.Minute})
 		assert.Nil(t, err)

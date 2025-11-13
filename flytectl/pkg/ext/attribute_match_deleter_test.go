@@ -22,42 +22,42 @@ func deleteAttributeMatchFetcherSetup() {
 
 func TestDeleteWorkflowAttributes(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("DeleteWorkflowAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminDeleterExt.DeleteWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 	assert.Nil(t, err)
 }
 
 func TestDeleteWorkflowAttributesError(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("DeleteWorkflowAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminDeleterExt.DeleteWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
 
 func TestDeleteProjectDomainAttributes(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("DeleteProjectDomainAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminDeleterExt.DeleteProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 	assert.Nil(t, err)
 }
 
 func TestDeleteProjectDomainAttributesError(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("DeleteProjectDomainAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminDeleterExt.DeleteProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
 
 func TestDeleteProjectAttributes(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("DeleteProjectAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminDeleterExt.DeleteProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
 	assert.Nil(t, err)
 }
 
 func TestDeleteProjectAttributesError(t *testing.T) {
 	deleteAttributeMatchFetcherSetup()
-	adminClient.OnDeleteProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("DeleteProjectAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminDeleterExt.DeleteProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }

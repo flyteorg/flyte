@@ -156,12 +156,12 @@ func TestLaunchPlanUpdateFailsWhenLaunchPlanDoesNotExist(t *testing.T) {
 	testLaunchPlanUpdateWithMockSetup(
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
-				OnGetLaunchPlanMatch(
+				On("GetLaunchPlan",
 					s.Ctx,
 					mock.Anything).
 				Return(nil, ext.NewNotFoundError("launch plan not found"))
 			s.MockAdminClient.
-				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).
+				On("UpdateLaunchPlan", s.Ctx, mock.Anything).
 				Return(&admin.LaunchPlanUpdateResponse{}, nil)
 		},
 		/* setup */ nil,
@@ -176,12 +176,12 @@ func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 	testLaunchPlanUpdateWithMockSetup(
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
-				OnGetLaunchPlanMatch(
+				On("GetLaunchPlan",
 					s.Ctx,
 					mock.Anything).
 				Return(launchplan, nil)
 			s.MockAdminClient.
-				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).
+				On("UpdateLaunchPlan", s.Ctx, mock.Anything).
 				Return(nil, fmt.Errorf("network error"))
 		},
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
@@ -233,12 +233,12 @@ func testLaunchPlanUpdate(
 	testLaunchPlanUpdateWithMockSetup(
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
-				OnGetLaunchPlanMatch(
+				On("GetLaunchPlan",
 					s.Ctx,
 					mock.Anything).
 				Return(launchplan, nil)
 			s.MockAdminClient.
-				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).
+				On("UpdateLaunchPlan", s.Ctx, mock.Anything).
 				Return(&admin.LaunchPlanUpdateResponse{}, nil)
 		},
 		setup,

@@ -25,14 +25,14 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	matchingAttr := &admin.MatchingAttributes{
 		Target: &admin.MatchingAttributes_TaskResourceAttributes{},
 	}
-	adminClient.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("UpdateWorkflowAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminUpdaterExt.UpdateWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", matchingAttr)
 	assert.Nil(t, err)
 }
 
 func TestUpdateWorkflowAttributesError(t *testing.T) {
 	updateAttributeMatchFetcherSetup()
-	adminClient.OnUpdateWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("UpdateWorkflowAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminUpdaterExt.UpdateWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", nil)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
@@ -42,14 +42,14 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	matchingAttr := &admin.MatchingAttributes{
 		Target: &admin.MatchingAttributes_TaskResourceAttributes{},
 	}
-	adminClient.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("UpdateProjectDomainAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminUpdaterExt.UpdateProjectDomainAttributes(ctx, "dummyProject", "domainValue", matchingAttr)
 	assert.Nil(t, err)
 }
 
 func TestUpdateProjectDomainAttributesError(t *testing.T) {
 	updateAttributeMatchFetcherSetup()
-	adminClient.OnUpdateProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("UpdateProjectDomainAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminUpdaterExt.UpdateProjectDomainAttributes(ctx, "dummyProject", "domainValue", nil)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
@@ -59,14 +59,14 @@ func TestUpdateProjectAttributes(t *testing.T) {
 	matchingAttr := &admin.MatchingAttributes{
 		Target: &admin.MatchingAttributes_TaskResourceAttributes{},
 	}
-	adminClient.OnUpdateProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	adminClient.On("UpdateProjectAttributes", mock.Anything, mock.Anything).Return(nil, nil)
 	err := adminUpdaterExt.UpdateProjectAttributes(ctx, "dummyProject", matchingAttr)
 	assert.Nil(t, err)
 }
 
 func TestUpdateProjectAttributesError(t *testing.T) {
 	updateAttributeMatchFetcherSetup()
-	adminClient.OnUpdateProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.On("UpdateProjectAttributes", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	err := adminUpdaterExt.UpdateProjectAttributes(ctx, "dummyProject", nil)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }

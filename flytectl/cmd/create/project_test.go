@@ -48,7 +48,7 @@ func TestCreateProjectFunc(t *testing.T) {
 	project.DefaultProjectConfig.Name = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""
-	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	s.MockAdminClient.On("RegisterProject", s.Ctx, projectRegisterRequest).Return(nil, nil)
 	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "RegisterProject", s.Ctx, projectRegisterRequest)
@@ -62,7 +62,7 @@ func TestEmptyProjectID(t *testing.T) {
 	defer s.TearDownAndVerify(t, "")
 	defer s.TearDown()
 	project.DefaultProjectConfig = &project.ConfigProject{}
-	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	s.MockAdminClient.On("RegisterProject", s.Ctx, projectRegisterRequest).Return(nil, nil)
 	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Equal(t, errors.New(clierrors.ErrProjectNotPassed), err)
 	s.MockAdminClient.AssertNotCalled(t, "RegisterProject", s.Ctx, mock.Anything)
@@ -78,7 +78,7 @@ func TestEmptyProjectName(t *testing.T) {
 	project.DefaultProjectConfig.ID = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""
-	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
+	s.MockAdminClient.On("RegisterProject", s.Ctx, projectRegisterRequest).Return(nil, nil)
 	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
 	assert.Equal(t, fmt.Errorf("project name is a required flag"), err)
 	s.MockAdminClient.AssertNotCalled(t, "RegisterProject", s.Ctx, mock.Anything)
