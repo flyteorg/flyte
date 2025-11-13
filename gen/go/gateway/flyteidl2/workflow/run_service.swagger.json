@@ -2984,6 +2984,13 @@
           "format": "date-time",
           "description": "Timestamp of the most recent finished run (terminal phase)."
         },
+        "created_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of unique user identities who created runs in this group."
+        },
         "should_delete": {
           "type": "boolean"
         }
