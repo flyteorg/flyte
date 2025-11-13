@@ -34,26 +34,3 @@ func SetVariable(vm *core.VariableMap, key string, variable *core.Variable) {
 		Value: variable,
 	})
 }
-
-// VariableMapToMap converts a VariableMap to a Go map for easier access.
-func VariableMapToMap(vm *core.VariableMap) map[string]*core.Variable {
-	result := make(map[string]*core.Variable)
-	if vm != nil {
-		for _, entry := range vm.GetVariables() {
-			result[entry.GetKey()] = entry.GetValue()
-		}
-	}
-	return result
-}
-
-// MapToVariableMap converts a Go map to a VariableMap.
-func MapToVariableMap(m map[string]*core.Variable) *core.VariableMap {
-	entries := make([]*core.VariableEntry, 0, len(m))
-	for key, value := range m {
-		entries = append(entries, &core.VariableEntry{
-			Key:   key,
-			Value: value,
-		})
-	}
-	return &core.VariableMap{Variables: entries}
-}
