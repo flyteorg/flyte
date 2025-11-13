@@ -446,5 +446,8 @@ message TaskGroup {
   // Timestamp of the most recent finished run (terminal phase).
   google.protobuf.Timestamp latest_finished_time = 8;
 
-  bool should_delete = 9;
+  // List of unique user identities who created runs in this group.
+  repeated string created_by = 9;
+
+  bool should_delete = 10;
 }
