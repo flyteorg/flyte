@@ -2206,7 +2206,7 @@ type TaskGroup struct {
 	AverageDuration *durationpb.Duration `protobuf:"bytes,7,opt,name=average_duration,json=averageDuration,proto3" json:"average_duration,omitempty"`
 	// Timestamp of the most recent finished run (terminal phase).
 	LatestFinishedTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=latest_finished_time,json=latestFinishedTime,proto3" json:"latest_finished_time,omitempty"`
-	// List of unique user identities who created runs in this group.
+	// List of user/application's enriched identity that created runs in this group.
 	CreatedBy    []*common.EnrichedIdentity `protobuf:"bytes,9,rep,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
 	ShouldDelete bool                       `protobuf:"varint,10,opt,name=should_delete,json=shouldDelete,proto3" json:"should_delete,omitempty"`
 }

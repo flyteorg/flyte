@@ -2990,7 +2990,7 @@
             "type": "object",
             "$ref": "#/definitions/commonEnrichedIdentity"
           },
-          "description": "List of unique user identities who created runs in this group."
+          "description": "List of user/application's enriched identity that created runs in this group."
         },
         "should_delete": {
           "type": "boolean"

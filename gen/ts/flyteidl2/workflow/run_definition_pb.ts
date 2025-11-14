@@ -1169,7 +1169,7 @@ export type TaskGroup = Message<"flyteidl2.workflow.TaskGroup"> & {
   latestFinishedTime?: Timestamp;
 
   /**
-   * List of unique user identities who created runs in this group.
+   * List of user/application's enriched identity that created runs in this group.
    *
    * @generated from field: repeated flyteidl2.common.EnrichedIdentity created_by = 9;
    */
