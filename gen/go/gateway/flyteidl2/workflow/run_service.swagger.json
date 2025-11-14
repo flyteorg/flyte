@@ -329,7 +329,14 @@
           "items": {
             "type": "string"
           },
-          "description": "Only in the case of a VALUE_IN function, values may contain multiple entries."
+          "description": "ONLY ONE of the following value fields should be set.\nOnly in the case of a VALUE_IN function, values may contain multiple entries."
+        },
+        "int_values": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         }
       }
     },
