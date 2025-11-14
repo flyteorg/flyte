@@ -2987,7 +2987,8 @@
         "created_by": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/commonEnrichedIdentity"
           },
           "description": "List of unique user identities who created runs in this group."
         },
