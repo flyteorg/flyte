@@ -1129,6 +1129,10 @@
         "automation_spec": {
           "$ref": "#/definitions/taskTriggerAutomationSpec",
           "description": "Optional automation spec."
+        },
+        "description": {
+          "type": "string",
+          "title": "Trigger description"
         }
       },
       "title": "Full details about a trigger stored in DB"
@@ -1603,6 +1607,10 @@
         "task_version": {
           "type": "string",
           "title": "Task version together with trigger name will give us the unique task id"
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description"
         }
       }
     },
