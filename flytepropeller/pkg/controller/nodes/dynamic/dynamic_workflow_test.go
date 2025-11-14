@@ -122,8 +122,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &mocks2.ExecutableNodeStatus{}
-		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
-		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.EXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
 		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.EXPECT().NodeStatus().Return(ns)

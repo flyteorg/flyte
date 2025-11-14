@@ -355,7 +355,7 @@ func TestDecideBranch(t *testing.T) {
 			DataReferenceConstructor: dataStore,
 		}
 		branchNode := &v1alpha1.BranchNodeSpec{}
-		b, err := DecideBranch(ctx, w, "n1", branchNode, nil)
+		b, err := DecideBranch(ctx, w, branchNode, nil)
 		assert.Error(t, err)
 		assert.Nil(t, b)
 	})
@@ -381,7 +381,7 @@ func TestDecideBranch(t *testing.T) {
 				ThenNode: nil,
 			},
 		}
-		b, err := DecideBranch(ctx, w, "n1", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
 		e, ok := errors.GetErrorCode(err)
@@ -416,7 +416,7 @@ func TestDecideBranch(t *testing.T) {
 				ThenNode: &n1,
 			},
 		}
-		b, err := DecideBranch(ctx, w, "n1", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.NoError(t, err)
 		assert.NotNil(t, b)
 		assert.Equal(t, n1, *b)
@@ -466,7 +466,7 @@ func TestDecideBranch(t *testing.T) {
 				},
 			},
 		}
-		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.NoError(t, err)
 		assert.NotNil(t, b)
 		assert.Equal(t, n1, *b)
@@ -517,7 +517,7 @@ func TestDecideBranch(t *testing.T) {
 				},
 			},
 		}
-		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.NoError(t, err)
 		assert.NotNil(t, b)
 		assert.Equal(t, n2, *b)
@@ -570,7 +570,7 @@ func TestDecideBranch(t *testing.T) {
 			},
 			Else: &n3,
 		}
-		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.NoError(t, err)
 		assert.NotNil(t, b)
 		assert.Equal(t, n3, *b)
@@ -620,7 +620,7 @@ func TestDecideBranch(t *testing.T) {
 			},
 			Else: &n3,
 		}
-		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
 		ec, ok := errors.GetErrorCode(err)
@@ -677,7 +677,7 @@ func TestDecideBranch(t *testing.T) {
 			},
 		}
 
-		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
+		b, err := DecideBranch(ctx, w, branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
 		ec, ok := errors.GetErrorCode(err)

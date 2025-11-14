@@ -30,8 +30,8 @@ import (
 
 type TaskReader struct{}
 
-func (t TaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) { return nil, nil }
-func (t TaskReader) GetTaskType() v1alpha1.TaskType                       { return "" }
+func (t TaskReader) Read(context.Context) (*core.TaskTemplate, error) { return nil, nil }
+func (t TaskReader) GetTaskType() v1alpha1.TaskType                   { return "" }
 func (t TaskReader) GetTaskID() *core.Identifier {
 	return &core.Identifier{Project: "p", Domain: "d", Name: "task-name"}
 }
@@ -41,11 +41,11 @@ type fakeEventRecorder struct {
 	taskErr error
 }
 
-func (f fakeEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (f fakeEventRecorder) RecordNodeEvent(context.Context, *event.NodeExecutionEvent, *config.EventConfig) error {
 	return f.nodeErr
 }
 
-func (f fakeEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+func (f fakeEventRecorder) RecordTaskEvent(context.Context, *event.TaskExecutionEvent, *config.EventConfig) error {
 	return f.taskErr
 }
 

@@ -28,12 +28,12 @@ func (f FailureNodeLookup) GetNodeExecutionStatus(ctx context.Context, id v1alph
 	return f.FailureNodeStatus
 }
 
-func (f FailureNodeLookup) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+func (f FailureNodeLookup) ToNode(v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	// The upstream node of the failure node is always the start node
 	return []v1alpha1.NodeID{v1alpha1.StartNodeID}, nil
 }
 
-func (f FailureNodeLookup) FromNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+func (f FailureNodeLookup) FromNode(v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	return nil, nil
 }
 

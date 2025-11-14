@@ -61,17 +61,17 @@ type mockKubeClient struct {
 	getMissCount      int
 }
 
-func (m *mockKubeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+func (m *mockKubeClient) Create(context.Context, client.Object, ...client.CreateOption) error {
 	m.createCalledCount++
 	return nil
 }
 
-func (m *mockKubeClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+func (m *mockKubeClient) Delete(context.Context, client.Object, ...client.DeleteOption) error {
 	m.deleteCalledCount++
 	return nil
 }
 
-func (m *mockKubeClient) Get(ctx context.Context, objectKey types.NamespacedName, obj client.Object, opts ...client.GetOption) error {
+func (m *mockKubeClient) Get(context.Context, types.NamespacedName, client.Object, ...client.GetOption) error {
 	if m.getCalledCount < m.getMissCount {
 		m.getMissCount--
 		return k8serrors.NewNotFound(v1.Resource("pod"), "name")

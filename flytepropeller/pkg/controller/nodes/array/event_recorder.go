@@ -40,7 +40,7 @@ func (t *taskExecutionID) GetID() idlcore.TaskExecutionIdentifier {
 	return *t.id
 }
 
-func (t *taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
+func (t *taskExecutionID) GetGeneratedNameWith(int, int) (string, error) {
 	return "", nil
 }
 
@@ -62,12 +62,12 @@ type externalResourcesEventRecorder struct {
 	taskEvents        []*event.TaskExecutionEvent
 }
 
-func (e *externalResourcesEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (e *externalResourcesEventRecorder) RecordNodeEvent(_ context.Context, event *event.NodeExecutionEvent, _ *config.EventConfig) error {
 	e.nodeEvents = append(e.nodeEvents, event)
 	return nil
 }
 
-func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+func (e *externalResourcesEventRecorder) RecordTaskEvent(_ context.Context, event *event.TaskExecutionEvent, _ *config.EventConfig) error {
 	e.taskEvents = append(e.taskEvents, event)
 	return nil
 }
@@ -235,7 +235,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 	return e.EventRecorder.RecordTaskEvent(ctx, taskExecutionEvent, eventConfig)
 }
 
-func (e *externalResourcesEventRecorder) finalizeRequired(ctx context.Context) bool {
+func (e *externalResourcesEventRecorder) finalizeRequired(context.Context) bool {
 	return len(e.externalResources) > 0
 }
 
@@ -243,16 +243,15 @@ type passThroughEventRecorder struct {
 	interfaces.EventRecorder
 }
 
-func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
+func (*passThroughEventRecorder) process(context.Context, interfaces.NodeExecutionContext, int, uint32) error {
 	return nil
 }
 
-func (*passThroughEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
+func (*passThroughEventRecorder) finalize(context.Context, interfaces.NodeExecutionContext, idlcore.TaskExecution_Phase, uint32, *config.EventConfig) error {
 	return nil
 }
 
-func (*passThroughEventRecorder) finalizeRequired(ctx context.Context) bool {
+func (*passThroughEventRecorder) finalizeRequired(context.Context) bool {
 	return false
 }
 
