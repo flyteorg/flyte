@@ -85,24 +85,24 @@ docker-build: ## Build Docker image
 	@docker build -t flyte-runs-service:latest -f Dockerfile ..
 
 .PHONY: docker-run
-docker-run: docker-build ## Build and run with docker-compose
-	@docker-compose up -d
+docker-run: docker-build ## Build and run with docker compose
+	@docker compose up -d
 
 .PHONY: docker-stop
-docker-stop: ## Stop docker-compose
-	@docker-compose down
+docker-stop: ## Stop docker compose
+	@docker compose down
 
 .PHONY: docker-logs
-docker-logs: ## Show docker-compose logs
-	@docker-compose logs -f runs-service
+docker-logs: ## Show docker compose logs
+	@docker compose logs -f runs-service
 
 .PHONY: docker-up
-docker-up: ## Run everything with docker-compose
-	@docker-compose up --build
+docker-up: ## Run everything with docker compose
+	@docker compose up --build
 
 .PHONY: docker-down
-docker-down: ## Stop docker-compose and remove volumes
-	@docker-compose down -v
+docker-down: ## Stop docker compose and remove volumes
+	@docker compose down -v
 
 # Override clean to also remove database
 clean: clean-db ## Remove build artifacts and database

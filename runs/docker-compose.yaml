@@ -28,9 +28,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
     volumes:
       - ./config-postgres.yaml:/app/config.yaml
     command: ["--config", "config.yaml"]

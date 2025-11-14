@@ -8,6 +8,7 @@
 
 # Generated files
 gen/
+!gen/go/**
 
 # Dependencies
 node_modules/
