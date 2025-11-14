@@ -50,7 +50,7 @@ func (g *gateNodeHandler) Abort(context.Context, interfaces.NodeExecutionContext
 }
 
 // Finalize completes the gate node defined in the NodeExecutionContext
-func (g *gateNodeHandler) Finalize(_ context.Context, _ interfaces.NodeExecutionContext) error {
+func (g *gateNodeHandler) Finalize(context.Context, interfaces.NodeExecutionContext) error {
 	return nil
 }
 
