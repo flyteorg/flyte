@@ -70,7 +70,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
-	github.com/flyteorg/stow v0.3.11 // indirect
+	github.com/flyteorg/stow v0.3.12 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.1.1 // indirect
