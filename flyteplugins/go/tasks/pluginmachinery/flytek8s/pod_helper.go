@@ -1078,6 +1078,7 @@ func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 
 	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
 	if podPendingTimeout > 0 && time.Since(t) >= podPendingTimeout {
+		t = time.Now() // using current time for `OccurredAt` rather than last transition time
 		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
 			OccurredAt: &t,
 		}), nil
@@ -1216,6 +1217,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
+									t = time.Now() // using current time for `OccurredAt` rather than last transition time
 									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
@@ -1230,6 +1232,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 							case "CreateContainerConfigError":
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
+									t = time.Now() // using current time for `OccurredAt` rather than last transition time
 									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
@@ -1249,6 +1252,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 							case "ImagePullBackOff":
 								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
+									t = time.Now() // using current time for `OccurredAt` rather than last transition time
 									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
