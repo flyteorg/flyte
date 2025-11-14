@@ -461,7 +461,7 @@ message TaskGroup {
   // Timestamp of the most recent finished run (terminal phase).
   google.protobuf.Timestamp latest_finished_time = 8;
 
-  // List of unique user identities who created runs in this group.
+  // List of user/application's enriched identity that created runs in this group.
   repeated common.EnrichedIdentity created_by = 9;
 
   bool should_delete = 10;
