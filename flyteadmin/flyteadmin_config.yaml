@@ -62,7 +62,7 @@ flyteadmin:
     - "admin"
   useOffloadedWorkflowClosure: false
   injectIdentityAnnotations: false
-  identityAnnotationPrefix: "flyte.ai"
+  identityAnnotationPrefix: "flyte.org"
   identityAnnotationKeys:
     - email
     - sub
