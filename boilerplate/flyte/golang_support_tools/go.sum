@@ -162,8 +162,8 @@ github.com/flyteorg/flyte/flytestdlib v1.11.0 h1:DxM/sf6H0ong8LIjgh0YwXK+abnGV8k
 github.com/flyteorg/flyte/flytestdlib v1.11.0/go.mod h1:AmgNCq/tGEDwVfilW1nFtgPQn8vQ9gcDu6SNwz1YY+M=
 github.com/flyteorg/protoc-gen-doc v1.4.2 h1:Otw0F+RHaPQ8XlpzhLLgjsCMcrAIcMO01Zh+ALe3rrE=
 github.com/flyteorg/protoc-gen-doc v1.4.2/go.mod h1:exDTOVwqpp30eV/EDPFLZy3Pwr2sn6hBC1WIYH/UbIg=
-github.com/flyteorg/stow v0.3.10 h1:uEe+tI+CGKn21H93uXp9z05hqynEki2BO9KkW/GweY8=
-github.com/flyteorg/stow v0.3.10/go.mod h1:fArjMpsYJNWkp/hyDKKdbcv07gxbuLmKFcb7YT1aSOM=
+github.com/flyteorg/stow v0.3.12 h1:RRXI5RUdxaK6A46HrO0D2r14cRlW1lJRL6qyzqpVMPU=
+github.com/flyteorg/stow v0.3.12/go.mod h1:nyaBf8ZWkpHWkKIl4rqKI2uXfPx+VbL0PmEtvq4Pxkc=
 github.com/frankban/quicktest v1.14.4 h1:g2rn0vABPOOXmZUj+vbmUp0lPoXEMuhTpIluN0XL9UY=
 github.com/frankban/quicktest v1.14.4/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=

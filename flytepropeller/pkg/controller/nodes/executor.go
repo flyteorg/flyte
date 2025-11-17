@@ -79,6 +79,7 @@ type nodeMetrics struct {
 	// Measures the latency between the time a node's been queued to the time the handler reported the executable moved
 	// to running state
 	QueuingLatency         labeled.StopWatch
+	ParallelismWaitLatency labeled.StopWatch
 	NodeExecutionTime      labeled.StopWatch
 	NodeInputGatherLatency labeled.StopWatch
 
@@ -211,6 +212,14 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		}
 
 		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
+			parentNodeEndTime, err := GetParentNodeMaxEndTime(ctx, dag, nl, currentNode)
+			if err != nil {
+				logger.Warnf(ctx, "Failed to record parallelism wait latency for node. Error: %s", err.Error())
+			} else {
+				if !parentNodeEndTime.IsZero() {
+					c.metrics.ParallelismWaitLatency.Observe(ctx, parentNodeEndTime.Time, time.Now())
+				}
+			}
 			return interfaces.NodeStatusRunning, nil
 		}
 
@@ -1471,6 +1480,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		ResolutionFailure:              labeled.NewCounter("input_resolve_fail", "Indicates failure in resolving node inputs", nodeScope),
 		TransitionLatency:              labeled.NewStopWatch("transition_latency", "Measures the latency between the last parent node stoppedAt time and current node's queued time.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 		QueuingLatency:                 labeled.NewStopWatch("queueing_latency", "Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		ParallelismWaitLatency:         labeled.NewStopWatch("parallelism_wait_latency", "Measures the time a node spends waiting for a parallelism slot to become available.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 		NodeExecutionTime:              labeled.NewStopWatch("node_exec_latency", "Measures the time taken to execute one node, a node can be complex so it may encompass sub-node latency.", time.Microsecond, nodeScope, labeled.EmitUnlabeledMetric),
 		NodeInputGatherLatency:         labeled.NewStopWatch("node_input_latency", "Measures the latency to aggregate inputs and check readiness of a node", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 		catalogHitCount:                labeled.NewCounter("discovery_hit_count", "Task cached in Discovery", scope),
