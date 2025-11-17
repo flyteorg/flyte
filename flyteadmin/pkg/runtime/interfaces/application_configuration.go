@@ -217,9 +217,6 @@ func (a *ApplicationConfig) GetIdentityAnnotationPrefix() string {
 }
 
 func (a *ApplicationConfig) GetIdentityAnnotationKeys() []string {
-	if len(a.IdentityAnnotationKeys) == 0 {
-		return []string{"email", "sub"}
-	}
 	return a.IdentityAnnotationKeys
 }
 

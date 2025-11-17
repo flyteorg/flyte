@@ -6389,13 +6389,13 @@ func TestAddIdentityAnnotations(t *testing.T) {
 		assert.Equal(t, subject, result["flyte.ai/user-sub"])
 	})
 
-	t.Run("default prefix and keys", func(t *testing.T) {
+	t.Run("default prefix empty keys", func(t *testing.T) {
 		manager := ExecutionManager{config: setupConfig(true, "", nil)}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
 		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
 		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
-		assert.Equal(t, principal, result["flyte.org/user-email"])
-		assert.Equal(t, subject, result["flyte.org/user-sub"])
+		assert.NotContains(t, result, "flyte.org/user-email")
+		assert.Equal(t, "value", result["existing"])
 	})
 
 	t.Run("app identity", func(t *testing.T) {
