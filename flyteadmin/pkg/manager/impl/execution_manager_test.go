@@ -34,7 +34,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -5889,7 +5888,7 @@ func TestGetClusterAssignment(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
 		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
 
-		resourceManager := mocks.ResourceInterface{}
+		resourceManager := managerMocks.ResourceInterface{}
 		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 		executionManager := ExecutionManager{
 			resourceManager: &resourceManager,
@@ -5918,7 +5917,7 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 	t.Run("no value in DB nor in config, takes value from request", func(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
-		resourceManager := mocks.ResourceInterface{}
+		resourceManager := managerMocks.ResourceInterface{}
 		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 
 		executionManager := ExecutionManager{
@@ -5947,7 +5946,7 @@ func TestGetClusterAssignment(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
 		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
 
-		resourceManager := mocks.ResourceInterface{}
+		resourceManager := managerMocks.ResourceInterface{}
 		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 		executionManager := ExecutionManager{
 			resourceManager: &resourceManager,
@@ -5981,7 +5980,7 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 	t.Run("db error", func(t *testing.T) {
 		expected := errors.New("fail db")
-		resourceManager := mocks.ResourceInterface{}
+		resourceManager := managerMocks.ResourceInterface{}
 		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
@@ -6337,236 +6336,113 @@ func TestQueryTemplate(t *testing.T) {
 func TestAddIdentityAnnotations(t *testing.T) {
 	principal := "test-user@example.com"
 	subject := "user-123-subject"
-
-	t.Run("enabled with user context and multiple keys", func(t *testing.T) {
+	setupConfig := func(enabled bool, prefix string, keys []string) runtimeInterfaces.Configuration {
 		mockConfig := runtimeMocks.NewMockConfigurationProvider(
 			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "sub"}
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = enabled
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = prefix
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = keys
+		return mockConfig
+	}
 
-		manager := ExecutionManager{config: mockConfig}
-
+	t.Run("user identity", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
-		assert.Equal(t, "user-123-subject", result["flyte.ai/user-sub"])
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.Equal(t, principal, result["flyte.ai/user-email"])
+		assert.Equal(t, subject, result["flyte.ai/user-sub"])
 		assert.Equal(t, "value", result["existing"])
 	})
 
 	t.Run("disabled", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = false
-
-		manager := ExecutionManager{config: mockConfig}
-
+		manager := ExecutionManager{config: setupConfig(false, "flyte.ai", []string{"email", "sub"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
 		assert.NotContains(t, result, "flyte.ai/user-email")
-		assert.NotContains(t, result, "flyte.ai/user-sub")
 		assert.Equal(t, "value", result["existing"])
 	})
 
 	t.Run("no identity context", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-
-		manager := ExecutionManager{config: mockConfig}
-		ctx := context.Background()
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
+		result := manager.addIdentityAnnotations(context.Background(), map[string]string{"existing": "value"})
 		assert.NotContains(t, result, "flyte.ai/user-email")
-		assert.NotContains(t, result, "flyte.ai/user-sub")
 		assert.Equal(t, "value", result["existing"])
 	})
 
-	t.Run("enabled but only subject available", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "sub"}
-
-		manager := ExecutionManager{config: mockConfig}
-
-		// UserInfo with no email set (but NewIdentityContext will populate subject from userID)
-		userInfo := &service.UserInfoResponse{}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Email should not be present, but subject should be (auto-filled by NewIdentityContext)
-		assert.NotContains(t, result, "flyte.ai/user-email")
-		assert.Equal(t, "user-id-123", result["flyte.ai/user-sub"])
-		assert.Equal(t, "value", result["existing"])
-	})
-
-	t.Run("enabled with nil annotations map", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "sub"}
-
-		manager := ExecutionManager{config: mockConfig}
-
+	t.Run("nil annotations map", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, nil)
-
-		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
-		assert.Equal(t, "user-123-subject", result["flyte.ai/user-sub"])
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), nil)
+		assert.Equal(t, principal, result["flyte.ai/user-email"])
+		assert.Equal(t, subject, result["flyte.ai/user-sub"])
 	})
 
 	t.Run("annotation already exists", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "sub"}
-
-		manager := ExecutionManager{config: mockConfig}
-
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"flyte.ai/user-email": "existing@example.com"})
-
-		// Should preserve existing annotation value
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"flyte.ai/user-email": "existing@example.com"})
 		assert.Equal(t, "existing@example.com", result["flyte.ai/user-email"])
-		// Subject should still be added
-		assert.Equal(t, "user-123-subject", result["flyte.ai/user-sub"])
+		assert.Equal(t, subject, result["flyte.ai/user-sub"])
 	})
 
-	t.Run("uses default prefix and keys when not configured", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = ""
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = nil
-
-		manager := ExecutionManager{config: mockConfig}
-
+	t.Run("default prefix and keys", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "", nil)}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Should use default prefix "flyte.ai" and default keys ["email", "sub"]
-		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
-		assert.Equal(t, "user-123-subject", result["flyte.ai/user-sub"])
-		assert.Equal(t, "value", result["existing"])
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.Equal(t, principal, result["flyte.org/user-email"])
+		assert.Equal(t, subject, result["flyte.org/user-sub"])
 	})
 
-	t.Run("app identity with multiple keys", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "sub", "id"}
-
-		manager := ExecutionManager{config: mockConfig}
-
-		// App identity (no userInfo, but has appID)
-		identity, err := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Should use app prefix and app ID for all keys
+	t.Run("app identity", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub", "id"})}
+		identity, _ := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
 		assert.Equal(t, "app-123", result["flyte.ai/app-email"])
 		assert.Equal(t, "app-123", result["flyte.ai/app-sub"])
 		assert.Equal(t, "app-123", result["flyte.ai/app-id"])
-		assert.Equal(t, "value", result["existing"])
 	})
 
-	t.Run("only email key configured", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email"}
-
-		manager := ExecutionManager{config: mockConfig}
-
+	t.Run("unknown key", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "unknown-key"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Should only add email, not subject
-		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
-		assert.NotContains(t, result, "flyte.ai/user-sub")
-		assert.Equal(t, "value", result["existing"])
-	})
-
-	t.Run("app identity with unknown key", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "unknown-key"}
-
-		manager := ExecutionManager{config: mockConfig}
-
-		// App identity
-		identity, err := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Should only add email (known key), not unknown-key
-		assert.Equal(t, "app-123", result["flyte.ai/app-email"])
-		assert.NotContains(t, result, "flyte.ai/app-unknown-key")
-		assert.Equal(t, "value", result["existing"])
-	})
-
-	t.Run("user identity with unknown key", func(t *testing.T) {
-		mockConfig := runtimeMocks.NewMockConfigurationProvider(
-			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().InjectIdentityAnnotations = true
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationPrefix = "flyte.ai"
-		mockConfig.ApplicationConfiguration().GetTopLevelConfig().IdentityAnnotationKeys = []string{"email", "unknown-key"}
-
-		manager := ExecutionManager{config: mockConfig}
-
-		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
-		identity, err := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
-		assert.NoError(t, err)
-		ctx := identity.WithContext(context.Background())
-
-		result := manager.addIdentityAnnotations(ctx, map[string]string{"existing": "value"})
-
-		// Should only add email (known key), not unknown-key
-		assert.Equal(t, "test-user@example.com", result["flyte.ai/user-email"])
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.Equal(t, principal, result["flyte.ai/user-email"])
 		assert.NotContains(t, result, "flyte.ai/user-unknown-key")
+	})
+
+	t.Run("invalid prefix", func(t *testing.T) {
+		for _, prefix := range []string{"Flyte.ai", "flyte_ai"} {
+			manager := ExecutionManager{config: setupConfig(true, prefix, []string{"email", "sub"})}
+			userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
+			identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+			result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+			assert.NotContains(t, result, prefix+"/user-email")
+			assert.Equal(t, "value", result["existing"])
+		}
+	})
+
+	t.Run("empty value", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
+		userInfo := &service.UserInfoResponse{Email: "", Subject: ""}
+		identity, _ := auth.NewIdentityContext("", "", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.NotContains(t, result, "flyte.ai/user-email")
 		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("app takes precedence", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub", "id"})}
+		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "app-456", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.Equal(t, "app-456", result["flyte.ai/app-email"])
+		assert.NotContains(t, result, "flyte.ai/user-email")
 	})
 
 }

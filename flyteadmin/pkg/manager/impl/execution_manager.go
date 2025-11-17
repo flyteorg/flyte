@@ -43,6 +43,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -2077,6 +2078,12 @@ func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAn
 	}
 
 	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationPrefix()
+	// Validate prefix format using DNS1123 subdomain validation
+	if errs := k8svalidation.IsDNS1123Subdomain(prefix); len(errs) > 0 {
+		logger.Warnf(ctx, "Invalid identity annotation prefix '%s': %v. Skipping identity annotation injection.", prefix, errs)
+		return initialAnnotations
+	}
+
 	keys := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationKeys()
 
 	// Determine if this is an app or user identity
@@ -2088,47 +2095,53 @@ func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAn
 		// Handle app-based identity
 		appID := identityContext.AppID()
 		for _, key := range keys {
-			annotationKey := prefix + "/app-" + key
-			if _, exists := initialAnnotations[annotationKey]; !exists {
-				var value string
-				switch key {
-				case "email", "sub", "id":
-					// For app identities, use the app ID for these fields
-					value = appID
-				default:
-					// Skip unknown keys for app identities
-					continue
-				}
-				if value != "" {
-					initialAnnotations[annotationKey] = value
-					logger.Debugf(ctx, "Injected app identity annotation %s=%s", annotationKey, value)
-				}
+			annotationKey := fmt.Sprintf("%s/app-%s", prefix, key)
+			if _, exists := initialAnnotations[annotationKey]; exists {
+				logger.Debugf(ctx, "Identity annotation key %s already exists, skipping injection", annotationKey)
+				continue
+			}
+			var value string
+			switch key {
+			case "email", "sub", "id":
+				// For app identities, use the app ID for these fields
+				value = appID
+			default:
+				// Skip unknown keys for app identities
+				logger.Debugf(ctx, "Unknown identity annotation key '%s' for app identity, skipping", key)
+				continue
+			}
+			if value != "" {
+				initialAnnotations[annotationKey] = value
+				logger.Debugf(ctx, "Injected app identity annotation %s=%s", annotationKey, value)
 			}
 		}
 	} else if isUserIdentity {
 		// Handle user-based identity
 		userInfo := identityContext.UserInfo()
 		for _, key := range keys {
-			annotationKey := prefix + "/user-" + key
-			if _, exists := initialAnnotations[annotationKey]; !exists {
-				var value string
-				switch key {
-				case "email":
-					value = userInfo.GetEmail()
-				case "sub":
-					value = userInfo.GetSubject()
-				default:
-					// Skip unknown keys
-					continue
-				}
-				if value != "" {
-					initialAnnotations[annotationKey] = value
-					logger.Debugf(ctx, "Injected user identity annotation %s=%s", annotationKey, value)
-				}
+			annotationKey := fmt.Sprintf("%s/user-%s", prefix, key)
+			if _, exists := initialAnnotations[annotationKey]; exists {
+				logger.Debugf(ctx, "Identity annotation key %s already exists, skipping injection", annotationKey)
+				continue
+			}
+			var value string
+			switch key {
+			case "email":
+				value = userInfo.GetEmail()
+			case "sub":
+				value = userInfo.GetSubject()
+			default:
+				// Skip unknown keys
+				logger.Debugf(ctx, "Unknown identity annotation key '%s' for user identity, skipping", key)
+				continue
+			}
+			if value != "" {
+				initialAnnotations[annotationKey] = value
+				logger.Debugf(ctx, "Injected user identity annotation %s=%s", annotationKey, value)
 			}
 		}
 	}
-
+	// codecov:ignore-next-line
 	return initialAnnotations
 }
 

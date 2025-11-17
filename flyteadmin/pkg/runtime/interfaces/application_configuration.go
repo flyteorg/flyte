@@ -211,7 +211,7 @@ func (a *ApplicationConfig) GetInjectIdentityAnnotations() bool {
 
 func (a *ApplicationConfig) GetIdentityAnnotationPrefix() string {
 	if a.IdentityAnnotationPrefix == "" {
-		return "flyte.ai"
+		return "flyte.org"
 	}
 	return a.IdentityAnnotationPrefix
 }

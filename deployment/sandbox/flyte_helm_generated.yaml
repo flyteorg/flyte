@@ -298,7 +298,11 @@ data:
           - openid
     flyteadmin:
       eventVersion: 2
-      injectUserAnnotations: false
+      identityAnnotationKeys:
+      - email
+      - sub
+      identityAnnotationPrefix: flyte.ai
+      injectIdentityAnnotations: false
       metadataStoragePrefix:
       - metadata
       - admin
@@ -307,7 +311,6 @@ data:
       roleNameKey: iam.amazonaws.com/role
       testing:
         host: http://flyteadmin
-      userAnnotationPrefix: flyte.ai
     server:
       grpc:
         port: 8089
@@ -6733,7 +6736,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fe83495c82ad870691613547d3dcb8acaaec70e61a501843703aba7462d0afe"
+        configChecksum: "5e59d3a5b0cb1f226968c73582cad1560b566876677aceb8e00da58d1522770"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -7130,7 +7133,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fe83495c82ad870691613547d3dcb8acaaec70e61a501843703aba7462d0afe"
+        configChecksum: "5e59d3a5b0cb1f226968c73582cad1560b566876677aceb8e00da58d1522770"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -7225,7 +7228,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d9e51c3db52801ac4f5827ea5926b15cd5fcb9a86a0aa7598c448580ee87d60"
+        configChecksum: "3ac79fef4fa8dd35a9a3e084a33d71a98938d7c8c564257aa082de14683296a"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7303,7 +7306,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.2
       annotations:
-        configChecksum: "d9e51c3db52801ac4f5827ea5926b15cd5fcb9a86a0aa7598c448580ee87d60"
+        configChecksum: "3ac79fef4fa8dd35a9a3e084a33d71a98938d7c8c564257aa082de14683296a"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
