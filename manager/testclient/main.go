@@ -115,7 +115,11 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 		log.Printf("❌ Failed to start WatchRuns: %v", err)
 		return
 	}
-	defer stream.Close()
+	defer func() {
+		if err := stream.Close(); err != nil {
+			log.Printf("❌ Failed to close WatchRuns stream: %v", err)
+		}
+	}()
 
 	log.Println("✅ WatchRuns stream connected")
 
@@ -148,7 +152,11 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 		log.Printf("❌ Failed to start WatchActions: %v", err)
 		return
 	}
-	defer stream.Close()
+	defer func() {
+		if err := stream.Close(); err != nil {
+			log.Printf("❌ Failed to close WatchActions stream: %v", err)
+		}
+	}()
 
 	log.Println("✅ WatchActions stream connected")
 

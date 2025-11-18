@@ -667,7 +667,7 @@ func loadPackage(pkg string) (*types.Package, error) {
 	}
 
 	if len(loadedPkgs) == 0 {
-		return nil, fmt.Errorf("No packages loaded")
+		return nil, fmt.Errorf("no packages loaded")
 	}
 
 	targetPackage := loadedPkgs[0].Types

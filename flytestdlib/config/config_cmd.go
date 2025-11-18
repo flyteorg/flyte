@@ -59,14 +59,14 @@ func NewConfigCommand(accessorProvider AccessorProvider) *cobra.Command {
 		Short: "Generate configuration documentation in rst format",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sections := GetRootSection().GetSections()
-			orderedSectionKeys := sets.NewString()
+			orderedSectionKeys := sets.New[string]()
 			for s := range sections {
 				orderedSectionKeys.Insert(s)
 			}
 			printToc(orderedSectionKeys)
 			visitedSection := map[string]bool{}
 			visitedType := map[reflect.Type]bool{}
-			for _, sectionKey := range orderedSectionKeys.List() {
+			for _, sectionKey := range orderedSectionKeys.UnsortedList() {
 				if canPrint(sections[sectionKey].GetConfig()) {
 					printDocs(sectionKey, false, sections[sectionKey], visitedSection, visitedType)
 				}
@@ -148,11 +148,11 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 
 	if section != nil {
 		sections := section.GetSections()
-		orderedSectionKeys := sets.NewString()
+		orderedSectionKeys := sets.New[string]()
 		for s := range sections {
 			orderedSectionKeys.Insert(s)
 		}
-		for _, sectionKey := range orderedSectionKeys.List() {
+		for _, sectionKey := range orderedSectionKeys.UnsortedList() {
 			fieldName := sectionKey
 			fieldType := reflect.TypeOf(sections[sectionKey].GetConfig())
 			fieldTypeString := getFieldTypeString(fieldType)
@@ -162,19 +162,19 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 			printSection(fieldName, fieldTypeString, fieldDefaultValue, "", isSubsection)
 		}
 	}
-	orderedSectionKeys := sets.NewString()
+	orderedSectionKeys := sets.New[string]()
 	for s := range subsections {
 		orderedSectionKeys.Insert(s)
 	}
 
-	for _, sectionKey := range orderedSectionKeys.List() {
+	for _, sectionKey := range orderedSectionKeys.UnsortedList() {
 		printDocs(sectionKey, true, NewSection(subsections[sectionKey], nil), visitedSection, visitedType)
 	}
 }
 
 // Print Table of contents
-func printToc(orderedSectionKeys sets.String) {
-	for _, sectionKey := range orderedSectionKeys.List() {
+func printToc(orderedSectionKeys sets.Set[string]) {
+	for _, sectionKey := range orderedSectionKeys.UnsortedList() {
 		fmt.Printf("- `%s <#section-%s>`_\n\n", sectionKey, sectionKey)
 	}
 }

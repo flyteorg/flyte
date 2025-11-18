@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint:staticcheck // TODO: migrate to google.golang.org/protobuf/proto
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
