@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Go 1.21+ installed
+- Go 1.24+ installed
 - PostgreSQL 12+ (or Docker)
 
 ## Option 1: Quick Test (Recommended)

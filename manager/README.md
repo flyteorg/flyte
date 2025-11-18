@@ -19,7 +19,7 @@ The Flyte Manager is a unified binary that runs all Flyte services in a single p
 ### Prerequisites
 
 1. **Kubernetes cluster** (k3d, kind, minikube, or any cluster)
-2. **Go 1.21 or later**
+2. **Go 1.24 or later**
 3. **TaskAction CRD** installed in the cluster
 4. **Kubeconfig** configured (or running in-cluster)
 
