@@ -40,3 +40,9 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'gen/go/flyteidl2/service/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/cacheservice/mocks'
+
