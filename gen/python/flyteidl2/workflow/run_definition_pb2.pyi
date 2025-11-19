@@ -386,6 +386,6 @@ class TaskGroup(_message.Message):
     average_failure_rate: float
     average_duration: _duration_pb2.Duration
     latest_finished_time: _timestamp_pb2.Timestamp
-    created_by: _containers.RepeatedScalarFieldContainer[str]
+    created_by: _containers.RepeatedCompositeFieldContainer[_identity_pb2.EnrichedIdentity]
     should_delete: bool
-    def __init__(self, task_name: _Optional[str] = ..., environment_name: _Optional[str] = ..., total_runs: _Optional[int] = ..., latest_run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., recent_statuses: _Optional[_Iterable[_Union[Phase, str]]] = ..., average_failure_rate: _Optional[float] = ..., average_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., latest_finished_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Iterable[str]] = ..., should_delete: bool = ...) -> None: ...
+    def __init__(self, task_name: _Optional[str] = ..., environment_name: _Optional[str] = ..., total_runs: _Optional[int] = ..., latest_run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., recent_statuses: _Optional[_Iterable[_Union[Phase, str]]] = ..., average_failure_rate: _Optional[float] = ..., average_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., latest_finished_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Iterable[_Union[_identity_pb2.EnrichedIdentity, _Mapping]]] = ..., should_delete: bool = ...) -> None: ...
