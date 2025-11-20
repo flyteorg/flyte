@@ -1211,6 +1211,30 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "ray job start time",
+			rayJob: rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+					CreationTimestamp: metav1.Time{
+						Time: time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+					},
+				},
+				Status: rayv1.RayJobStatus{
+					JobId: "ray-job-1",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray job ID",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .PodRFC3339StartTime }}/{{ .PodUnixStartTime }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray job ID",
+					Uri:  "http://test/2024-01-01T12:00:00Z/1704110400",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
