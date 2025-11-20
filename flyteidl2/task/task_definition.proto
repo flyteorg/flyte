@@ -110,6 +110,9 @@ message TaskMetadata {
 
   // Brief overview of attached triggers if any.
   TaskTriggersSummary triggers_summary = 5;
+
+  // The short description for this task
+  string short_description = 6;
 }
 
 // Lightweight representation of a task.
@@ -119,6 +122,20 @@ message Task {
 
   // Metadata for this task.
   TaskMetadata metadata = 2 [(buf.validate.field).required = true];
+}
+
+// Link to source code used to define this entity
+message SourceCode {
+  string link = 1;
+}
+
+message DocumentationEntity {
+  // One-liner overview of the entity.
+  string short_description = 1 [(buf.validate.field).string.max_len = 255];
+  // Full user description with formatting preserved.
+  string long_description = 2 [(buf.validate.field).string.max_len = 2048];
+  // Optional link to source code used to define this entity.
+  SourceCode source_code = 3;
 }
 
 // Specification for a task.
@@ -137,6 +154,9 @@ message TaskSpec {
 
   // Optional environment for this task. Note, some tasks may not be run in the context of an environment.
   Environment environment = 4;
+
+  // The documentation entity for the task
+  DocumentationEntity documentation = 5;
 }
 
 // Specification for a trace action.
@@ -181,4 +201,7 @@ message TaskTriggerSpec {
 
   // The run spec for triggered task.
   flyteidl2.task.RunSpec run_spec = 3;
+
+  //  Optional description
+  string description = 4;
 }
