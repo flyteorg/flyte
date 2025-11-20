@@ -35,7 +35,7 @@ func (l leafNodeDAGStructure) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, err
 	return nil, fmt.Errorf("unknown Node ID [%s]", id)
 }
 
-func (l leafNodeDAGStructure) FromNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+func (l leafNodeDAGStructure) FromNode(v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	return []v1alpha1.NodeID{}, nil
 }
 

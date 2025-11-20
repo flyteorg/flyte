@@ -22,7 +22,6 @@ const (
 	EPhaseRetryableFailure
 	EPhaseSuccess
 	EPhaseTimedout
-	EPhaseFailing
 	EPhaseDynamicRunning
 	EPhaseRecovered
 )
@@ -182,10 +181,6 @@ func PhaseInfoFailure(kind core.ExecutionError_ErrorKind, code, reason string, i
 
 func PhaseInfoFailureErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
 	return phaseInfoFailed(EPhaseFailed, err, info)
-}
-
-func PhaseInfoFailingErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
-	return phaseInfoFailed(EPhaseFailing, err, info)
 }
 
 func PhaseInfoRetryableFailure(kind core.ExecutionError_ErrorKind, code, reason string, info *ExecutionInfo) PhaseInfo {

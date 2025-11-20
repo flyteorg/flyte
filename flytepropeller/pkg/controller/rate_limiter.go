@@ -103,7 +103,7 @@ func (r *dedupingBucketRateLimiter) When(item interface{}) time.Duration {
 	return r.reservations[item].Delay()
 }
 
-func (r *dedupingBucketRateLimiter) NumRequeues(item interface{}) int {
+func (r *dedupingBucketRateLimiter) NumRequeues(interface{}) int {
 	return 0
 }
 

@@ -10,7 +10,7 @@ type bufferedEventRecorder struct {
 	ev []pluginCore.PhaseInfo
 }
 
-func (b *bufferedEventRecorder) RecordRaw(ctx context.Context, ev pluginCore.PhaseInfo) error {
+func (b *bufferedEventRecorder) RecordRaw(_ context.Context, ev pluginCore.PhaseInfo) error {
 	b.ev = append(b.ev, ev)
 	return nil
 }

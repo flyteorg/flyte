@@ -159,7 +159,7 @@ func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.No
 	return executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), nil
 }
 
-func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
+func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow) (handler.Transition, error) {
 	originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
 	if failureNode := subworkflow.GetOnFailureNode(); failureNode != nil {
 		execContext, err := s.getExecutionContextForDownstream(nCtx)
@@ -229,9 +229,7 @@ func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx 
 			handler.PhaseInfoFailure(core.ExecutionError_UNKNOWN, "SubworkflowNodeFailing", "", nil)), nil
 	}
 
-	status := nCtx.NodeStatus()
-	nodeLookup := executors.NewNodeLookup(subWorkflow, status, subWorkflow)
-	return s.HandleFailureNodeOfSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
+	return s.HandleFailureNodeOfSubWorkflow(ctx, nCtx, subWorkflow)
 }
 
 func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {

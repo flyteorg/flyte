@@ -256,8 +256,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, config.LiteralOffloadingConfig{}, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -342,8 +341,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, config.LiteralOffloadingConfig{}, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -406,10 +404,8 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	catalogClient, err := catalog.NewCatalogClient(ctx, nil)
 	assert.NoError(b, err)
 	recoveryClient := &recoveryMocks.Client{}
-	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	handlerFactory := &nodemocks.HandlerFactory{}
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, scope)
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, scope)
 	assert.NoError(b, err)
 
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -510,7 +506,6 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	catalogClient, err := catalog.NewCatalogClient(ctx, nil)
 	assert.NoError(t, err)
 	recoveryClient := &recoveryMocks.Client{}
-	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 
 	h := &nodemocks.NodeHandler{}
 	h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -522,8 +517,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	handlerFactory.EXPECT().Setup(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.EXPECT().GetHandler(mock.Anything).Return(h, nil)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -627,8 +621,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, config.LiteralOffloadingConfig{}, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
 	assert.NoError(t, err)
@@ -686,7 +679,6 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	assert.NoError(t, err)
 	recoveryClient := &recoveryMocks.Client{}
 
-	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	h := &nodemocks.NodeHandler{}
 	h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	h.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
@@ -695,8 +687,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	handlerFactory := &nodemocks.HandlerFactory{}
 	handlerFactory.EXPECT().Setup(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.EXPECT().GetHandler(mock.Anything).Return(h, nil)
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, "s3://bucket", catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	t.Run("EventAlreadyInTerminalStateError", func(t *testing.T) {

@@ -19,34 +19,34 @@ var (
 	projectShardStrategy = &EnvironmentShardStrategy{
 		EnvType: Project,
 		PerShardIDs: [][]string{
-			[]string{"flytesnacks"},
-			[]string{"flytefoo", "flytebar"},
+			{"flytesnacks"},
+			{"flytefoo", "flytebar"},
 		},
 	}
 
 	projectShardStrategyWildcard = &EnvironmentShardStrategy{
 		EnvType: Project,
 		PerShardIDs: [][]string{
-			[]string{"flytesnacks"},
-			[]string{"flytefoo", "flytebar"},
-			[]string{"*"},
+			{"flytesnacks"},
+			{"flytefoo", "flytebar"},
+			{"*"},
 		},
 	}
 
 	domainShardStrategy = &EnvironmentShardStrategy{
 		EnvType: Domain,
 		PerShardIDs: [][]string{
-			[]string{"production"},
-			[]string{"foo", "bar"},
+			{"production"},
+			{"foo", "bar"},
 		},
 	}
 
 	domainShardStrategyWildcard = &EnvironmentShardStrategy{
 		EnvType: Domain,
 		PerShardIDs: [][]string{
-			[]string{"production"},
-			[]string{"foo", "bar"},
-			[]string{"*"},
+			{"production"},
+			{"foo", "bar"},
+			{"*"},
 		},
 	}
 )
@@ -89,7 +89,7 @@ func TestUpdatePodSpec(t *testing.T) {
 			for podIndex := 0; podIndex < tt.shardStrategy.GetPodCount(); podIndex++ {
 				podSpec := v1.PodSpec{
 					Containers: []v1.Container{
-						v1.Container{
+						{
 							Name: "flytepropeller",
 						},
 					},
@@ -119,7 +119,7 @@ func TestUpdatePodSpecInvalidPodIndex(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			podSpec := v1.PodSpec{
 				Containers: []v1.Container{
-					v1.Container{
+					{
 						Name: "flytepropeller",
 					},
 				},
@@ -151,7 +151,7 @@ func TestUpdatePodSpecInvalidPodSpec(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			podSpec := v1.PodSpec{
 				Containers: []v1.Container{
-					v1.Container{
+					{
 						Name: "flytefoo",
 					},
 				},

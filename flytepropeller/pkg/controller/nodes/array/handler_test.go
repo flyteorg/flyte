@@ -23,12 +23,10 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
-	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	recoverymocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -52,7 +50,6 @@ var (
 
 func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler interfaces.NodeHandler, dataStore *storage.DataStore, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// mock components
-	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
 	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
 	offloadingConfig := config.LiteralOffloadingConfig{Enabled: false}
@@ -60,14 +57,11 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	mockEventSink := eventmocks.NewMockEventSink()
 	mockHandlerFactory := &mocks.HandlerFactory{}
 	mockHandlerFactory.EXPECT().GetHandler(mock.Anything).Return(nodeHandler, nil)
-	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
-	mockSignalClient := &gatemocks.SignalServiceClient{}
 	noopCatalogClient := catalog.NOOPCatalog{}
 
 	// create node executor
-	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient,
-		adminClient, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
+	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, "s3://bucket/", noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockHandlerFactory, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
@@ -142,7 +136,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 	// InputReader
 	inputFilePaths := &pluginiomocks.InputFilePaths{}
-	inputFilePaths.EXPECT().GetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	inputFilePaths.EXPECT().GetInputPath().Return("s3://bucket/input")
 	nCtx.EXPECT().InputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,
@@ -191,8 +185,8 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		Time: nowMinus,
 	}
 	nCtx.EXPECT().NodeStatus().Return(&v1alpha1.NodeStatus{
-		DataDir:              storage.DataReference("s3://bucket/data"),
-		OutputDir:            storage.DataReference("s3://bucket/output"),
+		DataDir:              "s3://bucket/data",
+		OutputDir:            "s3://bucket/output",
 		LastAttemptStartedAt: &metav1NowMinus,
 		StartedAt:            &metav1NowMinus,
 	})
@@ -215,7 +209,7 @@ func TestAbort(t *testing.T) {
 		{
 			name: "Aborted after failed",
 			inputMap: map[string][]int64{
-				"foo": []int64{0, 1, 2},
+				"foo": {0, 1, 2},
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
@@ -226,7 +220,7 @@ func TestAbort(t *testing.T) {
 		{
 			name: "Aborted while running",
 			inputMap: map[string][]int64{
-				"foo": []int64{0, 1, 2},
+				"foo": {0, 1, 2},
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
@@ -340,7 +334,7 @@ func TestFinalize(t *testing.T) {
 		{
 			name: "Success",
 			inputMap: map[string][]int64{
-				"foo": []int64{0, 1, 2},
+				"foo": {0, 1, 2},
 			},
 			subNodePhases:         []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:     []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
@@ -540,11 +534,11 @@ type fakeEventRecorder struct {
 	recordTaskEventCallCount int
 }
 
-func (f *fakeEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (f *fakeEventRecorder) RecordNodeEvent(context.Context, *event.NodeExecutionEvent, *config.EventConfig) error {
 	return nil
 }
 
-func (f *fakeEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+func (f *fakeEventRecorder) RecordTaskEvent(_ context.Context, event *event.TaskExecutionEvent, _ *config.EventConfig) error {
 	f.recordTaskEventCallCount++
 	if f.phaseVersionFailures == 0 || event.GetPhaseVersion() < f.phaseVersionFailures {
 		return f.taskErr
@@ -563,8 +557,8 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 	// initialize universal variables
 	inputMap := map[string][]int64{
-		"foo": []int64{0, 1},
-		"bar": []int64{2, 3},
+		"foo": {0, 1},
+		"bar": {2, 3},
 	}
 	literalMap := convertMapToArrayLiterals(inputMap)
 
@@ -1120,8 +1114,8 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 	ctx := context.Background()
 
 	inputValues := map[string][]int64{
-		"foo": []int64{1},
-		"bar": []int64{2},
+		"foo": {1},
+		"bar": {2},
 	}
 	literalMap := convertMapToArrayLiterals(inputValues)
 
@@ -1311,7 +1305,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 				outputFile := storage.DataReference(fmt.Sprintf("s3://bucket/output/%d/0/outputs.pb", i))
 				outputLiteralMap := &idlcore.LiteralMap{
 					Literals: map[string]*idlcore.Literal{
-						test.outputVariable: &idlcore.Literal{
+						test.outputVariable: {
 							Value: &idlcore.Literal_Scalar{
 								Scalar: &idlcore.Scalar{
 									Value: &idlcore.Scalar_Primitive{

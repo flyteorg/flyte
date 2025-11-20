@@ -41,7 +41,7 @@ var (
 			},
 			Spec: v1.PodSpec{
 				Containers: []v1.Container{
-					v1.Container{
+					{
 						Command: []string{"flytepropeller"},
 						Args:    []string{"--config", "/etc/flyte/config/*.yaml"},
 					},

@@ -571,17 +571,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -615,17 +615,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -675,17 +675,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "b"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "B"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -751,17 +751,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "b"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "B"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -853,17 +853,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "b"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "B"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -929,17 +929,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "d"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "D"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1015,17 +1015,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1056,17 +1056,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1112,7 +1112,7 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{
@@ -1122,10 +1122,10 @@ func TestMapCasting(t *testing.T) {
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "B"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1200,17 +1200,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1259,17 +1259,17 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "A"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{
@@ -1303,7 +1303,7 @@ func TestMapCasting(t *testing.T) {
 				},
 				Metadata: &structpb.Struct{
 					Fields: map[string]*structpb2.Value{
-						"required": &structpb.Value{
+						"required": {
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
 									Values: []*structpb.Value{
@@ -1313,10 +1313,10 @@ func TestMapCasting(t *testing.T) {
 								},
 							},
 						},
-						"title": &structpb.Value{
+						"title": {
 							Kind: &structpb.Value_StringValue{StringValue: "B"},
 						},
-						"properties": &structpb.Value{
+						"properties": {
 							Kind: &structpb.Value_StructValue{
 								StructValue: &structpb.Struct{
 									Fields: map[string]*structpb.Value{

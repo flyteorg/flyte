@@ -31,5 +31,5 @@ func (s *NodeQ) Deque() v1alpha1.NodeID {
 }
 
 func NewNodeNameQ(items ...v1alpha1.NodeID) NodeQ {
-	return NodeQ(items)
+	return items
 }

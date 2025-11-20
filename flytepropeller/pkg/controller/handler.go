@@ -206,7 +206,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] Stale.", namespace, name)
 			return nil
 		}
-		logger.Warningf(ctx, "Failed to GetWorkflow, retrying with back-off", fetchErr)
+		logger.Warningf(ctx, "Failed to GetWorkflow, retrying with back-off: %v", fetchErr)
 		return fetchErr
 	}
 

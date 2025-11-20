@@ -47,7 +47,3 @@ type RedisConfig struct {
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
-
-func SetConfig(cfg *Config) error {
-	return configSection.SetConfig(cfg)
-}

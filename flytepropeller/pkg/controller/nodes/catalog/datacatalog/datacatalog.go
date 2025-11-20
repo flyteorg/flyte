@@ -151,7 +151,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 func (m *CatalogClient) createDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
 	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
-		logger.Errorf(ctx, "DataCatalog failed to generate dataset for ID: %s, err: %s", key.Identifier, err)
+		logger.Errorf(ctx, "DataCatalog failed to generate dataset for ID: %v, err: %s", key.Identifier, err)
 		return nil, err
 	}
 
@@ -164,7 +164,7 @@ func (m *CatalogClient) createDataset(ctx context.Context, key catalog.Key, meta
 	if err != nil {
 		logger.Debugf(ctx, "Create dataset %v return err %v", datasetID, err)
 		if status.Code(err) == codes.AlreadyExists {
-			logger.Debugf(ctx, "Create Dataset for ID %s already exists", key.Identifier)
+			logger.Debugf(ctx, "Create Dataset for ID %v already exists", key.Identifier)
 		} else {
 			logger.Errorf(ctx, "Unable to create dataset %s, err: %s", datasetID, err)
 			return nil, err

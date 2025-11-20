@@ -78,11 +78,11 @@ func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskEx
 	return pluginCore.UnknownTransition, nil
 }
 
-func (n NextPhaseStatePlugin) Abort(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
+func (n NextPhaseStatePlugin) Abort(context.Context, pluginCore.TaskExecutionContext) error {
 	return nil
 }
 
-func (n NextPhaseStatePlugin) Finalize(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
+func (n NextPhaseStatePlugin) Finalize(context.Context, pluginCore.TaskExecutionContext) error {
 	return nil
 }
 

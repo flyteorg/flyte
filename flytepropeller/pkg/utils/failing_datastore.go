@@ -11,34 +11,34 @@ import (
 type FailingRawStore struct {
 }
 
-func (FailingRawStore) CopyRaw(ctx context.Context, source, destination storage.DataReference, opts storage.Options) error {
+func (FailingRawStore) CopyRaw(context.Context, storage.DataReference, storage.DataReference, storage.Options) error {
 	return fmt.Errorf("failed to copy raw")
 }
 
-func (FailingRawStore) CreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) (storage.SignedURLResponse, error) {
+func (FailingRawStore) CreateSignedURL(context.Context, storage.DataReference, storage.SignedURLProperties) (storage.SignedURLResponse, error) {
 	return storage.SignedURLResponse{}, fmt.Errorf("failed to create signed url")
 }
 
-func (FailingRawStore) GetBaseContainerFQN(ctx context.Context) storage.DataReference {
+func (FailingRawStore) GetBaseContainerFQN(context.Context) storage.DataReference {
 	return ""
 }
 
-func (FailingRawStore) Head(ctx context.Context, reference storage.DataReference) (storage.Metadata, error) {
+func (FailingRawStore) Head(context.Context, storage.DataReference) (storage.Metadata, error) {
 	return nil, fmt.Errorf("failed metadata fetch")
 }
 
-func (FailingRawStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+func (FailingRawStore) List(context.Context, storage.DataReference, int, storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
 	return nil, storage.NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
-func (FailingRawStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
+func (FailingRawStore) ReadRaw(context.Context, storage.DataReference) (io.ReadCloser, error) {
 	return nil, fmt.Errorf("failed read raw")
 }
 
-func (FailingRawStore) WriteRaw(ctx context.Context, reference storage.DataReference, size int64, opts storage.Options, raw io.Reader) error {
+func (FailingRawStore) WriteRaw(context.Context, storage.DataReference, int64, storage.Options, io.Reader) error {
 	return fmt.Errorf("failed write raw")
 }
 
-func (FailingRawStore) Delete(ctx context.Context, reference storage.DataReference) error {
+func (FailingRawStore) Delete(context.Context, storage.DataReference) error {
 	return fmt.Errorf("failed to delete")
 }

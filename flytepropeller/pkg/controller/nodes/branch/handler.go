@@ -45,7 +45,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil
 		}
-		finalNodeID, err := DecideBranch(ctx, nl, nCtx.NodeID(), branchNode, nodeInputs)
+		finalNodeID, err := DecideBranch(ctx, nl, branchNode, nodeInputs)
 		if err != nil {
 			ec, ok := stdErrors.GetErrorCode(err)
 			if ok {

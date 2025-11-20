@@ -126,11 +126,11 @@ func (d *dummyBaseWorkflow) GetSecurityContext() core.SecurityContext {
 	return core.SecurityContext{}
 }
 
-func (d *dummyBaseWorkflow) GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error) {
+func (d *dummyBaseWorkflow) GetTask(v1alpha1.TaskID) (v1alpha1.ExecutableTask, error) {
 	return nil, nil
 }
 
-func (d *dummyBaseWorkflow) FindSubWorkflow(subID v1alpha1.WorkflowID) v1alpha1.ExecutableSubWorkflow {
+func (d *dummyBaseWorkflow) FindSubWorkflow(v1alpha1.WorkflowID) v1alpha1.ExecutableSubWorkflow {
 	return nil
 }
 
