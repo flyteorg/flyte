@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// Specifies sort ordering in a list request.
+message Sort {
+  enum Direction {
+    // By default, fields are sorted in descending order.
+    DESCENDING = 0;
+    ASCENDING = 1;
+  }
+
+  // Indicates an attribute to sort the response values.
+  // +required
+  string key = 1;
+
+  // Indicates the direction to apply sort key for response values.
+  // +optional
+  Direction direction = 2;
+}
+
+message ListRequest {
+  // Indicates the number of resources to be returned.
+  // +required
+  uint32 limit = 1;
+
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query.
+  // +optional
+  string token = 2;
+
+  // Deprecated, use sort_by_fields instead.
+  // Specifies how listed entities should be sorted in the response.
+  // +optional
+  Sort sort_by = 3 [deprecated = true];
+
+  // Indicates a list of filters. This field is used for grpc get requests.
+  // +optional
+  repeated Filter filters = 4;
+
+  // Indicates a raw list of filters passed as string.This field is used for REST get requests
+  // +optional
+  repeated string raw_filters = 5;
+
+  // Specifies how listed entities should be sorted in the response.
+  // Sort fields are applied in order.
+  // +optional
+  repeated Sort sort_by_fields = 6;
+}
+
+message Filter {
+  enum Function {
+    EQUAL = 0;
+    NOT_EQUAL = 1;
+    GREATER_THAN = 2;
+    GREATER_THAN_OR_EQUAL = 3;
+    LESS_THAN = 4;
+    LESS_THAN_OR_EQUAL = 5;
+    CONTAINS = 6; // Case sensitive contains function.
+    VALUE_IN = 7;
+
+    // NOT_CONTAINS = 8;
+    // VALUE_NOT_IN = 9;
+    // STARTS_WITH = 10;
+    // NOT_STARTS_WITH = 11;
+
+    ENDS_WITH = 12;
+    NOT_ENDS_WITH = 13;
+    CONTAINS_CASE_INSENSITIVE = 14; // Case insensitive contains function.
+  }
+
+  Function function = 1;
+
+  // e.g. name or version
+  string field = 2;
+
+  // Only in the case of a VALUE_IN function, values may contain multiple entries.
+  repeated string values = 3;
+}
