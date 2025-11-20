@@ -1,14 +1,14 @@
 package yamlutils
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
 )
 
 func ReadYamlFileAsJSON(path string) ([]byte, error) {
-	r, err := ioutil.ReadFile(filepath.Clean(path))
+	r, err := os.ReadFile(filepath.Clean(path))
 	if err != nil {
 		return nil, err
 	}
