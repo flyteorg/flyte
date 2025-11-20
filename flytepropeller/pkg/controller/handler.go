@@ -104,7 +104,31 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
 	maxRetries := uint32(p.cfg.MaxWorkflowRetries) // #nosec G115
-	if !mutableW.GetDeletionTimestamp().IsZero() || mutableW.Status.FailedAttempts > maxRetries {
+	if mutableW.Status.FailedAttempts == maxRetries {
+		var err error
+		_ = controllerutil.AddFinalizer(mutableW, Finalizer)
+		SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
+
+		func() {
+			t := p.metrics.RawWorkflowTraversalTime.Start(ctx)
+			defer func() {
+				t.Stop()
+				if r := recover(); r != nil {
+					stack := debug.Stack()
+					err = fmt.Errorf("panic when reconciling workflow, Stack: [%s]", string(stack))
+					logger.Errorf(ctx, err.Error())
+					p.metrics.PanicObserved.Inc(ctx)
+				}
+			}()
+			err = p.workflowExecutor.HandleFlyteWorkflow(ctx, mutableW)
+		}()
+		if err != nil {
+			logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]",
+				err, reflect.TypeOf(err))
+			p.metrics.SystemError.Inc(ctx)
+			return nil, err
+		}
+	} else if !mutableW.GetDeletionTimestamp().IsZero() || mutableW.Status.FailedAttempts > maxRetries {
 		var err error
 		func() {
 			defer func() {
