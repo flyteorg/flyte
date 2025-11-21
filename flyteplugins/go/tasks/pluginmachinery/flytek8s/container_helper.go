@@ -305,12 +305,7 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 	}
 	container.Args = modifiedArgs
 
-	// The flyteconsole url is added based on the `IncludeConsoleURL` bit set via the task template
-	consoleURL := ""
-	if parameters.IncludeConsoleURL {
-		consoleURL = parameters.TaskExecMetadata.GetConsoleURL()
-	}
-	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, container.EnvFrom, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID(), consoleURL)
+	container.Env, container.EnvFrom = DecorateEnvVars(ctx, parameters, container.Env, container.EnvFrom)
 
 	// Sanitize base container GPU resource requirements
 	// Overrides for extendedResources have already been applied at this point

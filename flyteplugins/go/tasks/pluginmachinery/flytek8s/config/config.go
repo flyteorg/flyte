@@ -139,6 +139,7 @@ var (
 		UpdateBaseBackoffDuration:          10,
 		UpdateBackoffRetries:               5,
 		AddTolerationsForExtendedResources: []string{},
+		NamespacedNamePrefixTemplate:       "{{ project }}-{{ domain }}-",
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -300,6 +301,10 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// NamespacedNamePrefixTemplate is the template for generating INTERNAL_APP_ENDPOINT_PATTERN env var.
+	// Example: "{{ project }}-{{ domain }}-"
+	NamespacedNamePrefixTemplate string `json:"namespaced-name-prefix-template" pflag:",Template for internal app endpoint pattern (e.g., {{ project }}-{{ domain }}-)"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

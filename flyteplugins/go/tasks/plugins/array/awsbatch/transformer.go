@@ -55,31 +55,23 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	}
 
 	inputReader := array.GetInputReader(tCtx, taskTemplate)
-	cmd, err := template.Render(
-		ctx,
-		taskTemplate.GetContainer().GetCommand(),
-		template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           inputReader,
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		})
+	parameters := template.Parameters{
+		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:           inputReader,
+		OutputPath:       tCtx.OutputWriter(),
+		Task:             tCtx.TaskReader(),
+	}
+
+	cmd, err := template.Render(ctx, taskTemplate.GetContainer().GetCommand(), parameters)
 	if err != nil {
 		return nil, err
 	}
-	args, err := template.Render(ctx, taskTemplate.GetContainer().GetArgs(),
-		template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           inputReader,
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		})
-	taskTemplate.GetContainer().GetEnv()
+	args, err := template.Render(ctx, taskTemplate.GetContainer().GetArgs(), parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
+	envVars := getEnvVarsForTask(ctx, parameters, taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
 
 	// compile resources
 	res, err := flytek8s.ToK8sResourceRequirements(taskTemplate.GetContainer().GetResources())
@@ -142,9 +134,9 @@ func UpdateBatchInputForArray(_ context.Context, batchInput *batch.SubmitJobInpu
 	return batchInput
 }
 
-func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, containerEnvVars []*core.KeyValuePair,
+func getEnvVarsForTask(ctx context.Context, parameters template.Parameters, containerEnvVars []*core.KeyValuePair,
 	defaultEnvVars map[string]string) []v1.EnvVar {
-	envVars, _ := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), nil, nil, execID, "")
+	envVars, _ := flytek8s.DecorateEnvVars(ctx, parameters, flytek8s.ToK8sEnvVar(containerEnvVars), nil)
 	m := make(map[string]string, len(envVars))
 	for _, envVar := range envVars {
 		m[envVar.Name] = envVar.Value

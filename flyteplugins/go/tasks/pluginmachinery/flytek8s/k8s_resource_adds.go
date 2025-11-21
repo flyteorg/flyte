@@ -11,13 +11,16 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/namespaceutils"
 )
 
 const (
-	flyteExecutionURL = "FLYTE_EXECUTION_URL"
+	flyteExecutionURL          = "FLYTE_EXECUTION_URL"
+	internalAppEndpointPattern = "INTERNAL_APP_ENDPOINT_PATTERN"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
@@ -154,12 +157,36 @@ func GetLiteralOffloadingEnvVars() []v1.EnvVar {
 	return envVars
 }
 
-func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.EnvFromSource, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID, consoleURL string) ([]v1.EnvVar, []v1.EnvFromSource) {
-	envVars = append(envVars, GetContextEnvVars(ctx)...)
-	envVars = append(envVars, GetExecutionEnvVars(id, consoleURL)...)
-	envVars = append(envVars, GetLiteralOffloadingEnvVars()...)
+func GetServingEnvVars(id pluginsCore.TaskExecutionID, namespace string) []v1.EnvVar {
+	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.ExecutionId == nil {
+		return []v1.EnvVar{}
+	}
 
-	for k, v := range taskEnvironmentVariables {
+	nodeExecutionID := id.GetID().NodeExecutionId.ExecutionId
+	prefixTmpl := config.GetK8sPluginConfig().NamespacedNamePrefixTemplate
+	prefix := namespaceutils.GetNamespaceName(prefixTmpl, nodeExecutionID.Org, nodeExecutionID.Project, nodeExecutionID.Domain)
+
+	return []v1.EnvVar{
+		{
+			Name:  internalAppEndpointPattern,
+			Value: fmt.Sprintf("http://%s.%s.svc.cluster.local", namespaceutils.GetNameWithNamespacedPrefix(prefix, "{app_fqdn}"), namespace),
+		},
+	}
+}
+
+func DecorateEnvVars(ctx context.Context, parameters template.Parameters, envVars []v1.EnvVar, envFroms []v1.EnvFromSource) ([]v1.EnvVar, []v1.EnvFromSource) {
+	// The flyteconsole url is added based on the `IncludeConsoleURL` bit set via the task template
+	consoleURL := ""
+	if parameters.IncludeConsoleURL {
+		consoleURL = parameters.TaskExecMetadata.GetConsoleURL()
+	}
+
+	envVars = append(envVars, GetContextEnvVars(ctx)...)
+	envVars = append(envVars, GetExecutionEnvVars(parameters.TaskExecMetadata.GetTaskExecutionID(), consoleURL)...)
+	envVars = append(envVars, GetLiteralOffloadingEnvVars()...)
+	envVars = append(envVars, GetServingEnvVars(parameters.TaskExecMetadata.GetTaskExecutionID(), parameters.TaskExecMetadata.GetNamespace())...)
+
+	for k, v := range parameters.TaskExecMetadata.GetEnvironmentVariables() {
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})
 	}
 	for k, v := range config.GetK8sPluginConfig().DefaultEnvVars {

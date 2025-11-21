@@ -8,15 +8,20 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
+
+const testTaskExecName = "task-exec-name"
 
 func TestGetExecutionEnvVars(t *testing.T) {
 	mock := mockTaskExecutionIdentifier{}
@@ -66,6 +71,61 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		if tt.expectedEnvVar != nil {
 			assert.True(t, proto.Equal(&envVars[5], tt.expectedEnvVar))
 		}
+	}
+}
+
+func TestGetServingEnvVars(t *testing.T) {
+	tests := []struct {
+		name           string
+		id             pluginsCore.TaskExecutionID
+		prefixTemplate string
+		namespace      string
+		expectedValue  string
+	}{
+		{
+			name:           "nil-id",
+			id:             nil,
+			prefixTemplate: "{{ project }}-{{ domain }}-",
+			namespace:      "test-ns",
+			expectedValue:  "",
+		},
+		{
+			name:           "project-domain",
+			id:             mockTaskExecutionIdentifier{},
+			prefixTemplate: "{{ project }}-{{ domain }}-",
+			namespace:      "test-ns",
+			expectedValue:  "http://proj-domain-{app_fqdn}.test-ns.svc.cluster.local",
+		},
+		{
+			name:           "with-org",
+			id:             mockTaskExecutionIdentifier{},
+			prefixTemplate: "{{ org }}-{{ project }}-{{ domain }}-",
+			namespace:      "prod-ns",
+			expectedValue:  "http://org-proj-domain-{app_fqdn}.prod-ns.svc.cluster.local",
+		},
+		{
+			name:           "empty-prefix-template",
+			id:             mockTaskExecutionIdentifier{},
+			prefixTemplate: "",
+			namespace:      "default",
+			expectedValue:  "http://{app_fqdn}.default.svc.cluster.local",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				NamespacedNamePrefixTemplate: tt.prefixTemplate,
+			}))
+			envVars := GetServingEnvVars(tt.id, tt.namespace)
+			if tt.expectedValue == "" {
+				assert.Empty(t, envVars)
+			} else {
+				assert.Len(t, envVars, 1)
+				assert.Equal(t, "INTERNAL_APP_ENDPOINT_PATTERN", envVars[0].Name)
+				assert.Equal(t, tt.expectedValue, envVars[0].Value)
+			}
+		})
 	}
 }
 
@@ -253,6 +313,7 @@ var testTaskExecutionIdentifier = core.TaskExecutionIdentifier{
 	NodeExecutionId: &core.NodeExecutionIdentifier{
 		NodeId: "nodeId",
 		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Org:     "org",
 			Project: "proj",
 			Domain:  "domain",
 			Name:    "name",
@@ -267,11 +328,11 @@ func (m mockTaskExecutionIdentifier) GetID() core.TaskExecutionIdentifier {
 }
 
 func (m mockTaskExecutionIdentifier) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
-	return "task-exec-name", nil
+	return testTaskExecName, nil
 }
 
 func (m mockTaskExecutionIdentifier) GetGeneratedName() string {
-	return "task-exec-name"
+	return testTaskExecName
 }
 
 func (m mockTaskExecutionIdentifier) GetUniqueNodeID() string {
@@ -303,10 +364,20 @@ func TestDecorateEnvVars(t *testing.T) {
 	}
 	defer os.Setenv("value", originalEnvVal)
 
+	// Set up config with default prefix template for serving env vars
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		NamespacedNamePrefixTemplate: "{{ project }}-{{ domain }}-",
+	}))
+
+	testNamespace := "test-namespace"
 	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
 	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	// Offloading env vars come before serving env vars
 	expectedOffloaded := append(expected, v12.EnvVar{Name: "_F_L_MIN_SIZE_MB", Value: "1"})
 	expectedOffloaded = append(expectedOffloaded, v12.EnvVar{Name: "_F_L_MAX_SIZE_MB", Value: "42"})
+	expectedOffloaded = append(expectedOffloaded, GetServingEnvVars(mockTaskExecutionIdentifier{}, testNamespace)...)
+	// For non-offloaded case
+	expected = append(expected, GetServingEnvVars(mockTaskExecutionIdentifier{}, testNamespace)...)
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
 	type args struct {
@@ -390,12 +461,27 @@ func TestDecorateEnvVars(t *testing.T) {
 			}
 
 			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-				DefaultEnvVars:        tt.additionEnvVar,
-				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
+				DefaultEnvVars:               tt.additionEnvVar,
+				DefaultEnvVarsFromEnv:        tt.additionEnvVarFromEnv,
+				NamespacedNamePrefixTemplate: "{{ project }}-{{ domain }}-",
 			}))
-			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, nil, tt.executionEnvVar, tt.args.id, tt.consoleURL); !reflect.DeepEqual(got, tt.want) {
+
+			// Create mock TaskExecutionMetadata
+			mockMeta := &mocks.TaskExecutionMetadata{}
+			mockMeta.On("GetTaskExecutionID").Return(tt.args.id)
+			mockMeta.On("GetNamespace").Return(testNamespace)
+			mockMeta.On("GetEnvironmentVariables").Return(tt.executionEnvVar)
+			mockMeta.On("GetConsoleURL").Return(tt.consoleURL).Maybe()
+
+			parameters := template.Parameters{
+				TaskExecMetadata:  mockMeta,
+				IncludeConsoleURL: tt.consoleURL != "",
+			}
+
+			if got, _ := DecorateEnvVars(ctx, parameters, tt.args.envVars, nil); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
 			}
+			mock.AssertExpectationsForObjects(t, mockMeta)
 		})
 	}
 }

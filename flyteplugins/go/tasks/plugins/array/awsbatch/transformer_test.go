@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -163,6 +164,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	tMetadata.OnGetTaskExecutionID().Return(id)
 	tMetadata.OnGetOverrides().Return(to)
 	tMetadata.OnGetPlatformResources().Return(&v12.ResourceRequirements{})
+	tMetadata.OnGetEnvironmentVariables().Return(nil)
 
 	ir := &mocks2.InputReader{}
 	ir.OnGetInputPath().Return("inputs.pb")
@@ -219,13 +221,23 @@ func Test_getEnvVarsForTask(t *testing.T) {
 	id.OnGetGeneratedName().Return("Job_Name")
 	id.OnGetID().Return(core.TaskExecutionIdentifier{})
 
+	mockMeta := &mocks.TaskExecutionMetadata{}
+	mockMeta.On("GetTaskExecutionID").Return(id)
+	mockMeta.On("GetNamespace").Return("test-namespace")
+	mockMeta.On("GetEnvironmentVariables").Return(map[string]string(nil))
+	mockMeta.On("GetConsoleURL").Return("").Maybe()
+
 	assert.NoError(t, flyteK8sConfig.SetK8sPluginConfig(&flyteK8sConfig.K8sPluginConfig{
 		DefaultEnvVars: map[string]string{
 			"MyKey": "BadVal",
 		},
 	}))
 
-	envVars := getEnvVarsForTask(ctx, id, nil, map[string]string{
+	parameters := template.Parameters{
+		TaskExecMetadata: mockMeta,
+	}
+
+	envVars := getEnvVarsForTask(ctx, parameters, nil, map[string]string{
 		"MyKey": "MyVal",
 	})
 
