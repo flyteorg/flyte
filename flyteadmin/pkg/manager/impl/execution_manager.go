@@ -2141,7 +2141,6 @@ func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAn
 			}
 		}
 	}
-	// codecov:ignore-next-line
 	return initialAnnotations
 }
 

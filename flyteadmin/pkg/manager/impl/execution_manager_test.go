@@ -6407,6 +6407,23 @@ func TestAddIdentityAnnotations(t *testing.T) {
 		assert.Equal(t, "app-123", result["flyte.ai/app-id"])
 	})
 
+	t.Run("app identity annotation already exists", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub", "id"})}
+		identity, _ := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"flyte.ai/app-email": "existing-app@example.com"})
+		assert.Equal(t, "existing-app@example.com", result["flyte.ai/app-email"])
+		assert.Equal(t, "app-123", result["flyte.ai/app-sub"])
+		assert.Equal(t, "app-123", result["flyte.ai/app-id"])
+	})
+
+	t.Run("app identity unknown key", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "unknown-key"})}
+		identity, _ := auth.NewIdentityContext("", "", "app-123", time.Now(), sets.NewString(), nil, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.Equal(t, "app-123", result["flyte.ai/app-email"])
+		assert.NotContains(t, result, "flyte.ai/app-unknown-key")
+	})
+
 	t.Run("unknown key", func(t *testing.T) {
 		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "unknown-key"})}
 		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
@@ -6443,6 +6460,28 @@ func TestAddIdentityAnnotations(t *testing.T) {
 		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
 		assert.Equal(t, "app-456", result["flyte.ai/app-email"])
 		assert.NotContains(t, result, "flyte.ai/user-email")
+	})
+
+	t.Run("empty keys slice", func(t *testing.T) {
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{})}
+		userInfo := &service.UserInfoResponse{Email: principal, Subject: subject}
+		identity, _ := auth.NewIdentityContext("", "user-id-123", "", time.Now(), sets.NewString(), userInfo, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		assert.NotContains(t, result, "flyte.ai/user-email")
+		assert.Equal(t, "value", result["existing"])
+	})
+
+	t.Run("neither app nor user identity", func(t *testing.T) {
+		// Test case where identity context is not empty but neither app nor user identity is true
+		// This can happen if there's an execution identity but no app ID or user info
+		manager := ExecutionManager{config: setupConfig(true, "flyte.ai", []string{"email", "sub"})}
+		// Create identity with execution identity but no app ID or user info
+		identity, _ := auth.NewIdentityContext("exec-identity-123", "", "", time.Now(), sets.NewString(), nil, nil)
+		result := manager.addIdentityAnnotations(identity.WithContext(context.Background()), map[string]string{"existing": "value"})
+		// Should return original annotations unchanged since neither app nor user identity is true
+		assert.NotContains(t, result, "flyte.ai/user-email")
+		assert.NotContains(t, result, "flyte.ai/app-email")
+		assert.Equal(t, "value", result["existing"])
 	})
 
 }
