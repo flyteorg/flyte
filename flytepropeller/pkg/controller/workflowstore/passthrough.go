@@ -2,9 +2,12 @@ package workflowstore
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -64,7 +67,12 @@ func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha
 		if kubeerrors.IsConflict(err) {
 			p.metrics.workflowUpdateConflictCount.Inc()
 		}
-		if kubeerrors.IsRequestEntityTooLargeError(err) {
+		// Check for request too large errors from both K8s API server and etcd
+		// We check both the error type and string because the error might lose its type
+		// information when propagated through the Kubernetes API server
+		if kubeerrors.IsRequestEntityTooLargeError(err) ||
+			errors.Is(err, rpctypes.ErrRequestTooLarge) ||
+			strings.Contains(err.Error(), "etcdserver: request is too large") {
 			p.metrics.workflowTooLarge.Inc()
 			return nil, ErrWorkflowToLarge
 		}
