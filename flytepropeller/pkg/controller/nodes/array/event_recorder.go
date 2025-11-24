@@ -216,10 +216,11 @@ func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, e
 
 	existingExternalResourcesMap := make(map[uint32]*events.ExternalResourceInfo)
 	for _, resource := range existingExternalResources {
-		existingExternalResourcesMap[resource.Index] = resource
+		existingExternalResourcesMap[resource.GetIndex()] = resource
 	}
 
 	for index, subNodePhase := range subNodePhases {
+		// #nosec G115
 		if existingResource, exists := existingExternalResourcesMap[uint32(index)]; exists {
 			updatedExternalResources = append(updatedExternalResources, existingResource)
 			continue
@@ -231,12 +232,12 @@ func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, e
 		// instead of having retries to ensure subnodes are updated while running, subnodes could potentially
 		// in rare cases drop fields such as logs.
 
-		nodePhase := v1alpha1.NodePhase(subNodePhase)
+		nodePhase := v1alpha1.NodePhase(subNodePhase) // #nosec G115
 		nodeExecutionPhase := mapNodePhaseToNodeExecutionPhase(nodePhase)
 		// Note: this shouldn't happen as the lengths should always match
 		var retryAttempt uint32
 		if index < len(subNodeRetryAttempts) {
-			retryAttempt = uint32(subNodeRetryAttempts[index])
+			retryAttempt = uint32(subNodeRetryAttempts[index]) // #nosec G115
 		}
 		externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
 		if err != nil {
@@ -245,8 +246,8 @@ func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, e
 		updatedExternalResources = append(updatedExternalResources, &events.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Phase:        mapNodeExecutionPhaseToTaskExecutionPhase(nodeExecutionPhase),
-			Index:        uint32(index),
-			RetryAttempt: retryAttempt,
+			Index:        uint32(index), // #nosec G115
+			RetryAttempt: retryAttempt,  // #nosec G115
 		})
 	}
 

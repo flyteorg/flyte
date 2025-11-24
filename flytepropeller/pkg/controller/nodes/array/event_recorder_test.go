@@ -337,7 +337,7 @@ func TestUpdateExternalResourceSubnodePhases(t *testing.T) {
 				assert.NoError(t, err)
 
 				for i, phase := range test.subNodePhases {
-					subNodePhasesArray.SetItem(i, bitarray.Item(phase))
+					subNodePhasesArray.SetItem(i, bitarray.Item(phase)) // #nosec G115
 				}
 				for i, retryAttempt := range test.subNodeRetryAttempts {
 					subNodeRetryAttemptsArray.SetItem(i, bitarray.Item(retryAttempt))
