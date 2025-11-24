@@ -237,6 +237,14 @@
       ],
       "default": "UNKNOWN"
     },
+    "WatchGroupsRequestKnownSortField": {
+      "type": "object",
+      "properties": {
+        "latest_created_at": {
+          "$ref": "#/definitions/SortDirection"
+        }
+      }
+    },
     "commonActionIdentifier": {
       "type": "object",
       "properties": {

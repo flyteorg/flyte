@@ -208,16 +208,23 @@ class AbortActionResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class WatchGroupsRequest(_message.Message):
-    __slots__ = ["project_id", "start_date", "end_date", "request"]
+    __slots__ = ["project_id", "start_date", "end_date", "request", "known_sort_fields"]
+    class KnownSortField(_message.Message):
+        __slots__ = ["latest_created_at"]
+        LATEST_CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+        latest_created_at: _list_pb2.Sort.Direction
+        def __init__(self, latest_created_at: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ...) -> None: ...
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     START_DATE_FIELD_NUMBER: _ClassVar[int]
     END_DATE_FIELD_NUMBER: _ClassVar[int]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
+    KNOWN_SORT_FIELDS_FIELD_NUMBER: _ClassVar[int]
     project_id: _identifier_pb2.ProjectIdentifier
     start_date: _timestamp_pb2.Timestamp
     end_date: _timestamp_pb2.Timestamp
     request: _list_pb2.ListRequest
-    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., start_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ...) -> None: ...
+    known_sort_fields: _containers.RepeatedCompositeFieldContainer[WatchGroupsRequest.KnownSortField]
+    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., start_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., known_sort_fields: _Optional[_Iterable[_Union[WatchGroupsRequest.KnownSortField, _Mapping]]] = ...) -> None: ...
 
 class WatchGroupsResponse(_message.Message):
     __slots__ = ["task_groups", "sentinel"]
