@@ -21,6 +21,14 @@ type arrayEventRecorder struct {
 	mock.Mock
 }
 
+type arrayEventRecorder_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *arrayEventRecorder) EXPECT() *arrayEventRecorder_Expecter {
+	return &arrayEventRecorder_Expecter{mock: &_m.Mock}
+}
+
 // RecordNodeEvent provides a mock function with given fields: ctx, _a1, eventConfig
 func (_m *arrayEventRecorder) RecordNodeEvent(ctx context.Context, _a1 *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
 	ret := _m.Called(ctx, _a1, eventConfig)
@@ -37,6 +45,36 @@ func (_m *arrayEventRecorder) RecordNodeEvent(ctx context.Context, _a1 *event.No
 	}
 
 	return r0
+}
+
+// arrayEventRecorder_RecordNodeEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RecordNodeEvent'
+type arrayEventRecorder_RecordNodeEvent_Call struct {
+	*mock.Call
+}
+
+// RecordNodeEvent is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 *event.NodeExecutionEvent
+//   - eventConfig *config.EventConfig
+func (_e *arrayEventRecorder_Expecter) RecordNodeEvent(ctx interface{}, _a1 interface{}, eventConfig interface{}) *arrayEventRecorder_RecordNodeEvent_Call {
+	return &arrayEventRecorder_RecordNodeEvent_Call{Call: _e.mock.On("RecordNodeEvent", ctx, _a1, eventConfig)}
+}
+
+func (_c *arrayEventRecorder_RecordNodeEvent_Call) Run(run func(ctx context.Context, _a1 *event.NodeExecutionEvent, eventConfig *config.EventConfig)) *arrayEventRecorder_RecordNodeEvent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*event.NodeExecutionEvent), args[2].(*config.EventConfig))
+	})
+	return _c
+}
+
+func (_c *arrayEventRecorder_RecordNodeEvent_Call) Return(_a0 error) *arrayEventRecorder_RecordNodeEvent_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *arrayEventRecorder_RecordNodeEvent_Call) RunAndReturn(run func(context.Context, *event.NodeExecutionEvent, *config.EventConfig) error) *arrayEventRecorder_RecordNodeEvent_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // RecordTaskEvent provides a mock function with given fields: ctx, _a1, eventConfig
@@ -57,6 +95,36 @@ func (_m *arrayEventRecorder) RecordTaskEvent(ctx context.Context, _a1 *event.Ta
 	return r0
 }
 
+// arrayEventRecorder_RecordTaskEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RecordTaskEvent'
+type arrayEventRecorder_RecordTaskEvent_Call struct {
+	*mock.Call
+}
+
+// RecordTaskEvent is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 *event.TaskExecutionEvent
+//   - eventConfig *config.EventConfig
+func (_e *arrayEventRecorder_Expecter) RecordTaskEvent(ctx interface{}, _a1 interface{}, eventConfig interface{}) *arrayEventRecorder_RecordTaskEvent_Call {
+	return &arrayEventRecorder_RecordTaskEvent_Call{Call: _e.mock.On("RecordTaskEvent", ctx, _a1, eventConfig)}
+}
+
+func (_c *arrayEventRecorder_RecordTaskEvent_Call) Run(run func(ctx context.Context, _a1 *event.TaskExecutionEvent, eventConfig *config.EventConfig)) *arrayEventRecorder_RecordTaskEvent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*event.TaskExecutionEvent), args[2].(*config.EventConfig))
+	})
+	return _c
+}
+
+func (_c *arrayEventRecorder_RecordTaskEvent_Call) Return(_a0 error) *arrayEventRecorder_RecordTaskEvent_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *arrayEventRecorder_RecordTaskEvent_Call) RunAndReturn(run func(context.Context, *event.TaskExecutionEvent, *config.EventConfig) error) *arrayEventRecorder_RecordTaskEvent_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // finalize provides a mock function with given fields: ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError
 func (_m *arrayEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *core.ExecutionError) error {
 	ret := _m.Called(ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError)
@@ -73,6 +141,39 @@ func (_m *arrayEventRecorder) finalize(ctx context.Context, nCtx interfaces.Node
 	}
 
 	return r0
+}
+
+// arrayEventRecorder_finalize_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'finalize'
+type arrayEventRecorder_finalize_Call struct {
+	*mock.Call
+}
+
+// finalize is a helper method to define mock.On call
+//   - ctx context.Context
+//   - nCtx interfaces.NodeExecutionContext
+//   - taskPhase core.TaskExecution_Phase
+//   - taskPhaseVersion uint32
+//   - eventConfig *config.EventConfig
+//   - arrayNodeExecutionError *core.ExecutionError
+func (_e *arrayEventRecorder_Expecter) finalize(ctx interface{}, nCtx interface{}, taskPhase interface{}, taskPhaseVersion interface{}, eventConfig interface{}, arrayNodeExecutionError interface{}) *arrayEventRecorder_finalize_Call {
+	return &arrayEventRecorder_finalize_Call{Call: _e.mock.On("finalize", ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError)}
+}
+
+func (_c *arrayEventRecorder_finalize_Call) Run(run func(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *core.ExecutionError)) *arrayEventRecorder_finalize_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(interfaces.NodeExecutionContext), args[2].(core.TaskExecution_Phase), args[3].(uint32), args[4].(*config.EventConfig), args[5].(*core.ExecutionError))
+	})
+	return _c
+}
+
+func (_c *arrayEventRecorder_finalize_Call) Return(_a0 error) *arrayEventRecorder_finalize_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *arrayEventRecorder_finalize_Call) RunAndReturn(run func(context.Context, interfaces.NodeExecutionContext, core.TaskExecution_Phase, uint32, *config.EventConfig, *core.ExecutionError) error) *arrayEventRecorder_finalize_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // finalizeRequired provides a mock function with given fields: ctx
@@ -93,6 +194,34 @@ func (_m *arrayEventRecorder) finalizeRequired(ctx context.Context) bool {
 	return r0
 }
 
+// arrayEventRecorder_finalizeRequired_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'finalizeRequired'
+type arrayEventRecorder_finalizeRequired_Call struct {
+	*mock.Call
+}
+
+// finalizeRequired is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *arrayEventRecorder_Expecter) finalizeRequired(ctx interface{}) *arrayEventRecorder_finalizeRequired_Call {
+	return &arrayEventRecorder_finalizeRequired_Call{Call: _e.mock.On("finalizeRequired", ctx)}
+}
+
+func (_c *arrayEventRecorder_finalizeRequired_Call) Run(run func(ctx context.Context)) *arrayEventRecorder_finalizeRequired_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *arrayEventRecorder_finalizeRequired_Call) Return(_a0 bool) *arrayEventRecorder_finalizeRequired_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *arrayEventRecorder_finalizeRequired_Call) RunAndReturn(run func(context.Context) bool) *arrayEventRecorder_finalizeRequired_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // process provides a mock function with given fields: ctx, nCtx, index, retryAttempt
 func (_m *arrayEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
 	ret := _m.Called(ctx, nCtx, index, retryAttempt)
@@ -109,6 +238,37 @@ func (_m *arrayEventRecorder) process(ctx context.Context, nCtx interfaces.NodeE
 	}
 
 	return r0
+}
+
+// arrayEventRecorder_process_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'process'
+type arrayEventRecorder_process_Call struct {
+	*mock.Call
+}
+
+// process is a helper method to define mock.On call
+//   - ctx context.Context
+//   - nCtx interfaces.NodeExecutionContext
+//   - index int
+//   - retryAttempt uint32
+func (_e *arrayEventRecorder_Expecter) process(ctx interface{}, nCtx interface{}, index interface{}, retryAttempt interface{}) *arrayEventRecorder_process_Call {
+	return &arrayEventRecorder_process_Call{Call: _e.mock.On("process", ctx, nCtx, index, retryAttempt)}
+}
+
+func (_c *arrayEventRecorder_process_Call) Run(run func(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32)) *arrayEventRecorder_process_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(interfaces.NodeExecutionContext), args[2].(int), args[3].(uint32))
+	})
+	return _c
+}
+
+func (_c *arrayEventRecorder_process_Call) Return(_a0 error) *arrayEventRecorder_process_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *arrayEventRecorder_process_Call) RunAndReturn(run func(context.Context, interfaces.NodeExecutionContext, int, uint32) error) *arrayEventRecorder_process_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // newArrayEventRecorder creates a new instance of arrayEventRecorder. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
