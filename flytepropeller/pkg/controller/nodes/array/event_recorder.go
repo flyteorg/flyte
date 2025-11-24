@@ -245,7 +245,11 @@ func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, e
 
 		nodePhase := v1alpha1.NodePhase(subNodePhase)
 		nodeExecutionPhase := mapNodePhaseToNodeExecutionPhase(nodePhase)
-		retryAttempt := uint32(subNodeRetryAttempts[index])
+		// Note: this shouldn't happen as the lengths should always match
+		var retryAttempt uint32
+		if index < len(subNodeRetryAttempts) {
+			retryAttempt = uint32(subNodeRetryAttempts[index])
+		}
 		externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
 		if err != nil {
 			return nil, err
