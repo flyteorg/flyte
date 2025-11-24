@@ -76,6 +76,8 @@ message Filter {
   // e.g. name or version
   string field = 2;
 
+  // ONLY ONE of the following value fields should be set.
   // Only in the case of a VALUE_IN function, values may contain multiple entries.
   repeated string values = 3;
+  repeated int32 int_values = 4;
 }

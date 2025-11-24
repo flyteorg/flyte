@@ -95,7 +95,7 @@ buf-python:
 	@$(MAKE) sep
 
 .PHONY: buf
-buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
+buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check mocks
 	@echo '🛠️  Finished generating all protocol buffer files (local)'
 	@$(MAKE) sep
 

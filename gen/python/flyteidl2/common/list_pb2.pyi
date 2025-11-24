@@ -37,7 +37,7 @@ class ListRequest(_message.Message):
     def __init__(self, limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ..., filters: _Optional[_Iterable[_Union[Filter, _Mapping]]] = ..., raw_filters: _Optional[_Iterable[str]] = ..., sort_by_fields: _Optional[_Iterable[_Union[Sort, _Mapping]]] = ...) -> None: ...
 
 class Filter(_message.Message):
-    __slots__ = ["function", "field", "values"]
+    __slots__ = ["function", "field", "values", "int_values"]
     class Function(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         EQUAL: _ClassVar[Filter.Function]
@@ -65,7 +65,9 @@ class Filter(_message.Message):
     FUNCTION_FIELD_NUMBER: _ClassVar[int]
     FIELD_FIELD_NUMBER: _ClassVar[int]
     VALUES_FIELD_NUMBER: _ClassVar[int]
+    INT_VALUES_FIELD_NUMBER: _ClassVar[int]
     function: Filter.Function
     field: str
     values: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, function: _Optional[_Union[Filter.Function, str]] = ..., field: _Optional[str] = ..., values: _Optional[_Iterable[str]] = ...) -> None: ...
+    int_values: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, function: _Optional[_Union[Filter.Function, str]] = ..., field: _Optional[str] = ..., values: _Optional[_Iterable[str]] = ..., int_values: _Optional[_Iterable[int]] = ...) -> None: ...
