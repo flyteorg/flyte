@@ -26,7 +26,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/task_definition.proto.
  */
 export const file_flyteidl2_task_task_definition: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvdGFzay90YXNrX2RlZmluaXRpb24ucHJvdG8SDmZseXRlaWRsMi50YXNrInMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgm6SAZyBBABGD8izwIKE1Rhc2tUcmlnZ2Vyc1N1bW1hcnkSRQoHZGV0YWlscxgDIAEoCzIyLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2Vyc1N1bW1hcnkuVHJpZ2dlckRldGFpbHNIABJBCgVzdGF0cxgCIAEoCzIwLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2Vyc1N1bW1hcnkuVHJpZ2dlclN0YXRzSAAabgoOVHJpZ2dlckRldGFpbHMSDAoEbmFtZRgBIAEoCRIOCgZhY3RpdmUYAiABKAgSPgoPYXV0b21hdGlvbl9zcGVjGAMgASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjGi0KDFRyaWdnZXJTdGF0cxINCgV0b3RhbBgBIAEoDRIOCgZhY3RpdmUYAiABKA1CCQoHc3VtbWFyeUoECAEQAiKQAgoMVGFza01ldGFkYXRhEj8KC2RlcGxveWVkX2J5GAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5Qga6SAPIAQESEgoKc2hvcnRfbmFtZRgCIAEoCRI3CgtkZXBsb3llZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBARIYChBlbnZpcm9ubWVudF9uYW1lGAQgASgJEj0KEHRyaWdnZXJzX3N1bW1hcnkYBSABKAsyIy5mbHl0ZWlkbDIudGFzay5UYXNrVHJpZ2dlcnNTdW1tYXJ5EhkKEXNob3J0X2Rlc2NyaXB0aW9uGAYgASgJIncKBFRhc2sSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQESNgoIbWV0YWRhdGEYAiABKAsyHC5mbHl0ZWlkbDIudGFzay5UYXNrTWV0YWRhdGFCBrpIA8gBASIaCgpTb3VyY2VDb2RlEgwKBGxpbmsYASABKAkijwEKE0RvY3VtZW50YXRpb25FbnRpdHkSIwoRc2hvcnRfZGVzY3JpcHRpb24YASABKAlCCLpIBXIDGP8BEiIKEGxvbmdfZGVzY3JpcHRpb24YAiABKAlCCLpIBXIDGIAQEi8KC3NvdXJjZV9jb2RlGAMgASgLMhouZmx5dGVpZGwyLnRhc2suU291cmNlQ29kZSKKAgoIVGFza1NwZWMSOwoNdGFza190ZW1wbGF0ZRgBIAEoCzIcLmZseXRlaWRsMi5jb3JlLlRhc2tUZW1wbGF0ZUIGukgDyAEBEjYKDmRlZmF1bHRfaW5wdXRzGAIgAygLMh4uZmx5dGVpZGwyLnRhc2suTmFtZWRQYXJhbWV0ZXISGwoKc2hvcnRfbmFtZRgDIAEoCUIHukgEcgIYPxIwCgtlbnZpcm9ubWVudBgEIAEoCzIbLmZseXRlaWRsMi50YXNrLkVudmlyb25tZW50EjoKDWRvY3VtZW50YXRpb24YBSABKAsyIy5mbHl0ZWlkbDIudGFzay5Eb2N1bWVudGF0aW9uRW50aXR5Ij4KCVRyYWNlU3BlYxIxCglpbnRlcmZhY2UYASABKAsyHi5mbHl0ZWlkbDIuY29yZS5UeXBlZEludGVyZmFjZSKuAQoLVGFza0RldGFpbHMSNwoHdGFza19pZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyQga6SAPIAQESNgoIbWV0YWRhdGEYAiABKAsyHC5mbHl0ZWlkbDIudGFzay5UYXNrTWV0YWRhdGFCBrpIA8gBARIuCgRzcGVjGAMgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNCBrpIA8gBASKeAQoLVGFza1RyaWdnZXISGAoEbmFtZRgBIAEoCUIKukgHcgUQARj/ARI1CgRzcGVjGAIgASgLMh8uZmx5dGVpZGwyLnRhc2suVGFza1RyaWdnZXJTcGVjQga6SAPIAQESPgoPYXV0b21hdGlvbl9zcGVjGAMgASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjIokBCg9UYXNrVHJpZ2dlclNwZWMSDgoGYWN0aXZlGAEgASgIEiYKBmlucHV0cxgCIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0cxIpCghydW5fc3BlYxgDIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSEwoLZGVzY3JpcHRpb24YBCABKAlCuAEKEmNvbS5mbHl0ZWlkbDIudGFza0ITVGFza0RlZmluaXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_interface, file_flyteidl2_core_tasks, file_flyteidl2_task_common, file_flyteidl2_task_environment, file_flyteidl2_task_run, file_google_protobuf_timestamp]);
+  fileDesc("CiRmbHl0ZWlkbDIvdGFzay90YXNrX2RlZmluaXRpb24ucHJvdG8SDmZseXRlaWRsMi50YXNrInMKCFRhc2tOYW1lEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIpUBCg5UYXNrSWRlbnRpZmllchIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIaCgd2ZXJzaW9uGAUgASgJQgm6SAZyBBABGD8izwIKE1Rhc2tUcmlnZ2Vyc1N1bW1hcnkSRQoHZGV0YWlscxgDIAEoCzIyLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2Vyc1N1bW1hcnkuVHJpZ2dlckRldGFpbHNIABJBCgVzdGF0cxgCIAEoCzIwLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2Vyc1N1bW1hcnkuVHJpZ2dlclN0YXRzSAAabgoOVHJpZ2dlckRldGFpbHMSDAoEbmFtZRgBIAEoCRIOCgZhY3RpdmUYAiABKAgSPgoPYXV0b21hdGlvbl9zcGVjGAMgASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjGi0KDFRyaWdnZXJTdGF0cxINCgV0b3RhbBgBIAEoDRIOCgZhY3RpdmUYAiABKA1CCQoHc3VtbWFyeUoECAEQAiJ3ChBMYXRlc3RSdW5TdW1tYXJ5Eg4KBnJ1bl9pZBgBIAEoCRIsCghydW5fdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFcGhhc2UYAyABKAkSFgoOcm9vdF90YXNrX25hbWUYBCABKAkikAIKDFRhc2tNZXRhZGF0YRI/CgtkZXBsb3llZF9ieRgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eUIGukgDyAEBEhIKCnNob3J0X25hbWUYAiABKAkSNwoLZGVwbG95ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQESGAoQZW52aXJvbm1lbnRfbmFtZRgEIAEoCRI9ChB0cmlnZ2Vyc19zdW1tYXJ5GAUgASgLMiMuZmx5dGVpZGwyLnRhc2suVGFza1RyaWdnZXJzU3VtbWFyeRIZChFzaG9ydF9kZXNjcmlwdGlvbhgGIAEoCSLBAQoEVGFzaxI3Cgd0YXNrX2lkGAEgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJCBrpIA8gBARI2CghtZXRhZGF0YRgCIAEoCzIcLmZseXRlaWRsMi50YXNrLlRhc2tNZXRhZGF0YUIGukgDyAEBEjkKCmxhdGVzdF9ydW4YAyABKAsyIC5mbHl0ZWlkbDIudGFzay5MYXRlc3RSdW5TdW1tYXJ5SACIAQFCDQoLX2xhdGVzdF9ydW4iGgoKU291cmNlQ29kZRIMCgRsaW5rGAEgASgJIo8BChNEb2N1bWVudGF0aW9uRW50aXR5EiMKEXNob3J0X2Rlc2NyaXB0aW9uGAEgASgJQgi6SAVyAxj/ARIiChBsb25nX2Rlc2NyaXB0aW9uGAIgASgJQgi6SAVyAxiAEBIvCgtzb3VyY2VfY29kZRgDIAEoCzIaLmZseXRlaWRsMi50YXNrLlNvdXJjZUNvZGUiigIKCFRhc2tTcGVjEjsKDXRhc2tfdGVtcGxhdGUYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5UYXNrVGVtcGxhdGVCBrpIA8gBARI2Cg5kZWZhdWx0X2lucHV0cxgCIAMoCzIeLmZseXRlaWRsMi50YXNrLk5hbWVkUGFyYW1ldGVyEhsKCnNob3J0X25hbWUYAyABKAlCB7pIBHICGD8SMAoLZW52aXJvbm1lbnQYBCABKAsyGy5mbHl0ZWlkbDIudGFzay5FbnZpcm9ubWVudBI6Cg1kb2N1bWVudGF0aW9uGAUgASgLMiMuZmx5dGVpZGwyLnRhc2suRG9jdW1lbnRhdGlvbkVudGl0eSI+CglUcmFjZVNwZWMSMQoJaW50ZXJmYWNlGAEgASgLMh4uZmx5dGVpZGwyLmNvcmUuVHlwZWRJbnRlcmZhY2UirgEKC1Rhc2tEZXRhaWxzEjcKB3Rhc2tfaWQYASABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckIGukgDyAEBEjYKCG1ldGFkYXRhGAIgASgLMhwuZmx5dGVpZGwyLnRhc2suVGFza01ldGFkYXRhQga6SAPIAQESLgoEc3BlYxgDIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjQga6SAPIAQEingEKC1Rhc2tUcmlnZ2VyEhgKBG5hbWUYASABKAlCCrpIB3IFEAEY/wESNQoEc3BlYxgCIAEoCzIfLmZseXRlaWRsMi50YXNrLlRhc2tUcmlnZ2VyU3BlY0IGukgDyAEBEj4KD2F1dG9tYXRpb25fc3BlYxgDIAEoCzIlLmZseXRlaWRsMi50YXNrLlRyaWdnZXJBdXRvbWF0aW9uU3BlYyKJAQoPVGFza1RyaWdnZXJTcGVjEg4KBmFjdGl2ZRgBIAEoCBImCgZpbnB1dHMYAiABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSKQoIcnVuX3NwZWMYAyABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjEhMKC2Rlc2NyaXB0aW9uGAQgASgJQrgBChJjb20uZmx5dGVpZGwyLnRhc2tCE1Rhc2tEZWZpbml0aW9uUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_interface, file_flyteidl2_core_tasks, file_flyteidl2_task_common, file_flyteidl2_task_environment, file_flyteidl2_task_run, file_google_protobuf_timestamp]);
 
 /**
  * Name of a task. It may have multiple versions deployed.
@@ -198,6 +198,51 @@ export const TaskTriggersSummary_TriggerStatsSchema: GenMessage<TaskTriggersSumm
   messageDesc(file_flyteidl2_task_task_definition, 2, 1);
 
 /**
+ * LatestRunSummary contains minimal information about the most recent run of a task.
+ * This is a lightweight summary that avoids circular dependencies with workflow package.
+ *
+ * @generated from message flyteidl2.task.LatestRunSummary
+ */
+export type LatestRunSummary = Message<"flyteidl2.task.LatestRunSummary"> & {
+  /**
+   * Run identifier (run ID/name)
+   *
+   * @generated from field: string run_id = 1;
+   */
+  runId: string;
+
+  /**
+   * Last run time
+   *
+   * @generated from field: google.protobuf.Timestamp run_time = 2;
+   */
+  runTime?: Timestamp;
+
+  /**
+   * Phase of the last run as a string representing workflow.Phase (e.g.,
+   * "PHASE_SUCCEEDED", "PHASE_FAILED", "PHASE_RUNNING"). Avoid circular
+   * dependency with workflow.Phase enum.
+   *
+   * @generated from field: string phase = 3;
+   */
+  phase: string;
+
+  /**
+   * Name of the root task of the last run (env.task name)
+   *
+   * @generated from field: string root_task_name = 4;
+   */
+  rootTaskName: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.LatestRunSummary.
+ * Use `create(LatestRunSummarySchema)` to create a new message.
+ */
+export const LatestRunSummarySchema: GenMessage<LatestRunSummary> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_task_definition, 3);
+
+/**
  * TaskMetadata is static, lightweight metadata about a task.
  *
  * @generated from message flyteidl2.task.TaskMetadata
@@ -251,7 +296,7 @@ export type TaskMetadata = Message<"flyteidl2.task.TaskMetadata"> & {
  * Use `create(TaskMetadataSchema)` to create a new message.
  */
 export const TaskMetadataSchema: GenMessage<TaskMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 3);
+  messageDesc(file_flyteidl2_task_task_definition, 4);
 
 /**
  * Lightweight representation of a task.
@@ -272,6 +317,13 @@ export type Task = Message<"flyteidl2.task.Task"> & {
    * @generated from field: flyteidl2.task.TaskMetadata metadata = 2;
    */
   metadata?: TaskMetadata;
+
+  /**
+   * Summary of the latest run for this task, if any
+   *
+   * @generated from field: optional flyteidl2.task.LatestRunSummary latest_run = 3;
+   */
+  latestRun?: LatestRunSummary;
 };
 
 /**
@@ -279,7 +331,7 @@ export type Task = Message<"flyteidl2.task.Task"> & {
  * Use `create(TaskSchema)` to create a new message.
  */
 export const TaskSchema: GenMessage<Task> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 4);
+  messageDesc(file_flyteidl2_task_task_definition, 5);
 
 /**
  * Link to source code used to define this entity
@@ -298,7 +350,7 @@ export type SourceCode = Message<"flyteidl2.task.SourceCode"> & {
  * Use `create(SourceCodeSchema)` to create a new message.
  */
 export const SourceCodeSchema: GenMessage<SourceCode> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 5);
+  messageDesc(file_flyteidl2_task_task_definition, 6);
 
 /**
  * @generated from message flyteidl2.task.DocumentationEntity
@@ -331,7 +383,7 @@ export type DocumentationEntity = Message<"flyteidl2.task.DocumentationEntity"> 
  * Use `create(DocumentationEntitySchema)` to create a new message.
  */
 export const DocumentationEntitySchema: GenMessage<DocumentationEntity> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 6);
+  messageDesc(file_flyteidl2_task_task_definition, 7);
 
 /**
  * Specification for a task.
@@ -383,7 +435,7 @@ export type TaskSpec = Message<"flyteidl2.task.TaskSpec"> & {
  * Use `create(TaskSpecSchema)` to create a new message.
  */
 export const TaskSpecSchema: GenMessage<TaskSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 7);
+  messageDesc(file_flyteidl2_task_task_definition, 8);
 
 /**
  * Specification for a trace action.
@@ -404,7 +456,7 @@ export type TraceSpec = Message<"flyteidl2.task.TraceSpec"> & {
  * Use `create(TraceSpecSchema)` to create a new message.
  */
 export const TraceSpecSchema: GenMessage<TraceSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 8);
+  messageDesc(file_flyteidl2_task_task_definition, 9);
 
 /**
  * Detailed information about a task.
@@ -439,7 +491,7 @@ export type TaskDetails = Message<"flyteidl2.task.TaskDetails"> & {
  * Use `create(TaskDetailsSchema)` to create a new message.
  */
 export const TaskDetailsSchema: GenMessage<TaskDetails> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 9);
+  messageDesc(file_flyteidl2_task_task_definition, 10);
 
 /**
  * Contains details about a single trigger attached to a task. Should only be used in DeployTask endpoint.
@@ -470,7 +522,7 @@ export type TaskTrigger = Message<"flyteidl2.task.TaskTrigger"> & {
  * Use `create(TaskTriggerSchema)` to create a new message.
  */
 export const TaskTriggerSchema: GenMessage<TaskTrigger> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 10);
+  messageDesc(file_flyteidl2_task_task_definition, 11);
 
 /**
  * TaskTriggerSpec this is a copy of TriggerSpec without mandatory 'task_version' field.
@@ -513,5 +565,5 @@ export type TaskTriggerSpec = Message<"flyteidl2.task.TaskTriggerSpec"> & {
  * Use `create(TaskTriggerSpecSchema)` to create a new message.
  */
 export const TaskTriggerSpecSchema: GenMessage<TaskTriggerSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_task_definition, 11);
+  messageDesc(file_flyteidl2_task_task_definition, 12);
 

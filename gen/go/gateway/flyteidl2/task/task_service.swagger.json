@@ -2150,6 +2150,29 @@
       },
       "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
     },
+    "taskLatestRunSummary": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "title": "Run identifier (run ID/name)"
+        },
+        "run_time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last run time"
+        },
+        "phase": {
+          "type": "string",
+          "description": "Phase of the last run as a string representing workflow.Phase (e.g.,\n\"PHASE_SUCCEEDED\", \"PHASE_FAILED\", \"PHASE_RUNNING\"). Avoid circular\ndependency with workflow.Phase enum."
+        },
+        "root_task_name": {
+          "type": "string",
+          "title": "Name of the root task of the last run (env.task name)"
+        }
+      },
+      "description": "LatestRunSummary contains minimal information about the most recent run of a task.\nThis is a lightweight summary that avoids circular dependencies with workflow package."
+    },
     "taskListTasksResponse": {
       "type": "object",
       "properties": {
@@ -2301,6 +2324,10 @@
         "metadata": {
           "$ref": "#/definitions/flyteidl2taskTaskMetadata",
           "description": "Metadata for this task."
+        },
+        "latest_run": {
+          "$ref": "#/definitions/taskLatestRunSummary",
+          "title": "Summary of the latest run for this task, if any"
         }
       },
       "description": "Lightweight representation of a task."
