@@ -210,10 +210,10 @@ class AbortActionResponse(_message.Message):
 class WatchGroupsRequest(_message.Message):
     __slots__ = ["project_id", "start_date", "end_date", "request", "known_sort_fields"]
     class KnownSortField(_message.Message):
-        __slots__ = ["latest_created_at"]
-        LATEST_CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-        latest_created_at: _list_pb2.Sort.Direction
-        def __init__(self, latest_created_at: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ...) -> None: ...
+        __slots__ = ["created_at"]
+        CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+        created_at: _list_pb2.Sort.Direction
+        def __init__(self, created_at: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ...) -> None: ...
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     START_DATE_FIELD_NUMBER: _ClassVar[int]
     END_DATE_FIELD_NUMBER: _ClassVar[int]

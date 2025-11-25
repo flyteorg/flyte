@@ -240,7 +240,7 @@
     "WatchGroupsRequestKnownSortField": {
       "type": "object",
       "properties": {
-        "latest_created_at": {
+        "created_at": {
           "$ref": "#/definitions/SortDirection"
         }
       }

@@ -4390,7 +4390,7 @@ func (m *WatchGroupsRequest_KnownSortField) validate(all bool) error {
 	var errors []error
 
 	switch v := m.SortBy.(type) {
-	case *WatchGroupsRequest_KnownSortField_LatestCreatedAt:
+	case *WatchGroupsRequest_KnownSortField_CreatedAt:
 		if v == nil {
 			err := WatchGroupsRequest_KnownSortFieldValidationError{
 				field:  "SortBy",
@@ -4401,7 +4401,7 @@ func (m *WatchGroupsRequest_KnownSortField) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		// no validation rules for LatestCreatedAt
+		// no validation rules for CreatedAt
 	default:
 		_ = v // ensures v is used
 	}

@@ -317,7 +317,7 @@ message WatchGroupsRequest {
 
   message KnownSortField {
     oneof sort_by {
-      common.Sort.Direction latest_created_at = 1;
+      common.Sort.Direction created_at = 1;
     }
   }
 
