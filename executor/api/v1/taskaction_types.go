@@ -19,9 +19,10 @@ package v1
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!

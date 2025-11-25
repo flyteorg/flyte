@@ -6,7 +6,9 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Environment(_message.Message):
-    __slots__ = ["name"]
+    __slots__ = ["name", "description"]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     name: str
-    def __init__(self, name: _Optional[str] = ...) -> None: ...
+    description: str
+    def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
