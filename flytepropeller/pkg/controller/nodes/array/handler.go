@@ -26,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -123,7 +122,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	// update state for subNodes
-	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig); err != nil {
+	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig, arrayNodeState.Error); err != nil {
 		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
 		if !eventsErr.IsAlreadyExists(err) {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
@@ -452,7 +451,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// if there is a failing node set the error message if it has not been previous set
-		if failingCount > 0 && arrayNodeState.Error == nil {
+		if failingCount > 0 || failedCount > 0 && arrayNodeState.Error == nil {
+			// only set the error message as the collector summary can be the concatenation of multiple errors
+			// evaluated in the same evaluation
 			arrayNodeState.Error = &idlcore.ExecutionError{
 				Message: subNodeFailureCollector.Summary(events.MaxErrorMessageLength),
 			}
@@ -621,7 +622,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// ensure task_execution set to succeeded
-		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig); err != nil {
+		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig, arrayNodeState.Error); err != nil {
 			if !eventsErr.IsAlreadyExists(err) {
 				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 				return handler.UnknownTransition, err
@@ -660,35 +661,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.TaskPhaseVersion++
 		}
 
-		maxRetries := config.GetConfig().ArrayNode.MaxTaskPhaseVersionAttempts
-		retries := 0
-		for retries <= maxRetries {
-			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
-
-			if err == nil {
-				break
-			}
-
-			// Handle potential race condition if FlyteWorkflow CRD fails to get synced
-			if eventsErr.IsAlreadyExists(err) {
-				if !incrementTaskPhaseVersion {
-					break
-				}
-				logger.Warnf(ctx, "Event version already exists, bumping version and retrying (%d/%d): [%s]", retries+1, maxRetries, err.Error())
-				arrayNodeState.TaskPhaseVersion++
-			} else {
-				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-				return handler.UnknownTransition, err
-			}
-
-			retries++
-			if retries > maxRetries {
-				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
-				return handler.UnknownTransition, err
-			}
+		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig, arrayNodeState.Error); err != nil {
+			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+			return handler.UnknownTransition, err
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		// if the ArrayNode phase has changed, then we need to reset the taskPhaseVersion to 0
 		if currentArrayNodePhase != arrayNodeState.Phase {
 			arrayNodeState.TaskPhaseVersion = 0
 		}
@@ -733,21 +711,9 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalO
 		return nil, err
 	}
 
-	eventConfigCopy, err := stdConfig.DeepCopyConfig(eventConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	deepCopiedEventConfig, ok := eventConfigCopy.(*config.EventConfig)
-	if !ok {
-		return nil, fmt.Errorf("deep copy error: expected *config.EventConfig, but got %T", eventConfigCopy)
-	}
-
-	deepCopiedEventConfig.ErrorOnAlreadyExists = true
-
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
-		eventConfig:                 deepCopiedEventConfig,
+		eventConfig:                 eventConfig,
 		literalOffloadingConfig:     literalOffloadingConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
