@@ -149,44 +149,7 @@ pub mod heartbeat_response {
         }
     }
 }
-/// The metadata defining an active fasttask environment.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct FastTaskEnvironment {
-    /// The queue that replicas of the fasttask environment will query for task executions.
-    #[prost(string, tag = "1")]
-    pub queue_id: ::prost::alloc::string::String,
-}
-/// A definition of a fasttask environment.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct FastTaskEnvironmentSpec {
-    /// The number of items to keep in each replicas backlog. The backlog is used to effectively
-    /// queue work on each replica so that it can begin executing another task immediately after
-    /// the current one completes. This improves overall throughput at the cost of uneven
-    /// distribution.
-    #[prost(int32, tag = "1")]
-    pub backlog_length: i32,
-    /// The number of tasks that can be executed on a replica at the same time.
-    #[prost(int32, tag = "2")]
-    pub parallelism: i32,
-    /// A byte serialized `PodTemplateSpec` that will be used to create replica Pods. If not
-    /// provided Flyte will build a `PodTemplateSpec` using the `PodPlugin` as if this fasttask
-    /// instance were executed in a singular Pod.
-    #[prost(bytes = "vec", tag = "3")]
-    pub pod_template_spec: ::prost::alloc::vec::Vec<u8>,
-    /// The name of the primary container in the defined `pod_template_spec`. If a
-    /// `pod_template_spec` is not provided, this field is unnecessary.
-    #[prost(string, tag = "4")]
-    pub primary_container_name: ::prost::alloc::string::String,
-    /// The number of replicas to initialize for this environment.
-    #[prost(int32, tag = "5")]
-    pub replica_count: i32,
-    /// The criteria to determine how this environment should be deleted.
-    #[prost(oneof = "fast_task_environment_spec::TerminationCriteria", tags = "6")]
-    pub termination_criteria:
-        ::core::option::Option<fast_task_environment_spec::TerminationCriteria>,
-}
+
 /// Nested message and enum types in `FastTaskEnvironmentSpec`.
 pub mod fast_task_environment_spec {
     /// The criteria to determine how this environment should be deleted.
@@ -199,28 +162,6 @@ pub mod fast_task_environment_spec {
         TtlSeconds(i32),
     }
 }
-/// Represents an fasttask worker replica assignment.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct FastTaskAssignment {
-    /// Environment organization for this fast task, if available.
-    #[prost(string, tag = "1")]
-    pub environment_org: ::prost::alloc::string::String,
-    /// Environment project for this fast task.
-    #[prost(string, tag = "2")]
-    pub environment_project: ::prost::alloc::string::String,
-    /// Environment domain for this fast task.
-    #[prost(string, tag = "3")]
-    pub environment_domain: ::prost::alloc::string::String,
-    /// Environment name for this fast task.
-    #[prost(string, tag = "4")]
-    pub environment_name: ::prost::alloc::string::String,
-    /// Environment version for this fast task.
-    #[prost(string, tag = "5")]
-    pub environment_version: ::prost::alloc::string::String,
-    /// The assigned worker pod name for this fast task, if available.
-    #[prost(string, tag = "6")]
-    pub assigned_worker: ::prost::alloc::string::String,
-}
+
 include!("fasttask.tonic.rs");
 // @@protoc_insertion_point(module)

@@ -605,7 +605,7 @@ impl V2TaskManager {
                                 }
                                 true
                             } else {
-                                warn!(task.id = %response.unique_task_id, "Received response for unknown task");
+                                info!(task.id = %response.unique_task_id, "Received response for unknown task or task already removed");
                                 false
                             }
                         };
@@ -688,10 +688,28 @@ impl V2TaskManager {
                 Self::update_ack_time_static(hb_response, tasks_in_progress).await
             }
             Some(Operation::Delete) => {
-                trace!("Received task deletion request");
-                warn!("Received task deletion request {:?}", hb_response.task_id);
-                // Just send over cancellation notice regardless of what the state of the task is.
-                Self::try_send_cancellation_notice(assignment_tx, hb_response.task_id).await
+                info!("Received task deletion request {:?}", hb_response.task_id);
+
+                // DELETE is sent by the plugin after it has processed the task's terminal status.
+                // This signals the worker to stop tracking and reporting this task in future heartbeats.
+                // If the task is still running, we send a cancellation notice. Either way, we remove it from tracking.
+
+                // Attempt to send cancellation, but don't fail the DELETE operation if it doesn't work
+                if let Err(e) = Self::try_send_cancellation_notice(assignment_tx, hb_response.task_id.clone()).await {
+                    error!(task.id = %hb_response.task_id, error = %e, "Failed to send cancellation notice for DELETE, but will still remove from tracking");
+                }
+
+                // Remove task from tracking map regardless of cancellation success
+                {
+                    let mut tasks = tasks_in_progress.lock().unwrap();
+                    if tasks.remove(&hb_response.task_id).is_some() {
+                        info!(task.id = %hb_response.task_id, "Task removed from tracking because Delete sent");
+                    } else {
+                        warn!(task.id = %hb_response.task_id, "Received DELETE for unknown task");
+                    }
+                }
+
+                Ok(())
             }
             None => {
                 warn!(operation_code = hb_response.operation, "Unknown operation");
@@ -741,6 +759,7 @@ impl V2TaskManager {
                 return Err(anyhow!("Failed to send task cancellation"));
             }
         }
+
         Ok(())
     }
 
