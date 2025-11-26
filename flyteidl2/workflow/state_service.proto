@@ -4,8 +4,8 @@ package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/execution.proto";
-import "flyteidl2/workflow/run_definition.proto";
 import "google/rpc/status.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
@@ -97,7 +97,7 @@ message ActionUpdate {
   common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
   // the current phase of the action.
-  Phase phase = 2;
+  common.ActionPhase phase = 2;
 
   // the error associated with the action (if exists).
   optional flyteidl2.core.ExecutionError error = 3;

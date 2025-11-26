@@ -305,21 +305,21 @@ func (s *StateService) actionToUpdate(action *repository.Action) *workflow.Actio
 }
 
 // stringToPhase converts a string phase to a Phase enum
-func (s *StateService) stringToPhase(phase string) workflow.Phase {
+func (s *StateService) stringToPhase(phase string) common.ActionPhase {
 	switch phase {
 	case "PHASE_QUEUED":
-		return workflow.Phase_PHASE_QUEUED
+		return common.ActionPhase_PHASE_QUEUED
 	case "PHASE_INITIALIZING":
-		return workflow.Phase_PHASE_INITIALIZING
+		return common.ActionPhase_PHASE_INITIALIZING
 	case "PHASE_RUNNING":
-		return workflow.Phase_PHASE_RUNNING
+		return common.ActionPhase_PHASE_RUNNING
 	case "PHASE_SUCCEEDED":
-		return workflow.Phase_PHASE_SUCCEEDED
+		return common.ActionPhase_PHASE_SUCCEEDED
 	case "PHASE_FAILED":
-		return workflow.Phase_PHASE_FAILED
+		return common.ActionPhase_PHASE_FAILED
 	case "PHASE_ABORTED":
-		return workflow.Phase_PHASE_ABORTED
+		return common.ActionPhase_PHASE_ABORTED
 	default:
-		return workflow.Phase_PHASE_UNSPECIFIED
+		return common.ActionPhase_PHASE_UNSPECIFIED
 	}
 }

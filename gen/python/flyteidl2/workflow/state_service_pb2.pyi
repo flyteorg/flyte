@@ -1,7 +1,7 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
-from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.rpc import status_pb2 as _status_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -70,7 +70,7 @@ class ActionUpdate(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
-    phase: _run_definition_pb2.Phase
+    phase: _phase_pb2.ActionPhase
     error: _execution_pb2.ExecutionError
     output_uri: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_run_definition_pb2.Phase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ...) -> None: ...

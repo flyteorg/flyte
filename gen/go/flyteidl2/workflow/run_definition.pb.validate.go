@@ -18,6 +18,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/anypb"
 
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+
 	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -35,6 +37,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
 
 	_ = core.CatalogCacheStatus(0)
 )

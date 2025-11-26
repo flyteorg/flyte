@@ -5,6 +5,7 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/types.proto";
@@ -52,7 +53,7 @@ message TraceAction {
   string name = 1 [(buf.validate.field).string.min_len = 1];
 
   // Last known phase.
-  Phase phase = 2;
+  common.ActionPhase phase = 2;
 
   // Time the attempt started.
   google.protobuf.Timestamp start_time = 3;
@@ -169,19 +170,6 @@ message ActionMetadata {
   task.TriggerAutomationSpec trigger_type = 15;
 }
 
-// TODO: define phase transitions
-enum Phase {
-  PHASE_UNSPECIFIED = 0;
-  PHASE_QUEUED = 1;
-  PHASE_WAITING_FOR_RESOURCES = 2;
-  PHASE_INITIALIZING = 3;
-  PHASE_RUNNING = 4;
-  PHASE_SUCCEEDED = 5;
-  PHASE_FAILED = 6;
-  PHASE_ABORTED = 7;
-  PHASE_TIMED_OUT = 8;
-}
-
 enum ActionType {
   ACTION_TYPE_UNSPECIFIED = 0;
   ACTION_TYPE_TASK = 1;
@@ -192,7 +180,7 @@ enum ActionType {
 // Lightweight status of an action. For more detailed status see ActionDetails.
 message ActionStatus {
   // Last known phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time the action started.
   google.protobuf.Timestamp start_time = 2;
@@ -290,7 +278,7 @@ message ActionDetails {
 // ActionAttempt is a single attempt of an action.
 message ActionAttempt {
   // Last known phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time the attempt started.
   google.protobuf.Timestamp start_time = 2;
@@ -342,7 +330,7 @@ message ClusterEvent {
 
 message PhaseTransition {
   // The phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time this phase started.
   google.protobuf.Timestamp start_time = 2;
@@ -360,7 +348,7 @@ message ActionEvent {
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
   // The phase for this attempt.
-  Phase phase = 3;
+  common.ActionPhase phase = 3;
 
   // The version of this attempt and phase.
   uint32 version = 4;
@@ -449,7 +437,7 @@ message TaskGroup {
   google.protobuf.Timestamp latest_run_time = 4;
 
   // Recent run statuses, ordered from newest to oldest. Number of statuses determined by request.
-  repeated Phase recent_statuses = 5;
+  repeated common.ActionPhase recent_statuses = 5;
 
   // Average failure rate of runs in this group (0.0 to 1.0).
   // Computed as number of root actions with phase FAILED divided by total root actions.
