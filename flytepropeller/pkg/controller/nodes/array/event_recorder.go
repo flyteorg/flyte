@@ -9,7 +9,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	events "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
@@ -48,53 +49,99 @@ func (t *taskExecutionID) GetUniqueNodeID() string {
 	return t.nodeID
 }
 
+//go:generate mockery --all --case=underscore
+
 type arrayEventRecorder interface {
 	interfaces.EventRecorder
 	process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error
-	finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error
+	finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error
 	finalizeRequired(ctx context.Context) bool
+}
+
+func mapNodeExecutionPhaseToTaskExecutionPhase(nodePhase idlcore.NodeExecution_Phase) idlcore.TaskExecution_Phase {
+	switch nodePhase {
+	case idlcore.NodeExecution_UNDEFINED:
+		return idlcore.TaskExecution_UNDEFINED
+	case idlcore.NodeExecution_QUEUED:
+		return idlcore.TaskExecution_QUEUED
+	case idlcore.NodeExecution_RUNNING, idlcore.NodeExecution_DYNAMIC_RUNNING:
+		return idlcore.TaskExecution_RUNNING
+	case idlcore.NodeExecution_SUCCEEDED:
+		return idlcore.TaskExecution_SUCCEEDED
+	case idlcore.NodeExecution_FAILING, idlcore.NodeExecution_FAILED, idlcore.NodeExecution_TIMED_OUT:
+		return idlcore.TaskExecution_FAILED
+	case idlcore.NodeExecution_ABORTED:
+		return idlcore.TaskExecution_ABORTED
+	case idlcore.NodeExecution_SKIPPED:
+		return idlcore.TaskExecution_UNDEFINED
+	case idlcore.NodeExecution_RECOVERED:
+		return idlcore.TaskExecution_SUCCEEDED
+	default:
+		return idlcore.TaskExecution_UNDEFINED
+	}
+}
+
+func mapNodePhaseToNodeExecutionPhase(nodePhase v1alpha1.NodePhase) idlcore.NodeExecution_Phase {
+	switch nodePhase {
+	case v1alpha1.NodePhaseNotYetStarted:
+		return idlcore.NodeExecution_UNDEFINED
+	case v1alpha1.NodePhaseQueued:
+		return idlcore.NodeExecution_QUEUED
+	case v1alpha1.NodePhaseRunning:
+		return idlcore.NodeExecution_RUNNING
+	case v1alpha1.NodePhaseFailing:
+		return idlcore.NodeExecution_FAILING
+	case v1alpha1.NodePhaseSucceeding:
+		return idlcore.NodeExecution_SUCCEEDED
+	case v1alpha1.NodePhaseSucceeded:
+		return idlcore.NodeExecution_SUCCEEDED
+	case v1alpha1.NodePhaseFailed:
+		return idlcore.NodeExecution_FAILED
+	case v1alpha1.NodePhaseSkipped:
+		return idlcore.NodeExecution_SKIPPED
+	case v1alpha1.NodePhaseRetryableFailure:
+		return idlcore.NodeExecution_FAILED
+	case v1alpha1.NodePhaseTimingOut:
+		return idlcore.NodeExecution_TIMED_OUT
+	case v1alpha1.NodePhaseTimedOut:
+		return idlcore.NodeExecution_TIMED_OUT
+	case v1alpha1.NodePhaseDynamicRunning:
+		return idlcore.NodeExecution_DYNAMIC_RUNNING
+	case v1alpha1.NodePhaseRecovered:
+		return idlcore.NodeExecution_RECOVERED
+	default:
+		return idlcore.NodeExecution_UNDEFINED
+	}
 }
 
 type externalResourcesEventRecorder struct {
 	interfaces.EventRecorder
-	externalResources []*event.ExternalResourceInfo
-	nodeEvents        []*event.NodeExecutionEvent
-	taskEvents        []*event.TaskExecutionEvent
+	externalResources []*events.ExternalResourceInfo
+	nodeEvents        []*events.NodeExecutionEvent
+	taskEvents        []*events.TaskExecutionEvent
 }
 
-func (e *externalResourcesEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (e *externalResourcesEventRecorder) RecordNodeEvent(ctx context.Context, event *events.NodeExecutionEvent, eventConfig *config.EventConfig) error {
 	e.nodeEvents = append(e.nodeEvents, event)
 	return nil
 }
 
-func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, event *events.TaskExecutionEvent, eventConfig *config.EventConfig) error {
 	e.taskEvents = append(e.taskEvents, event)
 	return nil
 }
 
 func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
-	// generate externalResourceID
-	currentNodeUniqueID := nCtx.NodeID()
-	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
-		var err error
-		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
-		if err != nil {
-			return err
-		}
-	}
-
-	uniqueID, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(retryAttempt))})
+	externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
 	if err != nil {
 		return err
 	}
-
-	externalResourceID := fmt.Sprintf("%s-n%d-%d", uniqueID, index, retryAttempt)
 
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
 	for _, nodeExecutionEvent := range e.nodeEvents {
 		switch target := nodeExecutionEvent.GetTargetMetadata().(type) {
-		case *event.NodeExecutionEvent_TaskNodeMetadata:
+		case *events.NodeExecutionEvent_TaskNodeMetadata:
 			if target.TaskNodeMetadata != nil {
 				cacheStatus = target.TaskNodeMetadata.GetCacheStatus()
 			}
@@ -104,7 +151,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	// fastcache will not emit task events for cache hits. we need to manually detect a
 	// transition to `SUCCEEDED` and add an `ExternalResourceInfo` for it.
 	if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(e.taskEvents) == 0 {
-		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
+		e.externalResources = append(e.externalResources, &events.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Index:        uint32(index), // #nosec G115
 			RetryAttempt: retryAttempt,
@@ -136,7 +183,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			log.Name = fmt.Sprintf("%s-%d", log.GetName(), index)
 		}
 
-		externalResourceInfo := event.ExternalResourceInfo{
+		externalResourceInfo := events.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Index:        uint32(index), // #nosec G115
 			Logs:         taskExecutionEvent.GetLogs(),
@@ -160,8 +207,55 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	return nil
 }
 
+func updateExternalResourceSubnodePhases(nCtx interfaces.NodeExecutionContext, existingExternalResources []*events.ExternalResourceInfo) ([]*events.ExternalResourceInfo, error) {
+	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
+	subNodePhases := arrayNodeState.SubNodePhases.GetItems()
+	subNodeRetryAttempts := arrayNodeState.SubNodeRetryAttempts.GetItems()
+
+	updatedExternalResources := make([]*events.ExternalResourceInfo, 0, len(subNodePhases))
+
+	existingExternalResourcesMap := make(map[uint32]*events.ExternalResourceInfo)
+	for _, resource := range existingExternalResources {
+		existingExternalResourcesMap[resource.GetIndex()] = resource
+	}
+
+	for index, subNodePhase := range subNodePhases {
+		// #nosec G115
+		if existingResource, exists := existingExternalResourcesMap[uint32(index)]; exists {
+			updatedExternalResources = append(updatedExternalResources, existingResource)
+			continue
+		}
+
+		// ensure that all subnodes have the latest state set to handle scenarios where
+		// eventing fails due to taskPhaseVersion being out of sync
+		// Note: in opting for eventual subnode phase consistency when the array node reaches a terminal phase
+		// instead of having retries to ensure subnodes are updated while running, subnodes could potentially
+		// in rare cases drop fields such as logs.
+
+		nodePhase := v1alpha1.NodePhase(subNodePhase) // #nosec G115
+		nodeExecutionPhase := mapNodePhaseToNodeExecutionPhase(nodePhase)
+		// Note: this shouldn't happen as the lengths should always match
+		var retryAttempt uint32
+		if index < len(subNodeRetryAttempts) {
+			retryAttempt = uint32(subNodeRetryAttempts[index]) // #nosec G115
+		}
+		externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
+		if err != nil {
+			return nil, err
+		}
+		updatedExternalResources = append(updatedExternalResources, &events.ExternalResourceInfo{
+			ExternalId:   externalResourceID,
+			Phase:        mapNodeExecutionPhaseToTaskExecutionPhase(nodeExecutionPhase),
+			Index:        uint32(index), // #nosec G115
+			RetryAttempt: retryAttempt,  // #nosec G115
+		})
+	}
+
+	return updatedExternalResources, nil
+}
+
 func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
+	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error {
 
 	// build TaskExecutionEvent
 	occurredAt, err := ptypes.TimestampProto(time.Now())
@@ -189,14 +283,23 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		nodeExecutionID.NodeId = currentNodeUniqueID
 	}
 
-	taskExecutionEvent := &event.TaskExecutionEvent{
+	if nodes.IsTerminalTaskPhase(taskPhase) {
+		updatedExternalResources, err := updateExternalResourceSubnodePhases(nCtx, e.externalResources)
+		if err != nil {
+			logger.Errorf(ctx, "failed to update external resource phases for ArrayNode with error: %v", err)
+			return err
+		}
+		e.externalResources = updatedExternalResources
+	}
+
+	taskExecutionEvent := &events.TaskExecutionEvent{
 		TaskId:                taskID,
 		ParentNodeExecutionId: &nodeExecutionID,
 		RetryAttempt:          0, // ArrayNode will never retry
 		Phase:                 taskPhase,
 		PhaseVersion:          taskPhaseVersion,
 		OccurredAt:            occurredAt,
-		Metadata: &event.TaskExecutionMetadata{
+		Metadata: &events.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
 			PluginIdentifier:  "k8s-array",
 		},
@@ -213,12 +316,12 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 				return err
 			}
 
-			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputData{
+			taskExecutionEvent.InputValue = &events.TaskExecutionEvent_InputData{
 				InputData: literalMap,
 			}
 		} else {
 			// pass inputs by reference
-			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputUri{
+			taskExecutionEvent.InputValue = &events.TaskExecutionEvent_InputUri{
 				InputUri: nCtx.InputReader().GetInputPath().String(),
 			}
 		}
@@ -226,8 +329,13 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 
 	// only attach output uri if taskPhase is SUCCEEDED
 	if taskPhase == idlcore.TaskExecution_SUCCEEDED {
-		taskExecutionEvent.OutputResult = &event.TaskExecutionEvent_OutputUri{
+		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_OutputUri{
 			OutputUri: v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir()).String(),
+		}
+	} else if taskPhase == idlcore.TaskExecution_FAILED {
+		// attach first evaluated error(s) if taskPhase is FAILED
+		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_Error{
+			Error: arrayNodeExecutionError,
 		}
 	}
 
@@ -248,7 +356,7 @@ func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.No
 }
 
 func (*passThroughEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
+	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error {
 	return nil
 }
 
@@ -359,14 +467,14 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	if nCtx.ExecutionContext() != nil && nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
 		dynamic = true
 	}
-	nodeExecutionEvent := &event.NodeExecutionEvent{
+	nodeExecutionEvent := &events.NodeExecutionEvent{
 		Id: &idlcore.NodeExecutionIdentifier{
 			NodeId:      subNodeID,
 			ExecutionId: workflowExecutionID,
 		},
 		Phase:      nodePhase,
 		OccurredAt: timestamp,
-		ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+		ParentNodeMetadata: &events.ParentNodeExecutionMetadata{
 			NodeId: nCtx.NodeID(),
 		},
 		ReportedAt:       timestamp,
@@ -378,7 +486,7 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	}
 
 	// send TaskExecutionEvent
-	taskExecutionEvent := &event.TaskExecutionEvent{
+	taskExecutionEvent := &events.TaskExecutionEvent{
 		TaskId: &idlcore.Identifier{
 			ResourceType: idlcore.ResourceType_TASK,
 			Project:      workflowExecutionID.GetProject(),
@@ -398,4 +506,27 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	}
 
 	return nil
+}
+
+func generateExternalResourceID(nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) (string, error) {
+	currentNodeUniqueID := nCtx.NodeID()
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		var err error
+		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
+		if err != nil {
+			return "", err
+		}
+	}
+
+	uniqueID, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(nCtx.CurrentAttempt()))})
+	if err != nil {
+		return "", err
+	}
+
+	// Note: if the subNode is a task, then this value should map to the subNode's pod name. Services such as
+	// usage utilize ExternalResourceInfo.ExternalId to identify the pod.
+
+	externalResourceID := fmt.Sprintf("%s-n%d-%d", uniqueID, index, retryAttempt)
+
+	return externalResourceID, nil
 }

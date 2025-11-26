@@ -122,7 +122,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.GetType() == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.GetType() == SidecarTaskType || (len(podSpec.Containers) == 1 && taskTemplate.GetType() != rawContainerTaskType) {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -172,13 +172,11 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	if pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
-		if err != nil {
-			return pluginsCore.PhaseInfoUndefined, err
-		}
-		info.Logs = taskLogs
+	taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
 	}
+	info.Logs = taskLogs
 
 	phaseInfo, err := DemystifyPodStatus(ctx, pod, info)
 	if err != nil {
@@ -203,8 +201,6 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
 		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
-	case v1.PodUnknown:
-		// DO NOTHING
 	default:
 		if !primaryContainerExists {
 			// if all of the containers and sidecars in the Pod are complete, as an optimization, we can declare the task as

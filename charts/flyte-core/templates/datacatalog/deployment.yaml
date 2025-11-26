@@ -12,7 +12,9 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
+  {{- if not .Values.datacatalog.autoscaling.enabled }}
   replicas: {{ .Values.datacatalog.replicaCount }}
+  {{- end }}
   selector:
     matchLabels: {{ include "datacatalog.selectorLabels" . | nindent 6 }}
   {{- with .Values.datacatalog.strategy }}

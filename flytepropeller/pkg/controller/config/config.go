@@ -287,9 +287,8 @@ type NodeConfig struct {
 
 // DefaultDeadlines contains default values for timeouts
 type DefaultDeadlines struct {
-	DefaultNodeExecutionDeadline  config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout that includes the time spent to run the node/workflow"`
-	DefaultNodeActiveDeadline     config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout that includes the time spent queued."`
-	DefaultWorkflowActiveDeadline config.Duration `json:"workflow-active-deadline" pflag:",Default value of workflow timeout that includes the time spent queued."`
+	DefaultNodeExecutionDeadline config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout that includes the time spent to run the node/workflow"`
+	DefaultNodeActiveDeadline    config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout that includes the time spent queued."`
 }
 
 // LeaderElectionConfig Contains leader election configuration.
@@ -324,8 +323,6 @@ const (
 type EventConfig struct {
 	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
-	// only meant to be overridden for certain node types that have different eventing behavior such as ArrayNode
-	ErrorOnAlreadyExists bool `json:"-"`
 }
 
 // ParallelismBehavior defines how ArrayNode should handle subNode parallelism by default

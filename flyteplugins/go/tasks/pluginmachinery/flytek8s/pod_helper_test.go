@@ -221,121 +221,6 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 	})
 }
 
-func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
-	t.Run("with empty node affinity", func(t *testing.T) {
-		affinity := v1.Affinity{}
-		nst := v1.NodeSelectorRequirement{
-			Key:      "new",
-			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{"new"},
-		}
-		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
-		assert.EqualValues(
-			t,
-			[]v1.PreferredSchedulingTerm{
-				v1.PreferredSchedulingTerm{
-					Weight: 10,
-					Preference: v1.NodeSelectorTerm{
-						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
-								Key:      "new",
-								Operator: v1.NodeSelectorOpIn,
-								Values:   []string{"new"},
-							},
-						},
-					},
-				},
-			},
-			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
-		)
-	})
-
-	t.Run("with existing node affinity", func(t *testing.T) {
-		affinity := v1.Affinity{
-			NodeAffinity: &v1.NodeAffinity{
-				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
-					NodeSelectorTerms: []v1.NodeSelectorTerm{
-						v1.NodeSelectorTerm{
-							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
-									Key:      "required",
-									Operator: v1.NodeSelectorOpIn,
-									Values:   []string{"required"},
-								},
-							},
-						},
-					},
-				},
-				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
-					v1.PreferredSchedulingTerm{
-						Weight: 1,
-						Preference: v1.NodeSelectorTerm{
-							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
-									Key:      "preferred",
-									Operator: v1.NodeSelectorOpIn,
-									Values:   []string{"preferred"},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		nst := v1.NodeSelectorRequirement{
-			Key:      "new",
-			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{"new"},
-		}
-		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
-		assert.EqualValues(
-			t,
-			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
-					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
-							Key:      "required",
-							Operator: v1.NodeSelectorOpIn,
-							Values:   []string{"required"},
-						},
-					},
-				},
-			},
-			affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
-			[]v1.PreferredSchedulingTerm{
-				v1.PreferredSchedulingTerm{
-					Weight: 1,
-					Preference: v1.NodeSelectorTerm{
-						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
-								Key:      "preferred",
-								Operator: v1.NodeSelectorOpIn,
-								Values:   []string{"preferred"},
-							},
-						},
-					},
-				},
-				v1.PreferredSchedulingTerm{
-					Weight: 10,
-					Preference: v1.NodeSelectorTerm{
-						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
-								Key:      "new",
-								Operator: v1.NodeSelectorOpIn,
-								Values:   []string{"new"},
-							},
-						},
-					},
-				},
-			},
-			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
-		)
-	})
-}
-
 func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 	t.Run("WithInterruptibleNodeSelectorRequirement", func(t *testing.T) {
 		podSpec := v1.PodSpec{}
@@ -2445,6 +2330,116 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 			},
 			primaryContainerName:     "task-1",
 			primaryInitContainerName: "task-init-1",
+		},
+		{
+			name: "template with default container with env vars, base with default container",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "default-task-image",
+						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "default-task-init-image",
+						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "task-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "default",
+						Image: "task-image",
+						Env: []v1.EnvVar{
+							{Name: "FOO", Value: "BAR"},
+						},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "task-init-image",
+						Env: []v1.EnvVar{
+							{Name: "INIT_FOO", Value: "INIT_BAR"},
+						},
+					},
+				},
+			},
+			primaryContainerName:     "primary",
+			primaryInitContainerName: "primary-init",
+		},
+		{
+			name: "template with primary container with env vars, base with primary container",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "default-task-image",
+						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "default-task-init-image",
+						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+						Env: []v1.EnvVar{
+							{Name: "FOO", Value: "BAR"},
+						},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
+						Env: []v1.EnvVar{
+							{Name: "INIT_FOO", Value: "INIT_BAR"},
+						},
+					},
+				},
+			},
+			primaryContainerName:     "primary",
+			primaryInitContainerName: "primary-init",
 		},
 	}
 

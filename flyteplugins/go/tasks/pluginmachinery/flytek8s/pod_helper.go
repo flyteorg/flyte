@@ -74,25 +74,6 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 	}
 }
 
-// AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
-// objects to an existing v1.Affinity object's list of preferred scheduling terms.
-// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity-weight
-// for how weights are used during scheduling.
-func AddPreferredNodeSelectorRequirements(base *v1.Affinity, weight int32, new ...v1.NodeSelectorRequirement) {
-	if base.NodeAffinity == nil {
-		base.NodeAffinity = &v1.NodeAffinity{}
-	}
-	base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(
-		base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
-		v1.PreferredSchedulingTerm{
-			Weight: weight,
-			Preference: v1.NodeSelectorTerm{
-				MatchExpressions: new,
-			},
-		},
-	)
-}
-
 // ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
 func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
 	// Determine node selector terms to add to node affinity
@@ -780,7 +761,8 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 		// Check for any name matching template containers
 		for _, templateContainer := range templatePodSpec.Containers {
-			if templateContainer.Name != container.Name {
+			// skip default and primary template containers as they are handled above
+			if container.Name == primaryContainerName || container.Name == defaultContainerTemplateName || templateContainer.Name != container.Name {
 				continue
 			}
 
@@ -833,7 +815,8 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 		// Check for any name matching template containers
 		for _, templateInitContainer := range templatePodSpec.InitContainers {
-			if templateInitContainer.Name != initContainer.Name {
+			// skip default and primary template init containers as they are handled above
+			if initContainer.Name == primaryInitContainerName || initContainer.Name == defaultInitContainerTemplateName || templateInitContainer.Name != initContainer.Name {
 				continue
 			}
 

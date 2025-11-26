@@ -1,6 +1,6 @@
 dependencies:
 - name: docker-registry
-  repository: https://helm.twun.io/
+  repository: https://twuni.github.io/docker-registry.helm
   version: 2.2.2
 - name: flyte-binary
   repository: file://../flyte-binary
@@ -14,5 +14,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.8.1
-digest: sha256:f63a6ba148c681162253c24f0ba200ab7d5b7934a398824cb7b4f35d8f9166de
-generated: "2024-02-13T17:51:58.270175-08:00"
+digest: sha256:91238033c75676f44125aa05e1566231b0fa852fe03fe77e694723af7c0123ee
+generated: "2025-11-10T19:46:20.764261-08:00"

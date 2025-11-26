@@ -111,8 +111,8 @@ helm install gateway bitnami/contour -n flyte
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |
 | configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config"}` | Configuration for Flyte console UI |
-| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b4","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
-| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b4","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
+| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.2","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
+| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.2","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
 | configmap.core | object | `{"manager":{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"},"propeller":{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"},"webhook":{"certDir":"/etc/webhook/certs","serviceName":"flyte-pod-webhook"}}` | Core propeller configuration |
 | configmap.core.manager | object | `{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config). |
 | configmap.core.propeller | object | `{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config). |
@@ -123,8 +123,8 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","connector-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
-| configmap.otel | object | `{"otel":{"file":"/tmp/trace.txt","jaeger":{"endpoint":"http://localhost:14268/api/traces"},"otlpgrpc":{"endpoint":"http://localhost:4317"},"otlphttp":{"endpoint":"http://localhost:4318/v1/traces"},"sampler":{"parentSampler":"always"},"type":"noop"}}` | Open Telemetry Configuration |
-| configmap.otel.otel.file | string | `"/tmp/trace.txt"` | Configuration for the file exporter type |
+| configmap.otel | object | `{"otel":{"file":{"filename":"/tmp/trace.txt"},"jaeger":{"endpoint":"http://localhost:14268/api/traces"},"otlpgrpc":{"endpoint":"http://localhost:4317"},"otlphttp":{"endpoint":"http://localhost:4318/v1/traces"},"sampler":{"parentSampler":"always"},"type":"noop"}}` | Open Telemetry Configuration |
+| configmap.otel.otel.file | object | `{"filename":"/tmp/trace.txt"}` | Configuration for the file exporter type |
 | configmap.otel.otel.jaeger | object | `{"endpoint":"http://localhost:14268/api/traces"}` | Configuration for the jaeger exporter type |
 | configmap.otel.otel.otlphttp | object | `{"endpoint":"http://localhost:4318/v1/traces"}` | Configuration for the otlp exporter type |
 | configmap.otel.otel.sampler | object | `{"parentSampler":"always"}` | Configuration for sampling of traces |
@@ -149,12 +149,23 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
 | datacatalog.annotations | object | `{}` | Annotations for Datacatalog deployment |
+| datacatalog.autoscaling.enabled | bool | `false` |  |
+| datacatalog.autoscaling.maxReplicas | int | `10` |  |
+| datacatalog.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| datacatalog.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| datacatalog.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| datacatalog.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| datacatalog.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| datacatalog.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| datacatalog.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| datacatalog.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| datacatalog.autoscaling.minReplicas | int | `1` |  |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.enabled | bool | `true` |  |
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v1.16.0-b4"` | Docker image tag |
+| datacatalog.image.tag | string | `"v1.16.2"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.podEnv | object | `{}` | Additional Datacatalog container environment variables |
@@ -190,6 +201,17 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
 | flyteadmin.annotations | object | `{}` | Annotations for Flyteadmin deployment |
+| flyteadmin.autoscaling.enabled | bool | `false` |  |
+| flyteadmin.autoscaling.maxReplicas | int | `10` |  |
+| flyteadmin.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| flyteadmin.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| flyteadmin.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| flyteadmin.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| flyteadmin.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| flyteadmin.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| flyteadmin.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| flyteadmin.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| flyteadmin.autoscaling.minReplicas | int | `1` |  |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables  e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>"  e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
@@ -197,7 +219,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v1.16.0-b4"` |  |
+| flyteadmin.image.tag | string | `"v1.16.2"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.livenessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 20\nperiodSeconds: 5"` |  |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
@@ -240,6 +262,17 @@ helm install gateway bitnami/contour -n flyte
 | flyteconnector.podLabels | object | `{}` | Labels for flyteconnector pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.annotations | object | `{}` | Annotations for Flyteconsole deployment |
+| flyteconsole.autoscaling.enabled | bool | `false` |  |
+| flyteconsole.autoscaling.maxReplicas | int | `10` |  |
+| flyteconsole.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| flyteconsole.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| flyteconsole.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| flyteconsole.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| flyteconsole.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| flyteconsole.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| flyteconsole.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| flyteconsole.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| flyteconsole.autoscaling.minReplicas | int | `1` |  |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
 | flyteconsole.ga.tracking_id | string | `"G-0QW4DJWJ20"` |  |
@@ -277,7 +310,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.16.0-b4"` |  |
+| flytepropeller.image.tag | string | `"v1.16.2"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.manager_resources | object | `{"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}}` | If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
@@ -314,7 +347,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flytescheduler.image.tag | string | `"v1.16.0-b4"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v1.16.2"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.podEnv | object | `{}` | Additional Flytescheduler container environment variables |

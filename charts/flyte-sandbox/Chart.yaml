@@ -26,7 +26,7 @@ appVersion: "1.16.1"
 dependencies:
   - name: docker-registry
     version: 2.2.2
-    repository: https://helm.twun.io/
+    repository: https://twuni.github.io/docker-registry.helm
     condition: docker-registry.enabled
   - name: flyte-binary
     version: v0.1.10

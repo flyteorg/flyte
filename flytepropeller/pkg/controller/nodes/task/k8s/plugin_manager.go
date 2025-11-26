@@ -211,7 +211,11 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 	o, err := e.plugin.BuildResource(ctx, k8sTaskCtx)
 	if err != nil {
-		return pluginsCore.UnknownTransition, err
+		// If the resource cannot be constructed then permanently fail because this does not
+		// depend on any external system so this is not a transient error. Notify the user
+		// immediately so they can fix the task definition.
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("FailedToBuildResource",
+			fmt.Sprintf("could not build resource for task: %v", err.Error()), nil)), nil
 	}
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)

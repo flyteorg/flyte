@@ -8,12 +8,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -53,7 +55,7 @@ var logTemplateRegexes = struct {
 type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	return k8s.PluginProperties{GeneratedNameMaxLength: ptr.To[int](47)}
 }
 
 // BuildResource Creates a new ray job resource
@@ -554,11 +556,24 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 	var taskLogs []*core.TaskLog
 
+	// We use the creation timestamp of the RayJob as a proxy for the start time of the pods
+	startTime := rayJob.ObjectMeta.CreationTimestamp.Time.Unix()
+	// Don't have a good mechanism for this yet, but approximating with time.Now for now as is done in other plugins
+	finishTime := time.Now().Unix()
+	RFC3999StartTime := time.Unix(startTime, 0).Format(time.RFC3339)
+	RFC3999FinishTime := time.Unix(finishTime, 0).Format(time.RFC3339)
+
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
+	// Use PodRFC3339StartTime and PodUnixStartTime variable names with the term "Pod"
+	// for compatibility with existing log templates and documentation around task logs.
 	input := tasklog.Input{
-		Namespace:         rayJob.Namespace,
-		TaskExecutionID:   taskExecID,
-		ExtraTemplateVars: []tasklog.TemplateVar{},
+		Namespace:            rayJob.Namespace,
+		TaskExecutionID:      taskExecID,
+		PodRFC3339StartTime:  RFC3999StartTime,
+		PodRFC3339FinishTime: RFC3999FinishTime,
+		PodUnixStartTime:     startTime,
+		PodUnixFinishTime:    finishTime,
+		ExtraTemplateVars:    []tasklog.TemplateVar{},
 	}
 	if rayJob.Status.JobId != "" {
 		input.ExtraTemplateVars = append(

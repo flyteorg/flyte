@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.16.0-b4  # FLYTEADMIN_TAG
+    tag: v1.16.2  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -55,6 +55,25 @@ flyteadmin:
       memory: 50Mi
   # Strategy for Flyteadmin deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
   # -- Initial projects to create
@@ -170,7 +189,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.16.0-b4  # FLYTESCHEDULER_TAG
+    tag: v1.16.2  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -258,7 +277,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.16.0-b4  # DATACATALOG_TAG
+    tag: v1.16.2  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -273,6 +292,24 @@ datacatalog:
       memory: 50Mi
   # Strategy for Datacatalog deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
   # -- Default regex string for searching configuration files
   configPath: /etc/datacatalog/config/*.yaml
   # -- Service settings for Datacatalog
@@ -368,7 +405,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.16.0-b4  # FLYTEPROPELLER_TAG
+    tag: v1.16.2  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -549,6 +586,24 @@ flyteconsole:
       memory: 50Mi
   # Strategy for Flyteconsole deployment
   strategy: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
   # -- Service settings for Flyteconsole
   service:
     appProtocols:
@@ -869,7 +924,8 @@ configmap:
       # -- The type of exporter to use
       type: noop
       # -- Configuration for the file exporter type
-      file: "/tmp/trace.txt"
+      file:
+        filename: "/tmp/trace.txt"
       # -- Configuration for the jaeger exporter type
       jaeger:
         endpoint: "http://localhost:14268/api/traces"
@@ -1003,7 +1059,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b4  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.16.2  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration

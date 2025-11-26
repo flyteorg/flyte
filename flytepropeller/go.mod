@@ -30,6 +30,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/wI2L/jsondiff v0.6.0
 	gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7
+	go.etcd.io/etcd/api/v3 v3.5.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0
 	go.opentelemetry.io/otel v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
@@ -78,7 +79,7 @@ require (
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.8.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/flyteorg/stow v0.3.11 // indirect
+	github.com/flyteorg/stow v0.3.12 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

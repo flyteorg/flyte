@@ -47,7 +47,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/flyteorg/stow v0.3.11 // indirect
+	github.com/flyteorg/stow v0.3.12 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -126,11 +126,6 @@ retract (
 )
 
 replace (
-	github.com/flyteorg/flyte/datacatalog => ../datacatalog
-	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyte/flyteidl => ../flyteidl
-	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2

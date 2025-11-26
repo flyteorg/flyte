@@ -11,8 +11,8 @@ A Helm chart for the Flyte local sandbox
 | file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 12.6.7 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.8.1 |
-| https://helm.twun.io/ | docker-registry | 2.2.2 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
+| https://twuni.github.io/docker-registry.helm | docker-registry | 2.2.2 |
 
 ## Values
 

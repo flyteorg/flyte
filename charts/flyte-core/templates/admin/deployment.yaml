@@ -12,7 +12,9 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
+  {{- if not .Values.flyteadmin.autoscaling.enabled }}
   replicas: {{ .Values.flyteadmin.replicaCount }}
+  {{- end }}
   selector:
     matchLabels: {{ include "flyteadmin.selectorLabels" . | nindent 6 }}
   {{- with .Values.flyteadmin.strategy }}

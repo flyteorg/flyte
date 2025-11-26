@@ -15,6 +15,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -1210,6 +1211,30 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "ray job start time",
+			rayJob: rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+					CreationTimestamp: metav1.Time{
+						Time: time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+					},
+				},
+				Status: rayv1.RayJobStatus{
+					JobId: "ray-job-1",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray job ID",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .PodRFC3339StartTime }}/{{ .PodUnixStartTime }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray job ID",
+					Uri:  "http://test/2024-01-01T12:00:00Z/1704110400",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -1430,7 +1455,7 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
-	expected := k8s.PluginProperties{}
+	expected := k8s.PluginProperties{GeneratedNameMaxLength: ptr.To[int](47)}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
 }
 

@@ -28,13 +28,13 @@ func TestGetExecutionEnvVars(t *testing.T) {
 	}{
 		{
 			"no-console-url",
-			12,
+			8,
 			"",
 			nil,
 		},
 		{
 			"with-console-url",
-			13,
+			9,
 			"scheme://host/path",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
@@ -43,7 +43,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		},
 		{
 			"with-console-url-ending-in-single-slash",
-			13,
+			9,
 			"scheme://host/path/",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
@@ -52,7 +52,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		},
 		{
 			"with-console-url-ending-in-multiple-slashes",
-			13,
+			9,
 			"scheme://host/path////",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
