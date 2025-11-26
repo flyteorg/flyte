@@ -251,6 +251,22 @@
       },
       "description": "Unique identifier of an action."
     },
+    "commonActionPhase": {
+      "type": "string",
+      "enum": [
+        "ACTION_PHASE_UNSPECIFIED",
+        "ACTION_PHASE_QUEUED",
+        "ACTION_PHASE_WAITING_FOR_RESOURCES",
+        "ACTION_PHASE_INITIALIZING",
+        "ACTION_PHASE_RUNNING",
+        "ACTION_PHASE_SUCCEEDED",
+        "ACTION_PHASE_FAILED",
+        "ACTION_PHASE_ABORTED",
+        "ACTION_PHASE_TIMED_OUT"
+      ],
+      "default": "ACTION_PHASE_UNSPECIFIED",
+      "title": "TODO: define phase transitions"
+    },
     "commonAppSpec": {
       "type": "object",
       "properties": {
@@ -2092,22 +2108,6 @@
       },
       "description": "Lightweight representation of an action."
     },
-    "flyteidl2workflowPhase": {
-      "type": "string",
-      "enum": [
-        "PHASE_UNSPECIFIED",
-        "PHASE_QUEUED",
-        "PHASE_WAITING_FOR_RESOURCES",
-        "PHASE_INITIALIZING",
-        "PHASE_RUNNING",
-        "PHASE_SUCCEEDED",
-        "PHASE_FAILED",
-        "PHASE_ABORTED",
-        "PHASE_TIMED_OUT"
-      ],
-      "default": "PHASE_UNSPECIFIED",
-      "title": "TODO: define phase transitions"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -2552,7 +2552,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {
@@ -2719,7 +2719,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {
@@ -2912,7 +2912,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "The phase."
         },
         "start_time": {
@@ -3000,7 +3000,7 @@
         "recent_statuses": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/flyteidl2workflowPhase"
+            "$ref": "#/definitions/commonActionPhase"
           },
           "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
         },

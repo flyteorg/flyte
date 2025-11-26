@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// TODO: define phase transitions
+enum ActionPhase {
+  ACTION_PHASE_UNSPECIFIED = 0;
+  ACTION_PHASE_QUEUED = 1;
+  ACTION_PHASE_WAITING_FOR_RESOURCES = 2;
+  ACTION_PHASE_INITIALIZING = 3;
+  ACTION_PHASE_RUNNING = 4;
+  ACTION_PHASE_SUCCEEDED = 5;
+  ACTION_PHASE_FAILED = 6;
+  ACTION_PHASE_ABORTED = 7;
+  ACTION_PHASE_TIMED_OUT = 8;
+}
