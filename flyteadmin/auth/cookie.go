@@ -2,12 +2,13 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
-	"math/rand"
+	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/gorilla/securecookie"
 
@@ -112,25 +113,29 @@ func ReadSecureCookie(ctx context.Context, cookie http.Cookie, hashKey, blockKey
 	return "", errors.Wrapf(ErrSecureCookie, err, "Error reading secure cookie %s", cookie.Name)
 }
 
-func NewCsrfToken(seed int64) string {
-	rand.Seed(seed)
-	csrfToken := [10]rune{}
-	for i := 0; i < len(csrfToken); i++ {
-		/* #nosec */
-		csrfToken[i] = AllowedChars[rand.Intn(len(AllowedChars))]
+func NewCsrfToken() (string, error) {
+	// 32 bytes = 256 bits of entropy, plenty for CSRF
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
 	}
-	return string(csrfToken[:])
+
+	// base64 encode so it's safe to embed in HTML forms
+	return base64.URLEncoding.EncodeToString(b), nil
 }
 
-func NewCsrfCookie() http.Cookie {
-	csrfStateToken := NewCsrfToken(time.Now().UnixNano())
+func NewCsrfCookie() (http.Cookie, error) {
+	csrfStateToken, err := NewCsrfToken()
+	if err != nil {
+		return http.Cookie{}, fmt.Errorf("creating csrf token: %w", err)
+	}
 	return http.Cookie{
 		Name:     csrfStateCookieName,
 		Value:    csrfStateToken,
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
 		Secure:   !config.GetConfig().Security.InsecureCookieHeader,
-	}
+	}, nil
 }
 
 func VerifyCsrfCookie(ctx context.Context, request *http.Request) error {

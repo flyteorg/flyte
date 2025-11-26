@@ -2,6 +2,7 @@ package array
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"slices"
@@ -21,7 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	flyteErr "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
@@ -118,7 +119,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	if messageCollector.Length() > 0 {
-		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
+		return errors.New(messageCollector.Summary(events.MaxErrorMessageLength))
 	}
 
 	// update state for subNodes
@@ -166,7 +167,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	}
 
 	if messageCollector.Length() > 0 {
-		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
+		return errors.New(messageCollector.Summary(events.MaxErrorMessageLength))
 	}
 
 	return nil
@@ -210,7 +211,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			if err != nil {
 				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
-					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, flyteErr.IDLNotFoundErr, errMsg, nil),
 				), nil
 			}
 			if variable.GetOffloadedMetadata() != nil {
@@ -219,7 +220,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
 				if err != nil {
 					return handler.DoTransition(handler.TransitionTypeEphemeral,
-						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
+						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, flyteErr.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
 					), nil
 				}
 			}
@@ -230,7 +231,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					size = collectionLength
 				} else if size != collectionLength {
 					return handler.DoTransition(handler.TransitionTypeEphemeral,
-						handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_USER, flyteErr.InvalidArrayLength,
 							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
 					), nil
 				}
@@ -243,7 +244,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				size = 1
 			} else {
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
-					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength, "no input array provided", nil),
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, flyteErr.InvalidArrayLength, "no input array provided", nil),
 				), nil
 			}
 		}
@@ -558,7 +559,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
 			if err != nil {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM,
-					errors.BadSpecificationError, fmt.Sprintf("failed to find ArrayNode subNode task with id: '%s'", taskID), nil)), nil
+					flyteErr.BadSpecificationError, fmt.Sprintf("failed to find ArrayNode subNode task with id: '%s'", taskID), nil)), nil
 			}
 
 			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
@@ -637,7 +638,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			},
 		)), nil
 	default:
-		return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "invalid ArrayNode phase %+v", arrayNodeState.Phase)
+		return handler.UnknownTransition, flyteErr.Errorf(flyteErr.IllegalStateError, nCtx.NodeID(), "invalid ArrayNode phase %+v", arrayNodeState.Phase)
 	}
 
 	// if there were changes to subNode status then the eventRecorder will require finalizing to

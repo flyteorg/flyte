@@ -1,8 +1,6 @@
 module github.com/flyteorg/flyte/flytectl
 
-go 1.23.0
-
-toolchain go1.23.1
+go 1.24.0
 
 require (
 	github.com/apoorvam/goterminal v0.0.0-20180523175556-614d345c47e5

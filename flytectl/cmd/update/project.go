@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -104,7 +105,7 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 	}
 
 	if edits.GetId() == "" {
-		return fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
+		return errors.New(clierrors.ErrProjectNotPassed)
 	}
 
 	currentProject, err := cmdCtx.AdminFetcherExt().GetProjectByID(ctx, edits.GetId())
