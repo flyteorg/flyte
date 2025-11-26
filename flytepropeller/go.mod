@@ -32,6 +32,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/wI2L/jsondiff v0.6.0
 	gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7
+	go.etcd.io/etcd/api/v3 v3.5.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0
 	go.opentelemetry.io/otel v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
