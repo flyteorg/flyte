@@ -64,6 +64,18 @@ class TaskTriggersSummary(_message.Message):
     stats: TaskTriggersSummary.TriggerStats
     def __init__(self, details: _Optional[_Union[TaskTriggersSummary.TriggerDetails, _Mapping]] = ..., stats: _Optional[_Union[TaskTriggersSummary.TriggerStats, _Mapping]] = ...) -> None: ...
 
+class LatestRunSummary(_message.Message):
+    __slots__ = ["run_id", "run_time", "phase", "root_task_name"]
+    RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    RUN_TIME_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    ROOT_TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    run_id: str
+    run_time: _timestamp_pb2.Timestamp
+    phase: str
+    root_task_name: str
+    def __init__(self, run_id: _Optional[str] = ..., run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., phase: _Optional[str] = ..., root_task_name: _Optional[str] = ...) -> None: ...
+
 class TaskMetadata(_message.Message):
     __slots__ = ["deployed_by", "short_name", "deployed_at", "environment_name", "triggers_summary", "short_description"]
     DEPLOYED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -81,12 +93,14 @@ class TaskMetadata(_message.Message):
     def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., short_name: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., environment_name: _Optional[str] = ..., triggers_summary: _Optional[_Union[TaskTriggersSummary, _Mapping]] = ..., short_description: _Optional[str] = ...) -> None: ...
 
 class Task(_message.Message):
-    __slots__ = ["task_id", "metadata"]
+    __slots__ = ["task_id", "metadata", "latest_run"]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    LATEST_RUN_FIELD_NUMBER: _ClassVar[int]
     task_id: TaskIdentifier
     metadata: TaskMetadata
-    def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ...) -> None: ...
+    latest_run: LatestRunSummary
+    def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., latest_run: _Optional[_Union[LatestRunSummary, _Mapping]] = ...) -> None: ...
 
 class SourceCode(_message.Message):
     __slots__ = ["link"]

@@ -94,6 +94,24 @@ message TaskTriggersSummary {
   }
 }
 
+// LatestRunSummary contains minimal information about the most recent run of a task.
+// This is a lightweight summary that avoids circular dependencies with workflow package.
+message LatestRunSummary {
+  // Run identifier (run ID/name)
+  string run_id = 1;
+
+  // Last run time
+  google.protobuf.Timestamp run_time = 2;
+
+  // Phase of the last run as a string representing workflow.Phase (e.g.,
+  // "PHASE_SUCCEEDED", "PHASE_FAILED", "PHASE_RUNNING"). Avoid circular
+  // dependency with workflow.Phase enum.
+  string phase = 3;
+
+  // Name of the root task of the last run (env.task name)
+  string root_task_name = 4;
+}
+
 // TaskMetadata is static, lightweight metadata about a task.
 message TaskMetadata {
   // Identity that deployed the task.
@@ -122,6 +140,9 @@ message Task {
 
   // Metadata for this task.
   TaskMetadata metadata = 2 [(buf.validate.field).required = true];
+
+  // Summary of the latest run for this task, if any
+  optional LatestRunSummary latest_run = 3;
 }
 
 // Link to source code used to define this entity
