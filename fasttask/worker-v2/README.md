@@ -100,17 +100,40 @@ base = flyte.Image.from_debian_base()
 actor_image = base.clone(addl_layer=wheel_layer)
 ```
 
+If a test version has been published to test pypi, then you can use it in the task Image with
+```python
+flyte.Image.from_debian_base().with_pip_packages("unionai-reuse==0.1.8b4", extra_index_urls=["https://test.pypi.org/simple/"])
+```
 
 ## Releasing
-Most of this section should not exist - still awaiting proper CI.
+There is some CI in `.github/workflows/wheels.yml` at the base of this repo, but it is slow. That workflow will build and
+publish wheels to pypi and test pypi based on the following:
+
+To trigger the workflow, create and push a tag (or create on GitHub) matching `unionai_reuse-v*`.
+* Tags on the `master` branch publish to PyPI, while tags on feature branches publish to TestPyPI for testing.
+* Beta/prerelease versions (identified by `b`, `rc`, `alpha`, `beta`, or `dev` in the version string, e.g., `unionai_reuse-v0.1.8b0`)
+pushed from `master` will also publish to TestPyPI.
+* The workflow builds wheels for Linux (x86_64 and aarch64) and macOS
+platforms.
+
+To tag locally, run
+```bash
+git tag unionai_reuse-v0.1.9b0
+git push origin unionai_reuse-v0.1.9b0
+```
+
+However the CI is super, super slow - like running the ARM build takes like 40-50 mins. Can investigate ARM machines in the future.
+The below commands use the local commands and override the python version. This is the better option if you're in a hurry.
+Building for amd64 on a macbook arm is much faster, at least on my M4 I'm typing this on.
+The `make` targets are needed anyways in local development so we'll definitely keep these around.
+
 ```bash
 make build-wheels SETUPTOOLS_SCM_PRETEND_VERSION=0.1.7a0b0
 SETUPTOOLS_SCM_PRETEND_VERSION=0.1.7a0 python -m build --wheel
 ```
+
 but wheels need to be renamed to this pattern
 ```bash
 mv unionai_reuse-0.1.7a0-cp38-abi3-linux_aarch64.whl unionai_reuse-0.1.7a0-cp38-abi3-manylinux_2_28_aarch64.whl;
 mv unionai_reuse-0.1.7a0-cp38-abi3-linux_x86_64.whl unionai_reuse-0.1.7a0-cp38-abi3-manylinux_2_28_x86_64.whl
 ```
-
-Need to figure out how to make this automatic.

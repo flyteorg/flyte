@@ -1,47 +1,136 @@
-name: Build unionai-reuse
+name: Release unionai-reuse
 
 on:
   push:
-    branches:
-      - master
-      - fix-unwrap
-  workflow_dispatch:
+    tags:
+      - 'unionai_reuse-v*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  determine-publish-target:
+    name: Determine branch and publish target
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.info.outputs.version }}
+      is_master: ${{ steps.info.outputs.is_master }}
+      is_prerelease: ${{ steps.info.outputs.is_prerelease }}
+      publish_to_pypi: ${{ steps.info.outputs.publish_to_pypi }}
+      publish_to_testpypi: ${{ steps.info.outputs.publish_to_testpypi }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Determine version and publish targets
+        id: info
+        run: |
+          # Get the commit the tag points to
+          TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
+
+          # Check if this commit is on master
+          IS_MASTER="false"
+          if git branch -r --contains $TAG_COMMIT | grep -q 'origin/master'; then
+            IS_MASTER="true"
+          fi
+
+          # Extract version from tag name (e.g., unionai_reuse-v0.1.8 -> 0.1.8)
+          VERSION="${{ github.ref_name }}"
+          VERSION=${VERSION#unionai_reuse-v}
+
+          # Check if version is prerelease (contains b, rc, alpha, beta, dev)
+          IS_PRERELEASE="false"
+          if echo "$VERSION" | grep -qE 'b[0-9]|rc|alpha|beta|dev'; then
+            IS_PRERELEASE="true"
+          fi
+
+          # Determine publish targets:
+          # - Master + stable: PyPI only
+          # - Master + prerelease: Both TestPyPI and PyPI
+          # - Feature branch: TestPyPI only
+          PUBLISH_TO_PYPI="false"
+          PUBLISH_TO_TESTPYPI="false"
+
+          if [ "$IS_MASTER" = "true" ]; then
+            PUBLISH_TO_PYPI="true"
+            if [ "$IS_PRERELEASE" = "true" ]; then
+              PUBLISH_TO_TESTPYPI="true"
+            fi
+          else
+            PUBLISH_TO_TESTPYPI="true"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is_master=$IS_MASTER" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "publish_to_pypi=$PUBLISH_TO_PYPI" >> $GITHUB_OUTPUT
+          echo "publish_to_testpypi=$PUBLISH_TO_TESTPYPI" >> $GITHUB_OUTPUT
+
+          echo "📦 Version: $VERSION"
+          echo "🌿 On master: $IS_MASTER"
+          echo "🏷️  Prerelease: $IS_PRERELEASE"
+          echo "📤 Publish to PyPI: $PUBLISH_TO_PYPI"
+          echo "📤 Publish to TestPyPI: $PUBLISH_TO_TESTPYPI"
+
   build_wheel:
     name: Build wheels
+    needs: [determine-publish-target]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Set up QEMU for multi-arch
         if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: docker/setup-qemu-action@v3
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.0
         with:
           package-dir: fasttask/worker-v2
         env:
           CIBW_ARCHS_LINUX: "auto aarch64"
+          CIBW_ENVIRONMENT: "PATH=$HOME/.cargo/bin:$PATH SETUPTOOLS_SCM_PRETEND_VERSION=${{ needs.determine-publish-target.outputs.version }} SETUPTOOLS_SCM_LOCAL_SCHEME=no-local-version"
+
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
 
+  testpypi-publish:
+    name: Upload release to TestPyPI
+    needs: [determine-publish-target, build_wheel]
+    if: needs.determine-publish-target.outputs.publish_to_testpypi == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
+
+      - run: ls dist
+
+      - name: Publish package distributions to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          attestations: false
+
   pypi-publish:
     name: Upload release to PyPI
-    needs: [build_wheel]
+    needs: [determine-publish-target, build_wheel]
+    if: needs.determine-publish-target.outputs.publish_to_pypi == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
-    environment: release
-    # if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -49,8 +138,11 @@ jobs:
           pattern: cibw-*
           path: dist
           merge-multiple: true
+
       - run: ls dist
+
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
           attestations: false
