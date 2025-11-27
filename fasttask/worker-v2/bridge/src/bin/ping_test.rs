@@ -109,7 +109,7 @@ fn create_real_task(task_id: &str) -> Task {
         "--name".to_string(),
         task_id.to_string(),
         "--image-cache".to_string(),
-        "H4sIAAAAAAAC/03MQQrCMBCF4bvMWtLYSRByGZlMpjGYMlJTQUrurq0bV+/fvG+DMlOWa1W9rw8IG9DadF80ZwsB8o0XU3SY6ruJLvkXIaJznqxDZI6UJrHxwkIOfSLxPEI/AUVO8vqzvtLxNrtT5jyGSk2eDXrvH4y8QkGJAAAA".to_string(),
+        "H4sIAAAAAAAC/yXGQQqAIBAAwL/sAwotMf2MqGsqbWxIESH9vUNzmg519zk5Yt6uA2yHkojY3dwIwUIusQ2Vx5WeM3HLf6yRQSk/x6ijMhp1MCgk+nVJZgoaBbzvBw+uviZaAAAA".to_string(),
         "--tgz".to_string(),
         "/tmp/test-tgz/canonical-test.tar.gz".to_string(),
         "--dest".to_string(),

@@ -367,7 +367,7 @@ impl V2TaskManager {
                         error!("Failed to wait for executor process: {}", e);
                     }
                 }
-                Err(anyhow!("Executor process terminated, exiting"))
+                Err(anyhow!("Executor process terminated, exiting..."))
             }
 
             // Handle cancellation signal

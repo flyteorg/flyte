@@ -113,7 +113,6 @@ impl ConnectionRuntime for GRPCConnectionRuntime {
                 operation_tx.send(heartbeat_response).await?;
                 tokio::task::yield_now().await;
             }
-            info!("Exiting connection runtime heart-beating loop");
         }
         .into_future()
     }

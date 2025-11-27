@@ -5,9 +5,10 @@ use pyo3_async_runtimes::tokio::{future_into_py_with_locals, get_current_locals}
 use pyo3_async_runtimes::into_future_with_locals;
 use pyo3_async_runtimes::TaskLocals;
 use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::Duration;
 use pyo3::exceptions::PyValueError;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
 use tracing::{debug, info, warn};
@@ -15,8 +16,7 @@ use tracing_attributes::instrument;
 use unionai_actor_bridge::common::Task;
 use crate::TaskError;
 
-// todo: make this 180
-const GRACE: Duration = Duration::from_secs(10);
+const GRACE: Duration = Duration::from_secs(180);
 
 pyo3::create_exception!(async_bridge, CleanupTimeoutError, pyo3::exceptions::PyRuntimeError);
 
@@ -290,7 +290,12 @@ impl ActorEnvironment {
     }
 
     #[instrument(skip(self, task), fields(task.id = %task.unique_task_id), level = "info")]
-    pub async fn run(&self, task: Task, token: CancellationToken) -> Result<Py<PyAny>, TaskError> {
+    pub async fn run(
+        &self,
+        task: Task,
+        token: CancellationToken,
+        mut shutdown_rx: tokio::sync::broadcast::Receiver<String>,
+    ) -> Result<Py<PyAny>, TaskError> {
         let args = TaskArgs::from_command(&task.cmd)
             .map_err(|e| TaskError::Python(PyErr::new::<pyo3::exceptions::PyValueError, _>(e)))?;
 
@@ -369,11 +374,33 @@ impl ActorEnvironment {
                 result.map_err(|e| TaskError::Python(e))
             }
             _ = token.cancelled() => {
-                info!("Cancellation requested, canceling async Task for {:?}", run_name);
-                cancel_python_task(&self.locals, &py_task).await?;
+                // User-initiated abort only
+                info!("User-initiated cancellation for {:?}", run_name);
+                cancel_python_task(&self.locals, &py_task, None).await?;
 
                 let msg = format!("Task was aborted: run {:?}, action {:?}", run_name, action_name);
                 Err(TaskError::Cancelled(msg))
+            }
+            shutdown_msg = shutdown_rx.recv() => {
+                // System-wide shutdown due to controller error - this is a failure scenario
+                match shutdown_msg {
+                    Ok(error_msg) => {
+                        warn!(task_id = %task.unique_task_id, "System shutdown, failing task, action {:?} error: {}", action_name, error_msg);
+                        cancel_python_task(&self.locals, &py_task, Some(error_msg.clone())).await?;
+
+                        let msg = format!("Task failed due to system shutdown: action {:?}, reason: {}",
+                            action_name, error_msg);
+                        Err(TaskError::Python(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(msg)))
+                    }
+                    Err(_) => {
+                        // Shutdown channel closed without message
+                        warn!("Shutdown channel closed for {:?}", run_name);
+                        cancel_python_task(&self.locals, &py_task, Some("System shutdown".to_string())).await?;
+
+                        let msg = format!("Task failed due to system shutdown: run {:?}, action {:?}", run_name, action_name);
+                        Err(TaskError::Python(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(msg)))
+                    }
+                }
             }
         };
 
@@ -381,10 +408,14 @@ impl ActorEnvironment {
     }
 }
 
-async fn cancel_python_task(locals: &TaskLocals, py_task: &PyObject) -> Result<(), TaskError> {
+async fn cancel_python_task(locals: &TaskLocals, py_task: &PyObject, msg: Option<String>) -> Result<(), TaskError> {
     Python::with_gil(|py| -> PyResult<()> {
         let task = py_task.bind(py);
-        let _ = task.call_method0("cancel")?;
+        if let Some(message) = msg {
+            let _ = task.call_method1("cancel", (message,))?;
+        } else {
+            let _ = task.call_method0("cancel")?;
+        }
         Ok(())
     }).map_err(|e| TaskError::Python(e))?;
 

@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use pyo3_async_runtimes::tokio::into_future;
 use std::env;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 use tempfile::TempDir;
 use tokio::net::TcpStream;
 use tokio::sync::{mpsc, RwLock};
@@ -45,6 +47,13 @@ pub async fn run_worker_pool(
     let num_workers = args.num_workers.unwrap_or(1);
     info!("Starting worker pool");
 
+    // Create a shutdown flag that is checked by the workers
+    let shutdown = Arc::new(AtomicBool::new(false));
+    let worker_shutdown = Arc::clone(&shutdown);
+
+    // Broadcast channel for system-wide shutdown (separate from user-initiated cancellations)
+    let (shutdown_tx, _shutdown_rx) = tokio::sync::broadcast::channel::<String>(1);
+
     debug!("Creating controller for pool");
     let controller = match env::var("_UNION_EAGER_API_KEY") {
         Ok(value) => {
@@ -76,12 +85,15 @@ pub async fn run_worker_pool(
 
     // Channels for coordinating work between TCP handler and workers
     let (work_tx, work_rx) = mpsc::channel::<Task>(args.num_workers.unwrap_or(10));
-    let (response_tx, mut response_rx) = mpsc::channel::<Response>(100);
+    let (response_tx, mut response_rx) = mpsc::channel::<Response>(5 * args.num_workers.unwrap_or(50));
 
     // Single TCP connection handler
     let work_rx = Arc::new(tokio::sync::Mutex::new(work_rx));
     let tcp_addr = args.executor_registration_addr.clone();
     let registry_tcp = Arc::clone(&cancellation_registry);
+
+    // Move tcp stream creation up here and split the stream into reader and writer.
+    // This allows responses to be sent even if work_tx is full.
 
     tracker.spawn(async move {
         match TcpStream::connect(&tcp_addr).await {
@@ -123,6 +135,7 @@ pub async fn run_worker_pool(
                                     }
                                     debug!(task.id = %task.unique_task_id, "Distributing task to worker");
 
+                                    // potentially check the atomic boolean here. don't send onto the work channel
                                     if work_tx.send(task).await.is_err() {
                                         error!("Work channel closed, TCP handler exiting");
                                         break;
@@ -170,6 +183,8 @@ pub async fn run_worker_pool(
         let response_tx = response_tx.clone();
         let actor_environment = Arc::clone(&actor_environment);
         let registry_worker_pool = Arc::clone(&cancellation_registry);
+        let worker_shutdown_clone = Arc::clone(&worker_shutdown);
+        let worker_shutdown_rx = shutdown_tx.subscribe();
 
         tracker.spawn(async move {
             info!(worker.id = i, "Worker started");
@@ -177,6 +192,13 @@ pub async fn run_worker_pool(
                 let mut rx = work_rx.lock().await;
                 rx.recv().await
             } {
+                // Before doing anything make sure we're not in a shutdown state
+                if worker_shutdown_clone.load(Ordering::Acquire) {
+                    warn!(worker.id = i, task.id = %task.unique_task_id, "Worker shutting down because shutdown flag set...");
+                    // If in shutdown mode, shouldn't need to send back a response. The bridge should fail all non-terminal tasks.
+                    break;
+                }
+
                 let task_id = task.unique_task_id.clone();
 
                 let token = {
@@ -198,7 +220,7 @@ pub async fn run_worker_pool(
 
                 let task_execution = async {
                     debug!(cmd = ?task.cmd, "Processing task");
-                    let result = actor_environment.run(task, token).await;
+                    let result = actor_environment.run(task, token, worker_shutdown_rx.resubscribe()).await;
                     match &result {
                         Ok(_) => info!("Task completed successfully"),
                         Err(TaskError::Cancelled(msg)) => error!("Task aborted in run worker pool {}", msg),
@@ -244,7 +266,7 @@ pub async fn run_worker_pool(
                     break;
                 }
             }
-            info!(worker.id = i, "Worker finished");
+            warn!(worker.id = i, "Worker finished");
         });
     }
 
@@ -261,6 +283,22 @@ pub async fn run_worker_pool(
                 }
                 Err(e) => {
                     error!(error = %e, "Watch for errors terminated error");
+                    // Once we return an error from here, the top level asyncio.run shuts down, which causes a CancelledError
+                    // to be sent to all other running asyncio tasks (across any number of Runs)
+                    // To prevent that, broadcast a shutdown message intentionally, which will trigger an explicit
+                    // cancel from actor_environment.rs, which allows us to add a message to the cancel() call also.
+
+                    // Set the shutdown flag to prevent new tasks from starting
+                    shutdown.store(true, Ordering::Release);
+
+                    // Broadcast shutdown to all running tasks
+                    let shutdown_msg = format!("Controller error: {}", e);
+                    let _ = shutdown_tx.send(shutdown_msg);
+
+                    // Wait briefly for tasks to handle shutdown gracefully
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+
+                    return Err(e);
                 }
             }
         }
