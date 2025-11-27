@@ -131,6 +131,9 @@ jobs:
     needs: [determine-publish-target, build_wheel]
     if: needs.determine-publish-target.outputs.publish_to_pypi == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    environment: release
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -144,5 +147,4 @@ jobs:
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
           attestations: false
