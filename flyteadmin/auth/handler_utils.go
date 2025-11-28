@@ -168,7 +168,6 @@ func GetRedirectURLAllowed(ctx context.Context, urlRedirectParam string, cfg *co
 	}
 	logger.Debugf(ctx, "validating whether redirect url: %s is authorized", redirectURL)
 	for _, authorizedURI := range cfg.AuthorizedURIs {
-		authorizedURI := authorizedURI
 		if isAuthorizedRedirectURL(redirectURL, &authorizedURI.URL) {
 			logger.Debugf(ctx, "authorizing redirect url: %s against authorized uri: %s", redirectURL.String(), authorizedURI.String())
 			return true
