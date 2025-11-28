@@ -60,7 +60,7 @@ func (f *GcpFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 
 	serialized, err := json.Marshal(log)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to marshal fields to JSON, %w", err)
+		return nil, fmt.Errorf("failed to marshal fields to JSON: %w", err)
 	}
 	return append(serialized, '\n'), nil
 }

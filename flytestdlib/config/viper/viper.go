@@ -41,7 +41,7 @@ type viperAccessor struct {
 	rootConfig config.Section
 	// Ensures we initialize the file Watcher once.
 	watcherInitializer *sync.Once
-	existingFlagKeys   sets.String
+	existingFlagKeys   sets.Set[string]
 }
 
 func (viperAccessor) ID() string {
@@ -53,7 +53,7 @@ func (viperAccessor) InitializeFlags(cmdFlags *flag.FlagSet) {
 }
 
 func (v *viperAccessor) InitializePflags(cmdFlags *pflag.FlagSet) {
-	existingFlagKeys := sets.NewString()
+	existingFlagKeys := sets.New[string]()
 	cmdFlags.VisitAll(func(f *pflag.Flag) {
 		existingFlagKeys.Insert(f.Name)
 		if len(f.Shorthand) > 0 {
@@ -235,7 +235,7 @@ func stringToByteArray(f, t reflect.Type, data interface{}) (interface{}, error)
 // object. Otherwise, it'll just pass on the original data.
 func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, error) {
 	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
-	if to.Implements(unmarshalerType) || reflect.PtrTo(to).Implements(unmarshalerType) ||
+	if to.Implements(unmarshalerType) || reflect.PointerTo(to).Implements(unmarshalerType) ||
 		(canGetElement(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
 
 		ctx := context.Background()
@@ -268,7 +268,7 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 	errs := stdLibErrs.ErrorCollection{}
 	var mine interface{}
 	myKeysCount := 0
-	discoveredKeys := sets.NewString()
+	discoveredKeys := sets.New[string]()
 	if asMap, casted := settings.(map[string]interface{}); casted {
 		myMap := map[string]interface{}{}
 		for childKey, childValue := range asMap {
