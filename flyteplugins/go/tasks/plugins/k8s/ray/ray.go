@@ -82,7 +82,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	var primaryContainerIdx int
 	for idx, c := range podSpec.Containers {
 		if c.Name == primaryContainerName {
-			c := c
 			primaryContainer = &c
 			primaryContainerIdx = idx
 			break
@@ -281,7 +280,6 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	// Look for an existing volume mount on the primary container, mounted at /tmp/ray
 	for _, vm := range primaryContainer.VolumeMounts {
 		if vm.MountPath == rayStateMountPath {
-			vm := vm
 			rayStateVolMount = &vm
 			break
 		}
