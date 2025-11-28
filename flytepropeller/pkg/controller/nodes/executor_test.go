@@ -487,7 +487,6 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	mockEventSink := eventMocks.NewMockEventSink()
 
 	defaultNodeID := "n1"
-	taskID := taskID
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
 	createSingleNodeWf := func(p v1alpha1.NodePhase, maxAttempts int) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
@@ -1136,7 +1135,6 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	exec := execIface.(*recursiveNodeExecutor)
 
 	defaultNodeID := "n1"
-	taskID := taskID
 
 	createSingleNodeWf := func(parentPhase v1alpha1.NodePhase, maxAttempts int) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
 		startNode := &v1alpha1.NodeSpec{
@@ -1902,7 +1900,6 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 	exec := execIface.(*recursiveNodeExecutor)
 
 	defaultNodeID := "n1"
-	taskID := taskID
 	createSingleNodeWf := func(p v1alpha1.NodePhase, maxParallelism uint32) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
 		maxAttempts := 1
 		n := &v1alpha1.NodeSpec{
@@ -2600,7 +2597,6 @@ func (e existsMetadata) Etag() string {
 func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 	currentNodeID := "node-0"
 	downstreamNodeID := "node-1"
-	taskID := taskID
 
 	createMockWorkflow := func(currentNodePhase, downstreamNodePhase v1alpha1.NodePhase, dataStore *storage.DataStore) *v1alpha1.FlyteWorkflow {
 		return &v1alpha1.FlyteWorkflow{
