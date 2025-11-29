@@ -533,7 +533,7 @@ func getShardedLabelSelectorRequirements(cfg *config.Config) []v1.LabelSelectorR
 }
 
 // SharedInformerOptions creates informer options to work with FlytePropeller Sharding
-func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []informers.SharedInformerOption {
+func SharedInformerOptions(cfg *config.Config, defaultNamespace string) ([]informers.SharedInformerOption, []k8sInformers.SharedInformerOption) {
 	labelSelector := IgnoreCompletedWorkflowsLabelSelector()
 
 	shardedLabelSelectorRequirements := getShardedLabelSelectorRequirements(cfg)
@@ -547,10 +547,18 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 		}),
 	}
 
+	k8sOpts := []k8sInformers.SharedInformerOption{
+		k8sInformers.WithTweakListOptions(func(options *v1.ListOptions) {
+			options.LabelSelector = v1.FormatLabelSelector(labelSelector)
+		}),
+	}
+
 	if cfg.LimitNamespace != defaultNamespace {
 		opts = append(opts, informers.WithNamespace(cfg.LimitNamespace))
+		k8sOpts = append(k8sOpts, k8sInformers.WithNamespace(cfg.LimitNamespace))
 	}
-	return opts
+
+	return opts, k8sOpts
 }
 
 func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (manager.Manager, error) {
@@ -614,10 +622,10 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 		}
 	}
 
-	opts := SharedInformerOptions(cfg, defaultNamespace)
+	opts, k8sOpts := SharedInformerOptions(cfg, defaultNamespace)
 	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
 
-	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration)
+	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration, k8sOpts...)
 
 	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, mgr, *scope)
 	if err != nil {
