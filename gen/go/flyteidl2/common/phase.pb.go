@@ -20,19 +20,31 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// TODO: define phase transitions
+// ActionPhase represents the execution state of an action.
+//
+// Phase transitions follow this typical flow:
+// QUEUED -> WAITING_FOR_RESOURCES -> INITIALIZING -> RUNNING -> {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}
 type ActionPhase int32
 
 const (
-	ActionPhase_ACTION_PHASE_UNSPECIFIED           ActionPhase = 0
-	ActionPhase_ACTION_PHASE_QUEUED                ActionPhase = 1
+	// Default/unknown phase
+	ActionPhase_ACTION_PHASE_UNSPECIFIED ActionPhase = 0
+	// Action has been accepted and is waiting to be scheduled
+	ActionPhase_ACTION_PHASE_QUEUED ActionPhase = 1
+	// Action is scheduled but waiting for compute resources to become available
 	ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES ActionPhase = 2
-	ActionPhase_ACTION_PHASE_INITIALIZING          ActionPhase = 3
-	ActionPhase_ACTION_PHASE_RUNNING               ActionPhase = 4
-	ActionPhase_ACTION_PHASE_SUCCEEDED             ActionPhase = 5
-	ActionPhase_ACTION_PHASE_FAILED                ActionPhase = 6
-	ActionPhase_ACTION_PHASE_ABORTED               ActionPhase = 7
-	ActionPhase_ACTION_PHASE_TIMED_OUT             ActionPhase = 8
+	// Resources have been allocated and the action is being set up
+	ActionPhase_ACTION_PHASE_INITIALIZING ActionPhase = 3
+	// Action is actively executing
+	ActionPhase_ACTION_PHASE_RUNNING ActionPhase = 4
+	// Action completed successfully
+	ActionPhase_ACTION_PHASE_SUCCEEDED ActionPhase = 5
+	// Action failed during execution
+	ActionPhase_ACTION_PHASE_FAILED ActionPhase = 6
+	// Action was manually terminated or cancelled
+	ActionPhase_ACTION_PHASE_ABORTED ActionPhase = 7
+	// Action exceeded its execution time limit
+	ActionPhase_ACTION_PHASE_TIMED_OUT ActionPhase = 8
 )
 
 // Enum value maps for ActionPhase.
