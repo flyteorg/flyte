@@ -60,9 +60,6 @@ type TaskExecutionContext interface {
 
 	// Get a handle to catalog client
 	Catalog() catalog.AsyncClient
-
-	// Returns a handle to the Task events recorder, which get stored in the Admin.
-	EventsRecorder() EventsRecorder
 }
 
 // A simple fire-and-forget func
