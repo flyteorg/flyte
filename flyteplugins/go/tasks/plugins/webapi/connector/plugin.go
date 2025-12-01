@@ -11,6 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
@@ -95,6 +97,7 @@ type ResourceMetaWrapper struct {
 	ConnectorResourceMeta []byte
 	TaskCategory          plugins.TaskCategory
 	Domain                string
+	Connection            flyteIdl.Connection
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -152,6 +155,28 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		return nil, nil, err
 	}
 
+	connection := flyteIdl.Connection{}
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
+	}
+	// TODO: Fetch secrets
+	//for k, v := range connection.GetSecrets() {
+	//	secretID, err := secret.GetSecretID(v, source, labels)
+	//	if err != nil {
+	//		errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
+	//		logger.Errorf(ctx, errString)
+	//		return nil, nil, status.Errorf(codes.Internal, errString)
+	//	}
+	//	secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
+	//	if err != nil {
+	//		errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
+	//		logger.Errorf(ctx, errString)
+	//		return nil, nil, status.Errorf(codes.Internal, errString)
+	//	}
+	//	conn.Secrets[k] = secretVal
+	//}
+
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", connector.ConnectorDeployment)
@@ -171,7 +196,13 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		inputs = &task.Inputs{Literals: literals}
 	}
 
-	request := &plugins.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &plugins.CreateTaskRequest{
+		Inputs:                inputs,
+		Template:              taskTemplate,
+		OutputPrefix:          outputPrefix,
+		TaskExecutionMetadata: &taskExecutionMetadata,
+		Connection:            &connection,
+	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create task from connector with %v", err)
@@ -181,6 +212,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		OutputPrefix:          outputPrefix,
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          taskCategory,
+		Connection:            connection,
 		Domain:                taskTemplate.GetId().GetDomain(),
 	}, nil, nil
 }
@@ -203,6 +235,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.ConnectorResourceMeta,
 		OutputPrefix: metadata.OutputPrefix,
+		Connection:   &metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -240,6 +273,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	request := &plugins.DeleteTaskRequest{
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.ConnectorResourceMeta,
+		Connection:   &metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	if err != nil {
@@ -435,6 +469,7 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 }
 
 func RegisterConnectorPlugin(connectorService *ConnectorService) {
+	fmt.Printf("Registering connector plugin...\n")
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))
