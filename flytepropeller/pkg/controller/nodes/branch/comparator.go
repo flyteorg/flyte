@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -79,7 +80,7 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	}
 	comps, ok := perTypeComparators[lValueType.String()]
 	if !ok {
-		return false, errors.Errorf("Comparator not defined for type: [%v]", lValueType.String()) //nolint:govet,staticcheck
+		return false, fmt.Errorf("comparator not defined for type: [%v]", lValueType.String())
 	}
 	isBoolean := false
 	if lValueType.String() == primitiveBooleanType {
