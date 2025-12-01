@@ -4,15 +4,35 @@ package flyteidl2.common;
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
-// TODO: define phase transitions
+// ActionPhase represents the execution state of an action.
+//
+// Phase transitions follow this typical flow:
+// QUEUED -> WAITING_FOR_RESOURCES -> INITIALIZING -> RUNNING -> {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}
 enum ActionPhase {
+  // Default/unknown phase
   ACTION_PHASE_UNSPECIFIED = 0;
+
+  // Action has been accepted and is waiting to be scheduled
   ACTION_PHASE_QUEUED = 1;
+
+  // Action is scheduled but waiting for compute resources to become available
   ACTION_PHASE_WAITING_FOR_RESOURCES = 2;
+
+  // Resources have been allocated and the action is being set up
   ACTION_PHASE_INITIALIZING = 3;
+
+  // Action is actively executing
   ACTION_PHASE_RUNNING = 4;
+
+  // Action completed successfully
   ACTION_PHASE_SUCCEEDED = 5;
+
+  // Action failed during execution
   ACTION_PHASE_FAILED = 6;
+
+  // Action was manually terminated or cancelled
   ACTION_PHASE_ABORTED = 7;
+
+  // Action exceeded its execution time limit
   ACTION_PHASE_TIMED_OUT = 8;
 }
