@@ -148,10 +148,7 @@ func TestNewTaskExistsDifferentStructureError(t *testing.T) {
 }
 
 func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
-	req := &admin.TaskCreateRequest{
-		Id: &identifier,
-	}
-	statusErr := NewTaskExistsIdenticalStructureError(context.Background(), req)
+	statusErr := NewTaskExistsIdenticalStructureError()
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
@@ -293,10 +290,7 @@ func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
 }
 
 func TestNewLaunchPlanExistsIdenticalStructureError(t *testing.T) {
-	req := &admin.LaunchPlanCreateRequest{
-		Id: &identifier,
-	}
-	statusErr := NewLaunchPlanExistsIdenticalStructureError(context.Background(), req)
+	statusErr := NewLaunchPlanExistsIdenticalStructureError()
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)

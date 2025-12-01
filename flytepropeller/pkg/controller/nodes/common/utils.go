@@ -109,9 +109,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 	literalSizeMB := literalSizeBytes / MB
 	// check if the literal is large
 	if literalSizeMB >= literalOffloadingConfig.MaxSizeInMBForOffloading {
-		errString := fmt.Sprintf("Literal size [%d] MB is larger than the max size [%d] MB for offloading", literalSizeMB, literalOffloadingConfig.MaxSizeInMBForOffloading)
-		logger.Errorf(ctx, errString)
-		return fmt.Errorf(errString) //nolint:govet,staticcheck
+		return fmt.Errorf("literal size [%d] MB is larger than the max size [%d] MB for offloading", literalSizeMB, literalOffloadingConfig.MaxSizeInMBForOffloading)
 	}
 	if literalSizeMB < literalOffloadingConfig.MinSizeInMBForOffloading {
 		logger.Debugf(ctx, "Literal size [%d] MB is smaller than the min size [%d] MB for offloading", literalSizeMB, literalOffloadingConfig.MinSizeInMBForOffloading)
@@ -120,9 +118,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 
 	inferredType := validators.LiteralTypeForLiteral(toBeOffloaded)
 	if inferredType == nil {
-		errString := "Failed to determine literal type for offloaded literal"
-		logger.Errorf(ctx, errString)
-		return fmt.Errorf(errString) //nolint:govet,staticcheck
+		return fmt.Errorf("failed to determine literal type for offloaded literal")
 	}
 
 	// offload the literal

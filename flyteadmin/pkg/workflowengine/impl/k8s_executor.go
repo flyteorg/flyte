@@ -92,7 +92,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		TargetID: data.Cluster,
 	})
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error()) //nolint
+		return errors.NewFlyteAdminError(codes.Internal, err.Error())
 	}
 	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
 		PropagationPolicy: &deletePropagationBackground,
