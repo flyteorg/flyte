@@ -8,6 +8,11 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flyteorg/flyte/ci:v2
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:
         working-directory: ./gen/ts/
@@ -22,20 +27,15 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
-#      - name: Set up Node.js
-#        uses: wyvox/action-setup-pnpm@v3
-#        with:
-#          node-version: 20
-#          node-registry-url: 'https://registry.npmjs.org/'
-#          node-version-file: './gen/ts/package.json'
       - name: Set version in npm package
         run: |
           # v1.2.3 get 1.2.3
           VERSION=$(echo "${GITHUB_REF#refs/tags/v}")
           VERSION=$VERSION make update_npmversion
         shell: bash
-      - run: |
-          npm install
+
+      - name: Install dependencies
+        run: npm install
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

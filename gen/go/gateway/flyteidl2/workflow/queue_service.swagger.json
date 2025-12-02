@@ -182,6 +182,22 @@
       },
       "description": "Unique identifier of an action."
     },
+    "commonActionPhase": {
+      "type": "string",
+      "enum": [
+        "ACTION_PHASE_UNSPECIFIED",
+        "ACTION_PHASE_QUEUED",
+        "ACTION_PHASE_WAITING_FOR_RESOURCES",
+        "ACTION_PHASE_INITIALIZING",
+        "ACTION_PHASE_RUNNING",
+        "ACTION_PHASE_SUCCEEDED",
+        "ACTION_PHASE_FAILED",
+        "ACTION_PHASE_ABORTED",
+        "ACTION_PHASE_TIMED_OUT"
+      ],
+      "default": "ACTION_PHASE_UNSPECIFIED",
+      "description": "ActionPhase represents the execution state of an action.\n\nPhase transitions follow this typical flow:\nQUEUED -\u003e WAITING_FOR_RESOURCES -\u003e INITIALIZING -\u003e RUNNING -\u003e {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}\n\n - ACTION_PHASE_UNSPECIFIED: Default/unknown phase\n - ACTION_PHASE_QUEUED: Action has been accepted and is waiting to be scheduled\n - ACTION_PHASE_WAITING_FOR_RESOURCES: Action is scheduled but waiting for compute resources to become available\n - ACTION_PHASE_INITIALIZING: Resources have been allocated and the action is being set up\n - ACTION_PHASE_RUNNING: Action is actively executing\n - ACTION_PHASE_SUCCEEDED: Action completed successfully\n - ACTION_PHASE_FAILED: Action failed during execution\n - ACTION_PHASE_ABORTED: Action was manually terminated or cancelled\n - ACTION_PHASE_TIMED_OUT: Action exceeded its execution time limit"
+    },
     "commonRunIdentifier": {
       "type": "object",
       "properties": {
@@ -506,36 +522,6 @@
         }
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
-    },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
     "coreInputBindingData": {
       "type": "object",
@@ -976,32 +962,6 @@
       },
       "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
     },
-    "coreSecurityContext": {
-      "type": "object",
-      "properties": {
-        "run_as": {
-          "$ref": "#/definitions/flyteidl2coreIdentity",
-          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
-        },
-        "secrets": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidl2coreSecret"
-          },
-          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        },
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreOAuth2TokenRequest"
-          },
-          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        }
-      },
-      "description": "SecurityContext holds security attributes that apply to tasks."
-    },
     "coreSharedMemory": {
       "type": "object",
       "properties": {
@@ -1101,7 +1061,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidl2coreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -1135,7 +1095,7 @@
           "description": "This can be used to customize task handling at execution time for the same task type."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
         },
         "extended_resources": {
@@ -1290,6 +1250,36 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "flyteidl2coreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
+    },
     "flyteidl2coreIdentity": {
       "type": "object",
       "properties": {
@@ -1364,6 +1354,32 @@
       },
       "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
     },
+    "flyteidl2coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
+    },
     "flyteidl2coreTaskMetadata": {
       "type": "object",
       "properties": {
@@ -1435,22 +1451,6 @@
       },
       "title": "Task Metadata"
     },
-    "flyteidl2workflowPhase": {
-      "type": "string",
-      "enum": [
-        "PHASE_UNSPECIFIED",
-        "PHASE_QUEUED",
-        "PHASE_WAITING_FOR_RESOURCES",
-        "PHASE_INITIALIZING",
-        "PHASE_RUNNING",
-        "PHASE_SUCCEEDED",
-        "PHASE_FAILED",
-        "PHASE_ABORTED",
-        "PHASE_TIMED_OUT"
-      ],
-      "default": "PHASE_UNSPECIFIED",
-      "title": "TODO: define phase transitions"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -1506,12 +1506,57 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "taskCacheConfig": {
+      "type": "object",
+      "properties": {
+        "overwrite_cache": {
+          "type": "boolean",
+          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+        },
+        "cache_lookup_scope": {
+          "$ref": "#/definitions/taskCacheLookupScope",
+          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
+        }
+      },
+      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
+    },
+    "taskCacheLookupScope": {
+      "type": "string",
+      "enum": [
+        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+        "CACHE_LOOKUP_SCOPE_GLOBAL",
+        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
+      ],
+      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
+      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
+    },
+    "taskDocumentationEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."
@@ -1598,7 +1643,7 @@
         },
         "overwrite_cache": {
           "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
+          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
         },
         "cluster": {
           "type": "string",
@@ -1609,10 +1654,23 @@
           "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "SecurityContext holds security attributes that apply to tasks."
+        },
+        "cache_config": {
+          "$ref": "#/definitions/taskCacheConfig",
+          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
         }
       }
+    },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
     },
     "taskTaskIdentifier": {
       "type": "object",
@@ -1662,6 +1720,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "documentation": {
+          "$ref": "#/definitions/taskDocumentationEntity",
+          "title": "The documentation entity for the task"
         }
       },
       "description": "Specification for a task."
@@ -1749,7 +1811,7 @@
           "type": "string"
         },
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {

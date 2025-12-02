@@ -32,6 +32,7 @@ const (
 	RunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.RunService/WatchActions"
 	RunService_WatchClusterEvents_FullMethodName = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	RunService_AbortAction_FullMethodName        = "/flyteidl2.workflow.RunService/AbortAction"
+	RunService_WatchGroups_FullMethodName        = "/flyteidl2.workflow.RunService/WatchGroups"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -66,6 +67,8 @@ type RunServiceClient interface {
 	WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error)
+	// Stream updates for task groups based on the provided filter criteria.
+	WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error)
 }
 
 type runServiceClient struct {
@@ -308,6 +311,38 @@ func (c *runServiceClient) AbortAction(ctx context.Context, in *AbortActionReque
 	return out, nil
 }
 
+func (c *runServiceClient) WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[5], RunService_WatchGroups_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &runServiceWatchGroupsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type RunService_WatchGroupsClient interface {
+	Recv() (*WatchGroupsResponse, error)
+	grpc.ClientStream
+}
+
+type runServiceWatchGroupsClient struct {
+	grpc.ClientStream
+}
+
+func (x *runServiceWatchGroupsClient) Recv() (*WatchGroupsResponse, error) {
+	m := new(WatchGroupsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // RunServiceServer is the server API for RunService service.
 // All implementations should embed UnimplementedRunServiceServer
 // for forward compatibility
@@ -340,6 +375,8 @@ type RunServiceServer interface {
 	WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error)
+	// Stream updates for task groups based on the provided filter criteria.
+	WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error
 }
 
 // UnimplementedRunServiceServer should be embedded to have forward compatible implementations.
@@ -384,6 +421,9 @@ func (UnimplementedRunServiceServer) WatchClusterEvents(*WatchClusterEventsReque
 }
 func (UnimplementedRunServiceServer) AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbortAction not implemented")
+}
+func (UnimplementedRunServiceServer) WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchGroups not implemented")
 }
 
 // UnsafeRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -646,6 +686,27 @@ func _RunService_AbortAction_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RunService_WatchGroups_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchGroupsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(RunServiceServer).WatchGroups(m, &runServiceWatchGroupsServer{stream})
+}
+
+type RunService_WatchGroupsServer interface {
+	Send(*WatchGroupsResponse) error
+	grpc.ServerStream
+}
+
+type runServiceWatchGroupsServer struct {
+	grpc.ServerStream
+}
+
+func (x *runServiceWatchGroupsServer) Send(m *WatchGroupsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // RunService_ServiceDesc is the grpc.ServiceDesc for RunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -710,6 +771,11 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "WatchClusterEvents",
 			Handler:       _RunService_WatchClusterEvents_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "WatchGroups",
+			Handler:       _RunService_WatchGroups_Handler,
 			ServerStreams: true,
 		},
 	},

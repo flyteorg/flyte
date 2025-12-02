@@ -470,6 +470,109 @@ var _ interface {
 	ErrorName() string
 } = RawDataStorageValidationError{}
 
+// Validate checks the field values on CacheConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *CacheConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CacheConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CacheConfigMultiError, or
+// nil if none found.
+func (m *CacheConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CacheConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OverwriteCache
+
+	// no validation rules for CacheLookupScope
+
+	if len(errors) > 0 {
+		return CacheConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// CacheConfigMultiError is an error wrapping multiple validation errors
+// returned by CacheConfig.ValidateAll() if the designated constraints aren't met.
+type CacheConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CacheConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CacheConfigMultiError) AllErrors() []error { return m }
+
+// CacheConfigValidationError is the validation error returned by
+// CacheConfig.Validate if the designated constraints aren't met.
+type CacheConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CacheConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CacheConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CacheConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CacheConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CacheConfigValidationError) ErrorName() string { return "CacheConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CacheConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCacheConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CacheConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CacheConfigValidationError{}
+
 // Validate checks the field values on RunSpec with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -663,6 +766,35 @@ func (m *RunSpec) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return RunSpecValidationError{
 				field:  "SecurityContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCacheConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RunSpecValidationError{
+					field:  "CacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RunSpecValidationError{
+					field:  "CacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RunSpecValidationError{
+				field:  "CacheConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

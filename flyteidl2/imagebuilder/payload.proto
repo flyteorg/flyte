@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.imagebuilder;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/imagebuilder/definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
@@ -10,8 +11,15 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder"
 message GetImageRequest {
   // Image ID
   ImageIdentifier id = 1 [(buf.validate.field).required = true];
+
   // Optional organization that dictates which dataplane registry to reference
-  string organization = 2;
+  // Deprecated, please use the full ProjectIdentifier instead
+  string organization = 2 [deprecated = true];
+
+  // The scope in which to look for the image. Images maybe accessible in different project-domain pairs through
+  // different container registries (i.e. different image FQDNs)
+  // TODO: This scope will be made required after updating all clients/servers to respect it.
+  flyteidl2.common.ProjectIdentifier project_id = 3;
 }
 
 // GetSecretProxyResponse returns the looked up secret from the secret service

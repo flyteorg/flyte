@@ -30,6 +30,11 @@ class TaskServiceStub(object):
                 request_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListTasksRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListTasksResponse.FromString,
                 )
+        self.ListVersions = channel.unary_unary(
+                '/flyteidl2.task.TaskService/ListVersions',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.FromString,
+                )
 
 
 class TaskServiceServicer(object):
@@ -57,6 +62,13 @@ class TaskServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListVersions(self, request, context):
+        """Lists all versions for a task.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TaskServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -74,6 +86,11 @@ def add_TaskServiceServicer_to_server(servicer, server):
                     servicer.ListTasks,
                     request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListTasksRequest.FromString,
                     response_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListTasksResponse.SerializeToString,
+            ),
+            'ListVersions': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListVersions,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -134,5 +151,22 @@ class TaskService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/ListTasks',
             flyteidl2_dot_task_dot_task__service__pb2.ListTasksRequest.SerializeToString,
             flyteidl2_dot_task_dot_task__service__pb2.ListTasksResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListVersions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/ListVersions',
+            flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

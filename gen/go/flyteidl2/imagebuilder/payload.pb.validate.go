@@ -88,6 +88,35 @@ func (m *GetImageRequest) validate(all bool) error {
 
 	// no validation rules for Organization
 
+	if all {
+		switch v := interface{}(m.GetProjectId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetImageRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetImageRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetImageRequestValidationError{
+				field:  "ProjectId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return GetImageRequestMultiError(errors)
 	}

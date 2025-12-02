@@ -5,6 +5,7 @@ from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -209,3 +210,30 @@ class AbortActionRequest(_message.Message):
 class AbortActionResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class WatchGroupsRequest(_message.Message):
+    __slots__ = ["project_id", "start_date", "end_date", "request", "known_sort_fields"]
+    class KnownSortField(_message.Message):
+        __slots__ = ["created_at"]
+        CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+        created_at: _list_pb2.Sort.Direction
+        def __init__(self, created_at: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ...) -> None: ...
+    PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    START_DATE_FIELD_NUMBER: _ClassVar[int]
+    END_DATE_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    KNOWN_SORT_FIELDS_FIELD_NUMBER: _ClassVar[int]
+    project_id: _identifier_pb2.ProjectIdentifier
+    start_date: _timestamp_pb2.Timestamp
+    end_date: _timestamp_pb2.Timestamp
+    request: _list_pb2.ListRequest
+    known_sort_fields: _containers.RepeatedCompositeFieldContainer[WatchGroupsRequest.KnownSortField]
+    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., start_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., known_sort_fields: _Optional[_Iterable[_Union[WatchGroupsRequest.KnownSortField, _Mapping]]] = ...) -> None: ...
+
+class WatchGroupsResponse(_message.Message):
+    __slots__ = ["task_groups", "sentinel"]
+    TASK_GROUPS_FIELD_NUMBER: _ClassVar[int]
+    SENTINEL_FIELD_NUMBER: _ClassVar[int]
+    task_groups: _containers.RepeatedCompositeFieldContainer[_run_definition_pb2.TaskGroup]
+    sentinel: bool
+    def __init__(self, task_groups: _Optional[_Iterable[_Union[_run_definition_pb2.TaskGroup, _Mapping]]] = ..., sentinel: bool = ...) -> None: ...

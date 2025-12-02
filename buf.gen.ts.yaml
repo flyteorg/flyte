@@ -10,6 +10,7 @@ managed:
 plugins:
   - remote: buf.build/bufbuild/es:v2.2.5
     out: gen/ts
+    include_imports: true
     opt:
       - target=ts
       - import_extension=.ts

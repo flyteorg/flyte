@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.Sort_Direction(0)
 )
 
 // Validate checks the field values on CreateRunRequest with the rules defined
@@ -4036,3 +4040,532 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AbortActionResponseValidationError{}
+
+// Validate checks the field values on WatchGroupsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WatchGroupsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchGroupsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WatchGroupsRequestMultiError, or nil if none found.
+func (m *WatchGroupsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchGroupsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetStartDate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "StartDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "StartDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStartDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchGroupsRequestValidationError{
+				field:  "StartDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetEndDate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "EndDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "EndDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEndDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchGroupsRequestValidationError{
+				field:  "EndDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WatchGroupsRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchGroupsRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetKnownSortFields() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchGroupsRequestValidationError{
+						field:  fmt.Sprintf("KnownSortFields[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchGroupsRequestValidationError{
+						field:  fmt.Sprintf("KnownSortFields[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchGroupsRequestValidationError{
+					field:  fmt.Sprintf("KnownSortFields[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	switch v := m.ScopeBy.(type) {
+	case *WatchGroupsRequest_ProjectId:
+		if v == nil {
+			err := WatchGroupsRequestValidationError{
+				field:  "ScopeBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetProjectId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchGroupsRequestValidationError{
+						field:  "ProjectId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchGroupsRequestValidationError{
+						field:  "ProjectId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchGroupsRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return WatchGroupsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchGroupsRequestMultiError is an error wrapping multiple validation errors
+// returned by WatchGroupsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type WatchGroupsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchGroupsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchGroupsRequestMultiError) AllErrors() []error { return m }
+
+// WatchGroupsRequestValidationError is the validation error returned by
+// WatchGroupsRequest.Validate if the designated constraints aren't met.
+type WatchGroupsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchGroupsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchGroupsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchGroupsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchGroupsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchGroupsRequestValidationError) ErrorName() string {
+	return "WatchGroupsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchGroupsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchGroupsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchGroupsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchGroupsRequestValidationError{}
+
+// Validate checks the field values on WatchGroupsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WatchGroupsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchGroupsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WatchGroupsResponseMultiError, or nil if none found.
+func (m *WatchGroupsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchGroupsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetTaskGroups() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchGroupsResponseValidationError{
+						field:  fmt.Sprintf("TaskGroups[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchGroupsResponseValidationError{
+						field:  fmt.Sprintf("TaskGroups[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchGroupsResponseValidationError{
+					field:  fmt.Sprintf("TaskGroups[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Sentinel
+
+	if len(errors) > 0 {
+		return WatchGroupsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchGroupsResponseMultiError is an error wrapping multiple validation
+// errors returned by WatchGroupsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type WatchGroupsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchGroupsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchGroupsResponseMultiError) AllErrors() []error { return m }
+
+// WatchGroupsResponseValidationError is the validation error returned by
+// WatchGroupsResponse.Validate if the designated constraints aren't met.
+type WatchGroupsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchGroupsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchGroupsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchGroupsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchGroupsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchGroupsResponseValidationError) ErrorName() string {
+	return "WatchGroupsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchGroupsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchGroupsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchGroupsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchGroupsResponseValidationError{}
+
+// Validate checks the field values on WatchGroupsRequest_KnownSortField with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *WatchGroupsRequest_KnownSortField) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchGroupsRequest_KnownSortField
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// WatchGroupsRequest_KnownSortFieldMultiError, or nil if none found.
+func (m *WatchGroupsRequest_KnownSortField) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchGroupsRequest_KnownSortField) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.SortBy.(type) {
+	case *WatchGroupsRequest_KnownSortField_CreatedAt:
+		if v == nil {
+			err := WatchGroupsRequest_KnownSortFieldValidationError{
+				field:  "SortBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for CreatedAt
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return WatchGroupsRequest_KnownSortFieldMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchGroupsRequest_KnownSortFieldMultiError is an error wrapping multiple
+// validation errors returned by
+// WatchGroupsRequest_KnownSortField.ValidateAll() if the designated
+// constraints aren't met.
+type WatchGroupsRequest_KnownSortFieldMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchGroupsRequest_KnownSortFieldMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchGroupsRequest_KnownSortFieldMultiError) AllErrors() []error { return m }
+
+// WatchGroupsRequest_KnownSortFieldValidationError is the validation error
+// returned by WatchGroupsRequest_KnownSortField.Validate if the designated
+// constraints aren't met.
+type WatchGroupsRequest_KnownSortFieldValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchGroupsRequest_KnownSortFieldValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchGroupsRequest_KnownSortFieldValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchGroupsRequest_KnownSortFieldValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchGroupsRequest_KnownSortFieldValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchGroupsRequest_KnownSortFieldValidationError) ErrorName() string {
+	return "WatchGroupsRequest_KnownSortFieldValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchGroupsRequest_KnownSortFieldValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchGroupsRequest_KnownSortField.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchGroupsRequest_KnownSortFieldValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchGroupsRequest_KnownSortFieldValidationError{}

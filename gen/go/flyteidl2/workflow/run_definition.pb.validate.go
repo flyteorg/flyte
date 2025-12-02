@@ -18,6 +18,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/anypb"
 
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+
 	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -35,6 +37,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
 
 	_ = core.CatalogCacheStatus(0)
 )
@@ -1380,6 +1384,41 @@ func (m *ActionMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for EnvironmentName
+
+	// no validation rules for FuntionName
+
+	// no validation rules for TriggerName
+
+	if all {
+		switch v := interface{}(m.GetTriggerType()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "TriggerType",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "TriggerType",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTriggerType()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionMetadataValidationError{
+				field:  "TriggerType",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:
 		if v == nil {
@@ -1674,6 +1713,10 @@ func (m *ActionStatus) validate(all bool) error {
 			}
 		}
 
+	}
+
+	if m.DurationMs != nil {
+		// no validation rules for DurationMs
 	}
 
 	if len(errors) > 0 {
@@ -4068,3 +4111,233 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ActionSpecValidationError{}
+
+// Validate checks the field values on TaskGroup with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TaskGroup) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskGroup with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TaskGroupMultiError, or nil
+// if none found.
+func (m *TaskGroup) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskGroup) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TaskName
+
+	// no validation rules for EnvironmentName
+
+	// no validation rules for TotalRuns
+
+	if all {
+		switch v := interface{}(m.GetLatestRunTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "LatestRunTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "LatestRunTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLatestRunTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskGroupValidationError{
+				field:  "LatestRunTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AverageFailureRate
+
+	if all {
+		switch v := interface{}(m.GetAverageDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "AverageDuration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "AverageDuration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAverageDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskGroupValidationError{
+				field:  "AverageDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLatestFinishedTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "LatestFinishedTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskGroupValidationError{
+					field:  "LatestFinishedTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLatestFinishedTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskGroupValidationError{
+				field:  "LatestFinishedTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetCreatedBy() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("CreatedBy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("CreatedBy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskGroupValidationError{
+					field:  fmt.Sprintf("CreatedBy[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ShouldDelete
+
+	if len(errors) > 0 {
+		return TaskGroupMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskGroupMultiError is an error wrapping multiple validation errors returned
+// by TaskGroup.ValidateAll() if the designated constraints aren't met.
+type TaskGroupMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskGroupMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskGroupMultiError) AllErrors() []error { return m }
+
+// TaskGroupValidationError is the validation error returned by
+// TaskGroup.Validate if the designated constraints aren't met.
+type TaskGroupValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskGroupValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskGroupValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskGroupValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskGroupValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskGroupValidationError) ErrorName() string { return "TaskGroupValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TaskGroupValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskGroup.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskGroupValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskGroupValidationError{}

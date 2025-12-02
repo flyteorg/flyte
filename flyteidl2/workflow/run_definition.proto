@@ -5,12 +5,14 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/types.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -51,7 +53,7 @@ message TraceAction {
   string name = 1 [(buf.validate.field).string.min_len = 1];
 
   // Last known phase.
-  Phase phase = 2;
+  common.ActionPhase phase = 2;
 
   // Time the attempt started.
   google.protobuf.Timestamp start_time = 3;
@@ -154,19 +156,18 @@ message ActionMetadata {
 
   // If this run was initiated by a trigger, this will store the trigger identifier.
   common.TriggerIdentifier trigger_id = 11;
-}
 
-// TODO: define phase transitions
-enum Phase {
-  PHASE_UNSPECIFIED = 0;
-  PHASE_QUEUED = 1;
-  PHASE_WAITING_FOR_RESOURCES = 2;
-  PHASE_INITIALIZING = 3;
-  PHASE_RUNNING = 4;
-  PHASE_SUCCEEDED = 5;
-  PHASE_FAILED = 6;
-  PHASE_ABORTED = 7;
-  PHASE_TIMED_OUT = 8;
+  // Environment name
+  string environment_name = 12;
+
+  // Function name
+  string funtion_name = 13;
+
+  // Trigger name
+  string trigger_name = 14;
+
+  // Trigger Type
+  task.TriggerAutomationSpec trigger_type = 15;
 }
 
 enum ActionType {
@@ -179,7 +180,7 @@ enum ActionType {
 // Lightweight status of an action. For more detailed status see ActionDetails.
 message ActionStatus {
   // Last known phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time the action started.
   google.protobuf.Timestamp start_time = 2;
@@ -192,6 +193,9 @@ message ActionStatus {
 
   // cache status of the action's latest attempt
   flyteidl2.core.CatalogCacheStatus cache_status = 5;
+
+  // Duration of the action in milliseconds.
+  optional uint64 duration_ms = 6;
 }
 
 // Lightweight representation of an action.
@@ -274,7 +278,7 @@ message ActionDetails {
 // ActionAttempt is a single attempt of an action.
 message ActionAttempt {
   // Last known phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time the attempt started.
   google.protobuf.Timestamp start_time = 2;
@@ -326,7 +330,7 @@ message ClusterEvent {
 
 message PhaseTransition {
   // The phase.
-  Phase phase = 1;
+  common.ActionPhase phase = 1;
 
   // Time this phase started.
   google.protobuf.Timestamp start_time = 2;
@@ -344,7 +348,7 @@ message ActionEvent {
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
   // The phase for this attempt.
-  Phase phase = 3;
+  common.ActionPhase phase = 3;
 
   // The version of this attempt and phase.
   uint32 version = 4;
@@ -416,4 +420,37 @@ enum RunSource {
   RUN_SOURCE_WEB = 1;
   RUN_SOURCE_CLI = 2;
   RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+}
+
+// TaskGroup represents a group of runs for a specific task.
+message TaskGroup {
+  // Task name.
+  string task_name = 1;
+
+  // Environment name.
+  string environment_name = 2;
+
+  // Total number of runs for this task.
+  int64 total_runs = 3;
+
+  // Timestamp of the most recent run.
+  google.protobuf.Timestamp latest_run_time = 4;
+
+  // Recent run statuses, ordered from newest to oldest. Number of statuses determined by request.
+  repeated common.ActionPhase recent_statuses = 5;
+
+  // Average failure rate of runs in this group (0.0 to 1.0).
+  // Computed as number of root actions with phase FAILED divided by total root actions.
+  double average_failure_rate = 6;
+
+  // Average duration of runs in this group.
+  google.protobuf.Duration average_duration = 7;
+
+  // Timestamp of the most recent finished run (terminal phase).
+  google.protobuf.Timestamp latest_finished_time = 8;
+
+  // List of user/application's enriched identity that created runs in this group.
+  repeated common.EnrichedIdentity created_by = 9;
+
+  bool should_delete = 10;
 }
