@@ -182,6 +182,22 @@
       },
       "description": "Unique identifier of an action."
     },
+    "commonActionPhase": {
+      "type": "string",
+      "enum": [
+        "ACTION_PHASE_UNSPECIFIED",
+        "ACTION_PHASE_QUEUED",
+        "ACTION_PHASE_WAITING_FOR_RESOURCES",
+        "ACTION_PHASE_INITIALIZING",
+        "ACTION_PHASE_RUNNING",
+        "ACTION_PHASE_SUCCEEDED",
+        "ACTION_PHASE_FAILED",
+        "ACTION_PHASE_ABORTED",
+        "ACTION_PHASE_TIMED_OUT"
+      ],
+      "default": "ACTION_PHASE_UNSPECIFIED",
+      "description": "ActionPhase represents the execution state of an action.\n\nPhase transitions follow this typical flow:\nQUEUED -\u003e WAITING_FOR_RESOURCES -\u003e INITIALIZING -\u003e RUNNING -\u003e {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}\n\n - ACTION_PHASE_UNSPECIFIED: Default/unknown phase\n - ACTION_PHASE_QUEUED: Action has been accepted and is waiting to be scheduled\n - ACTION_PHASE_WAITING_FOR_RESOURCES: Action is scheduled but waiting for compute resources to become available\n - ACTION_PHASE_INITIALIZING: Resources have been allocated and the action is being set up\n - ACTION_PHASE_RUNNING: Action is actively executing\n - ACTION_PHASE_SUCCEEDED: Action completed successfully\n - ACTION_PHASE_FAILED: Action failed during execution\n - ACTION_PHASE_ABORTED: Action was manually terminated or cancelled\n - ACTION_PHASE_TIMED_OUT: Action exceeded its execution time limit"
+    },
     "commonRunIdentifier": {
       "type": "object",
       "properties": {
@@ -1435,22 +1451,6 @@
       },
       "title": "Task Metadata"
     },
-    "flyteidl2workflowPhase": {
-      "type": "string",
-      "enum": [
-        "PHASE_UNSPECIFIED",
-        "PHASE_QUEUED",
-        "PHASE_WAITING_FOR_RESOURCES",
-        "PHASE_INITIALIZING",
-        "PHASE_RUNNING",
-        "PHASE_SUCCEEDED",
-        "PHASE_FAILED",
-        "PHASE_ABORTED",
-        "PHASE_TIMED_OUT"
-      ],
-      "default": "PHASE_UNSPECIFIED",
-      "title": "TODO: define phase transitions"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -1811,7 +1811,7 @@
           "type": "string"
         },
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {
