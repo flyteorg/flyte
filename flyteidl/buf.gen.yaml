@@ -8,7 +8,7 @@ plugins:
     out: gen/pb_python
   - plugin: buf.build/protocolbuffers/pyi:v22.2
     out: gen/pb_python
-  - plugin: buf.build/community/neoeinstein-prost
+  - plugin: buf.build/community/neoeinstein-prost:v0.4.0
     out: gen/pb_rust
   - plugin: buf.build/community/neoeinstein-tonic:v0.4.0
     out: gen/pb_rust

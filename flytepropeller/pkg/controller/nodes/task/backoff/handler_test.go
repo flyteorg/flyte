@@ -37,6 +37,14 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 		return nil
 	}
 
+	operWithGPUQuotaErr := func() error {
+		callCount++
+		return apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.nvidia.com/gpu=1, "+
+				"used: requests.nvidia.com/gpu=128, limited: requests.nvidia.com/gpu=128"))
+	}
+
 	ctx := context.TODO()
 	tc := testing2.NewFakeClock(time.Now())
 	type fields struct {
@@ -133,6 +141,113 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 			wantNextEligibleTime: tc.Now().Add(time.Second * 2),
 			wantCeilings:         v1.ResourceList{v1.ResourceCPU: resource.MustParse("1Ei"), v1.ResourceMemory: resource.MustParse("1Gi")},
 			wantCallCount:        1,
+		},
+		{name: "GPU quota exceeded should update GPU ceiling and trigger backoff",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    stdAtomic.NewUint32(0),
+					NextEligibleTime:   NewAtomicTime(tc.Now().Add(time.Second * -2)),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1Ei")}),
+				},
+			},
+			args: args{
+				operation:             operWithGPUQuotaErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              1,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 1),
+			wantCeilings:         v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")},
+			wantCallCount:        1,
+		},
+
+		{name: "GPU request exceeding ceiling during backoff should be blocked without calling operation",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    stdAtomic.NewUint32(1),
+					NextEligibleTime:   NewAtomicTime(tc.Now().Add(time.Second * 5)),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")}),
+				},
+			},
+			args: args{
+				operation:             operWithNoErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("2")}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              1,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 5),
+			wantCeilings:         v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")},
+			wantCallCount:        0,
+		},
+
+		{name: "Smaller GPU request during backoff should be tried and update ceiling on failure",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    stdAtomic.NewUint32(2),
+					NextEligibleTime:   NewAtomicTime(tc.Now().Add(time.Second * 5)),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("2")}),
+				},
+			},
+			args: args{
+				operation:             operWithGPUQuotaErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              2,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 5),
+			wantCeilings:         v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")},
+			wantCallCount:        1,
+		},
+
+		{name: "Mixed resources request exceeding GPU ceiling should be blocked",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    stdAtomic.NewUint32(1),
+					NextEligibleTime:   NewAtomicTime(tc.Now().Add(time.Second * 5)),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: SyncResourceListFromResourceList(v1.ResourceList{
+						v1.ResourceCPU:                    resource.MustParse("100"),
+						v1.ResourceMemory:                 resource.MustParse("500Gi"),
+						v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+					}),
+				},
+			},
+			args: args{
+				operation: operWithNoErr,
+				requestedResourceList: v1.ResourceList{
+					v1.ResourceCPU:                    resource.MustParse("4"),
+					v1.ResourceMemory:                 resource.MustParse("16Gi"),
+					v1.ResourceName("nvidia.com/gpu"): resource.MustParse("2"),
+				}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              1,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 5),
+			wantCeilings: v1.ResourceList{
+				v1.ResourceCPU:                    resource.MustParse("100"),
+				v1.ResourceMemory:                 resource.MustParse("500Gi"),
+				v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+			},
+			wantCallCount: 0,
 		},
 	}
 
@@ -413,6 +528,26 @@ func TestGetComputeResourceAndQuantityRequested(t *testing.T) {
 				"exceeded quota: project-quota, requested: requests.cpu=7,requests.memory=64Gi, used: requests.cpu=249,requests.memory=2012730Mi, limited: requests.cpu=250,requests.memory=2000Gi")),
 			regexp: requestedRequestsRegexp},
 			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("7"), v1.ResourceMemory: resource.MustParse("64Gi")}},
+		{name: "Limited GPU requests (extended resource)", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.nvidia.com/gpu=1, used: requests.nvidia.com/gpu=128, limited: requests.nvidia.com/gpu=128")),
+			regexp: limitedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("128")}},
+		{name: "Requested GPU requests (extended resource)", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.nvidia.com/gpu=1, used: requests.nvidia.com/gpu=128, limited: requests.nvidia.com/gpu=128")),
+			regexp: requestedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1")}},
+		{name: "Mixed CPU, memory and GPU requests", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=4,requests.memory=16Gi,requests.nvidia.com/gpu=2, used: requests.cpu=100,requests.memory=500Gi,requests.nvidia.com/gpu=128, limited: requests.cpu=200,requests.memory=1000Gi,requests.nvidia.com/gpu=128")),
+			regexp: requestedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("4"), v1.ResourceMemory: resource.MustParse("16Gi"), v1.ResourceName("nvidia.com/gpu"): resource.MustParse("2")}},
+		{name: "Limited mixed resources with GPU", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=4,requests.memory=16Gi,requests.nvidia.com/gpu=2, used: requests.cpu=100,requests.memory=500Gi,requests.nvidia.com/gpu=128, limited: requests.cpu=200,requests.memory=1000Gi,requests.nvidia.com/gpu=128")),
+			regexp: limitedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("200"), v1.ResourceMemory: resource.MustParse("1000Gi"), v1.ResourceName("nvidia.com/gpu"): resource.MustParse("128")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -18,10 +18,10 @@ import (
 )
 
 var (
-	limitedLimitsRegexp     = regexp.MustCompile(`limited: (limits.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
-	limitedRequestsRegexp   = regexp.MustCompile(`limited: (requests.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
-	requestedLimitsRegexp   = regexp.MustCompile(`requested: (limits.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
-	requestedRequestsRegexp = regexp.MustCompile(`requested: (requests.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
+	limitedLimitsRegexp     = regexp.MustCompile(`limited: (limits.[a-zA-Z0-9.\/_-]+=[a-zA-Z0-9]+[,]*)+`)
+	limitedRequestsRegexp   = regexp.MustCompile(`limited: (requests.[a-zA-Z0-9.\/_-]+=[a-zA-Z0-9]+[,]*)+`)
+	requestedLimitsRegexp   = regexp.MustCompile(`requested: (limits.[a-zA-Z0-9.\/_-]+=[a-zA-Z0-9]+[,]*)+`)
+	requestedRequestsRegexp = regexp.MustCompile(`requested: (requests.[a-zA-Z0-9.\/_-]+=[a-zA-Z0-9]+[,]*)+`)
 )
 
 // SimpleBackOffBlocker is a simple exponential back-off timer that keeps track of the back-off period
@@ -175,6 +175,11 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
 				// even if CPU appears in requestedResourceList
 				newCeiling := GetComputeResourceAndQuantity(err, requestedLimitsRegexp)
+				for k, v := range GetComputeResourceAndQuantity(err, requestedRequestsRegexp) {
+					if _, exists := newCeiling[k]; !exists {
+						newCeiling[k] = v
+					}
+				}
 				h.ComputeResourceCeilings.updateAll(&newCeiling)
 			}
 

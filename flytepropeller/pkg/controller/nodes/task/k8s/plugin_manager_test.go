@@ -1185,6 +1185,197 @@ func TestFinalize(t *testing.T) {
 
 }
 
+func TestPluginManager_GetPodEffectiveResourceLimits(t *testing.T) {
+	ctx := context.Background()
+	pluginManager := &PluginManager{}
+
+	t.Run("OnlyLimits", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("2"),
+								v1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		cpu := result[v1.ResourceCPU]
+		mem := result[v1.ResourceMemory]
+		assert.Equal(t, "2", cpu.String())
+		assert.Equal(t, "4Gi", mem.String())
+	})
+
+	t.Run("OnlyRequests_GPU", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		gpu := result[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "1", gpu.String())
+	})
+
+	t.Run("BothLimitsAndRequests_UsesLimits", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("1"),
+								v1.ResourceMemory: resource.MustParse("2Gi"),
+							},
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("2"),
+								v1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		// Should only use limits if both requests and limits have been specified.
+		cpu := result[v1.ResourceCPU]
+		mem := result[v1.ResourceMemory]
+		assert.Equal(t, "2", cpu.String())
+		assert.Equal(t, "4Gi", mem.String())
+	})
+
+	t.Run("MixedResources_CPUMemoryAndGPU", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceCPU:                    resource.MustParse("1"),
+								v1.ResourceMemory:                 resource.MustParse("2Gi"),
+								v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+							},
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("2"),
+								v1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		cpu := result[v1.ResourceCPU]
+		mem := result[v1.ResourceMemory]
+		gpu := result[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "2", cpu.String())
+		assert.Equal(t, "4Gi", mem.String())
+		assert.Equal(t, "1", gpu.String())
+	})
+
+	t.Run("MultipleContainers_SumsResources", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+							},
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("2"),
+								v1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+					{
+						Resources: v1.ResourceRequirements{
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("1"),
+								v1.ResourceMemory: resource.MustParse("2Gi"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		cpu := result[v1.ResourceCPU]
+		mem := result[v1.ResourceMemory]
+		gpu := result[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "3", cpu.String())
+		assert.Equal(t, "6Gi", mem.String())
+		assert.Equal(t, "1", gpu.String())
+	})
+
+	t.Run("InitContainers_TakesMax", func(t *testing.T) {
+		pod := &v1.Pod{
+			Spec: v1.PodSpec{
+				InitContainers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+							},
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("4"),
+								v1.ResourceMemory: resource.MustParse("8Gi"),
+							},
+						},
+					},
+					{
+						Resources: v1.ResourceRequirements{
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("2"),
+								v1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+				},
+				Containers: []v1.Container{
+					{
+						Resources: v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceName("nvidia.com/gpu"): resource.MustParse("1"),
+							},
+							Limits: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("1"),
+								v1.ResourceMemory: resource.MustParse("2Gi"),
+							},
+						},
+					},
+				},
+			},
+		}
+
+		result := pluginManager.getPodEffectiveResourceLimits(ctx, pod)
+		cpu := result[v1.ResourceCPU]
+		mem := result[v1.ResourceMemory]
+		gpu := result[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "4", cpu.String())
+		assert.Equal(t, "8Gi", mem.String())
+		assert.Equal(t, "1", gpu.String())
+	})
+}
+
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey)
 }

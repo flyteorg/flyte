@@ -145,36 +145,48 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 	initContainersRequestedResources := make(v1.ResourceList)
 	containersRequestedResources := make(v1.ResourceList)
 
-	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
-	// to decide whether we should try the pod creation during the back off period
-
-	// Calculating the effective init resource limits based on the official definition:
-	// https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#resources
-	// "The highest of any particular resource request or limit defined on all init containers is the effective init request/limit"
+	// Calculating the effective init resource requirements
 	for _, initContainer := range pod.Spec.InitContainers {
 		for r, q := range initContainer.Resources.Limits {
 			if currentQuantity, found := initContainersRequestedResources[r]; !found || q.Cmp(currentQuantity) > 0 {
 				initContainersRequestedResources[r] = q
 			}
 		}
+
+		for r, q := range initContainer.Resources.Requests {
+			if _, hasLimit := initContainer.Resources.Limits[r]; !hasLimit {
+				if currentQuantity, found := initContainersRequestedResources[r]; !found || q.Cmp(currentQuantity) > 0 {
+					initContainersRequestedResources[r] = q
+				}
+			}
+		}
 	}
 
+	// Calculate container resource requirements.
 	for _, container := range pod.Spec.Containers {
 		for k, v := range container.Resources.Limits {
 			quantity := containersRequestedResources[k]
 			quantity.Add(v)
 			containersRequestedResources[k] = quantity
 		}
-	}
 
-	for k, v := range initContainersRequestedResources {
-		podRequestedResources[k] = v
+		for k, v := range container.Resources.Requests {
+			if _, hasLimit := container.Resources.Limits[k]; !hasLimit {
+				quantity := containersRequestedResources[k]
+				quantity.Add(v)
+				containersRequestedResources[k] = quantity
+			}
+		}
 	}
 
 	// https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#resources
 	// "The Pod’s effective request/limit for a resource is the higher of:
 	// - the sum of all app containers request/limit for a resource
 	// - the effective init request/limit for a resource"
+	for k, v := range initContainersRequestedResources {
+		podRequestedResources[k] = v
+	}
+
 	for k, qC := range containersRequestedResources {
 		if qI, found := podRequestedResources[k]; !found || qC.Cmp(qI) > 0 {
 			podRequestedResources[k] = qC
