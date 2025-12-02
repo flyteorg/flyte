@@ -12,7 +12,7 @@ A Helm chart for Flyte core
 
 ### Flyte INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
-- Fetch chart dependencies ``
+- Fetch chart dependencies `helm dependency build`
 - Install Flyte:
 
 ```bash
@@ -40,7 +40,7 @@ helm install gateway bitnami/contour -n flyte
 ```
 
 #### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-eks . -n flyte -f values-eks.yaml > flyte_generated_eks.yaml`
+- `helm template --validate --name-template=flyte-eks . -n flyte -f values-eks.yaml > flyte_generated_eks.yaml`
 - Deploy the manifest `kubectl apply -f flyte_generated_eks.yaml`
 
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
