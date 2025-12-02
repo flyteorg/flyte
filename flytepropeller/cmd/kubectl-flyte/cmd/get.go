@@ -56,7 +56,7 @@ func NewGetCommand(opts *RootOptions) *cobra.Command {
 func (g *GetOpts) getWorkflow(ctx context.Context, name string) error {
 	parts := strings.Split(name, "/")
 	if len(parts) > 1 {
-		g.ConfigOverrides.Context.Namespace = parts[0]
+		g.Context.Namespace = parts[0]
 		name = parts[1]
 	}
 	w, err := g.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(g.ConfigOverrides.Context.Namespace).Get(context.TODO(), name, v1.GetOptions{})
@@ -205,7 +205,7 @@ func (s SortableNSDist) Swap(i, j int) {
 }
 
 func (g *GetOpts) listWorkflows() error {
-	fmt.Printf("Listing workflows in [%s]\n", g.ConfigOverrides.Context.Namespace)
+	fmt.Printf("Listing workflows in [%s]\n", g.Context.Namespace)
 	wp := printers.WorkflowPrinter{}
 	workflows := gotree.New("workflows")
 	var counter int64

@@ -53,7 +53,7 @@ func (c CacheItem) IsTerminal() bool {
 			return resource.IsTerminal()
 		}
 	}
-	return c.State.Phase.IsTerminal()
+	return c.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from Client and store it in the cache
@@ -99,7 +99,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
 			logger.Debugf(ctx, "Sync loop - Item with key [%s] has failed to sync [%d] time(s). More than the allowed [%d] time(s). Marking as failure.",
 				resource.GetID(), cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
-			cacheItem.State.Phase = PhaseSystemFailure
+			cacheItem.Phase = PhaseSystemFailure
 			resp = append(resp, cache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,

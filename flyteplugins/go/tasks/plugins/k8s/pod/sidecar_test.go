@@ -183,11 +183,12 @@ func checkTolerations(t *testing.T, res client.Object, gpuTol v1.Toleration) {
 	// Assert user-specified tolerations don't get overridden
 	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 2)
 	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
-		if tol.Key == "my toleration key" {
+		switch tol.Key {
+		case "my toleration key":
 			assert.Equal(t, tol.Value, "my toleration value")
-		} else if tol.Key == gpuTol.Key {
+		case gpuTol.Key:
 			assert.Equal(t, tol, gpuTol)
-		} else {
+		default:
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}

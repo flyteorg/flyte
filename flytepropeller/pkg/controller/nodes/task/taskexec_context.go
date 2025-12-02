@@ -106,7 +106,7 @@ type taskExecutionContext struct {
 
 func (t *taskExecutionContext) TaskRefreshIndicator() pluginCore.SignalAsync {
 	return func(ctx context.Context) {
-		err := t.NodeExecutionContext.EnqueueOwnerFunc()
+		err := t.EnqueueOwnerFunc()
 		if err != nil {
 			logger.Errorf(ctx, "Failed to enqueue owner for Task [%v] and Owner [%v]. Error: %v",
 				t.TaskExecutionMetadata().GetTaskExecutionID(),

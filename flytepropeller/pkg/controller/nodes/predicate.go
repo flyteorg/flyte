@@ -96,8 +96,8 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 			upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseFailed ||
 			upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseTimedOut {
 			skipped = true
-		} else if !(upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseSucceeded ||
-			upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseRecovered) {
+		} else if upstreamNodeStatus.GetPhase() != v1alpha1.NodePhaseSucceeded &&
+			upstreamNodeStatus.GetPhase() != v1alpha1.NodePhaseRecovered {
 			return PredicatePhaseNotReady, nil
 		}
 	}

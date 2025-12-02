@@ -162,7 +162,7 @@ func TestUpdatePods(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.shardStrategy.GetPodCount(), len(pods.Items))
 			for _, pod := range pods.Items {
-				assert.Equal(t, "1", pod.ObjectMeta.Annotations[podTemplateResourceVersion])
+				assert.Equal(t, "1", pod.Annotations[podTemplateResourceVersion])
 			}
 
 			// create all pods and validate state
@@ -173,7 +173,7 @@ func TestUpdatePods(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.shardStrategy.GetPodCount(), len(pods.Items))
 			for _, pod := range pods.Items {
-				assert.Equal(t, podTemplate.ObjectMeta.ResourceVersion, pod.ObjectMeta.Annotations[podTemplateResourceVersion])
+				assert.Equal(t, podTemplate.ResourceVersion, pod.Annotations[podTemplateResourceVersion])
 			}
 		})
 	}

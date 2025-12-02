@@ -173,16 +173,17 @@ func GetAllocationToken(
 		newState.AllocationTokenRequestStartTime = currentState.AllocationTokenRequestStartTime
 	}
 
-	if allocationStatus == core.AllocationStatusGranted {
+	switch allocationStatus {
+	case core.AllocationStatusGranted:
 		metric.AllocationGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseQueued
-	} else if allocationStatus == core.AllocationStatusExhausted {
+	case core.AllocationStatusExhausted:
 		metric.AllocationNotGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseNotStarted
-	} else if allocationStatus == core.AllocationStatusNamespaceQuotaExceeded {
+	case core.AllocationStatusNamespaceQuotaExceeded:
 		metric.AllocationNotGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseNotStarted
-	} else {
+	default:
 		return newState, errors.Errorf(errors.ResourceManagerFailure, "Got bad allocation result [%s] for token [%s]",
 			allocationStatus, uniqueID)
 	}

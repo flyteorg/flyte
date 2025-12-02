@@ -121,7 +121,7 @@ func (h *ComputeResourceAwareBackOffHandler) IsActive() bool {
 
 func (h *ComputeResourceAwareBackOffHandler) reset() {
 	h.SimpleBackOffBlocker.reset()
-	h.ComputeResourceCeilings.resetAll()
+	h.resetAll()
 }
 
 // Act based on current backoff interval and set the next one accordingly
@@ -139,8 +139,8 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 	//      Else => we block the operation(), which is where the main improvement comes from
 
 	now := h.Clock.Now()
-	isBlocking := h.SimpleBackOffBlocker.isBlocking(now)
-	isTryable := h.ComputeResourceCeilings.isEligible(requestedResourceList)
+	isBlocking := h.isBlocking(now)
+	isTryable := h.isEligible(requestedResourceList)
 	if !h.IsActive() {
 		return operation()
 	} else if !isBlocking || isTryable {
@@ -156,10 +156,10 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
 				// we should increase the exponent in the backoff and update the NextEligibleTime
 
-				backOffDuration := h.SimpleBackOffBlocker.backOff(ctx)
+				backOffDuration := h.backOff(ctx)
 				logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
 					"%s (backing off for a duration of [%v] to timestamp [%v])\n",
-					err, backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
+					err, backOffDuration, h.NextEligibleTime)
 			} else {
 				// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
 				// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
@@ -168,14 +168,14 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
 					"but failed due to %s (the next eligible time "+
 					"remains unchanged [%v]). The requests are [%v]. The ceilings are [%v]\n",
-					err, h.SimpleBackOffBlocker.NextEligibleTime, requestedResourceList, h.computeResourceCeilings.String())
+					err, h.NextEligibleTime, requestedResourceList, h.computeResourceCeilings.String())
 			}
 			if IsResourceQuotaExceeded(err) {
 				// It is necessary to parse the error message to get the actual constraints
 				// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
 				// even if CPU appears in requestedResourceList
 				newCeiling := GetComputeResourceAndQuantity(err, requestedLimitsRegexp)
-				h.ComputeResourceCeilings.updateAll(&newCeiling)
+				h.updateAll(&newCeiling)
 			}
 
 			return errors.Wrapf(errors.BackOffError, err, "The operation was attempted but failed")
@@ -186,7 +186,7 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 		logger.Infof(ctx, "The operation was blocked due to back-off")
 		return errors.Errorf(errors.BackOffError, "The operation attempt was blocked by back-off "+
 			"[attempted at: %v][the block expires at: %v] and the requested "+
-			"resource(s) exceeds resource ceiling(s)", now, h.SimpleBackOffBlocker.getBlockExpirationTime())
+			"resource(s) exceeds resource ceiling(s)", now, h.getBlockExpirationTime())
 	}
 
 }
@@ -221,7 +221,7 @@ func GetComputeResourceAndQuantity(err error, resourceRegex *regexp.Regexp) v1.R
 	descr := strings.SplitN(matches[0][0], ":", 2)
 
 	// Extracting "limits.cpu=7","limits.memory=64Gi"
-	chunks := strings.SplitN(descr[1], ",", -1)
+	chunks := strings.Split(descr[1], ",")
 	for _, c := range chunks {
 		// Extracting "cpu=7","memory=64Gi"
 		resrcString := strings.SplitN(c, ".", 2)

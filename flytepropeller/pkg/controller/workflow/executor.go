@@ -453,7 +453,7 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 		}
 		failingErr := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus)
 		// Ignore ExecutionNotFound and IncompatibleCluster errors to allow graceful failure
-		if failingErr != nil && !(eventsErr.IsNotFound(failingErr) || eventsErr.IsEventIncompatibleClusterError(failingErr)) {
+		if failingErr != nil && (!eventsErr.IsNotFound(failingErr) && !eventsErr.IsEventIncompatibleClusterError(failingErr)) {
 			return failingErr
 		}
 		c.k8sRecorder.Event(w, corev1.EventTypeWarning, v1alpha1.WorkflowPhaseFailed.String(), "Workflow failed.")
@@ -465,7 +465,7 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 		}
 		failureErr := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus)
 		// Ignore ExecutionNotFound and IncompatibleCluster errors to allow graceful failure
-		if failureErr != nil && !(eventsErr.IsNotFound(failureErr) || eventsErr.IsEventIncompatibleClusterError(failureErr)) {
+		if failureErr != nil && (!eventsErr.IsNotFound(failureErr) && !eventsErr.IsEventIncompatibleClusterError(failureErr)) {
 			return failureErr
 		}
 		c.k8sRecorder.Event(w, corev1.EventTypeWarning, v1alpha1.WorkflowPhaseFailed.String(), "Workflow failed.")

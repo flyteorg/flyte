@@ -62,7 +62,7 @@ func (r *RedisResourceManagerBuilder) RegisterResourceQuota(ctx context.Context,
 }
 
 func getValidMetricScopeName(name string) string {
-	return strings.Replace(name, "-", "_", -1)
+	return strings.ReplaceAll(name, "-", "_")
 }
 
 func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) (BaseResourceManager, error) {

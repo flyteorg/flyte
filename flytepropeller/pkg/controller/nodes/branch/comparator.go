@@ -82,10 +82,8 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	if !ok {
 		return false, fmt.Errorf("comparator not defined for type: [%v]", lValueType.String())
 	}
-	isBoolean := false
-	if lValueType.String() == primitiveBooleanType {
-		isBoolean = true
-	}
+	isBoolean := lValueType.String() == primitiveBooleanType
+
 	switch op {
 	case core.ComparisonExpression_GT:
 		if isBoolean {
@@ -101,7 +99,7 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 		if isBoolean {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "[LT] not defined for boolean operands.")
 		}
-		return !(comps.gt(lValue, rValue) || comps.eq(lValue, rValue)), nil
+		return !comps.gt(lValue, rValue) && !comps.eq(lValue, rValue), nil
 	case core.ComparisonExpression_LTE:
 		if isBoolean {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "[LTE] not defined for boolean operands.")

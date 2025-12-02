@@ -187,7 +187,7 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 		}
 	}
 
-	flyteWf, err := k8s.BuildFlyteWorkflow(wf, inputs, executionID, c.ConfigOverrides.Context.Namespace)
+	flyteWf, err := k8s.BuildFlyteWorkflow(wf, inputs, executionID, c.Context.Namespace)
 	if err != nil {
 		return err
 	}

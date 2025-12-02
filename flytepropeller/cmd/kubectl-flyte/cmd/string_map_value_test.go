@@ -23,7 +23,7 @@ func formatArg(values map[string]string) string {
 
 func randSpaces() string {
 	res := ""
-	for cnt := rand.Int()%10 + 1; cnt > 0; cnt-- { // nolint: gas
+	for cnt := rand.Int()%10 + 1; cnt > 0; cnt-- { // nolint: gosec
 		res += " "
 	}
 

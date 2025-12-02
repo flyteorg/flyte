@@ -156,11 +156,12 @@ func ToGraphViz(g *core.CompiledWorkflow) string {
 
 	nodeKind := func(nodeId common.NodeID) string {
 		node := nodeFinder(nodeId)
-		if nodeId == common.StartNodeID {
+		switch nodeId {
+		case common.StartNodeID:
 			return "start"
-		} else if nodeId == common.EndNodeID {
+		case common.EndNodeID:
 			return "end"
-		} else {
+		default:
 			return reflect.TypeOf(node.GetTarget()).Name()
 		}
 	}

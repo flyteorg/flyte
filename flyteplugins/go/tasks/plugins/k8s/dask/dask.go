@@ -300,7 +300,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	o, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
-			Namespace:       job.ObjectMeta.Namespace,
+			Namespace:       job.Namespace,
 			PodName:         job.Status.JobRunnerPodName,
 			LogName:         "(Dask Runner Logs)",
 			TaskExecutionID: taskExecID,

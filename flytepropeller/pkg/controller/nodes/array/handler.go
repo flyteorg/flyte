@@ -358,7 +358,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		for i, nodeExecutionRequest := range nodeExecutionRequests {
 			nodeExecutionResponse := <-nodeExecutionRequest.responseChannel
 			if nodeExecutionResponse.error != nil {
-				workerErrorCollector.Collect(i, nodeExecutionResponse.error.Error())
+				workerErrorCollector.Collect(i, nodeExecutionResponse.Error())
 				continue
 			}
 
@@ -586,7 +586,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		for i, gatherOutputsRequest := range gatherOutputsRequests {
 			outputResponse := <-gatherOutputsRequest.responseChannel
 			if outputResponse.error != nil {
-				workerErrorCollector.Collect(i, outputResponse.error.Error())
+				workerErrorCollector.Collect(i, outputResponse.Error())
 				continue
 			}
 

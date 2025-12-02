@@ -56,7 +56,7 @@ type ExecutionStateCacheItem struct {
 }
 
 func (e ExecutionStateCacheItem) IsTerminal() bool {
-	return e.ExecutionState.CurrentPhase.IsTerminal()
+	return e.CurrentPhase.IsTerminal()
 }
 
 func (e ExecutionStateCacheItem) ID() string {

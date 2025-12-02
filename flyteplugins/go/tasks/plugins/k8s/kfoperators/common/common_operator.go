@@ -32,7 +32,7 @@ const (
 func ExtractCurrentCondition(jobConditions []kubeflowv1.JobCondition) (kubeflowv1.JobCondition, error) {
 	if jobConditions != nil {
 		sort.Slice(jobConditions, func(i, j int) bool {
-			return jobConditions[i].LastTransitionTime.Time.After(jobConditions[j].LastTransitionTime.Time)
+			return jobConditions[i].LastTransitionTime.After(jobConditions[j].LastTransitionTime.Time)
 		})
 
 		for _, jc := range jobConditions {
@@ -108,7 +108,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	}
 
 	// We use the creation timestamp of the Kubeflow Job as a proxy for the start time of the pods
-	startTime := objectMeta.CreationTimestamp.Time.Unix()
+	startTime := objectMeta.CreationTimestamp.Unix()
 	// Don't have a good mechanism for this yet, but approximating with time.Now for now
 	finishTime := time.Now().Unix()
 	RFC3999StartTime := time.Unix(startTime, 0).Format(time.RFC3339)

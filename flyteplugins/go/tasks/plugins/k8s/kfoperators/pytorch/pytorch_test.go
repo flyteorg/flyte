@@ -354,10 +354,10 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 
 		// verify TaskExecutionMetadata labels and annotations are copied to the PyTorchJob
 		for k, v := range dummyAnnotations {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+			assert.Equal(t, v, replicaSpec.Template.Annotations[k])
 		}
 		for k, v := range dummyLabels {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+			assert.Equal(t, v, replicaSpec.Template.Labels[k])
 		}
 	}
 }
@@ -380,12 +380,12 @@ func TestBuildResourcePytorch(t *testing.T) {
 	// verify TaskExecutionMetadata labels and annotations are copied to the TensorFlowJob
 	for k, v := range dummyAnnotations {
 		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+			assert.Equal(t, v, replicaSpec.Template.Annotations[k])
 		}
 	}
 	for k, v := range dummyLabels {
 		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+			assert.Equal(t, v, replicaSpec.Template.Labels[k])
 		}
 	}
 

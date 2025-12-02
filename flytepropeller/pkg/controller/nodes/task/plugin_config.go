@@ -30,10 +30,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 		return nil, nil, err
 	}
 
-	allPluginsEnabled := false
-	if pluginsConfigMeta.EnabledPlugins.Len() == 0 {
-		allPluginsEnabled = true
-	}
+	allPluginsEnabled := pluginsConfigMeta.EnabledPlugins.Len() == 0
 
 	logger.Infof(ctx, "Enabled plugins: %v", pluginsConfigMeta.EnabledPlugins.List())
 	logger.Infof(ctx, "Loading core Plugins, plugin configuration [all plugins enabled: %v]", allPluginsEnabled)
