@@ -178,6 +178,11 @@ data:
           - openid
     flyteadmin:
       eventVersion: 2
+      identityAnnotationKeys:
+      - email
+      - sub
+      identityAnnotationPrefix: flyte.ai
+      injectIdentityAnnotations: false
       metadataStoragePrefix:
       - metadata
       - admin
@@ -917,7 +922,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
+        configChecksum: "392d19b2bedccc3b7896bfec2259a9d4555e75219344ce8d7bdd66c9fa041c7"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1343,7 +1348,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b1a6f6afb902bd1384515a97c5bad38985c0799ca8173efb0e664bda8eb9ca1"
+        configChecksum: "392d19b2bedccc3b7896bfec2259a9d4555e75219344ce8d7bdd66c9fa041c7"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
