@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	pkgerrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -966,5 +968,57 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		assert.Error(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
 
 		assert.Equal(t, uint32(1), w.Status.FailedAttempts)
+	})
+
+	t.Run("abort-with-notfound-error-succeeds", func(t *testing.T) {
+		var evs []*event.WorkflowExecutionEvent
+		nodeExec := &nodemocks.Node{}
+		wfRecorder := &eventMocks.WorkflowEventRecorder{}
+		wfRecorder.OnRecordWorkflowEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
+			assert.Equal(t, testClusterID, ev.ProducerId)
+			evs = append(evs, ev)
+			return true
+		}), mock.Anything).Return(nil)
+
+		store, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			wfRecorder:   wfRecorder,
+			store:        store,
+			metrics:      newMetrics(promutils.NewTestScope()),
+			eventConfig: &config.EventConfig{
+				RawOutputPolicy: config.RawOutputPolicyReference,
+			},
+			clusterID: testClusterID,
+		}
+
+		// Simulate a NotFound error.
+		notFoundErr := pkgerrors.Wrap(os.ErrNotExist, "failed to read inputs")
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(notFoundErr)
+
+		w := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				DeletionTimestamp: &v1.Time{},
+			},
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 0,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		// The abort should succeed despite the NotFound error
+		assert.NoError(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(0), w.Status.FailedAttempts)
+		assert.Len(t, evs, 1)
+		assert.Equal(t, core.WorkflowExecution_ABORTED, evs[0].Phase)
 	})
 }

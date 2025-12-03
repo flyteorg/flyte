@@ -537,6 +537,13 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	if err := c.nodeExecutor.AbortHandler(ctx, execcontext, w, w, startNode, reason); err != nil {
+		// During abort/cleanup, some input files may not exist for nodes that never fully started. The
+		// "not found" errors should just be ignored.
+		if storage.IsNotFound(err) {
+			logger.Infof(ctx, "Ignoring NotFound error during abort cleanup: %v", err)
+			return nil
+		}
+		// Otherwise return the error.
 		return errors.Errorf(errors.CausedByError, w.GetID(), "Failed to propagate Abort for workflow. Error: %v", err)
 	}
 
