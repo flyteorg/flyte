@@ -126,7 +126,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/cobra v1.10.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/viper v1.12.0 // indirect
+	github.com/spf13/viper v1.11.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
@@ -184,4 +184,7 @@ replace (
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.60.1
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
+	github.com/spf13/viper => github.com/spf13/viper v1.11.0
 )
+
+exclude github.com/spf13/viper v1.12.0
