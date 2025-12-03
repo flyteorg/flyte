@@ -10,7 +10,7 @@ COPY images/manifest.txt images/preload ./
 RUN --security=insecure ./preload manifest.txt
 
 
-FROM --platform=${BUILDPLATFORM} golang:1.25-bullseye AS bootstrap
+FROM --platform=${BUILDPLATFORM} golang:1.25-bookworm AS bootstrap
 
 ARG TARGETARCH
 ENV CGO_ENABLED 0
