@@ -19,6 +19,11 @@ type RunService struct {
 	queueClient workflowconnect.QueueServiceClient
 }
 
+func (s *RunService) WatchGroups(ctx context.Context, c *connect.Request[workflow.WatchGroupsRequest], c2 *connect.ServerStream[workflow.WatchGroupsResponse]) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewRunService creates a new RunService instance
 func NewRunService(repo repository.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
 	return &RunService{
@@ -608,7 +613,7 @@ func (s *RunService) convertRunToProto(run *repository.Run) *workflow.Run {
 			// TODO: Extract from ActionSpec JSON if needed
 		},
 		Status: &workflow.ActionStatus{
-			Phase: workflow.Phase(workflow.Phase_value[run.Phase]),
+			Phase: common.ActionPhase(common.ActionPhase_value[run.Phase]),
 			// TODO: Extract timestamps, error, etc. from ActionDetails JSON
 		},
 	}
@@ -637,7 +642,7 @@ func (s *RunService) convertActionToEnrichedProto(action *repository.Action) *wo
 
 	// Build the action status
 	actionStatus := &workflow.ActionStatus{
-		Phase: workflow.Phase(workflow.Phase_value[action.Phase]),
+		Phase: common.ActionPhase(common.ActionPhase_value[action.Phase]),
 	}
 
 	// Build the action proto

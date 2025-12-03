@@ -182,6 +182,22 @@
       },
       "description": "Unique identifier of an action."
     },
+    "commonActionPhase": {
+      "type": "string",
+      "enum": [
+        "ACTION_PHASE_UNSPECIFIED",
+        "ACTION_PHASE_QUEUED",
+        "ACTION_PHASE_WAITING_FOR_RESOURCES",
+        "ACTION_PHASE_INITIALIZING",
+        "ACTION_PHASE_RUNNING",
+        "ACTION_PHASE_SUCCEEDED",
+        "ACTION_PHASE_FAILED",
+        "ACTION_PHASE_ABORTED",
+        "ACTION_PHASE_TIMED_OUT"
+      ],
+      "default": "ACTION_PHASE_UNSPECIFIED",
+      "description": "ActionPhase represents the execution state of an action.\n\nPhase transitions follow this typical flow:\nQUEUED -\u003e WAITING_FOR_RESOURCES -\u003e INITIALIZING -\u003e RUNNING -\u003e {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}\n\n - ACTION_PHASE_UNSPECIFIED: Default/unknown phase\n - ACTION_PHASE_QUEUED: Action has been accepted and is waiting to be scheduled\n - ACTION_PHASE_WAITING_FOR_RESOURCES: Action is scheduled but waiting for compute resources to become available\n - ACTION_PHASE_INITIALIZING: Resources have been allocated and the action is being set up\n - ACTION_PHASE_RUNNING: Action is actively executing\n - ACTION_PHASE_SUCCEEDED: Action completed successfully\n - ACTION_PHASE_FAILED: Action failed during execution\n - ACTION_PHASE_ABORTED: Action was manually terminated or cancelled\n - ACTION_PHASE_TIMED_OUT: Action exceeded its execution time limit"
+    },
     "commonRunIdentifier": {
       "type": "object",
       "properties": {
@@ -1435,22 +1451,6 @@
       },
       "title": "Task Metadata"
     },
-    "flyteidl2workflowPhase": {
-      "type": "string",
-      "enum": [
-        "PHASE_UNSPECIFIED",
-        "PHASE_QUEUED",
-        "PHASE_WAITING_FOR_RESOURCES",
-        "PHASE_INITIALIZING",
-        "PHASE_RUNNING",
-        "PHASE_SUCCEEDED",
-        "PHASE_FAILED",
-        "PHASE_ABORTED",
-        "PHASE_TIMED_OUT"
-      ],
-      "default": "PHASE_UNSPECIFIED",
-      "title": "TODO: define phase transitions"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -1530,12 +1530,33 @@
       "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
       "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
     },
+    "taskDocumentationEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."
@@ -1642,6 +1663,15 @@
         }
       }
     },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "taskTaskIdentifier": {
       "type": "object",
       "properties": {
@@ -1690,6 +1720,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "documentation": {
+          "$ref": "#/definitions/taskDocumentationEntity",
+          "title": "The documentation entity for the task"
         }
       },
       "description": "Specification for a task."
@@ -1777,7 +1811,7 @@
           "type": "string"
         },
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {

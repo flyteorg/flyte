@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -189,7 +190,7 @@ func serve(ctx context.Context) error {
 		}
 
 		logger.Infof(ctx, "Runs Service listening on %s", addr)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errCh <- fmt.Errorf("runs service error: %w", err)
 		}
 	}()
@@ -234,7 +235,7 @@ func serve(ctx context.Context) error {
 		}
 
 		logger.Infof(ctx, "Queue Service listening on %s", addr)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errCh <- fmt.Errorf("queue service error: %w", err)
 		}
 	}()

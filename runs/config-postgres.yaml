@@ -10,8 +10,8 @@ runs:
 database:
   # Using PostgreSQL
   postgres:
-    host: "localhost"
-    port: 5433
+    host: "postgres"
+    port: 5432
     dbname: "flyte_runs"
     username: "postgres"
     password: "postgres"

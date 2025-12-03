@@ -5,6 +5,11 @@ issue-845-fix: True
 structname: ""
 mockname: "{{.InterfaceName}}"
 packages:
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/app/mocks'
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow:
     config:
       include-auto-generated: true

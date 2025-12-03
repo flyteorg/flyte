@@ -156,7 +156,7 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 		msg := stream.Msg()
 		for _, enrichedAction := range msg.EnrichedActions {
 			if enrichedAction.Action != nil && enrichedAction.Action.Id != nil {
-				var phase workflow.Phase
+				var phase common.ActionPhase
 				if enrichedAction.Action.Status != nil {
 					phase = enrichedAction.Action.Status.Phase
 				}
@@ -224,25 +224,25 @@ func createRun(ctx context.Context, client workflowconnect.RunServiceClient) *co
 }
 
 // formatPhase converts a Phase enum to a readable string with emoji
-func formatPhase(phase workflow.Phase) string {
+func formatPhase(phase common.ActionPhase) string {
 	switch phase {
-	case workflow.Phase_PHASE_UNSPECIFIED:
+	case common.ActionPhase_ACTION_PHASE_UNSPECIFIED:
 		return "⚪ UNSPECIFIED"
-	case workflow.Phase_PHASE_QUEUED:
+	case common.ActionPhase_ACTION_PHASE_QUEUED:
 		return "🔵 QUEUED"
-	case workflow.Phase_PHASE_WAITING_FOR_RESOURCES:
+	case common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES:
 		return "⏳ WAITING_FOR_RESOURCES"
-	case workflow.Phase_PHASE_INITIALIZING:
+	case common.ActionPhase_ACTION_PHASE_INITIALIZING:
 		return "🔄 INITIALIZING"
-	case workflow.Phase_PHASE_RUNNING:
+	case common.ActionPhase_ACTION_PHASE_RUNNING:
 		return "🏃 RUNNING"
-	case workflow.Phase_PHASE_SUCCEEDED:
+	case common.ActionPhase_ACTION_PHASE_SUCCEEDED:
 		return "✅ SUCCEEDED"
-	case workflow.Phase_PHASE_FAILED:
+	case common.ActionPhase_ACTION_PHASE_FAILED:
 		return "❌ FAILED"
-	case workflow.Phase_PHASE_ABORTED:
+	case common.ActionPhase_ACTION_PHASE_ABORTED:
 		return "🛑 ABORTED"
-	case workflow.Phase_PHASE_TIMED_OUT:
+	case common.ActionPhase_ACTION_PHASE_TIMED_OUT:
 		return "⏰ TIMED_OUT"
 	default:
 		return fmt.Sprintf("❓ UNKNOWN(%d)", phase)
