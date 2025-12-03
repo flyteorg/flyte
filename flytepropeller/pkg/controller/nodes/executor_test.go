@@ -817,12 +817,13 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				}
 				assert.Equal(t, test.expectedPhase, s.NodePhase, "expected: %s, received %s", test.expectedPhase.String(), s.NodePhase.String())
 				assert.Equal(t, test.expectedNodePhase, mockNodeStatus.GetPhase(), "expected %s, received %s", test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String())
-				if test.expectedNodePhase == v1alpha1.NodePhaseFailing {
+				switch test.expectedNodePhase {
+				case v1alpha1.NodePhaseFailing:
 					assert.NotNil(t, mockNodeStatus.GetExecutionError())
-				} else if test.expectedNodePhase == v1alpha1.NodePhaseFailed {
+				case v1alpha1.NodePhaseFailed:
 					assert.NotNil(t, s.Err)
 					assert.Equal(t, execErr, s.Err)
-				} else {
+				default:
 					assert.Nil(t, s.Err)
 				}
 				assert.Equal(t, uint32(0), mockNodeStatus.GetAttempts())
@@ -929,14 +930,15 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				}
 				assert.Equal(t, test.expectedPhase, s.NodePhase, "expected: %s, received %s", test.expectedPhase.String(), s.NodePhase.String())
 				assert.Equal(t, test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String(), "expected %s, received %s", test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String())
-				if test.expectedNodePhase == v1alpha1.NodePhaseFailing {
+				switch test.expectedNodePhase {
+				case v1alpha1.NodePhaseFailing:
 					assert.NotNil(t, mockNodeStatus.GetExecutionError())
-				} else if test.expectedNodePhase == v1alpha1.NodePhaseFailed {
+				case v1alpha1.NodePhaseFailed:
 					assert.NotNil(t, s.Err)
 					if test.currentNodePhase == v1alpha1.NodePhaseFailing {
 						assert.Equal(t, execErr, s.Err)
 					}
-				} else {
+				default:
 					assert.Nil(t, s.Err)
 				}
 				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts()) // #nosec G115
@@ -2764,7 +2766,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 			mockWorkflow := createMockWorkflow(test.currentNodePhase, test.currentDownstreamNodePhase, dataStore)
 
 			// retrieve current node references
-			currentNodeSpec, ok := mockWorkflow.WorkflowSpec.Nodes[currentNodeID]
+			currentNodeSpec, ok := mockWorkflow.Nodes[currentNodeID]
 			assert.Equal(t, true, ok)
 
 			currentNodeStatus, ok := mockWorkflow.Status.NodeStatus[currentNodeID]

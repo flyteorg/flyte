@@ -133,12 +133,12 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
-	opts := []grpc.ServerOption{grpc.UnaryInterceptor(
-		otelgrpc.UnaryServerInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithPropagators(propagation.TraceContext{}),
-		),
-	)}
+	opts := []grpc.ServerOption{
+		grpc.StatsHandler(
+			otelgrpc.NewServerHandler(
+				otelgrpc.WithTracerProvider(tracerProvider),
+				otelgrpc.WithPropagators(propagation.TraceContext{}),
+			))}
 	if cfg.GrpcMaxRecvMsgSizeMBs > 0 {
 		opts = append(opts, grpc.MaxRecvMsgSize(cfg.GrpcMaxRecvMsgSizeMBs*1024*1024))
 	}
@@ -191,8 +191,8 @@ func Serve(ctx context.Context, cfg *config.Config) error {
 func newGRPCDummyServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			otelgrpc.UnaryServerInterceptor(
+		grpc.StatsHandler(
+			otelgrpc.NewServerHandler(
 				otelgrpc.WithTracerProvider(tracerProvider),
 				otelgrpc.WithPropagators(propagation.TraceContext{}),
 			),

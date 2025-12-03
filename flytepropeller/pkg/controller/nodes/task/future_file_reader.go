@@ -62,10 +62,10 @@ func (f FutureFileReader) CacheExists(ctx context.Context) (bool, error) {
 func (f FutureFileReader) Cache(ctx context.Context, wf *v1alpha1.FlyteWorkflow, workflowClosure *core.CompiledWorkflowClosure) error {
 	group, ctx := errgroup.WithContext(ctx)
 	group.Go(func() error {
-		return f.RemoteFileWorkflowStore.PutFlyteWorkflowCRD(ctx, wf, f.flyteWfCRDCacheLoc)
+		return f.PutFlyteWorkflowCRD(ctx, wf, f.flyteWfCRDCacheLoc)
 	})
 	group.Go(func() error {
-		return f.RemoteFileWorkflowStore.PutCompiledFlyteWorkflow(ctx, workflowClosure, f.flyteWfClosureCacheLoc)
+		return f.PutCompiledFlyteWorkflow(ctx, workflowClosure, f.flyteWfClosureCacheLoc)
 	})
 	return group.Wait()
 }
@@ -79,12 +79,12 @@ func (f FutureFileReader) RetrieveCache(ctx context.Context) (CacheContents, err
 	group, ctx := errgroup.WithContext(ctx)
 	var workflowCRD *v1alpha1.FlyteWorkflow
 	group.Go(func() (err error) {
-		workflowCRD, err = f.RemoteFileWorkflowStore.GetWorkflowCRD(ctx, f.flyteWfCRDCacheLoc)
+		workflowCRD, err = f.GetWorkflowCRD(ctx, f.flyteWfCRDCacheLoc)
 		return
 	})
 	var compiledWorkflow *core.CompiledWorkflowClosure
 	group.Go(func() (err error) {
-		compiledWorkflow, err = f.RemoteFileWorkflowStore.GetCompiledWorkflow(ctx, f.flyteWfClosureCacheLoc)
+		compiledWorkflow, err = f.GetCompiledWorkflow(ctx, f.flyteWfClosureCacheLoc)
 		return
 	})
 	if err := group.Wait(); err != nil {

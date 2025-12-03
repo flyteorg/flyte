@@ -256,7 +256,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			// TODO: Define which error codes are system errors (and return the error) vs user stdErr.
 
 			if status.Code(err) == codes.NotFound {
-				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.GetName())
+				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.GetName())
 			} else {
 				err = stdErr.Wrapf(RemoteErrorSystem, err, "system error")
 			}

@@ -42,7 +42,7 @@ func validateContainerCommand(task *core.TaskTemplate, errs errors.CompileErrors
 	}
 	hasInputs := task.GetInterface().GetInputs() != nil && len(task.GetInterface().GetInputs().GetVariables()) > 0
 	hasOutputs := task.GetInterface().GetOutputs() != nil && len(task.GetInterface().GetOutputs().GetVariables()) > 0
-	if !(hasInputs || hasOutputs) {
+	if !hasInputs && !hasOutputs {
 		// Nothing to validate.
 		return
 	}

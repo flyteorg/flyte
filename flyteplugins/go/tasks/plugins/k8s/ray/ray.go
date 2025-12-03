@@ -557,7 +557,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	var taskLogs []*core.TaskLog
 
 	// We use the creation timestamp of the RayJob as a proxy for the start time of the pods
-	startTime := rayJob.ObjectMeta.CreationTimestamp.Time.Unix()
+	startTime := rayJob.CreationTimestamp.Unix()
 	// Don't have a good mechanism for this yet, but approximating with time.Now for now as is done in other plugins
 	finishTime := time.Now().Unix()
 	RFC3999StartTime := time.Unix(startTime, 0).Format(time.RFC3339)

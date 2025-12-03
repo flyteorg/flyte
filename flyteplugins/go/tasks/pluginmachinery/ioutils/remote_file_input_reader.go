@@ -26,9 +26,9 @@ type RemoteFileInputReader struct {
 
 func (r RemoteFileInputReader) Get(ctx context.Context) (*core.LiteralMap, error) {
 	d := &core.LiteralMap{}
-	if err := r.store.ReadProtobuf(ctx, r.InputFilePaths.GetInputPath(), d); err != nil {
+	if err := r.store.ReadProtobuf(ctx, r.GetInputPath(), d); err != nil {
 		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
-		return nil, errors.Wrapf(ErrFailedRead, err, "failed to read data from dataDir [%v].", r.InputFilePaths.GetInputPath())
+		return nil, errors.Wrapf(ErrFailedRead, err, "failed to read data from dataDir [%v].", r.GetInputPath())
 	}
 
 	return d, nil

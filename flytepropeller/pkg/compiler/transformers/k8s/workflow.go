@@ -231,18 +231,18 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
 
-	obj.ObjectMeta.Name = name
-	obj.ObjectMeta.GenerateName = generatedName
-	obj.ObjectMeta.Labels[ExecutionIDLabel] = label
-	obj.ObjectMeta.Labels[ProjectLabel] = project
-	obj.ObjectMeta.Labels[DomainLabel] = domain
-	obj.ObjectMeta.Labels[WorkflowNameLabel] = utils.SanitizeLabelValue(WorkflowNameFromID(primarySpec.ID))
+	obj.Name = name
+	obj.GenerateName = generatedName
+	obj.Labels[ExecutionIDLabel] = label
+	obj.Labels[ProjectLabel] = project
+	obj.Labels[DomainLabel] = domain
+	obj.Labels[WorkflowNameLabel] = utils.SanitizeLabelValue(WorkflowNameFromID(primarySpec.ID))
 
 	h := fnv.New32a()
 	h.Write([]byte(label))
 	hash := h.Sum32() % v1alpha1.ShardKeyspaceSize
 
-	obj.ObjectMeta.Labels[ShardKeyLabel] = fmt.Sprint(hash)
+	obj.Labels[ShardKeyLabel] = fmt.Sprint(hash)
 
 	if obj.Nodes == nil || obj.Connections.Downstream == nil {
 		// If we come here, we'd better have an error generated earlier. Otherwise, add one to make sure build fails.

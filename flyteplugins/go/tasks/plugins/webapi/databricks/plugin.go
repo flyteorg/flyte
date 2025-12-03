@@ -276,13 +276,14 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case "TERMINATING":
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case "TERMINATED":
-		if resultState == "SUCCESS" {
+		switch resultState {
+		case "SUCCESS":
 			// Result state details. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runresultstate
 			if err := writeOutput(ctx, taskCtx); err != nil {
 				return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), "failed to write output", taskInfo), nil
 			}
 			return core.PhaseInfoSuccess(taskInfo), nil
-		} else if resultState == "FAILED" {
+		case "FAILED":
 			return core.PhaseInfoRetryableFailure("job failed", message, taskInfo), nil
 		}
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, message, taskInfo), nil

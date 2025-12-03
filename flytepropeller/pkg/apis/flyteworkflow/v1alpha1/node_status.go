@@ -953,7 +953,7 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		if *in.ParentNode != *other.ParentNode {
 			return false
 		}
-	} else if !(in.ParentNode == other.ParentNode) {
+	} else if in.ParentNode != other.ParentNode {
 		// Both are not nil
 		return false
 	}
@@ -1129,7 +1129,7 @@ func (in *TaskNodeStatus) Equals(other *TaskNodeStatus) bool {
 		bytes.Equal(in.PluginState, other.PluginState) &&
 		in.PluginStateVersion == other.PluginStateVersion &&
 		in.BarrierClockTick == other.BarrierClockTick &&
-		in.LastPhaseUpdatedAt == other.LastPhaseUpdatedAt &&
+		in.LastPhaseUpdatedAt.Equal(other.LastPhaseUpdatedAt) &&
 		in.PreviousNodeExecutionCheckpointPath == other.PreviousNodeExecutionCheckpointPath &&
 		in.CleanupOnFailure == other.CleanupOnFailure
 }

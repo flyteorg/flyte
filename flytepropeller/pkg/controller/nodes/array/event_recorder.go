@@ -328,11 +328,12 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 	}
 
 	// only attach output uri if taskPhase is SUCCEEDED
-	if taskPhase == idlcore.TaskExecution_SUCCEEDED {
+	switch taskPhase {
+	case idlcore.TaskExecution_SUCCEEDED:
 		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_OutputUri{
 			OutputUri: v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir()).String(),
 		}
-	} else if taskPhase == idlcore.TaskExecution_FAILED {
+	case idlcore.TaskExecution_FAILED:
 		// attach first evaluated error(s) if taskPhase is FAILED
 		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_Error{
 			Error: arrayNodeExecutionError,

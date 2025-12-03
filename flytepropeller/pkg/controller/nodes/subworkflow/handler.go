@@ -66,7 +66,8 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 	wfNode := nCtx.Node().GetWorkflowNode()
 	wfNodeState := nCtx.NodeStateReader().GetWorkflowNodeState()
 	workflowPhase := wfNodeState.Phase
-	if workflowPhase == v1alpha1.WorkflowNodePhaseUndefined {
+	switch workflowPhase {
+	case v1alpha1.WorkflowNodePhaseUndefined:
 		if wfNode == nil {
 			errMsg := "Invoked workflow handler, for a non workflow Node."
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil
@@ -81,13 +82,13 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 		}
 
 		return invalidWFNodeError()
-	} else if workflowPhase == v1alpha1.WorkflowNodePhaseExecuting {
+	case v1alpha1.WorkflowNodePhaseExecuting:
 		if wfNode.GetSubWorkflowRef() != nil {
 			return w.subWfHandler.CheckSubWorkflowStatus(ctx, nCtx)
 		} else if wfNode.GetLaunchPlanRefID() != nil {
 			return w.lpHandler.CheckLaunchPlanStatus(ctx, nCtx)
 		}
-	} else if workflowPhase == v1alpha1.WorkflowNodePhaseFailing {
+	case v1alpha1.WorkflowNodePhaseFailing:
 		if wfNode == nil {
 			errMsg := "Invoked workflow handler, for a non workflow Node."
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil

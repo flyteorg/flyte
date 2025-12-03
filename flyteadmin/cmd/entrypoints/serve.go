@@ -2,7 +2,7 @@ package entrypoints
 
 import (
 	"context"
-	_ "net/http/pprof" // Required to serve application.
+	_ "net/http/pprof" //nolint:gosec
 
 	"github.com/spf13/cobra"
 

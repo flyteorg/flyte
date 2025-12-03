@@ -189,10 +189,11 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecution
 
 	// If the branch was already evaluated i.e, Node is in Running status
 	branchNodeState := nCtx.NodeStateReader().GetBranchNodeState()
-	if branchNodeState.Phase == v1alpha1.BranchNodeNotYetEvaluated {
+	switch branchNodeState.Phase {
+	case v1alpha1.BranchNodeNotYetEvaluated:
 		logger.Errorf(ctx, "No node finalized through previous branch evaluation.")
 		return nil
-	} else if branchNodeState.Phase == v1alpha1.BranchNodeError {
+	case v1alpha1.BranchNodeError:
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {
@@ -233,10 +234,11 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecut
 
 	// If the branch was already evaluated i.e, Node is in Running status
 	branchNodeState := nCtx.NodeStateReader().GetBranchNodeState()
-	if branchNodeState.Phase == v1alpha1.BranchNodeNotYetEvaluated {
+	switch branchNodeState.Phase {
+	case v1alpha1.BranchNodeNotYetEvaluated:
 		logger.Errorf(ctx, "No node finalized through previous branch evaluation.")
 		return nil
-	} else if branchNodeState.Phase == v1alpha1.BranchNodeError {
+	case v1alpha1.BranchNodeError:
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {

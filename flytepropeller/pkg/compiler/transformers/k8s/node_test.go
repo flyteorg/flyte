@@ -79,7 +79,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	}
 
 	t.Run("Task", func(t *testing.T) {
-		n.Node.Target = &core.Node_TaskNode{
+		n.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
 					ReferenceId: &core.Identifier{Name: "ref_1"},
@@ -92,7 +92,7 @@ func TestBuildNodeSpec(t *testing.T) {
 
 	t.Run("node with resource overrides", func(t *testing.T) {
 		expectedCPU := resource.MustParse("20Mi")
-		n.Node.Target = &core.Node_TaskNode{
+		n.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
 					ReferenceId: &core.Identifier{Name: "ref_2"},
@@ -119,7 +119,7 @@ func TestBuildNodeSpec(t *testing.T) {
 
 	t.Run("node with resource extensions overrides", func(t *testing.T) {
 		expectedGpuDevice := "nvidia-tesla-t4"
-		n.Node.Target = &core.Node_TaskNode{
+		n.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
 					ReferenceId: &core.Identifier{Name: "ref_2"},
@@ -142,7 +142,7 @@ func TestBuildNodeSpec(t *testing.T) {
 
 	t.Run("node with container image override", func(t *testing.T) {
 		expectedContainerImage := "test-image:latest"
-		n.Node.Target = &core.Node_TaskNode{
+		n.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
 					ReferenceId: &core.Identifier{Name: "ref_2"},
@@ -159,7 +159,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("LaunchPlanRef", func(t *testing.T) {
-		n.Node.Target = &core.Node_WorkflowNode{
+		n.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
 				Reference: &core.WorkflowNode_LaunchplanRef{
 					LaunchplanRef: &core.Identifier{Name: "ref_1"},
@@ -172,7 +172,7 @@ func TestBuildNodeSpec(t *testing.T) {
 
 	t.Run("Workflow", func(t *testing.T) {
 		n.subWF = createSampleMockWorkflow()
-		n.Node.Target = &core.Node_WorkflowNode{
+		n.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
 				Reference: &core.WorkflowNode_SubWorkflowRef{
 					SubWorkflowRef: n.subWF.GetCoreWorkflow().GetTemplate().GetId(),
@@ -184,7 +184,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("Branch", func(t *testing.T) {
-		n.Node.Target = &core.Node_BranchNode{
+		n.Target = &core.Node_BranchNode{
 			BranchNode: &core.BranchNode{
 				IfElse: &core.IfElseBlock{
 					Other: []*core.IfBlock{},
@@ -237,7 +237,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("GateNodeApprove", func(t *testing.T) {
-		n.Node.Target = &core.Node_GateNode{
+		n.Target = &core.Node_GateNode{
 			GateNode: &core.GateNode{
 				Condition: &core.GateNode_Approve{
 					Approve: &core.ApproveCondition{
@@ -251,7 +251,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("GateNodeSignal", func(t *testing.T) {
-		n.Node.Target = &core.Node_GateNode{
+		n.Target = &core.Node_GateNode{
 			GateNode: &core.GateNode{
 				Condition: &core.GateNode_Signal{
 					Signal: &core.SignalCondition{
@@ -270,7 +270,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("GateNodeSleep", func(t *testing.T) {
-		n.Node.Target = &core.Node_GateNode{
+		n.Target = &core.Node_GateNode{
 			GateNode: &core.GateNode{
 				Condition: &core.GateNode_Sleep{
 					Sleep: &core.SleepCondition{
@@ -284,7 +284,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("ArrayNode", func(t *testing.T) {
-		n.Node.Target = &core.Node_ArrayNode{
+		n.Target = &core.Node_ArrayNode{
 			ArrayNode: &core.ArrayNode{
 				Node: &core.Node{
 					Id: "foo",
@@ -311,7 +311,7 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.Len(t, specs, 1)
 		assert.Equal(t, *specs[0].ArrayNode.Parallelism, uint32(10))
 
-		n.Node.Target = &core.Node_ArrayNode{
+		n.Target = &core.Node_ArrayNode{
 			ArrayNode: &core.ArrayNode{
 				Node: &core.Node{
 					Id: "foo",

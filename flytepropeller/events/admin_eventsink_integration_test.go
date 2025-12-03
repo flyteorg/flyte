@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 // Add this tag to your project settings if you want to pick it up.
 

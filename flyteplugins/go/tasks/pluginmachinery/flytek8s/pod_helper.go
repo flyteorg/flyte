@@ -713,9 +713,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract default container template
 	for i := 0; i < len(templatePodSpec.Containers); i++ {
-		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
+		switch templatePodSpec.Containers[i].Name {
+		case defaultContainerTemplateName:
 			defaultContainerTemplate = &templatePodSpec.Containers[i]
-		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
+		case primaryContainerTemplateName:
 			primaryContainerTemplate = &templatePodSpec.Containers[i]
 		}
 	}
@@ -725,9 +726,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract defaultInitContainerTemplate
 	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
-		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+		switch templatePodSpec.InitContainers[i].Name {
+		case defaultInitContainerTemplateName:
 			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		case primaryInitContainerTemplateName:
 			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}

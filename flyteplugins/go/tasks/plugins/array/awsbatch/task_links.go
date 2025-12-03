@@ -47,8 +47,8 @@ func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata
 	// TODO: Add tasktemplate container config to job config
 	jobConfig := newJobConfig().
 		MergeFromConfigMap(taskMeta.GetOverrides().GetConfig())
-	logLinks = append(logLinks, GetJobTaskLog(state.GetExecutionArraySize(), jobStore.Client.GetAccountID(),
-		jobStore.Client.GetRegion(), jobConfig.DynamicTaskQueue, *state.GetExternalJobID()))
+	logLinks = append(logLinks, GetJobTaskLog(state.GetExecutionArraySize(), jobStore.GetAccountID(),
+		jobStore.GetRegion(), jobConfig.DynamicTaskQueue, *state.GetExternalJobID()))
 
 	jobName := taskMeta.GetTaskExecutionID().GetGeneratedName()
 	job, err := jobStore.GetOrCreate(jobName, &Job{

@@ -553,11 +553,12 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 				}
 				fmt.Printf("\n")
 
-				if i == roundsToFail-1 {
+				switch i {
+				case roundsToFail - 1:
 					assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
-				} else if i == roundsToFail-2 {
+				case roundsToFail - 2:
 					assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
-				} else {
+				default:
 					assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
 				}
 

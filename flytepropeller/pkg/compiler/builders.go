@@ -152,8 +152,8 @@ func (t taskBuilder) GetCoreTask() *core.TaskTemplate {
 }
 
 func (t taskBuilder) GetID() c.Identifier {
-	if t.flyteTask.GetId() != nil {
-		return t.flyteTask.GetId()
+	if t.GetId() != nil {
+		return t.GetId()
 	}
 
 	return &core.Identifier{}

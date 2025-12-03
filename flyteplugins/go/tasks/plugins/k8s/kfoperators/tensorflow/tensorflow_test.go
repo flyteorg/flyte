@@ -347,12 +347,12 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 	// verify TaskExecutionMetadata labels and annotations are copied to the TensorFlowJob
 	for k, v := range dummyAnnotations {
 		for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+			assert.Equal(t, v, replicaSpec.Template.Annotations[k])
 		}
 	}
 	for k, v := range dummyLabels {
 		for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
-			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+			assert.Equal(t, v, replicaSpec.Template.Labels[k])
 		}
 	}
 

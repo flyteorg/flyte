@@ -244,8 +244,8 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 
 	// Job
 	jobSpec := daskJob.Spec.Job.Spec
-	assert.Equal(t, testAnnotations, daskJob.ObjectMeta.GetAnnotations())
-	assert.Equal(t, testLabels, daskJob.ObjectMeta.GetLabels())
+	assert.Equal(t, testAnnotations, daskJob.GetAnnotations())
+	assert.Equal(t, testLabels, daskJob.GetLabels())
 	assert.Equal(t, v1.RestartPolicyNever, jobSpec.RestartPolicy)
 	assert.Equal(t, "job-runner", jobSpec.Containers[0].Name)
 	assert.Equal(t, defaultTestImage, jobSpec.Containers[0].Image)
@@ -259,8 +259,8 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	assert.Contains(t, jobSpec.Containers[0].Env, testEnvVars[0])
 
 	// Cluster
-	assert.Equal(t, testAnnotations, daskJob.Spec.Cluster.ObjectMeta.GetAnnotations())
-	assert.Equal(t, testLabels, daskJob.Spec.Cluster.ObjectMeta.GetLabels())
+	assert.Equal(t, testAnnotations, daskJob.Spec.Cluster.GetAnnotations())
+	assert.Equal(t, testLabels, daskJob.Spec.Cluster.GetLabels())
 
 	// Scheduler
 	schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec

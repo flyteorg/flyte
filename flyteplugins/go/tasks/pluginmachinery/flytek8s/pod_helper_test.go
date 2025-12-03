@@ -609,13 +609,14 @@ func updatePod(t *testing.T) {
 	UpdatePod(taskExecutionMetadata, []v1.ResourceRequirements{}, &pod.Spec)
 	assert.Equal(t, v1.RestartPolicyNever, pod.Spec.RestartPolicy)
 	for _, tol := range pod.Spec.Tolerations {
-		if tol.Key == "x/flyte" {
+		switch tol.Key {
+		case "x/flyte":
 			assert.Equal(t, tol.Value, "interruptible")
 			assert.Equal(t, tol.Operator, v1.TolerationOperator("Equal"))
 			assert.Equal(t, tol.Effect, v1.TaintEffect("NoSchedule"))
-		} else if tol.Key == "my toleration key" {
+		case "my toleration key":
 			assert.Equal(t, tol.Value, "my toleration value")
-		} else {
+		default:
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}

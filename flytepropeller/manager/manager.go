@@ -79,7 +79,7 @@ func (m *Manager) createPods(ctx context.Context) error {
 	}
 
 	podAnnotations := map[string]string{
-		"podTemplateResourceVersion": podTemplate.ObjectMeta.ResourceVersion,
+		"podTemplateResourceVersion": podTemplate.ResourceVersion,
 		"shardConfigHash":            fmt.Sprintf("%d", shardConfigHash),
 	}
 	podNames := m.getPodNames()
@@ -108,12 +108,12 @@ func (m *Manager) createPods(ctx context.Context) error {
 
 	podsRunning := 0
 	for _, pod := range pods.Items {
-		podName := pod.ObjectMeta.Name
+		podName := pod.Name
 
 		// validate existing pod annotations
 		deletePod := false
 		for key, value := range podAnnotations {
-			if pod.ObjectMeta.Annotations[key] != value {
+			if pod.Annotations[key] != value {
 				logger.Infof(ctx, "detected pod '%s' with stale configuration", podName)
 				deletePod = true
 				break

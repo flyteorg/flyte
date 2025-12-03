@@ -1056,12 +1056,13 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
-	if np == v1alpha1.NodePhaseQueued {
+	switch np {
+	case v1alpha1.NodePhaseQueued:
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesRunning.Inc(ctx)
 		}
 		return interfaces.NodeStatusQueued, nil
-	} else if np == v1alpha1.NodePhaseSkipped {
+	case v1alpha1.NodePhaseSkipped:
 		return interfaces.NodeStatusSuccess, nil
 	}
 

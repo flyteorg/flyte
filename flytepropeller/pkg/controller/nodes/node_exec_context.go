@@ -99,7 +99,7 @@ func (e nodeExecMetadata) GetNodeExecutionID() *core.NodeExecutionIdentifier {
 }
 
 func (e nodeExecMetadata) GetK8sServiceAccount() string {
-	return e.Meta.GetServiceAccountName()
+	return e.GetServiceAccountName()
 }
 
 func (e nodeExecMetadata) GetOwnerID() types.NamespacedName {
