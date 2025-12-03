@@ -127,8 +127,5 @@ retract (
 
 replace (
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
-	k8s.io/api => k8s.io/api v0.28.2
-	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
-	k8s.io/client-go => k8s.io/client-go v0.28.2
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )

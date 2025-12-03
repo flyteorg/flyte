@@ -149,14 +149,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace (
-	github.com/flyteorg/flyte/datacatalog => ../datacatalog
-	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
-	k8s.io/api => k8s.io/api v0.28.2
-	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
-	k8s.io/client-go => k8s.io/client-go v0.28.2
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
-)
+replace sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
