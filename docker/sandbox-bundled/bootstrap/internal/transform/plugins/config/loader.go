@@ -72,7 +72,7 @@ func (cl *Loader) Transform(data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(workDir)
+	defer os.RemoveAll(workDir) //nolint:errcheck
 
 	// Write base resource module
 	baseManifestPath := filepath.Join(workDir, "base.yaml")
