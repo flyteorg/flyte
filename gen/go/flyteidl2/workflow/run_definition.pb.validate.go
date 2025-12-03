@@ -4265,6 +4265,8 @@ func (m *TaskGroup) validate(all bool) error {
 
 	// no validation rules for ShouldDelete
 
+	// no validation rules for ShortName
+
 	if len(errors) > 0 {
 		return TaskGroupMultiError(errors)
 	}

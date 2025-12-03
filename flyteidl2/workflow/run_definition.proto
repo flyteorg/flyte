@@ -453,4 +453,7 @@ message TaskGroup {
   repeated common.EnrichedIdentity created_by = 9;
 
   bool should_delete = 10;
+
+  // short name (function name) of the task.
+  string short_name = 11;
 }
