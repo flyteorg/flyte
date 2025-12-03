@@ -1,6 +1,7 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
@@ -64,6 +65,18 @@ class TaskTriggersSummary(_message.Message):
     stats: TaskTriggersSummary.TriggerStats
     def __init__(self, details: _Optional[_Union[TaskTriggersSummary.TriggerDetails, _Mapping]] = ..., stats: _Optional[_Union[TaskTriggersSummary.TriggerStats, _Mapping]] = ...) -> None: ...
 
+class LatestRunSummary(_message.Message):
+    __slots__ = ["run_id", "run_time", "phase", "root_task_name"]
+    RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    RUN_TIME_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    ROOT_TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    run_id: _identifier_pb2.RunIdentifier
+    run_time: _timestamp_pb2.Timestamp
+    phase: _phase_pb2.ActionPhase
+    root_task_name: str
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., root_task_name: _Optional[str] = ...) -> None: ...
+
 class TaskMetadata(_message.Message):
     __slots__ = ["deployed_by", "short_name", "deployed_at", "environment_name", "triggers_summary", "short_description"]
     DEPLOYED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -80,13 +93,21 @@ class TaskMetadata(_message.Message):
     short_description: str
     def __init__(self, deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., short_name: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., environment_name: _Optional[str] = ..., triggers_summary: _Optional[_Union[TaskTriggersSummary, _Mapping]] = ..., short_description: _Optional[str] = ...) -> None: ...
 
+class TaskSummary(_message.Message):
+    __slots__ = ["latest_run"]
+    LATEST_RUN_FIELD_NUMBER: _ClassVar[int]
+    latest_run: LatestRunSummary
+    def __init__(self, latest_run: _Optional[_Union[LatestRunSummary, _Mapping]] = ...) -> None: ...
+
 class Task(_message.Message):
-    __slots__ = ["task_id", "metadata"]
+    __slots__ = ["task_id", "metadata", "task_summary"]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    TASK_SUMMARY_FIELD_NUMBER: _ClassVar[int]
     task_id: TaskIdentifier
     metadata: TaskMetadata
-    def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ...) -> None: ...
+    task_summary: TaskSummary
+    def __init__(self, task_id: _Optional[_Union[TaskIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., task_summary: _Optional[_Union[TaskSummary, _Mapping]] = ...) -> None: ...
 
 class SourceCode(_message.Message):
     __slots__ = ["link"]
