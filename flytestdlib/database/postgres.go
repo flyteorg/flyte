@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -30,7 +29,7 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 			logger.Fatalf(ctx,
 				"missing database password at specified path [%s]", passwordPath)
 		}
-		passwordVal, err := ioutil.ReadFile(passwordPath)
+		passwordVal, err := os.ReadFile(passwordPath)
 		if err != nil {
 			logger.Fatalf(ctx, "failed to read database password from path [%s] with err: %v",
 				passwordPath, err)

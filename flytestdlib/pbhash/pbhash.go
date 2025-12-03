@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb" //nolint:staticcheck // TODO: migrate to google.golang.org/protobuf/encoding/protojson
+	"github.com/golang/protobuf/proto"  //nolint:staticcheck // TODO: migrate to google.golang.org/protobuf/proto
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )

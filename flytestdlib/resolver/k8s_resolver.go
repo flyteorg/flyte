@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
-	v1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1" //nolint:staticcheck // TODO: migrate to discoveryv1.EndpointSlice
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -133,6 +133,7 @@ func (k *kResolver) Close() {
 	logger.Infof(k.ctx, "k8s resolver: closed")
 }
 
+//nolint:staticcheck // TODO: migrate to discoveryv1.EndpointSlice
 func (k *kResolver) resolve(e *v1.Endpoints) {
 	var newAddrs []resolver.Address
 	for _, subset := range e.Subsets {
@@ -187,7 +188,7 @@ func (k *kResolver) run() {
 			if event.Object == nil {
 				continue
 			}
-			k.resolve(event.Object.(*v1.Endpoints))
+			k.resolve(event.Object.(*v1.Endpoints)) //nolint:staticcheck // TODO: migrate to discoveryv1.EndpointSlice
 		}
 	}
 }

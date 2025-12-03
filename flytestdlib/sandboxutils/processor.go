@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint:staticcheck // TODO: migrate to google.golang.org/protobuf/proto
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )

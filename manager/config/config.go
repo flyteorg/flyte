@@ -38,6 +38,7 @@ type KubernetesConfig struct {
 	KubeConfig string `json:"kubeconfig"` // Optional, defaults to in-cluster or ~/.kube/config
 }
 
+//nolint:unused // Used by go:generate pflags
 var defaultConfig = &Config{
 	RunsService: ServiceConfig{
 		Host: "0.0.0.0",
