@@ -24,6 +24,10 @@ It's the Python SDK for user to build their flyte tasks. Everything is in pure P
 
 A well-design UI interface for viewing tasks, runs, triggers, etc. 
 
+## System Structure
+![System Structure](./images/system_structure.png)
+[Excalidraw link](https://excalidraw.com/#room=2d2b7c70744a9260f0e1,D-qEq5oOXJ4DX0vHp9-tUQ)
+
 ## Control plane
 
 ### Run Service and Task Service
