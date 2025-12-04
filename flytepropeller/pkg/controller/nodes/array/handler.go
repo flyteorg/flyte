@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"time"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -21,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -52,13 +54,16 @@ type arrayNodeHandler struct {
 
 // metrics encapsulates the prometheus metrics for this handler
 type metrics struct {
-	scope promutils.Scope
+	scope               promutils.Scope
+	workerAssignLatency labeled.StopWatch
 }
 
 // newMetrics initializes a new metrics struct
 func newMetrics(scope promutils.Scope) metrics {
 	return metrics{
 		scope: scope,
+		workerAssignLatency: labeled.NewStopWatch("worker_assign_latency",
+			"Time blocked waiting to assign a node execution request to a worker", time.Millisecond, scope),
 	}
 }
 
@@ -367,7 +372,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			nodeExecutionRequests = append(nodeExecutionRequests, nodeExecutionRequest)
+			workerAssignStart := time.Now()
 			a.nodeExecutionRequestChannel <- nodeExecutionRequest
+			a.metrics.workerAssignLatency.Observe(ctx, workerAssignStart, time.Now())
 
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
