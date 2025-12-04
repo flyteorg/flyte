@@ -8,7 +8,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	//"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/agent"
 )
 
 func TestLoadPlugin(t *testing.T) {
@@ -94,18 +93,3 @@ func TestLoadPlugin(t *testing.T) {
 	})
 
 }
-
-// TODO @pvditt re-add after re-adding webapi
-//func TestAgentService(t *testing.T) {
-//	agentService := agent.AgentService{}
-//	taskTypes := []core.TaskType{"sensor", "chatgpt"}
-//
-//	for _, taskType := range taskTypes {
-//		assert.Equal(t, false, agentService.ContainTaskType(taskType))
-//	}
-//
-//	agentService.SetSupportedTaskType(taskTypes)
-//	for _, taskType := range taskTypes {
-//		assert.Equal(t, true, agentService.ContainTaskType(taskType))
-//	}
-//}
