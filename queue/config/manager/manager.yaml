@@ -1,43 +1,7 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: queue-sa
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: queue-role
-  namespace: flyte
-rules:
-  - apiGroups: ["flyte.org"]
-    resources: ["taskactions", "taskactions/status"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: queue-rb
-  namespace: flyte
-subjects:
-  - kind: ServiceAccount
-    name: queue-sa
-    namespace: flyte
-roleRef:
-  kind: Role
-  name: queue-role
-  apiGroup: rbac.authorization.k8s.io
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queue
-  namespace: flyte
 spec:
   replicas: 1
   selector:
@@ -74,7 +38,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: queue
-  namespace: flyte
 spec:
   selector:
     app: queue
