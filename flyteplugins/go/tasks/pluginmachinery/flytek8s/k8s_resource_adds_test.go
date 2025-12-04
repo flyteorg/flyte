@@ -1,0 +1,403 @@
+package flytek8s
+
+import (
+	"context"
+	"os"
+	"reflect"
+	"testing"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+	v12 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+
+	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+)
+
+func TestGetExecutionEnvVars(t *testing.T) {
+	mock := mockTaskExecutionIdentifier{}
+	tests := []struct {
+		name            string
+		expectedEnvVars int
+		consoleURL      string
+		expectedEnvVar  *v12.EnvVar
+	}{
+		{
+			"no-console-url",
+			13,
+			"",
+			nil,
+		},
+		{
+			"with-console-url",
+			14,
+			"scheme://host/path",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+		{
+			"with-console-url-ending-in-single-slash",
+			14,
+			"scheme://host/path/",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+		{
+			"with-console-url-ending-in-multiple-slashes",
+			14,
+			"scheme://host/path////",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		envVars := GetExecutionEnvVars(mock, tt.consoleURL)
+		assert.Len(t, envVars, tt.expectedEnvVars)
+		if tt.expectedEnvVar != nil {
+			assert.True(t, proto.Equal(&envVars[5], tt.expectedEnvVar))
+		}
+	}
+}
+
+func TestGetTolerationsForResources(t *testing.T) {
+	var empty []v12.Toleration
+	var emptyConfig map[v12.ResourceName][]v12.Toleration
+
+	tolGPU := v12.Toleration{
+		Key:      "flyte/gpu",
+		Value:    "dedicated",
+		Operator: v12.TolerationOpEqual,
+		Effect:   v12.TaintEffectNoSchedule,
+	}
+
+	tolEphemeralStorage := v12.Toleration{
+		Key:      "ephemeral-storage",
+		Value:    "dedicated",
+		Operator: v12.TolerationOpExists,
+		Effect:   v12.TaintEffectNoSchedule,
+	}
+
+	type args struct {
+		resources v12.ResourceRequirements
+	}
+	tests := []struct {
+		name        string
+		args        args
+		setVal      map[v12.ResourceName][]v12.Toleration
+		setDefaults []v12.Toleration
+		want        []v12.Toleration
+	}{
+		{
+			"no-tolerations-limits",
+			args{
+				v12.ResourceRequirements{
+					Limits: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			emptyConfig,
+			nil,
+			empty,
+		},
+		{
+			"no-tolerations-req",
+			args{
+				v12.ResourceRequirements{
+					Requests: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			emptyConfig,
+			nil,
+			empty,
+		},
+		{
+			"no-tolerations-both",
+			args{
+				v12.ResourceRequirements{
+					Limits: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+					Requests: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			emptyConfig,
+			nil,
+			empty,
+		},
+		{
+			"tolerations-limits",
+			args{
+				v12.ResourceRequirements{
+					Limits: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			map[v12.ResourceName][]v12.Toleration{
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
+			},
+			nil,
+			[]v12.Toleration{tolEphemeralStorage},
+		},
+		{
+			"tolerations-req",
+			args{
+				v12.ResourceRequirements{
+					Requests: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			map[v12.ResourceName][]v12.Toleration{
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
+			},
+			nil,
+			[]v12.Toleration{tolEphemeralStorage},
+		},
+		{
+			"tolerations-both",
+			args{
+				v12.ResourceRequirements{
+					Limits: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+					Requests: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			map[v12.ResourceName][]v12.Toleration{
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
+			},
+			nil,
+			[]v12.Toleration{tolEphemeralStorage},
+		},
+		{
+			"no-tolerations-both",
+			args{
+				v12.ResourceRequirements{
+					Limits: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+						ResourceNvidiaGPU:            resource.MustParse("1"),
+					},
+					Requests: v12.ResourceList{
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+					},
+				},
+			},
+			map[v12.ResourceName][]v12.Toleration{
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
+			},
+			nil,
+			[]v12.Toleration{tolEphemeralStorage, tolGPU},
+		},
+		{
+			"default-tolerations",
+			args{},
+			nil,
+			[]v12.Toleration{tolEphemeralStorage},
+			[]v12.Toleration{tolEphemeralStorage},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{ResourceTolerations: tt.setVal, DefaultTolerations: tt.setDefaults}))
+			if got := GetPodTolerations(true, tt.args.resources); len(got) != len(tt.want) {
+				t.Errorf("GetPodTolerations() = %v, want %v", got, tt.want)
+			} else {
+				for _, tol := range tt.want {
+					assert.Contains(t, got, tol)
+				}
+			}
+		})
+	}
+}
+
+var testTaskExecutionIdentifier = core.TaskExecutionIdentifier{
+	TaskId: &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Project:      "proj",
+		Domain:       "domain",
+		Name:         "name",
+	},
+	RetryAttempt: 1,
+	NodeExecutionId: &core.NodeExecutionIdentifier{
+		NodeId: "nodeId",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "proj",
+			Domain:  "domain",
+			Name:    "name",
+		},
+	},
+}
+
+type mockTaskExecutionIdentifier struct{}
+
+func (m mockTaskExecutionIdentifier) GetID() core.TaskExecutionIdentifier {
+	return testTaskExecutionIdentifier
+}
+
+func (m mockTaskExecutionIdentifier) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
+	return "task-exec-name", nil
+}
+
+func (m mockTaskExecutionIdentifier) GetGeneratedName() string {
+	return "task-exec-name"
+}
+
+func (m mockTaskExecutionIdentifier) GetUniqueNodeID() string {
+	return "unique-node-id"
+}
+
+func TestDecorateEnvVars(t *testing.T) {
+	ctx := context.Background()
+	ctx = contextutils.WithWorkflowID(ctx, "fake_workflow")
+
+	defaultEnv := []v12.EnvVar{
+		{
+			Name:  "x",
+			Value: "y",
+		},
+	}
+	additionalEnv := map[string]string{
+		"k": "v",
+	}
+	var emptyEnvVar map[string]string
+	envVarsFromEnv := map[string]string{
+		"k": "value",
+	}
+
+	originalEnvVal := os.Getenv("value")
+	err := os.Setenv("value", "v")
+	if err != nil {
+		t.Fatalf("failed to set env var 'value'; %v", err)
+	}
+	defer os.Setenv("value", originalEnvVal)
+
+	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
+	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	expectedOffloaded := append(expected, v12.EnvVar{Name: "_F_L_MIN_SIZE_MB", Value: "1"})
+	expectedOffloaded = append(expectedOffloaded, v12.EnvVar{Name: "_F_L_MAX_SIZE_MB", Value: "42"})
+
+	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
+	type args struct {
+		envVars []v12.EnvVar
+		id      pluginsCore.TaskExecutionID
+	}
+	tests := []struct {
+		name                  string
+		args                  args
+		additionEnvVar        map[string]string
+		additionEnvVarFromEnv map[string]string
+		offloadingEnabled     bool
+		offloadingEnvVar      map[string]string
+		executionEnvVar       map[string]string
+		consoleURL            string
+		want                  []v12.EnvVar
+	}{
+		{
+			"no-additional",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			expected,
+		},
+		// TODO @pvditt
+		//{
+		//	"no-additional-offloading-enabled",
+		//	args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+		//	emptyEnvVar,
+		//	emptyEnvVar,
+		//	true,
+		//	emptyEnvVar,
+		//	emptyEnvVar,
+		//	"",
+		//	expectedOffloaded,
+		//},
+		{
+			"with-additional",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			additionalEnv,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			aggregated,
+		},
+		{
+			"from-env",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			envVarsFromEnv,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			aggregated,
+		},
+		{
+			"from-execution-metadata",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			additionalEnv,
+			"",
+			aggregated,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// TODO @pvditt
+			//cfg := propellerCfg.GetConfig()
+			//cfg.LiteralOffloadingConfig = propellerCfg.LiteralOffloadingConfig{
+			//	Enabled:                  tt.offloadingEnabled,
+			//	MinSizeInMBForOffloading: 1,
+			//	MaxSizeInMBForOffloading: 42,
+			//}
+
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				DefaultEnvVars:        tt.additionEnvVar,
+				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
+			}))
+			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, nil, tt.executionEnvVar, tt.args.id, tt.consoleURL); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
