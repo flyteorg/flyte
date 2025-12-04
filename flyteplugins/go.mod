@@ -151,10 +151,7 @@ require (
 )
 
 replace (
-	github.com/flyteorg/flyte/datacatalog => ../datacatalog
-	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl
-	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
