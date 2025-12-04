@@ -16,18 +16,6 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
----
-apiVersion: v1
 automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
@@ -52,6 +40,17 @@ metadata:
   name: flyteconnector
   namespace: flyte
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -62,7 +61,6 @@ metadata:
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
 rules:
 - apiGroups:
   - ""
@@ -346,7 +344,6 @@ metadata:
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -473,7 +470,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.2"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.3"
       k8s-array:
         logs:
           config:
@@ -794,7 +791,6 @@ metadata:
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-settings
-  namespace: flyte
 ---
 apiVersion: v1
 kind: Secret
@@ -822,7 +818,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: WDh0TktlZnFoN2pnSmlhQQ==
+  haSharedSecret: dFpmSEJjUlRFdTN0d1BNdg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -833,19 +829,6 @@ metadata:
     heritage: Helm
     release: flyte-sandbox
   name: flyte-sandbox-docker-registry-secret
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard-certs
   namespace: flyte
 type: Opaque
 ---
@@ -896,8 +879,19 @@ metadata:
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-certs
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-csrf
-  namespace: flyte
 type: Opaque
 ---
 apiVersion: v1
@@ -910,7 +904,6 @@ metadata:
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-key-holder
-  namespace: flyte
 type: Opaque
 ---
 apiVersion: v1
@@ -979,30 +972,6 @@ spec:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    kubernetes.io/cluster-service: "true"
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: kubernetes-dashboard
   type: ClusterIP
 ---
 apiVersion: v1
@@ -1150,6 +1119,29 @@ spec:
   type: ClusterIP
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+    kubernetes.io/cluster-service: "true"
+  name: flyte-sandbox-kubernetes-dashboard
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: kubernetes-dashboard
+  type: ClusterIP
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -1253,7 +1245,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 257749cdf46fb0f1957430c417f121fb61c9319bebff033c83460657a2b4cdd9
+        checksum/configuration: dac45dcada803081b7d43fd5a6ec5591c0d6a36a1f551950143a5bf568fe0208
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1419,7 +1411,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: cc06ff00dd370cc70ab3accad614c392c417adeb19862c274157562bfc9d8c51
+        checksum/secret: 0ec2d2838881b9efc057c922a0810bb40e86dd37be7cdb80e1b418c4c62e9c05
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1465,89 +1457,6 @@ spec:
         name: flyte-sandbox-docker-registry-config
       - emptyDir: {}
         name: data
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: kubernetes-dashboard
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: kubernetes-dashboard
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations: null
-      labels:
-        app.kubernetes.io/component: kubernetes-dashboard
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: kubernetes-dashboard
-        app.kubernetes.io/version: 2.7.0
-        helm.sh/chart: kubernetes-dashboard-6.0.0
-    spec:
-      containers:
-      - args:
-        - --namespace=flyte
-        - --metrics-provider=none
-        - --enable-insecure-login
-        - --enable-skip-login
-        image: kubernetesui/dashboard:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 9090
-            scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        name: kubernetes-dashboard
-        ports:
-        - containerPort: 9090
-          name: http
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 2
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /certs
-          name: kubernetes-dashboard-certs
-        - mountPath: /tmp
-          name: tmp-volume
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: flyte-sandbox-kubernetes-dashboard
-      volumes:
-      - name: kubernetes-dashboard-certs
-        secret:
-          secretName: flyte-sandbox-kubernetes-dashboard-certs
-      - emptyDir: {}
-        name: tmp-volume
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1793,6 +1702,88 @@ spec:
       - name: flyteconnector
         secret:
           secretName: flyteconnector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kubernetes-dashboard
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: kubernetes-dashboard
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app.kubernetes.io/component: kubernetes-dashboard
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kubernetes-dashboard
+        app.kubernetes.io/version: 2.7.0
+        helm.sh/chart: kubernetes-dashboard-6.0.0
+    spec:
+      containers:
+      - args:
+        - --namespace=flyte
+        - --metrics-provider=none
+        - --enable-insecure-login
+        - --enable-skip-login
+        image: kubernetesui/dashboard:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        name: kubernetes-dashboard
+        ports:
+        - containerPort: 9090
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /certs
+          name: kubernetes-dashboard-certs
+        - mountPath: /tmp
+          name: tmp-volume
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: flyte-sandbox-kubernetes-dashboard
+      volumes:
+      - name: kubernetes-dashboard-certs
+        secret:
+          secretName: flyte-sandbox-kubernetes-dashboard-certs
+      - emptyDir: {}
+        name: tmp-volume
 ---
 apiVersion: apps/v1
 kind: StatefulSet
