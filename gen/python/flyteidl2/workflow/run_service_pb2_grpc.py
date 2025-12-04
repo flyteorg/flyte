@@ -80,6 +80,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
                 )
+        self.WatchGroups = channel.unary_stream(
+                '/flyteidl2.workflow.RunService/WatchGroups',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
+                )
 
 
 class RunServiceServicer(object):
@@ -179,6 +184,13 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def WatchGroups(self, request, context):
+        """Stream updates for task groups based on the provided filter criteria.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -246,6 +258,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.AbortAction,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.SerializeToString,
+            ),
+            'WatchGroups': grpc.unary_stream_rpc_method_handler(
+                    servicer.WatchGroups,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -476,5 +493,22 @@ class RunService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/AbortAction',
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def WatchGroups(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchGroups',
+            flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

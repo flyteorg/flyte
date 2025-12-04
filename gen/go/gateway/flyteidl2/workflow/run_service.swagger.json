@@ -1746,15 +1746,28 @@
       },
       "description": "Defines a strongly typed variable."
     },
+    "coreVariableEntry": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/coreVariable"
+        }
+      },
+      "description": "Defines a single entity for variable."
+    },
     "coreVariableMap": {
       "type": "object",
       "properties": {
         "variables": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/coreVariable"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreVariableEntry"
           },
-          "description": "Defines a map of variable names to variables."
+          "title": "Use repeated key value pair"
         }
       },
       "title": "A map of Variables"
@@ -2178,6 +2191,19 @@
       "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
       "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
     },
+    "taskCron": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
+        },
+        "timezone": {
+          "type": "string",
+          "title": "default is UTC"
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
@@ -2201,6 +2227,35 @@
         }
       },
       "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
+    "taskFixedRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "unit": {
+          "$ref": "#/definitions/taskFixedRateUnit"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
+        }
+      },
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
+    },
+    "taskFixedRateUnit": {
+      "type": "string",
+      "enum": [
+        "FIXED_RATE_UNIT_UNSPECIFIED",
+        "FIXED_RATE_UNIT_MINUTE",
+        "FIXED_RATE_UNIT_HOUR",
+        "FIXED_RATE_UNIT_DAY"
+      ],
+      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
+      "description": "Represents a frequency at which to run a schedule."
     },
     "taskInputs": {
       "type": "object",
@@ -2340,6 +2395,25 @@
         }
       }
     },
+    "taskSchedule": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "$ref": "#/definitions/taskFixedRate"
+        },
+        "cron_expression": {
+          "type": "string"
+        },
+        "cron": {
+          "$ref": "#/definitions/taskCron"
+        },
+        "kickoff_time_input_arg": {
+          "type": "string",
+          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        }
+      },
+      "description": "Defines complete set of information required to trigger an execution on a schedule."
+    },
     "taskTaskIdentifier": {
       "type": "object",
       "properties": {
@@ -2401,6 +2475,27 @@
         }
       },
       "description": "Specification for a trace action."
+    },
+    "taskTriggerAutomationSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpecType",
+          "description": "Explicitly defines trigger automation type."
+        },
+        "schedule": {
+          "$ref": "#/definitions/taskSchedule"
+        }
+      }
+    },
+    "taskTriggerAutomationSpecType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNSPECIFIED",
+        "TYPE_NONE",
+        "TYPE_SCHEDULE"
+      ],
+      "default": "TYPE_UNSPECIFIED"
     },
     "workflowAbortActionResponse": {
       "type": "object"
@@ -2570,6 +2665,22 @@
         "trigger_id": {
           "$ref": "#/definitions/commonTriggerIdentifier",
           "description": "If this run was initiated by a trigger, this will store the trigger identifier."
+        },
+        "environment_name": {
+          "type": "string",
+          "title": "Environment name"
+        },
+        "funtion_name": {
+          "type": "string",
+          "title": "Function name"
+        },
+        "trigger_name": {
+          "type": "string",
+          "title": "Trigger name"
+        },
+        "trigger_type": {
+          "$ref": "#/definitions/taskTriggerAutomationSpec",
+          "title": "Trigger Type"
         }
       },
       "description": "Static, lightweight metadata about an action."
@@ -2599,6 +2710,11 @@
         "cache_status": {
           "$ref": "#/definitions/coreCatalogCacheStatus",
           "title": "cache status of the action's latest attempt"
+        },
+        "duration_ms": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Duration of the action in milliseconds."
         }
       },
       "description": "Lightweight status of an action. For more detailed status see ActionDetails."
@@ -2839,6 +2955,61 @@
         }
       }
     },
+    "workflowTaskGroup": {
+      "type": "object",
+      "properties": {
+        "task_name": {
+          "type": "string",
+          "description": "Task name."
+        },
+        "environment_name": {
+          "type": "string",
+          "description": "Environment name."
+        },
+        "total_runs": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of runs for this task."
+        },
+        "latest_run_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent run."
+        },
+        "recent_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flyteidl2workflowPhase"
+          },
+          "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
+        },
+        "average_failure_rate": {
+          "type": "number",
+          "format": "double",
+          "description": "Average failure rate of runs in this group (0.0 to 1.0).\nComputed as number of root actions with phase FAILED divided by total root actions."
+        },
+        "average_duration": {
+          "type": "string",
+          "description": "Average duration of runs in this group."
+        },
+        "latest_finished_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the most recent finished run (terminal phase)."
+        },
+        "created_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of unique user identities who created runs in this group."
+        },
+        "should_delete": {
+          "type": "boolean"
+        }
+      },
+      "description": "TaskGroup represents a group of runs for a specific task."
+    },
     "workflowTraceActionMetadata": {
       "type": "object",
       "properties": {
@@ -2882,6 +3053,24 @@
           }
         }
       }
+    },
+    "workflowWatchGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "task_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/workflowTaskGroup"
+          },
+          "description": "List of task groups matching the filter criteria.\nFor the initial response, this contains all groups.\nFor subsequent updates, this contains only changed groups."
+        },
+        "sentinel": {
+          "type": "boolean",
+          "description": "Indicates when the initial List call is complete, and subsequent messages are updates."
+        }
+      },
+      "description": "Response message for watching task groups."
     },
     "workflowWatchRunDetailsResponse": {
       "type": "object",
