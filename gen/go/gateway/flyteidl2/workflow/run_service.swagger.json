@@ -3058,6 +3058,10 @@
         },
         "should_delete": {
           "type": "boolean"
+        },
+        "short_name": {
+          "type": "string",
+          "description": "short name (function name) of the task."
         }
       },
       "description": "TaskGroup represents a group of runs for a specific task."
