@@ -17,7 +17,7 @@ type APITimer struct {
 }
 
 func (a APITimer) Stop(err *error) {
-	if err != nil && *err != nil {
+	if err != nil && *err != nil && !errors.IsNotFound(*err) {
 		a.Failure.Stop()
 	} else {
 		a.Success.Stop()
