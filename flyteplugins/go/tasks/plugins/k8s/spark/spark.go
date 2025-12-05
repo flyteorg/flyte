@@ -591,6 +591,35 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	return phaseInfo, nil
 }
 
+// IsTerminal returns true if the SparkApplication is in a terminal state (Completed, Failed, or FailedSubmission)
+func (sparkResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	app, ok := resource.(*sparkOp.SparkApplication)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *SparkApplication, got %T", resource)
+	}
+	state := app.Status.AppState.State
+	return state == sparkOp.CompletedState || state == sparkOp.FailedState || state == sparkOp.FailedSubmissionState, nil
+}
+
+// GetCompletionTime returns the termination time of the SparkApplication
+func (sparkResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	app, ok := resource.(*sparkOp.SparkApplication)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *SparkApplication, got %T", resource)
+	}
+
+	if !app.Status.TerminationTime.IsZero() {
+		return app.Status.TerminationTime.Time, nil
+	}
+
+	// Fallback to submission time or creation time
+	if !app.Status.SubmissionTime.IsZero() {
+		return app.Status.SubmissionTime.Time, nil
+	}
+
+	return app.CreationTimestamp.Time, nil
+}
+
 func init() {
 	if err := sparkOp.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)

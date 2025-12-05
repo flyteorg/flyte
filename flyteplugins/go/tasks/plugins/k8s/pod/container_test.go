@@ -175,7 +175,7 @@ func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata p
 	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
 	inputReader.OnGetInputPath().Return("test-data-reference")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	pCtx.On("InputReader").Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
@@ -184,17 +184,17 @@ func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata p
 	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
-	pCtx.OnOutputWriter().Return(outputReader)
+	pCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	pCtx.On("TaskReader").Return(taskReader)
 
-	pCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+	pCtx.On("TaskExecutionMetadata").Return(taskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
 	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	pCtx.OnPluginStateReader().Return(pluginStateReader)
+	pCtx.On("PluginStateReader").Return(pluginStateReader)
 
 	return pCtx
 }

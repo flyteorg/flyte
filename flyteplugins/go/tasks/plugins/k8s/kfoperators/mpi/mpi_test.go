@@ -194,7 +194,7 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
 	inputReader.OnGetInputPath().Return("/input")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	pCtx.On("InputReader").Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
@@ -202,11 +202,11 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 	outputReader.OnGetRawOutputPrefix().Return("")
 	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.OnOutputWriter().Return(outputReader)
+	pCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	pCtx.On("TaskReader").Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
@@ -241,7 +241,7 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -253,7 +253,7 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 			return nil
 		})
 
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -1004,4 +1004,138 @@ func TestGetReplicaCount(t *testing.T) {
 
 	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker))
 	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher))
+}
+
+func TestIsTerminal(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		conditionType  kubeflowv1.JobConditionType
+		expectedResult bool
+	}{
+		{"Succeeded", kubeflowv1.JobSucceeded, true},
+		{"Failed", kubeflowv1.JobFailed, true},
+		{"Created", kubeflowv1.JobCreated, false},
+		{"Running", kubeflowv1.JobRunning, false},
+		{"Restarting", kubeflowv1.JobRestarting, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a simple job with only the condition we want to test
+			job := &kubeflowv1.MPIJob{
+				Status: kubeflowv1.JobStatus{
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:   tt.conditionType,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}
+			result, err := mpiResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := mpiResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *kubeflowv1.MPIJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses CompletionTime",
+			job: &kubeflowv1.MPIJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					CompletionTime: &v1.Time{Time: now},
+					StartTime:      &v1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to condition LastTransitionTime",
+			job: &kubeflowv1.MPIJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: earlier},
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:               kubeflowv1.JobSucceeded,
+							Status:             corev1.ConditionTrue,
+							LastTransitionTime: v1.NewTime(now),
+						},
+					},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &kubeflowv1.MPIJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &kubeflowv1.MPIJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(now),
+				},
+				Status: kubeflowv1.JobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := mpiResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := mpiResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

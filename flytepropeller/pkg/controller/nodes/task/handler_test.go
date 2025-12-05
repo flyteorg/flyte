@@ -122,11 +122,11 @@ func Test_task_Setup(t *testing.T) {
 
 	k8sPluginType := "k8s"
 	k8sPlugin := &pluginK8sMocks.Plugin{}
-	k8sPlugin.OnGetProperties().Return(pluginK8s.PluginProperties{})
+	k8sPlugin.On("GetProperties").Return(pluginK8s.PluginProperties{})
 
 	k8sPluginDefaultType := "k8sdefault"
 	k8sPluginDefault := &pluginK8sMocks.Plugin{}
-	k8sPluginDefault.OnGetProperties().Return(pluginK8s.PluginProperties{})
+	k8sPluginDefault.On("GetProperties").Return(pluginK8s.PluginProperties{})
 
 	loadErrorPluginType := "loadError"
 

@@ -201,7 +201,7 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
 	inputReader.OnGetInputPath().Return("/input")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	pCtx.On("InputReader").Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
@@ -209,11 +209,11 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 	outputReader.OnGetRawOutputPrefix().Return("")
 	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.OnOutputWriter().Return(outputReader)
+	pCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	pCtx.On("TaskReader").Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
@@ -248,7 +248,7 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -260,7 +260,7 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 			return nil
 		})
 
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -734,7 +734,7 @@ func TestGetTaskPhase(t *testing.T) {
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
-	pluginContext.OnK8sReader().Return(reader)
+	pluginContext.On("K8sReader").Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -778,7 +778,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	pluginCtx := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, pluginState)
 	reader := fake.NewFakeClient()
-	pluginCtx.OnK8sReader().Return(reader)
+	pluginCtx.On("K8sReader").Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
@@ -1368,7 +1368,7 @@ func TestGetTaskPhaseWithFailedPod(t *testing.T) {
 
 	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
 	reader := fake.NewFakeClient(pod)
-	pluginContext.OnK8sReader().Return(reader)
+	pluginContext.On("K8sReader").Return(reader)
 
 	// Even though PyTorchJob status is running, should return failure due to pod status
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
@@ -1419,11 +1419,145 @@ func TestGetTaskPhaseWithCrashLoopBackOff(t *testing.T) {
 
 	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
 	reader := fake.NewFakeClient(pod)
-	pluginContext.OnK8sReader().Return(reader)
+	pluginContext.On("K8sReader").Return(reader)
 
 	// CrashLoopBackOff should eventually lead to failure
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
 	assert.NoError(t, err)
 	// CrashLoopBackOff may not immediately fail, so we just check it doesn't crash
 	assert.NotNil(t, taskPhase)
+}
+
+func TestIsTerminal(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		conditionType  kubeflowv1.JobConditionType
+		expectedResult bool
+	}{
+		{"Succeeded", kubeflowv1.JobSucceeded, true},
+		{"Failed", kubeflowv1.JobFailed, true},
+		{"Created", kubeflowv1.JobCreated, false},
+		{"Running", kubeflowv1.JobRunning, false},
+		{"Restarting", kubeflowv1.JobRestarting, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a simple job with only the condition we want to test
+			job := &kubeflowv1.PyTorchJob{
+				Status: kubeflowv1.JobStatus{
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:   tt.conditionType,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}
+			result, err := pytorchResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := pytorchResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *kubeflowv1.PyTorchJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses CompletionTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					CompletionTime: &v1.Time{Time: now},
+					StartTime:      &v1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to condition LastTransitionTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: earlier},
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:               kubeflowv1.JobSucceeded,
+							Status:             corev1.ConditionTrue,
+							LastTransitionTime: v1.NewTime(now),
+						},
+					},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(now),
+				},
+				Status: kubeflowv1.JobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := pytorchResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := pytorchResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

@@ -103,6 +103,14 @@ func (k8sSampleHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.Plug
 	panic("implement me")
 }
 
+func (k8sSampleHandler) IsTerminal(ctx context.Context, resource client.Object) (bool, error) {
+	panic("implement me")
+}
+
+func (k8sSampleHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	panic("implement me")
+}
+
 type pluginWithAbortOverride struct {
 	mock.Mock
 }
@@ -127,6 +135,14 @@ func (p *pluginWithAbortOverride) GetTaskPhase(ctx context.Context, pluginContex
 func (p *pluginWithAbortOverride) OnAbort(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, resource client.Object) (behavior k8s.AbortBehavior, err error) {
 	args := p.Called(ctx, tCtx, resource)
 	return args.Get(0).(k8s.AbortBehavior), args.Error(1)
+}
+
+func (p *pluginWithAbortOverride) IsTerminal(ctx context.Context, resource client.Object) (bool, error) {
+	panic("implement me")
+}
+
+func (p *pluginWithAbortOverride) GetCompletionTime(resource client.Object) (time.Time, error) {
+	panic("implement me")
 }
 
 func ExampleNewPluginManager() {
@@ -288,8 +304,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tCtx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
 		mockClientset := k8sfake.NewSimpleClientset()
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
@@ -318,8 +334,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
 		mockClientset := k8sfake.NewSimpleClientset()
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
@@ -350,8 +366,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := extendedFakeClient{
 			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
 			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("exceeded quota")),
@@ -385,8 +401,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := extendedFakeClient{
 			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
 			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("auth error")),
@@ -418,8 +434,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// Creating a mock k8s plugin
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       flytek8s.PodKind,
 				APIVersion: v1.SchemeGroupVersion.String(),
@@ -473,8 +489,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 func Test_LaunchResource_ErrorHandling(t *testing.T) {
 	ctx := context.TODO()
 	mockResourceHandler := &pluginsk8sMock.Plugin{}
-	mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-	mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+	mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+	mockResourceHandler.On("BuildResource", mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 	fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
 	mockClientset := k8sfake.NewSimpleClientset()
 	pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
@@ -534,9 +550,9 @@ func TestPluginManager_Abort(t *testing.T) {
 
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildIdentityResource", mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
@@ -559,9 +575,9 @@ func TestPluginManager_Abort(t *testing.T) {
 		mockClientset := k8sfake.NewSimpleClientset()
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
+		mockResourceHandler.On("BuildIdentityResource", mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
@@ -745,7 +761,7 @@ func TestPluginManager_Handle_CheckResourcePhase(t *testing.T) {
 			mockClientset := k8sfake.NewSimpleClientset()
 			// common setup code
 			mockResourceHandler := &pluginsk8sMock.Plugin{}
-			mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
+			mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
 			mockResourceHandler.On("BuildIdentityResource", mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
 			mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(tt.args.getTaskPhaseCB())
 			pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
@@ -944,7 +960,7 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 			mockClientset := k8sfake.NewSimpleClientset()
 
 			mockResourceHandler := &pluginsk8sMock.Plugin{}
-			mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
+			mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
 			mockResourceHandler.On("BuildIdentityResource", mock.Anything, tCtx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
 			mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(tt.reportedPhaseInfo, nil)
 
@@ -987,7 +1003,7 @@ func TestPluginManager_CustomKubeClient(t *testing.T) {
 	tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
 	// common setup code
 	mockResourceHandler := &pluginsk8sMock.Plugin{}
-	mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
+	mockResourceHandler.On("GetProperties").Return(k8s.PluginProperties{})
 	mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
 	fakeClient := fake.NewClientBuilder().Build()
 	newFakeClient := &pluginsCoreMock.KubeClient{}
@@ -1019,7 +1035,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
 		o := &v1.Pod{}
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{})
+		p.On("GetProperties").Return(k8s.PluginProperties{})
 		pluginManager := PluginManager{plugin: &p}
 		pluginManager.addObjectMetadata(tm, o, cfg)
 		assert.Equal(t, genName, o.GetName())
@@ -1035,7 +1051,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 	t.Run("Disable OwnerReferences injection", func(t *testing.T) {
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectOwnerReferences: true})
+		p.On("GetProperties").Return(k8s.PluginProperties{DisableInjectOwnerReferences: true})
 		pluginManager := PluginManager{plugin: &p}
 		o := &v1.Pod{}
 		pluginManager.addObjectMetadata(tm, o, cfg)
@@ -1053,7 +1069,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 	t.Run("Disable enabled InjectFinalizer", func(t *testing.T) {
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		p.On("GetProperties").Return(k8s.PluginProperties{DisableInjectFinalizer: true})
 		pluginManager := PluginManager{plugin: &p}
 		// enable finalizer injection
 		cfg.InjectFinalizer = true
@@ -1073,7 +1089,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 	t.Run("Disable disabled InjectFinalizer", func(t *testing.T) {
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		p.On("GetProperties").Return(k8s.PluginProperties{DisableInjectFinalizer: true})
 		pluginManager := PluginManager{plugin: &p}
 		// disable finalizer injection
 		cfg.InjectFinalizer = false
@@ -1115,7 +1131,7 @@ func TestFinalize(t *testing.T) {
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: true}))
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		p.On("GetProperties").Return(k8s.PluginProperties{DisableInjectFinalizer: true})
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		o := &v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
@@ -1126,7 +1142,7 @@ func TestFinalize(t *testing.T) {
 
 		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
 
-		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
+		p.On("BuildIdentityResource", ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
 		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
 		actualO := &v1.Pod{}
 		// Assert the object exists before calling finalize
@@ -1153,7 +1169,7 @@ func TestFinalize(t *testing.T) {
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: false}))
 		p := pluginsk8sMock.Plugin{}
-		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		p.On("GetProperties").Return(k8s.PluginProperties{DisableInjectFinalizer: true})
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		o := &v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
@@ -1164,7 +1180,7 @@ func TestFinalize(t *testing.T) {
 
 		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
 
-		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
+		p.On("BuildIdentityResource", ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
 		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
 		actualO := &v1.Pod{}
 		// Assert the object exists before calling finalize
