@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: queue-rb
+subjects:
+  - kind: ServiceAccount
+    name: queue-sa
+roleRef:
+  kind: Role
+  name: queue-role
+  apiGroup: rbac.authorization.k8s.io
+
