@@ -4,6 +4,9 @@ package errors
 import (
 	"errors"
 	"fmt"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // A generic error code type.
@@ -133,4 +136,13 @@ func IsCausedByError(e, e2 error) bool {
 	}
 
 	return false
+}
+
+func IsGrpcErrorWithCode(code codes.Code, err error) bool {
+	s, ok := status.FromError(err)
+	return ok && s.Code() == code
+}
+
+func IsNotFound(err error) bool {
+	return IsGrpcErrorWithCode(codes.NotFound, err)
 }

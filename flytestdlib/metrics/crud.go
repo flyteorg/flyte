@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
@@ -43,7 +44,7 @@ type OperationTimer struct {
 
 func (o OperationTimer) Stop(err *error) {
 	seconds := time.Since(o.Start).Seconds()
-	if err != nil && *err != nil {
+	if err != nil && *err != nil && !errors.IsNotFound(*err) {
 		o.Failure.Observe(seconds)
 	} else {
 		o.Success.Observe(seconds)
