@@ -1,0 +1,343 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// RunService provides an interface for managing runs.
+service RunService {
+  // Create a new run of the given task.
+  rpc CreateRun(CreateRunRequest) returns (CreateRunResponse) {}
+
+  // Abort a run.
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+
+  // Get detailed information about a run.
+  rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about a run. The call will terminate when the run reaches a terminal phase.
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+
+  // Get detailed information about an action.
+  rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+
+  // Get input and output for an action.
+  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List runs based on the provided filter criteria.
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
+  // runs or updates to existing ones from the point of invocation.
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+
+  // List all actions for a given run.
+  rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
+  // to  existing ones from the point of invocation.
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+
+  // Stream of k8s cluster events in human readable form
+  rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {}
+
+  // AbortAction aborts a single action that was previously created or is currently being processed by a worker.
+  rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {}
+
+  // Stream updates for task groups based on the provided filter criteria.
+  rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
+}
+
+// Request message for creating a run.
+message CreateRunRequest {
+  oneof id {
+    option (buf.validate.oneof).required = true;
+
+    // The user provided run id.
+    common.RunIdentifier run_id = 1;
+
+    // The project id for this run. Run name will be generated.
+    common.ProjectIdentifier project_id = 6;
+  }
+
+  // The task to run.
+  oneof task {
+    option (buf.validate.oneof).required = true;
+
+    // The task id to use.
+    task.TaskIdentifier task_id = 2;
+
+    // The task spec to use.
+    task.TaskSpec task_spec = 3;
+
+    // The trigger name to use.
+    common.TriggerName trigger_name = 7;
+  }
+
+  // Inputs to use.
+  task.Inputs inputs = 4;
+
+  // The run spec to use.
+  task.RunSpec run_spec = 5;
+
+  // Indicates client that created this run.
+  RunSource source = 8;
+}
+
+// Response message for creating a run.
+message CreateRunResponse {
+  Run run = 1;
+}
+
+// Request message for aborting a run.
+message AbortRunRequest {
+  // Run to abort.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+
+  // Reason for aborting the run. if applicable.
+  optional string reason = 2;
+}
+
+// Response message for aborting a run.
+message AbortRunResponse {}
+
+// Request message for getting detailed information about a run.
+message GetRunDetailsRequest {
+  // Run to query.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting detailed information about a run.
+message GetRunDetailsResponse {
+  // Detailed information about the run.
+  RunDetails details = 1;
+}
+
+// Request message for watching detailed information about a run.
+message WatchRunDetailsRequest {
+  // Run to query.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for watching detailed information about a run.
+message WatchRunDetailsResponse {
+  // Detailed information about the run.
+  RunDetails details = 1;
+}
+
+// Request message for getting detailed information about an action.
+message GetActionDetailsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting detailed information about an action.
+message GetActionDetailsResponse {
+  // Detailed information about the action.
+  ActionDetails details = 1;
+}
+
+// Request message for watching detailed information about an action.
+message WatchActionDetailsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for watching detailed information about an action.
+message WatchActionDetailsResponse {
+  // Detailed information about the action.
+  ActionDetails details = 1;
+}
+
+// Request message for querying action data.
+message GetActionDataRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for querying action data.
+message GetActionDataResponse {
+  // Inputs for the action.
+  task.Inputs inputs = 1;
+
+  // Outputs for the action.
+  task.Outputs outputs = 2;
+}
+
+// Request message for listing runs.
+message ListRunsRequest {
+  reserved 3, 5; // Deprecated
+
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering runs.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+
+    // Project identifier for filtering runs.
+    common.ProjectIdentifier project_id = 4;
+
+    // List runs created from a trigger.
+    common.TriggerName trigger_name = 6;
+
+    // Task name for filtering runs
+    task.TaskName task_name = 7;
+
+    // Task identifier for filtering runs
+    task.TaskIdentifier task_id = 8;
+  }
+}
+
+// Response message for listing runs.
+message ListRunsResponse {
+  // List of runs matching the filter criteria.
+  repeated Run runs = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+}
+
+// Request message for watching runs.
+message WatchRunsRequest {
+  oneof target {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering runs.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+    // Cluster identifier for filtering runs.
+    common.ClusterIdentifier cluster_id = 3;
+    // Project identifier for filtering runs.
+    common.ProjectIdentifier project_id = 4;
+    // Task identifier for filtering runs.
+    task.TaskIdentifier task_id = 5;
+  }
+}
+
+// Response message for watching runs.
+message WatchRunsResponse {
+  // New or updated runs matching the filter criteria.
+  repeated Run runs = 1;
+}
+
+// Request message for listing actions.
+message ListActionsRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  // Run identifier for filtering actions.
+  common.RunIdentifier run_id = 2 [(buf.validate.field).required = true];
+}
+
+// Response message for listing actions.
+message ListActionsResponse {
+  // List of actions matching the filter criteria.
+  repeated Action actions = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+
+  // Note: This response does not include the enriched actions.
+  // The enriched actions are only available in the WatchActionsResponse.
+}
+
+// Request message for watching actions.
+message WatchActionsRequest {
+  // Run identifier for filtering actions.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+
+  // Optional filter(s) criteria for actions.
+  // Valid filter fields include:
+  // - NAME (must use function CONTAINS_CASE_INSENSITIVE): the value is whatever string to match to. This will cast all strings to lowercase and match.
+  // - PHASE (must use function VALUE_IN): the value is the stringified integer of the enum of the phase and you can pass multiple phases (i.e. ["1", "4"])
+  repeated common.Filter filter = 2;
+}
+
+// Response message for watching actions, comes with enriched action metadata.
+message WatchActionsResponse {
+  // New or updated actions matching the filter criteria. Enriched with children status counts
+  repeated EnrichedAction enriched_actions = 1;
+}
+
+message WatchClusterEventsRequest {
+  common.ActionIdentifier id = 1 [(buf.validate.field).required = true];
+
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+message WatchClusterEventsResponse {
+  repeated ClusterEvent cluster_events = 1;
+}
+
+message AbortActionRequest {
+  // Action to abort.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Optional reason for aborting the action.
+  string reason = 2;
+}
+
+message AbortActionResponse {}
+
+message WatchGroupsRequest {
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+    // Watch groups within a project.
+    common.ProjectIdentifier project_id = 1;
+  }
+
+  // Filter groups after this date (inclusive). Required.
+  google.protobuf.Timestamp start_date = 2 [(buf.validate.field).required = true];
+
+  // Filter groups before this date (inclusive).
+  // If null, will stream updates up to current time.
+  // If not null, will return groups once and close stream.
+  google.protobuf.Timestamp end_date = 3;
+
+  // Common list request parameters.
+  common.ListRequest request = 4;
+
+  message KnownSortField {
+    oneof sort_by {
+      common.Sort.Direction created_at = 1;
+    }
+  }
+
+  // Known sort fields in watch group
+  repeated KnownSortField known_sort_fields = 5;
+}
+
+// Response message for watching task groups.
+message WatchGroupsResponse {
+  // List of task groups matching the filter criteria.
+  // For the initial response, this contains all groups.
+  // For subsequent updates, this contains only changed groups.
+  repeated TaskGroup task_groups = 1;
+
+  // Indicates when the initial List call is complete, and subsequent messages are updates.
+  bool sentinel = 2;
+}

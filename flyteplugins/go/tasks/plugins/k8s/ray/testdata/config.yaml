@@ -1,0 +1,7 @@
+plugins:
+  ray:
+    remoteClusterConfig:
+      endpoint: 127.0.0.1
+      auth:
+        tokenPath: /path/token
+        caCertPath: /path/cert
