@@ -5,9 +5,15 @@ We will demonstrate how tasks are being executed in flyte v2.
 Quick recap on the components that will mainly be invoked when executing tasks:
 - flyte-sdk: SDK for Flyte. This is used in client side for user to run and deploy task, and it's also packed
   to the flyte backend for executing actions/sub-actions, update status, etc...
-- queue service: queueu and submit actions to the executor.
+- run service: An API that receive CreateRun gRPC request from SDK and submit to queue service.
+- queue service: queue and submit action CR to the K8s etcd.
 - state service: store the action status.
-- executor: Getting actions from queue service and execute task with suitable handler based on the task type
+- executor: Watching actions CR from the K8s etcd and execute task with suitable handler based on the task type
+
+The Terminologies:
+- task: A flyte task that defined by the user, which can be deployed to the flyte backend.
+- action: We call every task excution as an action
+- run: We call the root action a run, with the name "a0"
 
 ## Run the task
 
@@ -25,9 +31,9 @@ registry.
 
 Serialize task
 
-1. Create the tarball of the source file and upload to the storage in control plane. We will get the remote
+1. Create the tarball of the source file and upload to the storage in data plane. We will get the remote
    path to the code bundle.
-2. Serialize task to wire format (task spec). The image cache and the code bundle info will be pass into the
+2. Serialize task to wire format (task spec). The image cache and the code bundle info will be passed into the
    task spec by injecting into the container arguments. Container arguments are as below. Note that those are
    the arguments of the entrypoint for the pod.
 
@@ -72,7 +78,7 @@ python -m flyte._internal.entrypoint \
 ```
 
 4. By executing the above entrypoint command, we will execute the action `a0` in the pod with flyte-sdk.
-   During the exeuction of the root action, when a task function is being called, flyte will invoke the
+   During the exeuction of actions, when a task function is being called, flyte will invoke the
 `controller` in flyte-sdk to submit a new action through sending `EnqueueAction` RPC to queue service.
 
 For example, when running to the say_hello() line in main(), flyte-sdk will submit a new action `say_hello()`
