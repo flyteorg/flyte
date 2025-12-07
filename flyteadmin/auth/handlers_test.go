@@ -66,8 +66,9 @@ func addStateString(request *http.Request) {
 	request.Form = v
 }
 
-func addCsrfCookie(request *http.Request) {
-	cookie := NewCsrfCookie()
+func addCsrfCookie(t *testing.T, request *http.Request) {
+	cookie, err := NewCsrfCookie()
+	require.NoError(t, err)
 	cookie.Value = "hello world"
 	request.AddCookie(&cookie)
 }
@@ -87,7 +88,7 @@ func TestGetCallbackHandlerWithErrorOnToken(t *testing.T) {
 	r := plugins.NewRegistry()
 	callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 	request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
-	addCsrfCookie(request)
+	addCsrfCookie(t, request)
 	addStateString(request)
 	writer := httptest.NewRecorder()
 	callbackHandlerFunc(writer, request)
@@ -161,7 +162,7 @@ func TestGetCallbackHandler(t *testing.T) {
 		r := plugins.NewRegistry()
 		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
-		addCsrfCookie(request)
+		addCsrfCookie(t, request)
 		addStateString(request)
 		writer := httptest.NewRecorder()
 		openIDConfigJSON = fmt.Sprintf(`{
@@ -188,7 +189,7 @@ func TestGetCallbackHandler(t *testing.T) {
 		r.RegisterDefault(plugins.PluginIDPreRedirectHook, redirectFunc)
 		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
-		addCsrfCookie(request)
+		addCsrfCookie(t, request)
 		addStateString(request)
 		writer := httptest.NewRecorder()
 		openIDConfigJSON = fmt.Sprintf(`{
@@ -219,7 +220,7 @@ func TestGetCallbackHandler(t *testing.T) {
 		r.RegisterDefault(plugins.PluginIDPreRedirectHook, redirectFunc)
 		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
-		addCsrfCookie(request)
+		addCsrfCookie(t, request)
 		addStateString(request)
 		writer := httptest.NewRecorder()
 		openIDConfigJSON = fmt.Sprintf(`{

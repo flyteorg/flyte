@@ -2,14 +2,14 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	flyteErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/ioutils"
 )
 
@@ -97,12 +97,11 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		store := dummyStore{
 			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
 				readerCalled = true
-				//nolint:govet,staticcheck
-				return ioutils.NewBytesReadCloser(bigD), errors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata")
+				return ioutils.NewBytesReadCloser(bigD), flyteErr.Wrapf(ErrFailedToWriteCache, errors.New(dummyErrorMsg), "Failed to Cache the metadata")
 			},
 			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 				writerCalled = true
-				return errors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata") //nolint:govet,staticcheck
+				return flyteErr.Wrapf(ErrFailedToWriteCache, errors.New(dummyErrorMsg), "Failed to Cache the metadata")
 			},
 		}
 
@@ -124,11 +123,11 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		store := dummyStore{
 			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
 				readerCalled = true
-				return ioutils.NewBytesReadCloser(bigD), fmt.Errorf(dummyErrorMsg) //nolint:govet,staticcheck
+				return ioutils.NewBytesReadCloser(bigD), errors.New(dummyErrorMsg)
 			},
 			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 				writerCalled = true
-				return fmt.Errorf(dummyErrorMsg) //nolint:govet,staticcheck
+				return errors.New(dummyErrorMsg)
 			},
 		}
 

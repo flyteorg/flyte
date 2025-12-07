@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -28,7 +29,7 @@ type NamedEntityConfig struct {
 
 func (cfg NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdCore.CommandContext) error {
 	if cfg.Activate && cfg.Archive {
-		return fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
+		return errors.New(clierrors.ErrInvalidStateUpdate)
 	}
 
 	id := &admin.NamedEntityIdentifier{

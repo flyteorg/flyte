@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/flytestdlib
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/aws/aws-sdk-go v1.47.11
@@ -36,7 +36,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
 	golang.org/x/time v0.5.0
-	golang.org/x/tools v0.30.0
+	golang.org/x/tools v0.38.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.34.1
 	gorm.io/driver/postgres v1.5.3
@@ -125,15 +125,15 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/api v0.155.0 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
@@ -150,11 +150,6 @@ require (
 )
 
 replace (
-	github.com/flyteorg/flyte/datacatalog => ../datacatalog
-	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
 	k8s.io/client-go => k8s.io/client-go v0.28.2

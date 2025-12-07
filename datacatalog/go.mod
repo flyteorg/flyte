@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/datacatalog
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7
@@ -116,14 +116,14 @@ require (
 	go.opentelemetry.io/otel/sdk v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/api v0.155.0 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
@@ -147,11 +147,7 @@ require (
 )
 
 replace (
-	github.com/flyteorg/flyte/datacatalog => ../datacatalog
-	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl
-	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2

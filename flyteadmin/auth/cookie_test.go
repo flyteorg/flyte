@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
@@ -76,8 +77,21 @@ func TestSecureCookieLifecycle(t *testing.T) {
 }
 
 func TestNewCsrfToken(t *testing.T) {
-	csrf := NewCsrfToken(5)
-	assert.Equal(t, "5qz3p9w8qo", csrf)
+	// Generate many tokens and assert uniqueness and decodability
+	const n = 1000
+	seen := make(map[string]struct{}, n)
+
+	for i := 0; i < n; i++ {
+		tok, err := NewCsrfToken()
+		require.NoError(t, err)
+		require.Len(t, tok, 44)
+
+		if _, ok := seen[tok]; ok {
+			t.Fatalf("duplicate token generated at i=%d", i)
+		}
+		seen[tok] = struct{}{}
+	}
+
 }
 
 func TestNewCsrfCookie(t *testing.T) {
@@ -108,7 +122,8 @@ func TestNewCsrfCookie(t *testing.T) {
 			})
 
 			// Generate CSRF cookie
-			cookie := NewCsrfCookie()
+			cookie, err := NewCsrfCookie()
+			require.NoError(t, err)
 
 			// Validate CSRF cookie properties
 			assert.Equal(t, "flyte_csrf_state", cookie.Name)
@@ -139,7 +154,8 @@ func TestVerifyCsrfCookie(t *testing.T) {
 		v := url.Values{
 			"state": []string{"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"},
 		}
-		cookie := NewCsrfCookie()
+		cookie, err := NewCsrfCookie()
+		require.NoError(t, err)
 		cookie.Value = "helloworld"
 		request.Form = v
 		request.AddCookie(&cookie)
@@ -154,7 +170,8 @@ func TestVerifyCsrfCookie(t *testing.T) {
 		v := url.Values{
 			"state": []string{"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"},
 		}
-		cookie := NewCsrfCookie()
+		cookie, err := NewCsrfCookie()
+		require.NoError(t, err)
 		cookie.Value = "hello world"
 		request.Form = v
 		request.AddCookie(&cookie)

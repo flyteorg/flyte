@@ -88,7 +88,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.GetId())
 	if err == nil {
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
-			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, request)
+			return nil, errors.NewLaunchPlanExistsIdenticalStructureError()
 		}
 		existingLaunchPlan, transformerErr := transformers.FromLaunchPlanModel(existingLaunchPlanModel)
 		if transformerErr != nil {

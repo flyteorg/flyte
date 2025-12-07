@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyte/flytectl/clierrors"
@@ -37,7 +38,7 @@ func getUpdateWorkflowFunc(namedEntityConfig *NamedEntityConfig) func(ctx contex
 		project := config.GetConfig().Project
 		domain := config.GetConfig().Domain
 		if len(args) != 1 {
-			return fmt.Errorf(clierrors.ErrWorkflowNotPassed) //nolint
+			return errors.New(clierrors.ErrWorkflowNotPassed)
 		}
 		name := args[0]
 		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_WORKFLOW, cmdCtx)

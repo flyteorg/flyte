@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -36,13 +37,13 @@ func updateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 	project := config.GetConfig().Project
 	domain := config.GetConfig().Domain
 	if len(args) != 1 {
-		return fmt.Errorf(clierrors.ErrExecutionNotPassed) //nolint
+		return errors.New(clierrors.ErrExecutionNotPassed)
 	}
 	executionName := args[0]
 	activate := execution.UConfig.Activate
 	archive := execution.UConfig.Archive
 	if activate && archive {
-		return fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
+		return errors.New(clierrors.ErrInvalidStateUpdate)
 	}
 
 	var newState admin.ExecutionState
