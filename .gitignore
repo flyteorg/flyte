@@ -46,3 +46,4 @@ empty-config.yaml
 **/flyteidl2.egg-info
 node_modules
 cmd
+.claude/

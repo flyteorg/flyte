@@ -6,7 +6,7 @@ description = "Rust bindings and utilities for FlyteIDL protobufs."
 license = "Apache-2.0"
 
 [dependencies]
-pyo3 = { version = "0.24", features = ["extension-module", "experimental-async"] }
+pyo3 = { version = "0.24", features = ["experimental-async"] }
 pyo3-async-runtimes = { version = "0.24", features = ["tokio-runtime"] }
 tokio = { version = "1.0", features = ["full"] }
 tonic = "0.12.3"
