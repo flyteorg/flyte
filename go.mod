@@ -34,7 +34,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/common v0.62.0
 	github.com/ray-project/kuberay/ray-operator v1.1.0-rc.1
-	github.com/samber/lo v1.39.0
+	github.com/samber/lo v1.46.0
 	github.com/shamaton/msgpack/v2 v2.4.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
