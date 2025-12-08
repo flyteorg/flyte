@@ -58,6 +58,7 @@ func TestLoadConfig(t *testing.T) {
 		assert.True(t, expectedMemory.Equal(k8sConfig.DefaultMemoryRequest))
 		assert.Equal(t, map[string]string{"x/interruptible": "true"}, k8sConfig.InterruptibleNodeSelector)
 		assert.Equal(t, "x/flyte", k8sConfig.InterruptibleTolerations[0].Key)
+		assert.Equal(t, false, k8sConfig.EnableCreatePodGroupForPod)
 		assert.Equal(t, "interruptible", k8sConfig.InterruptibleTolerations[0].Value)
 		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext)
 		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext.FSGroup)
