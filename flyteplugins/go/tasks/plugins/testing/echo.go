@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	idlcore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -135,40 +136,53 @@ func compileInputToOutputVariableMappings(ctx context.Context, tCtx core.TaskExe
 		return nil, fmt.Errorf("failed to read TaskTemplate: [%w]", err)
 	}
 
-	var inputs, outputs map[string]*idlcore.Variable
+	var inputs, outputs *idlcore.VariableMap
 	if taskTemplate.Interface != nil {
-		if taskTemplate.Interface.Inputs != nil {
-			inputs = taskTemplate.Interface.Inputs.Variables
-		}
-		if taskTemplate.Interface.Outputs != nil {
-			outputs = taskTemplate.Interface.Outputs.Variables
-		}
+		inputs = taskTemplate.Interface.Inputs
+		outputs = taskTemplate.Interface.Outputs
 	}
 
-	if len(inputs) != len(outputs) {
-		return nil, fmt.Errorf("the number of input [%d] and output [%d] variables does not match", len(inputs), len(outputs))
-	} else if len(inputs) > 1 {
+	inputLen := 0
+	if inputs != nil {
+		inputLen = len(inputs.Variables)
+	}
+	outputLen := 0
+	if outputs != nil {
+		outputLen = len(outputs.Variables)
+	}
+
+	if inputLen != outputLen {
+		return nil, fmt.Errorf("the number of input [%d] and output [%d] variables does not match", inputLen, outputLen)
+	} else if inputLen > 1 {
 		return nil, fmt.Errorf("this plugin does not currently support more than one input variable")
 	}
 
 	inputToOutputVariableMappings := make(map[string]string)
 	outputVariableNameUsed := make(map[string]struct{})
-	for inputVariableName := range inputs {
-		firstCastableOutputName := ""
-		for outputVariableName := range outputs {
-			// TODO - need to check if types are castable to support multiple values
-			if _, ok := outputVariableNameUsed[outputVariableName]; !ok {
-				firstCastableOutputName = outputVariableName
-				break
+
+	if inputs != nil {
+		for _, inputEntry := range inputs.Variables {
+			inputVariableName := inputEntry.Key
+			firstCastableOutputName := ""
+
+			if outputs != nil {
+				for _, outputEntry := range outputs.Variables {
+					outputVariableName := outputEntry.Key
+					// TODO - need to check if types are castable to support multiple values
+					if _, ok := outputVariableNameUsed[outputVariableName]; !ok {
+						firstCastableOutputName = outputVariableName
+						break
+					}
+				}
 			}
-		}
 
-		if len(firstCastableOutputName) == 0 {
-			return nil, fmt.Errorf("no castable output variable found for input variable [%s]", inputVariableName)
-		}
+			if len(firstCastableOutputName) == 0 {
+				return nil, fmt.Errorf("no castable output variable found for input variable [%s]", inputVariableName)
+			}
 
-		outputVariableNameUsed[firstCastableOutputName] = struct{}{}
-		inputToOutputVariableMappings[inputVariableName] = firstCastableOutputName
+			outputVariableNameUsed[firstCastableOutputName] = struct{}{}
+			inputToOutputVariableMappings[inputVariableName] = firstCastableOutputName
+		}
 	}
 
 	return inputToOutputVariableMappings, nil
