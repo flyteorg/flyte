@@ -204,6 +204,12 @@ message ListRunsRequest {
 
     // List runs created from a trigger.
     common.TriggerName trigger_name = 6;
+
+    // Task name for filtering runs
+    task.TaskName task_name = 7;
+
+    // Task identifier for filtering runs
+    task.TaskIdentifier task_id = 8;
   }
 }
 
@@ -314,6 +320,15 @@ message WatchGroupsRequest {
 
   // Common list request parameters.
   common.ListRequest request = 4;
+
+  message KnownSortField {
+    oneof sort_by {
+      common.Sort.Direction created_at = 1;
+    }
+  }
+
+  // Known sort fields in watch group
+  repeated KnownSortField known_sort_fields = 5;
 }
 
 // Response message for watching task groups.

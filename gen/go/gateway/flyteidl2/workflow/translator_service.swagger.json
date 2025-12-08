@@ -328,7 +328,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
@@ -336,7 +336,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
@@ -520,20 +520,6 @@
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
-    },
-    "coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
     },
     "coreLabelValue": {
       "type": "object",
@@ -1263,6 +1249,20 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
+    "flyteidl2coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
     "flyteidl2coreRuntimeMetadata": {
       "type": "object",
       "properties": {
@@ -1454,12 +1454,33 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
+    "taskDocumentationEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."
@@ -1489,6 +1510,15 @@
         }
       }
     },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "taskTaskSpec": {
       "type": "object",
       "properties": {
@@ -1511,6 +1541,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "documentation": {
+          "$ref": "#/definitions/taskDocumentationEntity",
+          "title": "The documentation entity for the task"
         }
       },
       "description": "Specification for a task."

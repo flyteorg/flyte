@@ -18,6 +18,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/anypb"
 
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+
 	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -35,6 +37,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
 
 	_ = core.CatalogCacheStatus(0)
 )
@@ -4225,7 +4229,43 @@ func (m *TaskGroup) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetCreatedBy() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("CreatedBy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("CreatedBy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskGroupValidationError{
+					field:  fmt.Sprintf("CreatedBy[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	// no validation rules for ShouldDelete
+
+	// no validation rules for ShortName
 
 	if len(errors) > 0 {
 		return TaskGroupMultiError(errors)

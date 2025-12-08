@@ -744,7 +744,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
@@ -752,7 +752,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
@@ -950,20 +950,6 @@
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
-    },
-    "coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
     },
     "coreLabelValue": {
       "type": "object",
@@ -1764,6 +1750,20 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
+    "flyteidl2coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
     "flyteidl2coreRuntimeMetadata": {
       "type": "object",
       "properties": {
@@ -1942,6 +1942,62 @@
         }
       }
     },
+    "flyteidl2pluginsTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "k8s namespace where the task is executed in"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels attached to the task execution"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Annotations attached to the task execution"
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "title": "k8s service account associated with the task execution"
+        },
+        "environment_variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Environment variables attached to the task execution"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
+        },
+        "interruptible_failure_threshold": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
+        },
+        "identity": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "title": "Identity of user running this task execution"
+        }
+      },
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -1999,7 +2055,7 @@
           "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
         },
         "task_execution_metadata": {
-          "$ref": "#/definitions/pluginsTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidl2pluginsTaskExecutionMetadata",
           "description": "subset of runtime task execution metadata."
         },
         "connection": {
@@ -2116,62 +2172,6 @@
         }
       }
     },
-    "pluginsTaskExecutionMetadata": {
-      "type": "object",
-      "properties": {
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier"
-        },
-        "namespace": {
-          "type": "string",
-          "title": "k8s namespace where the task is executed in"
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Labels attached to the task execution"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Annotations attached to the task execution"
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "title": "k8s service account associated with the task execution"
-        },
-        "environment_variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Environment variables attached to the task execution"
-        },
-        "max_attempts": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
-        },
-        "interruptible_failure_threshold": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
-        },
-        "identity": {
-          "$ref": "#/definitions/flyteidl2coreIdentity",
-          "title": "Identity of user running this task execution"
-        }
-      },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -2206,7 +2206,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
         }

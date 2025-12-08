@@ -62,15 +62,6 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
-    "ErrorInfoKind": {
-      "type": "string",
-      "enum": [
-        "KIND_UNSPECIFIED",
-        "KIND_USER",
-        "KIND_SYSTEM"
-      ],
-      "default": "KIND_UNSPECIFIED"
-    },
     "FilterFunction": {
       "type": "string",
       "enum": [
@@ -237,6 +228,14 @@
       ],
       "default": "UNKNOWN"
     },
+    "WatchGroupsRequestKnownSortField": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "$ref": "#/definitions/SortDirection"
+        }
+      }
+    },
     "commonActionIdentifier": {
       "type": "object",
       "properties": {
@@ -250,6 +249,22 @@
         }
       },
       "description": "Unique identifier of an action."
+    },
+    "commonActionPhase": {
+      "type": "string",
+      "enum": [
+        "ACTION_PHASE_UNSPECIFIED",
+        "ACTION_PHASE_QUEUED",
+        "ACTION_PHASE_WAITING_FOR_RESOURCES",
+        "ACTION_PHASE_INITIALIZING",
+        "ACTION_PHASE_RUNNING",
+        "ACTION_PHASE_SUCCEEDED",
+        "ACTION_PHASE_FAILED",
+        "ACTION_PHASE_ABORTED",
+        "ACTION_PHASE_TIMED_OUT"
+      ],
+      "default": "ACTION_PHASE_UNSPECIFIED",
+      "description": "ActionPhase represents the execution state of an action.\n\nPhase transitions follow this typical flow:\nQUEUED -\u003e WAITING_FOR_RESOURCES -\u003e INITIALIZING -\u003e RUNNING -\u003e {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}\n\n - ACTION_PHASE_UNSPECIFIED: Default/unknown phase\n - ACTION_PHASE_QUEUED: Action has been accepted and is waiting to be scheduled\n - ACTION_PHASE_WAITING_FOR_RESOURCES: Action is scheduled but waiting for compute resources to become available\n - ACTION_PHASE_INITIALIZING: Resources have been allocated and the action is being set up\n - ACTION_PHASE_RUNNING: Action is actively executing\n - ACTION_PHASE_SUCCEEDED: Action completed successfully\n - ACTION_PHASE_FAILED: Action failed during execution\n - ACTION_PHASE_ABORTED: Action was manually terminated or cancelled\n - ACTION_PHASE_TIMED_OUT: Action exceeded its execution time limit"
     },
     "commonAppSpec": {
       "type": "object",
@@ -828,7 +843,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
@@ -836,7 +851,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
@@ -1032,20 +1047,6 @@
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
-    },
-    "coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
     },
     "coreLabelValue": {
       "type": "object",
@@ -1938,6 +1939,20 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
+    "flyteidl2coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
     "flyteidl2coreRuntimeMetadata": {
       "type": "object",
       "properties": {
@@ -2105,22 +2120,6 @@
       },
       "description": "Lightweight representation of an action."
     },
-    "flyteidl2workflowPhase": {
-      "type": "string",
-      "enum": [
-        "PHASE_UNSPECIFIED",
-        "PHASE_QUEUED",
-        "PHASE_WAITING_FOR_RESOURCES",
-        "PHASE_INITIALIZING",
-        "PHASE_RUNNING",
-        "PHASE_SUCCEEDED",
-        "PHASE_FAILED",
-        "PHASE_ABORTED",
-        "PHASE_TIMED_OUT"
-      ],
-      "default": "PHASE_UNSPECIFIED",
-      "title": "TODO: define phase transitions"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -2213,12 +2212,33 @@
         }
       }
     },
+    "taskDocumentationEntity": {
+      "type": "object",
+      "properties": {
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "type": "string",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/taskSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        }
+      }
+    },
     "taskEnvironment": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the environment."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description of environment"
         }
       },
       "description": "Environment for a task."
@@ -2230,7 +2250,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "description": "Map of custom environment variables to be applied to the execution resource."
         }
@@ -2281,7 +2301,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
+            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
           },
           "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
         }
@@ -2423,6 +2443,15 @@
       },
       "description": "Defines complete set of information required to trigger an execution on a schedule."
     },
+    "taskSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "taskTaskIdentifier": {
       "type": "object",
       "properties": {
@@ -2449,6 +2478,28 @@
       },
       "description": "TaskIdentifier is the unique identifier for a task."
     },
+    "taskTaskName": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this task belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this task belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this task belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
+        }
+      },
+      "description": "Name of a task. It may have multiple versions deployed."
+    },
     "taskTaskSpec": {
       "type": "object",
       "properties": {
@@ -2471,6 +2522,10 @@
         "environment": {
           "$ref": "#/definitions/taskEnvironment",
           "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
+        },
+        "documentation": {
+          "$ref": "#/definitions/taskDocumentationEntity",
+          "title": "The documentation entity for the task"
         }
       },
       "description": "Specification for a task."
@@ -2531,7 +2586,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {
@@ -2698,7 +2753,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "Last known phase."
         },
         "start_time": {
@@ -2811,11 +2866,20 @@
           "description": "Error message."
         },
         "kind": {
-          "$ref": "#/definitions/ErrorInfoKind",
+          "$ref": "#/definitions/workflowErrorInfoKind",
           "description": "Error kind."
         }
       },
       "description": "ErrorInfo captures details of an error."
+    },
+    "workflowErrorInfoKind": {
+      "type": "string",
+      "enum": [
+        "KIND_UNSPECIFIED",
+        "KIND_USER",
+        "KIND_SYSTEM"
+      ],
+      "default": "KIND_UNSPECIFIED"
     },
     "workflowGetActionDataResponse": {
       "type": "object",
@@ -2891,7 +2955,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/flyteidl2workflowPhase",
+          "$ref": "#/definitions/commonActionPhase",
           "description": "The phase."
         },
         "start_time": {
@@ -2979,7 +3043,7 @@
         "recent_statuses": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/flyteidl2workflowPhase"
+            "$ref": "#/definitions/commonActionPhase"
           },
           "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
         },
@@ -3000,12 +3064,17 @@
         "created_by": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/commonEnrichedIdentity"
           },
-          "description": "List of unique user identities who created runs in this group."
+          "description": "List of user/application's enriched identity that created runs in this group."
         },
         "should_delete": {
           "type": "boolean"
+        },
+        "short_name": {
+          "type": "string",
+          "description": "short name (function name) of the task."
         }
       },
       "description": "TaskGroup represents a group of runs for a specific task."

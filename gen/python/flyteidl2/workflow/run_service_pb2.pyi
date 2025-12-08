@@ -114,16 +114,20 @@ class GetActionDataResponse(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
-    __slots__ = ["request", "org", "project_id", "trigger_name"]
+    __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     project_id: _identifier_pb2.ProjectIdentifier
     trigger_name: _identifier_pb2.TriggerName
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ...) -> None: ...
+    task_name: _task_definition_pb2.TaskName
+    task_id: _task_definition_pb2.TaskIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ...) -> None: ...
 
 class ListRunsResponse(_message.Message):
     __slots__ = ["runs", "token"]
@@ -208,16 +212,23 @@ class AbortActionResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class WatchGroupsRequest(_message.Message):
-    __slots__ = ["project_id", "start_date", "end_date", "request"]
+    __slots__ = ["project_id", "start_date", "end_date", "request", "known_sort_fields"]
+    class KnownSortField(_message.Message):
+        __slots__ = ["created_at"]
+        CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+        created_at: _list_pb2.Sort.Direction
+        def __init__(self, created_at: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ...) -> None: ...
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     START_DATE_FIELD_NUMBER: _ClassVar[int]
     END_DATE_FIELD_NUMBER: _ClassVar[int]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
+    KNOWN_SORT_FIELDS_FIELD_NUMBER: _ClassVar[int]
     project_id: _identifier_pb2.ProjectIdentifier
     start_date: _timestamp_pb2.Timestamp
     end_date: _timestamp_pb2.Timestamp
     request: _list_pb2.ListRequest
-    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., start_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ...) -> None: ...
+    known_sort_fields: _containers.RepeatedCompositeFieldContainer[WatchGroupsRequest.KnownSortField]
+    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., start_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_date: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., known_sort_fields: _Optional[_Iterable[_Union[WatchGroupsRequest.KnownSortField, _Mapping]]] = ...) -> None: ...
 
 class WatchGroupsResponse(_message.Message):
     __slots__ = ["task_groups", "sentinel"]

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package flyteidl2.cacheservice.v2;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/cacheservice/cacheservice.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2";
+
+/*
+ * CacheService defines operations for cache management including retrieval, storage, and deletion of cached task/workflow outputs.
+ */
+service CacheService {
+  // Retrieves cached data by key.
+  rpc Get(GetCacheRequest) returns (flyteidl2.cacheservice.GetCacheResponse);
+
+  // Stores or updates cached data by key.
+  rpc Put(PutCacheRequest) returns (flyteidl2.cacheservice.PutCacheResponse);
+
+  // Deletes cached data by key.
+  rpc Delete(DeleteCacheRequest) returns (flyteidl2.cacheservice.DeleteCacheResponse);
+
+  // Get or extend a reservation for a cache key
+  rpc GetOrExtendReservation(GetOrExtendReservationRequest) returns (flyteidl2.cacheservice.GetOrExtendReservationResponse);
+
+  // Release the reservation for a cache key
+  rpc ReleaseReservation(ReleaseReservationRequest) returns (flyteidl2.cacheservice.ReleaseReservationResponse);
+}
+
+/*
+ * Identifier for cache operations, including org, project, and domain.
+ * This is used to scope cache operations to specific organizational contexts.
+ */
+message Identifier {
+  string org = 1 [(buf.validate.field).string.min_len = 1]; // Organization identifier
+  string project = 2 [(buf.validate.field).string.min_len = 1]; // Project identifier
+  string domain = 3 [(buf.validate.field).string.min_len = 1]; // Domain identifier
+}
+
+/*
+ * Request to retrieve cached data by key.
+ */
+message GetCacheRequest {
+  flyteidl2.cacheservice.GetCacheRequest base_request = 1;
+  Identifier identifier = 2 [(buf.validate.field).required = true]; // Identifier for the cache operation
+}
+
+/*
+ * Request to store/update cached data by key.
+ */
+message PutCacheRequest {
+  flyteidl2.cacheservice.PutCacheRequest base_request = 1;
+  Identifier identifier = 2 [(buf.validate.field).required = true]; // Identifier for the cache operation
+}
+
+/*
+ * Request to delete cached data by key.
+ */
+message DeleteCacheRequest {
+  flyteidl2.cacheservice.DeleteCacheRequest base_request = 1;
+  Identifier identifier = 2 [(buf.validate.field).required = true]; // Identifier for the cache operation
+}
+
+/*
+ * Request to get or extend a reservation for a cache key
+ */
+message GetOrExtendReservationRequest {
+  flyteidl2.cacheservice.GetOrExtendReservationRequest base_request = 1;
+  Identifier identifier = 2 [(buf.validate.field).required = true]; // Identifier for the cache operation
+}
+
+/*
+ * Request to release the reservation for a cache key
+ */
+message ReleaseReservationRequest {
+  flyteidl2.cacheservice.ReleaseReservationRequest base_request = 1;
+  Identifier identifier = 2 [(buf.validate.field).required = true]; // Identifier for the cache operation
+}
