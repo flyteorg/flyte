@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/flyteorg/flyte/flytectl/clierrors"
@@ -37,7 +38,7 @@ func getUpdateLPMetaFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.
 		project := config.GetConfig().Project
 		domain := config.GetConfig().Domain
 		if len(args) != 1 {
-			return fmt.Errorf(clierrors.ErrLPNotPassed) //nolint
+			return errors.New(clierrors.ErrLPNotPassed)
 		}
 		name := args[0]
 		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_LAUNCH_PLAN, cmdCtx)

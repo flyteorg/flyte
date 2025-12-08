@@ -1,8 +1,6 @@
 package transformers
 
 import (
-	"fmt"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
@@ -47,14 +45,14 @@ func FromWorkflowModel(workflowModel models.Workflow) (admin.Workflow, error) {
 	}
 	createdAt, err := ptypes.TimestampProto(workflowModel.CreatedAt)
 	if err != nil {
-		return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read created at timestamp")
+		return admin.Workflow{}, errors.NewFlyteAdminError(codes.Internal, "failed to read created at timestamp")
 	}
 
 	var workflowInterface core.TypedInterface
 	if len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
-			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, fmt.Sprintf("failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error()))  //nolint
+			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error())
 		}
 	}
 
