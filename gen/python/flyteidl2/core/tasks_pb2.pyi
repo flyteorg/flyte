@@ -321,3 +321,74 @@ class RawOutputDataConfig(_message.Message):
     OUTPUT_LOCATION_PREFIX_FIELD_NUMBER: _ClassVar[int]
     output_location_prefix: str
     def __init__(self, output_location_prefix: _Optional[str] = ...) -> None: ...
+
+class Node(_message.Message):
+    __slots__ = ["id", "metadata", "inputs", "task_node"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    TASK_NODE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    metadata: NodeMetadata
+    inputs: _containers.RepeatedCompositeFieldContainer[_literals_pb2.Binding]
+    task_node: TaskNode
+    def __init__(self, id: _Optional[str] = ..., metadata: _Optional[_Union[NodeMetadata, _Mapping]] = ..., inputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., task_node: _Optional[_Union[TaskNode, _Mapping]] = ...) -> None: ...
+
+class TaskNode(_message.Message):
+    __slots__ = ["reference_id", "overrides"]
+    REFERENCE_ID_FIELD_NUMBER: _ClassVar[int]
+    OVERRIDES_FIELD_NUMBER: _ClassVar[int]
+    reference_id: _identifier_pb2.Identifier
+    overrides: TaskNodeOverrides
+    def __init__(self, reference_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., overrides: _Optional[_Union[TaskNodeOverrides, _Mapping]] = ...) -> None: ...
+
+class TaskNodeOverrides(_message.Message):
+    __slots__ = ["resources", "extended_resources", "container_image", "pod_template"]
+    RESOURCES_FIELD_NUMBER: _ClassVar[int]
+    EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
+    CONTAINER_IMAGE_FIELD_NUMBER: _ClassVar[int]
+    POD_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    resources: Resources
+    extended_resources: ExtendedResources
+    container_image: str
+    pod_template: K8sPod
+    def __init__(self, resources: _Optional[_Union[Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ..., pod_template: _Optional[_Union[K8sPod, _Mapping]] = ...) -> None: ...
+
+class NodeMetadata(_message.Message):
+    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable", "config"]
+    class ConfigEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    TIMEOUT_FIELD_NUMBER: _ClassVar[int]
+    RETRIES_FIELD_NUMBER: _ClassVar[int]
+    INTERRUPTIBLE_FIELD_NUMBER: _ClassVar[int]
+    CACHEABLE_FIELD_NUMBER: _ClassVar[int]
+    CACHE_VERSION_FIELD_NUMBER: _ClassVar[int]
+    CACHE_SERIALIZABLE_FIELD_NUMBER: _ClassVar[int]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    timeout: _duration_pb2.Duration
+    retries: _literals_pb2.RetryStrategy
+    interruptible: bool
+    cacheable: bool
+    cache_version: str
+    cache_serializable: bool
+    config: _containers.ScalarMap[str, str]
+    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class DynamicJobSpec(_message.Message):
+    __slots__ = ["nodes", "min_successes", "outputs", "tasks"]
+    NODES_FIELD_NUMBER: _ClassVar[int]
+    MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    TASKS_FIELD_NUMBER: _ClassVar[int]
+    nodes: _containers.RepeatedCompositeFieldContainer[Node]
+    min_successes: int
+    outputs: _containers.RepeatedCompositeFieldContainer[_literals_pb2.Binding]
+    tasks: _containers.RepeatedCompositeFieldContainer[TaskTemplate]
+    def __init__(self, nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., min_successes: _Optional[int] = ..., outputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., tasks: _Optional[_Iterable[_Union[TaskTemplate, _Mapping]]] = ...) -> None: ...
