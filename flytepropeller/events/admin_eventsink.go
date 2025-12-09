@@ -171,7 +171,7 @@ func ConstructEventSink(ctx context.Context, config *Config, scope promutils.Sco
 			return nil, err
 		}
 
-		filter, err := fastcheck.NewOppoBloomFilter(50000, scope.NewSubScope("admin").NewSubScope("filter"))
+		filter, err := fastcheck.NewOppoBloomFilter(config.FilterSize, scope.NewSubScope("admin").NewSubScope("filter"))
 		if err != nil {
 			return nil, err
 		}

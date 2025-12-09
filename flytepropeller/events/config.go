@@ -29,6 +29,7 @@ type Config struct {
 	MaxRetries    int                `json:"max-retries" pflag:",The max number of retries for event recording."`
 	BackoffScalar int                `json:"base-scalar" pflag:",The base/scalar backoff duration in milliseconds for event recording retries."`
 	BackoffJitter string             `json:"backoff-jitter" pflag:",A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries."`
+	FilterSize    int                `json:"filter-size" pflag:",Size of the oppo bloom filter used to deduplicate events for admin sink"`
 }
 
 var (
@@ -39,6 +40,7 @@ var (
 		MaxRetries:    5,
 		BackoffScalar: 100,
 		BackoffJitter: "0.1",
+		FilterSize:    10000000,
 	}
 
 	configSection = config.MustRegisterSectionWithUpdates(configSectionKey, &defaultConfig, func(ctx context.Context, newValue config.Config) {
