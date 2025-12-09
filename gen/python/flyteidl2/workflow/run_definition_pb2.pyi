@@ -128,7 +128,7 @@ class ConditionActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ..., run_id: _Optional[str] = ..., action_id: _Optional[str] = ..., **kwargs) -> None: ...
 
 class ActionMetadata(_message.Message):
-    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type"]
+    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source"]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     EXECUTED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -141,6 +141,7 @@ class ActionMetadata(_message.Message):
     FUNTION_NAME_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_TYPE_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     parent: str
     group: str
     executed_by: _identity_pb2.EnrichedIdentity
@@ -153,7 +154,8 @@ class ActionMetadata(_message.Message):
     funtion_name: str
     trigger_name: str
     trigger_type: _common_pb2.TriggerAutomationSpec
-    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
+    source: RunSource
+    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., source: _Optional[_Union[RunSource, str]] = ...) -> None: ...
 
 class ActionStatus(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status", "duration_ms"]

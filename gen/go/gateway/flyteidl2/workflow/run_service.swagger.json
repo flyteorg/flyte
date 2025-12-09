@@ -2732,6 +2732,10 @@
         "trigger_type": {
           "$ref": "#/definitions/taskTriggerAutomationSpec",
           "title": "Trigger Type"
+        },
+        "source": {
+          "$ref": "#/definitions/workflowRunSource",
+          "title": "Who initiated this run"
         }
       },
       "description": "Static, lightweight metadata about an action."

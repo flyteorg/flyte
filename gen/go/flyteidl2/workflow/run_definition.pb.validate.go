@@ -1419,6 +1419,8 @@ func (m *ActionMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Source
+
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:
 		if v == nil {
