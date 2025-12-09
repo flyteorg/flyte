@@ -380,15 +380,3 @@ class NodeMetadata(_message.Message):
     cache_serializable: bool
     config: _containers.ScalarMap[str, str]
     def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
-
-class DynamicJobSpec(_message.Message):
-    __slots__ = ["nodes", "min_successes", "outputs", "tasks"]
-    NODES_FIELD_NUMBER: _ClassVar[int]
-    MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
-    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    TASKS_FIELD_NUMBER: _ClassVar[int]
-    nodes: _containers.RepeatedCompositeFieldContainer[Node]
-    min_successes: int
-    outputs: _containers.RepeatedCompositeFieldContainer[_literals_pb2.Binding]
-    tasks: _containers.RepeatedCompositeFieldContainer[TaskTemplate]
-    def __init__(self, nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., min_successes: _Optional[int] = ..., outputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., tasks: _Optional[_Iterable[_Union[TaskTemplate, _Mapping]]] = ...) -> None: ...
