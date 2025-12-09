@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
+	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -43,7 +44,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 )
 
 const childContainerQueueKey = "child_queue"
