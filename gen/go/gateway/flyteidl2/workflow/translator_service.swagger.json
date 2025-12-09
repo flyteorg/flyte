@@ -328,7 +328,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
+            "$ref": "#/definitions/coreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
@@ -336,7 +336,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
+            "$ref": "#/definitions/coreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
@@ -520,6 +520,20 @@
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
+    },
+    "coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
     },
     "coreLabelValue": {
       "type": "object",
@@ -1235,20 +1249,6 @@
         }
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
-    },
-    "flyteidl2coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
     },
     "flyteidl2coreRuntimeMetadata": {
       "type": "object",
