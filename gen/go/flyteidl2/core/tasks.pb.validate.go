@@ -2394,6 +2394,110 @@ var _ interface {
 	ErrorName() string
 } = SqlValidationError{}
 
+// Validate checks the field values on RawOutputDataConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RawOutputDataConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RawOutputDataConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RawOutputDataConfigMultiError, or nil if none found.
+func (m *RawOutputDataConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RawOutputDataConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OutputLocationPrefix
+
+	if len(errors) > 0 {
+		return RawOutputDataConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// RawOutputDataConfigMultiError is an error wrapping multiple validation
+// errors returned by RawOutputDataConfig.ValidateAll() if the designated
+// constraints aren't met.
+type RawOutputDataConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RawOutputDataConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RawOutputDataConfigMultiError) AllErrors() []error { return m }
+
+// RawOutputDataConfigValidationError is the validation error returned by
+// RawOutputDataConfig.Validate if the designated constraints aren't met.
+type RawOutputDataConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RawOutputDataConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RawOutputDataConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RawOutputDataConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RawOutputDataConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RawOutputDataConfigValidationError) ErrorName() string {
+	return "RawOutputDataConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RawOutputDataConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRawOutputDataConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RawOutputDataConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RawOutputDataConfigValidationError{}
+
 // Validate checks the field values on Resources_ResourceEntry with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
