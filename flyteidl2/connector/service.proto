@@ -1,15 +1,15 @@
 syntax = "proto3";
-package flyteidl2.service;
+package flyteidl2.connector;
 
-import "flyteidl2/plugins/connector.proto";
+import "flyteidl2/connector/task.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector";
 
 // AsyncConnectorService defines an RPC Service that allows executor to send the request to the connector server asynchronously.
 service AsyncConnectorService {
   // CreateTask sends a task create request to the connector service.
-  rpc CreateTask(flyteidl2.plugins.CreateTaskRequest) returns (flyteidl2.plugins.CreateTaskResponse) {
+  rpc CreateTask(flyteidl2.connector.CreateTaskRequest) returns (flyteidl2.connector.CreateTaskResponse) {
     option (google.api.http) = {
       post: "/api/v1/connector/task"
       body: "*"
@@ -17,12 +17,12 @@ service AsyncConnectorService {
   }
 
   // Get job status.
-  rpc GetTask(flyteidl2.plugins.GetTaskRequest) returns (flyteidl2.plugins.GetTaskResponse) {
+  rpc GetTask(flyteidl2.connector.GetTaskRequest) returns (flyteidl2.connector.GetTaskResponse) {
     option (google.api.http) = {get: "/api/v1/connector/task/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 
   // Delete the task resource.
-  rpc DeleteTask(flyteidl2.plugins.DeleteTaskRequest) returns (flyteidl2.plugins.DeleteTaskResponse) {
+  rpc DeleteTask(flyteidl2.connector.DeleteTaskRequest) returns (flyteidl2.connector.DeleteTaskResponse) {
     option (google.api.http) = {delete: "/api/v1/connector/task_executions/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 
@@ -31,12 +31,12 @@ service AsyncConnectorService {
   // Errors include
   //  * OutOfRange if metrics are not available for the specified task time range
   //  * various other errors
-  rpc GetTaskMetrics(flyteidl2.plugins.GetTaskMetricsRequest) returns (flyteidl2.plugins.GetTaskMetricsResponse) {
+  rpc GetTaskMetrics(flyteidl2.connector.GetTaskMetricsRequest) returns (flyteidl2.connector.GetTaskMetricsResponse) {
     option (google.api.http) = {get: "/api/v1/connector/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 
   // GetTaskLogs returns task execution logs, if available.
-  rpc GetTaskLogs(flyteidl2.plugins.GetTaskLogsRequest) returns (stream flyteidl2.plugins.GetTaskLogsResponse) {
+  rpc GetTaskLogs(flyteidl2.connector.GetTaskLogsRequest) returns (stream flyteidl2.connector.GetTaskLogsResponse) {
     option (google.api.http) = {get: "/api/v1/connector/task/logs/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 }
@@ -45,12 +45,12 @@ service AsyncConnectorService {
 // This service allows executor or users to get the metadata of connectors.
 service ConnectorMetadataService {
   // Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
-  rpc GetConnector(flyteidl2.plugins.GetConnectorRequest) returns (flyteidl2.plugins.GetConnectorResponse) {
+  rpc GetConnector(flyteidl2.connector.GetConnectorRequest) returns (flyteidl2.connector.GetConnectorResponse) {
     option (google.api.http) = {get: "/api/v1/connector/{name}"};
   }
 
   // Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
-  rpc ListConnectors(flyteidl2.plugins.ListConnectorsRequest) returns (flyteidl2.plugins.ListConnectorsResponse) {
+  rpc ListConnectors(flyteidl2.connector.ListConnectorsRequest) returns (flyteidl2.connector.ListConnectorsResponse) {
     option (google.api.http) = {get: "/api/v1/connectors"};
   }
 }

@@ -2,13 +2,12 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: flyteidl2/service/connector.proto
+// source: flyteidl2/connector/service.proto
 
-package service
+package connector
 
 import (
 	context "context"
-	plugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -20,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AsyncConnectorService_CreateTask_FullMethodName     = "/flyteidl2.service.AsyncConnectorService/CreateTask"
-	AsyncConnectorService_GetTask_FullMethodName        = "/flyteidl2.service.AsyncConnectorService/GetTask"
-	AsyncConnectorService_DeleteTask_FullMethodName     = "/flyteidl2.service.AsyncConnectorService/DeleteTask"
-	AsyncConnectorService_GetTaskMetrics_FullMethodName = "/flyteidl2.service.AsyncConnectorService/GetTaskMetrics"
-	AsyncConnectorService_GetTaskLogs_FullMethodName    = "/flyteidl2.service.AsyncConnectorService/GetTaskLogs"
+	AsyncConnectorService_CreateTask_FullMethodName     = "/flyteidl2.connector.AsyncConnectorService/CreateTask"
+	AsyncConnectorService_GetTask_FullMethodName        = "/flyteidl2.connector.AsyncConnectorService/GetTask"
+	AsyncConnectorService_DeleteTask_FullMethodName     = "/flyteidl2.connector.AsyncConnectorService/DeleteTask"
+	AsyncConnectorService_GetTaskMetrics_FullMethodName = "/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics"
+	AsyncConnectorService_GetTaskLogs_FullMethodName    = "/flyteidl2.connector.AsyncConnectorService/GetTaskLogs"
 )
 
 // AsyncConnectorServiceClient is the client API for AsyncConnectorService service.
@@ -32,19 +31,19 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AsyncConnectorServiceClient interface {
 	// CreateTask sends a task create request to the connector service.
-	CreateTask(ctx context.Context, in *plugins.CreateTaskRequest, opts ...grpc.CallOption) (*plugins.CreateTaskResponse, error)
+	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
 	// Get job status.
-	GetTask(ctx context.Context, in *plugins.GetTaskRequest, opts ...grpc.CallOption) (*plugins.GetTaskResponse, error)
+	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*GetTaskResponse, error)
 	// Delete the task resource.
-	DeleteTask(ctx context.Context, in *plugins.DeleteTaskRequest, opts ...grpc.CallOption) (*plugins.DeleteTaskResponse, error)
+	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error)
 	// GetTaskMetrics returns one or more task execution metrics, if available.
 	//
 	// Errors include
 	//   - OutOfRange if metrics are not available for the specified task time range
 	//   - various other errors
-	GetTaskMetrics(ctx context.Context, in *plugins.GetTaskMetricsRequest, opts ...grpc.CallOption) (*plugins.GetTaskMetricsResponse, error)
+	GetTaskMetrics(ctx context.Context, in *GetTaskMetricsRequest, opts ...grpc.CallOption) (*GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(ctx context.Context, in *plugins.GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncConnectorService_GetTaskLogsClient, error)
+	GetTaskLogs(ctx context.Context, in *GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncConnectorService_GetTaskLogsClient, error)
 }
 
 type asyncConnectorServiceClient struct {
@@ -55,8 +54,8 @@ func NewAsyncConnectorServiceClient(cc grpc.ClientConnInterface) AsyncConnectorS
 	return &asyncConnectorServiceClient{cc}
 }
 
-func (c *asyncConnectorServiceClient) CreateTask(ctx context.Context, in *plugins.CreateTaskRequest, opts ...grpc.CallOption) (*plugins.CreateTaskResponse, error) {
-	out := new(plugins.CreateTaskResponse)
+func (c *asyncConnectorServiceClient) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
+	out := new(CreateTaskResponse)
 	err := c.cc.Invoke(ctx, AsyncConnectorService_CreateTask_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,8 +63,8 @@ func (c *asyncConnectorServiceClient) CreateTask(ctx context.Context, in *plugin
 	return out, nil
 }
 
-func (c *asyncConnectorServiceClient) GetTask(ctx context.Context, in *plugins.GetTaskRequest, opts ...grpc.CallOption) (*plugins.GetTaskResponse, error) {
-	out := new(plugins.GetTaskResponse)
+func (c *asyncConnectorServiceClient) GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*GetTaskResponse, error) {
+	out := new(GetTaskResponse)
 	err := c.cc.Invoke(ctx, AsyncConnectorService_GetTask_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,8 +72,8 @@ func (c *asyncConnectorServiceClient) GetTask(ctx context.Context, in *plugins.G
 	return out, nil
 }
 
-func (c *asyncConnectorServiceClient) DeleteTask(ctx context.Context, in *plugins.DeleteTaskRequest, opts ...grpc.CallOption) (*plugins.DeleteTaskResponse, error) {
-	out := new(plugins.DeleteTaskResponse)
+func (c *asyncConnectorServiceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error) {
+	out := new(DeleteTaskResponse)
 	err := c.cc.Invoke(ctx, AsyncConnectorService_DeleteTask_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -82,8 +81,8 @@ func (c *asyncConnectorServiceClient) DeleteTask(ctx context.Context, in *plugin
 	return out, nil
 }
 
-func (c *asyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, in *plugins.GetTaskMetricsRequest, opts ...grpc.CallOption) (*plugins.GetTaskMetricsResponse, error) {
-	out := new(plugins.GetTaskMetricsResponse)
+func (c *asyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, in *GetTaskMetricsRequest, opts ...grpc.CallOption) (*GetTaskMetricsResponse, error) {
+	out := new(GetTaskMetricsResponse)
 	err := c.cc.Invoke(ctx, AsyncConnectorService_GetTaskMetrics_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -91,7 +90,7 @@ func (c *asyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, in *pl
 	return out, nil
 }
 
-func (c *asyncConnectorServiceClient) GetTaskLogs(ctx context.Context, in *plugins.GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncConnectorService_GetTaskLogsClient, error) {
+func (c *asyncConnectorServiceClient) GetTaskLogs(ctx context.Context, in *GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncConnectorService_GetTaskLogsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &AsyncConnectorService_ServiceDesc.Streams[0], AsyncConnectorService_GetTaskLogs_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -107,7 +106,7 @@ func (c *asyncConnectorServiceClient) GetTaskLogs(ctx context.Context, in *plugi
 }
 
 type AsyncConnectorService_GetTaskLogsClient interface {
-	Recv() (*plugins.GetTaskLogsResponse, error)
+	Recv() (*GetTaskLogsResponse, error)
 	grpc.ClientStream
 }
 
@@ -115,8 +114,8 @@ type asyncConnectorServiceGetTaskLogsClient struct {
 	grpc.ClientStream
 }
 
-func (x *asyncConnectorServiceGetTaskLogsClient) Recv() (*plugins.GetTaskLogsResponse, error) {
-	m := new(plugins.GetTaskLogsResponse)
+func (x *asyncConnectorServiceGetTaskLogsClient) Recv() (*GetTaskLogsResponse, error) {
+	m := new(GetTaskLogsResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -128,38 +127,38 @@ func (x *asyncConnectorServiceGetTaskLogsClient) Recv() (*plugins.GetTaskLogsRes
 // for forward compatibility
 type AsyncConnectorServiceServer interface {
 	// CreateTask sends a task create request to the connector service.
-	CreateTask(context.Context, *plugins.CreateTaskRequest) (*plugins.CreateTaskResponse, error)
+	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
 	// Get job status.
-	GetTask(context.Context, *plugins.GetTaskRequest) (*plugins.GetTaskResponse, error)
+	GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error)
 	// Delete the task resource.
-	DeleteTask(context.Context, *plugins.DeleteTaskRequest) (*plugins.DeleteTaskResponse, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error)
 	// GetTaskMetrics returns one or more task execution metrics, if available.
 	//
 	// Errors include
 	//   - OutOfRange if metrics are not available for the specified task time range
 	//   - various other errors
-	GetTaskMetrics(context.Context, *plugins.GetTaskMetricsRequest) (*plugins.GetTaskMetricsResponse, error)
+	GetTaskMetrics(context.Context, *GetTaskMetricsRequest) (*GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(*plugins.GetTaskLogsRequest, AsyncConnectorService_GetTaskLogsServer) error
+	GetTaskLogs(*GetTaskLogsRequest, AsyncConnectorService_GetTaskLogsServer) error
 }
 
 // UnimplementedAsyncConnectorServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedAsyncConnectorServiceServer struct {
 }
 
-func (UnimplementedAsyncConnectorServiceServer) CreateTask(context.Context, *plugins.CreateTaskRequest) (*plugins.CreateTaskResponse, error) {
+func (UnimplementedAsyncConnectorServiceServer) CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
-func (UnimplementedAsyncConnectorServiceServer) GetTask(context.Context, *plugins.GetTaskRequest) (*plugins.GetTaskResponse, error) {
+func (UnimplementedAsyncConnectorServiceServer) GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTask not implemented")
 }
-func (UnimplementedAsyncConnectorServiceServer) DeleteTask(context.Context, *plugins.DeleteTaskRequest) (*plugins.DeleteTaskResponse, error) {
+func (UnimplementedAsyncConnectorServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
 }
-func (UnimplementedAsyncConnectorServiceServer) GetTaskMetrics(context.Context, *plugins.GetTaskMetricsRequest) (*plugins.GetTaskMetricsResponse, error) {
+func (UnimplementedAsyncConnectorServiceServer) GetTaskMetrics(context.Context, *GetTaskMetricsRequest) (*GetTaskMetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTaskMetrics not implemented")
 }
-func (UnimplementedAsyncConnectorServiceServer) GetTaskLogs(*plugins.GetTaskLogsRequest, AsyncConnectorService_GetTaskLogsServer) error {
+func (UnimplementedAsyncConnectorServiceServer) GetTaskLogs(*GetTaskLogsRequest, AsyncConnectorService_GetTaskLogsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetTaskLogs not implemented")
 }
 
@@ -175,7 +174,7 @@ func RegisterAsyncConnectorServiceServer(s grpc.ServiceRegistrar, srv AsyncConne
 }
 
 func _AsyncConnectorService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.CreateTaskRequest)
+	in := new(CreateTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -187,13 +186,13 @@ func _AsyncConnectorService_CreateTask_Handler(srv interface{}, ctx context.Cont
 		FullMethod: AsyncConnectorService_CreateTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsyncConnectorServiceServer).CreateTask(ctx, req.(*plugins.CreateTaskRequest))
+		return srv.(AsyncConnectorServiceServer).CreateTask(ctx, req.(*CreateTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AsyncConnectorService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.GetTaskRequest)
+	in := new(GetTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -205,13 +204,13 @@ func _AsyncConnectorService_GetTask_Handler(srv interface{}, ctx context.Context
 		FullMethod: AsyncConnectorService_GetTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsyncConnectorServiceServer).GetTask(ctx, req.(*plugins.GetTaskRequest))
+		return srv.(AsyncConnectorServiceServer).GetTask(ctx, req.(*GetTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AsyncConnectorService_DeleteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.DeleteTaskRequest)
+	in := new(DeleteTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -223,13 +222,13 @@ func _AsyncConnectorService_DeleteTask_Handler(srv interface{}, ctx context.Cont
 		FullMethod: AsyncConnectorService_DeleteTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsyncConnectorServiceServer).DeleteTask(ctx, req.(*plugins.DeleteTaskRequest))
+		return srv.(AsyncConnectorServiceServer).DeleteTask(ctx, req.(*DeleteTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AsyncConnectorService_GetTaskMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.GetTaskMetricsRequest)
+	in := new(GetTaskMetricsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -241,13 +240,13 @@ func _AsyncConnectorService_GetTaskMetrics_Handler(srv interface{}, ctx context.
 		FullMethod: AsyncConnectorService_GetTaskMetrics_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsyncConnectorServiceServer).GetTaskMetrics(ctx, req.(*plugins.GetTaskMetricsRequest))
+		return srv.(AsyncConnectorServiceServer).GetTaskMetrics(ctx, req.(*GetTaskMetricsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AsyncConnectorService_GetTaskLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(plugins.GetTaskLogsRequest)
+	m := new(GetTaskLogsRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -255,7 +254,7 @@ func _AsyncConnectorService_GetTaskLogs_Handler(srv interface{}, stream grpc.Ser
 }
 
 type AsyncConnectorService_GetTaskLogsServer interface {
-	Send(*plugins.GetTaskLogsResponse) error
+	Send(*GetTaskLogsResponse) error
 	grpc.ServerStream
 }
 
@@ -263,7 +262,7 @@ type asyncConnectorServiceGetTaskLogsServer struct {
 	grpc.ServerStream
 }
 
-func (x *asyncConnectorServiceGetTaskLogsServer) Send(m *plugins.GetTaskLogsResponse) error {
+func (x *asyncConnectorServiceGetTaskLogsServer) Send(m *GetTaskLogsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -271,7 +270,7 @@ func (x *asyncConnectorServiceGetTaskLogsServer) Send(m *plugins.GetTaskLogsResp
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AsyncConnectorService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl2.service.AsyncConnectorService",
+	ServiceName: "flyteidl2.connector.AsyncConnectorService",
 	HandlerType: (*AsyncConnectorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -298,12 +297,12 @@ var AsyncConnectorService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "flyteidl2/service/connector.proto",
+	Metadata: "flyteidl2/connector/service.proto",
 }
 
 const (
-	ConnectorMetadataService_GetConnector_FullMethodName   = "/flyteidl2.service.ConnectorMetadataService/GetConnector"
-	ConnectorMetadataService_ListConnectors_FullMethodName = "/flyteidl2.service.ConnectorMetadataService/ListConnectors"
+	ConnectorMetadataService_GetConnector_FullMethodName   = "/flyteidl2.connector.ConnectorMetadataService/GetConnector"
+	ConnectorMetadataService_ListConnectors_FullMethodName = "/flyteidl2.connector.ConnectorMetadataService/ListConnectors"
 )
 
 // ConnectorMetadataServiceClient is the client API for ConnectorMetadataService service.
@@ -311,9 +310,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConnectorMetadataServiceClient interface {
 	// Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
-	GetConnector(ctx context.Context, in *plugins.GetConnectorRequest, opts ...grpc.CallOption) (*plugins.GetConnectorResponse, error)
+	GetConnector(ctx context.Context, in *GetConnectorRequest, opts ...grpc.CallOption) (*GetConnectorResponse, error)
 	// Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
-	ListConnectors(ctx context.Context, in *plugins.ListConnectorsRequest, opts ...grpc.CallOption) (*plugins.ListConnectorsResponse, error)
+	ListConnectors(ctx context.Context, in *ListConnectorsRequest, opts ...grpc.CallOption) (*ListConnectorsResponse, error)
 }
 
 type connectorMetadataServiceClient struct {
@@ -324,8 +323,8 @@ func NewConnectorMetadataServiceClient(cc grpc.ClientConnInterface) ConnectorMet
 	return &connectorMetadataServiceClient{cc}
 }
 
-func (c *connectorMetadataServiceClient) GetConnector(ctx context.Context, in *plugins.GetConnectorRequest, opts ...grpc.CallOption) (*plugins.GetConnectorResponse, error) {
-	out := new(plugins.GetConnectorResponse)
+func (c *connectorMetadataServiceClient) GetConnector(ctx context.Context, in *GetConnectorRequest, opts ...grpc.CallOption) (*GetConnectorResponse, error) {
+	out := new(GetConnectorResponse)
 	err := c.cc.Invoke(ctx, ConnectorMetadataService_GetConnector_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -333,8 +332,8 @@ func (c *connectorMetadataServiceClient) GetConnector(ctx context.Context, in *p
 	return out, nil
 }
 
-func (c *connectorMetadataServiceClient) ListConnectors(ctx context.Context, in *plugins.ListConnectorsRequest, opts ...grpc.CallOption) (*plugins.ListConnectorsResponse, error) {
-	out := new(plugins.ListConnectorsResponse)
+func (c *connectorMetadataServiceClient) ListConnectors(ctx context.Context, in *ListConnectorsRequest, opts ...grpc.CallOption) (*ListConnectorsResponse, error) {
+	out := new(ListConnectorsResponse)
 	err := c.cc.Invoke(ctx, ConnectorMetadataService_ListConnectors_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -347,19 +346,19 @@ func (c *connectorMetadataServiceClient) ListConnectors(ctx context.Context, in 
 // for forward compatibility
 type ConnectorMetadataServiceServer interface {
 	// Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
-	GetConnector(context.Context, *plugins.GetConnectorRequest) (*plugins.GetConnectorResponse, error)
+	GetConnector(context.Context, *GetConnectorRequest) (*GetConnectorResponse, error)
 	// Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
-	ListConnectors(context.Context, *plugins.ListConnectorsRequest) (*plugins.ListConnectorsResponse, error)
+	ListConnectors(context.Context, *ListConnectorsRequest) (*ListConnectorsResponse, error)
 }
 
 // UnimplementedConnectorMetadataServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedConnectorMetadataServiceServer struct {
 }
 
-func (UnimplementedConnectorMetadataServiceServer) GetConnector(context.Context, *plugins.GetConnectorRequest) (*plugins.GetConnectorResponse, error) {
+func (UnimplementedConnectorMetadataServiceServer) GetConnector(context.Context, *GetConnectorRequest) (*GetConnectorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConnector not implemented")
 }
-func (UnimplementedConnectorMetadataServiceServer) ListConnectors(context.Context, *plugins.ListConnectorsRequest) (*plugins.ListConnectorsResponse, error) {
+func (UnimplementedConnectorMetadataServiceServer) ListConnectors(context.Context, *ListConnectorsRequest) (*ListConnectorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListConnectors not implemented")
 }
 
@@ -375,7 +374,7 @@ func RegisterConnectorMetadataServiceServer(s grpc.ServiceRegistrar, srv Connect
 }
 
 func _ConnectorMetadataService_GetConnector_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.GetConnectorRequest)
+	in := new(GetConnectorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -387,13 +386,13 @@ func _ConnectorMetadataService_GetConnector_Handler(srv interface{}, ctx context
 		FullMethod: ConnectorMetadataService_GetConnector_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorMetadataServiceServer).GetConnector(ctx, req.(*plugins.GetConnectorRequest))
+		return srv.(ConnectorMetadataServiceServer).GetConnector(ctx, req.(*GetConnectorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ConnectorMetadataService_ListConnectors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(plugins.ListConnectorsRequest)
+	in := new(ListConnectorsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -405,7 +404,7 @@ func _ConnectorMetadataService_ListConnectors_Handler(srv interface{}, ctx conte
 		FullMethod: ConnectorMetadataService_ListConnectors_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectorMetadataServiceServer).ListConnectors(ctx, req.(*plugins.ListConnectorsRequest))
+		return srv.(ConnectorMetadataServiceServer).ListConnectors(ctx, req.(*ListConnectorsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -414,7 +413,7 @@ func _ConnectorMetadataService_ListConnectors_Handler(srv interface{}, ctx conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ConnectorMetadataService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl2.service.ConnectorMetadataService",
+	ServiceName: "flyteidl2.connector.ConnectorMetadataService",
 	HandlerType: (*ConnectorMetadataServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -427,5 +426,5 @@ var ConnectorMetadataService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "flyteidl2/service/connector.proto",
+	Metadata: "flyteidl2/connector/service.proto",
 }

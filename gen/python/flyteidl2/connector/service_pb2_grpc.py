@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from flyteidl2.plugins import connector_pb2 as flyteidl2_dot_plugins_dot_connector__pb2
+from flyteidl2.connector import task_pb2 as flyteidl2_dot_connector_dot_task__pb2
 
 
 class AsyncConnectorServiceStub(object):
@@ -16,29 +16,29 @@ class AsyncConnectorServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateTask = channel.unary_unary(
-                '/flyteidl2.service.AsyncConnectorService/CreateTask',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskResponse.FromString,
+                '/flyteidl2.connector.AsyncConnectorService/CreateTask',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.CreateTaskRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.CreateTaskResponse.FromString,
                 )
         self.GetTask = channel.unary_unary(
-                '/flyteidl2.service.AsyncConnectorService/GetTask',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskResponse.FromString,
+                '/flyteidl2.connector.AsyncConnectorService/GetTask',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskResponse.FromString,
                 )
         self.DeleteTask = channel.unary_unary(
-                '/flyteidl2.service.AsyncConnectorService/DeleteTask',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskResponse.FromString,
+                '/flyteidl2.connector.AsyncConnectorService/DeleteTask',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.DeleteTaskRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.DeleteTaskResponse.FromString,
                 )
         self.GetTaskMetrics = channel.unary_unary(
-                '/flyteidl2.service.AsyncConnectorService/GetTaskMetrics',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsResponse.FromString,
+                '/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsResponse.FromString,
                 )
         self.GetTaskLogs = channel.unary_stream(
-                '/flyteidl2.service.AsyncConnectorService/GetTaskLogs',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsResponse.FromString,
+                '/flyteidl2.connector.AsyncConnectorService/GetTaskLogs',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsResponse.FromString,
                 )
 
 
@@ -90,32 +90,32 @@ def add_AsyncConnectorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateTask': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTask,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.CreateTaskRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.CreateTaskResponse.SerializeToString,
             ),
             'GetTask': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTask,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskResponse.SerializeToString,
             ),
             'DeleteTask': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteTask,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.DeleteTaskRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.DeleteTaskResponse.SerializeToString,
             ),
             'GetTaskMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTaskMetrics,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsResponse.SerializeToString,
             ),
             'GetTaskLogs': grpc.unary_stream_rpc_method_handler(
                     servicer.GetTaskLogs,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.service.AsyncConnectorService', rpc_method_handlers)
+            'flyteidl2.connector.AsyncConnectorService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -135,9 +135,9 @@ class AsyncConnectorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.AsyncConnectorService/CreateTask',
-            flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.CreateTaskResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.AsyncConnectorService/CreateTask',
+            flyteidl2_dot_connector_dot_task__pb2.CreateTaskRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.CreateTaskResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -152,9 +152,9 @@ class AsyncConnectorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.AsyncConnectorService/GetTask',
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.AsyncConnectorService/GetTask',
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -169,9 +169,9 @@ class AsyncConnectorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.AsyncConnectorService/DeleteTask',
-            flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.DeleteTaskResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.AsyncConnectorService/DeleteTask',
+            flyteidl2_dot_connector_dot_task__pb2.DeleteTaskRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.DeleteTaskResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -186,9 +186,9 @@ class AsyncConnectorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.AsyncConnectorService/GetTaskMetrics',
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskMetricsResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics',
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskMetricsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -203,9 +203,9 @@ class AsyncConnectorService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.service.AsyncConnectorService/GetTaskLogs',
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.GetTaskLogsResponse.FromString,
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.connector.AsyncConnectorService/GetTaskLogs',
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.GetTaskLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -222,14 +222,14 @@ class ConnectorMetadataServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetConnector = channel.unary_unary(
-                '/flyteidl2.service.ConnectorMetadataService/GetConnector',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorResponse.FromString,
+                '/flyteidl2.connector.ConnectorMetadataService/GetConnector',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.GetConnectorRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetConnectorResponse.FromString,
                 )
         self.ListConnectors = channel.unary_unary(
-                '/flyteidl2.service.ConnectorMetadataService/ListConnectors',
-                request_serializer=flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsResponse.FromString,
+                '/flyteidl2.connector.ConnectorMetadataService/ListConnectors',
+                request_serializer=flyteidl2_dot_connector_dot_task__pb2.ListConnectorsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_connector_dot_task__pb2.ListConnectorsResponse.FromString,
                 )
 
 
@@ -257,17 +257,17 @@ def add_ConnectorMetadataServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetConnector': grpc.unary_unary_rpc_method_handler(
                     servicer.GetConnector,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.GetConnectorRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.GetConnectorResponse.SerializeToString,
             ),
             'ListConnectors': grpc.unary_unary_rpc_method_handler(
                     servicer.ListConnectors,
-                    request_deserializer=flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsRequest.FromString,
-                    response_serializer=flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_connector_dot_task__pb2.ListConnectorsRequest.FromString,
+                    response_serializer=flyteidl2_dot_connector_dot_task__pb2.ListConnectorsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.service.ConnectorMetadataService', rpc_method_handlers)
+            'flyteidl2.connector.ConnectorMetadataService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -288,9 +288,9 @@ class ConnectorMetadataService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.ConnectorMetadataService/GetConnector',
-            flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.GetConnectorResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.ConnectorMetadataService/GetConnector',
+            flyteidl2_dot_connector_dot_task__pb2.GetConnectorRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.GetConnectorResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -305,8 +305,8 @@ class ConnectorMetadataService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.service.ConnectorMetadataService/ListConnectors',
-            flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsRequest.SerializeToString,
-            flyteidl2_dot_plugins_dot_connector__pb2.ListConnectorsResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.connector.ConnectorMetadataService/ListConnectors',
+            flyteidl2_dot_connector_dot_task__pb2.ListConnectorsRequest.SerializeToString,
+            flyteidl2_dot_connector_dot_task__pb2.ListConnectorsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
