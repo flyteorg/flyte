@@ -42,7 +42,12 @@ func newRequestMetricsProvider() requestMetricsProvider {
 			Buckets: latencyBuckets,
 		},
 		[]string{"verb"})
-	prometheus.MustRegister(requestLatency)
+	if err := prometheus.Register(requestLatency); err != nil {
+		// Ignore AlreadyRegisteredError to handle multiple package imports
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			panic(err)
+		}
+	}
 	requestResult := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "k8s_client_request_total",
@@ -50,7 +55,12 @@ func newRequestMetricsProvider() requestMetricsProvider {
 		},
 		[]string{"code", "method"},
 	)
-	prometheus.MustRegister(requestResult)
+	if err := prometheus.Register(requestResult); err != nil {
+		// Ignore AlreadyRegisteredError to handle multiple package imports
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			panic(err)
+		}
+	}
 	return requestMetricsProvider{
 		requestLatency,
 		requestResult,
@@ -73,7 +83,12 @@ func newRateLimiterMetricsAdapter() rateLimiterMetricsProvider {
 			Buckets: latencyBuckets,
 		},
 		[]string{"verb"})
-	prometheus.MustRegister(rateLimiterLatency)
+	if err := prometheus.Register(rateLimiterLatency); err != nil {
+		// Ignore AlreadyRegisteredError to handle multiple package imports
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			panic(err)
+		}
+	}
 	return rateLimiterMetricsProvider{
 		rateLimiterLatency,
 	}

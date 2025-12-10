@@ -16,11 +16,14 @@ import (
 
 var exampleInterface = &core.TypedInterface{
 	Inputs: &core.VariableMap{
-		Variables: map[string]*core.Variable{
-			"a": {
-				Type: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_INTEGER,
+		Variables: []*core.VariableEntry{
+			{
+				Key: "a",
+				Value: &core.Variable{
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
 					},
 				},
 			},
