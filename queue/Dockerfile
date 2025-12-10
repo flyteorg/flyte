@@ -29,9 +29,5 @@ COPY --from=builder /workspace/queue/config.yaml .
 
 EXPOSE 8089
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8089/healthz || exit 1
-
 ENTRYPOINT ["./queue-service"]
 CMD ["--config", "config.yaml"]
-

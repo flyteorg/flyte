@@ -3,7 +3,13 @@ kind: Role
 metadata:
   name: queue-role
 rules:
-  - apiGroups: ["flyte.org"]
-    resources: ["taskactions"]
-    verbs: ["get", "list", "watch", "create", "delete"]
-
+- apiGroups:
+  - flyte.org
+  resources:
+  - taskactions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
