@@ -168,6 +168,9 @@ message ActionMetadata {
 
   // Trigger Type
   task.TriggerAutomationSpec trigger_type = 15;
+
+  // Who initiated this run
+  RunSource source = 16;
 }
 
 enum ActionType {
