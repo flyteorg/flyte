@@ -61,6 +61,11 @@ flyteadmin:
     - "metadata"
     - "admin"
   useOffloadedWorkflowClosure: false
+  injectIdentityAnnotations: false
+  identityAnnotationPrefix: "flyte.org"
+  identityAnnotationKeys:
+    - email
+    - sub
 database:
   postgres:
     port: 30001

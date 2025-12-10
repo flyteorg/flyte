@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
+	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -590,6 +591,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		annotations = executionConfig.GetAnnotations().GetValues()
 	}
 
+	annotations = m.addIdentityAnnotations(ctx, annotations)
+
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
 		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
@@ -1025,6 +1028,9 @@ func (m *ExecutionManager) launchExecution(
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
+	annotations = m.addIdentityAnnotations(ctx, annotations)
+
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.GetRawOutputDataConfig() != nil {
 		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
@@ -2048,6 +2054,94 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 		}
 	}
 	return initialLabels, nil
+}
+
+// addIdentityAnnotations automatically injects identity information (user or app) as annotations when enabled in config.
+// This allows tracking which identity submitted each workflow execution and enables identity-based authorization.
+func (m *ExecutionManager) addIdentityAnnotations(ctx context.Context, initialAnnotations map[string]string) map[string]string {
+	// Check if identity annotation injection is enabled
+	if !m.config.ApplicationConfiguration().GetTopLevelConfig().GetInjectIdentityAnnotations() {
+		return initialAnnotations
+	}
+
+	// Get identity from authentication context
+	identityContext := auth.IdentityContextFromContext(ctx)
+
+	// Check if identity context is empty
+	if identityContext.IsEmpty() {
+		logger.Debugf(ctx, "No identity information found in context, skipping identity annotation injection")
+		return initialAnnotations
+	}
+
+	if initialAnnotations == nil {
+		initialAnnotations = make(map[string]string)
+	}
+
+	prefix := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationPrefix()
+	// Validate prefix format using DNS1123 subdomain validation
+	if errs := k8svalidation.IsDNS1123Subdomain(prefix); len(errs) > 0 {
+		logger.Warnf(ctx, "Invalid identity annotation prefix '%s': %v. Skipping identity annotation injection.", prefix, errs)
+		return initialAnnotations
+	}
+
+	keys := m.config.ApplicationConfiguration().GetTopLevelConfig().GetIdentityAnnotationKeys()
+
+	// Determine if this is an app or user identity
+	isAppIdentity := identityContext.AppID() != ""
+	isUserIdentity := identityContext.UserInfo() != nil && !isAppIdentity
+
+	// Add annotations based on identity type
+	if isAppIdentity {
+		// Handle app-based identity
+		appID := identityContext.AppID()
+		for _, key := range keys {
+			annotationKey := fmt.Sprintf("%s/app-%s", prefix, key)
+			if _, exists := initialAnnotations[annotationKey]; exists {
+				logger.Debugf(ctx, "Identity annotation key %s already exists, skipping injection", annotationKey)
+				continue
+			}
+			var value string
+			switch key {
+			case "email", "sub", "id":
+				// For app identities, use the app ID for these fields
+				value = appID
+			default:
+				// Skip unknown keys for app identities
+				logger.Debugf(ctx, "Unknown identity annotation key '%s' for app identity, skipping", key)
+				continue
+			}
+			if value != "" {
+				initialAnnotations[annotationKey] = value
+				logger.Debugf(ctx, "Injected app identity annotation %s=%s", annotationKey, value)
+			}
+		}
+	} else if isUserIdentity {
+		// Handle user-based identity
+		userInfo := identityContext.UserInfo()
+		for _, key := range keys {
+			annotationKey := fmt.Sprintf("%s/user-%s", prefix, key)
+			if _, exists := initialAnnotations[annotationKey]; exists {
+				logger.Debugf(ctx, "Identity annotation key %s already exists, skipping injection", annotationKey)
+				continue
+			}
+			var value string
+			switch key {
+			case "email":
+				value = userInfo.GetEmail()
+			case "sub":
+				value = userInfo.GetSubject()
+			default:
+				// Skip unknown keys
+				logger.Debugf(ctx, "Unknown identity annotation key '%s' for user identity, skipping", key)
+				continue
+			}
+			if value != "" {
+				initialAnnotations[annotationKey] = value
+				logger.Debugf(ctx, "Injected user identity annotation %s=%s", annotationKey, value)
+			}
+		}
+	}
+	return initialAnnotations
 }
 
 func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error) {

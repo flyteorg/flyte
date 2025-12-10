@@ -298,6 +298,11 @@ data:
           - openid
     flyteadmin:
       eventVersion: 2
+      identityAnnotationKeys:
+      - email
+      - sub
+      identityAnnotationPrefix: flyte.org
+      injectIdentityAnnotations: false
       metadataStoragePrefix:
       - metadata
       - admin
@@ -710,6 +715,7 @@ data:
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
+        redis: null
         type: noop
   storage.yaml: | 
     storage:
@@ -6730,7 +6736,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "29b249082ba3f15e213daf85d53d386f968925a8aeab291c585078d59680378"
+        configChecksum: "a793650b39e484cd7d51cf6269cc5f255463fbe767a1d63a11580bc95fc6196"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -7127,7 +7133,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "29b249082ba3f15e213daf85d53d386f968925a8aeab291c585078d59680378"
+        configChecksum: "a793650b39e484cd7d51cf6269cc5f255463fbe767a1d63a11580bc95fc6196"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -7222,7 +7228,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "989dd7f386ab7d98ada2d2eb81c87a94032a5fdfbefe35386285f47f6af64ad"
+        configChecksum: "bd5dc2fac7d03bb5f099f61c9699f4f99ee324a515d605a12720b5d801861d6"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7300,7 +7306,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.3
       annotations:
-        configChecksum: "989dd7f386ab7d98ada2d2eb81c87a94032a5fdfbefe35386285f47f6af64ad"
+        configChecksum: "bd5dc2fac7d03bb5f099f61c9699f4f99ee324a515d605a12720b5d801861d6"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
