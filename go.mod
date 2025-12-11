@@ -19,7 +19,7 @@ require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.5
 	github.com/go-test/deep v1.1.1
 	github.com/golang/protobuf v1.5.4
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/imdario/mergo v0.3.16
 	github.com/jackc/pgconn v1.14.3
