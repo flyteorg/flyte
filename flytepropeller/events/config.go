@@ -40,7 +40,7 @@ var (
 		MaxRetries:    5,
 		BackoffScalar: 100,
 		BackoffJitter: "0.1",
-		FilterSize:    10000000,
+		FilterSize:    8388608, // 2^23
 	}
 
 	configSection = config.MustRegisterSectionWithUpdates(configSectionKey, &defaultConfig, func(ctx context.Context, newValue config.Config) {

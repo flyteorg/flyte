@@ -10543,7 +10543,6 @@
         }
       }
     },
-<<<<<<< HEAD
     "adminClusterResourceAttributesWithSource": {
       "type": "object",
       "properties": {
@@ -10555,6 +10554,29 @@
         },
         "metadata": {
           "$ref": "#/definitions/adminAttributeMetadata"
+        }
+      }
+    },
+    "adminConcurrencyLimitBehavior": {
+      "type": "string",
+      "enum": [
+        "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+        "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"
+      ],
+      "default": "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+      "description": " - CONCURRENCY_LIMIT_BEHAVIOR_SKIP: A workflow that will be skipped because the limit has been hit."
+    },
+    "adminConcurrencyPolicy": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "integer",
+          "format": "int32",
+          "title": "A setting for the maximum number of concurrent workflows"
+        },
+        "behavior": {
+          "$ref": "#/definitions/adminConcurrencyLimitBehavior",
+          "title": "Descriptor for workflow execution behavior after the concurrency limit is hit"
         }
       }
     },
@@ -10739,31 +10761,6 @@
       },
       "title": "The launch plan that was created for or that already existed from re-running node(s) within a workflow"
     },
-=======
-    "adminConcurrencyLimitBehavior": {
-      "type": "string",
-      "enum": [
-        "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
-        "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"
-      ],
-      "default": "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
-      "description": " - CONCURRENCY_LIMIT_BEHAVIOR_SKIP: A workflow that will be skipped because the limit has been hit."
-    },
-    "adminConcurrencyPolicy": {
-      "type": "object",
-      "properties": {
-        "max": {
-          "type": "integer",
-          "format": "int32",
-          "title": "A setting for the maximum number of concurrent workflows"
-        },
-        "behavior": {
-          "$ref": "#/definitions/adminConcurrencyLimitBehavior",
-          "title": "Descriptor for workflow execution behavior after the concurrency limit is hit"
-        }
-      }
-    },
->>>>>>> 640ad57cd (Add workflow concurrency control (#6475))
     "adminCronSchedule": {
       "type": "object",
       "properties": {
