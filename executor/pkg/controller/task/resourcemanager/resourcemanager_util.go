@@ -3,9 +3,9 @@ package resourcemanager
 import (
 	"context"
 
-	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	rmConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 const (

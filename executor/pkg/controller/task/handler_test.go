@@ -15,38 +15,38 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginCatalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/fakeplugins"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	v1Api "github.com/flyteorg/flyte/v2/executor/api/v1"
+	eventsErr "github.com/flyteorg/flyte/v2/executor/events/errors"
+	flyteMocks "github.com/flyteorg/flyte/v2/executor/pkg/apis/flyteworkflow/v1Api1/mocks"
+	controllerConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/config"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/handler"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/interfaces"
+	nodeMocks "github.com/flyteorg/flyte/v2/executor/pkg/controller/interfaces/mocks"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/codex"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/config"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/fakeplugins"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/resourcemanager"
+	rmConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginCatalogMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCoreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	pluginK8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginK8sMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/admin"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/event"
 )
 
 var eventConfig = &controllerConfig.EventConfig{
@@ -307,7 +307,7 @@ func Test_task_ResolvePlugin(t *testing.T) {
 	}
 	type args struct {
 		ttype           string
-		executionConfig v1alpha1.ExecutionConfig
+		executionConfig v1Api.ExecutionConfig
 	}
 	tests := []struct {
 		name    string
@@ -337,8 +337,8 @@ func Test_task_ResolvePlugin(t *testing.T) {
 						someID: somePlugin,
 					},
 				},
-			}, args{ttype: someID, executionConfig: v1alpha1.ExecutionConfig{
-				TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
+			}, args{ttype: someID, executionConfig: v1Api.ExecutionConfig{
+				TaskPluginImpls: map[string]v1Api1.TaskPluginOverride{
 					someID: {
 						PluginIDs:             []string{someID},
 						MissingPluginBehavior: admin.PluginOverride_FAIL,
@@ -494,7 +494,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
 		ma := 5
-		n.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.EXPECT().GetRetryStrategy().Return(&v1Api1.RetryStrategy{MinAttempts: &ma})
 		n.EXPECT().GetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
@@ -523,8 +523,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetExecutionConfig().Return(v1Api1.ExecutionConfig{})
+		executionContext.EXPECT().GetEventVersion().Return(v1Api1.EventVersion0)
 		executionContext.EXPECT().GetParentInfo().Return(nil)
 		if allowIncrementParallelism {
 			executionContext.EXPECT().IncrementParallelism().Return(1)
@@ -814,7 +814,7 @@ func Test_task_Abort(t *testing.T) {
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
 		ma := 5
-		n.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.EXPECT().GetRetryStrategy().Return(&v1Api1.RetryStrategy{MinAttempts: &ma})
 		n.EXPECT().GetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
@@ -838,9 +838,9 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.EXPECT().EventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetExecutionConfig().Return(v1Api1.ExecutionConfig{})
 		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetEventVersion().Return(v1Api1.EventVersion0)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
@@ -978,7 +978,7 @@ func Test_task_Abort_v1(t *testing.T) {
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
 		ma := 5
-		n.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.EXPECT().GetRetryStrategy().Return(&v1Api1.RetryStrategy{MinAttempts: &ma})
 		n.EXPECT().GetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
@@ -1002,9 +1002,9 @@ func Test_task_Abort_v1(t *testing.T) {
 		nCtx.EXPECT().EventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetExecutionConfig().Return(v1Api1.ExecutionConfig{})
 		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		executionContext.EXPECT().GetEventVersion().Return(v1Api1.EventVersion1)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
@@ -1160,7 +1160,7 @@ func Test_task_Finalize(t *testing.T) {
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
 		ma := 5
-		n.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+		n.EXPECT().GetRetryStrategy().Return(&v1Api1.RetryStrategy{MinAttempts: &ma})
 		n.EXPECT().GetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
@@ -1185,9 +1185,9 @@ func Test_task_Finalize(t *testing.T) {
 		nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetExecutionConfig().Return(v1Api1.ExecutionConfig{})
 		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetEventVersion().Return(v1Api1.EventVersion0)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
@@ -1279,7 +1279,7 @@ func init() {
 func Test_task_Handle_ValidateOutputErr(t *testing.T) {
 	ctx := context.TODO()
 	nodeID := "n1"
-	execConfig := v1alpha1.ExecutionConfig{}
+	execConfig := v1Api1.ExecutionConfig{}
 
 	tk := &core.TaskTemplate{
 		Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},

@@ -1,21 +1,21 @@
 package task
 
 import (
+	v1Api "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/common"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/config"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/executors"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/handler"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/interfaces"
+	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	flytek8sConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/event"
 )
 
 // This is used by flyteadmin to indicate that map tasks now report subtask metadata individually.
@@ -59,7 +59,7 @@ func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execCo
 	nodeExecutionID := &core.NodeExecutionIdentifier{
 		ExecutionId: taskExecID.GetNodeExecutionId().GetExecutionId(),
 	}
-	if execContext.GetEventVersion() != v1alpha1.EventVersion0 {
+	if execContext.GetEventVersion() != v1Api.EventVersion0 {
 		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.GetNodeExecutionId().GetNodeId())
 		if err != nil {
 			return nil, err

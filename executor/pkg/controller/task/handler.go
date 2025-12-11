@@ -10,8 +10,8 @@ import (
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/v2/executor/api/v1"
+	eventsErr "github.com/flyteorg/flyte/v2/executor/events/errors"
 	controllerConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/config"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller/errors"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller/handler"
@@ -612,27 +612,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		if deckStatus == DeckUnknown {
 			pluginTrns.AddDeckURI(tCtx)
 		}
-		// -------------------------------------
-		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes
-		// This code only exists to support Dynamic tasks. Eventually dynamic tasks will use closure nodes to execute
-		// Until then we have to check if the Handler executed resulted in a dynamic node being generated, if so, then
-		// we will not check for outputs or call onTaskSuccess. The reason is that outputs have not yet been materialized.
-		// Output for the parent node will only get generated after the subtasks complete. We have to wait for the completion
-		// the dynamic.handler will call onTaskSuccess for the parent node
 
-		f, err := NewRemoteFutureFileReader(ctx, tCtx.ow.GetOutputPrefixPath(), tCtx.DataStore())
-		if err != nil {
-			return nil, regErrors.Wrapf(err, "failed to create remote file reader")
-		}
-		if ok, err := f.Exists(ctx); err != nil {
-			logger.Errorf(ctx, "failed to check existence of futures file")
-			return nil, regErrors.Wrapf(err, "failed to check existence of futures file")
-		} else if ok {
-			logger.Infof(ctx, "Futures file exists, this is a dynamic parent-Handler will not run onTaskSuccess")
-			return pluginTrns, nil
-		}
-		// End TODO
-		// -------------------------------------
 		logger.Debugf(ctx, "Task success detected, calling on Task success")
 		outputCommitter := ioutils.NewRemoteFileOutputWriter(ctx, tCtx.DataStore(), tCtx.OutputWriter())
 		ee, err := t.ValidateOutput(ctx, tCtx.NodeID(), tCtx.InputReader(), tCtx.ow.GetReader(),

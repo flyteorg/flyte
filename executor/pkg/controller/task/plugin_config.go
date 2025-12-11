@@ -8,11 +8,11 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/backoff"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/config"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 var once sync.Once
