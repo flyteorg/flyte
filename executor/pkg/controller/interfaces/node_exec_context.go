@@ -6,20 +6,20 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyte/flytepropeller/events"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	v1Api "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/events"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/executors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 //go:generate mockery --all --case=underscore --with-expecter
 
 type TaskReader interface {
 	Read(ctx context.Context) (*core.TaskTemplate, error)
-	GetTaskType() v1alpha1.TaskType
+	GetTaskType() v1Api.TaskType
 	GetTaskID() *core.Identifier
 }
 
@@ -55,8 +55,8 @@ type NodeExecutionContext interface {
 	DataStore() *storage.DataStore
 	InputReader() io.InputReader
 	EventsRecorder() EventRecorder
-	NodeID() v1alpha1.NodeID
-	Node() v1alpha1.ExecutableNode
+	NodeID() v1Api.NodeID
+	Node() v1Api.ExecutableNode
 	CurrentAttempt() uint32
 	TaskReader() TaskReader
 
@@ -71,5 +71,5 @@ type NodeExecutionContext interface {
 	ExecutionContext() executors.ExecutionContext
 	// TODO We should not need to pass NodeStatus, we probably only need it for DataDir, which should actually be sent using an OutputWriter interface
 	// Deprecated
-	NodeStatus() v1alpha1.ExecutableNodeStatus
+	NodeStatus() v1Api.ExecutableNodeStatus
 }

@@ -42,9 +42,9 @@ import (
 	"github.com/Masterminds/semver"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

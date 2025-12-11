@@ -8,8 +8,8 @@ import (
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdAtomic "github.com/flyteorg/flyte/v2/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 // Controller is a name-spaced collection of back-off handlers

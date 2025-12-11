@@ -12,9 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/utils/clock"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	stdAtomic "github.com/flyteorg/flyte/v2/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 var (

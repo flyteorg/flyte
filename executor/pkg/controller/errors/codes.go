@@ -1,6 +1,6 @@
 package errors
 
-import "github.com/flyteorg/flyte/flytestdlib/errors"
+import "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 
 type ErrorCode = errors.ErrorCode
 

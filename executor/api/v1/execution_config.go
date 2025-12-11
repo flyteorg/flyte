@@ -2,8 +2,6 @@ package v1
 
 import (
 	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
@@ -25,7 +23,7 @@ type ExecutionConfig struct {
 	// Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
 	MaxParallelism uint32
 	// Defines execution behavior for processing nodes.
-	RecoveryExecution WorkflowExecutionIdentifier
+	// RecoveryExecution WorkflowExecutionIdentifier
 	// Defines the resource requests and limits specified for tasks run as part of this execution that ought to be
 	// applied at execution time.
 	TaskResources TaskResources
@@ -38,8 +36,7 @@ type ExecutionConfig struct {
 }
 
 type TaskPluginOverride struct {
-	PluginIDs             []string
-	MissingPluginBehavior admin.PluginOverride_MissingPluginBehavior
+	PluginIDs []string
 }
 
 // Defines a set of configurable resources of different types that a task can request or apply as limits.

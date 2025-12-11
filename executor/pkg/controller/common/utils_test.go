@@ -7,18 +7,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/v2/executor/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/config"
+	nodeMocks "github.com/flyteorg/flyte/v2/executor/pkg/controller/interfaces/mocks"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	idlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type ParentInfo struct {
@@ -27,7 +27,7 @@ type ParentInfo struct {
 	isInDynamicChain bool
 }
 
-func (p ParentInfo) GetUniqueID() v1alpha1.NodeID {
+func (p ParentInfo) GetUniqueID() v1.NodeID {
 	return p.uniqueID
 }
 
@@ -236,7 +236,7 @@ func TestCheckOffloadingCompat(t *testing.T) {
 	executionContext := &executorMocks.ExecutionContext{}
 	executableTask := &mocks.ExecutableTask{}
 	node := &mocks.ExecutableNode{}
-	node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+	node.EXPECT().GetKind().Return(v1.NodeKindTask)
 	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 	executionContext.EXPECT().GetTask("task1").Return(executableTask, nil)
 	executableTask.EXPECT().CoreTask().Return(&idlCore.TaskTemplate{

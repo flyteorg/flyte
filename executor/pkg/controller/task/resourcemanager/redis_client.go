@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-redis/redis"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 //go:generate mockery --name RedisClient --case=underscore --with-expecter

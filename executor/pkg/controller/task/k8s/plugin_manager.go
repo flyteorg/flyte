@@ -25,22 +25,21 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	compiler "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
-	nodeTaskConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/backoff"
+	nodeTaskConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/task/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -51,6 +50,8 @@ const (
 )
 
 const pluginStateVersion = 1
+
+const executionIDLabel = "execution-id"
 
 type PluginPhase uint8
 
@@ -643,7 +644,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 					// attempt to enqueue this tasks owner by retrieving the workfowID from the resource labels
 					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
 
-					workflowID, exists := evt.ObjectNew.GetLabels()[compiler.ExecutionIDLabel]
+					workflowID, exists := evt.ObjectNew.GetLabels()[executionIDLabel]
 					if exists {
 						logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
 						namespacedName := k8stypes.NamespacedName{

@@ -8,18 +8,17 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/config"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/executors"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/handler"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller/interfaces"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	idlcore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -55,30 +54,6 @@ func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID stri
 	}
 
 	return executors.NewParentInfo(uniqueID, parentAttempt, false), nil
-}
-
-func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) *core.Identifier {
-	var targetEntity *core.Identifier
-	if nCtx.Node().GetWorkflowNode() != nil {
-		subRef := nCtx.Node().GetWorkflowNode().GetSubWorkflowRef()
-		if subRef != nil && len(*subRef) > 0 {
-			// todo: uncomment this if Support caching subworkflows and launchplans (v2) is upstreamed
-			// for now, we can leave it empty
-			//nCtx.ExecutionContext().FindSubWorkflow(*subRef)
-			//targetEntity = subWorkflow.GetIdentifier()
-		} else if nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID() != nil {
-			lpRef := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
-			targetEntity = lpRef.Identifier
-		}
-	} else if taskIDStr := nCtx.Node().GetTaskID(); taskIDStr != nil && len(*taskIDStr) > 0 {
-		taskID, err := nCtx.ExecutionContext().GetTask(*taskIDStr)
-		if err != nil {
-			// This doesn't feed a very important part of the node execution event, swallow it for now.
-			logger.Errorf(ctx, "Failed to get task [%v] with error [%v]", taskID, err)
-		}
-		targetEntity = taskID.CoreTask().GetId()
-	}
-	return targetEntity
 }
 
 // ReadLargeLiteral reads the offloaded large literal needed by array node task
@@ -150,7 +125,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 }
 
 // CheckOffloadingCompat checks if the upstream and downstream nodes are compatible with the literal offloading feature and returns an error if not contained in phase info object
-func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionContext, inputLiterals map[string]*core.Literal, node v1alpha1.ExecutableNode, literalOffloadingConfig config.LiteralOffloadingConfig) *handler.PhaseInfo {
+func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionContext, inputLiterals map[string]*idlcore.Literal, node v1.ExecutableNode, literalOffloadingConfig config.LiteralOffloadingConfig) *handler.PhaseInfo {
 	consumesOffloadLiteral := false
 	for _, val := range inputLiterals {
 		if val != nil && val.GetOffloadedMetadata() != nil {
@@ -164,7 +139,7 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 	var phaseInfo handler.PhaseInfo
 
 	// Return early if the node is not of type NodeKindTask
-	if node.GetKind() != v1alpha1.NodeKindTask {
+	if node.GetKind() != v1.NodeKindTask {
 		return nil
 	}
 
@@ -172,7 +147,7 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 	taskID := *node.GetTaskID()
 	taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
 	if err != nil {
-		phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "GetTaskIDFailure", err.Error(), nil)
+		phaseInfo = handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, "GetTaskIDFailure", err.Error(), nil)
 		return &phaseInfo
 	}
 	runtimeData := taskNode.CoreTask().GetMetadata().GetRuntime()
@@ -180,13 +155,13 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 		if !literalOffloadingConfig.Enabled {
 			errMsg := fmt.Sprintf("task [%s] is trying to consume offloaded literals but feature is not enabled", taskID)
 			logger.Errorf(ctx, errMsg)
-			phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingDisabled", errMsg, nil)
+			phaseInfo = handler.PhaseInfoFailure(idlcore.ExecutionError_USER, "LiteralOffloadingDisabled", errMsg, nil)
 			return &phaseInfo
 		}
 		leastSupportedVersion := literalOffloadingConfig.GetSupportedSDKVersion(runtimeData.GetType().String())
 		errMsg := fmt.Sprintf("Literal offloading is not supported for this task as its registered with SDK version [%s] which is less than the least supported version [%s] for this feature", runtimeData.GetVersion(), leastSupportedVersion)
 		logger.Errorf(ctx, errMsg)
-		phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingNotSupported", errMsg, nil)
+		phaseInfo = handler.PhaseInfoFailure(idlcore.ExecutionError_USER, "LiteralOffloadingNotSupported", errMsg, nil)
 		return &phaseInfo
 	}
 

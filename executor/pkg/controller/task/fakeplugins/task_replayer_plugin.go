@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 type HandleResponse struct {

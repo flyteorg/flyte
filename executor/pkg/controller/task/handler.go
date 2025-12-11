@@ -21,7 +21,6 @@ import (
 	rmConfig "github.com/flyteorg/flyte/v2/executor/pkg/controller/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller/task/secretmanager"
 	"github.com/flyteorg/flyte/v2/executor/pkg/utils"
-	"github.com/flyteorg/flyte/v2/flyteidl2/gen/pb-go/flyteidl/admin"
 	pluginMachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -394,11 +393,7 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 			}
 		}
 
-		// If we've exhausted the list of overridable plugins and no single implementation is found, fail fast if the
-		// task plugin overrides specify so.
-		if executionConfig.TaskPluginImpls[ttype].MissingPluginBehavior == admin.PluginOverride_FAIL {
-			return nil, fmt.Errorf("no matching plugin overrides defined for Handler type [%s]. Ignoring any defaultPlugins configured", ttype)
-		}
+		return nil, fmt.Errorf("no matching plugin overrides defined for Handler type [%s]. Ignoring any defaultPlugins configured", ttype)
 	}
 
 	p, ok := t.defaultPlugins[ttype]

@@ -1,11 +1,11 @@
 package k8s
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
-	k8sUtils "github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	k8sUtils "github.com/flyteorg/flyte/v2/executor/pkg/utils"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const executionIdentityVariable = "execution-identity"

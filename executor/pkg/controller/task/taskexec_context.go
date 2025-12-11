@@ -212,7 +212,7 @@ func convertTaskResourcesToRequirements(taskResources v1Api.TaskResources) *v1.R
 // ComputeRawOutputPrefix constructs the output directory, where raw outputs of a task can be stored by the task. FlytePropeller may not have
 // access to this location and can be passed in per execution.
 // the function also returns the uniqueID generated
-func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx interfaces.NodeExecutionContext, currentNodeUniqueID v1alpha1.NodeID, currentAttempt uint32) (io.RawOutputPaths, string, error) {
+func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx interfaces.NodeExecutionContext, currentNodeUniqueID v1Api.NodeID, currentAttempt uint32) (io.RawOutputPaths, string, error) {
 	uniqueID, err := encoding.FixedLengthUniqueIDForParts(length, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(currentAttempt))})
 	if err != nil {
 		// SHOULD never really happen
@@ -227,7 +227,7 @@ func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx interfaces.Nod
 }
 
 // ComputePreviousCheckpointPath returns the checkpoint path for the previous attempt, if this is the first attempt then returns an empty path
-func ComputePreviousCheckpointPath(ctx context.Context, length int, nCtx interfaces.NodeExecutionContext, currentNodeUniqueID v1alpha1.NodeID, currentAttempt uint32) (storage.DataReference, error) {
+func ComputePreviousCheckpointPath(ctx context.Context, length int, nCtx interfaces.NodeExecutionContext, currentNodeUniqueID v1Api.NodeID, currentAttempt uint32) (storage.DataReference, error) {
 	// If first attempt for this node execution, look for a checkpoint path in a prior execution
 	if currentAttempt == 0 {
 		return nCtx.NodeStateReader().GetTaskNodeState().PreviousNodeExecutionCheckpointURI, nil
@@ -245,7 +245,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 	id := GetTaskExecutionIdentifier(nCtx)
 
 	currentNodeUniqueID := nCtx.NodeID()
-	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+	if nCtx.ExecutionContext().GetEventVersion() != v1Api.EventVersion0 {
 		var err error
 		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
 		if err != nil {

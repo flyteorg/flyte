@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/v2/executor/api/v1"
 )
 
 type ErrorMessage = string
@@ -12,7 +12,7 @@ type ErrorMessage = string
 type NodeError struct {
 	ErrCode ErrorCode
 	Message ErrorMessage
-	Node    v1alpha1.NodeID
+	Node    v1.NodeID
 }
 
 func (n *NodeError) Code() ErrorCode {
@@ -86,7 +86,7 @@ func (n *NodeErrorWithCause) Unwrap() error {
 	return n.cause
 }
 
-func errorf(c ErrorCode, n v1alpha1.NodeID, msgFmt string, args ...interface{}) error {
+func errorf(c ErrorCode, n v1.NodeID, msgFmt string, args ...interface{}) error {
 	return &NodeError{
 		ErrCode: c,
 		Node:    n,
@@ -94,11 +94,11 @@ func errorf(c ErrorCode, n v1alpha1.NodeID, msgFmt string, args ...interface{}) 
 	}
 }
 
-func Errorf(c ErrorCode, n v1alpha1.NodeID, msgFmt string, args ...interface{}) error {
+func Errorf(c ErrorCode, n v1.NodeID, msgFmt string, args ...interface{}) error {
 	return errorf(c, n, msgFmt, args...)
 }
 
-func Wrapf(c ErrorCode, n v1alpha1.NodeID, cause error, msgFmt string, args ...interface{}) error {
+func Wrapf(c ErrorCode, n v1.NodeID, cause error, msgFmt string, args ...interface{}) error {
 	return &NodeErrorWithCause{
 		NodeError: errorf(c, n, msgFmt, args...),
 		cause:     cause,
