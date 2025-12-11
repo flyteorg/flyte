@@ -143,6 +143,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		newContainer.ReadinessProbe = &v1.Probe{
 			ProbeHandler: v1.ProbeHandler{
 				HTTPGet: &v1.HTTPGetAction{
+					Path: "/healthz", // This endpoint is designed specifically to bypass the standard heartbeat check.
 					Port: intstr.FromInt32(int32(port)),
 				},
 			},
