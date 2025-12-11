@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl2.plugins;
+package flyteidl2.connector;
 
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
@@ -12,7 +12,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector";
 
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
 message TaskExecutionMetadata {

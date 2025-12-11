@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/service/connector.proto",
+    "title": "flyteidl2/connector/service.proto",
     "version": "version not set"
   },
   "tags": [
@@ -27,7 +27,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsCreateTaskResponse"
+              "$ref": "#/definitions/connectorCreateTaskResponse"
             }
           },
           "default": {
@@ -44,7 +44,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/pluginsCreateTaskRequest"
+              "$ref": "#/definitions/connectorCreateTaskRequest"
             }
           }
         ],
@@ -64,13 +64,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/pluginsGetTaskLogsResponse"
+                  "$ref": "#/definitions/connectorGetTaskLogsResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/googlerpcStatus"
                 }
               },
-              "title": "Stream result of pluginsGetTaskLogsResponse"
+              "title": "Stream result of connectorGetTaskLogsResponse"
             }
           },
           "default": {
@@ -134,7 +134,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsGetTaskMetricsResponse"
+              "$ref": "#/definitions/connectorGetTaskMetricsResponse"
             }
           },
           "default": {
@@ -216,7 +216,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsGetTaskResponse"
+              "$ref": "#/definitions/connectorGetTaskResponse"
             }
           },
           "default": {
@@ -292,7 +292,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsDeleteTaskResponse"
+              "$ref": "#/definitions/connectorDeleteTaskResponse"
             }
           },
           "default": {
@@ -361,7 +361,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsGetConnectorResponse"
+              "$ref": "#/definitions/connectorGetConnectorResponse"
             }
           },
           "default": {
@@ -393,7 +393,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/pluginsListConnectorsResponse"
+              "$ref": "#/definitions/connectorListConnectorsResponse"
             }
           },
           "default": {
@@ -579,6 +579,157 @@
         "JSON"
       ],
       "default": "UNKNOWN"
+    },
+    "connectorConnector": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name is the developer-assigned name of the connector."
+        },
+        "supported_task_categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/connectorTaskCategory"
+          },
+          "description": "Supported_task_categories are the categories of the tasks that the connector can handle."
+        }
+      },
+      "description": "A message containing the connector metadata."
+    },
+    "connectorCreateTaskRequest": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/taskInputs",
+          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
+        },
+        "template": {
+          "$ref": "#/definitions/coreTaskTemplate",
+          "description": "Template of the task that encapsulates all the metadata of the task."
+        },
+        "output_prefix": {
+          "type": "string",
+          "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
+        },
+        "task_execution_metadata": {
+          "$ref": "#/definitions/flyteidl2connectorTaskExecutionMetadata",
+          "description": "subset of runtime task execution metadata."
+        },
+        "connection": {
+          "$ref": "#/definitions/coreConnection",
+          "title": "Connection (secret and config) required by the connector.\nConnector will use the secret and config in the taskTemplate if it's None.\n+optional"
+        }
+      },
+      "description": "Represents a request structure to create task."
+    },
+    "connectorCreateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "resource_meta": {
+          "type": "string",
+          "format": "byte",
+          "description": "ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata)."
+        }
+      },
+      "description": "Represents a create response structure."
+    },
+    "connectorDeleteTaskResponse": {
+      "type": "object",
+      "description": "Response to delete a task."
+    },
+    "connectorGetConnectorResponse": {
+      "type": "object",
+      "properties": {
+        "connector": {
+          "$ref": "#/definitions/connectorConnector"
+        }
+      },
+      "description": "A response containing an connector."
+    },
+    "connectorGetTaskLogsResponse": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/connectorGetTaskLogsResponseHeader"
+        },
+        "body": {
+          "$ref": "#/definitions/connectorGetTaskLogsResponseBody"
+        }
+      },
+      "description": "A response containing the logs for a task execution."
+    },
+    "connectorGetTaskLogsResponseBody": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The execution log results."
+        }
+      }
+    },
+    "connectorGetTaskLogsResponseHeader": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      }
+    },
+    "connectorGetTaskMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreExecutionMetricResult"
+          },
+          "description": "The execution metric results."
+        }
+      },
+      "description": "A response containing a list of metrics for a task execution."
+    },
+    "connectorGetTaskResponse": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/flyteidl2connectorResource"
+        }
+      },
+      "description": "Response to get an individual task resource."
+    },
+    "connectorListConnectorsResponse": {
+      "type": "object",
+      "properties": {
+        "connectors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/connectorConnector"
+          }
+        }
+      },
+      "description": "A response containing a list of connectors."
+    },
+    "connectorTaskCategory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the task type."
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The version of the task type."
+        }
+      }
     },
     "coreArtifactBindingData": {
       "type": "object",
@@ -1672,6 +1823,91 @@
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
     },
+    "flyteidl2connectorResource": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/taskOutputs",
+          "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
+        },
+        "message": {
+          "type": "string",
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
+        },
+        "custom_info": {
+          "type": "object",
+          "description": "Custom data specific to the connector."
+        }
+      }
+    },
+    "flyteidl2connectorTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "k8s namespace where the task is executed in"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels attached to the task execution"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Annotations attached to the task execution"
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "title": "k8s service account associated with the task execution"
+        },
+        "environment_variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Environment variables attached to the task execution"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
+        },
+        "interruptible_failure_threshold": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
+        },
+        "identity": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "title": "Identity of user running this task execution"
+        }
+      },
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
+    },
     "flyteidl2coreEnumType": {
       "type": "object",
       "properties": {
@@ -1900,91 +2136,6 @@
       },
       "title": "Task Metadata"
     },
-    "flyteidl2pluginsResource": {
-      "type": "object",
-      "properties": {
-        "outputs": {
-          "$ref": "#/definitions/taskOutputs",
-          "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
-        },
-        "message": {
-          "type": "string",
-          "description": "A descriptive message for the current state. e.g. waiting for cluster."
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "log information for the task execution."
-        },
-        "phase": {
-          "$ref": "#/definitions/coreTaskExecutionPhase",
-          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
-        },
-        "custom_info": {
-          "type": "object",
-          "description": "Custom data specific to the connector."
-        }
-      }
-    },
-    "flyteidl2pluginsTaskExecutionMetadata": {
-      "type": "object",
-      "properties": {
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier"
-        },
-        "namespace": {
-          "type": "string",
-          "title": "k8s namespace where the task is executed in"
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Labels attached to the task execution"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Annotations attached to the task execution"
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "title": "k8s service account associated with the task execution"
-        },
-        "environment_variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Environment variables attached to the task execution"
-        },
-        "max_attempts": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
-        },
-        "interruptible_failure_threshold": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
-        },
-        "identity": {
-          "$ref": "#/definitions/flyteidl2coreIdentity",
-          "title": "Identity of user running this task execution"
-        }
-      },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -2007,157 +2158,6 @@
         }
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
-    },
-    "pluginsConnector": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name is the developer-assigned name of the connector."
-        },
-        "supported_task_categories": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/pluginsTaskCategory"
-          },
-          "description": "Supported_task_categories are the categories of the tasks that the connector can handle."
-        }
-      },
-      "description": "A message containing the connector metadata."
-    },
-    "pluginsCreateTaskRequest": {
-      "type": "object",
-      "properties": {
-        "inputs": {
-          "$ref": "#/definitions/taskInputs",
-          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
-        },
-        "template": {
-          "$ref": "#/definitions/coreTaskTemplate",
-          "description": "Template of the task that encapsulates all the metadata of the task."
-        },
-        "output_prefix": {
-          "type": "string",
-          "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
-        },
-        "task_execution_metadata": {
-          "$ref": "#/definitions/flyteidl2pluginsTaskExecutionMetadata",
-          "description": "subset of runtime task execution metadata."
-        },
-        "connection": {
-          "$ref": "#/definitions/coreConnection",
-          "title": "Connection (secret and config) required by the connector.\nConnector will use the secret and config in the taskTemplate if it's None.\n+optional"
-        }
-      },
-      "description": "Represents a request structure to create task."
-    },
-    "pluginsCreateTaskResponse": {
-      "type": "object",
-      "properties": {
-        "resource_meta": {
-          "type": "string",
-          "format": "byte",
-          "description": "ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata)."
-        }
-      },
-      "description": "Represents a create response structure."
-    },
-    "pluginsDeleteTaskResponse": {
-      "type": "object",
-      "description": "Response to delete a task."
-    },
-    "pluginsGetConnectorResponse": {
-      "type": "object",
-      "properties": {
-        "connector": {
-          "$ref": "#/definitions/pluginsConnector"
-        }
-      },
-      "description": "A response containing an connector."
-    },
-    "pluginsGetTaskLogsResponse": {
-      "type": "object",
-      "properties": {
-        "header": {
-          "$ref": "#/definitions/pluginsGetTaskLogsResponseHeader"
-        },
-        "body": {
-          "$ref": "#/definitions/pluginsGetTaskLogsResponseBody"
-        }
-      },
-      "description": "A response containing the logs for a task execution."
-    },
-    "pluginsGetTaskLogsResponseBody": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The execution log results."
-        }
-      }
-    },
-    "pluginsGetTaskLogsResponseHeader": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string",
-          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
-        }
-      }
-    },
-    "pluginsGetTaskMetricsResponse": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreExecutionMetricResult"
-          },
-          "description": "The execution metric results."
-        }
-      },
-      "description": "A response containing a list of metrics for a task execution."
-    },
-    "pluginsGetTaskResponse": {
-      "type": "object",
-      "properties": {
-        "resource": {
-          "$ref": "#/definitions/flyteidl2pluginsResource"
-        }
-      },
-      "description": "Response to get an individual task resource."
-    },
-    "pluginsListConnectorsResponse": {
-      "type": "object",
-      "properties": {
-        "connectors": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/pluginsConnector"
-          }
-        }
-      },
-      "description": "A response containing a list of connectors."
-    },
-    "pluginsTaskCategory": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the task type."
-        },
-        "version": {
-          "type": "integer",
-          "format": "int32",
-          "description": "The version of the task type."
-        }
-      }
     },
     "protobufAny": {
       "type": "object",

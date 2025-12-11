@@ -90,9 +90,9 @@ pub mod async_connector_service_client {
 */
         pub async fn create_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::plugins::CreateTaskRequest>,
+            request: impl tonic::IntoRequest<super::CreateTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::CreateTaskResponse>,
+            tonic::Response<super::CreateTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -106,13 +106,13 @@ pub mod async_connector_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.AsyncConnectorService/CreateTask",
+                "/flyteidl2.connector.AsyncConnectorService/CreateTask",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.AsyncConnectorService",
+                        "flyteidl2.connector.AsyncConnectorService",
                         "CreateTask",
                     ),
                 );
@@ -122,9 +122,9 @@ pub mod async_connector_service_client {
 */
         pub async fn get_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::plugins::GetTaskRequest>,
+            request: impl tonic::IntoRequest<super::GetTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetTaskResponse>,
+            tonic::Response<super::GetTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -138,12 +138,15 @@ pub mod async_connector_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.AsyncConnectorService/GetTask",
+                "/flyteidl2.connector.AsyncConnectorService/GetTask",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.service.AsyncConnectorService", "GetTask"),
+                    GrpcMethod::new(
+                        "flyteidl2.connector.AsyncConnectorService",
+                        "GetTask",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -151,9 +154,9 @@ pub mod async_connector_service_client {
 */
         pub async fn delete_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::plugins::DeleteTaskRequest>,
+            request: impl tonic::IntoRequest<super::DeleteTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::DeleteTaskResponse>,
+            tonic::Response<super::DeleteTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -167,13 +170,13 @@ pub mod async_connector_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.AsyncConnectorService/DeleteTask",
+                "/flyteidl2.connector.AsyncConnectorService/DeleteTask",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.AsyncConnectorService",
+                        "flyteidl2.connector.AsyncConnectorService",
                         "DeleteTask",
                     ),
                 );
@@ -187,11 +190,9 @@ pub mod async_connector_service_client {
 */
         pub async fn get_task_metrics(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::plugins::GetTaskMetricsRequest,
-            >,
+            request: impl tonic::IntoRequest<super::GetTaskMetricsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetTaskMetricsResponse>,
+            tonic::Response<super::GetTaskMetricsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -205,13 +206,13 @@ pub mod async_connector_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.AsyncConnectorService/GetTaskMetrics",
+                "/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.AsyncConnectorService",
+                        "flyteidl2.connector.AsyncConnectorService",
                         "GetTaskMetrics",
                     ),
                 );
@@ -221,11 +222,9 @@ pub mod async_connector_service_client {
 */
         pub async fn get_task_logs(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::plugins::GetTaskLogsRequest>,
+            request: impl tonic::IntoRequest<super::GetTaskLogsRequest>,
         ) -> std::result::Result<
-            tonic::Response<
-                tonic::codec::Streaming<super::super::plugins::GetTaskLogsResponse>,
-            >,
+            tonic::Response<tonic::codec::Streaming<super::GetTaskLogsResponse>>,
             tonic::Status,
         > {
             self.inner
@@ -239,13 +238,13 @@ pub mod async_connector_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.AsyncConnectorService/GetTaskLogs",
+                "/flyteidl2.connector.AsyncConnectorService/GetTaskLogs",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.AsyncConnectorService",
+                        "flyteidl2.connector.AsyncConnectorService",
                         "GetTaskLogs",
                     ),
                 );
@@ -264,27 +263,24 @@ pub mod async_connector_service_server {
 */
         async fn create_task(
             &self,
-            request: tonic::Request<super::super::plugins::CreateTaskRequest>,
+            request: tonic::Request<super::CreateTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::CreateTaskResponse>,
+            tonic::Response<super::CreateTaskResponse>,
             tonic::Status,
         >;
         /** Get job status.
 */
         async fn get_task(
             &self,
-            request: tonic::Request<super::super::plugins::GetTaskRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetTaskResponse>,
-            tonic::Status,
-        >;
+            request: tonic::Request<super::GetTaskRequest>,
+        ) -> std::result::Result<tonic::Response<super::GetTaskResponse>, tonic::Status>;
         /** Delete the task resource.
 */
         async fn delete_task(
             &self,
-            request: tonic::Request<super::super::plugins::DeleteTaskRequest>,
+            request: tonic::Request<super::DeleteTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::DeleteTaskResponse>,
+            tonic::Response<super::DeleteTaskResponse>,
             tonic::Status,
         >;
         /** GetTaskMetrics returns one or more task execution metrics, if available.
@@ -295,17 +291,14 @@ pub mod async_connector_service_server {
 */
         async fn get_task_metrics(
             &self,
-            request: tonic::Request<super::super::plugins::GetTaskMetricsRequest>,
+            request: tonic::Request<super::GetTaskMetricsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetTaskMetricsResponse>,
+            tonic::Response<super::GetTaskMetricsResponse>,
             tonic::Status,
         >;
         /// Server streaming response type for the GetTaskLogs method.
         type GetTaskLogsStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<
-                    super::super::plugins::GetTaskLogsResponse,
-                    tonic::Status,
-                >,
+                Item = std::result::Result<super::GetTaskLogsResponse, tonic::Status>,
             >
             + Send
             + 'static;
@@ -313,7 +306,7 @@ pub mod async_connector_service_server {
 */
         async fn get_task_logs(
             &self,
-            request: tonic::Request<super::super::plugins::GetTaskLogsRequest>,
+            request: tonic::Request<super::GetTaskLogsRequest>,
         ) -> std::result::Result<
             tonic::Response<Self::GetTaskLogsStream>,
             tonic::Status,
@@ -398,24 +391,21 @@ pub mod async_connector_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.service.AsyncConnectorService/CreateTask" => {
+                "/flyteidl2.connector.AsyncConnectorService/CreateTask" => {
                     #[allow(non_camel_case_types)]
                     struct CreateTaskSvc<T: AsyncConnectorService>(pub Arc<T>);
                     impl<
                         T: AsyncConnectorService,
-                    > tonic::server::UnaryService<
-                        super::super::plugins::CreateTaskRequest,
-                    > for CreateTaskSvc<T> {
-                        type Response = super::super::plugins::CreateTaskResponse;
+                    > tonic::server::UnaryService<super::CreateTaskRequest>
+                    for CreateTaskSvc<T> {
+                        type Response = super::CreateTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::CreateTaskRequest,
-                            >,
+                            request: tonic::Request<super::CreateTaskRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -447,23 +437,21 @@ pub mod async_connector_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.service.AsyncConnectorService/GetTask" => {
+                "/flyteidl2.connector.AsyncConnectorService/GetTask" => {
                     #[allow(non_camel_case_types)]
                     struct GetTaskSvc<T: AsyncConnectorService>(pub Arc<T>);
                     impl<
                         T: AsyncConnectorService,
-                    > tonic::server::UnaryService<super::super::plugins::GetTaskRequest>
+                    > tonic::server::UnaryService<super::GetTaskRequest>
                     for GetTaskSvc<T> {
-                        type Response = super::super::plugins::GetTaskResponse;
+                        type Response = super::GetTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::GetTaskRequest,
-                            >,
+                            request: tonic::Request<super::GetTaskRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -495,24 +483,21 @@ pub mod async_connector_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.service.AsyncConnectorService/DeleteTask" => {
+                "/flyteidl2.connector.AsyncConnectorService/DeleteTask" => {
                     #[allow(non_camel_case_types)]
                     struct DeleteTaskSvc<T: AsyncConnectorService>(pub Arc<T>);
                     impl<
                         T: AsyncConnectorService,
-                    > tonic::server::UnaryService<
-                        super::super::plugins::DeleteTaskRequest,
-                    > for DeleteTaskSvc<T> {
-                        type Response = super::super::plugins::DeleteTaskResponse;
+                    > tonic::server::UnaryService<super::DeleteTaskRequest>
+                    for DeleteTaskSvc<T> {
+                        type Response = super::DeleteTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::DeleteTaskRequest,
-                            >,
+                            request: tonic::Request<super::DeleteTaskRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -544,24 +529,21 @@ pub mod async_connector_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.service.AsyncConnectorService/GetTaskMetrics" => {
+                "/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics" => {
                     #[allow(non_camel_case_types)]
                     struct GetTaskMetricsSvc<T: AsyncConnectorService>(pub Arc<T>);
                     impl<
                         T: AsyncConnectorService,
-                    > tonic::server::UnaryService<
-                        super::super::plugins::GetTaskMetricsRequest,
-                    > for GetTaskMetricsSvc<T> {
-                        type Response = super::super::plugins::GetTaskMetricsResponse;
+                    > tonic::server::UnaryService<super::GetTaskMetricsRequest>
+                    for GetTaskMetricsSvc<T> {
+                        type Response = super::GetTaskMetricsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::GetTaskMetricsRequest,
-                            >,
+                            request: tonic::Request<super::GetTaskMetricsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -596,15 +578,14 @@ pub mod async_connector_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.service.AsyncConnectorService/GetTaskLogs" => {
+                "/flyteidl2.connector.AsyncConnectorService/GetTaskLogs" => {
                     #[allow(non_camel_case_types)]
                     struct GetTaskLogsSvc<T: AsyncConnectorService>(pub Arc<T>);
                     impl<
                         T: AsyncConnectorService,
-                    > tonic::server::ServerStreamingService<
-                        super::super::plugins::GetTaskLogsRequest,
-                    > for GetTaskLogsSvc<T> {
-                        type Response = super::super::plugins::GetTaskLogsResponse;
+                    > tonic::server::ServerStreamingService<super::GetTaskLogsRequest>
+                    for GetTaskLogsSvc<T> {
+                        type Response = super::GetTaskLogsResponse;
                         type ResponseStream = T::GetTaskLogsStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
@@ -612,9 +593,7 @@ pub mod async_connector_service_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::GetTaskLogsRequest,
-                            >,
+                            request: tonic::Request<super::GetTaskLogsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -678,7 +657,7 @@ pub mod async_connector_service_server {
     }
     impl<T: AsyncConnectorService> tonic::server::NamedService
     for AsyncConnectorServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.service.AsyncConnectorService";
+        const NAME: &'static str = "flyteidl2.connector.AsyncConnectorService";
     }
 }
 /// Generated client implementations.
@@ -775,9 +754,9 @@ pub mod connector_metadata_service_client {
 */
         pub async fn get_connector(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::plugins::GetConnectorRequest>,
+            request: impl tonic::IntoRequest<super::GetConnectorRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetConnectorResponse>,
+            tonic::Response<super::GetConnectorResponse>,
             tonic::Status,
         > {
             self.inner
@@ -791,13 +770,13 @@ pub mod connector_metadata_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.ConnectorMetadataService/GetConnector",
+                "/flyteidl2.connector.ConnectorMetadataService/GetConnector",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.ConnectorMetadataService",
+                        "flyteidl2.connector.ConnectorMetadataService",
                         "GetConnector",
                     ),
                 );
@@ -807,11 +786,9 @@ pub mod connector_metadata_service_client {
 */
         pub async fn list_connectors(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::plugins::ListConnectorsRequest,
-            >,
+            request: impl tonic::IntoRequest<super::ListConnectorsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::ListConnectorsResponse>,
+            tonic::Response<super::ListConnectorsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -825,13 +802,13 @@ pub mod connector_metadata_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.service.ConnectorMetadataService/ListConnectors",
+                "/flyteidl2.connector.ConnectorMetadataService/ListConnectors",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.service.ConnectorMetadataService",
+                        "flyteidl2.connector.ConnectorMetadataService",
                         "ListConnectors",
                     ),
                 );
@@ -850,18 +827,18 @@ pub mod connector_metadata_service_server {
 */
         async fn get_connector(
             &self,
-            request: tonic::Request<super::super::plugins::GetConnectorRequest>,
+            request: tonic::Request<super::GetConnectorRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::GetConnectorResponse>,
+            tonic::Response<super::GetConnectorResponse>,
             tonic::Status,
         >;
         /** Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
 */
         async fn list_connectors(
             &self,
-            request: tonic::Request<super::super::plugins::ListConnectorsRequest>,
+            request: tonic::Request<super::ListConnectorsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::plugins::ListConnectorsResponse>,
+            tonic::Response<super::ListConnectorsResponse>,
             tonic::Status,
         >;
     }
@@ -945,24 +922,21 @@ pub mod connector_metadata_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.service.ConnectorMetadataService/GetConnector" => {
+                "/flyteidl2.connector.ConnectorMetadataService/GetConnector" => {
                     #[allow(non_camel_case_types)]
                     struct GetConnectorSvc<T: ConnectorMetadataService>(pub Arc<T>);
                     impl<
                         T: ConnectorMetadataService,
-                    > tonic::server::UnaryService<
-                        super::super::plugins::GetConnectorRequest,
-                    > for GetConnectorSvc<T> {
-                        type Response = super::super::plugins::GetConnectorResponse;
+                    > tonic::server::UnaryService<super::GetConnectorRequest>
+                    for GetConnectorSvc<T> {
+                        type Response = super::GetConnectorResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::GetConnectorRequest,
-                            >,
+                            request: tonic::Request<super::GetConnectorRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -997,24 +971,21 @@ pub mod connector_metadata_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.service.ConnectorMetadataService/ListConnectors" => {
+                "/flyteidl2.connector.ConnectorMetadataService/ListConnectors" => {
                     #[allow(non_camel_case_types)]
                     struct ListConnectorsSvc<T: ConnectorMetadataService>(pub Arc<T>);
                     impl<
                         T: ConnectorMetadataService,
-                    > tonic::server::UnaryService<
-                        super::super::plugins::ListConnectorsRequest,
-                    > for ListConnectorsSvc<T> {
-                        type Response = super::super::plugins::ListConnectorsResponse;
+                    > tonic::server::UnaryService<super::ListConnectorsRequest>
+                    for ListConnectorsSvc<T> {
+                        type Response = super::ListConnectorsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::plugins::ListConnectorsRequest,
-                            >,
+                            request: tonic::Request<super::ListConnectorsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -1081,6 +1052,6 @@ pub mod connector_metadata_service_server {
     }
     impl<T: ConnectorMetadataService> tonic::server::NamedService
     for ConnectorMetadataServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.service.ConnectorMetadataService";
+        const NAME: &'static str = "flyteidl2.connector.ConnectorMetadataService";
     }
 }

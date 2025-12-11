@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/plugins/connector.proto",
+    "title": "flyteidl2/connector/connector.proto",
     "version": "version not set"
   },
   "consumes": [
