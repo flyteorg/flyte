@@ -443,7 +443,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			switch nodePhase {
 			case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRecovered, v1alpha1.NodePhaseSkipped:
 				successCount++
-			case v1alpha1.NodePhaseFailing:
+			case v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseTimingOut:
 				failingCount++
 			case v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseTimedOut:
 				failedCount++
