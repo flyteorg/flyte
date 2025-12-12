@@ -59,16 +59,18 @@ class TriggerStatus(_message.Message):
     def __init__(self, deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., triggered_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deleted_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class TriggerRevision(_message.Message):
-    __slots__ = ["id", "metadata", "status", "action"]
+    __slots__ = ["id", "metadata", "status", "action", "created_at"]
     ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.TriggerIdentifier
     metadata: TriggerMetadata
     status: TriggerStatus
     action: TriggerRevisionAction
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TriggerMetadata, _Mapping]] = ..., status: _Optional[_Union[TriggerStatus, _Mapping]] = ..., action: _Optional[_Union[TriggerRevisionAction, str]] = ...) -> None: ...
+    created_at: _timestamp_pb2.Timestamp
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[TriggerMetadata, _Mapping]] = ..., status: _Optional[_Union[TriggerStatus, _Mapping]] = ..., action: _Optional[_Union[TriggerRevisionAction, str]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class TriggerDetails(_message.Message):
     __slots__ = ["id", "metadata", "spec", "status", "automation_spec", "description"]

@@ -1573,6 +1573,11 @@
         },
         "action": {
           "$ref": "#/definitions/triggerTriggerRevisionAction"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp at which given revision was created."
         }
       },
       "title": "Light-weight information about a single trigger revision"
