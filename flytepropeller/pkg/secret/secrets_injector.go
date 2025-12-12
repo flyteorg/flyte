@@ -48,7 +48,15 @@ func newSecretsInjector(
 			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
 			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
 		}
-
+		if webhookConfig.KubeClientConfig.QPS > 0 {
+			kubeConfig.QPS = float32(webhookConfig.KubeClientConfig.QPS)
+		}
+		if webhookConfig.KubeClientConfig.Burst > 0 {
+			kubeConfig.Burst = webhookConfig.KubeClientConfig.Burst
+		}
+		if webhookConfig.KubeClientConfig.Timeout.Duration > 0 {
+			kubeConfig.Timeout = webhookConfig.KubeClientConfig.Timeout.Duration
+		}
 		// Initialize controller-runtime client
 		ctrlRuntimeScheme := k8sRuntime.NewScheme()
 		if err := corev1.AddToScheme(ctrlRuntimeScheme); err != nil {

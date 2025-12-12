@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+	"sync"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -95,9 +97,15 @@ var (
 		},
 		WebhookTimeout:                     30, // default timeout for webhook calls in seconds
 		DisableCreateMutatingWebhookConfig: false,
+		KubeClientConfig: KubeClientConfig{
+			QPS:     100,
+			Burst:   25,
+			Timeout: config.Duration{Duration: 30 * time.Second},
+		},
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
+	initOnce      sync.Once
 )
 
 // SecretManagerType defines which secret manager to use.
@@ -162,6 +170,7 @@ type Config struct {
 	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
 	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
 	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
+	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType
@@ -197,7 +206,8 @@ type AzureConfig struct {
 }
 
 type K8sConfig struct {
-	Namespace string `json:"namespace" pflag:",K8s namespace to be used for storing union secrets"`
+	Namespace        string           `json:"namespace" pflag:",K8s namespace to be used for storing union secrets"`
+	KubeClientConfig KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the secret fetcher for K8s embedded secret manager. Falls back to webhook.kubeClientConfig if not set."`
 }
 
 type FileMountInitContainerConfig struct {
@@ -249,8 +259,38 @@ type ImagePullSecretsConfig struct {
 	Enabled bool `json:"enabled" pflag:",Whether to enable image pull secrets for the webhook pod."`
 }
 
+// KubeClientConfig contains the configuration used by the webhook to configure its internal Kubernetes Client.
+type KubeClientConfig struct {
+	// QPS indicates the maximum QPS to the master from this client.
+	QPS int32 `json:"qps" pflag:",Max QPS to the master for requests to KubeAPI. 0 defaults to 5."`
+	// Maximum burst for throttle.
+	Burst int `json:"burst" pflag:",Max burst rate for throttle. 0 defaults to 10"`
+	// The maximum length of time to wait before giving up on a server request.
+	Timeout config.Duration `json:"timeout" pflag:",Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout."`
+}
+
+// ResolveKubeClientConfigs initializes KubeClientConfig with fallback values
+// For K8s secretfetcher: if k8sConfig.kubeClientConfig is not set, use webhook-level kubeClientConfig as fallback
+func (c *Config) ResolveKubeClientConfigs() {
+	// Resolve K8s secret fetcher config with fallback to webhook-level config
+	if c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.QPS == 0 {
+		c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.QPS = c.KubeClientConfig.QPS
+	}
+	if c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Burst == 0 {
+		c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Burst = c.KubeClientConfig.Burst
+	}
+	if c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Timeout.Duration == 0 {
+		c.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Timeout = c.KubeClientConfig.Timeout
+	}
+}
+
 func GetConfig() *Config {
-	return configSection.GetConfig().(*Config)
+	cfg := configSection.GetConfig().(*Config)
+	// Ensure initialization happens exactly once, thread-safe
+	initOnce.Do(func() {
+		cfg.ResolveKubeClientConfigs()
+	})
+	return cfg
 }
 
 func MustRegisterSubsection(key config.SectionKey, section config.Config) config.Section {

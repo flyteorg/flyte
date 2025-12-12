@@ -54,6 +54,20 @@ func NewSecretFetcher(ctx context.Context, cfg config.EmbeddedSecretManagerConfi
 			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
 			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
 		}
+		// Config is already resolved
+		if cfg.K8sConfig.KubeClientConfig.QPS > 0 {
+			kubeConfig.QPS = float32(cfg.K8sConfig.KubeClientConfig.QPS)
+			logger.Infof(ctx, "K8s secret fetcher using QPS: %v", kubeConfig.QPS)
+		}
+		if cfg.K8sConfig.KubeClientConfig.Burst > 0 {
+			kubeConfig.Burst = cfg.K8sConfig.KubeClientConfig.Burst
+			logger.Infof(ctx, "K8s secret fetcher using Burst: %v", kubeConfig.Burst)
+		}
+		if cfg.K8sConfig.KubeClientConfig.Timeout.Duration > 0 {
+			kubeConfig.Timeout = cfg.K8sConfig.KubeClientConfig.Timeout.Duration
+			logger.Infof(ctx, "K8s secret fetcher using Timeout: %v", kubeConfig.Timeout)
+		}
+
 		kubeClientset, err := kubernetes.NewForConfig(kubeConfig)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to create kubernetes clientset: %v", err)

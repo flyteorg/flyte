@@ -309,6 +309,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.qps", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.qps", testValue)
+			if vInt32, err := cmdFlags.GetInt32("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.qps"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.QPS)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.burst", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.timeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Timeout.String()
+
+			cmdFlags.Set("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.timeout", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_embeddedSecretManagerConfig.fileMountInitContainer.image", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -387,6 +429,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("disableCreateMutatingWebhookConfig", testValue)
 			if vBool, err := cmdFlags.GetBool("disableCreateMutatingWebhookConfig"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.DisableCreateMutatingWebhookConfig)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubeClientConfig.qps", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubeClientConfig.qps", testValue)
+			if vInt32, err := cmdFlags.GetInt32("kubeClientConfig.qps"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.KubeClientConfig.QPS)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubeClientConfig.burst", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubeClientConfig.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("kubeClientConfig.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.KubeClientConfig.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubeClientConfig.timeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.KubeClientConfig.Timeout.String()
+
+			cmdFlags.Set("kubeClientConfig.timeout", testValue)
+			if vString, err := cmdFlags.GetString("kubeClientConfig.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.KubeClientConfig.Timeout)
 
 			} else {
 				assert.FailNow(t, err.Error())

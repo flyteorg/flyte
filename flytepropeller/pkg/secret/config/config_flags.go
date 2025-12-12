@@ -65,11 +65,17 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.gcpConfig.project"), DefaultConfig.EmbeddedSecretManagerConfig.GCPConfig.Project, "GCP project to be used for secret manager")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.azureConfig.vaultURI"), DefaultConfig.EmbeddedSecretManagerConfig.AzureConfig.VaultURI, "Azure Vault URI")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.k8sConfig.namespace"), DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.Namespace, "K8s namespace to be used for storing union secrets")
+	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.qps"), DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.QPS, "Max QPS to the master for requests to KubeAPI. 0 defaults to 5.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.burst"), DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.k8sConfig.kubeClientConfig.timeout"), DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.KubeClientConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.image"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.Image, "Specifies init container image to use for mounting secrets as files.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.containerName"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.ContainerName, "Specifies the name of the init container that mounts secrets as files.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.imagePullSecrets.enabled"), DefaultConfig.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled, "Whether to enable image pull secrets for the webhook pod.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "azureSecretManager.sidecarImage"), DefaultConfig.AzureSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "webhookTimeout"), DefaultConfig.WebhookTimeout, "Timeout for webhook calls in seconds. Defaults to 30 seconds.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "disableCreateMutatingWebhookConfig"), DefaultConfig.DisableCreateMutatingWebhookConfig, "")
+	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.qps"), DefaultConfig.KubeClientConfig.QPS, "Max QPS to the master for requests to KubeAPI. 0 defaults to 5.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.burst"), DefaultConfig.KubeClientConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.timeout"), DefaultConfig.KubeClientConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")
 	return cmdFlags
 }
