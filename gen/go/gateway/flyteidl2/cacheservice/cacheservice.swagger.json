@@ -75,7 +75,7 @@
           "title": "URI to output data"
         },
         "metadata": {
-          "$ref": "#/definitions/flyteidl2cacheserviceMetadata",
+          "$ref": "#/definitions/cacheserviceMetadata",
           "title": "Associated metadata"
         }
       },
@@ -95,6 +95,16 @@
       },
       "description": "Response with cached data for a given key."
     },
+    "cacheserviceGetOrExtendReservationResponse": {
+      "type": "object",
+      "properties": {
+        "reservation": {
+          "$ref": "#/definitions/cacheserviceReservation",
+          "title": "The reservation that was created or extended"
+        }
+      },
+      "title": "Request to get or extend a reservation for a cache key"
+    },
     "cacheserviceKeyMapMetadata": {
       "type": "object",
       "properties": {
@@ -107,6 +117,30 @@
         }
       },
       "title": "Additional metadata as key-value pairs"
+    },
+    "cacheserviceMetadata": {
+      "type": "object",
+      "properties": {
+        "source_identifier": {
+          "$ref": "#/definitions/flyteidl2coreIdentifier",
+          "title": "Source task or workflow identifier"
+        },
+        "key_map": {
+          "$ref": "#/definitions/cacheserviceKeyMapMetadata",
+          "title": "Additional metadata as key-value pairs"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Creation timestamp"
+        },
+        "last_updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last update timestamp"
+        }
+      },
+      "description": "Metadata for cached outputs, including the source identifier and timestamps."
     },
     "cacheserviceOverwriteOutput": {
       "type": "object",
@@ -128,6 +162,33 @@
     "cacheservicePutCacheResponse": {
       "type": "object",
       "description": "Response message of cache store/update operation.\n\nEmpty, success indicated by no errors"
+    },
+    "cacheserviceReleaseReservationResponse": {
+      "type": "object",
+      "description": "Response message of release reservation operation.\n\nEmpty, success indicated by no errors"
+    },
+    "cacheserviceReservation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "The unique ID for the reservation - same as the cache key"
+        },
+        "owner_id": {
+          "type": "string",
+          "title": "The unique ID of the owner for the reservation"
+        },
+        "heartbeat_interval": {
+          "type": "string",
+          "title": "Requested reservation extension heartbeat interval"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration timestamp of this reservation"
+        }
+      },
+      "description": "A reservation including owner, heartbeat interval, expiration timestamp, and various metadata."
     },
     "coreBinary": {
       "type": "object",
@@ -535,67 +596,6 @@
     "coreVoid": {
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
-    },
-    "flyteidl2cacheserviceGetOrExtendReservationResponse": {
-      "type": "object",
-      "properties": {
-        "reservation": {
-          "$ref": "#/definitions/flyteidl2cacheserviceReservation",
-          "title": "The reservation that was created or extended"
-        }
-      },
-      "title": "Request to get or extend a reservation for a cache key"
-    },
-    "flyteidl2cacheserviceMetadata": {
-      "type": "object",
-      "properties": {
-        "source_identifier": {
-          "$ref": "#/definitions/flyteidl2coreIdentifier",
-          "title": "Source task or workflow identifier"
-        },
-        "key_map": {
-          "$ref": "#/definitions/cacheserviceKeyMapMetadata",
-          "title": "Additional metadata as key-value pairs"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Creation timestamp"
-        },
-        "last_updated_at": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Last update timestamp"
-        }
-      },
-      "description": "Metadata for cached outputs, including the source identifier and timestamps."
-    },
-    "flyteidl2cacheserviceReleaseReservationResponse": {
-      "type": "object",
-      "description": "Response message of release reservation operation.\n\nEmpty, success indicated by no errors"
-    },
-    "flyteidl2cacheserviceReservation": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "title": "The unique ID for the reservation - same as the cache key"
-        },
-        "owner_id": {
-          "type": "string",
-          "title": "The unique ID of the owner for the reservation"
-        },
-        "heartbeat_interval": {
-          "type": "string",
-          "title": "Requested reservation extension heartbeat interval"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Expiration timestamp of this reservation"
-        }
-      },
-      "description": "A reservation including owner, heartbeat interval, expiration timestamp, and various metadata."
     },
     "flyteidl2coreEnumType": {
       "type": "object",

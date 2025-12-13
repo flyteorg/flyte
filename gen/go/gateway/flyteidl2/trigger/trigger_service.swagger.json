@@ -541,6 +541,20 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -1045,20 +1059,6 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
-    "flyteidl2coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
-    },
     "flyteidl2coreSecret": {
       "type": "object",
       "properties": {
@@ -1236,7 +1236,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
+            "$ref": "#/definitions/coreKeyValuePair"
           },
           "description": "Map of custom environment variables to be applied to the execution resource."
         }
@@ -1287,7 +1287,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flyteidl2coreKeyValuePair"
+            "$ref": "#/definitions/coreKeyValuePair"
           },
           "title": "Context for the action. If an action receives context, it'll automatically pass it to any actions it spawns.\nContext will not be used for cache key computation.\nExamples for context include:\n - User-provided metadata that is not part of the action's inputs.\n - Information about the environment the action is running in (e.g. cluster, region, etc.)\n - Tracing information about the action"
         }
