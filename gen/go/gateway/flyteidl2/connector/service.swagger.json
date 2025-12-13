@@ -1,12 +1,15 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/workflow/run_service.proto",
+    "title": "flyteidl2/connector/service.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "RunService"
+      "name": "AsyncConnectorService"
+    },
+    {
+      "name": "ConnectorMetadataService"
     }
   ],
   "consumes": [
@@ -15,7 +18,397 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/connector/task": {
+      "post": {
+        "summary": "CreateTask sends a task create request to the connector service.",
+        "operationId": "AsyncConnectorService_CreateTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorCreateTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Represents a request structure to create task.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/connectorCreateTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AsyncConnectorService"
+        ]
+      }
+    },
+    "/api/v1/connector/task/logs/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "GetTaskLogs returns task execution logs, if available.",
+        "operationId": "AsyncConnectorService_GetTaskLogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/connectorGetTaskLogsResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of connectorGetTaskLogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "lines",
+            "description": "Number of lines to return.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncConnectorService"
+        ]
+      }
+    },
+    "/api/v1/connector/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "GetTaskMetrics returns one or more task execution metrics, if available.",
+        "description": "Errors include\n * OutOfRange if metrics are not available for the specified task time range\n * various other errors",
+        "operationId": "AsyncConnectorService_GetTaskMetrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorGetTaskMetricsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "queries",
+            "description": "The metrics to query. If empty, will return a default set of metrics.\ne.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start_time",
+            "description": "Start timestamp, inclusive.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "end_time",
+            "description": "End timestamp, inclusive..",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "step",
+            "description": "Query resolution step width in duration format or float number of seconds.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncConnectorService"
+        ]
+      }
+    },
+    "/api/v1/connector/task/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "AsyncConnectorService_GetTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorGetTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata about the resource to be pass to the connector.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "output_prefix",
+            "description": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "connection.task_type",
+            "description": "The task type that the connection is used for.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "connection.secrets[string]",
+            "description": "The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.\nThe key is the name of the secret, and it's defined in the flytekit.\nflytekit uses the key to locate the desired secret within the map.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "connection.configs[string]",
+            "description": "The configuration to use for the connection, such as the endpoint, account name, etc.\nThe key is the name of the config, and it's defined in the flytekit.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncConnectorService"
+        ]
+      }
+    },
+    "/api/v1/connector/task_executions/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "delete": {
+        "summary": "Delete the task resource.",
+        "operationId": "AsyncConnectorService_DeleteTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorDeleteTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata about the resource to be pass to the connector.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "connection.task_type",
+            "description": "The task type that the connection is used for.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "connection.secrets[string][string]",
+            "description": "The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.\nThe key is the name of the secret, and it's defined in the flytekit.\nflytekit uses the key to locate the desired secret within the map.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "connection.configs[string][string]",
+            "description": "The configuration to use for the connection, such as the endpoint, account name, etc.\nThe key is the name of the config, and it's defined in the flytekit.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncConnectorService"
+        ]
+      }
+    },
+    "/api/v1/connector/{name}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.",
+        "operationId": "ConnectorMetadataService_GetConnector",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorGetConnectorResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the connector.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConnectorMetadataService"
+        ]
+      }
+    },
+    "/api/v1/connectors": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.",
+        "operationId": "ConnectorMetadataService_ListConnectors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/connectorListConnectorsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ConnectorMetadataService"
+        ]
+      }
+    }
+  },
   "definitions": {
     "BlobTypeBlobDimensionality": {
       "type": "string",
@@ -37,20 +430,6 @@
       "default": "UNKNOWN",
       "description": "Architecture-type the container image supports."
     },
-    "ContainerContextProcessContext": {
-      "type": "object",
-      "properties": {
-        "container_start_time": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "container_end_time": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "title": "Contains metadata required to identify logs produces by a single light-weight process that was run inside a container"
-    },
     "DataLoadingConfigLiteralMapFormat": {
       "type": "string",
       "enum": [
@@ -61,24 +440,6 @@
       "default": "JSON",
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
-    },
-    "FilterFunction": {
-      "type": "string",
-      "enum": [
-        "EQUAL",
-        "NOT_EQUAL",
-        "GREATER_THAN",
-        "GREATER_THAN_OR_EQUAL",
-        "LESS_THAN",
-        "LESS_THAN_OR_EQUAL",
-        "CONTAINS",
-        "VALUE_IN",
-        "ENDS_WITH",
-        "NOT_ENDS_WITH",
-        "CONTAINS_CASE_INSENSITIVE"
-      ],
-      "default": "EQUAL",
-      "description": " - CONTAINS: Case sensitive contains function.\n - CONTAINS_CASE_INSENSITIVE: Case insensitive contains function."
     },
     "GPUAcceleratorDeviceClass": {
       "type": "string",
@@ -176,15 +537,6 @@
       "default": "ANY",
       "description": " - ANY: Default case, indicates the client can tolerate either mounting options.\n - ENV_VAR: ENV_VAR indicates the secret needs to be mounted as an environment variable.\n - FILE: FILE indicates the secret needs to be mounted as a file."
     },
-    "SortDirection": {
-      "type": "string",
-      "enum": [
-        "DESCENDING",
-        "ASCENDING"
-      ],
-      "default": "DESCENDING",
-      "description": " - DESCENDING: By default, fields are sorted in descending order."
-    },
     "SqlDialect": {
       "type": "string",
       "enum": [
@@ -228,442 +580,154 @@
       ],
       "default": "UNKNOWN"
     },
-    "WatchGroupsRequestKnownSortField": {
+    "connectorConnector": {
       "type": "object",
       "properties": {
-        "created_at": {
-          "$ref": "#/definitions/SortDirection"
-        }
-      }
-    },
-    "commonActionIdentifier": {
-      "type": "object",
-      "properties": {
-        "run": {
-          "$ref": "#/definitions/commonRunIdentifier",
-          "description": "Identifier for the run."
-        },
         "name": {
           "type": "string",
-          "description": "Name of the action. Must be unique within the run."
+          "description": "Name is the developer-assigned name of the connector."
+        },
+        "supported_task_categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/connectorTaskCategory"
+          },
+          "description": "Supported_task_categories are the categories of the tasks that the connector can handle."
         }
       },
-      "description": "Unique identifier of an action."
+      "description": "A message containing the connector metadata."
     },
-    "commonActionPhase": {
-      "type": "string",
-      "enum": [
-        "ACTION_PHASE_UNSPECIFIED",
-        "ACTION_PHASE_QUEUED",
-        "ACTION_PHASE_WAITING_FOR_RESOURCES",
-        "ACTION_PHASE_INITIALIZING",
-        "ACTION_PHASE_RUNNING",
-        "ACTION_PHASE_SUCCEEDED",
-        "ACTION_PHASE_FAILED",
-        "ACTION_PHASE_ABORTED",
-        "ACTION_PHASE_TIMED_OUT"
-      ],
-      "default": "ACTION_PHASE_UNSPECIFIED",
-      "description": "ActionPhase represents the execution state of an action.\n\nPhase transitions follow this typical flow:\nQUEUED -\u003e WAITING_FOR_RESOURCES -\u003e INITIALIZING -\u003e RUNNING -\u003e {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}\n\n - ACTION_PHASE_UNSPECIFIED: Default/unknown phase\n - ACTION_PHASE_QUEUED: Action has been accepted and is waiting to be scheduled\n - ACTION_PHASE_WAITING_FOR_RESOURCES: Action is scheduled but waiting for compute resources to become available\n - ACTION_PHASE_INITIALIZING: Resources have been allocated and the action is being set up\n - ACTION_PHASE_RUNNING: Action is actively executing\n - ACTION_PHASE_SUCCEEDED: Action completed successfully\n - ACTION_PHASE_FAILED: Action failed during execution\n - ACTION_PHASE_ABORTED: Action was manually terminated or cancelled\n - ACTION_PHASE_TIMED_OUT: Action exceeded its execution time limit"
-    },
-    "commonAppSpec": {
+    "connectorCreateTaskRequest": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
+        "inputs": {
+          "$ref": "#/definitions/taskInputs",
+          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         },
-        "organization": {
-          "type": "string"
-        }
-      }
-    },
-    "commonApplication": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonApplicationIdentifier"
+        "template": {
+          "$ref": "#/definitions/coreTaskTemplate",
+          "description": "Template of the task that encapsulates all the metadata of the task."
         },
-        "spec": {
-          "$ref": "#/definitions/commonAppSpec"
-        }
-      }
-    },
-    "commonApplicationIdentifier": {
-      "type": "object",
-      "properties": {
-        "subject": {
-          "type": "string"
-        }
-      }
-    },
-    "commonClusterIdentifier": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "commonDomain": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "organization": {
-          "$ref": "#/definitions/commonOrganization"
-        }
-      }
-    },
-    "commonEnrichedIdentity": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/commonUser"
-        },
-        "application": {
-          "$ref": "#/definitions/commonApplication"
-        }
-      }
-    },
-    "commonFilter": {
-      "type": "object",
-      "properties": {
-        "function": {
-          "$ref": "#/definitions/FilterFunction"
-        },
-        "field": {
+        "output_prefix": {
           "type": "string",
-          "title": "e.g. name or version"
+          "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
         },
-        "values": {
+        "task_execution_metadata": {
+          "$ref": "#/definitions/flyteidl2connectorTaskExecutionMetadata",
+          "description": "subset of runtime task execution metadata."
+        },
+        "connection": {
+          "$ref": "#/definitions/coreConnection",
+          "title": "Connection (secret and config) required by the connector.\nConnector will use the secret and config in the taskTemplate if it's None.\n+optional"
+        }
+      },
+      "description": "Represents a request structure to create task."
+    },
+    "connectorCreateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "resource_meta": {
+          "type": "string",
+          "format": "byte",
+          "description": "ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata)."
+        }
+      },
+      "description": "Represents a create response structure."
+    },
+    "connectorDeleteTaskResponse": {
+      "type": "object",
+      "description": "Response to delete a task."
+    },
+    "connectorGetConnectorResponse": {
+      "type": "object",
+      "properties": {
+        "connector": {
+          "$ref": "#/definitions/connectorConnector"
+        }
+      },
+      "description": "A response containing an connector."
+    },
+    "connectorGetTaskLogsResponse": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/connectorGetTaskLogsResponseHeader"
+        },
+        "body": {
+          "$ref": "#/definitions/connectorGetTaskLogsResponseBody"
+        }
+      },
+      "description": "A response containing the logs for a task execution."
+    },
+    "connectorGetTaskLogsResponseBody": {
+      "type": "object",
+      "properties": {
+        "results": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Only in the case of a VALUE_IN function, values may contain multiple entries."
+          "description": "The execution log results."
         }
       }
     },
-    "commonLaunchPlan": {
+    "connectorGetTaskLogsResponseHeader": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "project": {
-          "$ref": "#/definitions/commonProject"
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       }
     },
-    "commonOrganization": {
+    "connectorGetTaskMetricsResponse": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreExecutionMetricResult"
+          },
+          "description": "The execution metric results."
         }
-      }
+      },
+      "description": "A response containing a list of metrics for a task execution."
     },
-    "commonPermission": {
+    "connectorGetTaskResponse": {
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/flyteidl2commonResource"
-        },
-        "actions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/flyteidl2commonAction"
-          }
+          "$ref": "#/definitions/flyteidl2connectorResource"
         }
       },
-      "description": "Defines a set of allowed actions on a specific authorization resource."
+      "description": "Response to get an individual task resource."
     },
-    "commonPolicy": {
+    "connectorListConnectorsResponse": {
       "type": "object",
       "properties": {
-        "id": {
-          "$ref": "#/definitions/commonPolicyIdentifier"
-        },
-        "bindings": {
+        "connectors": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/commonPolicyBinding"
-          }
-        },
-        "description": {
-          "type": "string",
-          "title": "Optional: human readable description"
-        }
-      },
-      "description": "A policy is a collection of roles bound to a resource."
-    },
-    "commonPolicyBinding": {
-      "type": "object",
-      "properties": {
-        "role_id": {
-          "$ref": "#/definitions/commonRoleIdentifier",
-          "description": "The role designates the permitted set of actions which can be applied to the resource."
-        },
-        "resource": {
-          "$ref": "#/definitions/flyteidl2commonResource"
-        }
-      },
-      "description": "A policy binding represents a role (a set of actions) defined on a resource."
-    },
-    "commonPolicyIdentifier": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string",
-          "title": "Unique name for this policy within the organization"
-        }
-      }
-    },
-    "commonProject": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "domain": {
-          "$ref": "#/definitions/commonDomain"
-        }
-      }
-    },
-    "commonProjectIdentifier": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "type": "string"
-        },
-        "domain": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "commonRole": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonRoleIdentifier"
-        },
-        "permissions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonPermission"
-          }
-        },
-        "role_spec": {
-          "$ref": "#/definitions/commonRoleSpec"
-        },
-        "role_type": {
-          "$ref": "#/definitions/commonRoleType"
-        },
-        "actions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/flyteidl2commonAction"
-          }
-        }
-      }
-    },
-    "commonRoleIdentifier": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string",
-          "title": "Unique name for this role within the organization"
-        }
-      }
-    },
-    "commonRoleSpec": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Optional, human readable description for this role."
-        }
-      }
-    },
-    "commonRoleType": {
-      "type": "string",
-      "enum": [
-        "ROLE_TYPE_NONE",
-        "ROLE_TYPE_ADMIN",
-        "ROLE_TYPE_CONTRIBUTOR",
-        "ROLE_TYPE_VIEWER",
-        "ROLE_TYPE_CUSTOM",
-        "ROLE_TYPE_CLUSTER_MANAGER",
-        "ROLE_TYPE_FLYTE_PROJECT_ADMIN",
-        "ROLE_TYPE_SERVERLESS_VIEWER",
-        "ROLE_TYPE_SERVERLESS_CONTRIBUTOR",
-        "ROLE_TYPE_SUPPORT"
-      ],
-      "default": "ROLE_TYPE_NONE",
-      "description": "- ROLE_TYPE_NONE: Default group. Not used in practice.\n - ROLE_TYPE_ADMIN: The admin role has a collective set of permissions to do everything\n - ROLE_TYPE_CONTRIBUTOR: The contributor role has a collective set of permissions to view inventory, view executions, write inventory and create executions\n - ROLE_TYPE_VIEWER: The viewer role has a collective set of permissions to view inventory and view executions\n - ROLE_TYPE_CUSTOM: Represent a role with user-defined sets of permissions.\n - ROLE_TYPE_CLUSTER_MANAGER: The role with permissions to administer a specific customer cluster.\n - ROLE_TYPE_FLYTE_PROJECT_ADMIN: Role with permissions specific to administer flyte project(s).\n - ROLE_TYPE_SERVERLESS_VIEWER: The viewer role for serverless\n - ROLE_TYPE_SERVERLESS_CONTRIBUTOR: The contributor role for serverless\n - ROLE_TYPE_SUPPORT: The support role would have contributor permissions plus the access to support endpoints",
-      "title": "A role type is a short-hand for understanding the permissions associated with a role.\nBoilerplate role types include a conventional collection of permissions\nCustom role types include a user-defined collection of permissions"
-    },
-    "commonRunIdentifier": {
-      "type": "object",
-      "properties": {
-        "org": {
-          "type": "string",
-          "description": "Org this run belongs to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Project this run belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain this run belongs to."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing."
-        }
-      },
-      "description": "Unique identifier of a run."
-    },
-    "commonSort": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "title": "Indicates an attribute to sort the response values.\n+required"
-        },
-        "direction": {
-          "$ref": "#/definitions/SortDirection",
-          "title": "Indicates the direction to apply sort key for response values.\n+optional"
-        }
-      },
-      "description": "Specifies sort ordering in a list request."
-    },
-    "commonTriggerIdentifier": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/commonTriggerName"
-        },
-        "revision": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Revision of the trigger."
-        }
-      },
-      "title": "Identifies a trigger revision within an org, project and domain"
-    },
-    "commonTriggerName": {
-      "type": "object",
-      "properties": {
-        "org": {
-          "type": "string",
-          "description": "Org this trigger belongs to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Project this trigger belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain this trigger belongs to."
-        },
-        "name": {
-          "type": "string",
-          "description": "Unique name of the trigger."
-        },
-        "task_name": {
-          "type": "string"
-        }
-      },
-      "title": "Identifies trigger within an org, project and domain"
-    },
-    "commonUser": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonUserIdentifier"
-        },
-        "spec": {
-          "$ref": "#/definitions/commonUserSpec"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonRole"
-          }
-        },
-        "policies": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonPolicy"
+            "$ref": "#/definitions/connectorConnector"
           }
         }
       },
-      "description": "Encapsulates user profile details for a member of an organization."
+      "description": "A response containing a list of connectors."
     },
-    "commonUserIdentifier": {
-      "type": "object",
-      "properties": {
-        "subject": {
-          "type": "string"
-        }
-      }
-    },
-    "commonUserSpec": {
-      "type": "object",
-      "properties": {
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "user_handle": {
-          "type": "string"
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "photo_url": {
-          "type": "string"
-        }
-      }
-    },
-    "commonWorkflow": {
+    "connectorTaskCategory": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the task type."
         },
-        "project": {
-          "$ref": "#/definitions/commonProject"
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The version of the task type."
         }
       }
     },
@@ -719,25 +783,6 @@
           "type": "string"
         }
       }
-    },
-    "coreArtifactQuery": {
-      "type": "object",
-      "properties": {
-        "artifact_id": {
-          "$ref": "#/definitions/coreArtifactID"
-        },
-        "artifact_tag": {
-          "$ref": "#/definitions/coreArtifactTag"
-        },
-        "uri": {
-          "type": "string"
-        },
-        "binding": {
-          "$ref": "#/definitions/coreArtifactBindingData",
-          "description": "This is used in the trigger case, where a user specifies a value for an input that is one of the triggering\nartifacts, or a partition value derived from a triggering artifact."
-        }
-      },
-      "title": "Uniqueness constraints for Artifacts\n - project, domain, name, version, partitions\nOption 2 (tags are standalone, point to an individual artifact id):\n - project, domain, name, alias (points to one partition if partitioned)\n - project, domain, name, partition key, partition value"
     },
     "coreArtifactTag": {
       "type": "object",
@@ -798,21 +843,28 @@
       },
       "title": "Defines type behavior for blob objects"
     },
-    "coreCatalogCacheStatus": {
-      "type": "string",
-      "enum": [
-        "CACHE_DISABLED",
-        "CACHE_MISS",
-        "CACHE_HIT",
-        "CACHE_POPULATED",
-        "CACHE_LOOKUP_FAILURE",
-        "CACHE_PUT_FAILURE",
-        "CACHE_SKIPPED",
-        "CACHE_EVICTED"
-      ],
-      "default": "CACHE_DISABLED",
-      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped\n - CACHE_EVICTED: Used to indicate that the cache was evicted",
-      "title": "Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future"
+    "coreConnection": {
+      "type": "object",
+      "properties": {
+        "task_type": {
+          "type": "string",
+          "description": "The task type that the connection is used for."
+        },
+        "secrets[string][string]": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.\nThe key is the name of the secret, and it's defined in the flytekit.\nflytekit uses the key to locate the desired secret within the map."
+        },
+        "configs[string][string]": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The configuration to use for the connection, such as the endpoint, account name, etc.\nThe key is the name of the config, and it's defined in the flytekit."
+        }
+      }
     },
     "coreContainer": {
       "type": "object",
@@ -872,18 +924,6 @@
         }
       }
     },
-    "coreContainerContext": {
-      "type": "object",
-      "properties": {
-        "container_name": {
-          "type": "string"
-        },
-        "process": {
-          "$ref": "#/definitions/ContainerContextProcessContext"
-        }
-      },
-      "title": "Contains metadata required to identify logs produces by a single container"
-    },
     "coreContainerPort": {
       "type": "object",
       "properties": {
@@ -937,6 +977,20 @@
         }
       },
       "description": "Represents an error thrown from a node."
+    },
+    "coreExecutionMetricResult": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG."
+        },
+        "data": {
+          "type": "object",
+          "title": "The result data in prometheus range query result format\nhttps://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.\nThis may include multiple time series, differentiated by their metric labels.\nStart time is greater of (execution attempt start, 48h ago)\nEnd time is lesser of (execution attempt end, now)"
+        }
+      },
+      "description": "ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task."
     },
     "coreExtendedResources": {
       "type": "object",
@@ -1212,21 +1266,17 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
-    "coreLogContext": {
+    "coreNodeExecutionIdentifier": {
       "type": "object",
       "properties": {
-        "pods": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/corePodLogContext"
-          }
-        },
-        "primary_pod_name": {
+        "node_id": {
           "type": "string"
+        },
+        "execution_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
         }
       },
-      "title": "Contains metadata required to identify logs produces by a set of pods"
+      "description": "Encapsulation of fields that identify a Flyte node execution entity."
     },
     "coreOAuth2Client": {
       "type": "object",
@@ -1284,31 +1334,6 @@
       ],
       "default": "MINUS"
     },
-    "coreParameter": {
-      "type": "object",
-      "properties": {
-        "var": {
-          "$ref": "#/definitions/coreVariable",
-          "description": "+required Variable. Defines the type of the variable backing this parameter."
-        },
-        "default": {
-          "$ref": "#/definitions/coreLiteral",
-          "description": "Defines a default value that has to match the variable type defined."
-        },
-        "required": {
-          "type": "boolean",
-          "description": "+optional, is this value required to be filled."
-        },
-        "artifact_query": {
-          "$ref": "#/definitions/coreArtifactQuery",
-          "description": "This is an execution time search basically that should result in exactly one Artifact with a Type that\nmatches the type of the variable."
-        },
-        "artifact_id": {
-          "$ref": "#/definitions/coreArtifactID"
-        }
-      },
-      "description": "A parameter is used as input to a launch plan and has\nthe special ability to have a default value or mark itself as required."
-    },
     "corePartitions": {
       "type": "object",
       "properties": {
@@ -1319,35 +1344,6 @@
           }
         }
       }
-    },
-    "corePodLogContext": {
-      "type": "object",
-      "properties": {
-        "namespace": {
-          "type": "string"
-        },
-        "pod_name": {
-          "type": "string"
-        },
-        "containers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreContainerContext"
-          }
-        },
-        "primary_container_name": {
-          "type": "string"
-        },
-        "init_containers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreContainerContext"
-          }
-        }
-      },
-      "title": "Contains metadata required to identify logs produces by a single pod"
     },
     "corePrimitive": {
       "type": "object",
@@ -1577,6 +1573,38 @@
         }
       }
     },
+    "coreTaskExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "$ref": "#/definitions/flyteidl2coreIdentifier"
+        },
+        "node_execution_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier"
+        },
+        "retry_attempt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
+    "coreTaskExecutionPhase": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "ABORTED",
+        "FAILED",
+        "INITIALIZING",
+        "WAITING_FOR_RESOURCES",
+        "RETRYABLE_FAILED"
+      ],
+      "default": "UNDEFINED",
+      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
+    },
     "coreTaskLog": {
       "type": "object",
       "properties": {
@@ -1787,93 +1815,112 @@
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
     },
-    "flyteidl2commonAction": {
-      "type": "string",
-      "enum": [
-        "ACTION_NONE",
-        "ACTION_CREATE",
-        "ACTION_READ",
-        "ACTION_UPDATE",
-        "ACTION_DELETE",
-        "ACTION_VIEW_FLYTE_INVENTORY",
-        "ACTION_VIEW_FLYTE_EXECUTIONS",
-        "ACTION_REGISTER_FLYTE_INVENTORY",
-        "ACTION_CREATE_FLYTE_EXECUTIONS",
-        "ACTION_ADMINISTER_PROJECT",
-        "ACTION_MANAGE_PERMISSIONS",
-        "ACTION_ADMINISTER_ACCOUNT",
-        "ACTION_MANAGE_CLUSTER",
-        "ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES",
-        "ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES",
-        "ACTION_EDIT_UNUSED_ATTRIBUTES",
-        "ACTION_SUPPORT_SYSTEM_LOGS"
-      ],
-      "default": "ACTION_NONE",
-      "title": "- ACTION_VIEW_FLYTE_INVENTORY: Read Flyte workflows, tasks and launch plans\n - ACTION_VIEW_FLYTE_EXECUTIONS: View Flyte executions\n - ACTION_REGISTER_FLYTE_INVENTORY: Register new versions of Flyte workflows, tasks and launch plans\n - ACTION_CREATE_FLYTE_EXECUTIONS: Create new Flyte workflow and task executions\n - ACTION_ADMINISTER_PROJECT: Create new projects and update project descriptions\n - ACTION_MANAGE_PERMISSIONS: Add users, roles and update role assignments.\n - ACTION_ADMINISTER_ACCOUNT: Manage billing, account-wide settings\n - ACTION_MANAGE_CLUSTER: Operations for clusters\n - ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Edit execution related attributes, including TASK_RESOURCE, WORKFLOW_EXECUTION_CONFIG, and EXTERNAL_RESOURCE\n - ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Edit cluster related attributes, including CLUSTER_RESOURCE and CLUSTER_ASSIGNMENT\n - ACTION_EDIT_UNUSED_ATTRIBUTES: Edit unused attributes, including EXECUTION_QUEUE, EXECUTION_CLUSTER_LABEL, QUALITY_OF_SERVICE_SPECIFICATION, and PLUGIN_OVERRIDE\n - ACTION_SUPPORT_SYSTEM_LOGS: View system logs"
-    },
-    "flyteidl2commonListRequest": {
+    "coreWorkflowExecutionIdentifier": {
       "type": "object",
       "properties": {
-        "limit": {
-          "type": "integer",
-          "format": "int64",
-          "title": "Indicates the number of resources to be returned.\n+required"
-        },
-        "token": {
+        "project": {
           "type": "string",
-          "title": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional"
-        },
-        "sort_by": {
-          "$ref": "#/definitions/commonSort",
-          "title": "Deprecated, use sort_by_fields instead.\nSpecifies how listed entities should be sorted in the response.\n+optional"
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonFilter"
-          },
-          "title": "Indicates a list of filters. This field is used for grpc get requests.\n+optional"
-        },
-        "raw_filters": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "Indicates a raw list of filters passed as string.This field is used for REST get requests\n+optional"
-        },
-        "sort_by_fields": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonSort"
-          },
-          "title": "Specifies how listed entities should be sorted in the response.\nSort fields are applied in order.\n+optional"
-        }
-      }
-    },
-    "flyteidl2commonResource": {
-      "type": "object",
-      "properties": {
-        "organization": {
-          "$ref": "#/definitions/commonOrganization"
+          "description": "Name of the project the resource belongs to."
         },
         "domain": {
-          "$ref": "#/definitions/commonDomain"
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
         },
-        "project": {
-          "$ref": "#/definitions/commonProject"
+        "name": {
+          "type": "string",
+          "description": "User or system provided value for the resource."
         },
-        "workflow": {
-          "$ref": "#/definitions/commonWorkflow"
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+    },
+    "flyteidl2connectorResource": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/taskOutputs",
+          "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
         },
-        "launch_plan": {
-          "$ref": "#/definitions/commonLaunchPlan"
+        "message": {
+          "type": "string",
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
         },
-        "cluster": {
-          "$ref": "#/definitions/commonClusterIdentifier"
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
+        },
+        "custom_info": {
+          "type": "object",
+          "description": "Custom data specific to the connector."
         }
       }
+    },
+    "flyteidl2connectorTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "k8s namespace where the task is executed in"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels attached to the task execution"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Annotations attached to the task execution"
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "title": "k8s service account associated with the task execution"
+        },
+        "environment_variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Environment variables attached to the task execution"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
+        },
+        "interruptible_failure_threshold": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
+        },
+        "identity": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "title": "Identity of user running this task execution"
+        }
+      },
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
     },
     "flyteidl2coreEnumType": {
       "type": "object",
@@ -2089,24 +2136,6 @@
       },
       "title": "Task Metadata"
     },
-    "flyteidl2workflowAction": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonActionIdentifier",
-          "description": "Id for this action."
-        },
-        "metadata": {
-          "$ref": "#/definitions/workflowActionMetadata",
-          "description": "Metadata for this action."
-        },
-        "status": {
-          "$ref": "#/definitions/workflowActionStatus",
-          "description": "Last known status."
-        }
-      },
-      "description": "Lightweight representation of an action."
-    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -2149,130 +2178,6 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
-    "taskAnnotations": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom annotations to be applied to the execution resource."
-        }
-      },
-      "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
-    },
-    "taskCacheConfig": {
-      "type": "object",
-      "properties": {
-        "overwrite_cache": {
-          "type": "boolean",
-          "description": "If true, recompute outputs for this run and overwrite any existing cache."
-        },
-        "cache_lookup_scope": {
-          "$ref": "#/definitions/taskCacheLookupScope",
-          "description": "CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config\nwill be used (global unless configured otherwise)."
-        }
-      },
-      "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
-    },
-    "taskCacheLookupScope": {
-      "type": "string",
-      "enum": [
-        "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
-        "CACHE_LOOKUP_SCOPE_GLOBAL",
-        "CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN"
-      ],
-      "default": "CACHE_LOOKUP_SCOPE_UNSPECIFIED",
-      "description": " - CACHE_LOOKUP_SCOPE_UNSPECIFIED: CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured\notherwise)\n - CACHE_LOOKUP_SCOPE_GLOBAL: CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).\nThis has traditionally been the default behavior. It requires all workloads running in all projects/domains\nto have access to the same artifacts/buckets. Otherwise it risks runtime failures.\n - CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures\ndata access success at the expense of potentially more cache misses and recomputation happening. This should not\nbe considered a security enforcement (that can happen through the system-wide config)."
-    },
-    "taskCron": {
-      "type": "object",
-      "properties": {
-        "expression": {
-          "type": "string",
-          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
-        },
-        "timezone": {
-          "type": "string",
-          "title": "default is UTC"
-        }
-      }
-    },
-    "taskDocumentationEntity": {
-      "type": "object",
-      "properties": {
-        "short_description": {
-          "type": "string",
-          "description": "One-liner overview of the entity."
-        },
-        "long_description": {
-          "type": "string",
-          "description": "Full user description with formatting preserved."
-        },
-        "source_code": {
-          "$ref": "#/definitions/taskSourceCode",
-          "description": "Optional link to source code used to define this entity."
-        }
-      }
-    },
-    "taskEnvironment": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the environment."
-        },
-        "description": {
-          "type": "string",
-          "title": "Description of environment"
-        }
-      },
-      "description": "Environment for a task."
-    },
-    "taskEnvs": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreKeyValuePair"
-          },
-          "description": "Map of custom environment variables to be applied to the execution resource."
-        }
-      },
-      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
-    },
-    "taskFixedRate": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "unit": {
-          "$ref": "#/definitions/taskFixedRateUnit"
-        },
-        "start_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Optional, timestamp after which rate should be calculated. Can be only in future.\nE.g. We create a rate schedule \"every 5 minutes\" with start_time=\"12:00\" inactive.\nActivate it at \"12:04\".\nTrigger should fire at \"12:05\" as it adds 5 minutes to start_time=\"12:00\"."
-        }
-      },
-      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
-    },
-    "taskFixedRateUnit": {
-      "type": "string",
-      "enum": [
-        "FIXED_RATE_UNIT_UNSPECIFIED",
-        "FIXED_RATE_UNIT_MINUTE",
-        "FIXED_RATE_UNIT_HOUR",
-        "FIXED_RATE_UNIT_DAY"
-      ],
-      "default": "FIXED_RATE_UNIT_UNSPECIFIED",
-      "description": "Represents a frequency at which to run a schedule."
-    },
     "taskInputs": {
       "type": "object",
       "properties": {
@@ -2295,19 +2200,6 @@
       },
       "description": "Input payload for an action."
     },
-    "taskLabels": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of custom labels to be applied to the execution resource."
-        }
-      },
-      "description": "Label values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge labels defined at registration and execution time."
-    },
     "taskNamedLiteral": {
       "type": "object",
       "properties": {
@@ -2322,31 +2214,6 @@
       },
       "description": "Named literal value."
     },
-    "taskNamedParameter": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "parameter": {
-          "$ref": "#/definitions/coreParameter"
-        }
-      }
-    },
-    "taskOutputReferences": {
-      "type": "object",
-      "properties": {
-        "output_uri": {
-          "type": "string",
-          "description": "The output uri."
-        },
-        "report_uri": {
-          "type": "string",
-          "title": "Native URI to HTML report"
-        }
-      },
-      "description": "Output references."
-    },
     "taskOutputs": {
       "type": "object",
       "properties": {
@@ -2360,801 +2227,6 @@
         }
       },
       "description": "Output payload for an action."
-    },
-    "taskRawDataStorage": {
-      "type": "object",
-      "properties": {
-        "raw_data_prefix": {
-          "type": "string",
-          "title": "Prefix for where offloaded data from user actions will be written\ne.g. s3://bucket/key or s3://bucket/"
-        }
-      }
-    },
-    "taskRunSpec": {
-      "type": "object",
-      "properties": {
-        "labels": {
-          "$ref": "#/definitions/taskLabels",
-          "description": "Labels to apply to the run."
-        },
-        "annotations": {
-          "$ref": "#/definitions/taskAnnotations",
-          "description": "Annotations to apply to the run."
-        },
-        "envs": {
-          "$ref": "#/definitions/taskEnvs",
-          "description": "Envs to apply to the run."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Explicit override for executing this run as interruptible or not. If not set, use the default."
-        },
-        "overwrite_cache": {
-          "type": "boolean",
-          "title": "If true, recompute outputs for this run and overwrite any existing cache.\nDeprecated, please use CacheConfig.OverwriteCache instead"
-        },
-        "cluster": {
-          "type": "string",
-          "description": "the specific cluster that this action should be executed on. this value will be used as the\ndefault for all actions in the run unless overridden."
-        },
-        "raw_data_storage": {
-          "$ref": "#/definitions/taskRawDataStorage",
-          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
-        },
-        "security_context": {
-          "$ref": "#/definitions/flyteidl2coreSecurityContext",
-          "description": "SecurityContext holds security attributes that apply to tasks."
-        },
-        "cache_config": {
-          "$ref": "#/definitions/taskCacheConfig",
-          "title": "CacheConfig contains configurations that influence the behavior of cache reads and writes"
-        }
-      }
-    },
-    "taskSchedule": {
-      "type": "object",
-      "properties": {
-        "rate": {
-          "$ref": "#/definitions/taskFixedRate"
-        },
-        "cron_expression": {
-          "type": "string"
-        },
-        "cron": {
-          "$ref": "#/definitions/taskCron"
-        },
-        "kickoff_time_input_arg": {
-          "type": "string",
-          "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
-        }
-      },
-      "description": "Defines complete set of information required to trigger an execution on a schedule."
-    },
-    "taskSourceCode": {
-      "type": "object",
-      "properties": {
-        "link": {
-          "type": "string"
-        }
-      },
-      "title": "Link to source code used to define this entity"
-    },
-    "taskTaskIdentifier": {
-      "type": "object",
-      "properties": {
-        "org": {
-          "type": "string",
-          "description": "Org this task belongs to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Project this task belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain this task belongs to."
-        },
-        "name": {
-          "type": "string",
-          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
-        },
-        "version": {
-          "type": "string",
-          "description": "Version of the task."
-        }
-      },
-      "description": "TaskIdentifier is the unique identifier for a task."
-    },
-    "taskTaskName": {
-      "type": "object",
-      "properties": {
-        "org": {
-          "type": "string",
-          "description": "Org this task belongs to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Project this task belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain this task belongs to."
-        },
-        "name": {
-          "type": "string",
-          "description": "Unique name of the task. Should not be interpreted/parsed. Use `short_name` and `environment_name` for user facing names."
-        }
-      },
-      "description": "Name of a task. It may have multiple versions deployed."
-    },
-    "taskTaskSpec": {
-      "type": "object",
-      "properties": {
-        "task_template": {
-          "$ref": "#/definitions/coreTaskTemplate",
-          "description": "The template for this task."
-        },
-        "default_inputs": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/taskNamedParameter"
-          },
-          "description": "Ordered default inputs.\nThese can be overridden when an run is created.\nClient should not send required=true flag in underlying flyteidl2.core.Parameter."
-        },
-        "short_name": {
-          "type": "string",
-          "description": "User facing display name for this task. Not required to be unique.\nThis is passed in via the SDK when the task is created and is either a user defined override or the name of the task."
-        },
-        "environment": {
-          "$ref": "#/definitions/taskEnvironment",
-          "description": "Optional environment for this task. Note, some tasks may not be run in the context of an environment."
-        },
-        "documentation": {
-          "$ref": "#/definitions/taskDocumentationEntity",
-          "title": "The documentation entity for the task"
-        }
-      },
-      "description": "Specification for a task."
-    },
-    "taskTraceSpec": {
-      "type": "object",
-      "properties": {
-        "interface": {
-          "$ref": "#/definitions/coreTypedInterface",
-          "description": "A strongly typed interface for the trace."
-        }
-      },
-      "description": "Specification for a trace action."
-    },
-    "taskTriggerAutomationSpec": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/taskTriggerAutomationSpecType",
-          "description": "Explicitly defines trigger automation type."
-        },
-        "schedule": {
-          "$ref": "#/definitions/taskSchedule"
-        }
-      }
-    },
-    "taskTriggerAutomationSpecType": {
-      "type": "string",
-      "enum": [
-        "TYPE_UNSPECIFIED",
-        "TYPE_NONE",
-        "TYPE_SCHEDULE"
-      ],
-      "default": "TYPE_UNSPECIFIED"
-    },
-    "workflowAbortActionResponse": {
-      "type": "object"
-    },
-    "workflowAbortInfo": {
-      "type": "object",
-      "properties": {
-        "reason": {
-          "type": "string",
-          "description": "Reason provided for the abort."
-        },
-        "aborted_by": {
-          "$ref": "#/definitions/commonEnrichedIdentity",
-          "description": "Identity that aborted the run."
-        }
-      },
-      "description": "AbortInfo captures details of an aborted run."
-    },
-    "workflowAbortRunResponse": {
-      "type": "object",
-      "description": "Response message for aborting a run."
-    },
-    "workflowActionAttempt": {
-      "type": "object",
-      "properties": {
-        "phase": {
-          "$ref": "#/definitions/commonActionPhase",
-          "description": "Last known phase."
-        },
-        "start_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time the attempt started."
-        },
-        "end_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time the attempt ended, if applicable."
-        },
-        "error_info": {
-          "$ref": "#/definitions/workflowErrorInfo",
-          "description": "Error info for the attempt, if failed."
-        },
-        "attempt": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The attempt number, starting with 1."
-        },
-        "log_info": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "Log references."
-        },
-        "outputs": {
-          "$ref": "#/definitions/taskOutputReferences",
-          "description": "Output references."
-        },
-        "logs_available": {
-          "type": "boolean",
-          "description": "Indicates whether logs are available for tailing. It doesn't necessarily indicate the logs are present, but that\nwe have the info we need to look them up."
-        },
-        "cache_status": {
-          "$ref": "#/definitions/coreCatalogCacheStatus",
-          "title": "cache status of the action attempt"
-        },
-        "cluster_events": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowClusterEvent"
-          },
-          "description": "Cluster events like k8s events in a human-readable form."
-        },
-        "phase_transitions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowPhaseTransition"
-          },
-          "description": "History of phase transitions."
-        },
-        "cluster": {
-          "type": "string",
-          "description": "The cluster this attempt is assigned to."
-        },
-        "log_context": {
-          "$ref": "#/definitions/coreLogContext",
-          "description": "Contains corresponding k8s pods and containers information for this action attempt."
-        }
-      },
-      "description": "ActionAttempt is a single attempt of an action."
-    },
-    "workflowActionDetails": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/commonActionIdentifier",
-          "description": "Id for this action."
-        },
-        "metadata": {
-          "$ref": "#/definitions/workflowActionMetadata",
-          "description": "Metadata for this action."
-        },
-        "status": {
-          "$ref": "#/definitions/workflowActionStatus",
-          "description": "Last known status."
-        },
-        "error_info": {
-          "$ref": "#/definitions/workflowErrorInfo",
-          "description": "Error info for the action, if failed."
-        },
-        "abort_info": {
-          "$ref": "#/definitions/workflowAbortInfo",
-          "description": "Abort info for the action, if aborted."
-        },
-        "task": {
-          "$ref": "#/definitions/taskTaskSpec"
-        },
-        "trace": {
-          "$ref": "#/definitions/taskTraceSpec"
-        },
-        "attempts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowActionAttempt"
-          },
-          "description": "List of action attempts."
-        }
-      },
-      "description": "ActionDetails is the full details of an action."
-    },
-    "workflowActionMetadata": {
-      "type": "object",
-      "properties": {
-        "parent": {
-          "type": "string",
-          "description": "Parent action if not the root."
-        },
-        "group": {
-          "type": "string",
-          "description": "Group this action belongs to, if applicable."
-        },
-        "executed_by": {
-          "$ref": "#/definitions/commonEnrichedIdentity",
-          "description": "Identity that executed this run."
-        },
-        "task": {
-          "$ref": "#/definitions/workflowTaskActionMetadata",
-          "description": "Task action."
-        },
-        "trace": {
-          "$ref": "#/definitions/workflowTraceActionMetadata",
-          "description": "Trace action."
-        },
-        "condition": {
-          "$ref": "#/definitions/workflowConditionActionMetadata",
-          "description": "Condition action."
-        },
-        "action_type": {
-          "$ref": "#/definitions/workflowActionType",
-          "description": "Action type."
-        },
-        "trigger_id": {
-          "$ref": "#/definitions/commonTriggerIdentifier",
-          "description": "If this run was initiated by a trigger, this will store the trigger identifier."
-        },
-        "environment_name": {
-          "type": "string",
-          "title": "Environment name"
-        },
-        "funtion_name": {
-          "type": "string",
-          "title": "Function name"
-        },
-        "trigger_name": {
-          "type": "string",
-          "title": "Trigger name"
-        },
-        "trigger_type": {
-          "$ref": "#/definitions/taskTriggerAutomationSpec",
-          "title": "Trigger Type"
-        },
-        "source": {
-          "$ref": "#/definitions/workflowRunSource",
-          "title": "Who initiated this run"
-        }
-      },
-      "description": "Static, lightweight metadata about an action."
-    },
-    "workflowActionStatus": {
-      "type": "object",
-      "properties": {
-        "phase": {
-          "$ref": "#/definitions/commonActionPhase",
-          "description": "Last known phase."
-        },
-        "start_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time the action started."
-        },
-        "end_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time the action ended, if applicable."
-        },
-        "attempts": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Number of action attempts."
-        },
-        "cache_status": {
-          "$ref": "#/definitions/coreCatalogCacheStatus",
-          "title": "cache status of the action's latest attempt"
-        },
-        "duration_ms": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Duration of the action in milliseconds."
-        }
-      },
-      "description": "Lightweight status of an action. For more detailed status see ActionDetails."
-    },
-    "workflowActionType": {
-      "type": "string",
-      "enum": [
-        "ACTION_TYPE_UNSPECIFIED",
-        "ACTION_TYPE_TASK",
-        "ACTION_TYPE_TRACE",
-        "ACTION_TYPE_CONDITION"
-      ],
-      "default": "ACTION_TYPE_UNSPECIFIED"
-    },
-    "workflowClusterEvent": {
-      "type": "object",
-      "properties": {
-        "occurred_at": {
-          "type": "string",
-          "format": "date-time",
-          "description": "occurred_at is the timestamp indicating the instant that this reason happened."
-        },
-        "message": {
-          "type": "string",
-          "description": "message is the explanation for the most recent phase transition or status update."
-        }
-      }
-    },
-    "workflowConditionActionMetadata": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "run_id": {
-          "type": "string",
-          "description": "RunId is the unique identifier for the run this action is associated with."
-        },
-        "action_id": {
-          "type": "string",
-          "description": "ActionId is the unique identifier for the action this action is associated with."
-        },
-        "global": {
-          "type": "boolean",
-          "description": "Global indicates the condition is global and can be used across all runs and actions."
-        }
-      }
-    },
-    "workflowCreateRunResponse": {
-      "type": "object",
-      "properties": {
-        "run": {
-          "$ref": "#/definitions/workflowRun"
-        }
-      },
-      "description": "Response message for creating a run."
-    },
-    "workflowEnrichedAction": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "$ref": "#/definitions/flyteidl2workflowAction",
-          "description": "The action itself."
-        },
-        "meets_filter": {
-          "type": "boolean",
-          "title": "Whether this action meets specified filters of the request or not.\nIf an action that was previously meeting the filter but no longer does, will be sent with this flag set to false"
-        },
-        "children_phase_counts": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "title": "Child phase info for this action (Map of phase to counts of children in given phase)"
-        }
-      },
-      "title": "EnrichedAction is a wrapper around Action that contains additional information"
-    },
-    "workflowErrorInfo": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Error message."
-        },
-        "kind": {
-          "$ref": "#/definitions/workflowErrorInfoKind",
-          "description": "Error kind."
-        }
-      },
-      "description": "ErrorInfo captures details of an error."
-    },
-    "workflowErrorInfoKind": {
-      "type": "string",
-      "enum": [
-        "KIND_UNSPECIFIED",
-        "KIND_USER",
-        "KIND_SYSTEM"
-      ],
-      "default": "KIND_UNSPECIFIED"
-    },
-    "workflowGetActionDataResponse": {
-      "type": "object",
-      "properties": {
-        "inputs": {
-          "$ref": "#/definitions/taskInputs",
-          "description": "Inputs for the action."
-        },
-        "outputs": {
-          "$ref": "#/definitions/taskOutputs",
-          "description": "Outputs for the action."
-        }
-      },
-      "description": "Response message for querying action data."
-    },
-    "workflowGetActionDetailsResponse": {
-      "type": "object",
-      "properties": {
-        "details": {
-          "$ref": "#/definitions/workflowActionDetails",
-          "description": "Detailed information about the action."
-        }
-      },
-      "description": "Response message for getting detailed information about an action."
-    },
-    "workflowGetRunDetailsResponse": {
-      "type": "object",
-      "properties": {
-        "details": {
-          "$ref": "#/definitions/workflowRunDetails",
-          "description": "Detailed information about the run."
-        }
-      },
-      "description": "Response message for getting detailed information about a run."
-    },
-    "workflowListActionsResponse": {
-      "type": "object",
-      "properties": {
-        "actions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidl2workflowAction"
-          },
-          "description": "List of actions matching the filter criteria."
-        },
-        "token": {
-          "type": "string",
-          "description": "Token for fetching the next page of results, if any."
-        }
-      },
-      "description": "Response message for listing actions."
-    },
-    "workflowListRunsResponse": {
-      "type": "object",
-      "properties": {
-        "runs": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowRun"
-          },
-          "description": "List of runs matching the filter criteria."
-        },
-        "token": {
-          "type": "string",
-          "description": "Token for fetching the next page of results, if any."
-        }
-      },
-      "description": "Response message for listing runs."
-    },
-    "workflowPhaseTransition": {
-      "type": "object",
-      "properties": {
-        "phase": {
-          "$ref": "#/definitions/commonActionPhase",
-          "description": "The phase."
-        },
-        "start_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time this phase started."
-        },
-        "end_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Time this phase ended, if applicable. For terminal phases, start time will equal end time."
-        }
-      }
-    },
-    "workflowRun": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "$ref": "#/definitions/flyteidl2workflowAction",
-          "description": "Lightweight information about the root action."
-        }
-      }
-    },
-    "workflowRunDetails": {
-      "type": "object",
-      "properties": {
-        "run_spec": {
-          "$ref": "#/definitions/taskRunSpec",
-          "description": "Run spec."
-        },
-        "action": {
-          "$ref": "#/definitions/workflowActionDetails",
-          "description": "Detailed information about the root action."
-        }
-      }
-    },
-    "workflowRunSource": {
-      "type": "string",
-      "enum": [
-        "RUN_SOURCE_UNSPECIFIED",
-        "RUN_SOURCE_WEB",
-        "RUN_SOURCE_CLI",
-        "RUN_SOURCE_SCHEDULE_TRIGGER"
-      ],
-      "default": "RUN_SOURCE_UNSPECIFIED"
-    },
-    "workflowTaskActionMetadata": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/taskTaskIdentifier",
-          "description": "Id of the task this action is associated with."
-        },
-        "task_type": {
-          "type": "string",
-          "description": "Extensible task type."
-        },
-        "short_name": {
-          "type": "string",
-          "description": "The short name for this task."
-        }
-      }
-    },
-    "workflowTaskGroup": {
-      "type": "object",
-      "properties": {
-        "task_name": {
-          "type": "string",
-          "description": "Task name."
-        },
-        "environment_name": {
-          "type": "string",
-          "description": "Environment name."
-        },
-        "total_runs": {
-          "type": "string",
-          "format": "int64",
-          "description": "Total number of runs for this task."
-        },
-        "latest_run_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp of the most recent run."
-        },
-        "recent_statuses": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/commonActionPhase"
-          },
-          "description": "Recent run statuses, ordered from newest to oldest. Number of statuses determined by request."
-        },
-        "average_failure_rate": {
-          "type": "number",
-          "format": "double",
-          "description": "Average failure rate of runs in this group (0.0 to 1.0).\nComputed as number of root actions with phase FAILED divided by total root actions."
-        },
-        "average_duration": {
-          "type": "string",
-          "description": "Average duration of runs in this group."
-        },
-        "latest_finished_time": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp of the most recent finished run (terminal phase)."
-        },
-        "created_by": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/commonEnrichedIdentity"
-          },
-          "description": "List of user/application's enriched identity that created runs in this group."
-        },
-        "should_delete": {
-          "type": "boolean"
-        },
-        "short_name": {
-          "type": "string",
-          "description": "short name (function name) of the task."
-        }
-      },
-      "description": "TaskGroup represents a group of runs for a specific task."
-    },
-    "workflowTraceActionMetadata": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "workflowWatchActionDetailsResponse": {
-      "type": "object",
-      "properties": {
-        "details": {
-          "$ref": "#/definitions/workflowActionDetails",
-          "description": "Detailed information about the action."
-        }
-      },
-      "description": "Response message for watching detailed information about an action."
-    },
-    "workflowWatchActionsResponse": {
-      "type": "object",
-      "properties": {
-        "enriched_actions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowEnrichedAction"
-          },
-          "title": "New or updated actions matching the filter criteria. Enriched with children status counts"
-        }
-      },
-      "description": "Response message for watching actions, comes with enriched action metadata."
-    },
-    "workflowWatchClusterEventsResponse": {
-      "type": "object",
-      "properties": {
-        "cluster_events": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowClusterEvent"
-          }
-        }
-      }
-    },
-    "workflowWatchGroupsResponse": {
-      "type": "object",
-      "properties": {
-        "task_groups": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowTaskGroup"
-          },
-          "description": "List of task groups matching the filter criteria.\nFor the initial response, this contains all groups.\nFor subsequent updates, this contains only changed groups."
-        },
-        "sentinel": {
-          "type": "boolean",
-          "description": "Indicates when the initial List call is complete, and subsequent messages are updates."
-        }
-      },
-      "description": "Response message for watching task groups."
-    },
-    "workflowWatchRunDetailsResponse": {
-      "type": "object",
-      "properties": {
-        "details": {
-          "$ref": "#/definitions/workflowRunDetails",
-          "description": "Detailed information about the run."
-        }
-      },
-      "description": "Response message for watching detailed information about a run."
-    },
-    "workflowWatchRunsResponse": {
-      "type": "object",
-      "properties": {
-        "runs": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/workflowRun"
-          },
-          "description": "New or updated runs matching the filter criteria."
-        }
-      },
-      "description": "Response message for watching runs."
     }
   }
 }
