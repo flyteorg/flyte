@@ -21,6 +21,9 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/flyteorg/flyte/v2/executor/pkg/fakeplugins"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/stretchr/testify/mock"
 	"net"
 	"net/http"
 	"time"
@@ -34,7 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	"github.com/flyteorg/flyte/v2/executor/pkg/fakeplugins"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -91,11 +94,18 @@ const (
 func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
+	// Init plugin
+	p, err := r.invokePlugin()
+	if err != nil {
+		logger.Error(err, "Failed to initialize plugin")
+		return ctrl.Result{}, err
+	}
+
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
 	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
 		if errors.IsNotFound(err) {
-			// TaskAction was deleted
+			// Call handler to abort
 			logger.Info("TaskAction not found, likely deleted", "name", req.NamespacedName)
 			return ctrl.Result{}, nil
 		}
@@ -103,7 +113,6 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	// Get the ActionSpec from the TaskAction
 	actionSpec, err := taskAction.Spec.GetActionSpec()
 	if err != nil {
 		logger.Error(err, "Failed to unmarshal ActionSpec")
@@ -112,82 +121,57 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Determine current phase (default to empty if new)
 	currentPhase := taskAction.Status.Phase
-
-	// init dummy plugin
-	dummyPlugin := fakeplugins.NewPhaseBasedPlugin()
-
-	// State machine logic
-	var nextPhase string
 	var requeueAfter time.Duration
 
-	// TODO (haytham): Remove when we add real code that executes plugins. For now this is here so that watchers can see
-	//  things transition between states.
 	time.Sleep(2 * time.Second)
-	switch currentPhase {
-	case "":
-		// New TaskAction - transition to Queued
-		nextPhase = PhaseQueued
-		logger.Info("New TaskAction detected, transitioning to Queued",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
 
-	case PhaseQueued:
-		// Queued → Initializing
-		nextPhase = PhaseInitializing
-		logger.Info("Transitioning from Queued to Initializing",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+	// Create mock TaskExecutionContext with PluginStateReader
+	// TODO(alex): We might need to remove NodeExecutionContext from TaskExecutionContext interface as we don't have NodeExecutor now
+	mockPluginStateReader := &mocks.PluginStateReader{}
+	mockPluginStateReader.OnGet(mock.Anything).Return(uint8(r.getPhaseID(currentPhase)), nil)
+	mockTaskExecutionContext := &mocks.TaskExecutionContext{}
+	mockTaskExecutionContext.OnPluginStateReader().Return(mockPluginStateReader)
 
-	case PhaseInitializing:
-		// Initializing → Running
-		nextPhase = PhaseRunning
-		logger.Info("Transitioning from Initializing to Running",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseRunning:
-		// Running → Succeeded (simulated execution)
-		nextPhase = PhaseSucceeded
-		logger.Info("Transitioning from Running to Succeeded",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseSucceeded, PhaseFailed, PhaseAborted:
-		// Terminal states - no further transitions
-		logger.Info("TaskAction in terminal state",
-			"name", taskAction.Name, "phase", currentPhase)
-		return ctrl.Result{}, nil
-
-	default:
-		logger.Info("Unknown phase, resetting to Queued",
-			"name", taskAction.Name, "phase", currentPhase)
-		nextPhase = PhaseQueued
-	}
-
-	// Create state JSON (simplified NodeStatus)
-	stateJSON := r.createStateJSON(actionSpec, nextPhase)
-
-	// Send state update to State Service
-	if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-		logger.Error(err, "Failed to update state service", "phase", nextPhase)
-		// Continue anyway - we'll try again on next reconcile
-	}
-
-	// Update TaskAction status
-	taskAction.Status.Phase = nextPhase
-	taskAction.Status.StateJSON = stateJSON
-	taskAction.Status.Message = fmt.Sprintf("Transitioned to %s", nextPhase)
-
-	if err := r.Status().Update(ctx, taskAction); err != nil {
-		logger.Error(err, "Failed to update TaskAction status")
+	pluginTrns, err := p.Handle(ctx, mockTaskExecutionContext)
+	if err != nil {
+		logger.Error(err, "Failed to handle TaskAction")
 		return ctrl.Result{}, err
 	}
 
-	logger.Info("Successfully updated TaskAction status",
-		"name", taskAction.Name, "phase", nextPhase)
+	nextPhase := r.getPhaseString(pluginTrns.Info().Phase())
 
-	// Requeue after a delay to simulate state transitions
-	// For non-terminal states, requeue after 5 seconds
-	if nextPhase != PhaseSucceeded && nextPhase != PhaseFailed && nextPhase != PhaseAborted {
-		requeueAfter = 5 * time.Second
+	if nextPhase != "" && currentPhase != nextPhase {
+		// Create state JSON (simplified NodeStatus)
+		stateJSON := r.createStateJSON(actionSpec, nextPhase)
+
+		// Send state update to State Service
+		if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
+			logger.Error(err, "Failed to update state service", "phase", nextPhase)
+			return ctrl.Result{}, err
+		}
+
+		// Update TaskAction status
+		taskAction.Status.Phase = nextPhase
+		taskAction.Status.StateJSON = stateJSON
+		taskAction.Status.Message = fmt.Sprintf("Transitioned to %s", nextPhase)
+
+		if err := r.Status().Update(ctx, taskAction); err != nil {
+			logger.Error(err, "Failed to update TaskAction status")
+			return ctrl.Result{}, err
+		}
+
+		logger.Info("Successfully updated TaskAction status",
+			"name", taskAction.Name, "phase", nextPhase)
+
+		// Requeue after a delay to simulate state transitions
+		// For non-terminal states, requeue after 5 seconds
+		if nextPhase != PhaseSucceeded && nextPhase != PhaseFailed && nextPhase != PhaseAborted {
+			requeueAfter = 5 * time.Second
+		}
+	} else {
+		// If taskAction CR was in terminal state, we should stop reconciling
+		return ctrl.Result{}, nil
 	}
-
 	return ctrl.Result{RequeueAfter: requeueAfter}, nil
 }
 
@@ -229,6 +213,56 @@ func (r *TaskActionReconciler) updateStateService(ctx context.Context, actionID 
 	}
 
 	return nil
+}
+
+// Invoke plugin based on task type
+func (r *TaskActionReconciler) invokePlugin() (core.Plugin, error) {
+	// This is a sample implementation, we should invoke the plugin by task type in the future
+	return fakeplugins.NewPhaseBasedPlugin(), nil
+}
+
+// Get phase ID from phase string
+// This function should be removed in the future
+func (r *TaskActionReconciler) getPhaseID(phase string) core.Phase {
+	switch phase {
+	case "":
+		return core.PhaseNotReady
+	case PhaseQueued:
+		return core.PhaseQueued
+	case PhaseInitializing:
+		return core.PhaseInitializing
+	case PhaseRunning:
+		return core.PhaseRunning
+	case PhaseSucceeded:
+		return core.PhaseSuccess
+	case PhaseFailed:
+		return core.PhaseRetryableFailure
+	case PhaseAborted:
+		return core.PhaseAborted
+	default:
+		return core.PhaseUndefined
+	}
+}
+
+// get phase string from phase ID
+// This function should be removed in the future
+func (r *TaskActionReconciler) getPhaseString(phase core.Phase) string {
+	switch phase {
+	case core.PhaseQueued:
+		return PhaseQueued
+	case core.PhaseInitializing:
+		return PhaseInitializing
+	case core.PhaseRunning:
+		return PhaseRunning
+	case core.PhaseSuccess:
+		return PhaseSucceeded
+	case core.PhaseRetryableFailure:
+		return PhaseFailed
+	case core.PhaseAborted:
+		return PhaseAborted
+	default:
+		return ""
+	}
 }
 
 // SetupWithManager sets up the controller with the Manager.

@@ -2,22 +2,20 @@ package fakeplugins
 
 import (
 	"context"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-
 	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"time"
 )
 
-// Phase constants
-const (
-	PhaseQueued       = "PHASE_QUEUED"
-	PhaseInitializing = "PHASE_INITIALIZING"
-	PhaseRunning      = "PHASE_RUNNING"
-	PhaseSucceeded    = "PHASE_SUCCEEDED"
-	PhaseFailed       = "PHASE_FAILED"
-	PhaseAborted      = "PHASE_ABORTED"
-)
+// PhaseToStringMap maps core.Phase to phase string
+var PhaseToStringMap = map[pluginCore.Phase]string{
+	pluginCore.PhaseQueued:           "PHASE_QUEUED",
+	pluginCore.PhaseInitializing:     "PHASE_INITIALIZING",
+	pluginCore.PhaseRunning:          "PHASE_RUNNING",
+	pluginCore.PhaseSuccess:          "PHASE_SUCCEEDED",
+	pluginCore.PhaseRetryableFailure: "PHASE_FAILED",
+	pluginCore.PhaseAborted:          "PHASE_ABORTED",
+}
 
 type NextPhaseState struct {
 	Phase        pluginCore.Phase
@@ -42,47 +40,28 @@ func (n NextPhaseStatePlugin) GetProperties() pluginCore.PluginProperties {
 	return n.props
 }
 
-func (n NextPhaseStatePlugin) Handle(ctx context.Context, phase string) (string, error) {
-	logger := log.FromContext(ctx)
-	var nextPhase string
-	switch phase {
-	case "":
-		// New TaskAction - transition to Queued
-		nextPhase = PhaseQueued
-		logger.Info("New TaskAction detected, transitioning to Queued",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseQueued:
-		// Queued → Initializing
-		nextPhase = PhaseInitializing
-		logger.Info("Transitioning from Queued to Initializing",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseInitializing:
-		// Initializing → Running
-		nextPhase = PhaseRunning
-		logger.Info("Transitioning from Initializing to Running",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseRunning:
-		// Running → Succeeded (simulated execution)
-		nextPhase = PhaseSucceeded
-		logger.Info("Transitioning from Running to Succeeded",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseSucceeded, PhaseFailed, PhaseAborted:
-		// Terminal states - no further transitions
-		logger.Info("TaskAction in terminal state",
-			"name", taskAction.Name, "phase", currentPhase)
-		return ctrl.Result{}, nil
-
-	default:
-		logger.Info("Unknown phase, resetting to Queued",
-			"name", taskAction.Name, "phase", currentPhase)
-		nextPhase = PhaseQueued
+func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskExecutionContext) (pluginCore.Transition, error) {
+	// Get current plugin phase
+	s := &NextPhaseState{}
+	phaseVersion, err := tCtx.PluginStateReader().Get(s)
+	if err != nil {
+		return pluginCore.Transition{}, err
 	}
-	return nextPhase, nil
 
+	switch pluginCore.Phase(phaseVersion) {
+	case pluginCore.PhaseSuccess, pluginCore.PhasePermanentFailure, pluginCore.PhaseRetryableFailure:
+		return pluginCore.Transition{}, nil
+	case pluginCore.PhaseInitializing:
+		return pluginCore.DoTransition(pluginCore.PhaseInfoRunning(s.PhaseVersion, s.TaskInfo)), nil
+	case pluginCore.PhaseQueued:
+		return pluginCore.DoTransition(pluginCore.PhaseInfoInitializing(time.Now(), s.PhaseVersion, "initializing", s.TaskInfo)), nil
+	case pluginCore.PhaseRunning:
+		return pluginCore.DoTransition(pluginCore.PhaseInfoSuccess(s.TaskInfo)), nil
+	case pluginCore.PhaseNotReady:
+		return pluginCore.DoTransition(pluginCore.PhaseInfoQueued(time.Now(), s.PhaseVersion, "Queueing")), nil
+	default:
+		return pluginCore.Transition{}, nil
+	}
 }
 
 func (n NextPhaseStatePlugin) Abort(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {

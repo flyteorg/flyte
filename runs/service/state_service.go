@@ -308,18 +308,18 @@ func (s *StateService) actionToUpdate(action *repository.Action) *workflow.Actio
 func (s *StateService) stringToPhase(phase string) common.ActionPhase {
 	switch phase {
 	case "PHASE_QUEUED":
-		return common.ActionPhase_PHASE_QUEUED
+		return common.ActionPhase_ACTION_PHASE_QUEUED
 	case "PHASE_INITIALIZING":
-		return common.ActionPhase_PHASE_INITIALIZING
+		return common.ActionPhase_ACTION_PHASE_INITIALIZING
 	case "PHASE_RUNNING":
-		return common.ActionPhase_PHASE_RUNNING
+		return common.ActionPhase_ACTION_PHASE_RUNNING
 	case "PHASE_SUCCEEDED":
-		return common.ActionPhase_PHASE_SUCCEEDED
+		return common.ActionPhase_ACTION_PHASE_SUCCEEDED
 	case "PHASE_FAILED":
-		return common.ActionPhase_PHASE_FAILED
+		return common.ActionPhase_ACTION_PHASE_FAILED
 	case "PHASE_ABORTED":
-		return common.ActionPhase_PHASE_ABORTED
+		return common.ActionPhase_ACTION_PHASE_ABORTED
 	default:
-		return common.ActionPhase_PHASE_UNSPECIFIED
+		return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 	}
 }
