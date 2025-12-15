@@ -1798,15 +1798,28 @@
       },
       "description": "Defines a strongly typed variable."
     },
+    "coreVariableEntry": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/coreVariable"
+        }
+      },
+      "description": "Defines a single entity for variable."
+    },
     "coreVariableMap": {
       "type": "object",
       "properties": {
         "variables": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/coreVariable"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreVariableEntry"
           },
-          "description": "Defines a map of variable names to variables."
+          "title": "Use repeated key value pair"
         }
       },
       "title": "A map of Variables"
