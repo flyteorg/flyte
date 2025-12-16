@@ -105,7 +105,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	taskAction := &flyteorgv1.TaskAction{}
 	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
 		if errors.IsNotFound(err) {
-			// Call handler to abort
+			// TaskAction was deleted
 			logger.Info("TaskAction not found, likely deleted", "name", req.NamespacedName)
 			return ctrl.Result{}, nil
 		}
