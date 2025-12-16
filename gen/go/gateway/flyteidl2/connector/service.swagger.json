@@ -2132,6 +2132,10 @@
         "debuggable": {
           "type": "boolean",
           "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
+        },
+        "log_links": {
+          "$ref": "#/definitions/coreTaskLog",
+          "description": "Log links associated with this task."
         }
       },
       "title": "Task Metadata"

@@ -889,6 +889,35 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	// no validation rules for Debuggable
 
+	if all {
+		switch v := interface{}(m.GetLogLinks()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "LogLinks",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "LogLinks",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLogLinks()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskMetadataValidationError{
+				field:  "LogLinks",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.InterruptibleValue.(type) {
 	case *TaskMetadata_Interruptible:
 		if v == nil {

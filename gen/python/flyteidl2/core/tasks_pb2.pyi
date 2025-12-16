@@ -1,3 +1,4 @@
+from flyteidl2.core import execution_pb2 as _execution_pb2
 from flyteidl2.core import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
@@ -101,7 +102,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -124,6 +125,7 @@ class TaskMetadata(_message.Message):
     GENERATES_DECK_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     DEBUGGABLE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -139,7 +141,8 @@ class TaskMetadata(_message.Message):
     generates_deck: _wrappers_pb2.BoolValue
     metadata: K8sObjectMetadata
     debuggable: bool
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ...) -> None: ...
+    log_links: _execution_pb2.TaskLog
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Union[_execution_pb2.TaskLog, _Mapping]] = ...) -> None: ...
 
 class TaskTemplate(_message.Message):
     __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config"]

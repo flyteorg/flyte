@@ -232,6 +232,25 @@
         }
       }
     },
+    "TaskLogLinkType": {
+      "type": "string",
+      "enum": [
+        "EXTERNAL",
+        "DASHBOARD",
+        "IDE"
+      ],
+      "default": "EXTERNAL",
+      "description": " - EXTERNAL: The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.\n - DASHBOARD: The link for spark UI, ray dashboard, etc.\n - IDE: The link for vscode or other IDEs."
+    },
+    "TaskLogMessageFormat": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CSV",
+        "JSON"
+      ],
+      "default": "UNKNOWN"
+    },
     "TaskTriggersSummaryTriggerStats": {
       "type": "object",
       "properties": {
@@ -1446,6 +1465,36 @@
         }
       }
     },
+    "coreTaskLog": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "message_format": {
+          "$ref": "#/definitions/TaskLogMessageFormat"
+        },
+        "ttl": {
+          "type": "string"
+        },
+        "ShowWhilePending": {
+          "type": "boolean"
+        },
+        "HideOnceFinished": {
+          "type": "boolean"
+        },
+        "link_type": {
+          "$ref": "#/definitions/TaskLogLinkType"
+        },
+        "ready": {
+          "type": "boolean"
+        }
+      },
+      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
+    },
     "coreTaskTemplate": {
       "type": "object",
       "properties": {
@@ -1938,6 +1987,10 @@
         "debuggable": {
           "type": "boolean",
           "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
+        },
+        "log_links": {
+          "$ref": "#/definitions/coreTaskLog",
+          "description": "Log links associated with this task."
         }
       },
       "title": "Task Metadata"

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/literals.proto";
@@ -188,6 +189,9 @@ message TaskMetadata {
 
   // Whether the task is able to run the debugger (vscode server) inside the task container.
   bool debuggable = 17;
+
+  // Log links associated with this task.
+  core.TaskLog log_links = 18;
 }
 
 // A Task structure that uniquely identifies a task in the system
