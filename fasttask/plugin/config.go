@@ -16,7 +16,7 @@ var (
 		CallbackURI:               "http://host.docker.internal:15605",
 		DefaultEnvironmentTTL:     config.Duration{Duration: time.Second * 90},
 		DefaultWorkerTTL:          config.Duration{Duration: time.Second * 90},
-		InitializingWorkerTTL:     config.Duration{Duration: time.Minute * 5},
+		InitializingWorkerTTL:     config.Duration{Duration: time.Second * 0},
 		OrphanedWorkerTTL:         config.Duration{Duration: time.Second * 30},
 		Endpoint:                  "0.0.0.0:15605",
 		EnvDetectOrphanInterval:   config.Duration{Duration: time.Second * 60},

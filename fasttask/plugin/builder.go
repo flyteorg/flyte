@@ -554,12 +554,10 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 		timeSinceLastAccess := float64(now - workerLastAccessedAt)
 		switch worker.State() {
 		case interfaces.INITIALIZING:
-			if timeSinceLastAccess > initializingTTL {
+			if initializingTTL != 0 && timeSinceLastAccess > initializingTTL {
 				expiredInitializingWorkers = append(expiredInitializingWorkers, worker.ID())
 			}
-			// allow time for:
-			// - new pods to start up and connect
-			// - pod detected during env orphan detection to connect to the new deployment
+			// allow time for new pods to start up and connect
 		case interfaces.ORPHANED:
 			if timeSinceLastAccess > orphanedTTL {
 				expiredOrphanedWorkers = append(expiredOrphanedWorkers, worker.ID())
