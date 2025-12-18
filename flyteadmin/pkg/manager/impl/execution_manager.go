@@ -562,6 +562,14 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
+	// If a parentNode launched this execution and it's a launchPlan, respect the maxParallelism set in the launchPlan.
+	if parentNodeExecutionID > 0 {
+		if launchPlan.Spec.MaxParallelism > 0 {
+			logger.Info(ctx, fmt.Sprintf("Max parallelism %d set in the LaunchPlan spec.", launchPlan.Spec.MaxParallelism))
+			requestSpec.MaxParallelism = launchPlan.Spec.MaxParallelism
+		}
+	}
+
 	// Dynamically assign task resource defaults.
 	platformTaskResources := util.GetTaskResources(ctx, workflow.GetId(), m.resourceManager, m.config.TaskResourceConfiguration())
 	for _, t := range workflow.GetClosure().GetCompiledWorkflow().GetTasks() {
@@ -997,6 +1005,14 @@ func (m *ExecutionManager) launchExecution(
 	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, workflowExecutionID)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+
+	// If a parentNode launched this execution and it's a launchPlan, respect the maxParallelism set in the launchPlan.
+	if parentNodeExecutionID > 0 {
+		if launchPlan.Spec.MaxParallelism > 0 {
+			logger.Info(ctx, fmt.Sprintf("Max parallelism %d set in the LaunchPlan spec.", launchPlan.Spec.MaxParallelism))
+			requestSpec.MaxParallelism = launchPlan.Spec.MaxParallelism
+		}
 	}
 
 	// Dynamically assign task resource defaults.
