@@ -756,6 +756,35 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	return phaseInfo, err
 }
 
+// IsTerminal returns true if the RayJob is in a terminal state (Complete or Failed)
+func (rayJobResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*rayv1.RayJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
+	}
+	status := job.Status.JobDeploymentStatus
+	return status == rayv1.JobDeploymentStatusComplete || status == rayv1.JobDeploymentStatusFailed, nil
+}
+
+// GetCompletionTime returns the end time of the RayJob
+func (rayJobResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*rayv1.RayJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
+	}
+
+	if job.Status.EndTime != nil && !job.Status.EndTime.IsZero() {
+		return job.Status.EndTime.Time, nil
+	}
+
+	// Fallback to start time or creation time
+	if job.Status.StartTime != nil && !job.Status.StartTime.IsZero() {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
+}
+
 func init() {
 	if err := rayv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
