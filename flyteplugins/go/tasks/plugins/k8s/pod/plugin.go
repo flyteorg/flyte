@@ -5,13 +5,16 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	volcanov1beta1 "volcano.sh/apis/pkg/apis/scheduling/v1beta1"
 
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -263,6 +266,11 @@ func (plugin) GetProperties() k8s.PluginProperties {
 }
 
 func init() {
+	if config.GetK8sPluginConfig().EnableCreatePodGroupForPod {
+		if err := volcanov1beta1.AddToScheme(scheme.Scheme); err != nil {
+			panic(err)
+		}
+	}
 	// Register ContainerTaskType and SidecarTaskType plugin entries. These separate task types
 	// still exist within the system, only now both are evaluated using the same internal pod plugin
 	// instance. This simplifies migration as users may keep the same configuration but are

@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	volcanov1beta1 "volcano.sh/apis/pkg/apis/scheduling/v1beta1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -196,6 +197,93 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 	return podRequestedResources
 }
 
+// getRequestResource will get the actual request resource.
+// It will first check if there is a defined request resource, if not, it will use the limit resource as the request.
+func getRequestResource(resources v1.ResourceRequirements) v1.ResourceList {
+	merged := v1.ResourceList{}
+	for name, req := range resources.Requests {
+		merged[name] = req
+	}
+	// If resources don't have requests, it defaults limit if that is explicitly specified.
+	for name, lim := range resources.Limits {
+		if _, ok := merged[name]; !ok {
+			merged[name] = lim
+		}
+	}
+	return merged
+}
+
+// createPodGroupForPod will build the associated volcano podgroup for a pod.
+func createPodGroupForPod(taskCtx pluginsCore.TaskExecutionMetadata, pod *v1.Pod) *volcanov1beta1.PodGroup {
+	// minResources is a concept in Volcano. A PodGroup will be enqueued when the required minResources
+	// are available in the cluster. Enqueue is a pre-filtering step before resource allocation,
+	// so strict computation is not necessary as long as the PodGroup meets the criteria for enqueuing.
+	//
+	// The minResources value is determined by:
+	// - The the total resources requested by all main containers.
+	// - The highest individual resource request among the init containers.
+	minResources := v1.ResourceList{}
+	for _, c := range pod.Spec.Containers {
+		requestResources := getRequestResource(c.Resources)
+		for name, quantity := range requestResources {
+			if q, ok := minResources[name]; !ok {
+				minResources[name] = quantity.DeepCopy()
+			} else {
+				q.Add(quantity)
+				minResources[name] = q
+			}
+		}
+	}
+	// InitContainers are run sequentially before other containers start, so the highest
+	// init container resource is compared against the sum of app containers to determine
+	// the effective usage.
+	for _, c := range pod.Spec.InitContainers {
+		requestResources := getRequestResource(c.Resources)
+		for name, quantity := range requestResources {
+			if value, ok := minResources[name]; !ok || quantity.Cmp(value) > 0 {
+				minResources[name] = quantity.DeepCopy()
+			}
+		}
+	}
+	podGroup := &volcanov1beta1.PodGroup{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: volcanov1beta1.SchemeGroupVersion.String(),
+			Kind:       "PodGroup",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            pod.Name,
+			Namespace:       pod.Namespace,
+			OwnerReferences: []metav1.OwnerReference{taskCtx.GetOwnerReference()},
+			Annotations:     map[string]string{},
+			Labels:          map[string]string{},
+		},
+		Spec: volcanov1beta1.PodGroupSpec{
+			MinMember:         1,
+			PriorityClassName: pod.Spec.PriorityClassName,
+			MinResources:      &minResources,
+		},
+	}
+	if pod.Labels != nil {
+		for k, v := range pod.Labels {
+			podGroup.Labels[k] = v
+		}
+	}
+	if pod.Annotations != nil {
+		for k, v := range pod.Annotations {
+			podGroup.Annotations[k] = v
+		}
+	}
+	if pod.Annotations == nil {
+		pod.Annotations = make(map[string]string)
+	}
+	if queueName, ok := pod.Annotations[volcanov1beta1.QueueNameAnnotationKey]; ok {
+		podGroup.Spec.Queue = queueName
+	}
+	// This is to prevent volcano from creating the podgroup for the pod
+	pod.Annotations[volcanov1beta1.KubeGroupNameAnnotationKey] = podGroup.Name
+	return podGroup
+}
+
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 	tmpl, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -235,6 +323,19 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 		cfg := nodeTaskConfig.GetConfig()
 		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration.Duration)
+
+		if config.GetK8sPluginConfig().EnableCreatePodGroupForPod {
+			podGroup := createPodGroupForPod(k8sTaskCtxMetadata, pod)
+			err := e.kubeClient.GetClient().Create(ctx, podGroup)
+			if err != nil {
+				if !k8serrors.IsAlreadyExists(err) {
+					reason := k8serrors.ReasonForError(err)
+					return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create volcano podgroup for pod")
+				}
+				// The error is IsAlreadyExists
+				logger.Warnf(ctx, "PodGroup [%s] is already exists. Err: %v", podGroup.Name, err)
+			}
+		}
 
 		err = backOffHandler.Handle(ctx, func() error {
 			return e.kubeClient.GetClient().Create(ctx, o)

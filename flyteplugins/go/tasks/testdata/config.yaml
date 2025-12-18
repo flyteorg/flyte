@@ -40,6 +40,7 @@ plugins:
     default-security-context:
       allowPrivilegeEscalation: false
     enable-host-networking-pod: true
+    enable-create-pod-group-for-pod: false
     default-pod-dns-config:
       options:
         - name: "ndots"
