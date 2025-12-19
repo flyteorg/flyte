@@ -9,7 +9,7 @@ requires-python = ">=3.10"
 description = "Enables actor v2"
 authors = [{ name = "unionai", email = "info@union.ai" }]
 readme = { file = "README.md", content-type = "text/markdown" }
-dependencies = ["flyte>=2.0.0b23,<2.0.0b40"]
+dependencies = ["flyte>=2.0.0b23,<2.1.0"]
 classifiers = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
