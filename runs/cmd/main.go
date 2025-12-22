@@ -78,7 +78,7 @@ func serve(ctx context.Context) error {
 	}
 
 	// Create repository
-	repo := repository.NewPostgresRepository(db)
+	repo := repository.NewRepository(db)
 
 	// Create queue service client
 	queueClient := workflowconnect.NewQueueServiceClient(
