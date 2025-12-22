@@ -540,6 +540,8 @@ func (m *TaskLog) validate(all bool) error {
 
 	// no validation rules for Ready
 
+	// no validation rules for IconUri
+
 	if len(errors) > 0 {
 		return TaskLogMultiError(errors)
 	}

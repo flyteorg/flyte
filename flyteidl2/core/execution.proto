@@ -106,6 +106,7 @@ message TaskLog {
   bool HideOnceFinished = 6;
   LinkType link_type = 7;
   bool ready = 8;
+  string icon_uri = 9;
 }
 
 // Contains metadata required to identify logs produces by a set of pods
