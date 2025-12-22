@@ -191,7 +191,7 @@ message TaskMetadata {
   bool debuggable = 17;
 
   // Log links associated with this task.
-  core.TaskLog log_links = 18;
+  repeated core.TaskLog log_links = 18;
 }
 
 // A Task structure that uniquely identifies a task in the system
