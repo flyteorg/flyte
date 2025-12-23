@@ -171,6 +171,14 @@ Test 7: Aborting a run...
 All tests completed successfully! 🎉
 ```
 
+## Scripts
+
+Convenient scripts are provided in `runs/tests/scripts/` to interact with the service using `buf curl`.
+Ensure the service is running before executing these scripts.
+
+- `./runs/tests/scripts/create_task.sh` - create a new task
+- `./runs/tests/scripts/list_tasks.sh` - list tasks with name filtering
+
 ### Check service health
 
 ```bash
