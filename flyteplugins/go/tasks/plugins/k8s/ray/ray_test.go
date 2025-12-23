@@ -3,6 +3,7 @@ package ray
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -1217,7 +1218,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "test-namespace",
 					CreationTimestamp: metav1.Time{
-						Time: time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+						Time: time.Unix(0, 0),
 					},
 				},
 				Status: rayv1.RayJobStatus{
@@ -1231,7 +1232,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			expectedTaskLogs: []*core.TaskLog{
 				{
 					Name: "ray job ID",
-					Uri:  "http://test/2024-01-01T12:00:00Z/1704110400",
+					Uri:  fmt.Sprintf("http://test/%s/0", time.Unix(0, 0).Format(time.RFC3339)),
 				},
 			},
 		},
