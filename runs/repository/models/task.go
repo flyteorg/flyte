@@ -43,16 +43,16 @@ type TaskName struct {
 
 // TaskKey is a composite key for a task
 type TaskKey struct {
-	Org     string
-	Project string
-	Domain  string
-	Name    string
-	Version string
+	Org     string `gorm:"primaryKey;index:idx_tasks_identifier,priority:1" db:"org"`
+	Project string `gorm:"primaryKey;index:idx_tasks_identifier,priority:2" db:"project"`
+	Domain  string `gorm:"primaryKey;index:idx_tasks_identifier,priority:3" db:"domain"`
+	Name    string `gorm:"primaryKey;index:idx_tasks_identifier,priority:4" db:"name"`
+	Version string `gorm:"primaryKey;index:idx_tasks_identifier,priority:5" db:"version"`
 }
 
 // Tasks models the TaskDetails from the task_definition.proto
 type Task struct {
-	TaskKey `gorm:"-" db:"-"`
+	TaskKey `gorm:"embedded"`
 
 	// Extracted from Name
 	Environment  string `gorm:"column:environment" db:"environment"`
@@ -68,13 +68,16 @@ type Task struct {
 	TotalTriggers         uint32         `gorm:"column:total_triggers" db:"total_triggers"`
 	ActiveTriggers        uint32         `gorm:"column:active_triggers" db:"active_triggers"`
 	TriggerAutomationSpec []byte         `gorm:"column:trigger_automation_spec" db:"trigger_automation_spec"`
-	TriggerTypes          pgtype.Bits    `gorm:"column:trigger_types" db:"trigger_types"`
+	TriggerTypes          pgtype.Bits    `gorm:"column:trigger_types;type:bit(10)" db:"trigger_types"`
 	EnvDescription        sql.NullString `gorm:"column:env_description" db:"env_description" json:"env_description,omitempty"`
 	ShortDescription      sql.NullString `gorm:"column:short_description" db:"short_description" json:"short_description,omitempty"`
 
 	// Spec
 	TaskSpec []byte `gorm:"column:task_spec" db:"task_spec"`
 }
+
+// TableName specifies the table name
+func (Task) TableName() string { return "tasks" }
 
 type TaskCounts struct {
 	// FilteredTotal is the number of tasks matching the applied filter

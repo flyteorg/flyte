@@ -11,21 +11,24 @@ import (
 )
 
 var (
-	Marshaller        = proto.MarshalOptions{}
+	Marshaller = proto.MarshalOptions{}
 )
 
 // TaskSpec is the model for ALL action specs, including normal tasks, traces, conditional actions, etc.
 type TaskSpec struct {
 	// Base64 encoded digest used as a unique identifier for the task spec
-	Digest string
+	Digest string `gorm:"primaryKey" db:"digest"`
 
 	// Base fields
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP" db:"created_at"`
+	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP" db:"updated_at"`
 
 	// Marshaled task spec
-	Spec []byte
+	Spec []byte `gorm:"not null" db:"spec"`
 }
+
+// TableName specifies the table name
+func (TaskSpec) TableName() string { return "task_specs" }
 
 func NewTaskSpecModel(ctx context.Context, spec *flyteWorkflow.TaskSpec) (*TaskSpec, error) {
 	digest, err := pbhash.ComputeHashString(ctx, spec)

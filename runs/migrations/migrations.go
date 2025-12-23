@@ -27,7 +27,7 @@ func RunMigrations(db *gorm.DB) error {
 	}
 
 	// AutoMigrate will create the new actions table with simplified schema
-	if err := db.AutoMigrate(&models.Action{}); err != nil {
+	if err := db.AutoMigrate(&models.Action{}, &models.Task{}, &models.TaskSpec{}); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
