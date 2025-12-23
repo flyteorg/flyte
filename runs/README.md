@@ -232,6 +232,12 @@ The service exposes the following buf connect endpoints:
 - `POST /flyteidl2.workflow.RunService/ListActions` - List actions for a run
 - `POST /flyteidl2.workflow.RunService/AbortAction` - Abort a specific action
 
+### Task Management
+- `POST /flyteidl2.workflow.TaskService/CreateTask` - Create a new task
+- `POST /flyteidl2.workflow.TaskService/GetTask` - Get task details
+- `POST /flyteidl2.workflow.TaskService/ListTasks` - List tasks with filtering and sorting
+- `POST /flyteidl2.workflow.TaskService/UpdateTask` - Update an existing task
+
 ### Streaming (Watch) RPCs
 - `POST /flyteidl2.workflow.RunService/WatchRunDetails` - Stream run detail updates
 - `POST /flyteidl2.workflow.RunService/WatchActionDetails` - Stream action detail updates
