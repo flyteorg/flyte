@@ -124,11 +124,10 @@ func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.Tas
 }
 
 func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResourceInput) (*models.TaskListResult, error) {
-	// TODO(nary): This is a simplified version. The original had complex CTE queries for:
+	// TODO(nary): This is a simplified version without following features:
 	// - Selecting latest version per task name using ROW_NUMBER() window function
 	// - Filtered and unfiltered counts
 	// - Custom filter expressions
-	// Need to reimplement with GORM raw queries or refactor the logic
 
 	var tasks []*models.Task
 	query := r.db.WithContext(ctx).Model(&models.Task{})
