@@ -384,14 +384,20 @@ The service automatically selects the database based on configuration:
 
 No code changes needed, just update `config.yaml`!
 
+### Database migration
+
+We are using gorm for auto migration, please ensure addding `gorm` tags in `/runs/repository/models/` when you
+add any more columns/models.
+
 ### Adding new features
 
 1. Update proto definitions in `/flyteidl2/workflow/`
 2. Regenerate code: `buf generate`
-3. Update repository interface in `repository/interfaces.go`
-4. Implement in `repository/postgres.go`
-5. Add service handler in `service/run_service.go`
-6. Add tests and update client
+3. Update repository interface in `repository/interfaces/`
+4. Update DB models in `repository/models/`
+5. Implement in `repository/impl/`
+6. Add service handler in `service/xxx_service.go`
+7. Add tests and update client
 
 ## Troubleshooting
 
