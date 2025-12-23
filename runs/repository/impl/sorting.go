@@ -33,7 +33,7 @@ func NewSortParameter(field string, order interfaces.SortOrder) interfaces.SortP
 
 // GetSortByFieldsV2 converts proto sort fields to our SortParameter interfaces with validation
 func GetSortByFieldsV2(request *common.ListRequest, allowedSortColumns sets.Set[string]) ([]interfaces.SortParameter, error) {
-	if request == nil || request.GetSortByFields() == nil{
+	if request == nil || request.GetSortByFields() == nil {
 		return nil, nil
 	}
 

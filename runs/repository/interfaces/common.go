@@ -5,7 +5,7 @@ type ListResourceInput struct {
 	Limit  int
 	Offset int
 
-	Filter            Filter
+	Filter Filter
 	// The filter set by scopeBy in the query
 	ScopeByFilter  Filter
 	SortParameters []SortParameter
