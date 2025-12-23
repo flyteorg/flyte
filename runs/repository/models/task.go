@@ -5,6 +5,32 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"k8s.io/apimachinery/pkg/util/sets"
+)
+
+// TaskColumns are the allowed columns for task queries
+var TaskColumns = sets.New(
+	"org",
+	"project",
+	"domain",
+	"name",
+	"version",
+	"environment",
+	"function_name",
+	"deployed_by",
+	"created_at",
+	"updated_at",
+	"trigger_name",
+	"total_triggers",
+	"active_triggers",
+	"env_description",
+	"short_description",
+)
+
+// TaskVersionColumns are the allowed columns for task version queries
+var TaskVersionColumns = sets.New(
+	"version",
+	"created_at",
 )
 
 // TaskName is a composite key representing a task
