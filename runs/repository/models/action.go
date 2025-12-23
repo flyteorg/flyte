@@ -9,33 +9,33 @@ import (
 // Action represents a workflow action in the database
 // Root actions (where ParentActionName is NULL) represent runs
 type Action struct {
-	ID uint `gorm:"primaryKey"`
+	ID uint `gorm:"primaryKey" db:"id"`
 
 	// Action Identifier (unique across org/project/domain/name)
-	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org"`
-	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project"`
-	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain"`
-	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4"`
+	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org" db:"org"`
+	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project" db:"project"`
+	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain" db:"domain"`
+	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
-	ParentActionName *string `gorm:"index:idx_actions_parent"`
+	ParentActionName *string `gorm:"index:idx_actions_parent" db:"parent_action_name"`
 
 	// High-level status for quick queries/filtering
-	Phase string `gorm:"not null;default:'PHASE_QUEUED';index:idx_actions_phase"`
+	Phase string `gorm:"not null;default:'PHASE_QUEUED';index:idx_actions_phase" db:"phase"`
 
 	// Serialized protobuf messages
 	// ActionSpec contains the full action specification proto
-	ActionSpec datatypes.JSON `gorm:"type:jsonb"`
+	ActionSpec datatypes.JSON `gorm:"type:jsonb" db:"action_spec"`
 
 	// ActionDetails contains the full action details proto:
 	// - ActionStatus (phase, timestamps, error, cache status, etc.)
 	// - ActionAttempts array (all attempts with their phase transitions, cluster events, logs, etc.)
 	// - Any other runtime state
-	ActionDetails datatypes.JSON `gorm:"type:jsonb"`
+	ActionDetails datatypes.JSON `gorm:"type:jsonb" db:"action_details"`
 
 	// Timestamps
-	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created"`
-	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated"`
+	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
+	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 }
 
 // TableName specifies the table name
