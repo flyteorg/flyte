@@ -1,4 +1,4 @@
-package repository
+package impl
 
 import (
 	"context"
@@ -15,10 +15,12 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// PostgresRepository implements Repository interface using PostgreSQL/SQLite
-type PostgresRepository struct {
+// actionRepo implements actionRepo interface using PostgreSQL/SQLite
+type actionRepo struct {
 	db         *gorm.DB
 	isPostgres bool
 	listener   *pq.Listener
@@ -29,13 +31,13 @@ type PostgresRepository struct {
 	mu                sync.RWMutex
 }
 
-// NewPostgresRepository creates a new PostgreSQL/SQLite repository
-func NewPostgresRepository(db *gorm.DB) Repository {
+// NewActionRepo creates a new PostgreSQL/SQLite repository
+func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
 
-	repo := &PostgresRepository{
+	repo := &actionRepo{
 		db:                db,
 		isPostgres:        isPostgres,
 		runSubscribers:    make(map[chan string]bool),
@@ -51,7 +53,7 @@ func NewPostgresRepository(db *gorm.DB) Repository {
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
-func (r *PostgresRepository) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*Run, error) {
+func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
 	// Determine run ID
 	var runID *common.RunIdentifier
 	switch id := req.Id.(type) {
@@ -104,7 +106,7 @@ func (r *PostgresRepository) CreateRun(ctx context.Context, req *workflow.Create
 	}
 
 	// Create root action (represents the run)
-	run := &Run{
+	run := &models.Run{
 		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
@@ -129,8 +131,8 @@ func (r *PostgresRepository) CreateRun(ctx context.Context, req *workflow.Create
 }
 
 // GetRun retrieves a run by identifier
-func (r *PostgresRepository) GetRun(ctx context.Context, runID *common.RunIdentifier) (*Run, error) {
-	var run Run
+func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
+	var run models.Run
 	result := r.db.WithContext(ctx).
 		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
@@ -148,8 +150,8 @@ func (r *PostgresRepository) GetRun(ctx context.Context, runID *common.RunIdenti
 }
 
 // ListRuns lists runs with pagination
-func (r *PostgresRepository) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*Run, string, error) {
-	query := r.db.WithContext(ctx).Model(&Run{}).
+func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
+	query := r.db.WithContext(ctx).Model(&models.Run{}).
 		Where("parent_action_name IS NULL") // Only root actions (runs)
 
 	// Apply scope filters
@@ -167,7 +169,7 @@ func (r *PostgresRepository) ListRuns(ctx context.Context, req *workflow.ListRun
 		limit = int(req.Request.Limit)
 	}
 
-	var runs []*Run
+	var runs []*models.Run
 	result := query.
 		Order("created_at DESC").
 		Limit(limit + 1). // Fetch one extra to determine if there are more
@@ -188,7 +190,7 @@ func (r *PostgresRepository) ListRuns(ctx context.Context, req *workflow.ListRun
 }
 
 // AbortRun aborts a run and all its actions
-func (r *PostgresRepository) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	// Update the run action to aborted
 	updates := map[string]interface{}{
 		"phase":      "PHASE_ABORTED",
@@ -196,7 +198,7 @@ func (r *PostgresRepository) AbortRun(ctx context.Context, runID *common.RunIden
 	}
 
 	result := r.db.WithContext(ctx).
-		Model(&Run{}).
+		Model(&models.Run{}).
 		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		Updates(updates)
@@ -213,7 +215,7 @@ func (r *PostgresRepository) AbortRun(ctx context.Context, runID *common.RunIden
 }
 
 // CreateAction creates a new action
-func (r *PostgresRepository) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*Action, error) {
+func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error) {
 	// Serialize action spec
 	actionSpecBytes, err := json.Marshal(actionSpec)
 	if err != nil {
@@ -226,7 +228,7 @@ func (r *PostgresRepository) CreateAction(ctx context.Context, runID uint, actio
 		parentActionName = actionSpec.ParentActionName
 	}
 
-	action := &Action{
+	action := &models.Action{
 		Org:              actionSpec.ActionId.Run.Org,
 		Project:          actionSpec.ActionId.Run.Project,
 		Domain:           actionSpec.ActionId.Run.Domain,
@@ -250,8 +252,8 @@ func (r *PostgresRepository) CreateAction(ctx context.Context, runID uint, actio
 }
 
 // GetAction retrieves an action by identifier
-func (r *PostgresRepository) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*Action, error) {
-	var action Action
+func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
+	var action models.Action
 	result := r.db.WithContext(ctx).
 		Where("org = ? AND project = ? AND domain = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
@@ -268,12 +270,12 @@ func (r *PostgresRepository) GetAction(ctx context.Context, actionID *common.Act
 }
 
 // ListActions lists actions for a run
-func (r *PostgresRepository) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*Action, string, error) {
+func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
 	if limit == 0 {
 		limit = 100
 	}
 
-	query := r.db.WithContext(ctx).Model(&Action{}).
+	query := r.db.WithContext(ctx).Model(&models.Action{}).
 		Where("org = ? AND project = ? AND domain = ?",
 							runID.Org, runID.Project, runID.Domain).
 		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
@@ -283,7 +285,7 @@ func (r *PostgresRepository) ListActions(ctx context.Context, runID *common.RunI
 		query = query.Where("id > ?", token)
 	}
 
-	var actions []*Action
+	var actions []*models.Action
 	result := query.
 		Order("id ASC").
 		Limit(limit + 1).
@@ -304,14 +306,14 @@ func (r *PostgresRepository) ListActions(ctx context.Context, runID *common.RunI
 }
 
 // UpdateActionPhase updates the phase of an action
-func (r *PostgresRepository) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error {
+func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error {
 	updates := map[string]interface{}{
 		"phase":      phase,
 		"updated_at": time.Now(),
 	}
 
 	result := r.db.WithContext(ctx).
-		Model(&Action{}).
+		Model(&models.Action{}).
 		Where("org = ? AND project = ? AND domain = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
 		Updates(updates)
@@ -327,14 +329,14 @@ func (r *PostgresRepository) UpdateActionPhase(ctx context.Context, actionID *co
 }
 
 // AbortAction aborts a specific action
-func (r *PostgresRepository) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	updates := map[string]interface{}{
 		"phase":      "PHASE_ABORTED",
 		"updated_at": time.Now(),
 	}
 
 	result := r.db.WithContext(ctx).
-		Model(&Action{}).
+		Model(&models.Action{}).
 		Where("org = ? AND project = ? AND domain = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
 		Updates(updates)
@@ -351,7 +353,7 @@ func (r *PostgresRepository) AbortAction(ctx context.Context, actionID *common.A
 }
 
 // UpdateActionState updates the state of an action
-func (r *PostgresRepository) UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
+func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
 	// Parse the state JSON to extract the phase
 	var stateObj map[string]interface{}
 	if err := json.Unmarshal([]byte(state), &stateObj); err != nil {
@@ -374,7 +376,7 @@ func (r *PostgresRepository) UpdateActionState(ctx context.Context, actionID *co
 	updates["action_details"] = datatypes.JSON([]byte(state))
 
 	result := r.db.WithContext(ctx).
-		Model(&Action{}).
+		Model(&models.Action{}).
 		Where("org = ? AND project = ? AND domain = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
 		Updates(updates)
@@ -395,8 +397,8 @@ func (r *PostgresRepository) UpdateActionState(ctx context.Context, actionID *co
 }
 
 // GetActionState retrieves the state of an action
-func (r *PostgresRepository) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
-	var action Action
+func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
+	var action models.Action
 	result := r.db.WithContext(ctx).
 		Select("action_details").
 		Where("org = ? AND project = ? AND domain = ? AND name = ?",
@@ -413,21 +415,21 @@ func (r *PostgresRepository) GetActionState(ctx context.Context, actionID *commo
 }
 
 // NotifyStateUpdate sends a notification about a state update
-func (r *PostgresRepository) NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
+func (r *actionRepo) NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
 	// This is already handled by notifyActionUpdate
 	r.notifyActionUpdate(ctx, actionID)
 	return nil
 }
 
 // WatchStateUpdates watches for state updates (simplified implementation)
-func (r *PostgresRepository) WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
+func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
 	// For now, just block until context is cancelled
 	// In a full implementation, this would listen for state notifications
 	<-ctx.Done()
 }
 
 // WatchRunUpdates watches for run updates (simplified polling implementation)
-func (r *PostgresRepository) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Run, errs chan<- error) {
+func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
@@ -490,7 +492,7 @@ func (r *PostgresRepository) WatchRunUpdates(ctx context.Context, runID *common.
 }
 
 // WatchAllRunUpdates watches for all run updates (not filtered by runID)
-func (r *PostgresRepository) WatchAllRunUpdates(ctx context.Context, updates chan<- *Run, errs chan<- error) {
+func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		notifCh := make(chan string, 10)
@@ -548,7 +550,7 @@ func (r *PostgresRepository) WatchAllRunUpdates(ctx context.Context, updates cha
 				return
 			case <-ticker.C:
 				// Query runs updated since last check
-				var runs []*Run
+				var runs []*models.Run
 				if err := r.db.WithContext(ctx).
 					Where("updated_at > ? AND parent_action_name IS NULL", lastCheck).
 					Find(&runs).Error; err != nil {
@@ -567,7 +569,7 @@ func (r *PostgresRepository) WatchAllRunUpdates(ctx context.Context, updates cha
 }
 
 // WatchActionUpdates watches for action updates
-func (r *PostgresRepository) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *Action, errs chan<- error) {
+func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
@@ -623,7 +625,7 @@ func (r *PostgresRepository) WatchActionUpdates(ctx context.Context, runID *comm
 				return
 			case <-ticker.C:
 				// Query actions updated since last check
-				var actions []*Action
+				var actions []*models.Action
 				if err := r.db.WithContext(ctx).
 					Where("org = ? AND project = ? AND domain = ? AND updated_at > ? AND parent_action_name IS NOT NULL",
 						runID.Org, runID.Project, runID.Domain, lastCheck).
@@ -643,7 +645,7 @@ func (r *PostgresRepository) WatchActionUpdates(ctx context.Context, runID *comm
 }
 
 // startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener
-func (r *PostgresRepository) startPostgresListener() {
+func (r *actionRepo) startPostgresListener() {
 	// Get the underlying SQL DB
 	sqlDB, err := r.db.DB()
 	if err != nil {
@@ -736,7 +738,7 @@ func (r *PostgresRepository) startPostgresListener() {
 }
 
 // notifyRunUpdate sends a notification about a run update
-func (r *PostgresRepository) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
+func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
 	if !r.isPostgres {
 		return
 	}
@@ -751,7 +753,7 @@ func (r *PostgresRepository) notifyRunUpdate(ctx context.Context, runID *common.
 }
 
 // notifyActionUpdate sends a notification about an action update
-func (r *PostgresRepository) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
 	if !r.isPostgres {
 		return
 	}
