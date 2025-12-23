@@ -209,6 +209,23 @@
         }
       }
     },
+    "TaskGroupErrorCounts": {
+      "type": "object",
+      "properties": {
+        "user_error": {
+          "type": "string",
+          "format": "int64"
+        },
+        "system_error": {
+          "type": "string",
+          "format": "int64"
+        },
+        "unspecified_error": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "TaskLogLinkType": {
       "type": "string",
       "enum": [
@@ -3077,6 +3094,9 @@
         "short_name": {
           "type": "string",
           "description": "short name (function name) of the task."
+        },
+        "error_counts": {
+          "$ref": "#/definitions/TaskGroupErrorCounts"
         }
       },
       "description": "TaskGroup represents a group of runs for a specific task."
