@@ -67,21 +67,3 @@ func NewTaskSpecModelFromTraceSpec(ctx context.Context, traceSpec *flyteWorkflow
 		Spec:   specBytes,
 	}, nil
 }
-
-// ToTaskSpec uses the deprecated task spec unmarshalling
-func ToTaskSpec(specModel *TaskSpec) (*flyteWorkflow.TaskSpec, error) {
-	spec := &flyteWorkflow.TaskSpec{}
-	if err := proto.Unmarshal(specModel.Spec, spec); err != nil {
-		return nil, err
-	}
-	return spec, nil
-}
-
-// ToTraceSpec uses the deprecated trace spec unmarshalling
-func ToTraceSpec(specModel *TaskSpec) (*flyteWorkflow.TraceSpec, error) {
-	spec := &flyteWorkflow.TraceSpec{}
-	if err := proto.Unmarshal(specModel.Spec, spec); err != nil {
-		return nil, err
-	}
-	return spec, nil
-}
