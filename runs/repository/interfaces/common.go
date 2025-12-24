@@ -14,9 +14,10 @@ type ListResourceInput struct {
 func (l ListResourceInput) WithFilter(filter Filter) ListResourceInput {
 	if l.Filter != nil {
 		l.Filter = l.Filter.And(filter)
+	} else {
+		l.Filter = filter
 	}
 
-	l.Filter = filter
 	return l
 }
 
