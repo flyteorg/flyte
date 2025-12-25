@@ -45,3 +45,9 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'gen/go/flyteidl2/service/mocks'
+  github.com/flyteorg/flyte/v2/runs/repository/interfaces:
+    config:
+      include-auto-generated: true
+      all: true
+      with-expecter: true
+      dir: 'runs/repository/mocks'
