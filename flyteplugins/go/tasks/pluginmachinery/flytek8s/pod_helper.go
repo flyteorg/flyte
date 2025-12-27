@@ -1218,7 +1218,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									t = time.Now() // using current time for `OccurredAt` rather than last transition time
-									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
