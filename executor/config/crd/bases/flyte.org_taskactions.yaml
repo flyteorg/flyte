@@ -43,11 +43,52 @@ spec:
           spec:
             description: spec defines the desired state of TaskAction
             properties:
-              taskActionBytes:
-                description: foo is an example field of TaskAction. Edit taskaction_types.go
-                  to remove/update
-                format: byte
+              actionName:
+                description: ActionName is the unique name of this action within the
+                  run
+                maxLength: 30
+                minLength: 1
                 type: string
+              domain:
+                description: Domain this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              inputUri:
+                description: InputURI is the path to the input data for this action
+                minLength: 1
+                type: string
+              org:
+                description: Org this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              parentActionName:
+                description: ParentActionName is the optional name of the parent action
+                type: string
+              project:
+                description: Project this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              runName:
+                description: RunName is the name of the run this action belongs to
+                maxLength: 30
+                minLength: 1
+                type: string
+              runOutputBase:
+                description: RunOutputBase is the base path where this action should
+                  write its output
+                minLength: 1
+                type: string
+            required:
+            - actionName
+            - domain
+            - inputUri
+            - org
+            - project
+            - runName
+            - runOutputBase
             type: object
           status:
             description: status defines the observed state of TaskAction
