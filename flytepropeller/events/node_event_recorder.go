@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --output=mocks --case=underscore --with-expecter
-
 // NodeEventRecorder records Node events
 type NodeEventRecorder interface {
 	// RecordNodeEvent records execution events indicating the node has undergone a phase change and additional metadata.

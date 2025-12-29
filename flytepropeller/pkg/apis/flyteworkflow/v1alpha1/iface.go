@@ -19,8 +19,6 @@ import (
 // The intention of these interfaces is to decouple the algorithm and usage from the actual CRD definition.
 // this would help in ease of changes underneath without affecting the code.
 
-//go:generate mockery --all --with-expecter
-
 type WorkflowID = string
 type TaskID = string
 type NodeID = string

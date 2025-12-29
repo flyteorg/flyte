@@ -6,8 +6,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 var (
 	ErrNotFound = fmt.Errorf("secret not found in keyring")
 )

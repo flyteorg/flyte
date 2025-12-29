@@ -6,8 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery --name=NodeExecutionInterface --output=../mocks --case=underscore --with-expecter
-
 // Interface for managing Flyte Workflow NodeExecutions
 type NodeExecutionInterface interface {
 	CreateNodeEvent(ctx context.Context, request *admin.NodeExecutionEventRequest) (

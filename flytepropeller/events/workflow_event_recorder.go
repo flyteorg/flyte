@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --output=mocks --case=underscore --with-expecter
-
 // Recorder for Workflow events
 type WorkflowEventRecorder interface {
 	// Records workflow execution events indicating the workflow has undergone a phase change and additional metadata.

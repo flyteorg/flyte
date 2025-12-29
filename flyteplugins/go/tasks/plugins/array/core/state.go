@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 //go:generate enumer -type=Phase
 
 type Phase uint8

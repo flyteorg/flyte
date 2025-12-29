@@ -9,8 +9,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // p of the node
 type NodePhase int
 

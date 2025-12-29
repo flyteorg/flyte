@@ -13,8 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // Metadata to be associated with the catalog object
 type Metadata struct {
 	WorkflowExecutionIdentifier *core.WorkflowExecutionIdentifier

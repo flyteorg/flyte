@@ -17,8 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 type HandlerRegisterer interface {
 	HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 }

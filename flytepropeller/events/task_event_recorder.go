@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --output=mocks --case=underscore --with-expecter
-
 // Recorder for Task events
 type TaskEventRecorder interface {
 	// Records task execution events indicating the task has undergone a phase change and additional metadata.

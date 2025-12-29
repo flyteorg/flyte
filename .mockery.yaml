@@ -1,0 +1,464 @@
+# Centralized mockery configuration for the Flyte monorepo.
+# This file replaces inline //go:generate mockery directives.
+# Run `mockery` from the repository root to generate all mocks.
+
+log-level: warn
+resolve-type-alias: False
+disable-version-string: True
+issue-845-fix: True
+mockname: "{{.InterfaceName}}"
+with-expecter: True
+
+packages:
+  # datacatalog
+  github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces:
+    config:
+      dir: 'datacatalog/pkg/manager/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ArtifactManager:
+
+  github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces:
+    config:
+      dir: 'datacatalog/pkg/repositories/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ArtifactRepo:
+      DatasetRepo:
+      PartitionRepo:
+      ReservationRepo:
+      TagRepo:
+
+  # flyteadmin/auth
+  github.com/flyteorg/flyte/flyteadmin/auth/interfaces:
+    config:
+      dir: 'flyteadmin/auth/interfaces/mocks'
+      all: true
+      case: underscore
+
+  # flyteadmin/scheduler
+  github.com/flyteorg/flyte/flyteadmin/scheduler/executor:
+    config:
+      dir: 'flyteadmin/scheduler/executor/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Executor:
+
+  github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces:
+    config:
+      dir: 'flyteadmin/scheduler/repositories/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      SchedulableEntityRepoInterface:
+      ScheduleEntitiesSnapShotRepoInterface:
+
+  # flyteadmin/pkg/async/cloudevent
+  github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/async/cloudevent/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Publisher:
+      Sender:
+
+  # flyteadmin/pkg/async/events
+  github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/async/events/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      NodeExecutionEventWriter:
+      WorkflowExecutionEventWriter:
+
+  # flyteadmin/pkg/async/notifications
+  github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/async/notifications/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Emailer:
+      Processor:
+      Publisher:
+      SMTPClient:
+
+  github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations:
+    config:
+      dir: 'flyteadmin/pkg/async/notifications/mocks'
+      all: true
+      case: underscore
+
+  # flyteadmin/pkg/async/schedule
+  github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/async/schedule/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      EventScheduler:
+      WorkflowExecutor:
+
+  # flyteadmin/pkg/clusterresource
+  github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/clusterresource/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      FlyteAdminDataProvider:
+
+  # flyteadmin/pkg/data
+  github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/data/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      RemoteURLInterface:
+
+  # flyteadmin/pkg/executioncluster
+  github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/executioncluster/mocks'
+      all: true
+      case: underscore
+
+  # flyteadmin/pkg/manager
+  github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/manager/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ExecutionInterface:
+      LaunchPlanInterface:
+      MetricsInterface:
+      NamedEntityInterface:
+      NodeExecutionInterface:
+      ProjectInterface:
+      ResourceInterface:
+      SignalInterface:
+      TaskExecutionInterface:
+      TaskInterface:
+      VersionInterface:
+      WorkflowInterface:
+
+  # flyteadmin/pkg/repositories
+  github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/repositories/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      DescriptionEntityRepoInterface:
+      ExecutionEventRepoInterface:
+      NamedEntityRepoInterface:
+      NodeExecutionEventRepoInterface:
+      SignalRepoInterface:
+
+  # flyteadmin/pkg/runtime
+  github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/runtime/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ClusterConfiguration:
+      ClusterPoolAssignmentConfiguration:
+      NamespaceMappingConfiguration:
+      QualityOfServiceConfiguration:
+      WhitelistConfiguration:
+
+  # flyteadmin/pkg/workflowengine
+  github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces:
+    config:
+      dir: 'flyteadmin/pkg/workflowengine/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      FlyteWorkflowBuilder:
+      WorkflowExecutor:
+
+  # flytectl
+  github.com/flyteorg/flyte/flytectl/cmd/update/interfaces:
+    config:
+      dir: 'flytectl/cmd/update/interfaces/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Updater:
+
+  github.com/flyteorg/flyte/flytectl/pkg/docker:
+    config:
+      dir: 'flytectl/pkg/docker/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytectl/pkg/ext:
+    config:
+      dir: 'flytectl/pkg/ext/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytectl/pkg/github:
+    config:
+      dir: 'flytectl/pkg/github/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      GHRepoService:
+
+  github.com/flyteorg/flyte/flytectl/pkg/k8s:
+    config:
+      dir: 'flytectl/pkg/k8s/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ContextOps:
+
+  github.com/flyteorg/flyte/flytectl/pkg/visualize:
+    config:
+      dir: 'flytectl/pkg/visualize/mocks'
+      all: true
+      case: underscore
+
+  # flyteidl
+  github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache:
+    config:
+      dir: 'flyteidl/clients/go/admin/cache/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteidl/clients/go/admin:
+    config:
+      dir: 'flyteidl/clients/go/admin/mocks'
+      all: false
+    interfaces:
+      TokenSource:
+
+  github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service:
+    config:
+      dir: 'flyteidl/clients/go/admin/mocks'
+      all: false
+    interfaces:
+      AdminServiceClient:
+
+  # flyteplugins
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/catalog/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/core/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/io/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/k8s/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/webapi/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue:
+    config:
+      dir: 'flyteplugins/go/tasks/pluginmachinery/workqueue/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch:
+    config:
+      dir: 'flyteplugins/go/tasks/plugins/array/awsbatch/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core:
+    config:
+      dir: 'flyteplugins/go/tasks/plugins/array/core/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client:
+    config:
+      dir: 'flyteplugins/go/tasks/plugins/presto/client/mocks'
+      all: true
+      case: snake
+
+  # flytepropeller
+  github.com/flyteorg/flyte/flytepropeller/events:
+    config:
+      dir: 'flytepropeller/events/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy:
+    config:
+      dir: 'flytepropeller/manager/shardstrategy/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ShardStrategy:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1:
+    config:
+      dir: 'flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks'
+      all: true
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common:
+    config:
+      dir: 'flytepropeller/pkg/compiler/common/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors:
+    config:
+      dir: 'flytepropeller/pkg/controller/executors/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Client:
+      DAGStructure:
+      DAGStructureWithStartNode:
+      ImmutableExecutionContext:
+      ExecutionContext:
+      ControlFlow:
+      ParentInfo:
+      NodeLookup:
+      Workflow:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/interfaces:
+    config:
+      dir: 'flytepropeller/pkg/controller/mocks'
+      all: false
+      case: snake
+    interfaces:
+      Limiter:
+      Reservation:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      OutputResolver:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/array:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/array/mocks'
+      all: true
+      case: underscore
+      with-expecter: false
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/dynamic:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/dynamic/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/gate/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/interfaces/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/recovery/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Client:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager:
+    config:
+      dir: 'flytepropeller/pkg/controller/nodes/task/resourcemanager/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      RedisClient:
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore:
+    config:
+      dir: 'flytepropeller/pkg/controller/workflowstore/mocks'
+      all: true
+
+  github.com/flyteorg/flyte/flytepropeller/pkg/webhook:
+    config:
+      dir: 'flytepropeller/pkg/webhook/mocks'
+      all: true
+      case: underscore
+
+  # flytestdlib
+  github.com/flyteorg/flyte/flytestdlib/cache:
+    config:
+      dir: 'flytestdlib/cache/mocks'
+      all: true
+
+  github.com/flyteorg/flyte/flytestdlib/fastcheck:
+    config:
+      dir: 'flytestdlib/fastcheck/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      Filter:
+
+  github.com/flyteorg/flyte/flytestdlib/random:
+    config:
+      dir: 'flytestdlib/random/mocks'
+      all: true
+      case: underscore
+
+  github.com/flyteorg/flyte/flytestdlib/storage:
+    config:
+      dir: 'flytestdlib/storage/mocks'
+      all: false
+      case: underscore
+    interfaces:
+      ComposedProtobufStore:
+      RawStore:
+      ReferenceConstructor:
+
+  github.com/flyteorg/flyte/flytestdlib/utils:
+    config:
+      dir: 'flytestdlib/utils/mocks'
+      all: true
+      case: underscore

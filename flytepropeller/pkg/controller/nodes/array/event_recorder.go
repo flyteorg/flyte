@@ -49,8 +49,6 @@ func (t *taskExecutionID) GetUniqueNodeID() string {
 	return t.nodeID
 }
 
-//go:generate mockery --all --case=underscore
-
 type arrayEventRecorder interface {
 	interfaces.EventRecorder
 	process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error

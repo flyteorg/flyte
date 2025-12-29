@@ -10,8 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --name=WorkflowExecutor --output=../mocks/ --case=underscore --with-expecter
-
 type TaskResources struct {
 	Defaults runtime.TaskResourceSet
 	Limits   runtime.TaskResourceSet

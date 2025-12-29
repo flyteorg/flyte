@@ -7,8 +7,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // AdminDeleterExtInterface Interface for exposing the update capabilities from the admin
 type AdminDeleterExtInterface interface {
 	AdminServiceClient() service.AdminServiceClient

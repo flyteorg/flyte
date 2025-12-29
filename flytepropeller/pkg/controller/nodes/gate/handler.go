@@ -18,8 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // SignalServiceClient is a SignalServiceClient wrapper interface used specifically for generating
 // mocks for testing
 type SignalServiceClient interface {

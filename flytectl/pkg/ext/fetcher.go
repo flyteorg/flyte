@@ -8,8 +8,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // AdminFetcherExtInterface Interface for exposing the fetch capabilities from the admin and also allow this to be injectable into other
 // modules. eg : create execution which requires to fetch launchplan details to construct the execution spec.
 type AdminFetcherExtInterface interface {

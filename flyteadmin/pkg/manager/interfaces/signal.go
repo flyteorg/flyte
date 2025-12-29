@@ -6,8 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery --name=SignalInterface --output=../mocks --case=underscore --with-expecter
-
 // Interface for managing Flyte Signals
 type SignalInterface interface {
 	GetOrCreateSignal(ctx context.Context, request *admin.SignalGetOrCreateRequest) (*admin.Signal, error)

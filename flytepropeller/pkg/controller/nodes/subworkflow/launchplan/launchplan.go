@@ -8,8 +8,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // LaunchContext is a simple context that is used to start an execution of a LaunchPlan. It encapsulates enough parent information
 // to tie the executions
 type LaunchContext struct {

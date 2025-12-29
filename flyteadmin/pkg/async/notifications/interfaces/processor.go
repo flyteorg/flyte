@@ -1,7 +1,5 @@
 package interfaces
 
-//go:generate mockery --name=Processor --output=../mocks --case=underscore --with-expecter
-
 // Exposes the common methods required for a subscriber.
 // There is one ProcessNotification per type.
 type Processor interface {

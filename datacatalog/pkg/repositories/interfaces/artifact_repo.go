@@ -6,8 +6,6 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 )
 
-//go:generate mockery --name=ArtifactRepo --output=../mocks --case=underscore --with-expecter
-
 type ArtifactRepo interface {
 	Create(ctx context.Context, in models.Artifact) error
 	Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error)

@@ -10,8 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
-
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
 	// ID/Name of the plugin. This will be used to identify this plugin and has to be unique in the entire system
