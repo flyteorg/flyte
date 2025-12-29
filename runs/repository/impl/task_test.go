@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -69,6 +70,8 @@ func TestCreateTask(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, task.Environment, retrieved.Environment)
 	assert.Equal(t, task.FunctionName, retrieved.FunctionName)
+    assert.False(t, retrieved.CreatedAt.IsZero(), "created_at should not be zero")
+    assert.False(t, retrieved.UpdatedAt.IsZero(), "updated_at should not be zero")
 }
 
 func TestGetTask_NotFound(t *testing.T) {
@@ -155,4 +158,77 @@ func TestCreateTaskSpec(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, spec.Digest, retrieved.Digest)
 	assert.Equal(t, spec.Spec, retrieved.Spec)
+}
+
+func TestCreateTask_Timestamps(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewTaskRepo(db)
+	ctx := context.Background()
+
+	task := &models.Task{
+		TaskKey: models.TaskKey{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "test-task",
+			Version: "v1",
+		},
+		Environment:  "production",
+		FunctionName: "my_function",
+		TaskSpec:     []byte(`{}`),
+	}
+
+	err := repo.CreateTask(ctx, task)
+	assert.NoError(t, err)
+
+	retrieved, err := repo.GetTask(ctx, task.TaskKey)
+	require.NoError(t, err)
+
+	now := time.Now()
+	assert.True(t, retrieved.CreatedAt.After(now.Add(-5*time.Second)))
+	assert.True(t, retrieved.CreatedAt.Before(now.Add(time.Second)))
+
+	diff := retrieved.UpdatedAt.Sub(retrieved.CreatedAt)
+	assert.True(t, diff >= 0 && diff < time.Second)
+}
+
+func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewTaskRepo(db)
+	ctx := context.Background()
+
+	task := &models.Task{
+		TaskKey: models.TaskKey{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "test-task",
+			Version: "v1",
+		},
+		Environment:  "production",
+		FunctionName: "original_function",
+		TaskSpec:     []byte(`{}`),
+	}
+
+	err := repo.CreateTask(ctx, task)
+	require.NoError(t, err)
+
+	original, err := repo.GetTask(ctx, task.TaskKey)
+	require.NoError(t, err)
+
+	originalCreatedAt := original.CreatedAt
+	originalUpdatedAt := original.UpdatedAt
+
+	time.Sleep(100 * time.Millisecond)
+
+	task.FunctionName = "updated_function"
+	err = repo.CreateTask(ctx, task)
+	require.NoError(t, err)
+
+	updated, err := repo.GetTask(ctx, task.TaskKey)
+	require.NoError(t, err)
+
+	assert.Equal(t, originalCreatedAt, updated.CreatedAt)
+	assert.True(t, updated.UpdatedAt.After(originalUpdatedAt))
+	assert.Equal(t, "updated_function", updated.FunctionName)
 }
