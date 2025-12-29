@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -31,8 +32,9 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			environment, function_name, deployed_by,
 			trigger_name, total_triggers, active_triggers,
 			trigger_automation_spec, trigger_types,
-			task_spec, env_description, short_description
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			task_spec, env_description, short_description,
+			created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT (org, project, domain, name, version) DO UPDATE SET
 			environment = EXCLUDED.environment,
 			function_name = EXCLUDED.function_name,
@@ -44,7 +46,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			trigger_types = EXCLUDED.trigger_types,
 			task_spec = EXCLUDED.task_spec,
 			env_description = EXCLUDED.env_description,
-			short_description = EXCLUDED.short_description`,
+			short_description = EXCLUDED.short_description,
+			updated_at = EXCLUDED.updated_at`,
 			newTask.Org,
 			newTask.Project,
 			newTask.Domain,
@@ -61,6 +64,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			newTask.TaskSpec,
 			newTask.EnvDescription,
 			newTask.ShortDescription,
+			time.Now(),
+			time.Now(),
 		)
 
 	if result.Error != nil {
