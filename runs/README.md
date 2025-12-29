@@ -121,6 +121,15 @@ go test ./...
 make test
 ```
 
+### Run API tests
+
+Pleaes ensure the service is started by following [Quick Start with SQLite](#quick-start-with-sqlite) section
+before running API tests.
+
+```sh
+make api-test
+```
+
 ### Run integration test with client
 
 **Using SQLite:**
