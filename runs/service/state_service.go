@@ -11,16 +11,17 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 // StateService implements the StateService gRPC API
 type StateService struct {
-	repo repository.Repository
+	repo interfaces.Repository
 }
 
 // NewStateService creates a new StateService
-func NewStateService(repo repository.Repository) *StateService {
+func NewStateService(repo interfaces.Repository) *StateService {
 	return &StateService{
 		repo: repo,
 	}
@@ -67,7 +68,7 @@ func (s *StateService) Put(ctx context.Context, req *connect.Request[workflow.Pu
 	}
 
 	// Update action state in database
-	if err := s.repo.UpdateActionState(ctx, msg.ActionId, msg.State); err != nil {
+	if err := s.repo.ActionRepo().UpdateActionState(ctx, msg.ActionId, msg.State); err != nil {
 		logger.Warnf(ctx, "Failed to update action state: %v", err)
 		return connect.NewResponse(&workflow.PutResponse{
 			ActionId: msg.ActionId,
@@ -79,7 +80,7 @@ func (s *StateService) Put(ctx context.Context, req *connect.Request[workflow.Pu
 	}
 
 	// Send notification
-	if err := s.repo.NotifyStateUpdate(ctx, msg.ActionId); err != nil {
+	if err := s.repo.ActionRepo().NotifyStateUpdate(ctx, msg.ActionId); err != nil {
 		logger.Warnf(ctx, "Failed to send state update notification: %v", err)
 		// Continue anyway - the update was saved
 	}
@@ -118,7 +119,7 @@ func (s *StateService) Get(ctx context.Context, req *connect.Request[workflow.Ge
 	}
 
 	// Get action state from database
-	state, err := s.repo.GetActionState(ctx, msg.ActionId)
+	state, err := s.repo.ActionRepo().GetActionState(ctx, msg.ActionId)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get action state: %v", err)
 		return connect.NewResponse(&workflow.GetResponse{
@@ -202,7 +203,7 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 	updates := make(chan *common.ActionIdentifier, 100)
 	errs := make(chan error, 1)
 
-	go s.repo.WatchStateUpdates(ctx, updates, errs)
+	go s.repo.ActionRepo().WatchStateUpdates(ctx, updates, errs)
 
 	for {
 		select {
@@ -221,7 +222,7 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 			}
 
 			// Get the full action details
-			action, err := s.repo.GetAction(ctx, actionID)
+			action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to get action details: %v", err)
 				continue
@@ -247,16 +248,16 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 // Helper functions
 
 // getChildActions retrieves all child actions for a parent action
-func (s *StateService) getChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*repository.Action, error) {
+func (s *StateService) getChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*models.Action, error) {
 	// For simplicity, we'll list all actions in the run and filter by parent
 	// In a production system, you'd add a more efficient query
 	runID := parentActionID.Run
-	allActions, _, err := s.repo.ListActions(ctx, runID, 1000, "")
+	allActions, _, err := s.repo.ActionRepo().ListActions(ctx, runID, 1000, "")
 	if err != nil {
 		return nil, err
 	}
 
-	var childActions []*repository.Action
+	var childActions []*models.Action
 	for _, action := range allActions {
 		// Include the parent action itself and all its children
 		if action.Name == parentActionID.Name ||
@@ -284,7 +285,7 @@ func (s *StateService) isChildOf(actionID *common.ActionIdentifier, parentAction
 }
 
 // actionToUpdate converts a repository Action to an ActionUpdate message
-func (s *StateService) actionToUpdate(action *repository.Action) *workflow.ActionUpdate {
+func (s *StateService) actionToUpdate(action *models.Action) *workflow.ActionUpdate {
 	update := &workflow.ActionUpdate{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
@@ -308,18 +309,18 @@ func (s *StateService) actionToUpdate(action *repository.Action) *workflow.Actio
 func (s *StateService) stringToPhase(phase string) common.ActionPhase {
 	switch phase {
 	case "PHASE_QUEUED":
-		return common.ActionPhase_PHASE_QUEUED
+		return common.ActionPhase_ACTION_PHASE_QUEUED
 	case "PHASE_INITIALIZING":
-		return common.ActionPhase_PHASE_INITIALIZING
+		return common.ActionPhase_ACTION_PHASE_INITIALIZING
 	case "PHASE_RUNNING":
-		return common.ActionPhase_PHASE_RUNNING
+		return common.ActionPhase_ACTION_PHASE_RUNNING
 	case "PHASE_SUCCEEDED":
-		return common.ActionPhase_PHASE_SUCCEEDED
+		return common.ActionPhase_ACTION_PHASE_SUCCEEDED
 	case "PHASE_FAILED":
-		return common.ActionPhase_PHASE_FAILED
+		return common.ActionPhase_ACTION_PHASE_FAILED
 	case "PHASE_ABORTED":
-		return common.ActionPhase_PHASE_ABORTED
+		return common.ActionPhase_ACTION_PHASE_ABORTED
 	default:
-		return common.ActionPhase_PHASE_UNSPECIFIED
+		return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 	}
 }

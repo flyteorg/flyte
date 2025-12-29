@@ -171,6 +171,14 @@ Test 7: Aborting a run...
 All tests completed successfully! 🎉
 ```
 
+## Scripts
+
+Convenient scripts are provided in `runs/tests/scripts/` to interact with the service using `buf curl`.
+Ensure the service is running before executing these scripts.
+
+- `./runs/tests/scripts/create_task.sh` - create a new task
+- `./runs/tests/scripts/list_tasks.sh` - list tasks with name filtering
+
 ### Check service health
 
 ```bash
@@ -231,6 +239,12 @@ The service exposes the following buf connect endpoints:
 - `POST /flyteidl2.workflow.RunService/GetActionData` - Get action input/output data
 - `POST /flyteidl2.workflow.RunService/ListActions` - List actions for a run
 - `POST /flyteidl2.workflow.RunService/AbortAction` - Abort a specific action
+
+### Task Management
+- `POST /flyteidl2.workflow.TaskService/CreateTask` - Create a new task
+- `POST /flyteidl2.workflow.TaskService/GetTask` - Get task details
+- `POST /flyteidl2.workflow.TaskService/ListTasks` - List tasks with filtering and sorting
+- `POST /flyteidl2.workflow.TaskService/UpdateTask` - Update an existing task
 
 ### Streaming (Watch) RPCs
 - `POST /flyteidl2.workflow.RunService/WatchRunDetails` - Stream run detail updates
@@ -384,14 +398,20 @@ The service automatically selects the database based on configuration:
 
 No code changes needed, just update `config.yaml`!
 
+### Database migration
+
+We are using gorm for auto migration, please ensure addding `gorm` tags in `/runs/repository/models/` when you
+add any more columns/models.
+
 ### Adding new features
 
 1. Update proto definitions in `/flyteidl2/workflow/`
 2. Regenerate code: `buf generate`
-3. Update repository interface in `repository/interfaces.go`
-4. Implement in `repository/postgres.go`
-5. Add service handler in `service/run_service.go`
-6. Add tests and update client
+3. Update repository interface in `repository/interfaces/`
+4. Update DB models in `repository/models/`
+5. Implement in `repository/impl/`
+6. Add service handler in `service/xxx_service.go`
+7. Add tests and update client
 
 ## Troubleshooting
 

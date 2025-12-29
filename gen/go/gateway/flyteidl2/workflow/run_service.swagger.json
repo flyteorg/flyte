@@ -209,6 +209,23 @@
         }
       }
     },
+    "TaskGroupErrorCounts": {
+      "type": "object",
+      "properties": {
+        "user_error": {
+          "type": "string",
+          "format": "int64"
+        },
+        "system_error": {
+          "type": "string",
+          "format": "int64"
+        },
+        "unspecified_error": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "TaskLogLinkType": {
       "type": "string",
       "enum": [
@@ -1589,6 +1606,9 @@
         },
         "ready": {
           "type": "boolean"
+        },
+        "icon_uri": {
+          "type": "string"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
@@ -2085,6 +2105,14 @@
         "debuggable": {
           "type": "boolean",
           "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "Log links associated with this task."
         }
       },
       "title": "Task Metadata"
@@ -3066,6 +3094,9 @@
         "short_name": {
           "type": "string",
           "description": "short name (function name) of the task."
+        },
+        "error_counts": {
+          "$ref": "#/definitions/TaskGroupErrorCounts"
         }
       },
       "description": "TaskGroup represents a group of runs for a specific task."
