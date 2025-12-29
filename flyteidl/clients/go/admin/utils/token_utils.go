@@ -15,7 +15,7 @@ import (
 // defaultExpiryDelta determines how earlier a token should be considered
 // expired than its actual expiration time. It is used to avoid late
 // expirations due to client-server time mismatches.
-const defaultExpiryDelta = 10 * time.Second
+const defaultExpiryDelta = 15 * time.Minute
 
 // Valid reports whether t is non-nil, has an AccessToken, and is not expired.
 func Valid(t *oauth2.Token) bool {

@@ -236,7 +236,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		RedirectUri:              "http://localhost:54545/callback",
 	}
 	http.DefaultServeMux = http.NewServeMux()
-	tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(time.Minute))
+	tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(30*time.Minute))
 	t.Run("cache hit", func(t *testing.T) {
 		mockTokenCache := new(cachemocks.TokenCache)
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
