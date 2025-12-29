@@ -34,18 +34,39 @@ type (
 )
 
 // Condition type constants
+// Following Kubernetes API conventions:
+// - Condition types describe the current observed state
+// - Use Reason field to track sub-states (like Queued, Initializing, Executing)
 const (
-	ConditionTypeNew          TaskActionConditionType = "New"
-	ConditionTypeQueued       TaskActionConditionType = "Queued"
-	ConditionTypeInitializing TaskActionConditionType = "Initializing"
-	ConditionTypeRunning      TaskActionConditionType = "Running"
-	ConditionTypeSucceeded    TaskActionConditionType = "Succeeded"
-	ConditionTypeFailed       TaskActionConditionType = "Failed"
+	// ConditionTypeProgressing indicates whether the TaskAction is actively progressing.
+	// This is True when the TaskAction is queued, initializing, or executing.
+	// This is False when the TaskAction has completed or failed.
+	ConditionTypeProgressing TaskActionConditionType = "Progressing"
+
+	// ConditionTypeSucceeded indicates whether the TaskAction has completed successfully.
+	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
+	ConditionTypeSucceeded TaskActionConditionType = "Succeeded"
+
+	// ConditionTypeFailed indicates whether the TaskAction has failed.
+	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
+	ConditionTypeFailed TaskActionConditionType = "Failed"
 )
 
-// Condition reason constant
+// Condition reason constants
+// Reasons explain why a condition has a particular status.
+// These are used in the Reason field of conditions to provide detailed sub-state information.
 const (
-	ConditionReasonNew TaskActionConditionReason = "New"
+	// ConditionReasonQueued indicates the TaskAction is queued and waiting for resources
+	ConditionReasonQueued TaskActionConditionReason = "Queued"
+
+	// ConditionReasonInitializing indicates the TaskAction is being initialized
+	ConditionReasonInitializing TaskActionConditionReason = "Initializing"
+
+	// ConditionReasonExecuting indicates the TaskAction is actively executing
+	ConditionReasonExecuting TaskActionConditionReason = "Executing"
+
+	// ConditionReasonCompleted indicates the TaskAction has completed successfully
+	ConditionReasonCompleted TaskActionConditionReason = "Completed"
 )
 
 // TaskActionSpec defines the desired state of TaskAction
