@@ -86,6 +86,8 @@ spec:
                 type: string
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
+                maxLength: 30
+                minLength: 1
                 type: string
               project:
                 description: Project this action belongs to

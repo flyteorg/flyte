@@ -101,6 +101,8 @@ type TaskActionSpec struct {
 
 	// ParentActionName is the optional name of the parent action
 	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=30
 	ParentActionName *string `json:"parentActionName,omitempty"`
 
 	// InputURI is the path to the input data for this action
