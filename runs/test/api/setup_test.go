@@ -38,7 +38,23 @@ var (
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 	var exitCode int
+
 	defer func() {
+		// Stop server if it was started
+		if testServer != nil {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := testServer.Shutdown(shutdownCtx); err != nil {
+				log.Printf("Test server shutdown error: %v", err)
+			}
+			log.Println("Test server stopped")
+		}
+
+		// Remove test database file
+		if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
+			log.Printf("Warning: Failed to remove test database: %v", err)
+		}
+
 		os.Exit(exitCode)
 	}()
 
@@ -54,13 +70,17 @@ func TestMain(m *testing.M) {
 	var err error
 	testDB, err = database.GetDB(ctx, dbConfig, logCfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		log.Printf("Failed to initialize database: %v", err)
+		exitCode = 1
+		return
 	}
 	log.Println("Database initialized")
 
 	// Run migrations
 	if err := migrations.RunMigrations(testDB); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+		log.Printf("Failed to run migrations: %v", err)
+		exitCode = 1
+		return
 	}
 	log.Println("Database migrations completed")
 
@@ -116,19 +136,6 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
-
-	// Teardown: Stop server
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := testServer.Shutdown(shutdownCtx); err != nil {
-		log.Printf("Test server shutdown error: %v", err)
-	}
-	log.Println("Test server stopped")
-
-	// Cleanup: Remove test database file
-	if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
-		log.Printf("Warning: Failed to remove test database: %v", err)
-	}
 }
 
 // waitForServer waits for the server to be ready
