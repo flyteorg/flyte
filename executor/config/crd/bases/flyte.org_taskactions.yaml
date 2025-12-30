@@ -15,9 +15,30 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.runName
+      name: Run
+      type: string
+    - jsonPath: .spec.actionName
+      name: Action
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Progressing')].reason
+      name: Status
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    - jsonPath: .status.conditions[?(@.type=='Progressing')].status
+      name: Progressing
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Succeeded')].status
+      name: Succeeded
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Failed')].status
+      name: Failed
+      priority: 1
+      type: string
     name: v1
     schema:
       openAPIV3Schema:
