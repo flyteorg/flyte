@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+package flyteidl2.trigger;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/trigger/trigger_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger";
+
+// TriggerService provides an interface for managing triggers.
+service TriggerService {
+  // Create if trigger didn't exist previously.
+  // Update if it already exists.
+  // Re-create(or undelete) if it was soft-deleted.
+  // Client must fetch the latest trigger in order to obtain the latest `trigger.id.revision`.
+  // If trigger is not found, client can set `trigger.id.revision` to 1, it is ignored and set automatically by backend.
+  // If trigger is found, client should set `trigger.id.revision` to the <latest>.
+  // Backend validates that version is the latest and creates a new revision of the trigger.
+  // Otherwise, operation is rejected(optimistic locking) and client must re-fetch trigger again.
+  rpc DeployTrigger(DeployTriggerRequest) returns (DeployTriggerResponse) {}
+
+  // Get detailed info about the latest trigger revision
+  rpc GetTriggerDetails(GetTriggerDetailsRequest) returns (GetTriggerDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Get detailed info about a specific trigger revision
+  rpc GetTriggerRevisionDetails(GetTriggerRevisionDetailsRequest) returns (GetTriggerRevisionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List basic info about triggers based on various filtering and sorting rules.
+  rpc ListTriggers(ListTriggersRequest) returns (ListTriggersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // GetTriggerRevisionHistory returns all revisions for a given trigger
+  rpc GetTriggerRevisionHistory(GetTriggerRevisionHistoryRequest) returns (GetTriggerRevisionHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Update some trigger spec fields for multiple triggers at once
+  rpc UpdateTriggers(UpdateTriggersRequest) returns (UpdateTriggersResponse) {}
+
+  // Soft-delete multiple triggers at once.
+  rpc DeleteTriggers(DeleteTriggersRequest) returns (DeleteTriggersResponse) {}
+}
+
+// Request message for saving a trigger.
+message DeployTriggerRequest {
+  reserved 1;
+
+  flyteidl2.common.TriggerName name = 4 [(buf.validate.field).required = true];
+
+  // Revision of the trigger.
+  // Optional for the initial deploy of the trigger.
+  // Mandatory for updating existing trigger and should store latest previously deployed revision.
+  uint64 revision = 5;
+
+  TriggerSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Optional automation spec.
+  flyteidl2.task.TriggerAutomationSpec automation_spec = 3;
+}
+
+// Response message for saving a trigger.
+message DeployTriggerResponse {
+  flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
+}
+
+// Request message for saving a trigger.
+message GetTriggerDetailsRequest {
+  common.TriggerName name = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for saving a trigger.
+message GetTriggerDetailsResponse {
+  flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
+}
+
+// Request message for saving a trigger.
+message GetTriggerRevisionDetailsRequest {
+  common.TriggerIdentifier id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for saving a trigger.
+message GetTriggerRevisionDetailsResponse {
+  flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
+}
+
+message ListTriggersRequest {
+  // Common list request parameters.
+  flyteidl2.common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+
+    // Project identifier for filtering.
+    flyteidl2.common.ProjectIdentifier project_id = 3;
+
+    // List all triggers attached to a given version of a task .
+    flyteidl2.task.TaskIdentifier task_id = 4;
+
+    // List all triggers attached to a given task.
+    flyteidl2.task.TaskName task_name = 5;
+  }
+}
+
+// Response message for listing triggers.
+message ListTriggersResponse {
+  // List of triggers matching the filter criteria.
+  repeated flyteidl2.trigger.Trigger triggers = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+}
+
+message GetTriggerRevisionHistoryRequest {
+  flyteidl2.common.ListRequest request = 1;
+
+  common.TriggerName name = 2 [(buf.validate.field).required = true];
+}
+
+message GetTriggerRevisionHistoryResponse {
+  // List of triggers matching the filter criteria.
+  repeated flyteidl2.trigger.TriggerRevision triggers = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+}
+
+// Request message for updating some trigger spec fields for multiple triggers
+message UpdateTriggersRequest {
+  repeated common.TriggerName names = 1 [(buf.validate.field).repeated.min_items = 1];
+
+  bool active = 2;
+}
+
+// Response message for updating some trigger spec fields for multiple triggers
+message UpdateTriggersResponse {}
+
+// Request message for activating or deactivating multiple triggers
+message DeleteTriggersRequest {
+  repeated common.TriggerName names = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// Response message for activating or deactivating multiple triggers.
+message DeleteTriggersResponse {}
