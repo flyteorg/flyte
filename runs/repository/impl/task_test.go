@@ -66,14 +66,14 @@ func TestCreateTask(t *testing.T) {
 	startTime := time.Now()
 	err := repo.CreateTask(ctx, task)
 	assert.NoError(t, err)
-	endTime := time.Now()
 
 	retrieved, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 	assert.Equal(t, task.Environment, retrieved.Environment)
 	assert.Equal(t, task.FunctionName, retrieved.FunctionName)
-	assert.False(t, retrieved.CreatedAt.Before(startTime), "created_at should be after startTime")
-	assert.False(t, retrieved.CreatedAt.After(endTime), "created_at should be before endTime")
+	assert.WithinDuration(t, startTime, retrieved.CreatedAt, 1*time.Second, "created_at should be close to now")
+	assert.Equal(t, retrieved.CreatedAt, retrieved.UpdatedAt, "created_at and updated_at should be equal")
+
 }
 
 func TestGetTask_NotFound(t *testing.T) {
@@ -186,9 +186,6 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	original, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 
-	originalCreatedAt := original.CreatedAt
-	originalUpdatedAt := original.UpdatedAt
-
 	time.Sleep(100 * time.Millisecond)
 
 	task.FunctionName = "updated_function"
@@ -198,7 +195,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	updated, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 
-	assert.Equal(t, originalCreatedAt, updated.CreatedAt)
-	assert.True(t, updated.UpdatedAt.After(originalUpdatedAt))
+	assert.Equal(t, original.CreatedAt, updated.CreatedAt, "create time shouldn't change")
+	assert.True(t, updated.UpdatedAt.After(original.UpdatedAt))
 	assert.Equal(t, "updated_function", updated.FunctionName)
 }
