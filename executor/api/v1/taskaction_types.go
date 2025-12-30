@@ -189,7 +189,6 @@ type TaskActionStatus struct {
 // +kubebuilder:printcolumn:name="Succeeded",type="string",JSONPath=".status.conditions[?(@.type=='Succeeded')].status",priority=1
 // +kubebuilder:printcolumn:name="Failed",type="string",JSONPath=".status.conditions[?(@.type=='Failed')].status",priority=1
 
-
 // TaskAction is the Schema for the taskactions API
 type TaskAction struct {
 	metav1.TypeMeta `json:",inline"`
