@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-//go:generate mockery --all --case=underscore
 
 // An interface to access a remote/sharable location that contains the serialized TaskTemplate
 type TaskTemplatePath interface {
