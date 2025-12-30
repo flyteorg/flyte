@@ -22,6 +22,7 @@ type GlobalSecretProvider interface {
 // variables. If a secret has a mounting requirement that does not allow Env Vars, it'll fail to inject the secret.
 type GlobalSecrets struct {
 	envSecretManager GlobalSecretProvider
+	cfg              *config.Config
 }
 
 func (g GlobalSecrets) Type() config.SecretManagerType {
@@ -47,13 +48,13 @@ func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *co
 		}
 
 		envVar := corev1.EnvVar{
-			Name:  strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
+			Name:  strings.ToUpper(g.cfg.SecretEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
 			Value: v,
 		}
 
 		prefixEnvVar := corev1.EnvVar{
 			Name:  SecretEnvVarPrefix,
-			Value: K8sDefaultEnvVarPrefix,
+			Value: g.cfg.SecretEnvVarPrefix,
 		}
 
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
@@ -70,8 +71,9 @@ func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *co
 	return p, true, nil
 }
 
-func NewGlobalSecrets(provider GlobalSecretProvider) GlobalSecrets {
+func NewGlobalSecrets(provider GlobalSecretProvider, cfg *config.Config) GlobalSecrets {
 	return GlobalSecrets{
 		envSecretManager: provider,
+		cfg:              cfg,
 	}
 }

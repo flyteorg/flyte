@@ -33,9 +33,9 @@ func newSecretsInjector(
 ) (SecretsInjector, error) {
 	switch secretManagerType {
 	case config.SecretManagerTypeGlobal:
-		return NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(globalSecretManagerConfig)), nil
+		return NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(globalSecretManagerConfig), webhookConfig), nil
 	case config.SecretManagerTypeK8s:
-		return NewK8sSecretsInjector(), nil
+		return NewK8sSecretsInjector(webhookConfig), nil
 	case config.SecretManagerTypeAWS:
 		return NewAWSSecretManagerInjector(webhookConfig.AWSSecretManagerConfig), nil
 	case config.SecretManagerTypeGCP:
@@ -94,7 +94,7 @@ func newSecretsInjector(
 		}
 
 		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetchers,
-			ctrlRuntimeClient, podNamespace, secretCache), nil
+			ctrlRuntimeClient, podNamespace, secretCache, webhookConfig), nil
 	case config.SecretManagerTypeAzure:
 		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil
 	default:

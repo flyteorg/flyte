@@ -24,7 +24,6 @@ import (
 )
 
 const (
-	UnionSecretEnvVarPrefix = "_UNION_"
 	// Static name of the volume used for mounting secrets with file mount requirement.
 	EmbeddedSecretsFileMountVolumeName = "embedded-secret-vol" // #nosec G101
 	EmbeddedSecretsFileMountPath       = "/etc/flyte/secrets"  // #nosec G101
@@ -71,6 +70,7 @@ type EmbeddedSecretManagerInjector struct {
 	k8sClient          client.Client
 	referenceNamespace string
 	secretCache        goCache.CacheInterface[SecretValue]
+	parentCfg          *config.Config
 }
 
 func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
@@ -355,10 +355,10 @@ func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secr
 	envVars := []corev1.EnvVar{
 		{
 			Name:  SecretEnvVarPrefix,
-			Value: UnionSecretEnvVarPrefix,
+			Value: i.parentCfg.SecretEnvVarPrefix,
 		},
 		{
-			Name:  UnionSecretEnvVarPrefix + strings.ToUpper(secret.GetKey()),
+			Name:  i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey()),
 			Value: secretValue,
 		},
 	}
@@ -493,6 +493,7 @@ func NewEmbeddedSecretManagerInjector(
 	k8sClient client.Client,
 	referenceNamespace string,
 	secretCache goCache.CacheInterface[SecretValue],
+	parentCfg *config.Config,
 ) SecretsInjector {
 	return &EmbeddedSecretManagerInjector{
 		cfg:                cfg,
@@ -500,6 +501,7 @@ func NewEmbeddedSecretManagerInjector(
 		k8sClient:          k8sClient,
 		referenceNamespace: referenceNamespace,
 		secretCache:        secretCache,
+		parentCfg:          parentCfg,
 	}
 }
 

@@ -40,12 +40,12 @@ func TestGlobalSecrets_Inject(t *testing.T) {
 					Name: "container1",
 					Env: []corev1.EnvVar{
 						{
-							Name:  "_FSEC_GROUP_HELLO",
+							Name:  config.DefaultSecretEnvVarPrefix + "GROUP_HELLO",
 							Value: "my_password",
 						},
 						{
 							Name:  "FLYTE_SECRETS_ENV_PREFIX",
-							Value: "_FSEC_",
+							Value: config.DefaultSecretEnvVarPrefix,
 						},
 					},
 				},
@@ -79,6 +79,7 @@ func TestGlobalSecrets_Inject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := GlobalSecrets{
 				envSecretManager: tt.envSecretManager,
+				cfg:              &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix},
 			}
 
 			assert.Equal(t, config.SecretManagerTypeGlobal, g.Type())

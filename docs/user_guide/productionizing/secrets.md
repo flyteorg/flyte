@@ -269,7 +269,7 @@ Flytekit relies on the following environment variables to load secrets (defined 
 
 - `FLYTE_SECRETS_DEFAULT_DIR`: The directory Flytekit searches for secret files. **Default:** `"/etc/secrets"`
 - `FLYTE_SECRETS_FILE_PREFIX`: a common file prefix for Flyte secrets. **Default:** `""`
-- `FLYTE_SECRETS_ENV_PREFIX`: a common env var prefix for Flyte secrets. **Default:** `"_FSEC_"`
+- `FLYTE_SECRETS_ENV_PREFIX`: a common env var prefix for Flyte secrets. **Default:** `"_UNION_"`
 
 When running a workflow on a Flyte cluster, the configured secret manager will use the secret Group and Key to try and retrieve a secret.
 If successful, it will make the secret available as either file or environment variable and will if necessary modify the above variables automatically so that the task can load and use the secrets.

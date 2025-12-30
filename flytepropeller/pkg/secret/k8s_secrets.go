@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	K8sDefaultEnvVarPrefix  = "_FSEC_"
 	EnvVarGroupKeySeparator = "_"
 )
 
@@ -28,9 +27,10 @@ var (
 // a single key from the referenced secret object.
 // The secret.Group will be used to reference the k8s secret object, the Secret.Key will be used to reference a key inside
 // and the secret.Version will be ignored.
-// Environment variables will be named _FSEC_<SecretGroup>_<SecretKey>. Files will be mounted on
+// Environment variables will be named _UNION_<SecretGroup>_<SecretKey>. Files will be mounted on
 // /etc/flyte/secrets/<SecretGroup>/<SecretKey>
 type K8sSecretInjector struct {
+	cfg *config.Config
 }
 
 func (i K8sSecretInjector) Type() config.SecretManagerType {
@@ -83,7 +83,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		}
 
 	case core.Secret_ENV_VAR:
-		envVar := CreateEnvVarForSecret(secret)
+		envVar := CreateEnvVarForSecret(secret, i.cfg.SecretEnvVarPrefix)
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
 
@@ -97,7 +97,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 
 		prefixEnvVar := corev1.EnvVar{
 			Name:  SecretEnvVarPrefix,
-			Value: K8sDefaultEnvVarPrefix,
+			Value: i.cfg.SecretEnvVarPrefix,
 		}
 
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
@@ -111,6 +111,8 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 	return p, true, nil
 }
 
-func NewK8sSecretsInjector() K8sSecretInjector {
-	return K8sSecretInjector{}
+func NewK8sSecretsInjector(cfg *config.Config) K8sSecretInjector {
+	return K8sSecretInjector{
+		cfg: cfg,
+	}
 }

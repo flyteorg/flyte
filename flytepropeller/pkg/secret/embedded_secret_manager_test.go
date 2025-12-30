@@ -174,7 +174,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 								},
 								{
 									Name:  SecretEnvVarPrefix,
-									Value: UnionSecretEnvVarPrefix,
+									Value: config.DefaultSecretEnvVarPrefix,
 								},
 							},
 						},
@@ -203,7 +203,8 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			}
 
 			secretCache := cacheMocks.NewMockCache[SecretValue](true)
-			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace, secretCache)
+			parentCfg := &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix}
+			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace, secretCache, parentCfg)
 
 			actualP, injected, err := injector.Inject(ctx, inputSecret, tt.pod)
 			assert.Equal(t, tt.expectedInjected, injected)
@@ -278,7 +279,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 							BinaryValue: []byte("banana"),
 						},
 					},
-				}}, mockClient, testReferenceNamespace, secretCache)
+				}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -358,7 +359,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 							StringValue: "fruits",
 						},
 					},
-				}}, mockClient, testReferenceNamespace, secretCache)
+				}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -419,7 +420,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 					StringValue: "fruits @ domain",
 				},
 			},
-		}}, mockClient, testReferenceNamespace, secretCache)
+		}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -489,7 +490,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 					StringValue: "fruits @ project",
 				},
 			},
-		}}, mockClient, testReferenceNamespace, secretCache)
+		}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -579,7 +580,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace, secretCache)
+			}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -616,7 +617,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace, secretCache)
+			}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -638,7 +639,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace, secretCache)
+			}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -689,7 +690,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace, secretCache)
+			}}, mockClient, testReferenceNamespace, secretCache, &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)

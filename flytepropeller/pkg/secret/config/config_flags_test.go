@@ -477,4 +477,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_secretEnvVarPrefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("secretEnvVarPrefix", testValue)
+			if vString, err := cmdFlags.GetString("secretEnvVarPrefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SecretEnvVarPrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

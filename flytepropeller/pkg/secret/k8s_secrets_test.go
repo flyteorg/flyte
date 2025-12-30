@@ -8,6 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 )
 
 func TestK8sSecretInjector_Inject(t *testing.T) {
@@ -32,10 +33,10 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					Env: []corev1.EnvVar{
 						{
 							Name:  "FLYTE_SECRETS_ENV_PREFIX",
-							Value: "_FSEC_",
+							Value: config.DefaultSecretEnvVarPrefix,
 						},
 						{
-							Name: "_FSEC_GROUP_HELLO",
+							Name: config.DefaultSecretEnvVarPrefix + "GROUP_HELLO",
 							ValueFrom: &corev1.EnvVarSource{
 								SecretKeyRef: &corev1.SecretKeySelector{
 									Key: "HELLO",
@@ -191,7 +192,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					Env: []corev1.EnvVar{
 						{
 							Name:  "FLYTE_SECRETS_ENV_PREFIX",
-							Value: "_FSEC_",
+							Value: config.DefaultSecretEnvVarPrefix,
 						},
 						{
 							Name: "MY_CUSTOM_ENV",
@@ -206,7 +207,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 							},
 						},
 						{
-							Name: "_FSEC_GROUP_HELLO",
+							Name: config.DefaultSecretEnvVarPrefix + "GROUP_HELLO",
 							ValueFrom: &corev1.EnvVarSource{
 								SecretKeyRef: &corev1.SecretKeySelector{
 									Key: "HELLO",
@@ -303,7 +304,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := K8sSecretInjector{}
+			i := K8sSecretInjector{cfg: &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix}}
 			got, _, err := i.Inject(ctx, tt.args.secret, tt.args.p)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Inject() error = %v, wantErr %v", err, tt.wantErr)
