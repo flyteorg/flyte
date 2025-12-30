@@ -85,16 +85,31 @@ func TestMain(m *testing.M) {
 	}
 
 	// Start server in background
+	errChan := make(chan error, 1)
 	go func() {
 		log.Printf("Test server starting on %s", endpoint)
 		if err := testServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("Server error: %v", err)
+			errChan <- err
 		}
 	}()
 
-	// Wait for server to be ready
-	if !waitForServer(endpoint, 10*time.Second) {
-		log.Fatal("Test server failed to start")
+	// Wait for either server readiness or startup error
+	readyChan := make(chan bool, 1)
+	go func() {
+		readyChan <- waitForServer(endpoint, 10*time.Second)
+	}()
+
+	select {
+	case err := <-errChan:
+		log.Printf("Test server failed to start: %v", err)
+		exitCode = 1
+		return
+	case ready := <-readyChan:
+		if !ready {
+			log.Printf("Test server failed to start (health check timeout)")
+			exitCode = 1
+			return
+		}
 	}
 	log.Println("Test server is ready")
 
