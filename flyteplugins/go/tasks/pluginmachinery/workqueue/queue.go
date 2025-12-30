@@ -15,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-//go:generate mockery -all -case=underscore
 //go:generate enumer --type=WorkStatus
 
 type WorkItemID = string
