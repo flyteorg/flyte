@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -62,6 +63,7 @@ func TestCreateTask(t *testing.T) {
 		TaskSpec:     []byte(`{"type": "python"}`),
 	}
 
+	startTime := time.Now()
 	err := repo.CreateTask(ctx, task)
 	assert.NoError(t, err)
 
@@ -69,6 +71,8 @@ func TestCreateTask(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, task.Environment, retrieved.Environment)
 	assert.Equal(t, task.FunctionName, retrieved.FunctionName)
+	assert.WithinDuration(t, startTime, retrieved.CreatedAt, 1*time.Second, "created_at should be close to now")
+	assert.Equal(t, retrieved.CreatedAt, retrieved.UpdatedAt, "created_at and updated_at should be equal")
 }
 
 func TestGetTask_NotFound(t *testing.T) {
@@ -155,4 +159,42 @@ func TestCreateTaskSpec(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, spec.Digest, retrieved.Digest)
 	assert.Equal(t, spec.Spec, retrieved.Spec)
+}
+
+func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewTaskRepo(db)
+	ctx := context.Background()
+
+	task := &models.Task{
+		TaskKey: models.TaskKey{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "test-task",
+			Version: "v1",
+		},
+		Environment:  "production",
+		FunctionName: "original_function",
+		TaskSpec:     []byte(`{}`),
+	}
+
+	err := repo.CreateTask(ctx, task)
+	require.NoError(t, err)
+
+	original, err := repo.GetTask(ctx, task.TaskKey)
+	require.NoError(t, err)
+
+	time.Sleep(100 * time.Millisecond)
+
+	task.FunctionName = "updated_function"
+	err = repo.CreateTask(ctx, task)
+	require.NoError(t, err)
+
+	updated, err := repo.GetTask(ctx, task.TaskKey)
+	require.NoError(t, err)
+
+	assert.Equal(t, original.CreatedAt, updated.CreatedAt, "create time shouldn't change")
+	assert.True(t, updated.UpdatedAt.After(original.UpdatedAt))
+	assert.Equal(t, "updated_function", updated.FunctionName)
 }
