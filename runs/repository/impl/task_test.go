@@ -73,7 +73,6 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, task.FunctionName, retrieved.FunctionName)
 	assert.WithinDuration(t, startTime, retrieved.CreatedAt, 1*time.Second, "created_at should be close to now")
 	assert.Equal(t, retrieved.CreatedAt, retrieved.UpdatedAt, "created_at and updated_at should be equal")
-
 }
 
 func TestGetTask_NotFound(t *testing.T) {
