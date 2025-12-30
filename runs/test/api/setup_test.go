@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -159,13 +160,12 @@ func cleanupTestDB(t *testing.T) {
 		return
 	}
 
-	// Delete all records from all tables
-	// Order matters due to foreign key constraints (if any)
-	tables := []string{"tasks", "task_specs", "actions"}
+	// Loop through all models defined in migrations
+	for _, model := range migrations.AllModels {
+		tableName := testDB.NamingStrategy.TableName(reflect.TypeOf(model).Elem().Name())
 
-	for _, table := range tables {
-		if err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)).Error; err != nil {
-			t.Logf("Warning: Failed to cleanup table %s: %v", table, err)
+		if err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", tableName)).Error; err != nil {
+			t.Logf("Warning: Failed to cleanup table %s: %v", tableName, err)
 		}
 	}
 
