@@ -32,7 +32,7 @@ make clean
 
 ## Local development on kind cluster
 
-Following steps requires you to switch your workign directory to the `executor/`.
+Following steps requires you to switch your working directory to the `executor/`.
 
 ```sh
 cd executor
@@ -58,7 +58,7 @@ IMG=flyteorg/executor:nightly make docker-build
 kind load docker-image flyteorg/executor:nightly --name flytev2
 ```
 
-4. Install CRD in to the cluster
+4. Install CRD into the cluster
 
 ```sh
 make install
@@ -84,7 +84,7 @@ kind delete cluster --name flytev2
 kind create cluster --image=kindest/node:v1.26.0 --name flytev2
 ```
 
-2. Install CRD in to the cluster
+2. Install CRD into the cluster
 
 ```sh
 make install
@@ -112,7 +112,7 @@ kubectl apply -k config/samples/
 You can see the `TaskAction` CRD created:
 
 ```sh
-❯ k get taskactions
+❯ kubectl get taskactions
 NAME                RUN          ACTION        STATUS      AGE
 taskaction-sample   sample-run   sample-task   Completed   59m
 ```
@@ -120,7 +120,7 @@ taskaction-sample   sample-run   sample-task   Completed   59m
 Or use `-o wide` to view more details:
 
 ```sh
-❯ k get taskactions -o wide
+❯ kubectl get taskactions -o wide
 NAME                RUN          ACTION        STATUS      AGE   PROGRESSING   SUCCEEDED   FAILED
 taskaction-sample   sample-run   sample-task   Completed   59m   False         True
 ```
