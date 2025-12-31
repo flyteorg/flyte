@@ -20,6 +20,10 @@ const (
 )
 
 func TestDeployTask(t *testing.T) {
+	// Ensure a clean test database
+	cleanupTestDB(t)
+
+	// Cleanup after test
 	t.Cleanup(func() {
 		cleanupTestDB(t)
 	})
@@ -72,4 +76,21 @@ func TestDeployTask(t *testing.T) {
 	assert.Equal(t, taskID.GetName(), details.GetTaskId().GetName())
 	assert.Equal(t, taskID.GetVersion(), details.GetTaskId().GetVersion())
 	t.Logf("Task details retrieved successfully: %v", details)
+
+	// Get versions of the task
+	getVersionsResp, err := taskClient.ListVersions(ctx, connect.NewRequest(&task.ListVersionsRequest{
+		TaskName: &task.TaskName{
+			Org:     testOrg,
+			Project: testProject,
+			Domain:  testDomain,
+			Name:    "test-task",
+		},
+	}))
+
+	require.NoError(t, err)
+	require.NotNil(t, getVersionsResp)
+	versions := getVersionsResp.Msg.GetVersions()
+	assert.Equal(t, 1, len(versions))
+	assert.Equal(t, taskID.GetVersion(), versions[0].Version)
+	t.Logf("Task versions retrieved successfully: %v", versions)
 }
