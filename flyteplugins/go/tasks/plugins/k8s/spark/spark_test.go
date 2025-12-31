@@ -424,26 +424,26 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	taskCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -460,7 +460,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
 	overrides.On("GetExtendedResources").Return(nil)
 	overrides.On("GetPodTemplate").Return(nil)
-	overrides.OnGetContainerImage().Return("")
+	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
@@ -492,7 +492,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 			return nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
@@ -503,26 +503,26 @@ func dummySparkPluginContext(taskTemplate *core.TaskTemplate, pluginState k8s.Pl
 func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginState k8s.PluginState, pods ...client.Object) k8s.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	pCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -538,7 +538,7 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
 	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
 	overrides.On("GetExtendedResources").Return(nil)
-	overrides.OnGetContainerImage().Return("")
+	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
@@ -559,7 +559,7 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	taskExecutionMetadata.On("GetOverrides").Return(overrides)
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
-	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -575,9 +575,9 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	objs := make([]client.Object, len(pods))
 	copy(objs, pods)
 	reader := fake.NewClientBuilder().WithObjects(objs...).Build()
-	pCtx.OnK8sReader().Return(reader)
+	pCtx.EXPECT().K8sReader().Return(reader)
 
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 

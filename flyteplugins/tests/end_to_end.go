@@ -69,24 +69,23 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	assert.NoError(t, ds.WriteProtobuf(ctx, basePrefix+"/inputs.pb", storage.Options{}, inputs))
 
 	tr := &coreMocks.TaskReader{}
-	tr.OnRead(ctx).Return(template, nil)
+	tr.EXPECT().Read(ctx).Return(template, nil)
 
 	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(basePrefix)
-	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
+	inputReader.EXPECT().GetInputPrefixPath().Return(basePrefix)
+	inputReader.EXPECT().GetInputPath().Return(basePrefix + "/inputs.pb")
+	inputReader.EXPECT().Get(mock.Anything).Return(inputs, nil)
 
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnGetRawOutputPrefix().Return("/sandbox/")
-	outputWriter.OnGetOutputPrefixPath().Return(basePrefix)
-	outputWriter.OnGetErrorPath().Return(basePrefix + "/error.pb")
-	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
-	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.EXPECT().GetRawOutputPrefix().Return("/sandbox/")
+	outputWriter.EXPECT().GetOutputPrefixPath().Return(basePrefix)
+	outputWriter.EXPECT().GetErrorPath().Return(basePrefix + "/error.pb")
+	outputWriter.EXPECT().GetOutputPath().Return(basePrefix + "/outputs.pb")
+	outputWriter.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputWriter.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		or := args.Get(1).(io.OutputReader)
-		literals, ee, err := or.Read(ctx)
+	outputWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(ctx context.Context, reader io.OutputReader) {
+		literals, ee, err := reader.Read(ctx)
 		assert.NoError(t, err)
 
 		if ee != nil {
@@ -100,26 +99,25 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 
 	pluginStateWriter := &coreMocks.PluginStateWriter{}
 	latestKnownState := atomic.Value{}
-	pluginStateWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		latestKnownState.Store(args.Get(1))
+	pluginStateWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(_ uint8, v interface{}) {
+		latestKnownState.Store(v)
 	})
 
-	pluginStateWriter.OnReset().Return(nil).Run(func(args mock.Arguments) {
+	pluginStateWriter.EXPECT().Reset().Return(nil).Run(func() {
 		latestKnownState.Store(nil)
 	})
 
 	pluginStateReader := &coreMocks.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
-		o := args.Get(0)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil).Run(func(state interface{}) {
 		x, err := json.Marshal(latestKnownState.Load())
 		assert.NoError(t, err)
-		assert.NoError(t, json.Unmarshal(x, &o))
+		assert.NoError(t, json.Unmarshal(x, &state))
 	})
-	pluginStateReader.OnGetStateVersion().Return(0)
+	pluginStateReader.EXPECT().GetStateVersion().Return(0)
 
 	tID := &coreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return(execID + "-my-task-1")
-	tID.OnGetID().Return(idlCore.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return(execID + "-my-task-1")
+	tID.EXPECT().GetID().Return(idlCore.TaskExecutionIdentifier{
 		TaskId: &idlCore.Identifier{
 			ResourceType: idlCore.ResourceType_TASK,
 			Project:      "a",
@@ -137,19 +135,19 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		},
 		RetryAttempt: 0,
 	})
-	tID.OnGetUniqueNodeID().Return("unique-node-id")
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
-	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		"dynamic-queue": "queue1",
 	}})
-	overrides.OnGetResources().Return(&v1.ResourceRequirements{
+	overrides.EXPECT().GetResources().Return(&v1.ResourceRequirements{
 		Requests: map[v1.ResourceName]resource.Quantity{},
 		Limits:   map[v1.ResourceName]resource.Quantity{},
 	})
-	overrides.OnGetExtendedResources().Return(&idlCore.ExtendedResources{})
-	overrides.OnGetContainerImage().Return("")
-	overrides.OnGetPodTemplate().Return(nil)
+	overrides.EXPECT().GetExtendedResources().Return(&idlCore.ExtendedResources{})
+	overrides.EXPECT().GetContainerImage().Return("")
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	connections := map[string]pluginCore.ConnectionWrapper{
 		"my-openai": {
@@ -163,29 +161,29 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	}
 
 	tMeta := &coreMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
-	tMeta.OnGetK8sServiceAccount().Return("s")
-	tMeta.OnGetNamespace().Return("fake-development")
-	tMeta.OnGetMaxAttempts().Return(2)
-	tMeta.OnGetSecurityContext().Return(idlCore.SecurityContext{
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
+	tMeta.EXPECT().GetK8sServiceAccount().Return("s")
+	tMeta.EXPECT().GetNamespace().Return("fake-development")
+	tMeta.EXPECT().GetMaxAttempts().Return(2)
+	tMeta.EXPECT().GetSecurityContext().Return(idlCore.SecurityContext{
 		RunAs: &idlCore.Identity{
 			K8SServiceAccount: "s",
 		},
 	})
-	tMeta.OnGetLabels().Return(map[string]string{"organization": "flyte", "project": "flytesnacks", "domain": "development"})
-	tMeta.OnGetAnnotations().Return(map[string]string{})
-	tMeta.OnIsInterruptible().Return(true)
-	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
-	tMeta.OnGetOwnerID().Return(types.NamespacedName{
+	tMeta.EXPECT().GetLabels().Return(map[string]string{"organization": "flyte", "project": "flytesnacks", "domain": "development"})
+	tMeta.EXPECT().GetAnnotations().Return(map[string]string{})
+	tMeta.EXPECT().IsInterruptible().Return(true)
+	tMeta.EXPECT().GetOwnerReference().Return(v12.OwnerReference{})
+	tMeta.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "fake-development",
 		Name:      execID,
 	})
-	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
-	tMeta.OnGetEnvironmentVariables().Return(nil)
-	tMeta.OnGetExternalResourceAttributes().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
-	tMeta.OnGetConsoleURL().Return("")
+	tMeta.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	tMeta.EXPECT().GetInterruptibleFailureThreshold().Return(2)
+	tMeta.EXPECT().GetEnvironmentVariables().Return(nil)
+	tMeta.EXPECT().GetExternalResourceAttributes().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
+	tMeta.EXPECT().GetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}
@@ -197,9 +195,9 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			}
 
 			or := &ioMocks.OutputReader{}
-			or.OnExistsMatch(mock.Anything).Return(true, nil)
-			or.OnIsErrorMatch(mock.Anything).Return(false, nil)
-			or.OnReadMatch(mock.Anything).Return(data.(*idlCore.LiteralMap), nil, nil)
+			or.EXPECT().Exists(mock.Anything).Return(true, nil)
+			or.EXPECT().IsError(mock.Anything).Return(false, nil)
+			or.EXPECT().Read(mock.Anything).Return(data.(*idlCore.LiteralMap), nil, nil)
 			return or
 		},
 		func(ctx context.Context, key catalog.Key) error {
@@ -237,28 +235,28 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	assert.NoError(t, cat.Start(ctx))
 
 	eRecorder := &coreMocks.EventsRecorder{}
-	eRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
+	eRecorder.EXPECT().RecordRaw(mock.Anything, mock.Anything).Return(nil)
 
 	resourceManager := &coreMocks.ResourceManager{}
-	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
-	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
+	resourceManager.EXPECT().ReleaseResource(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	secretManager := &coreMocks.SecretManager{}
-	secretManager.OnGet(ctx, mock.Anything).Return("fake-token", nil)
+	secretManager.EXPECT().Get(ctx, mock.Anything).Return("fake-token", nil)
 
 	tCtx := &coreMocks.TaskExecutionContext{}
-	tCtx.OnInputReader().Return(inputReader)
-	tCtx.OnTaskRefreshIndicator().Return(func(ctx context.Context) {})
-	tCtx.OnOutputWriter().Return(outputWriter)
-	tCtx.OnDataStore().Return(ds)
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnPluginStateWriter().Return(pluginStateWriter)
-	tCtx.OnPluginStateReader().Return(pluginStateReader)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnCatalog().Return(cat)
-	tCtx.OnEventsRecorder().Return(eRecorder)
-	tCtx.OnResourceManager().Return(resourceManager)
-	tCtx.OnSecretManager().Return(secretManager)
+	tCtx.EXPECT().InputReader().Return(inputReader)
+	tCtx.EXPECT().TaskRefreshIndicator().Return(func(ctx context.Context) {})
+	tCtx.EXPECT().OutputWriter().Return(outputWriter)
+	tCtx.EXPECT().DataStore().Return(ds)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().PluginStateWriter().Return(pluginStateWriter)
+	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().Catalog().Return(cat)
+	tCtx.EXPECT().EventsRecorder().Return(eRecorder)
+	tCtx.EXPECT().ResourceManager().Return(resourceManager)
+	tCtx.EXPECT().SecretManager().Return(secretManager)
 
 	trns := pluginCore.DoTransition(pluginCore.PhaseInfoQueued(time.Now(), 0, ""))
 	for !trns.Info().Phase().IsTerminal() {

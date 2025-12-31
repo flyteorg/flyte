@@ -458,22 +458,22 @@ func TestAddCoPilotToPod(t *testing.T) {
 	}
 
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.OnGetNamespace().Return("test-namespace")
-	taskMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
-	taskMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskMetadata.OnGetK8sServiceAccount().Return("")
-	taskMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	taskMetadata.EXPECT().GetK8sServiceAccount().Return("")
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
-	taskMetadata.OnIsInterruptible().Return(false)
+	taskMetadata.EXPECT().IsInterruptible().Return(false)
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			Name: "my-task",
 		},
@@ -485,21 +485,21 @@ func TestAddCoPilotToPod(t *testing.T) {
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("name")
-	taskMetadata.OnGetTaskExecutionID().Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("name")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.OnGetResources().Return(resourceRequirements)
-	taskMetadata.OnGetOverrides().Return(to)
+	to.EXPECT().GetResources().Return(resourceRequirements)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
 
 	inputPaths := &pluginsIOMock.InputFilePaths{}
 	inputs := "/base/inputs"
-	inputPaths.OnGetInputPrefixPath().Return(storage.DataReference(inputs))
-	inputPaths.OnGetInputPath().Return(storage.DataReference(inputs + "/inputs.pb"))
+	inputPaths.EXPECT().GetInputPrefixPath().Return(storage.DataReference(inputs))
+	inputPaths.EXPECT().GetInputPath().Return(storage.DataReference(inputs + "/inputs.pb"))
 
 	opath := &pluginsIOMock.OutputFilePaths{}
-	opath.OnGetRawOutputPrefix().Return("/raw")
-	opath.OnGetOutputPrefixPath().Return("/output")
+	opath.EXPECT().GetRawOutputPrefix().Return("/raw")
+	opath.EXPECT().GetOutputPrefixPath().Return("/output")
 
 	t.Run("happy", func(t *testing.T) {
 		pod := v1.PodSpec{}
