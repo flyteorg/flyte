@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-//go:generate mockery -all -case=underscore
 
 // InputFilePaths contains the different ways available for downstream systems to retrieve inputs.
 // If using Files for IO with tasks, then the input will be written to this path. All the files are always created in a

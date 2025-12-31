@@ -40,9 +40,9 @@ func TestReadOrigin(t *testing.T) {
 	ctx := context.TODO()
 
 	opath := &pluginsIOMock.OutputFilePaths{}
-	opath.OnGetErrorPath().Return("")
+	opath.EXPECT().GetErrorPath().Return("")
 	deckPath := "deck.html"
-	opath.OnGetDeckPath().Return(storage.DataReference(deckPath))
+	opath.EXPECT().GetDeckPath().Return(storage.DataReference(deckPath))
 
 	t.Run("user", func(t *testing.T) {
 		errorDoc := &core.ErrorDocument{

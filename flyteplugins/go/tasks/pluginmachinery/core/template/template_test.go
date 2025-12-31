@@ -416,7 +416,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	t.Run("sub task template happy", func(t *testing.T) {
 		ctx := context.TODO()
 		tMock := &pluginsCoreMocks.TaskTemplatePath{}
-		tMock.OnPath(ctx).Return("s3://task-path", nil)
+		tMock.EXPECT().Path(ctx).Return("s3://task-path", nil)
 		params := Parameters{
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
@@ -442,7 +442,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	t.Run("sub task template error", func(t *testing.T) {
 		ctx := context.TODO()
 		tMock := &pluginsCoreMocks.TaskTemplatePath{}
-		tMock.OnPath(ctx).Return("", fmt.Errorf("error"))
+		tMock.EXPECT().Path(ctx).Return("", fmt.Errorf("error"))
 		params := Parameters{
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
