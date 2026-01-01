@@ -93,3 +93,51 @@ func TestListUniqueTaskIds(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, resp)
 }
+
+func TestListTasks(t *testing.T) {
+	ctx := context.Background()
+
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().ListTasks(mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context,
+			request *admin.ResourceListRequest) (*admin.TaskList, error) {
+			return &admin.TaskList{}, nil
+		},
+	)
+	mockServer := NewMockAdminServer(NewMockAdminServerInput{
+		taskManager: &mockTaskManager,
+	})
+
+	resp, err := mockServer.ListTasks(ctx, &admin.ResourceListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, resp)
+}
+
+func TestListTasks_Error(t *testing.T) {
+	ctx := context.Background()
+
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().ListTasks(mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context,
+			request *admin.ResourceListRequest) (*admin.TaskList, error) {
+			return nil, errors.GetInvalidInputError("invalid input")
+		},
+	)
+	mockServer := NewMockAdminServer(NewMockAdminServerInput{
+		taskManager: &mockTaskManager,
+	})
+
+	resp, err := mockServer.ListTasks(ctx, &admin.ResourceListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
+	assert.Error(t, err)
+	assert.Nil(t, resp)
+}
