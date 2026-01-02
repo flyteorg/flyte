@@ -613,6 +613,10 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 		// Redirect if one was given
 		queryParams := request.URL.Query()
 		if redirectURL := queryParams.Get(RedirectURLParameter); redirectURL != "" {
+			if !GetRedirectURLAllowed(ctx, redirectURL, authCtx.Options()) {
+				logger.Warnf(ctx, "Rejecting unauthorized redirect_url in logout: %s", redirectURL)
+				redirectURL = authCtx.Options().UserAuth.RedirectURL.String()
+			}
 			http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 		}
 	}

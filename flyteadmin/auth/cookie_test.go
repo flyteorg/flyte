@@ -225,6 +225,11 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 		assert.NotNil(t, cookie)
 		request.AddCookie(cookie)
 		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+		})
 		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/console", redirect)
 	})
@@ -241,5 +246,96 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 		})
 		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/api/v1/projects", redirect)
+	})
+
+	t.Run("query param with authorized absolute redirect URL", func(t *testing.T) {
+		ctx := context.Background()
+		request, err := http.NewRequest(http.MethodGet, "/test?redirect_url=https://example.com/dashboard", nil)
+		assert.NoError(t, err)
+		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		assert.Equal(t, "https://example.com/dashboard", redirect)
+	})
+
+	t.Run("query param with unauthorized absolute redirect URL", func(t *testing.T) {
+		ctx := context.Background()
+		request, err := http.NewRequest(http.MethodGet, "/test?redirect_url=https://evil.com/phishing", nil)
+		assert.NoError(t, err)
+		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		assert.Equal(t, "/api/v1/projects", redirect)
+	})
+
+	t.Run("cookie with authorized absolute redirect URL", func(t *testing.T) {
+		ctx := context.Background()
+		request, err := http.NewRequest(http.MethodGet, "/test", nil)
+		assert.NoError(t, err)
+		cookie := NewRedirectCookie(ctx, "https://example.com/callback")
+		assert.NotNil(t, cookie)
+		request.AddCookie(cookie)
+		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		assert.Equal(t, "https://example.com/callback", redirect)
+	})
+
+	t.Run("cookie with unauthorized absolute redirect URL", func(t *testing.T) {
+		ctx := context.Background()
+		request, err := http.NewRequest(http.MethodGet, "/test", nil)
+		assert.NoError(t, err)
+		cookie := NewRedirectCookie(ctx, "https://malicious.com/steal")
+		assert.NotNil(t, cookie)
+		request.AddCookie(cookie)
+		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		assert.Equal(t, "/api/v1/projects", redirect)
+	})
+
+	t.Run("query param takes precedence over cookie", func(t *testing.T) {
+		ctx := context.Background()
+		request, err := http.NewRequest(http.MethodGet, "/test?redirect_url=/query-path", nil)
+		assert.NoError(t, err)
+		cookie := NewRedirectCookie(ctx, "/cookie-path")
+		assert.NotNil(t, cookie)
+		request.AddCookie(cookie)
+		mockAuthCtx := &mocks.AuthenticationContext{}
+		mockAuthCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+		})
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		assert.Equal(t, "/query-path", redirect)
 	})
 }

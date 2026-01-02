@@ -314,6 +314,11 @@ func TestGetLogoutHandler(t *testing.T) {
 		cookieHandler := &CookieManager{}
 		authCtx := mocks.AuthenticationContext{}
 		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+		})
 		w := httptest.NewRecorder()
 		r := plugins.NewRegistry()
 		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/foo", nil)
@@ -331,6 +336,11 @@ func TestGetLogoutHandler(t *testing.T) {
 		cookieHandler := &CookieManager{}
 		authCtx := mocks.AuthenticationContext{}
 		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+		})
 		w := httptest.NewRecorder()
 		r := plugins.NewRegistry()
 		hook := new(mock.Mock)
@@ -378,6 +388,84 @@ func TestGetLogoutHandler(t *testing.T) {
 		assert.Empty(t, w.Result().Cookies())
 		authCtx.AssertExpectations(t)
 		hook.AssertExpectations(t)
+	})
+
+	t.Run("with_authorized_absolute_redirect_url", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=https://example.com/dashboard", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		assert.Equal(t, "https://example.com/dashboard", w.Header().Get("Location"))
+		require.Len(t, w.Result().Cookies(), 5)
+		authCtx.AssertExpectations(t)
+	})
+
+	t.Run("with_unauthorized_absolute_redirect_url", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=https://evil.com/phishing", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		assert.Equal(t, "/api/v1/projects", w.Header().Get("Location"))
+		require.Len(t, w.Result().Cookies(), 5)
+		authCtx.AssertExpectations(t)
+	})
+
+	t.Run("with_relative_redirect_url", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.OnOptions().Return(&config.Config{
+			UserAuth: config.UserAuthConfig{
+				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
+			},
+			AuthorizedURIs: []stdConfig.URL{
+				{URL: mustParseURL(t, "https://example.com")},
+			},
+		})
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/dashboard/home", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		assert.Equal(t, "/dashboard/home", w.Header().Get("Location"))
+		require.Len(t, w.Result().Cookies(), 5)
+		authCtx.AssertExpectations(t)
 	})
 }
 

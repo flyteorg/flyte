@@ -179,16 +179,25 @@ func NewRedirectCookie(ctx context.Context, redirectURL string) *http.Cookie {
 // in this package's Config object.
 func GetAuthFlowEndRedirect(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request) string {
 	queryParams := request.URL.Query()
+	defaultRedirect := authCtx.Options().UserAuth.RedirectURL.String()
 	// Use the redirect URL specified in the request if one is available.
 	if redirectURL := queryParams.Get(RedirectURLParameter); len(redirectURL) > 0 {
-		return redirectURL
+		if GetRedirectURLAllowed(ctx, redirectURL, authCtx.Options()) {
+			return redirectURL
+		}
+		logger.Warnf(ctx, "Rejecting unauthorized redirect_url from query parameter: %s", redirectURL)
+		return defaultRedirect
 	}
 
 	cookie, err := request.Cookie(redirectURLCookieName)
 	if err != nil {
 		logger.Debugf(ctx, "Could not detect end-of-flow redirect url cookie")
-		return authCtx.Options().UserAuth.RedirectURL.String()
+		return defaultRedirect
 	}
 
-	return cookie.Value
+	if GetRedirectURLAllowed(ctx, cookie.Value, authCtx.Options()) {
+		return cookie.Value
+	}
+	logger.Warnf(ctx, "Rejecting unauthorized redirect_url from cookie: %s", cookie.Value)
+	return defaultRedirect
 }
