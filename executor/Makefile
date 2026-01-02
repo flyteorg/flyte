@@ -117,7 +117,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	$(CONTAINER_TOOL) build -t ${IMG} -f Dockerfile ..
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -177,6 +177,10 @@ undeploy: kustomize ## Undeploy controller from the K8s cluster specified in ~/.
 LOCALBIN ?= $(shell pwd)/bin
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
+
+.PHONY: clean
+clean: ## Cleanup local binaries such as controller-gen and kustomize
+	rm -rf $(LOCALBIN)
 
 ## Tool Binaries
 KUBECTL ?= kubectl

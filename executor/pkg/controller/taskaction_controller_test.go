@@ -19,14 +19,19 @@ package controller
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+	rpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	workflowconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
 
 var _ = Describe("TaskAction Controller", func() {
@@ -50,7 +55,15 @@ var _ = Describe("TaskAction Controller", func() {
 						Name:      resourceName,
 						Namespace: "default",
 					},
-					// TODO(user): Specify other spec details if needed.
+					Spec: flyteorgv1.TaskActionSpec{
+						RunName:       "test-run",
+						Org:           "test-org",
+						Project:       "test-project",
+						Domain:        "test-domain",
+						ActionName:    "test-action",
+						InputURI:      "/tmp/input",
+						RunOutputBase: "/tmp/output",
+					},
 				}
 				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
 			}
@@ -67,17 +80,36 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 		It("should successfully reconcile the resource", func() {
 			By("Reconciling the created resource")
+
+			// Create a mock state service client
+			mockClient := &workflowconnectmocks.StateServiceClient{}
+
+			// Set up expectations for Put calls - return a proper response with status
+			mockClient.On("Put", mock.Anything, mock.Anything).
+				Return(connect.NewResponse(&workflow.PutResponse{
+					Status: &rpcstatus.Status{
+						Code:    0,
+						Message: "success",
+					},
+				}), nil).
+				Maybe()
+
 			controllerReconciler := &TaskActionReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
+				Client:             k8sClient,
+				Scheme:             k8sClient.Scheme(),
+				stateServiceClient: mockClient,
 			}
 
 			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
 				NamespacedName: typeNamespacedName,
 			})
 			Expect(err).NotTo(HaveOccurred())
-			// TODO(user): Add more specific assertions depending on your controller's reconciliation logic.
-			// Example: If you expect a certain status condition after reconciliation, verify it here.
+
+			// Verify that the TaskAction was updated with a condition
+			updatedTaskAction := &flyteorgv1.TaskAction{}
+			err = k8sClient.Get(ctx, typeNamespacedName, updatedTaskAction)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(updatedTaskAction.Status.Conditions).NotTo(BeEmpty())
 		})
 	})
 })
