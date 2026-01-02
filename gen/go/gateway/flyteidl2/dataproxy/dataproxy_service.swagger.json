@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/workflow/run_logs_service.proto",
+    "title": "flyteidl2/dataproxy/dataproxy_service.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "RunLogsService"
+      "name": "DataProxyService"
     }
   ],
   "consumes": [
