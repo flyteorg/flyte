@@ -52,6 +52,11 @@ var retryableStatusReasons = sets.NewString(
 	"NodeShutdown",
 	// kubelet admission rejects the pod before the node gets assigned appropriate labels.
 	"NodeAffinity",
+	// kubelet admission rejects the pod due to insufficient resources at admission time.
+	// This is a race condition where the scheduler assigned the pod to a node, but by the
+	// time the kubelet tried to admit it, resources were consumed.
+	"OutOfcpu",
+	"OutOfmemory",
 )
 
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement

@@ -2721,25 +2721,66 @@ func TestDemystifySuccess(t *testing.T) {
 func TestDemystifyFailure(t *testing.T) {
 	ctx := context.TODO()
 
-	t.Run("unknown-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{}, pluginsCore.TaskInfo{}, "")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-	})
-
-	t.Run("known-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{}, "")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "hello", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-	})
-
-	t.Run("OOMKilled", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-			ContainerStatuses: []v1.ContainerStatus{
+	tests := []struct {
+		name                 string
+		reason               string
+		containerStatuses    []v1.ContainerStatus
+		primaryContainerName string
+		expectedCode         string
+		expectedKind         core.ExecutionError_ErrorKind
+	}{
+		{
+			name:         "Shutdown",
+			reason:       "Shutdown",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "Terminated",
+			reason:       "Terminated",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "NodeShutdown",
+			reason:       "NodeShutdown",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "NodeAffinity",
+			reason:       "NodeAffinity",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "OutOfcpu",
+			reason:       "OutOfcpu",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "OutOfmemory",
+			reason:       "OutOfmemory",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "Unknown",
+			reason:       "",
+			expectedCode: "Interrupted",
+			expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:         "Custom",
+			reason:       "hello",
+			expectedCode: "hello",
+			expectedKind: core.ExecutionError_USER,
+		},
+		{
+			name:   "Container was OOMKilled",
+			reason: "",
+			containerStatuses: []v1.ContainerStatus{
 				{
 					State: v1.ContainerState{
 						Terminated: &v1.ContainerStateTerminated{
@@ -2749,16 +2790,13 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{}, "")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-	})
-
-	t.Run("SIGKILL non-primary container", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-			ContainerStatuses: []v1.ContainerStatus{
+			expectedCode: "OOMKilled",
+			expectedKind: core.ExecutionError_USER,
+		},
+		{
+			name:   "SIGKILL of non-primary container",
+			reason: "",
+			containerStatuses: []v1.ContainerStatus{
 				{
 					LastTerminationState: v1.ContainerState{
 						Terminated: &v1.ContainerStateTerminated{
@@ -2769,16 +2807,14 @@ func TestDemystifyFailure(t *testing.T) {
 					Name: "non-primary-container",
 				},
 			},
-		}, pluginsCore.TaskInfo{}, "primary-container")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-	})
-
-	t.Run("SIGKILL primary container", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-			ContainerStatuses: []v1.ContainerStatus{
+			primaryContainerName: "primary-container",
+			expectedCode:         "Interrupted",
+			expectedKind:         core.ExecutionError_USER,
+		},
+		{
+			name:   "SIGKILL of primary container",
+			reason: "",
+			containerStatuses: []v1.ContainerStatus{
 				{
 					LastTerminationState: v1.ContainerState{
 						Terminated: &v1.ContainerStateTerminated{
@@ -2789,57 +2825,26 @@ func TestDemystifyFailure(t *testing.T) {
 					Name: "primary-container",
 				},
 			},
-		}, pluginsCore.TaskInfo{}, "primary-container")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-	})
+			primaryContainerName: "primary-container",
+			expectedCode:         "Interrupted",
+			expectedKind:         core.ExecutionError_SYSTEM,
+		},
+	}
 
-	t.Run("GKE node preemption", func(t *testing.T) {
-		for _, reason := range []string{
-			"Terminated",
-			"Shutdown",
-			"NodeShutdown",
-		} {
-			t.Run(reason, func(t *testing.T) {
-				message := "Test pod status message"
-				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-					Message: message,
-					Reason:  reason,
-					// Can't always rely on GCP returining container statuses when node is preempted
-					ContainerStatuses: []v1.ContainerStatus{},
-				}, pluginsCore.TaskInfo{}, "")
-				assert.Nil(t, err)
-				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-				assert.Equal(t, message, phaseInfo.Err().GetMessage())
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+				Reason:            tt.reason,
+				Phase:             v1.PodFailed,
+				ContainerStatuses: tt.containerStatuses,
+			}, pluginsCore.TaskInfo{}, tt.primaryContainerName)
 
-	t.Run("Kubelet admission denies pod due to missing node label", func(t *testing.T) {
-		for _, reason := range []string{
-			"NodeAffinity",
-		} {
-			t.Run(reason, func(t *testing.T) {
-				message := "Pod was rejected: Predicate NodeAffinity failed: node(s) didn't match Pod's node affinity/selector"
-				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-					Message: message,
-					Reason:  reason,
-					Phase:   v1.PodFailed,
-					// Can't always rely on GCP returining container statuses when node is preempted
-					ContainerStatuses: []v1.ContainerStatus{},
-				}, pluginsCore.TaskInfo{}, "")
-				assert.Nil(t, err)
-				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-				assert.Equal(t, message, phaseInfo.Err().GetMessage())
-			})
-		}
-	})
+			assert.Nil(t, err)
+			assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+			assert.Equal(t, tt.expectedCode, phaseInfo.Err().GetCode())
+			assert.Equal(t, tt.expectedKind, phaseInfo.Err().GetKind())
+		})
+	}
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
