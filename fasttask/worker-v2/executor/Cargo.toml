@@ -11,7 +11,7 @@ path = "src/lib.rs"
 [dependencies]
 bincode = { workspace = true }
 futures = { workspace = true }
-pyo3 = { version = "0.25.1", features = ["py-clone"] }
+pyo3 = { version = "0.25.1", features = ["py-clone", "abi3-py310"] }
 pyo3-async-runtimes = { version = "0.25.0", features = ["tokio-runtime"] }
 tokio = { version = "1.45.1", features = ["full"] }
 tokio-util = { workspace = true, features = ["rt"] }
