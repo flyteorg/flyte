@@ -167,6 +167,98 @@ func (_c *TaskExecutionMetadata_GetEnvironmentVariables_Call) RunAndReturn(run f
 	return _c
 }
 
+// GetExecutionDomain provides a mock function with no fields
+func (_m *TaskExecutionMetadata) GetExecutionDomain() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetExecutionDomain")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// TaskExecutionMetadata_GetExecutionDomain_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetExecutionDomain'
+type TaskExecutionMetadata_GetExecutionDomain_Call struct {
+	*mock.Call
+}
+
+// GetExecutionDomain is a helper method to define mock.On call
+func (_e *TaskExecutionMetadata_Expecter) GetExecutionDomain() *TaskExecutionMetadata_GetExecutionDomain_Call {
+	return &TaskExecutionMetadata_GetExecutionDomain_Call{Call: _e.mock.On("GetExecutionDomain")}
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionDomain_Call) Run(run func()) *TaskExecutionMetadata_GetExecutionDomain_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionDomain_Call) Return(_a0 string) *TaskExecutionMetadata_GetExecutionDomain_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionDomain_Call) RunAndReturn(run func() string) *TaskExecutionMetadata_GetExecutionDomain_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetExecutionID provides a mock function with no fields
+func (_m *TaskExecutionMetadata) GetExecutionID() *flyteidlcore.WorkflowExecutionIdentifier {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetExecutionID")
+	}
+
+	var r0 *flyteidlcore.WorkflowExecutionIdentifier
+	if rf, ok := ret.Get(0).(func() *flyteidlcore.WorkflowExecutionIdentifier); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidlcore.WorkflowExecutionIdentifier)
+		}
+	}
+
+	return r0
+}
+
+// TaskExecutionMetadata_GetExecutionID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetExecutionID'
+type TaskExecutionMetadata_GetExecutionID_Call struct {
+	*mock.Call
+}
+
+// GetExecutionID is a helper method to define mock.On call
+func (_e *TaskExecutionMetadata_Expecter) GetExecutionID() *TaskExecutionMetadata_GetExecutionID_Call {
+	return &TaskExecutionMetadata_GetExecutionID_Call{Call: _e.mock.On("GetExecutionID")}
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionID_Call) Run(run func()) *TaskExecutionMetadata_GetExecutionID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionID_Call) Return(_a0 *flyteidlcore.WorkflowExecutionIdentifier) *TaskExecutionMetadata_GetExecutionID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetExecutionID_Call) RunAndReturn(run func() *flyteidlcore.WorkflowExecutionIdentifier) *TaskExecutionMetadata_GetExecutionID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetInterruptibleFailureThreshold provides a mock function with no fields
 func (_m *TaskExecutionMetadata) GetInterruptibleFailureThreshold() int32 {
 	ret := _m.Called()
