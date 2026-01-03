@@ -252,8 +252,18 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// initialize ArrayNode state
 		maxSystemFailuresValue := int(config.GetConfig().NodeConfig.MaxNodeRetriesOnSystemFailures)
 		maxAttemptsValue := int(config.GetConfig().NodeConfig.DefaultMaxAttempts)
-		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
-			maxAttemptsValue = *nCtx.Node().GetRetryStrategy().MinAttempts
+
+		retryStrategy := nCtx.Node().GetRetryStrategy()
+		subNodeRetryStrategy := nCtx.Node().GetArrayNode().GetSubNodeSpec().GetRetryStrategy()
+
+		if retryStrategy != nil && retryStrategy.MinAttempts != nil && *retryStrategy.MinAttempts != 1 {
+			maxAttemptsValue = *retryStrategy.MinAttempts
+		}
+
+		// Ensure that the bitarray used for tracking retry attempts is large enough to accommodate the retry budget
+		// that is potentially set on the task decorator
+		if subNodeRetryStrategy != nil && subNodeRetryStrategy.MinAttempts != nil && *subNodeRetryStrategy.MinAttempts != 1 {
+			maxAttemptsValue = max(maxAttemptsValue, *subNodeRetryStrategy.MinAttempts)
 		}
 
 		if config.GetConfig().NodeConfig.IgnoreRetryCause {
