@@ -17,6 +17,20 @@
   ],
   "paths": {},
   "definitions": {
+    "commonProjectIdentifier": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
@@ -39,6 +53,37 @@
         }
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "imagebuilderGetImageResponse": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "$ref": "#/definitions/imagebuilderImage"
+        }
+      },
+      "title": "GetSecretProxyResponse returns the looked up secret from the secret service"
+    },
+    "imagebuilderImage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/imagebuilderImageIdentifier"
+        },
+        "fqin": {
+          "type": "string",
+          "title": "Fully qualified, pullable, image name"
+        }
+      },
+      "title": "Simple container to surface if image exists"
+    },
+    "imagebuilderImageIdentifier": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "title": "ImageIdentifier is how to identify an image"
     },
     "protobufAny": {
       "type": "object",
