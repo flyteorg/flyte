@@ -137,7 +137,7 @@ func getDummySidecarPluginContext(taskTemplate *core.TaskTemplate, resources *v1
 	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
 	inputReader.OnGetInputPath().Return("test-data-reference")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	pCtx.On("InputReader").Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
@@ -145,17 +145,17 @@ func getDummySidecarPluginContext(taskTemplate *core.TaskTemplate, resources *v1
 	outputReader.OnGetRawOutputPrefix().Return("")
 	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.OnOutputWriter().Return(outputReader)
+	pCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	pCtx.On("TaskReader").Return(taskReader)
 
-	pCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
+	pCtx.On("TaskExecutionMetadata").Return(dummyTaskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
 	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	pCtx.OnPluginStateReader().Return(pluginStateReader)
+	pCtx.On("PluginStateReader").Return(pluginStateReader)
 
 	return pCtx
 }

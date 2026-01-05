@@ -2,6 +2,8 @@ package pod
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -336,6 +338,66 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 
 	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
+}
+
+// latestTime returns the latest non-zero time from the given times
+func latestTime(times []metav1.Time) time.Time {
+	var latest time.Time
+	for _, t := range times {
+		if !t.IsZero() && t.Time.After(latest) {
+			latest = t.Time
+		}
+	}
+	return latest
+}
+
+// IsTerminal returns true if the pod is in a terminal state (Succeeded or Failed)
+func (plugin) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	pod, ok := resource.(*v1.Pod)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *v1.Pod, got %T", resource)
+	}
+	return pod.Status.Phase == v1.PodSucceeded || pod.Status.Phase == v1.PodFailed, nil
+}
+
+// GetCompletionTime returns the latest container termination time, or falls back to other timestamps
+func (plugin) GetCompletionTime(resource client.Object) (time.Time, error) {
+	pod, ok := resource.(*v1.Pod)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *v1.Pod, got %T", resource)
+	}
+
+	var times []metav1.Time
+
+	for _, cs := range pod.Status.InitContainerStatuses {
+		if cs.State.Terminated != nil {
+			times = append(times, cs.State.Terminated.FinishedAt)
+		}
+		if cs.LastTerminationState.Terminated != nil {
+			times = append(times, cs.LastTerminationState.Terminated.FinishedAt)
+		}
+	}
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Terminated != nil {
+			times = append(times, cs.State.Terminated.FinishedAt)
+		}
+		if cs.LastTerminationState.Terminated != nil {
+			times = append(times, cs.LastTerminationState.Terminated.FinishedAt)
+		}
+	}
+
+	latest := latestTime(times)
+	if !latest.IsZero() {
+		return latest, nil
+	}
+
+	if pod.DeletionTimestamp != nil {
+		return pod.DeletionTimestamp.Time, nil
+	}
+	if pod.Status.StartTime != nil {
+		return pod.Status.StartTime.Time, nil
+	}
+	return pod.CreationTimestamp.Time, nil
 }
 
 func init() {
