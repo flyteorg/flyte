@@ -1,8 +1,20 @@
-# executor
-// TODO(user): Add simple overview of use/purpose
+# Executor
+
+The Executor is a Kubernetes operator that manages the execution of Flyte tasks in the data plane. Built using the Kubernetes Operator pattern with `controller-runtime`, it watches and reconciles `TaskAction` custom resources to orchestrate task execution.
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+
+The Executor controller is responsible for:
+- **Monitoring TaskAction CRs**: Watches for TaskAction resources created in the Kubernetes cluster
+- **Task Execution**: Executes tasks based on the specifications defined in TaskAction resources
+- **State Management**: Reports task execution state to the State Service
+- **Lifecycle Management**: Manages the full lifecycle of task execution from queued to completed/failed states
+
+The executor uses conditions to track task progress:
+- `Progressing`: Indicates active execution (reasons: Queued, Initializing, Executing)
+- `Succeeded`: Task completed successfully
+- `Failed`: Task execution failed
+
 
 ## Getting Started
 
@@ -110,8 +122,11 @@ the '--force' flag and manually ensure that any custom configuration
 previously added to 'dist/chart/values.yaml' or 'dist/chart/manager/manager.yaml'
 is manually re-applied afterwards.
 
+
 ## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
+
+Please read our [CONTRIBUTING](../CONTRIBUTING.md) guide before making a pull request. Refer to our
+[DEVELOPMENT.md](DEVELOPMENT.md) to build and run tests for executor locally.
 
 **NOTE:** Run `make help` for more information on all potential `make` targets
 
