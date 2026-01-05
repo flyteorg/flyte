@@ -267,10 +267,15 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 }
 
 func ApplyGPUNodeSelectors(ctx context.Context, podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
+	logger.Infof(ctx, "[GPU_DEBUG] ApplyGPUNodeSelectors called with gpuAccelerator: %+v", gpuAccelerator)
+
 	// Short circuit if pod spec does not contain any containers that use accelerators
 	if !podRequiresAccelerator(podSpec) {
+		logger.Infof(ctx, "[GPU_DEBUG] Pod does not require accelerator, short-circuiting")
 		return
 	}
+
+	logger.Infof(ctx, "[GPU_DEBUG] Pod requires accelerator, proceeding with GPU node selector application")
 
 	if podSpec.Affinity == nil {
 		podSpec.Affinity = &v1.Affinity{}
@@ -278,12 +283,14 @@ func ApplyGPUNodeSelectors(ctx context.Context, podSpec *v1.PodSpec, gpuAccelera
 
 	// Get device-class-specific configuration
 	accelConfig := getAcceleratorConfig(gpuAccelerator)
+	logger.Infof(ctx, "[GPU_DEBUG] Got accelerator config: %+v", accelConfig)
 
 	// Apply changes for GPU device
 	if device := gpuAccelerator.GetDevice(); len(device) > 0 {
+		logger.Infof(ctx, "[GPU_DEBUG] GPU device specified: '%s'", device)
 		// Normalize the device name
 		normalizedDevice := GetNormalizedAcceleratorDevice(device)
-		logger.Debugf(ctx, "Applying GPU node selectors for device '%s' (normalized: '%s') using device class config: %+v",
+		logger.Infof(ctx, "[GPU_DEBUG] Applying GPU node selectors for device '%s' (normalized: '%s') using device class config: %+v",
 			device, normalizedDevice, accelConfig)
 
 		// Add node selector requirement for GPU device
@@ -507,10 +514,13 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// Merge overrides with base extended resources
+	logger.Infof(ctx, "[GPU_DEBUG] Task template extended resources: %+v", taskTemplate.GetExtendedResources())
+	logger.Infof(ctx, "[GPU_DEBUG] Override extended resources: %+v", tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources())
 	extendedResources := ApplyExtendedResourcesOverrides(
 		taskTemplate.GetExtendedResources(),
 		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
 	)
+	logger.Infof(ctx, "[GPU_DEBUG] Merged extended resources: %+v", extendedResources)
 
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
@@ -590,8 +600,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	//}
 
 	// GPU accelerator
+	logger.Infof(ctx, "[GPU_DEBUG] Checking for GPU accelerator in extendedResources: %+v", extendedResources)
 	if extendedResources.GetGpuAccelerator() != nil {
+		logger.Infof(ctx, "[GPU_DEBUG] GPU accelerator found, calling ApplyGPUNodeSelectors")
 		ApplyGPUNodeSelectors(ctx, podSpec, extendedResources.GetGpuAccelerator())
+	} else {
+		logger.Infof(ctx, "[GPU_DEBUG] No GPU accelerator found in extendedResources, skipping ApplyGPUNodeSelectors")
 	}
 
 	// Shared memory volume

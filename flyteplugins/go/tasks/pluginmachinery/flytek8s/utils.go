@@ -1,6 +1,7 @@
 package flytek8s
 
 import (
+	"context"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -9,6 +10,7 @@ import (
 
 	pluginmachinery_core "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -103,9 +105,13 @@ func GetServiceAccountNameFromTaskExecutionMetadata(taskExecutionMetadata plugin
 // Falls back to the original device name if the device is not configured.
 func GetNormalizedAcceleratorDevice(device string) string {
 	cfg := config.GetK8sPluginConfig()
-	if normalized, ok := cfg.AcceleratorDevices[strings.ToUpper(device)]; ok {
+	logger.Infof(context.Background(), "[GPU_DEBUG] GetNormalizedAcceleratorDevice called with device='%s', AcceleratorDevices config: %+v", device, cfg.AcceleratorDevices)
+	upperDevice := strings.ToUpper(device)
+	if normalized, ok := cfg.AcceleratorDevices[upperDevice]; ok {
+		logger.Infof(context.Background(), "[GPU_DEBUG] Found mapping for '%s' -> '%s'", upperDevice, normalized)
 		return normalized
 	}
+	logger.Infof(context.Background(), "[GPU_DEBUG] No mapping found for '%s', returning original device name", upperDevice)
 	return device
 }
 
