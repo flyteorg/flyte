@@ -25,7 +25,7 @@ require (
 	github.com/ray-project/kuberay/ray-operator v1.5.1
 	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/spf13/pflag v1.0.7
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.30.0
