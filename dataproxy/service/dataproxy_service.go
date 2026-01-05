@@ -2,15 +2,16 @@ package service
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
+	"encoding/base32"
+	"encoding/base64"
 	"fmt"
 	"time"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/stow"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -51,17 +52,6 @@ func (s *Service) CreateUploadLocation(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// - TODO: start from here: filename and filename root provided, need to check if file already exists -> check what is the best practice to handle it
-	// - check expires in set (already done in validation)
-	// - generate filename if not provided
-	// - create storage location (prefix is filename root or md5)
-	// - created signed url
-	// - create response
-
-	if len(req.Msg.GetFilename()) > 0 && len(req.Msg.GetFilenameRoot()) > 0 {
-		// check if file already exists
-	}
-
 	// Build the storage path
 	storagePath, err := s.constructStoragePath(ctx, req.Msg)
 	if err != nil {
@@ -69,26 +59,32 @@ func (s *Service) CreateUploadLocation(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct storage path: %w", err))
 	}
 
-	// Set expires in to default if not provided in request
-	if expiresIn := req.Msg.GetExpiresIn(); expiresIn == nil {
+	// Check if file already exists and validate for safe upload
+	if err := s.checkFileExists(ctx, storagePath, req.Msg); err != nil {
+		return nil, err
+	}
+
+	// Set expires_in to default if not provided in request
+	if req.Msg.GetExpiresIn() == nil {
 		req.Msg.ExpiresIn = durationpb.New(s.cfg.Upload.MaxExpiresIn.Duration)
 	}
 
-	// 3. Create signed URL properties
+	// Create signed URL properties
+	expiresIn := req.Msg.ExpiresIn.AsDuration()
 	props := storage.SignedURLProperties{
 		Scope:      stow.ClientMethodPut,
-		ExpiresIn:  req.Msg.ExpiresIn.AsDuration(),
+		ExpiresIn:  expiresIn,
 		ContentMD5: string(req.Msg.ContentMd5),
 	}
 
-	// 4. Generate signed URL
+	// Generate signed URL
 	signedResp, err := s.dataStore.CreateSignedURL(ctx, storagePath, props)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create signed URL: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create signed URL: %w", err))
 	}
 
-	// 5. Build response
+	// Build response
 	expiresAt := time.Now().Add(expiresIn)
 	resp := &dataproxy.CreateUploadLocationResponse{
 		SignedUrl: signedResp.URL.String(),
@@ -103,61 +99,90 @@ func (s *Service) CreateUploadLocation(
 	return connect.NewResponse(resp), nil
 }
 
+// checkFileExists validates whether a file upload is safe by checking existing files.
+// Returns an error if:
+//   - File exists without content_md5 provided (cannot verify safe overwrite)
+//   - File exists with different content_md5 (prevents accidental overwrite)
+//
+// Returns nil if:
+//   - File does not exist (safe to upload)
+//   - File exists with matching content_md5 (safe to re-upload same content)
+func (s *Service) checkFileExists(ctx context.Context, storagePath storage.DataReference, req *dataproxy.CreateUploadLocationRequest) error {
+	// Only check if both filename and filename_root are provided
+	if len(req.GetFilename()) == 0 || len(req.GetFilenameRoot()) == 0 {
+		return nil
+	}
+
+	metadata, err := s.dataStore.Head(ctx, storagePath)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to check if file exists at location [%s]: %v", storagePath.String(), err)
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to check if file exists at location [%s]: %w", storagePath.String(), err))
+	}
+
+	if !metadata.Exists() {
+		return nil
+	}
+
+	// Validate based on content hash if file exists
+	// NOTE: This is a best-effort check. Race conditions may occur when multiple clients
+	// upload to the same location simultaneously.
+	if len(req.GetContentMd5()) == 0 {
+		// Cannot verify content, reject to prevent accidental overwrites
+		return connect.NewError(connect.CodeAlreadyExists,
+			fmt.Errorf("file already exists at [%v]; content_md5 is required to verify safe overwrite", storagePath))
+	}
+
+	// Validate hash matches
+	base64Digest := base64.StdEncoding.EncodeToString(req.GetContentMd5())
+	if base64Digest != metadata.ContentMD5() {
+		// Hash mismatch, reject to prevent overwriting different content
+		logger.Errorf(ctx, "File exists at [%v] with different content hash", storagePath)
+		return connect.NewError(connect.CodeAlreadyExists,
+			fmt.Errorf("file already exists at [%v] with different content (hash mismatch)", storagePath))
+	}
+
+	// File exists with matching hash, allow upload to proceed
+	logger.Debugf(ctx, "File already exists at [%v] with matching hash, allowing upload", storagePath)
+	return nil
+}
+
 // constructStoragePath builds the storage path based on the request parameters.
 // Path patterns:
-//   - project/domain/(md5_hash)/filename (if filename is present)
-//   - project/domain/filename_root/filename (if filename_root and filename are present)
+//   - storage_prefix/org/project/domain/filename_root/filename (if filename_root is provided)
+//   - storage_prefix/org/project/domain/base32_hash/filename (if only content_md5 is provided)
 func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.CreateUploadLocationRequest) (storage.DataReference, error) {
-	// TODO: rewrite this
-	// Get base container
 	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
 
-	// Build path components
-	pathComponents := []string{}
+	// Build path components: storage_prefix/org/project/domain/prefix/filename
+	pathComponents := []string{s.cfg.Upload.StoragePrefix, req.GetOrg(), req.GetProject(), req.GetDomain()}
 
-	// Add org if present
-	if req.Org != "" {
-		pathComponents = append(pathComponents, req.Org)
-	}
-
-	// Add project and domain
-	pathComponents = append(pathComponents, req.Project, req.Domain)
-
-	// Add filename_root or md5 hash
-	if req.FilenameRoot != "" {
-		// Use filename_root if provided
-		pathComponents = append(pathComponents, req.FilenameRoot)
-	} else if len(req.ContentMd5) > 0 {
-		// Use MD5 hash as directory name
-		md5Hash := hex.EncodeToString(req.ContentMd5)
-		pathComponents = append(pathComponents, md5Hash)
+	// Set filename_root or base32-encoded content hash as prefix
+	if len(req.GetFilenameRoot()) > 0 {
+		pathComponents = append(pathComponents, req.GetFilenameRoot())
 	} else {
-		// Generate a hash from content_md5 for consistency
-		hasher := md5.New()
-		hasher.Write([]byte(fmt.Sprintf("%s/%s/%s", req.Project, req.Domain, req.Filename)))
-		md5Hash := hex.EncodeToString(hasher.Sum(nil))
-		pathComponents = append(pathComponents, md5Hash)
+		// URL-safe base32 encoding of content hash
+		pathComponents = append(pathComponents, base32.StdEncoding.EncodeToString(req.GetContentMd5()))
 	}
 
-	// Add filename if present
-	if req.Filename != "" {
-		pathComponents = append(pathComponents, req.Filename)
-	}
+	pathComponents = append(pathComponents, req.GetFilename())
 
-	// Construct the full reference
+	// Filter out empty components to avoid double slashes in path
+	pathComponents = lo.Filter(pathComponents, func(key string, _ int) bool {
+		return key != ""
+	})
+
 	return s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
 }
 
-// validateUploadRequest performs validation on the upload request
+// validateUploadRequest performs validation on the upload request.
 func validateUploadRequest(ctx context.Context, req *dataproxy.CreateUploadLocationRequest, cfg config.DataProxyConfig) error {
-
 	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
-		return fmt.Errorf("Either filename_root or content_md5 must be provided")
+		return fmt.Errorf("either filename_root or content_md5 must be provided")
 	}
 
 	// Validate expires_in against platform maximum
 	if req.ExpiresIn != nil {
-		if req.ExpiresIn.IsValid() {
+		if !req.ExpiresIn.IsValid() {
 			return fmt.Errorf("expires_in (%v) is invalid", req.ExpiresIn)
 		}
 		maxExpiration := cfg.Upload.MaxExpiresIn.Duration
