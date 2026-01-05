@@ -51,3 +51,10 @@ packages:
       all: true
       with-expecter: true
       dir: 'runs/repository/mocks'
+  github.com/flyteorg/flyte/v2/flytestdlib/storage:
+    interfaces:
+      Metadata:
+        config:
+          with-expecter: true
+          dir: 'flytestdlib/storage/mocks'
+          outpkg: mocks
