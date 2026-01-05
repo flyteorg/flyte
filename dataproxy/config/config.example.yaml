@@ -1,0 +1,52 @@
+# Example configuration for Data Proxy with MinIO storage backend
+# This configuration is for local development and testing purposes.
+
+# Data Proxy Configuration
+dataproxy:
+  upload:
+    # Maximum size for uploads (100MB)
+    maxSize: "100Mi"
+    # Maximum expiration time for signed URLs (1 hour)
+    maxExpiresIn: 1h
+    # Default filename length when auto-generating names
+    defaultFileNameLength: 20
+    # Storage prefix for all uploads
+    storagePrefix: "uploads"
+
+  download:
+    # Maximum expiration time for download URLs (1 hour)
+    maxExpiresIn: 1h
+
+# Storage Configuration
+storage:
+  # Type of storage backend (options: s3, minio, local, mem, stow)
+  type: minio
+
+  # Initial bucket/container name
+  # This bucket will be created automatically if it doesn't exist
+  container: "flyte-data"
+
+  # Enable multi-container support
+  # When true, allows accessing multiple buckets
+  enable-multicontainer: false
+
+  # Connection settings for MinIO
+  connection:
+    # MinIO endpoint URL
+    # For local development with port-forward: http://localhost:9000
+    # For in-cluster access: http://minio.flyte-dataproxy.svc.cluster.local:9000
+    endpoint: "http://localhost:9000"
+
+    # Authentication type (options: iam, accesskey)
+    auth-type: accesskey
+
+    # MinIO credentials (default credentials)
+    access-key: "minioadmin"
+    secret-key: "minioadmin"
+
+    # Region (can be any value for MinIO)
+    region: "us-east-1"
+
+    # Disable SSL (set to true for local development)
+    disable-ssl: true
+
