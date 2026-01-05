@@ -66,6 +66,7 @@ require (
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
 	k8s.io/client-go v0.34.1
+	k8s.io/klog/v2 v2.130.1
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/controller-runtime v0.22.4
 )
@@ -89,7 +90,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.53.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
-	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
+	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230512164433-5d1fd1a340c9 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.12 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.10 // indirect
@@ -157,7 +158,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -206,12 +207,11 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
-	k8s.io/apiextensions-apiserver v0.31.2 // indirect
-	k8s.io/apiserver v0.28.4 // indirect
-	k8s.io/component-base v0.28.4 // indirect
-	k8s.io/klog/v2 v2.130.1 // indirect
+	k8s.io/apiextensions-apiserver v0.34.1 // indirect
+	k8s.io/apiserver v0.34.1 // indirect
+	k8s.io/component-base v0.34.1 // indirect
 	k8s.io/kms v0.28.3 // indirect
-	k8s.io/kube-openapi v0.0.0-20240430033511-f0e62f92d13f // indirect
+	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
@@ -225,6 +225,7 @@ replace (
 	github.com/flyteorg/flyte/v2 => ./
 	github.com/flyteorg/flyte/v2/flyteplugins => ./flyteplugins
 	github.com/flyteorg/flyte/v2/flytestdlib => ./flytestdlib
+	github.com/google/cel-go => github.com/google/cel-go v0.16.1
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc => go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0

@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
@@ -90,6 +91,7 @@ func serve(ctx context.Context) error {
 	// Create services
 	runsSvc := service.NewRunService(repo, queueClient)
 	stateSvc := service.NewStateService(repo)
+	taskSvc := service.NewTaskService(repo)
 
 	// Setup HTTP server with Connect handlers
 	mux := http.NewServeMux()
@@ -102,8 +104,13 @@ func serve(ctx context.Context) error {
 	statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
 	mux.Handle(statePath, stateHandler)
 
+	// Mount the Task Service
+	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
+	mux.Handle(taskPath, taskHandler)
+
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 	logger.Infof(ctx, "Mounted StateService at %s", statePath)
+	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
 	// Add health check endpoint
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

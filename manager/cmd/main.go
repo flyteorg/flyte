@@ -119,7 +119,7 @@ func serve(ctx context.Context) error {
 	}
 
 	// Create repository
-	repo := repository.NewPostgresRepository(db)
+	repo := repository.NewRepository(db)
 
 	// Initialize Kubernetes client
 	k8sClient, k8sConfig, err := initKubernetesClient(ctx, &cfg.Kubernetes)
