@@ -45,4 +45,5 @@ flyteidl/clients/go/admin/pkce/*.html
 
 .go-version
 .claude/
+.run/
 
