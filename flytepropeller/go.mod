@@ -27,7 +27,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/wI2L/jsondiff v0.6.0
 	gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7
 	go.etcd.io/etcd/api/v3 v3.6.4
