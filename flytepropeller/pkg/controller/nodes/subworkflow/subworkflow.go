@@ -169,7 +169,7 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 		status := nCtx.NodeStatus()
 		subworkflowNodeLookup := executors.NewNodeLookup(subworkflow, status, subworkflow)
 		failureNodeStatus := status.GetNodeExecutionStatus(ctx, failureNode.GetID())
-		failureNodeLookup := executors.NewFailureNodeLookup(subworkflowNodeLookup, failureNode, failureNodeStatus)
+		failureNodeLookup := executors.NewFailureNodeLookup(subworkflowNodeLookup, failureNode, failureNodeStatus, originalError)
 
 		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, failureNodeLookup, failureNodeLookup, failureNode)
 		if err != nil {
