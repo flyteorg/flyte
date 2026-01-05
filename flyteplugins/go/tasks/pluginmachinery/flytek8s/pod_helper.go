@@ -266,7 +266,7 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 	return accelConfig
 }
 
-func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
+func ApplyGPUNodeSelectors(ctx context.Context, podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
 	// Short circuit if pod spec does not contain any containers that use accelerators
 	if !podRequiresAccelerator(podSpec) {
 		return
@@ -283,6 +283,8 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 	if device := gpuAccelerator.GetDevice(); len(device) > 0 {
 		// Normalize the device name
 		normalizedDevice := GetNormalizedAcceleratorDevice(device)
+		logger.Debugf(ctx, "Applying GPU node selectors for device '%s' (normalized: '%s') using device class config: %+v",
+			device, normalizedDevice, accelConfig)
 
 		// Add node selector requirement for GPU device
 		deviceNsr := v1.NodeSelectorRequirement{
@@ -589,7 +591,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
-		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+		ApplyGPUNodeSelectors(ctx, podSpec, extendedResources.GetGpuAccelerator())
 	}
 
 	// Shared memory volume
