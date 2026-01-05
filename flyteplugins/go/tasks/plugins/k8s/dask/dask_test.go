@@ -253,7 +253,7 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
 	inputReader.OnGetInputPath().Return("/input")
 	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	pCtx.On("InputReader").Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
@@ -265,7 +265,7 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	pCtx.On("TaskReader").Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
@@ -310,9 +310,9 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 
 	// Add K8sReader mock
 	reader := fake.NewFakeClient(pods...)
-	pCtx.OnK8sReader().Return(reader)
+	pCtx.On("K8sReader").Return(reader)
 
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -1099,4 +1099,109 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.PrimaryContainerName)
 	assert.Equal(t, 1, len(podLogContext.Containers))
 	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		status         daskAPI.JobStatus
+		expectedResult bool
+	}{
+		{"Successful", daskAPI.DaskJobSuccessful, true},
+		{"Failed", daskAPI.DaskJobFailed, true},
+		{"Running", daskAPI.DaskJobRunning, false},
+		{"Created", daskAPI.DaskJobCreated, false},
+		{"ClusterCreated", daskAPI.DaskJobClusterCreated, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := dummyDaskJob(tt.status)
+			result, err := daskResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &v1.Pod{}
+	result, err := daskResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *daskAPI.DaskJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses EndTime",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: daskAPI.DaskJobStatus{
+					EndTime:   metav1.NewTime(now),
+					StartTime: metav1.NewTime(earlier),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: daskAPI.DaskJobStatus{
+					StartTime: metav1.NewTime(now),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(now),
+				},
+				Status: daskAPI.DaskJobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := daskResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+
+	wrongResource := &v1.Pod{}
+	result, err := daskResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }
