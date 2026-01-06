@@ -23,7 +23,7 @@ func TestLazyUploadingTaskReader_Happy(t *testing.T) {
 
 	ctx := context.TODO()
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(ttm, nil)
+	tr.EXPECT().Read(ctx).Return(ttm, nil)
 
 	ds, err := storage.NewDataStore(&storage.Config{
 		Type: storage.TypeMemory,
@@ -59,7 +59,7 @@ func TestLazyUploadingTaskReader_TaskWriteFailure(t *testing.T) {
 
 	ctx := context.TODO()
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(ttm, nil)
+	tr.EXPECT().Read(ctx).Return(ttm, nil)
 
 	ltr := NewLazyUploadingTaskReader(tr, dummyPath, &failingProtoStore{})
 
@@ -76,7 +76,7 @@ func TestLazyUploadingTaskReader_TaskReadFailure(t *testing.T) {
 
 	ctx := context.TODO()
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(nil, fmt.Errorf("read fail"))
+	tr.EXPECT().Read(ctx).Return(nil, fmt.Errorf("read fail"))
 
 	ds, err := storage.NewDataStore(&storage.Config{
 		Type: storage.TypeMemory,

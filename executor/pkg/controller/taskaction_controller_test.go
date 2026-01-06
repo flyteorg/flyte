@@ -85,7 +85,7 @@ var _ = Describe("TaskAction Controller", func() {
 			mockClient := &workflowconnectmocks.StateServiceClient{}
 
 			// Set up expectations for Put calls - return a proper response with status
-			mockClient.On("Put", mock.Anything, mock.Anything).
+			mockClient.EXPECT().Put(mock.Anything, mock.Anything).
 				Return(connect.NewResponse(&workflow.PutResponse{
 					Status: &rpcstatus.Status{
 						Code:    0,

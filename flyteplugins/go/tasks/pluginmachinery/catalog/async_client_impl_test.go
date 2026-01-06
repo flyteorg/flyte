@@ -67,14 +67,14 @@ func TestAsyncClientImpl_Download(t *testing.T) {
 
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}
-	info.OnItem().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
-	info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-	q.OnGetMatch(mock.Anything).Return(info, true, nil)
-	q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	info.EXPECT().Item().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
+	info.EXPECT().Status().Return(workqueue.WorkStatusSucceeded)
+	q.EXPECT().Get(mock.Anything).Return(info, true, nil)
+	q.EXPECT().Queue(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	ow := &mocks2.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("/prefix/")
-	ow.OnGetOutputPath().Return("/prefix/outputs.pb")
+	ow.EXPECT().GetOutputPrefixPath().Return("/prefix/")
+	ow.EXPECT().GetOutputPath().Return("/prefix/outputs.pb")
 
 	tests := []struct {
 		name             string
@@ -115,16 +115,16 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}
-	info.OnItem().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
-	info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-	q.OnGetMatch(mock.Anything).Return(info, true, nil)
-	q.OnGetMatch(mock.Anything).Return(info, true, nil)
-	q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	info.EXPECT().Item().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
+	info.EXPECT().Status().Return(workqueue.WorkStatusSucceeded)
+	q.EXPECT().Get(mock.Anything).Return(info, true, nil)
+	q.EXPECT().Get(mock.Anything).Return(info, true, nil)
+	q.EXPECT().Queue(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	inputReader1 := &mocks2.InputReader{}
-	inputReader1.OnGetMatch(mock.Anything).Return(input1, nil)
+	inputReader1.EXPECT().Get(mock.Anything).Return(input1, nil)
 	inputReader2 := &mocks2.InputReader{}
-	inputReader2.OnGetMatch(mock.Anything).Return(input2, nil)
+	inputReader2.EXPECT().Get(mock.Anything).Return(input2, nil)
 
 	tests := []struct {
 		name          string
