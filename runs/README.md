@@ -123,7 +123,7 @@ make test
 
 ### Run API tests
 
-Pleaes ensure the service is started by following [Quick Start with SQLite](#quick-start-with-sqlite) section
+Please ensure the service is started by following [Quick Start with SQLite](#quick-start-with-sqlite) section
 before running API tests.
 
 ```sh
