@@ -254,7 +254,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	tCtx.EXPECT().Catalog().Return(cat)
-	tCtx.EXPECT().EventsRecorder().Return(eRecorder)
 	tCtx.EXPECT().ResourceManager().Return(resourceManager)
 	tCtx.EXPECT().SecretManager().Return(secretManager)
 
