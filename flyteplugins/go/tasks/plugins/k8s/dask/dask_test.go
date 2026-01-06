@@ -253,7 +253,7 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
 	inputReader.EXPECT().GetInputPath().Return("/input")
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.On("InputReader").Return(inputReader)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
@@ -261,11 +261,11 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 	outputReader.EXPECT().GetRawOutputPrefix().Return("")
 	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.On("OutputWriter").Return(outputReader)
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
-	pCtx.On("TaskReader").Return(taskReader)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
@@ -296,7 +296,7 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 	overrides.EXPECT().GetExtendedResources().Return(nil)
 	overrides.EXPECT().GetContainerImage().Return("")
 	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -310,9 +310,9 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 
 	// Add K8sReader mock
 	reader := fake.NewFakeClient(pods...)
-	pCtx.On("K8sReader").Return(reader)
+	pCtx.EXPECT().K8sReader().Return(reader)
 
-	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 

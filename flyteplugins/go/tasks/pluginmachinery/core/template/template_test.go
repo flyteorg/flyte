@@ -75,10 +75,10 @@ func (d dummyOutputPaths) GetErrorPath() storage.DataReference {
 
 func TestReplaceTemplateCommandArgs(t *testing.T) {
 	taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
-	taskExecutionID.On("GetGeneratedName").Return("per_retry_unique_key")
+	taskExecutionID.EXPECT().GetGeneratedName().Return("per_retry_unique_key")
 	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-	taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
-	taskMetadata.On("GetNamespace").Return("test-namespace")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(taskExecutionID)
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
 
 	t.Run("empty cmd", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{}, Parameters{})
@@ -619,10 +619,10 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 
 	t.Run("dashes are replaced", func(t *testing.T) {
 		taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
-		taskExecutionID.On("GetGeneratedName").Return("per-retry-unique-key")
+		taskExecutionID.EXPECT().GetGeneratedName().Return("per-retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
-		taskMetadata.On("GetNamespace").Return("my-namespace")
+		taskMetadata.EXPECT().GetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.EXPECT().GetNamespace().Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		actual, err := Render(context.TODO(), []string{
@@ -643,10 +643,10 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 	t.Run("non-alphabet leading characters are stripped", func(t *testing.T) {
 		var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
 		taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
-		taskExecutionID.On("GetGeneratedName").Return("33 per retry-unique-key")
+		taskExecutionID.EXPECT().GetGeneratedName().Return("33 per retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
-		taskMetadata.On("GetNamespace").Return("my-namespace")
+		taskMetadata.EXPECT().GetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.EXPECT().GetNamespace().Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		testString := "doesn't start with a number"

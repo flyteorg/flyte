@@ -380,6 +380,6 @@ func dummyTaskContext() *k8smocks.PluginContext {
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return pCtx
 }

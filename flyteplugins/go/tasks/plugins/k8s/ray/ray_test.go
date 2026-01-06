@@ -885,7 +885,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.EXPECT().GetTaskExecutionID().Return(taskExecID)
-	plg.On("TaskExecutionMetadata").Return(tskCtx)
+	plg.EXPECT().TaskExecutionMetadata().Return(tskCtx)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -897,7 +897,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 			return nil
 		})
 
-	plg.On("PluginStateReader").Return(&pluginStateReaderMock)
+	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 
 	return plg
 }
@@ -1393,7 +1393,7 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
-	pluginCtx.On("K8sReader").Return(reader)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
 	return pluginCtx
 }
 
@@ -1411,7 +1411,7 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 func rayPluginContextWithPods(pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
 	reader := fake.NewFakeClient(pods...)
-	pluginCtx.On("K8sReader").Return(reader)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
 	return pluginCtx
 }
 

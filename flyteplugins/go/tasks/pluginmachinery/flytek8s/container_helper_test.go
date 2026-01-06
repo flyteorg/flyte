@@ -503,7 +503,7 @@ func TestToK8sContainer(t *testing.T) {
 	}
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
 
 	inputReader := &mocks2.InputReader{}
 	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
@@ -615,7 +615,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockInputPath := storage.DataReference("s3://input/path")
 	mockInputReader.EXPECT().GetInputPath().Return(mockInputPath)
 	mockInputReader.EXPECT().GetInputPrefixPath().Return(mockInputPath)
-	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
+	mockInputReader.EXPECT().Get(mock.Anything).Return(nil, nil)
 
 	mockOutputPath := mocks2.OutputFilePaths{}
 	mockOutputPathPrefix := storage.DataReference("s3://output/path")

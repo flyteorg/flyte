@@ -436,7 +436,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	taskCtx.On("OutputWriter").Return(outputReader)
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
@@ -452,36 +452,36 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	overrides.EXPECT().GetResources().Return(&corev1.ResourceRequirements{})
 	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
-	overrides.On("GetExtendedResources").Return(nil)
-	overrides.On("GetPodTemplate").Return(nil)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
-	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
-	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.On("GetOwnerReference").Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
-	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
-	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
-	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
-	taskExecutionMetadata.On("GetOverrides").Return(overrides)
-	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
-	taskExecutionMetadata.On("GetConsoleURL").Return("")
-	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(interruptible)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(nil)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("new-val")
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
 		func(v interface{}) uint8 {
@@ -506,7 +506,7 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
 	inputReader.EXPECT().GetInputPath().Return("/input")
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.On("InputReader").Return(inputReader)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
@@ -515,11 +515,11 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	pCtx.On("OutputWriter").Return(outputReader)
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
-	pCtx.On("TaskReader").Return(taskReader)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
@@ -531,35 +531,35 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	overrides.EXPECT().GetResources().Return(&corev1.ResourceRequirements{})
 	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
-	overrides.On("GetExtendedResources").Return(nil)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
 	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
-	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
-	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.On("GetOwnerReference").Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
-	taskExecutionMetadata.On("IsInterruptible").Return(false)
-	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
-	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
-	taskExecutionMetadata.On("GetOverrides").Return(overrides)
-	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
-	taskExecutionMetadata.On("GetConsoleURL").Return("")
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(false)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(nil)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("new-val")
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -575,9 +575,9 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	objs := make([]client.Object, len(pods))
 	copy(objs, pods)
 	reader := fake.NewClientBuilder().WithObjects(objs...).Build()
-	pCtx.On("K8sReader").Return(reader)
+	pCtx.EXPECT().K8sReader().Return(reader)
 
-	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 

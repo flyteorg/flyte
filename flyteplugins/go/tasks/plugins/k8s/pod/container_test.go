@@ -91,29 +91,29 @@ func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *cor
 
 func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool, containerImage string) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("test-namespace")
-	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
 	if returnsServiceAccount {
-		taskMetadata.On("GetK8sServiceAccount").Return(serviceAccount)
+		taskMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
 	} else {
-		taskMetadata.On("GetK8sServiceAccount").Return("")
+		taskMetadata.EXPECT().GetK8sServiceAccount().Return("")
 	}
-	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: securityContextServiceAccount},
 	})
-	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
 	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -122,19 +122,19 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.EXPECT().GetGeneratedName().Return("my_project:my_domain:my_name")
 	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
-	taskMetadata.On("GetTaskExecutionID").Return(tID)
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
-	to.On("GetPodTemplate").Return(nil)
+	to.EXPECT().GetResources().Return(resources)
+	to.EXPECT().GetExtendedResources().Return(extendedResources)
+	to.EXPECT().GetPodTemplate().Return(nil)
 
 	to.EXPECT().GetContainerImage().Return(containerImage)
-	taskMetadata.On("GetOverrides").Return(to)
-	taskMetadata.On("IsInterruptible").Return(true)
-	taskMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
+	taskMetadata.EXPECT().IsInterruptible().Return(true)
+	taskMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskMetadata
 }
@@ -175,7 +175,7 @@ func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata p
 	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference")
 	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.On("InputReader").Return(inputReader)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
 	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
@@ -184,17 +184,17 @@ func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata p
 	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	pCtx.On("OutputWriter").Return(outputReader)
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
-	pCtx.On("TaskReader").Return(taskReader)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
-	pCtx.On("TaskExecutionMetadata").Return(taskMetadata)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
 	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
-	pCtx.On("PluginStateReader").Return(pluginStateReader)
+	pCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return pCtx
 }
