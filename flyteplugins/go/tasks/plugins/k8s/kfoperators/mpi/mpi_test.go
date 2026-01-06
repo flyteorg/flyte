@@ -175,13 +175,10 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = k8s.PluginState{}
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
 	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
@@ -244,13 +241,10 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
 	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)

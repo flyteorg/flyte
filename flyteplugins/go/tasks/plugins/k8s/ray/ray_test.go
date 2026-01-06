@@ -888,13 +888,10 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	plg.EXPECT().TaskExecutionMetadata().Return(tskCtx)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
 	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
