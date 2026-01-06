@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package flyteidl2.core;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
+
+// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+message ExecutionMetricResult {
+  // The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+  string metric = 1;
+
+  // The result data in prometheus range query result format
+  // https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+  // This may include multiple time series, differentiated by their metric labels.
+  // Start time is greater of (execution attempt start, 48h ago)
+  // End time is lesser of (execution attempt end, now)
+  google.protobuf.Struct data = 2;
+}
