@@ -120,53 +120,6 @@ func (_c *TaskExecutionContext_DataStore_Call) RunAndReturn(run func() *storage.
 	return _c
 }
 
-// EventsRecorder provides a mock function with no fields
-func (_m *TaskExecutionContext) EventsRecorder() core.EventsRecorder {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for EventsRecorder")
-	}
-
-	var r0 core.EventsRecorder
-	if rf, ok := ret.Get(0).(func() core.EventsRecorder); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(core.EventsRecorder)
-		}
-	}
-
-	return r0
-}
-
-// TaskExecutionContext_EventsRecorder_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EventsRecorder'
-type TaskExecutionContext_EventsRecorder_Call struct {
-	*mock.Call
-}
-
-// EventsRecorder is a helper method to define mock.On call
-func (_e *TaskExecutionContext_Expecter) EventsRecorder() *TaskExecutionContext_EventsRecorder_Call {
-	return &TaskExecutionContext_EventsRecorder_Call{Call: _e.mock.On("EventsRecorder")}
-}
-
-func (_c *TaskExecutionContext_EventsRecorder_Call) Run(run func()) *TaskExecutionContext_EventsRecorder_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *TaskExecutionContext_EventsRecorder_Call) Return(_a0 core.EventsRecorder) *TaskExecutionContext_EventsRecorder_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *TaskExecutionContext_EventsRecorder_Call) RunAndReturn(run func() core.EventsRecorder) *TaskExecutionContext_EventsRecorder_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // InputReader provides a mock function with no fields
 func (_m *TaskExecutionContext) InputReader() io.InputReader {
 	ret := _m.Called()
