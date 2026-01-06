@@ -20,9 +20,6 @@ const (
 )
 
 func TestDeployTask(t *testing.T) {
-	// Ensure a clean test database
-	cleanupTestDB(t)
-
 	// Cleanup after test
 	t.Cleanup(func() {
 		cleanupTestDB(t)
