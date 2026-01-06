@@ -7,6 +7,7 @@ mockname: "{{.InterfaceName}}"
 filename: "{{.InterfaceName | snakecase}}.go"
 inpackage: false
 outpkg: "mocks"
+with-expecter: true
 packages:
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app:
     config:
@@ -57,7 +58,6 @@ packages:
     config:
       include-auto-generated: true
       all: true
-      with-expecter: true
       dir: 'runs/repository/mocks'
 
   # flyteplugins
@@ -86,17 +86,14 @@ packages:
   github.com/flyteorg/flyte/v2/flytestdlib/cache:
     config:
       all: true
-      with-expecter: true
       dir: 'flytestdlib/cache/mocks'
   github.com/flyteorg/flyte/v2/flytestdlib/utils:
     config:
       all: true
-      with-expecter: true
       dir: 'flytestdlib/utils/mocks'
   github.com/flyteorg/flyte/v2/flytestdlib/storage:
     config:
       all: false
-      with-expecter: true
       dir: 'flytestdlib/storage/mocks'
     interfaces:
       RawStore:
@@ -105,12 +102,10 @@ packages:
   github.com/flyteorg/flyte/v2/flytestdlib/fastcheck:
     config:
       all: false
-      with-expecter: true
       dir: 'flytestdlib/fastcheck/mocks'
     interfaces:
       Filter:
   github.com/flyteorg/flyte/v2/flytestdlib/random:
     config:
       all: true
-      with-expecter: true
       dir: 'flytestdlib/random/mocks'
