@@ -9,8 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	nodesmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -73,7 +75,7 @@ var (
 	}
 )
 
-func TestConstructLiteralMap(t *testing.T) {
+func TestSubNodeInputResolver_Initialize(t *testing.T) {
 	ctx := context.TODO()
 	scope := promutils.NewTestScope()
 	dataStore, err := storage.NewDataStore(&storage.Config{
@@ -81,164 +83,47 @@ func TestConstructLiteralMap(t *testing.T) {
 	}, scope)
 	assert.NoError(t, err)
 
-	dataReference := storage.DataReference("s3://bucket/key")
-	err = dataStore.WriteProtobuf(ctx, dataReference, storage.Options{}, collectionLiteral)
-	assert.Nil(t, err)
-
-	mockArrayNode := mocks.ExecutableArrayNode{}
-	mockArrayNode.OnGetBoundInputs().Return([]string{})
-
-	individualInputFilesArrayNode := mocks.ExecutableArrayNode{}
-	individualInputFilesArrayNode.OnGetDataMode().Return(core.ArrayNode_INDIVIDUAL_INPUT_FILES)
-	individualInputFilesArrayNode.OnGetBoundInputs().Return([]string{})
-
-	singleInputFileArrayNode := mocks.ExecutableArrayNode{}
-	singleInputFileArrayNode.OnGetDataMode().Return(core.ArrayNode_SINGLE_INPUT_FILE)
-	singleInputFileArrayNode.OnGetBoundInputs().Return([]string{})
-
-	boundInputsArrayNode := mocks.ExecutableArrayNode{}
-	boundInputsArrayNode.OnGetBoundInputs().Return([]string{"bar"})
-
-	literalOneHash, err := pbhash.ComputeHash(ctx, literalOne)
-	assert.NoError(t, err)
-	offloadedLiteral := &core.Literal{
-		Value: &core.Literal_OffloadedMetadata{
-			OffloadedMetadata: &core.LiteralOffloadedMetadata{
-				Uri:       "s3://bucket/key",
-				SizeBytes: 100,
-				InferredType: &core.LiteralType{
-					Type: &core.LiteralType_CollectionType{
-						CollectionType: &core.LiteralType{
-							Type: &core.LiteralType_Simple{
-								Simple: core.SimpleType_INTEGER,
-							},
-						},
-					},
-				},
+	dataReference := storage.DataReference("s3://bucket/offloaded")
+	offloadedCollection := &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{literalOne, literalTwo},
 			},
 		},
-		Hash: base64.RawURLEncoding.EncodeToString(literalOneHash),
 	}
+	err = dataStore.WriteProtobuf(ctx, dataReference, storage.Options{}, offloadedCollection)
+	assert.NoError(t, err)
 
 	tests := []struct {
-		name                string
-		inputLiteralMaps    *core.LiteralMap
-		expectedLiteralMaps []*core.LiteralMap
-		arrayNode           v1alpha1.ExecutableArrayNode
+		name                     string
+		inputLiteralMap          *core.LiteralMap
+		boundInputs              []string
+		expectOffloadedDownloads int
 	}{
 		{
-			"SingleList",
-			&core.LiteralMap{
+			name: "NoOffloadedLiterals",
+			inputLiteralMap: &core.LiteralMap{
 				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
+					"foo": {
 						Value: &core.Literal_Collection{
 							Collection: &core.LiteralCollection{
-								Literals: []*core.Literal{
-									literalOne,
-									literalTwo,
-								},
+								Literals: []*core.Literal{literalOne, literalTwo},
 							},
 						},
 					},
 				},
 			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalOne,
-					},
-				},
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalTwo,
-					},
-				},
-			},
-			&mockArrayNode,
+			boundInputs:              []string{},
+			expectOffloadedDownloads: 0,
 		},
 		{
-			"MultiList",
-			&core.LiteralMap{
-				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
-						Value: &core.Literal_Collection{
-							Collection: &core.LiteralCollection{
-								Literals: []*core.Literal{
-									literalOne,
-									literalTwo,
-								},
-							},
-						},
-					},
-					"bar": &core.Literal{
-						Value: &core.Literal_Collection{
-							Collection: &core.LiteralCollection{
-								Literals: []*core.Literal{
-									literalTwo,
-									literalOne,
-								},
-							},
-						},
-					},
-				},
-			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalOne,
-						"bar": literalTwo,
-					},
-				},
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalTwo,
-						"bar": literalOne,
-					},
-				},
-			},
-			&mockArrayNode,
-		},
-		{
-			"Partial",
-			&core.LiteralMap{
-				Literals: map[string]*core.Literal{
-					"foo": &core.Literal{
-						Value: &core.Literal_Collection{
-							Collection: &core.LiteralCollection{
-								Literals: []*core.Literal{
-									literalOne,
-									literalTwo,
-								},
-							},
-						},
-					},
-					"bar": literalTwo,
-				},
-			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalOne,
-						"bar": literalTwo,
-					},
-				},
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalTwo,
-						"bar": literalTwo,
-					},
-				},
-			},
-			&mockArrayNode,
-		},
-		{
-			"Offloaded Literal Collection - Individual Input Files",
-			&core.LiteralMap{
+			name: "WithOffloadedLiteral",
+			inputLiteralMap: &core.LiteralMap{
 				Literals: map[string]*core.Literal{
 					"foo": {
 						Value: &core.Literal_OffloadedMetadata{
 							OffloadedMetadata: &core.LiteralOffloadedMetadata{
-								Uri:       "s3://bucket/key",
+								Uri:       "s3://bucket/offloaded",
 								SizeBytes: 100,
 								InferredType: &core.LiteralType{
 									Type: &core.LiteralType_CollectionType{
@@ -254,23 +139,17 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalOne,
-					},
-				},
-			},
-			&individualInputFilesArrayNode,
+			boundInputs:              []string{},
+			expectOffloadedDownloads: 1,
 		},
 		{
-			"Offloaded Literal Collection - Single Input File",
-			&core.LiteralMap{
+			name: "BoundInputsSkipped",
+			inputLiteralMap: &core.LiteralMap{
 				Literals: map[string]*core.Literal{
 					"foo": {
 						Value: &core.Literal_OffloadedMetadata{
 							OffloadedMetadata: &core.LiteralOffloadedMetadata{
-								Uri:       "s3://bucket/key",
+								Uri:       "s3://bucket/offloaded",
 								SizeBytes: 100,
 								InferredType: &core.LiteralType{
 									Type: &core.LiteralType_CollectionType{
@@ -286,65 +165,357 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": offloadedLiteral,
-					},
-				},
-			},
-			&singleInputFileArrayNode,
-		},
-		{
-			"Bound inputs - scalar",
-			&core.LiteralMap{
-				Literals: map[string]*core.Literal{
-					"foo": collectionLiteralTwo,
-					"bar": literalTwo,
-				},
-			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": literalTwo,
-						"bar": literalTwo,
-					},
-				},
-			},
-			&boundInputsArrayNode,
-		},
-		{
-			"Bound inputs - collection",
-			&core.LiteralMap{
-				Literals: map[string]*core.Literal{
-					"foo": collectionOfCollectionLiteral,
-					"bar": collectionLiteralTwo,
-				},
-			},
-			[]*core.LiteralMap{
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": collectionLiteral,
-						"bar": collectionLiteralTwo,
-					},
-				},
-				&core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"foo": collectionLiteralTwo,
-						"bar": collectionLiteralTwo,
-					},
-				},
-			},
-			&boundInputsArrayNode,
+			boundInputs:              []string{"foo"},
+			expectOffloadedDownloads: 0,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			for i := 0; i < len(test.expectedLiteralMaps); i++ {
-				inputLiteralMap, err := constructLiteralMap(ctx, dataStore, test.arrayNode, test.inputLiteralMaps, i)
-				assert.NoError(t, err)
-				assert.True(t, proto.Equal(test.expectedLiteralMaps[i], inputLiteralMap))
+			inputFilePaths := &pluginiomocks.InputFilePaths{}
+			inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
+			inputReader := newStaticInputReader(inputFilePaths, test.inputLiteralMap)
+
+			nCtx := &nodesmocks.NodeExecutionContext{}
+			nCtx.OnInputReader().Return(inputReader)
+			nCtx.OnDataStore().Return(dataStore)
+
+			arrayNode := &mocks.ExecutableArrayNode{}
+			arrayNode.OnGetBoundInputs().Return(test.boundInputs)
+
+			resolver := newSubNodeInputResolver(nCtx, arrayNode)
+			err := resolver.Initialize(ctx)
+			assert.NoError(t, err)
+
+			// Verify parent inputs were cached
+			assert.NotNil(t, resolver.parentInputs)
+			assert.Equal(t, len(test.inputLiteralMap.Literals), len(resolver.parentInputs.Literals))
+
+			// Verify offloaded literals were downloaded
+			assert.Equal(t, test.expectOffloadedDownloads, len(resolver.offloadedCollections))
+		})
+	}
+}
+
+func TestSubNodeInputResolver_GetSubNodeInputs(t *testing.T) {
+	ctx := context.TODO()
+	scope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, scope)
+	assert.NoError(t, err)
+
+	dataReference := storage.DataReference("s3://bucket/offloaded")
+	offloadedCollection := &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{literalOne, literalTwo},
+			},
+		},
+	}
+	err = dataStore.WriteProtobuf(ctx, dataReference, storage.Options{}, offloadedCollection)
+	assert.NoError(t, err)
+
+	// Pre-compute hash for SINGLE_INPUT_FILE offloaded literal test
+	literalOneHash, err := pbhash.ComputeHash(ctx, literalOne)
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name                string
+		inputLiteralMap     *core.LiteralMap
+		boundInputs         []string
+		dataMode            core.ArrayNode_DataMode
+		subNodeIndex        int
+		expectedLiteralMap  *core.LiteralMap
+		expectInputBindings bool
+	}{
+		{
+			name: "CollectionLiteral_Index0",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalOne,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "CollectionLiteral_Index1",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 1,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalTwo,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "OffloadedLiteral_Index0",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_OffloadedMetadata{
+							OffloadedMetadata: &core.LiteralOffloadedMetadata{
+								Uri:       "s3://bucket/offloaded",
+								SizeBytes: 100,
+								InferredType: &core.LiteralType{
+									Type: &core.LiteralType_CollectionType{
+										CollectionType: &core.LiteralType{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalOne,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "BoundInput_PassedThrough",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+					"bar": literalTwo,
+				},
+			},
+			boundInputs:  []string{"bar"},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalOne,
+					"bar": literalTwo,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "MultipleCollections",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+					"bar": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalTwo, literalOne},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalOne,
+					"bar": literalTwo,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "PartialCollectionAndScalar",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+					"bar": literalTwo,
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 1,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalTwo,
+					"bar": literalTwo,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "BoundInput_Collection",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionOfCollectionLiteral,
+					"bar": collectionLiteralTwo,
+				},
+			},
+			boundInputs:  []string{"bar"},
+			dataMode:     core.ArrayNode_INDIVIDUAL_INPUT_FILES,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionLiteral,
+					"bar": collectionLiteralTwo,
+				},
+			},
+			expectInputBindings: true,
+		},
+		{
+			name: "SingleInputFile_NilBindings",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{literalOne, literalTwo},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_SINGLE_INPUT_FILE,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": literalOne,
+				},
+			},
+			expectInputBindings: false,
+		},
+		{
+			name: "OffloadedLiteral_SingleInputFile",
+			inputLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_OffloadedMetadata{
+							OffloadedMetadata: &core.LiteralOffloadedMetadata{
+								Uri:       "s3://bucket/offloaded",
+								SizeBytes: 100,
+								InferredType: &core.LiteralType{
+									Type: &core.LiteralType_CollectionType{
+										CollectionType: &core.LiteralType{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:  []string{},
+			dataMode:     core.ArrayNode_SINGLE_INPUT_FILE,
+			subNodeIndex: 0,
+			expectedLiteralMap: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_OffloadedMetadata{
+							OffloadedMetadata: &core.LiteralOffloadedMetadata{
+								Uri:       "s3://bucket/offloaded",
+								SizeBytes: 100,
+								InferredType: &core.LiteralType{
+									Type: &core.LiteralType_CollectionType{
+										CollectionType: &core.LiteralType{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+									},
+								},
+							},
+						},
+						Hash: base64.RawURLEncoding.EncodeToString(literalOneHash),
+					},
+				},
+			},
+			expectInputBindings: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Setup mocks
+			inputFilePaths := &pluginiomocks.InputFilePaths{}
+			inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
+			inputReader := newStaticInputReader(inputFilePaths, test.inputLiteralMap)
+
+			nCtx := &nodesmocks.NodeExecutionContext{}
+			nCtx.OnInputReader().Return(inputReader)
+			nCtx.OnDataStore().Return(dataStore)
+
+			// Create a mock subNodeSpec for constructInputBindings
+			subNodeSpec := &v1alpha1.NodeSpec{}
+
+			arrayNode := &mocks.ExecutableArrayNode{}
+			arrayNode.OnGetBoundInputs().Return(test.boundInputs)
+			arrayNode.OnGetDataMode().Return(test.dataMode)
+			arrayNode.OnGetSubNodeSpec().Return(subNodeSpec)
+
+			resolver := newSubNodeInputResolver(nCtx, arrayNode)
+			err := resolver.Initialize(ctx)
+			assert.NoError(t, err)
+
+			subDataDir := storage.DataReference("s3://bucket/subnode")
+			inputReaderResult, inputBindings, err := resolver.GetSubNodeInputs(ctx, test.subNodeIndex, subDataDir)
+			assert.NoError(t, err)
+
+			resultLiteralMap, err := inputReaderResult.Get(ctx)
+			assert.NoError(t, err)
+			assert.True(t, proto.Equal(test.expectedLiteralMap, resultLiteralMap))
+
+			if !test.expectInputBindings {
+				assert.Nil(t, inputBindings)
 			}
 		})
 	}

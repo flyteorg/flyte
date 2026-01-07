@@ -105,7 +105,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder)
+				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, nil)
 			if err != nil {
 				return err
 			}
@@ -176,7 +176,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder)
+				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, nil)
 			if err != nil {
 				return err
 			}
@@ -328,6 +328,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
 			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
+		inputResolver := newSubNodeInputResolver(nCtx, arrayNode)
+		if err := inputResolver.Initialize(ctx); err != nil {
+			return handler.UnknownTransition, err
+		}
+
 		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
 		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
@@ -348,7 +353,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), subNodeKind == v1alpha1.NodeKindTask)
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, subNodeStatus, err :=
-				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder)
+				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, inputResolver)
 			if err != nil {
 				return handler.UnknownTransition, err
 			}

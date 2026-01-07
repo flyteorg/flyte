@@ -17,11 +17,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery-v2 --all --case=underscore
 
 type arrayNodeStateStore interface {
 	initArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) error
-	buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder) (
+	buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder, inputResolver *SubNodeInputResolver) (
 		interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error)
 	persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int)
 	getAttempts(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int) uint32
@@ -68,7 +68,7 @@ func (f *fullStateStore) persistArraySubNodeState(ctx context.Context, nCtx inte
 	*subNodeStatusAddress = *subNodeStatus
 }
 
-func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder) (
+func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder, inputResolver *SubNodeInputResolver) (
 	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
 	subNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, getSubNodeID(subNodeIndex))
 	if subNodeStatus == nil {
@@ -100,9 +100,14 @@ func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfa
 		executors.NewExecutionContext(nCtx.ExecutionContext(), nCtx.ExecutionContext(), nCtx.ExecutionContext(), newParentInfo, executors.InitializeControlFlow()),
 		subNodeIndex)
 
-	inputReader, inputBindings, err := constructSubNodeInputs(ctx, nCtx, arrayNode, subNodeIndex, subDataDir)
-	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+	var inputReader staticInputReader
+	var inputBindings []*v1alpha1.Binding
+	if inputResolver != nil {
+		var err error
+		inputReader, inputBindings, err = inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
+		if err != nil {
+			return nil, nil, nil, nil, nil, nil, err
+		}
 	}
 	subNodeSpec.InputBindings = inputBindings
 
@@ -194,7 +199,7 @@ func (m *minStateStore) persistArraySubNodeState(ctx context.Context, nCtx inter
 // but need many different execution details, for example setting input values as a singular item rather than a collection,
 // injecting environment variables for flytekit maptask execution, aggregating eventing so that rather than tracking state for
 // each subnode individually it sends a single event for the whole ArrayNode, and many more.
-func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder) (
+func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder, inputResolver *SubNodeInputResolver) (
 	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
 	nodePhase := v1alpha1.NodePhase(m.arrayNodeStateCopy.SubNodePhases.GetItem(subNodeIndex))
 	taskPhase := int(m.arrayNodeStateCopy.SubNodeTaskPhases.GetItem(subNodeIndex))
@@ -221,9 +226,14 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	inputReader, inputBindings, err := constructSubNodeInputs(ctx, nCtx, arrayNode, subNodeIndex, subDataDir)
-	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+	var inputReader staticInputReader
+	var inputBindings []*v1alpha1.Binding
+	if inputResolver != nil {
+		var err error
+		inputReader, inputBindings, err = inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
+		if err != nil {
+			return nil, nil, nil, nil, nil, nil, err
+		}
 	}
 	subNodeSpec.InputBindings = inputBindings
 
