@@ -94,7 +94,8 @@ type SignedURLProperties struct {
 	Scope stow.ClientMethod
 	// ExpiresIn defines the expiration duration for the URL. It's strongly recommended setting it.
 	ExpiresIn time.Duration
-	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
+	// ContentMD5 defines the expected Base64-encoded 128-bit MD5 hash of the generated file.
+	// It's strongly recommended setting it.for data integrity checks on the storage backend.
 	ContentMD5 string
 	// AddContentMD5Metadata Add ContentMD5 to the metadata of signed URL if true.
 	AddContentMD5Metadata bool
