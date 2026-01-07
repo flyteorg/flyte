@@ -59,7 +59,7 @@ func TestGetPluginLogs(t *testing.T) {
 		},
 	}
 
-	mapLogPlugin, err := logs.InitializeLogPlugins(logConfig)
+	mapLogPlugin, err := logs.InitializeLogPlugins(logConfig, nil)
 	assert.Nil(t, err)
 
 	// create NodeExecutionContext

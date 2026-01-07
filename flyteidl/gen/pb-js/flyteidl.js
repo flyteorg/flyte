@@ -14181,6 +14181,7 @@
                  * @property {boolean|null} [HideOnceFinished] TaskLog HideOnceFinished
                  * @property {flyteidl.core.TaskLog.LinkType|null} [linkType] TaskLog linkType
                  * @property {boolean|null} [ready] TaskLog ready
+                 * @property {string|null} [iconUri] TaskLog iconUri
                  */
     
                 /**
@@ -14263,6 +14264,14 @@
                 TaskLog.prototype.ready = false;
     
                 /**
+                 * TaskLog iconUri.
+                 * @member {string} iconUri
+                 * @memberof flyteidl.core.TaskLog
+                 * @instance
+                 */
+                TaskLog.prototype.iconUri = "";
+    
+                /**
                  * Creates a new TaskLog instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskLog
@@ -14302,6 +14311,8 @@
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.linkType);
                     if (message.ready != null && message.hasOwnProperty("ready"))
                         writer.uint32(/* id 8, wireType 0 =*/64).bool(message.ready);
+                    if (message.iconUri != null && message.hasOwnProperty("iconUri"))
+                        writer.uint32(/* id 9, wireType 2 =*/74).string(message.iconUri);
                     return writer;
                 };
     
@@ -14346,6 +14357,9 @@
                             break;
                         case 8:
                             message.ready = reader.bool();
+                            break;
+                        case 9:
+                            message.iconUri = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14404,6 +14418,9 @@
                     if (message.ready != null && message.hasOwnProperty("ready"))
                         if (typeof message.ready !== "boolean")
                             return "ready: boolean expected";
+                    if (message.iconUri != null && message.hasOwnProperty("iconUri"))
+                        if (!$util.isString(message.iconUri))
+                            return "iconUri: string expected";
                     return null;
                 };
     
@@ -16297,6 +16314,7 @@
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  * @property {boolean|null} [isEager] TaskMetadata isEager
                  * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] TaskMetadata logLinks
                  */
     
                 /**
@@ -16310,6 +16328,7 @@
                 function TaskMetadata(properties) {
                     this.tags = {};
                     this.cacheIgnoreInputVars = [];
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -16420,6 +16439,14 @@
                  */
                 TaskMetadata.prototype.generatesDeck = null;
     
+                /**
+                 * TaskMetadata logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.logLinks = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -16486,6 +16513,9 @@
                         writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
                     if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
                         $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
                     return writer;
                 };
     
@@ -16552,6 +16582,11 @@
                             break;
                         case 15:
                             message.generatesDeck = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 18:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -16630,6 +16665,15 @@
                         var error = $root.google.protobuf.BoolValue.verify(message.generatesDeck);
                         if (error)
                             return "generatesDeck." + error;
+                    }
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
                     }
                     return null;
                 };

@@ -374,9 +374,14 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 	taskLogs := make([]*core.TaskLog, 0, 3)
 	var logCtx *core.LogContext
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch task template. Error: %w", err)
+	} else if taskTemplate == nil {
+		return nil, fmt.Errorf("failed to fetch task template")
+	}
 	if sj.Status.DriverInfo.PodName != "" {
-		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
+		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed, taskTemplate)
 		if err != nil {
 			return nil, err
 		}
@@ -397,7 +402,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		}
 	}
 
-	p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.User)
+	p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.User, taskTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +446,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		}
 	}
 
-	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
+	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System, taskTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +465,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
 
-	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.AllUser)
+	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.AllUser, taskTemplate)
 	if err != nil {
 		return nil, err
 	}

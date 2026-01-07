@@ -447,6 +447,11 @@ export class TaskLog extends Message<TaskLog> {
    */
   ready = false;
 
+  /**
+   * @generated from field: string icon_uri = 9;
+   */
+  iconUri = "";
+
   constructor(data?: PartialMessage<TaskLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -463,6 +468,7 @@ export class TaskLog extends Message<TaskLog> {
     { no: 6, name: "HideOnceFinished", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 7, name: "link_type", kind: "enum", T: proto3.getEnumType(TaskLog_LinkType) },
     { no: 8, name: "ready", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "icon_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskLog {

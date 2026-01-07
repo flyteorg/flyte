@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/literals.proto";
@@ -175,6 +176,9 @@ message TaskMetadata {
     // - true: The task will generate a deck.
     // - false: The task will not generate a deck.
     google.protobuf.BoolValue generates_deck = 15;
+
+    // Log links associated with this task.
+    repeated core.TaskLog log_links = 18;
 }
 
 // A Task structure that uniquely identifies a task in the system

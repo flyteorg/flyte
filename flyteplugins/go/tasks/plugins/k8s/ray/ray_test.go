@@ -886,6 +886,10 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
 	plg.On("TaskExecutionMetadata").Return(tskCtx)
+	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
+	taskReader := &mocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	plg.On("TaskReader").Return(taskReader)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(

@@ -5888,6 +5888,9 @@ export namespace flyteidl {
 
             /** TaskLog ready */
             ready?: (boolean|null);
+
+            /** TaskLog iconUri */
+            iconUri?: (string|null);
         }
 
         /** Represents a TaskLog. */
@@ -5922,6 +5925,9 @@ export namespace flyteidl {
 
             /** TaskLog ready. */
             public ready: boolean;
+
+            /** TaskLog iconUri. */
+            public iconUri: string;
 
             /**
              * Creates a new TaskLog instance using the specified properties.
@@ -6800,6 +6806,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck */
             generatesDeck?: (google.protobuf.IBoolValue|null);
+
+            /** TaskMetadata logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6849,6 +6858,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck. */
             public generatesDeck?: (google.protobuf.IBoolValue|null);
+
+            /** TaskMetadata logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

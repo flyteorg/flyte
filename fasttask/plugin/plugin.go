@@ -475,7 +475,7 @@ func (p *Plugin) buildTaskInfoWithLogs(ctx context.Context, executionEnvID inter
 		},
 		EnableVscode: enableVscode,
 	}
-	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs, taskTemplate)
 	if err != nil {
 		return nil, err
 	}

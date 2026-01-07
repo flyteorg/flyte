@@ -14778,8 +14778,7 @@
         "ABORTED",
         "FAILED",
         "INITIALIZING",
-        "WAITING_FOR_RESOURCES",
-        "RETRYABLE_FAILED"
+        "WAITING_FOR_RESOURCES"
       ],
       "default": "UNDEFINED",
       "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
@@ -14810,6 +14809,9 @@
         },
         "ready": {
           "type": "boolean"
+        },
+        "icon_uri": {
+          "type": "string"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
@@ -14873,6 +14875,14 @@
         "generates_deck": {
           "type": "boolean",
           "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "Log links associated with this task."
         }
       },
       "title": "Task Metadata"

@@ -121,7 +121,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	}
 
 	// initialize log plugin
-	logPlugin, err := logs.InitializeLogPlugins(&config.LogConfig.Config)
+	logPlugin, err := logs.InitializeLogPlugins(&config.LogConfig.Config, nil)
 	if err != nil {
 		return currentState, externalResources, err
 	}

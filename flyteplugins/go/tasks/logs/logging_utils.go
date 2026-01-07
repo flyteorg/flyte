@@ -96,10 +96,24 @@ func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.O
 }
 
 // InitializeLogPlugins initializes log plugin based on config.
-func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
+func InitializeLogPlugins(cfg *LogConfig, taskTemplate *core.TaskTemplate) (tasklog.Plugin, error) {
 	// Use a list to maintain order.
 	var plugins []tasklog.Plugin
 	var dynamicPlugins []tasklog.Plugin
+
+	if taskTemplate != nil {
+		if len(taskTemplate.GetMetadata().GetLogLinks()) > 0 {
+			for _, l := range taskTemplate.GetMetadata().GetLogLinks() {
+				plugins = append(plugins, tasklog.TemplateLogPlugin{
+					DisplayName:   l.GetName(),
+					TemplateURIs:  []tasklog.TemplateURI{l.GetUri()},
+					MessageFormat: l.GetMessageFormat(),
+					LinkType:      core.TaskLog_DASHBOARD.String(),
+					IconUri:       l.GetIconUri(),
+				})
+			}
+		}
+	}
 
 	if cfg.IsKubernetesEnabled {
 		if len(cfg.KubernetesTemplateURI) > 0 {
@@ -136,6 +150,7 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 				ShowWhilePending:    dynamicLogLink.ShowWhilePending,
 				HideOnceFinished:    dynamicLogLink.HideOnceFinished,
 				LinkType:            dynamicLogLink.LinkType,
+				IconUri:             dynamicLogLink.IconUri,
 			})
 	}
 

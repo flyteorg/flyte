@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { BoolValue, Duration, Message, proto3, Struct } from "@bufbuild/protobuf";
 import { KeyValuePair, RetryStrategy } from "./literals_pb.js";
+import { TaskLog } from "./execution_pb.js";
 import { Identifier } from "./identifier_pb.js";
 import { TypedInterface } from "./interface_pb.js";
 import { SecurityContext } from "./security_pb.js";
@@ -582,6 +583,13 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   generatesDeck?: boolean;
 
+  /**
+   * Log links associated with this task.
+   *
+   * @generated from field: repeated flyteidl.core.TaskLog log_links = 18;
+   */
+  logLinks: TaskLog[] = [];
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -603,6 +611,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
+    { no: 18, name: "log_links", kind: "message", T: TaskLog, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {

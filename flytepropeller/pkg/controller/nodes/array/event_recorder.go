@@ -190,7 +190,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 
 	var mapLogPlugin tasklog.Plugin
 	if config.GetConfig().ArrayNode.UseMapPluginLogs {
-		mapLogPlugin, err = logs.InitializeLogPlugins(&mapplugin.GetConfig().LogConfig.Config)
+		mapLogPlugin, err = logs.InitializeLogPlugins(&mapplugin.GetConfig().LogConfig.Config, nil)
 		if err != nil {
 			logger.Warnf(ctx, "failed to initialize log plugin with error:%v", err)
 		}
