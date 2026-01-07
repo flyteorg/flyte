@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/dataproxy/dataproxy_service.proto.
  */
 export const file_flyteidl2_dataproxy_dataproxy_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5IusBChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESCwoDb3JnGAMgASgJEhAKCGZpbGVuYW1lGAQgASgJEi0KCmV4cGlyZXNfaW4YBSABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SHAoLY29udGVudF9tZDUYBiABKAxCB7pIBHoCaBASFQoNZmlsZW5hbWVfcm9vdBgHIAEoCRIWCg5jb250ZW50X2xlbmd0aBgIIAEoAyL3AQocQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZRISCgpzaWduZWRfdXJsGAEgASgJEhIKCm5hdGl2ZV91cmwYAiABKAkSLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASTwoHaGVhZGVycxgEIAMoCzI+LmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZS5IZWFkZXJzRW50cnkaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEykQEKEERhdGFQcm94eVNlcnZpY2USfQoUQ3JlYXRlVXBsb2FkTG9jYXRpb24SMC5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVxdWVzdBoxLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZSIAQtgBChdjb20uZmx5dGVpZGwyLmRhdGFwcm94eUIVRGF0YXByb3h5U2VydmljZVByb3RvSAJQAVo3Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2RhdGFwcm94eaICA0ZEWKoCE0ZseXRlaWRsMi5EYXRhcHJveHnKAhNGbHl0ZWlkbDJcRGF0YXByb3h54gIfRmx5dGVpZGwyXERhdGFwcm94eVxHUEJNZXRhZGF0YeoCFEZseXRlaWRsMjo6RGF0YXByb3h5YgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5Io0CChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMi9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBMpEBChBEYXRhUHJveHlTZXJ2aWNlEn0KFENyZWF0ZVVwbG9hZExvY2F0aW9uEjAuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QaMS5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UiAELYAQoXY29tLmZseXRlaWRsMi5kYXRhcHJveHlCFURhdGFwcm94eVNlcnZpY2VQcm90b0gCUAFaN2dpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9kYXRhcHJveHmiAgNGRFiqAhNGbHl0ZWlkbDIuRGF0YXByb3h5ygITRmx5dGVpZGwyXERhdGFwcm94eeICH0ZseXRlaWRsMlxEYXRhcHJveHlcR1BCTWV0YWRhdGHqAhRGbHl0ZWlkbDI6OkRhdGFwcm94eWIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -42,18 +42,10 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
   domain: string;
 
   /**
-   * Org is the organization key applied to the resource.
-   * +optional
-   *
-   * @generated from field: string org = 3;
-   */
-  org: string;
-
-  /**
    * Filename specifies the desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
    * +optional. By default, the service generates a consistent name based on the default filename length provided in the global config..
    *
-   * @generated from field: string filename = 4;
+   * @generated from field: string filename = 3;
    */
   filename: string;
 
@@ -62,7 +54,7 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
    * exceeds the platform's configured maximum.
    * +optional. The default value comes from the global config.
    *
-   * @generated from field: google.protobuf.Duration expires_in = 5;
+   * @generated from field: google.protobuf.Duration expires_in = 4;
    */
   expiresIn?: Duration;
 
@@ -71,7 +63,7 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
    * generated path for verification.
    * +required
    *
-   * @generated from field: bytes content_md5 = 6;
+   * @generated from field: bytes content_md5 = 5;
    */
   contentMd5: Uint8Array;
 
@@ -81,16 +73,34 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
    * configured in the data proxy. This option is useful when uploading multiple related files.
    * +optional
    *
-   * @generated from field: string filename_root = 7;
+   * @generated from field: string filename_root = 6;
    */
   filenameRoot: string;
+
+  /**
+   * If true, the data proxy will add content_md5 to the Signed URL requirements,
+   * forcing clients to send this checksum with the object.
+   * This is required to enforce data integrity on backends like GCP, ensuring that
+   * the uploaded file matches the hash.
+   *
+   * @generated from field: bool add_content_md5_metadata = 7;
+   */
+  addContentMd5Metadata: boolean;
+
+  /**
+   * Org is the organization key applied to the resource.
+   * +optional
+   *
+   * @generated from field: string org = 8;
+   */
+  org: string;
 
   /**
    * ContentLength specifies the size of the content to be uploaded in bytes.
    * This is validated against the platform's maximum upload size if provided.
    * +optional
    *
-   * @generated from field: int64 content_length = 8;
+   * @generated from field: int64 content_length = 9;
    */
   contentLength: bigint;
 };

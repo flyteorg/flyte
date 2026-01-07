@@ -28,34 +28,40 @@ message CreateUploadLocationRequest {
   // +required
   string domain = 2 [(buf.validate.field).string.min_len = 1];
 
-  // Org is the organization key applied to the resource.
-  // +optional
-  string org = 3;
-
   // Filename specifies the desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.
   // +optional. By default, the service generates a consistent name based on the default filename length provided in the global config..
-  string filename = 4;
+  string filename = 3;
 
   // ExpiresIn defines the requested expiration duration for the generated URL. The request will be rejected if this
   // exceeds the platform's configured maximum.
   // +optional. The default value comes from the global config.
-  google.protobuf.Duration expires_in = 5;
+  google.protobuf.Duration expires_in = 4;
 
   // ContentMD5 restricts the upload location to the specific MD5 provided. The MD5 hash will also appear in the
   // generated path for verification.
   // +required
-  bytes content_md5 = 6 [(buf.validate.field).bytes.len = 16];
+  bytes content_md5 = 5 [(buf.validate.field).bytes.len = 16];
 
   // FilenameRoot, if present, will be used instead of the MD5 hash in the path. When combined with filename,
   // this makes the upload location deterministic. The native URL will still be prefixed by the upload location prefix
   // configured in the data proxy. This option is useful when uploading multiple related files.
   // +optional
-  string filename_root = 7;
+  string filename_root = 6;
+
+  // If true, the data proxy will add content_md5 to the Signed URL requirements,
+  // forcing clients to send this checksum with the object.
+  // This is required to enforce data integrity on backends like GCP, ensuring that
+  // the uploaded file matches the hash.
+  bool add_content_md5_metadata = 7;
+
+  // Org is the organization key applied to the resource.
+  // +optional
+  string org = 8;
 
   // ContentLength specifies the size of the content to be uploaded in bytes.
   // This is validated against the platform's maximum upload size if provided.
   // +optional
-  int64 content_length = 8;
+  int64 content_length = 9;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.

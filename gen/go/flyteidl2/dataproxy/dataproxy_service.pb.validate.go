@@ -61,8 +61,6 @@ func (m *CreateUploadLocationRequest) validate(all bool) error {
 
 	// no validation rules for Domain
 
-	// no validation rules for Org
-
 	// no validation rules for Filename
 
 	if all {
@@ -97,6 +95,10 @@ func (m *CreateUploadLocationRequest) validate(all bool) error {
 	// no validation rules for ContentMd5
 
 	// no validation rules for FilenameRoot
+
+	// no validation rules for AddContentMd5Metadata
+
+	// no validation rules for Org
 
 	// no validation rules for ContentLength
 
