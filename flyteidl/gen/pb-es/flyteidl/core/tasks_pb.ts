@@ -538,6 +538,13 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   metadata?: K8sObjectMetadata;
 
+  /**
+   * Indicates whether the execution mode is Dynamic or not
+   *
+   * @generated from field: flyteidl.core.TaskMetadata.ExecutionMode mode = 17;
+   */
+  mode = TaskMetadata_ExecutionMode.DEFAULT;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -560,6 +567,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
     { no: 16, name: "metadata", kind: "message", T: K8sObjectMetadata },
+    { no: 17, name: "mode", kind: "enum", T: proto3.getEnumType(TaskMetadata_ExecutionMode) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {
@@ -578,6 +586,26 @@ export class TaskMetadata extends Message<TaskMetadata> {
     return proto3.util.equals(TaskMetadata, a, b);
   }
 }
+
+/**
+ * @generated from enum flyteidl.core.TaskMetadata.ExecutionMode
+ */
+export enum TaskMetadata_ExecutionMode {
+  /**
+   * @generated from enum value: DEFAULT = 0;
+   */
+  DEFAULT = 0,
+
+  /**
+   * @generated from enum value: DYNAMIC = 1;
+   */
+  DYNAMIC = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(TaskMetadata_ExecutionMode)
+proto3.util.setEnumType(TaskMetadata_ExecutionMode, "flyteidl.core.TaskMetadata.ExecutionMode", [
+  { no: 0, name: "DEFAULT" },
+  { no: 1, name: "DYNAMIC" },
+]);
 
 /**
  * A Task structure that uniquely identifies a task in the system

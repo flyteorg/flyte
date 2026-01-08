@@ -856,7 +856,6 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 	if err != nil {
 		return handler.PhaseInfoUndefined, err
 	}
-
 	phase := t.Info()
 	// check for timeout for non-terminal phases
 	if !phase.GetPhase().IsTerminal() {

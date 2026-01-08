@@ -169,6 +169,14 @@ message TaskMetadata {
     // the CR object itself while the metadata in the pod template/K8sPod is applied
     // to the pod template spec of the CR object.
     K8sObjectMetadata metadata = 16;
+
+    enum ExecutionMode {
+        DEFAULT = 0;
+        DYNAMIC = 1;
+    }
+
+    // Indicates whether the execution mode is Dynamic or not
+    ExecutionMode mode = 17;
 }
 
 // A Task structure that uniquely identifies a task in the system

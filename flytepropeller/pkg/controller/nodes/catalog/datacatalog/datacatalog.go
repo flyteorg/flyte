@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/uuid"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -23,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	futureFileReaderInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
@@ -67,6 +69,39 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 		},
 	}
 	response, err := m.client.GetArtifact(ctx, artifactQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	// check artifact's age if the configuration specifies a max age
+	if m.maxCacheAge > time.Duration(0) {
+		artifact := response.GetArtifact()
+		createdAt, err := ptypes.Timestamp(artifact.GetCreatedAt())
+		if err != nil {
+			logger.Errorf(ctx, "DataCatalog Artifact has invalid createdAt %+v, err: %+v", artifact.GetCreatedAt(), err)
+			return nil, err
+		}
+
+		if time.Since(createdAt) > m.maxCacheAge {
+			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
+				artifact.GetId(), createdAt.String(), m.maxCacheAge)
+			return nil, status.Error(codes.NotFound, "Artifact over age limit")
+		}
+	}
+
+	return response.GetArtifact(), nil
+}
+
+// GetFutureArtifactByTag retrieves an artifact using the provided tag and dataset.
+func (m *CatalogClient) GetFutureArtifactByTag(ctx context.Context, tagName string, dataset *datacatalog.Dataset) (*datacatalog.Artifact, error) {
+	logger.Debugf(ctx, "Get future Artifact by tag %v", tagName)
+	artifactQuery := &datacatalog.GetArtifactRequest{
+		Dataset: dataset.GetId(),
+		QueryHandle: &datacatalog.GetArtifactRequest_TagName{
+			TagName: tagName,
+		},
+	}
+	response, err := m.client.GetFutureArtifact(ctx, artifactQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -147,6 +182,60 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
 }
 
+func (m *CatalogClient) GetFuture(ctx context.Context, key catalog.Key) (catalog.Entry, error) {
+	dataset, err := m.GetDataset(ctx, key)
+	if err != nil {
+		logger.Debugf(ctx, "DataCatalog failed to get dataset for ID %s, err: %+v", key.Identifier.String(), err)
+		return catalog.Entry{}, errors.Wrapf(err, "DataCatalog failed to get dataset for ID %s", key.Identifier.String())
+	}
+
+	inputs := &core.LiteralMap{}
+	if key.TypedInterface.GetInputs() != nil {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			return catalog.Entry{}, errors.Wrap(err, "failed to read inputs when trying to query catalog")
+		}
+		inputs = retInputs
+	}
+
+	tag, err := GenerateFutureArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
+	if err != nil {
+		logger.Errorf(ctx, "DataCatalog failed to generate tag for inputs %+v, err: %+v", inputs, err)
+		return catalog.Entry{}, err
+	}
+
+	artifact, err := m.GetFutureArtifactByTag(ctx, tag, dataset)
+	if err != nil {
+		logger.Debugf(ctx, "DataCatalog failed to get artifact by tag %+v, err: %+v", tag, err)
+		return catalog.Entry{}, err
+	}
+	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact.GetId(), tag)
+
+	var relevantTag *datacatalog.Tag
+	// Todo: is it possible that an artifact has more than 1 tag?
+	if len(artifact.GetTags()) > 0 {
+		relevantTag = artifact.GetTags()[0]
+	}
+
+	source, err := GetSourceFromMetadata(dataset.GetMetadata(), artifact.GetMetadata(), key.Identifier)
+	if err != nil {
+		return catalog.Entry{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
+	}
+
+	md := EventCatalogMetadata(dataset.GetId(), relevantTag, source)
+
+	// The GenerateFutureLiteralMapFromArtifact function will only return an error if the artifact has no literals.
+	// Therefore, if an error is returned, it indicates a cache miss.
+	outputs, err := GenerateFutureLiteralMapFromArtifact(key.Identifier, artifact)
+	if err != nil {
+		logger.Errorf(ctx, "DataCatalog failed to get outputs from artifact %+v, err: %+v", artifact.GetId(), err)
+		return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, md)), nil
+	}
+
+	logger.Infof(ctx, "Retrieved %v outputs from artifact %v, tag: %v", len(outputs.GetLiterals()), artifact.GetId(), tag)
+	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
+}
+
 // createDataset creates a Dataset in datacatalog including the associated metadata.
 func (m *CatalogClient) createDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
 	datasetID, err := GenerateDatasetIDForTask(ctx, key)
@@ -205,6 +294,27 @@ func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog
 	return inputs, outputs, nil
 }
 
+func (m *CatalogClient) prepareInputsAndFuture(ctx context.Context, key catalog.Key, futureReader futureFileReaderInterfaces.FutureFileReaderInterface) (inputs *core.LiteralMap, future *core.DynamicJobSpec, err error) {
+	inputs = &core.LiteralMap{}
+	if key.TypedInterface.GetInputs() != nil && len(key.TypedInterface.GetInputs().GetVariables()) != 0 {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			logger.Errorf(ctx, "DataCatalog failed to read inputs err: %s", err)
+			return nil, nil, err
+		}
+		logger.Debugf(ctx, "DataCatalog read inputs")
+		inputs = retInputs
+	}
+
+	future, err = futureReader.Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "DataCatalog failed to read future err: %s", err)
+		return nil, nil, err
+	}
+
+	return inputs, future, nil
+}
+
 // createArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
 // the provided input values for retrieval.
 func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
@@ -261,6 +371,108 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 
 	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact.GetId(), key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
+}
+
+func (m *CatalogClient) createFutureArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, djSpec *core.DynamicJobSpec, metadata catalog.Metadata) (catalog.Status, error) {
+	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
+
+	// Create the artifact for the execution that belongs in the task
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, 1)
+	binary, err := proto.Marshal(djSpec)
+	if err != nil {
+		return catalog.Status{}, err
+	}
+	artifactDataList = append(artifactDataList, &datacatalog.ArtifactData{
+		Name:  "future",
+		Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Binary{Binary: &core.Binary{Value: binary}}}}},
+	})
+
+	cachedFutureArtifact := &datacatalog.Artifact{
+		Id:       string(uuid.NewUUID()),
+		Dataset:  datasetID,
+		Data:     artifactDataList,
+		Metadata: GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+	}
+	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedFutureArtifact}
+	_, err = m.client.CreateFutureArtifact(ctx, createArtifactRequest)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create future Artifact %+v, err: %v", cachedFutureArtifact.GetId(), err)
+		return catalog.Status{}, err
+	}
+	logger.Debugf(ctx, "Created future artifact: %v, with %v outputs from execution %+v", cachedFutureArtifact.GetId(), len(artifactDataList), metadata)
+
+	// Tag the artifact since it is the cached artifact
+	tagName, err := GenerateFutureArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to generate tag for artifact %+v, err: %+v", cachedFutureArtifact.GetId(), err)
+		return catalog.Status{}, err
+	}
+	logger.Infof(ctx, "Cached exec tag: %v, task: %v", tagName, key.Identifier)
+
+	tag := &datacatalog.Tag{
+		Name:       tagName,
+		Dataset:    datasetID,
+		ArtifactId: cachedFutureArtifact.GetId(),
+	}
+	_, err = m.client.AddTag(ctx, &datacatalog.AddTagRequest{Tag: tag})
+	if err != nil {
+		if status.Code(err) == codes.AlreadyExists {
+			logger.Warnf(ctx, "Tag %v already exists for Artifact %v (idempotent)", tagName, cachedFutureArtifact.GetId())
+		} else {
+			logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedFutureArtifact.GetId(), err)
+			return catalog.Status{}, err
+		}
+	}
+
+	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedFutureArtifact.GetId(), key, datasetID, metadata)
+	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
+}
+
+func (m *CatalogClient) updateFutureArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, djSpec *core.DynamicJobSpec, metadata catalog.Metadata) (catalog.Status, error) {
+	logger.Debugf(ctx, "Updating future artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
+
+	// Create the artifact for the execution that belongs in the task
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, 1)
+	binary, err := proto.Marshal(djSpec)
+	if err != nil {
+		return catalog.Status{}, err
+	}
+	artifactDataList = append(artifactDataList, &datacatalog.ArtifactData{
+		Name:  "future",
+		Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Binary{Binary: &core.Binary{Value: binary}}}}},
+	})
+
+	tagName, err := GenerateFutureArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to generate future artifact tag name for key %+v, dataset %+v and execution %+v, err: %+v", key, datasetID, metadata, err)
+		return catalog.Status{}, err
+	}
+
+	updateFutureArtifactRequest := &datacatalog.UpdateArtifactRequest{
+		Dataset:     datasetID,
+		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
+		Data:        artifactDataList,
+		Metadata:    GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+	}
+	resp, err := m.client.UpdateArtifact(ctx, updateFutureArtifactRequest)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to update future artifact for key %+v, dataset %+v and execution %+v, err: %v", key, datasetID, metadata, err)
+		return catalog.Status{}, err
+	}
+
+	tag := &datacatalog.Tag{
+		Name:       tagName,
+		Dataset:    datasetID,
+		ArtifactId: resp.GetArtifactId(),
+	}
+
+	source, err := GetSourceFromMetadata(GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier), GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier), key.Identifier)
+	if err != nil {
+		return catalog.Status{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
+	}
+
+	logger.Debugf(ctx, "Successfully updated future artifact with ID %v and %d outputs for key %+v, dataset %+v and execution %+v", tag.GetArtifactId(), len(artifactDataList), key, datasetID, metadata)
+	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, source)), nil
 }
 
 // updateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
@@ -331,6 +543,58 @@ func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.Outp
 		return catalog.NewPutFailureStatus(&key), err
 	}
 	return createArtifactStatus, err
+}
+
+// PutFuture is similar to Put, but it is used for future.pb caching.
+// It creates a dataset with the task name and version, and then calls Put to create the artifact.
+func (m *CatalogClient) PutFuture(ctx context.Context, key catalog.Key, futureReader futureFileReaderInterfaces.FutureFileReaderInterface, metadata catalog.Metadata) (catalog.Status, error) {
+	// Ensure dataset exists, idempotent operations. Populate Metadata for later recovery
+	datasetID, err := m.createDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+	inputs, djSpec, err := m.prepareInputsAndFuture(ctx, key, futureReader)
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+
+	createArtifactStatus, err := m.createFutureArtifact(ctx, key, datasetID, inputs, djSpec, metadata)
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+	return createArtifactStatus, nil
+}
+
+// UpdateFuture will overwrite any already stored future data from previous execution
+func (m *CatalogClient) UpdateFuture(ctx context.Context, key catalog.Key, futureReader futureFileReaderInterfaces.FutureFileReaderInterface, metadata catalog.Metadata) (catalog.Status, error) {
+	datasetID, err := m.createDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+	inputs, djSpec, err := m.prepareInputsAndFuture(ctx, key, futureReader)
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+
+	catalogStatus, err := m.updateFutureArtifact(ctx, key, datasetID, inputs, djSpec, metadata)
+	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			// No existing artifact found (e.g. initial execution of task with overwrite flag already set),
+			// silently ignore error and create artifact instead to make overwriting an idempotent operation.
+			logger.Debugf(ctx, "Artifact %+v for dataset %+v does not exist while updating, creating instead", key, datasetID)
+			createFutureArtifactStatus, err := m.createFutureArtifact(ctx, key, datasetID, inputs, djSpec, metadata)
+			if err != nil {
+				return catalog.NewPutFailureStatus(&key), err
+			}
+			return createFutureArtifactStatus, nil
+		}
+
+		logger.Errorf(ctx, "Failed to update future artifact %+v for dataset %+v: %v", key, datasetID, err)
+		return catalog.NewPutFailureStatus(&key), err
+	}
+
+	logger.Debugf(ctx, "Successfully updated future artifact %+v for dataset %+v", key, datasetID)
+	return catalogStatus, nil
 }
 
 // Update stores the result of a task execution as a cached Artifact, overwriting any already stored data from a previous

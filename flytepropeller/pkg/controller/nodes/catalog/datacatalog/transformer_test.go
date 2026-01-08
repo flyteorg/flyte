@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -370,4 +371,160 @@ func TestGenerateTaskOutputsFromArtifact_IDLNotFound(t *testing.T) {
 	expectedContainedErrorMsg := "failed to validate literal type"
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), expectedContainedErrorMsg)
+}
+
+func TestGenerateFutureLiteralMapFromArtifact(t *testing.T) {
+	t.Run("successfully retrieve future literal", func(t *testing.T) {
+		// Prepare test data
+		id := core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+		}
+
+		expectedLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_Integer{
+								Integer: 42,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		artifact := &datacatalog.Artifact{
+			Data: []*datacatalog.ArtifactData{
+				{
+					Name:  futureDataName,
+					Value: expectedLiteral,
+				},
+			},
+		}
+
+		// Execute test
+		result, err := GenerateFutureLiteralMapFromArtifact(id, artifact)
+
+		// Verify results
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, expectedLiteral, result.GetLiterals()[futureDataName])
+	})
+
+	t.Run("returns error when no future literal exists", func(t *testing.T) {
+		// Prepare test data
+		id := core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+		}
+
+		artifact := &datacatalog.Artifact{
+			Data: []*datacatalog.ArtifactData{
+				{
+					Name:  "other_data",
+					Value: &core.Literal{},
+				},
+			},
+		}
+
+		// Execute test
+		result, err := GenerateFutureLiteralMapFromArtifact(id, artifact)
+
+		// Verify results
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "has no cached future")
+	})
+}
+
+func TestGenerateFutureArtifactTagName(t *testing.T) {
+	// Test cases for GenerateFutureArtifactTagName function
+	tests := []struct {
+		name              string           // Test case name
+		inputs            *core.LiteralMap // Input literal map
+		cacheIgnoreInputs []string         // Variables to ignore in cache
+		expectedTagPrefix string           // Expected prefix of the generated tag
+		wantErr           bool             // Whether we expect an error
+	}{
+		{
+			name: "Empty inputs",
+			inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
+			cacheIgnoreInputs: []string{},
+			expectedTagPrefix: "flyte_cached_future-",
+			wantErr:           false,
+		},
+		{
+			name: "With simple inputs",
+			inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"a": {
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{
+										Value: &core.Primitive_Integer{
+											Integer: 42,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			cacheIgnoreInputs: []string{},
+			expectedTagPrefix: "flyte_cached_future-",
+			wantErr:           false,
+		},
+		{
+			name: "With ignored inputs",
+			inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"ignore_me": {
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{
+										Value: &core.Primitive_Integer{
+											Integer: 42,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			cacheIgnoreInputs: []string{"ignore_me"},
+			expectedTagPrefix: "flyte_cached_future-",
+			wantErr:           false,
+		},
+	}
+
+	ctx := context.Background()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateFutureArtifactTagName(ctx, tt.inputs, tt.cacheIgnoreInputs)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.True(t, strings.HasPrefix(got, tt.expectedTagPrefix))
+			assert.Greater(t, len(got), len(tt.expectedTagPrefix))
+		})
+	}
 }
