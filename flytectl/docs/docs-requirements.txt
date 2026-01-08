@@ -81,7 +81,7 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 sphinxcontrib-youtube==1.4.1
     # via -r docs-requirements.in
-urllib3==2.6.0
+urllib3==2.6.3
     # via
     #   requests
     #   sphinx-prompt
