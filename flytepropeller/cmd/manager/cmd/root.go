@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	cfgFile        string
+	cfgFile        []string
 	configAccessor = viper.NewAccessor(config.Options{StrictMode: true})
 )
 
@@ -106,8 +106,7 @@ func init() {
 
 	// Here you will define your flags and configuration settings. Cobra supports persistent flags, which, if defined
 	// here, will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
-		"config file (default is $HOME/config.yaml)")
+	rootCmd.PersistentFlags().StringSliceVar(&cfgFile, "config", []string{}, "config file (default is $HOME/config.yaml)")
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
@@ -117,7 +116,7 @@ func init() {
 func initConfig(cmd *cobra.Command, _ []string) error {
 	configAccessor = viper.NewAccessor(config.Options{
 		StrictMode:  false,
-		SearchPaths: []string{cfgFile},
+		SearchPaths: cfgFile,
 	})
 
 	configAccessor.InitializePflags(cmd.PersistentFlags())
