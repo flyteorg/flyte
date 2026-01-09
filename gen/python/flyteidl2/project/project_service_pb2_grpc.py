@@ -5,7 +5,7 @@ import grpc
 from flyteidl2.project import project_service_pb2 as flyteidl2_dot_project_dot_project__service__pb2
 
 
-class AdminServiceStub(object):
+class ProjectServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,28 +15,28 @@ class AdminServiceStub(object):
             channel: A grpc.Channel.
         """
         self.RegisterProject = channel.unary_unary(
-                '/flyteidl2.project.AdminService/RegisterProject',
+                '/flyteidl2.project.ProjectService/RegisterProject',
                 request_serializer=flyteidl2_dot_project_dot_project__service__pb2.ProjectRegisterRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_project_dot_project__service__pb2.ProjectRegisterResponse.FromString,
                 )
         self.UpdateProject = channel.unary_unary(
-                '/flyteidl2.project.AdminService/UpdateProject',
+                '/flyteidl2.project.ProjectService/UpdateProject',
                 request_serializer=flyteidl2_dot_project_dot_project__service__pb2.Project.SerializeToString,
                 response_deserializer=flyteidl2_dot_project_dot_project__service__pb2.ProjectUpdateResponse.FromString,
                 )
         self.GetProject = channel.unary_unary(
-                '/flyteidl2.project.AdminService/GetProject',
+                '/flyteidl2.project.ProjectService/GetProject',
                 request_serializer=flyteidl2_dot_project_dot_project__service__pb2.ProjectGetRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_project_dot_project__service__pb2.Project.FromString,
                 )
         self.ListProjects = channel.unary_unary(
-                '/flyteidl2.project.AdminService/ListProjects',
+                '/flyteidl2.project.ProjectService/ListProjects',
                 request_serializer=flyteidl2_dot_project_dot_project__service__pb2.ProjectListRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_project_dot_project__service__pb2.Projects.FromString,
                 )
 
 
-class AdminServiceServicer(object):
+class ProjectServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def RegisterProject(self, request, context):
@@ -65,7 +65,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_AdminServiceServicer_to_server(servicer, server):
+def add_ProjectServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RegisterProject': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterProject,
@@ -89,12 +89,12 @@ def add_AdminServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.project.AdminService', rpc_method_handlers)
+            'flyteidl2.project.ProjectService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class AdminService(object):
+class ProjectService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -108,7 +108,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.AdminService/RegisterProject',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.ProjectService/RegisterProject',
             flyteidl2_dot_project_dot_project__service__pb2.ProjectRegisterRequest.SerializeToString,
             flyteidl2_dot_project_dot_project__service__pb2.ProjectRegisterResponse.FromString,
             options, channel_credentials,
@@ -125,7 +125,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.AdminService/UpdateProject',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.ProjectService/UpdateProject',
             flyteidl2_dot_project_dot_project__service__pb2.Project.SerializeToString,
             flyteidl2_dot_project_dot_project__service__pb2.ProjectUpdateResponse.FromString,
             options, channel_credentials,
@@ -142,7 +142,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.AdminService/GetProject',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.ProjectService/GetProject',
             flyteidl2_dot_project_dot_project__service__pb2.ProjectGetRequest.SerializeToString,
             flyteidl2_dot_project_dot_project__service__pb2.Project.FromString,
             options, channel_credentials,
@@ -159,7 +159,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.AdminService/ListProjects',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.project.ProjectService/ListProjects',
             flyteidl2_dot_project_dot_project__service__pb2.ProjectListRequest.SerializeToString,
             flyteidl2_dot_project_dot_project__service__pb2.Projects.FromString,
             options, channel_credentials,

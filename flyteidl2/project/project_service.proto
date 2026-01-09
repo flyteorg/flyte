@@ -108,7 +108,7 @@ message ProjectGetRequest {
   string org = 2;
 }
 
-service AdminService {
+service ProjectService {
   rpc RegisterProject(ProjectRegisterRequest) returns (ProjectRegisterResponse) {
     option (google.api.http) = {
       post: "/api/v1/projects"

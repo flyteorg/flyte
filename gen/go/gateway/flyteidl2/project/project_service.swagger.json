@@ -6,7 +6,7 @@
   },
   "tags": [
     {
-      "name": "AdminService"
+      "name": "ProjectService"
     }
   ],
   "consumes": [
@@ -18,7 +18,7 @@
   "paths": {
     "/api/v1/org/projects/{org}": {
       "get": {
-        "operationId": "AdminService_ListProjects2",
+        "operationId": "ProjectService_ListProjects2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -84,13 +84,13 @@
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       }
     },
     "/api/v1/org/projects/{org}/{id}": {
       "get": {
-        "operationId": "AdminService_GetProject2",
+        "operationId": "ProjectService_GetProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -122,12 +122,12 @@
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       },
       "put": {
         "summary": "it will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "AdminService_UpdateProject2",
+        "operationId": "ProjectService_UpdateProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -162,18 +162,18 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AdminServiceUpdateProjectBody"
+              "$ref": "#/definitions/ProjectServiceUpdateProjectBody"
             }
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       }
     },
     "/api/v1/org/projects/{project.org}": {
       "post": {
-        "operationId": "AdminService_RegisterProject2",
+        "operationId": "ProjectService_RegisterProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -201,18 +201,18 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AdminServiceRegisterProjectBody"
+              "$ref": "#/definitions/ProjectServiceRegisterProjectBody"
             }
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       }
     },
     "/api/v1/projects": {
       "get": {
-        "operationId": "AdminService_ListProjects",
+        "operationId": "ProjectService_ListProjects",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -278,11 +278,11 @@
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       },
       "post": {
-        "operationId": "AdminService_RegisterProject",
+        "operationId": "ProjectService_RegisterProject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -308,13 +308,13 @@
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       }
     },
     "/api/v1/projects/{id}": {
       "get": {
-        "operationId": "AdminService_GetProject",
+        "operationId": "ProjectService_GetProject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -346,12 +346,12 @@
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       },
       "put": {
         "summary": "it will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "AdminService_UpdateProject",
+        "operationId": "ProjectService_UpdateProject",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -379,18 +379,29 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AdminServiceUpdateProjectBody"
+              "$ref": "#/definitions/ProjectServiceUpdateProjectBody"
             }
           }
         ],
         "tags": [
-          "AdminService"
+          "ProjectService"
         ]
       }
     }
   },
   "definitions": {
-    "AdminServiceRegisterProjectBody": {
+    "ProjectProjectState": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "ARCHIVED",
+        "SYSTEM_GENERATED",
+        "SYSTEM_ARCHIVED"
+      ],
+      "default": "ACTIVE",
+      "description": "The state of the project is used to control its visibility in the UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.\n - SYSTEM_ARCHIVED: System archived projects that aren't explicitly archived by a user."
+    },
+    "ProjectServiceRegisterProjectBody": {
       "type": "object",
       "properties": {
         "project": {
@@ -427,7 +438,7 @@
       },
       "title": "Adds a new user-project within the Flyte deployment.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
     },
-    "AdminServiceUpdateProjectBody": {
+    "ProjectServiceUpdateProjectBody": {
       "type": "object",
       "properties": {
         "name": {
@@ -452,17 +463,6 @@
           "$ref": "#/definitions/ProjectProjectState"
         }
       }
-    },
-    "ProjectProjectState": {
-      "type": "string",
-      "enum": [
-        "ACTIVE",
-        "ARCHIVED",
-        "SYSTEM_GENERATED",
-        "SYSTEM_ARCHIVED"
-      ],
-      "default": "ACTIVE",
-      "description": "The state of the project is used to control its visibility in the UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.\n - SYSTEM_ARCHIVED: System archived projects that aren't explicitly archived by a user."
     },
     "flyteidl2projectDomain": {
       "type": "object",

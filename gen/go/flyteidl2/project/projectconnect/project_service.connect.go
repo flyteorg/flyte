@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// AdminServiceName is the fully-qualified name of the AdminService service.
-	AdminServiceName = "flyteidl2.project.AdminService"
+	// ProjectServiceName is the fully-qualified name of the ProjectService service.
+	ProjectServiceName = "flyteidl2.project.ProjectService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,30 +33,31 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AdminServiceRegisterProjectProcedure is the fully-qualified name of the AdminService's
+	// ProjectServiceRegisterProjectProcedure is the fully-qualified name of the ProjectService's
 	// RegisterProject RPC.
-	AdminServiceRegisterProjectProcedure = "/flyteidl2.project.AdminService/RegisterProject"
-	// AdminServiceUpdateProjectProcedure is the fully-qualified name of the AdminService's
+	ProjectServiceRegisterProjectProcedure = "/flyteidl2.project.ProjectService/RegisterProject"
+	// ProjectServiceUpdateProjectProcedure is the fully-qualified name of the ProjectService's
 	// UpdateProject RPC.
-	AdminServiceUpdateProjectProcedure = "/flyteidl2.project.AdminService/UpdateProject"
-	// AdminServiceGetProjectProcedure is the fully-qualified name of the AdminService's GetProject RPC.
-	AdminServiceGetProjectProcedure = "/flyteidl2.project.AdminService/GetProject"
-	// AdminServiceListProjectsProcedure is the fully-qualified name of the AdminService's ListProjects
+	ProjectServiceUpdateProjectProcedure = "/flyteidl2.project.ProjectService/UpdateProject"
+	// ProjectServiceGetProjectProcedure is the fully-qualified name of the ProjectService's GetProject
 	// RPC.
-	AdminServiceListProjectsProcedure = "/flyteidl2.project.AdminService/ListProjects"
+	ProjectServiceGetProjectProcedure = "/flyteidl2.project.ProjectService/GetProject"
+	// ProjectServiceListProjectsProcedure is the fully-qualified name of the ProjectService's
+	// ListProjects RPC.
+	ProjectServiceListProjectsProcedure = "/flyteidl2.project.ProjectService/ListProjects"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	adminServiceServiceDescriptor               = project.File_flyteidl2_project_project_service_proto.Services().ByName("AdminService")
-	adminServiceRegisterProjectMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("RegisterProject")
-	adminServiceUpdateProjectMethodDescriptor   = adminServiceServiceDescriptor.Methods().ByName("UpdateProject")
-	adminServiceGetProjectMethodDescriptor      = adminServiceServiceDescriptor.Methods().ByName("GetProject")
-	adminServiceListProjectsMethodDescriptor    = adminServiceServiceDescriptor.Methods().ByName("ListProjects")
+	projectServiceServiceDescriptor               = project.File_flyteidl2_project_project_service_proto.Services().ByName("ProjectService")
+	projectServiceRegisterProjectMethodDescriptor = projectServiceServiceDescriptor.Methods().ByName("RegisterProject")
+	projectServiceUpdateProjectMethodDescriptor   = projectServiceServiceDescriptor.Methods().ByName("UpdateProject")
+	projectServiceGetProjectMethodDescriptor      = projectServiceServiceDescriptor.Methods().ByName("GetProject")
+	projectServiceListProjectsMethodDescriptor    = projectServiceServiceDescriptor.Methods().ByName("ListProjects")
 )
 
-// AdminServiceClient is a client for the flyteidl2.project.AdminService service.
-type AdminServiceClient interface {
+// ProjectServiceClient is a client for the flyteidl2.project.ProjectService service.
+type ProjectServiceClient interface {
 	RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error)
@@ -64,73 +65,73 @@ type AdminServiceClient interface {
 	ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error)
 }
 
-// NewAdminServiceClient constructs a client for the flyteidl2.project.AdminService service. By
+// NewProjectServiceClient constructs a client for the flyteidl2.project.ProjectService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AdminServiceClient {
+func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProjectServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	return &adminServiceClient{
+	return &projectServiceClient{
 		registerProject: connect.NewClient[project.ProjectRegisterRequest, project.ProjectRegisterResponse](
 			httpClient,
-			baseURL+AdminServiceRegisterProjectProcedure,
-			connect.WithSchema(adminServiceRegisterProjectMethodDescriptor),
+			baseURL+ProjectServiceRegisterProjectProcedure,
+			connect.WithSchema(projectServiceRegisterProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		updateProject: connect.NewClient[project.Project, project.ProjectUpdateResponse](
 			httpClient,
-			baseURL+AdminServiceUpdateProjectProcedure,
-			connect.WithSchema(adminServiceUpdateProjectMethodDescriptor),
+			baseURL+ProjectServiceUpdateProjectProcedure,
+			connect.WithSchema(projectServiceUpdateProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getProject: connect.NewClient[project.ProjectGetRequest, project.Project](
 			httpClient,
-			baseURL+AdminServiceGetProjectProcedure,
-			connect.WithSchema(adminServiceGetProjectMethodDescriptor),
+			baseURL+ProjectServiceGetProjectProcedure,
+			connect.WithSchema(projectServiceGetProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		listProjects: connect.NewClient[project.ProjectListRequest, project.Projects](
 			httpClient,
-			baseURL+AdminServiceListProjectsProcedure,
-			connect.WithSchema(adminServiceListProjectsMethodDescriptor),
+			baseURL+ProjectServiceListProjectsProcedure,
+			connect.WithSchema(projectServiceListProjectsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// adminServiceClient implements AdminServiceClient.
-type adminServiceClient struct {
+// projectServiceClient implements ProjectServiceClient.
+type projectServiceClient struct {
 	registerProject *connect.Client[project.ProjectRegisterRequest, project.ProjectRegisterResponse]
 	updateProject   *connect.Client[project.Project, project.ProjectUpdateResponse]
 	getProject      *connect.Client[project.ProjectGetRequest, project.Project]
 	listProjects    *connect.Client[project.ProjectListRequest, project.Projects]
 }
 
-// RegisterProject calls flyteidl2.project.AdminService.RegisterProject.
-func (c *adminServiceClient) RegisterProject(ctx context.Context, req *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
+// RegisterProject calls flyteidl2.project.ProjectService.RegisterProject.
+func (c *projectServiceClient) RegisterProject(ctx context.Context, req *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
 	return c.registerProject.CallUnary(ctx, req)
 }
 
-// UpdateProject calls flyteidl2.project.AdminService.UpdateProject.
-func (c *adminServiceClient) UpdateProject(ctx context.Context, req *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
+// UpdateProject calls flyteidl2.project.ProjectService.UpdateProject.
+func (c *projectServiceClient) UpdateProject(ctx context.Context, req *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
 	return c.updateProject.CallUnary(ctx, req)
 }
 
-// GetProject calls flyteidl2.project.AdminService.GetProject.
-func (c *adminServiceClient) GetProject(ctx context.Context, req *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
+// GetProject calls flyteidl2.project.ProjectService.GetProject.
+func (c *projectServiceClient) GetProject(ctx context.Context, req *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
 	return c.getProject.CallUnary(ctx, req)
 }
 
-// ListProjects calls flyteidl2.project.AdminService.ListProjects.
-func (c *adminServiceClient) ListProjects(ctx context.Context, req *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
+// ListProjects calls flyteidl2.project.ProjectService.ListProjects.
+func (c *projectServiceClient) ListProjects(ctx context.Context, req *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
 	return c.listProjects.CallUnary(ctx, req)
 }
 
-// AdminServiceHandler is an implementation of the flyteidl2.project.AdminService service.
-type AdminServiceHandler interface {
+// ProjectServiceHandler is an implementation of the flyteidl2.project.ProjectService service.
+type ProjectServiceHandler interface {
 	RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error)
@@ -138,67 +139,67 @@ type AdminServiceHandler interface {
 	ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error)
 }
 
-// NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
+// NewProjectServiceHandler builds an HTTP handler from the service implementation. It returns the
 // path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	adminServiceRegisterProjectHandler := connect.NewUnaryHandler(
-		AdminServiceRegisterProjectProcedure,
+func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	projectServiceRegisterProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceRegisterProjectProcedure,
 		svc.RegisterProject,
-		connect.WithSchema(adminServiceRegisterProjectMethodDescriptor),
+		connect.WithSchema(projectServiceRegisterProjectMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceUpdateProjectHandler := connect.NewUnaryHandler(
-		AdminServiceUpdateProjectProcedure,
+	projectServiceUpdateProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceUpdateProjectProcedure,
 		svc.UpdateProject,
-		connect.WithSchema(adminServiceUpdateProjectMethodDescriptor),
+		connect.WithSchema(projectServiceUpdateProjectMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceGetProjectHandler := connect.NewUnaryHandler(
-		AdminServiceGetProjectProcedure,
+	projectServiceGetProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceGetProjectProcedure,
 		svc.GetProject,
-		connect.WithSchema(adminServiceGetProjectMethodDescriptor),
+		connect.WithSchema(projectServiceGetProjectMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceListProjectsHandler := connect.NewUnaryHandler(
-		AdminServiceListProjectsProcedure,
+	projectServiceListProjectsHandler := connect.NewUnaryHandler(
+		ProjectServiceListProjectsProcedure,
 		svc.ListProjects,
-		connect.WithSchema(adminServiceListProjectsMethodDescriptor),
+		connect.WithSchema(projectServiceListProjectsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl2.project.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.project.ProjectService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case AdminServiceRegisterProjectProcedure:
-			adminServiceRegisterProjectHandler.ServeHTTP(w, r)
-		case AdminServiceUpdateProjectProcedure:
-			adminServiceUpdateProjectHandler.ServeHTTP(w, r)
-		case AdminServiceGetProjectProcedure:
-			adminServiceGetProjectHandler.ServeHTTP(w, r)
-		case AdminServiceListProjectsProcedure:
-			adminServiceListProjectsHandler.ServeHTTP(w, r)
+		case ProjectServiceRegisterProjectProcedure:
+			projectServiceRegisterProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceUpdateProjectProcedure:
+			projectServiceUpdateProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceGetProjectProcedure:
+			projectServiceGetProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceListProjectsProcedure:
+			projectServiceListProjectsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedAdminServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedAdminServiceHandler struct{}
+// UnimplementedProjectServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedProjectServiceHandler struct{}
 
-func (UnimplementedAdminServiceHandler) RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.AdminService.RegisterProject is not implemented"))
+func (UnimplementedProjectServiceHandler) RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.RegisterProject is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.AdminService.UpdateProject is not implemented"))
+func (UnimplementedProjectServiceHandler) UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.UpdateProject is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) GetProject(context.Context, *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.AdminService.GetProject is not implemented"))
+func (UnimplementedProjectServiceHandler) GetProject(context.Context, *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.GetProject is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.AdminService.ListProjects is not implemented"))
+func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.ListProjects is not implemented"))
 }

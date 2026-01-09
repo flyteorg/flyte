@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_AdminService_RegisterProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_RegisterProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectRegisterRequest
 	var metadata runtime.ServerMetadata
 
@@ -49,7 +49,7 @@ func request_AdminService_RegisterProject_0(ctx context.Context, marshaler runti
 
 }
 
-func local_request_AdminService_RegisterProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_RegisterProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectRegisterRequest
 	var metadata runtime.ServerMetadata
 
@@ -66,7 +66,7 @@ func local_request_AdminService_RegisterProject_0(ctx context.Context, marshaler
 
 }
 
-func request_AdminService_RegisterProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_RegisterProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectRegisterRequest
 	var metadata runtime.ServerMetadata
 
@@ -100,7 +100,7 @@ func request_AdminService_RegisterProject_1(ctx context.Context, marshaler runti
 
 }
 
-func local_request_AdminService_RegisterProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_RegisterProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectRegisterRequest
 	var metadata runtime.ServerMetadata
 
@@ -134,7 +134,7 @@ func local_request_AdminService_RegisterProject_1(ctx context.Context, marshaler
 
 }
 
-func request_AdminService_UpdateProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_UpdateProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.Project
 	var metadata runtime.ServerMetadata
 
@@ -168,7 +168,7 @@ func request_AdminService_UpdateProject_0(ctx context.Context, marshaler runtime
 
 }
 
-func local_request_AdminService_UpdateProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_UpdateProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.Project
 	var metadata runtime.ServerMetadata
 
@@ -202,7 +202,7 @@ func local_request_AdminService_UpdateProject_0(ctx context.Context, marshaler r
 
 }
 
-func request_AdminService_UpdateProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_UpdateProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.Project
 	var metadata runtime.ServerMetadata
 
@@ -246,7 +246,7 @@ func request_AdminService_UpdateProject_1(ctx context.Context, marshaler runtime
 
 }
 
-func local_request_AdminService_UpdateProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_UpdateProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.Project
 	var metadata runtime.ServerMetadata
 
@@ -291,10 +291,10 @@ func local_request_AdminService_UpdateProject_1(ctx context.Context, marshaler r
 }
 
 var (
-	filter_AdminService_GetProject_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
+	filter_ProjectService_GetProject_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
 )
 
-func request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
@@ -318,7 +318,7 @@ func request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Ma
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_GetProject_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_GetProject_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -327,7 +327,7 @@ func request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func local_request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
@@ -351,7 +351,7 @@ func local_request_AdminService_GetProject_0(ctx context.Context, marshaler runt
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_GetProject_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_GetProject_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -360,7 +360,7 @@ func local_request_AdminService_GetProject_0(ctx context.Context, marshaler runt
 
 }
 
-func request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
@@ -396,7 +396,7 @@ func request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func local_request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
@@ -433,17 +433,17 @@ func local_request_AdminService_GetProject_1(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_AdminService_ListProjects_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_ProjectService_ListProjects_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_AdminService_ListProjects_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_ListProjects_0(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectListRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_ListProjects_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_ListProjects_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -452,14 +452,14 @@ func request_AdminService_ListProjects_0(ctx context.Context, marshaler runtime.
 
 }
 
-func local_request_AdminService_ListProjects_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_ListProjects_0(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectListRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_ListProjects_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_ListProjects_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -469,10 +469,10 @@ func local_request_AdminService_ListProjects_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_AdminService_ListProjects_1 = &utilities.DoubleArray{Encoding: map[string]int{"org": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
+	filter_ProjectService_ListProjects_1 = &utilities.DoubleArray{Encoding: map[string]int{"org": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
 )
 
-func request_AdminService_ListProjects_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ProjectService_ListProjects_1(ctx context.Context, marshaler runtime.Marshaler, client extProject.ProjectServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectListRequest
 	var metadata runtime.ServerMetadata
 
@@ -496,7 +496,7 @@ func request_AdminService_ListProjects_1(ctx context.Context, marshaler runtime.
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_ListProjects_1); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_ListProjects_1); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -505,7 +505,7 @@ func request_AdminService_ListProjects_1(ctx context.Context, marshaler runtime.
 
 }
 
-func local_request_AdminService_ListProjects_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ProjectService_ListProjects_1(ctx context.Context, marshaler runtime.Marshaler, server extProject.ProjectServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extProject.ProjectListRequest
 	var metadata runtime.ServerMetadata
 
@@ -529,7 +529,7 @@ func local_request_AdminService_ListProjects_1(ctx context.Context, marshaler ru
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_ListProjects_1); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ProjectService_ListProjects_1); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -538,13 +538,13 @@ func local_request_AdminService_ListProjects_1(ctx context.Context, marshaler ru
 
 }
 
-// RegisterAdminServiceHandlerServer registers the http handlers for service AdminService to "mux".
-// UnaryRPC     :call AdminServiceServer directly.
+// RegisterProjectServiceHandlerServer registers the http handlers for service ProjectService to "mux".
+// UnaryRPC     :call ProjectServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAdminServiceHandlerFromEndpoint instead.
-func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server extProject.AdminServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterProjectServiceHandlerFromEndpoint instead.
+func RegisterProjectServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server extProject.ProjectServiceServer) error {
 
-	mux.Handle("POST", pattern_AdminService_RegisterProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ProjectService_RegisterProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -552,12 +552,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/projects"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_RegisterProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_RegisterProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -565,11 +565,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_RegisterProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_RegisterProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_RegisterProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ProjectService_RegisterProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -577,12 +577,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{project.org}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{project.org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_RegisterProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_RegisterProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -590,11 +590,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_RegisterProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_RegisterProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ProjectService_UpdateProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -602,12 +602,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_UpdateProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_UpdateProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -615,11 +615,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_UpdateProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_UpdateProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ProjectService_UpdateProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -627,12 +627,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_UpdateProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_UpdateProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -640,11 +640,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_UpdateProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_UpdateProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -652,12 +652,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_GetProject_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -665,11 +665,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_GetProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -677,12 +677,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/GetProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/GetProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_GetProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_GetProject_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -690,11 +690,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_GetProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_GetProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_ListProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_ListProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -702,12 +702,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/projects"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_ListProjects_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_ListProjects_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -715,11 +715,11 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_ListProjects_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_ListProjects_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -727,12 +727,12 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.AdminService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl2.project.ProjectService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdminService_ListProjects_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ProjectService_ListProjects_1(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -740,16 +740,16 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_AdminService_ListProjects_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_ListProjects_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterAdminServiceHandlerFromEndpoint is same as RegisterAdminServiceHandler but
+// RegisterProjectServiceHandlerFromEndpoint is same as RegisterProjectServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterAdminServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterProjectServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
@@ -769,195 +769,195 @@ func RegisterAdminServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterAdminServiceHandler(ctx, mux, conn)
+	return RegisterProjectServiceHandler(ctx, mux, conn)
 }
 
-// RegisterAdminServiceHandler registers the http handlers for service AdminService to "mux".
+// RegisterProjectServiceHandler registers the http handlers for service ProjectService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterAdminServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterAdminServiceHandlerClient(ctx, mux, extProject.NewAdminServiceClient(conn))
+func RegisterProjectServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterProjectServiceHandlerClient(ctx, mux, extProject.NewProjectServiceClient(conn))
 }
 
-// RegisterAdminServiceHandlerClient registers the http handlers for service AdminService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "extProject.AdminServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "extProject.AdminServiceClient"
+// RegisterProjectServiceHandlerClient registers the http handlers for service ProjectService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "extProject.ProjectServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "extProject.ProjectServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "extProject.AdminServiceClient" to call the correct interceptors.
-func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client extProject.AdminServiceClient) error {
+// "extProject.ProjectServiceClient" to call the correct interceptors.
+func RegisterProjectServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client extProject.ProjectServiceClient) error {
 
-	mux.Handle("POST", pattern_AdminService_RegisterProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ProjectService_RegisterProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/projects"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_RegisterProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_RegisterProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RegisterProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_RegisterProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_AdminService_RegisterProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ProjectService_RegisterProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{project.org}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/RegisterProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{project.org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_RegisterProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_RegisterProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_RegisterProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_RegisterProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ProjectService_UpdateProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_UpdateProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_UpdateProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_UpdateProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("PUT", pattern_AdminService_UpdateProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_ProjectService_UpdateProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/UpdateProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_UpdateProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_UpdateProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_UpdateProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_UpdateProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_GetProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/GetProject", runtime.WithHTTPPathPattern("/api/v1/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_GetProject_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_GetProject_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_GetProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_GetProject_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/GetProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/GetProject", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_GetProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_GetProject_1(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_GetProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_GetProject_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_ListProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_ListProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/projects"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_ListProjects_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_ListProjects_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_ListProjects_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_ListProjects_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ProjectService_ListProjects_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.AdminService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl2.project.ProjectService/ListProjects", runtime.WithHTTPPathPattern("/api/v1/org/projects/{org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdminService_ListProjects_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectService_ListProjects_1(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdminService_ListProjects_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectService_ListProjects_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -965,37 +965,37 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_AdminService_RegisterProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
+	pattern_ProjectService_RegisterProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 
-	pattern_AdminService_RegisterProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "project.org"}, ""))
+	pattern_ProjectService_RegisterProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "project.org"}, ""))
 
-	pattern_AdminService_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
+	pattern_ProjectService_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
 
-	pattern_AdminService_UpdateProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "id"}, ""))
+	pattern_ProjectService_UpdateProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "id"}, ""))
 
-	pattern_AdminService_GetProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
+	pattern_ProjectService_GetProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
 
-	pattern_AdminService_GetProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "id"}, ""))
+	pattern_ProjectService_GetProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "projects", "id"}, ""))
 
-	pattern_AdminService_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
+	pattern_ProjectService_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 
-	pattern_AdminService_ListProjects_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2}, []string{"api", "v1", "org", "projects"}, ""))
+	pattern_ProjectService_ListProjects_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 2}, []string{"api", "v1", "org", "projects"}, ""))
 )
 
 var (
-	forward_AdminService_RegisterProject_0 = runtime.ForwardResponseMessage
+	forward_ProjectService_RegisterProject_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_RegisterProject_1 = runtime.ForwardResponseMessage
+	forward_ProjectService_RegisterProject_1 = runtime.ForwardResponseMessage
 
-	forward_AdminService_UpdateProject_0 = runtime.ForwardResponseMessage
+	forward_ProjectService_UpdateProject_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_UpdateProject_1 = runtime.ForwardResponseMessage
+	forward_ProjectService_UpdateProject_1 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetProject_0 = runtime.ForwardResponseMessage
+	forward_ProjectService_GetProject_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_GetProject_1 = runtime.ForwardResponseMessage
+	forward_ProjectService_GetProject_1 = runtime.ForwardResponseMessage
 
-	forward_AdminService_ListProjects_0 = runtime.ForwardResponseMessage
+	forward_ProjectService_ListProjects_0 = runtime.ForwardResponseMessage
 
-	forward_AdminService_ListProjects_1 = runtime.ForwardResponseMessage
+	forward_ProjectService_ListProjects_1 = runtime.ForwardResponseMessage
 )

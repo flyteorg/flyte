@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AdminService_RegisterProject_FullMethodName = "/flyteidl2.project.AdminService/RegisterProject"
-	AdminService_UpdateProject_FullMethodName   = "/flyteidl2.project.AdminService/UpdateProject"
-	AdminService_GetProject_FullMethodName      = "/flyteidl2.project.AdminService/GetProject"
-	AdminService_ListProjects_FullMethodName    = "/flyteidl2.project.AdminService/ListProjects"
+	ProjectService_RegisterProject_FullMethodName = "/flyteidl2.project.ProjectService/RegisterProject"
+	ProjectService_UpdateProject_FullMethodName   = "/flyteidl2.project.ProjectService/UpdateProject"
+	ProjectService_GetProject_FullMethodName      = "/flyteidl2.project.ProjectService/GetProject"
+	ProjectService_ListProjects_FullMethodName    = "/flyteidl2.project.ProjectService/ListProjects"
 )
 
-// AdminServiceClient is the client API for AdminService service.
+// ProjectServiceClient is the client API for ProjectService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AdminServiceClient interface {
+type ProjectServiceClient interface {
 	RegisterProject(ctx context.Context, in *ProjectRegisterRequest, opts ...grpc.CallOption) (*ProjectRegisterResponse, error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(ctx context.Context, in *Project, opts ...grpc.CallOption) (*ProjectUpdateResponse, error)
@@ -36,54 +36,54 @@ type AdminServiceClient interface {
 	ListProjects(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*Projects, error)
 }
 
-type adminServiceClient struct {
+type projectServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAdminServiceClient(cc grpc.ClientConnInterface) AdminServiceClient {
-	return &adminServiceClient{cc}
+func NewProjectServiceClient(cc grpc.ClientConnInterface) ProjectServiceClient {
+	return &projectServiceClient{cc}
 }
 
-func (c *adminServiceClient) RegisterProject(ctx context.Context, in *ProjectRegisterRequest, opts ...grpc.CallOption) (*ProjectRegisterResponse, error) {
+func (c *projectServiceClient) RegisterProject(ctx context.Context, in *ProjectRegisterRequest, opts ...grpc.CallOption) (*ProjectRegisterResponse, error) {
 	out := new(ProjectRegisterResponse)
-	err := c.cc.Invoke(ctx, AdminService_RegisterProject_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ProjectService_RegisterProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) UpdateProject(ctx context.Context, in *Project, opts ...grpc.CallOption) (*ProjectUpdateResponse, error) {
+func (c *projectServiceClient) UpdateProject(ctx context.Context, in *Project, opts ...grpc.CallOption) (*ProjectUpdateResponse, error) {
 	out := new(ProjectUpdateResponse)
-	err := c.cc.Invoke(ctx, AdminService_UpdateProject_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ProjectService_UpdateProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) GetProject(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*Project, error) {
+func (c *projectServiceClient) GetProject(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*Project, error) {
 	out := new(Project)
-	err := c.cc.Invoke(ctx, AdminService_GetProject_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ProjectService_GetProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) ListProjects(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*Projects, error) {
+func (c *projectServiceClient) ListProjects(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*Projects, error) {
 	out := new(Projects)
-	err := c.cc.Invoke(ctx, AdminService_ListProjects_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ProjectService_ListProjects_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AdminServiceServer is the server API for AdminService service.
-// All implementations should embed UnimplementedAdminServiceServer
+// ProjectServiceServer is the server API for ProjectService service.
+// All implementations should embed UnimplementedProjectServiceServer
 // for forward compatibility
-type AdminServiceServer interface {
+type ProjectServiceServer interface {
 	RegisterProject(context.Context, *ProjectRegisterRequest) (*ProjectRegisterResponse, error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(context.Context, *Project) (*ProjectUpdateResponse, error)
@@ -91,128 +91,128 @@ type AdminServiceServer interface {
 	ListProjects(context.Context, *ProjectListRequest) (*Projects, error)
 }
 
-// UnimplementedAdminServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedAdminServiceServer struct {
+// UnimplementedProjectServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedProjectServiceServer struct {
 }
 
-func (UnimplementedAdminServiceServer) RegisterProject(context.Context, *ProjectRegisterRequest) (*ProjectRegisterResponse, error) {
+func (UnimplementedProjectServiceServer) RegisterProject(context.Context, *ProjectRegisterRequest) (*ProjectRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterProject not implemented")
 }
-func (UnimplementedAdminServiceServer) UpdateProject(context.Context, *Project) (*ProjectUpdateResponse, error) {
+func (UnimplementedProjectServiceServer) UpdateProject(context.Context, *Project) (*ProjectUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProject not implemented")
 }
-func (UnimplementedAdminServiceServer) GetProject(context.Context, *ProjectGetRequest) (*Project, error) {
+func (UnimplementedProjectServiceServer) GetProject(context.Context, *ProjectGetRequest) (*Project, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
 }
-func (UnimplementedAdminServiceServer) ListProjects(context.Context, *ProjectListRequest) (*Projects, error) {
+func (UnimplementedProjectServiceServer) ListProjects(context.Context, *ProjectListRequest) (*Projects, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
 }
 
-// UnsafeAdminServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AdminServiceServer will
+// UnsafeProjectServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ProjectServiceServer will
 // result in compilation errors.
-type UnsafeAdminServiceServer interface {
-	mustEmbedUnimplementedAdminServiceServer()
+type UnsafeProjectServiceServer interface {
+	mustEmbedUnimplementedProjectServiceServer()
 }
 
-func RegisterAdminServiceServer(s grpc.ServiceRegistrar, srv AdminServiceServer) {
-	s.RegisterService(&AdminService_ServiceDesc, srv)
+func RegisterProjectServiceServer(s grpc.ServiceRegistrar, srv ProjectServiceServer) {
+	s.RegisterService(&ProjectService_ServiceDesc, srv)
 }
 
-func _AdminService_RegisterProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProjectService_RegisterProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProjectRegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).RegisterProject(ctx, in)
+		return srv.(ProjectServiceServer).RegisterProject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_RegisterProject_FullMethodName,
+		FullMethod: ProjectService_RegisterProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).RegisterProject(ctx, req.(*ProjectRegisterRequest))
+		return srv.(ProjectServiceServer).RegisterProject(ctx, req.(*ProjectRegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_UpdateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProjectService_UpdateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Project)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).UpdateProject(ctx, in)
+		return srv.(ProjectServiceServer).UpdateProject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_UpdateProject_FullMethodName,
+		FullMethod: ProjectService_UpdateProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).UpdateProject(ctx, req.(*Project))
+		return srv.(ProjectServiceServer).UpdateProject(ctx, req.(*Project))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProjectService_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProjectGetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).GetProject(ctx, in)
+		return srv.(ProjectServiceServer).GetProject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_GetProject_FullMethodName,
+		FullMethod: ProjectService_GetProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).GetProject(ctx, req.(*ProjectGetRequest))
+		return srv.(ProjectServiceServer).GetProject(ctx, req.(*ProjectGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_ListProjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProjectService_ListProjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProjectListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).ListProjects(ctx, in)
+		return srv.(ProjectServiceServer).ListProjects(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_ListProjects_FullMethodName,
+		FullMethod: ProjectService_ListProjects_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).ListProjects(ctx, req.(*ProjectListRequest))
+		return srv.(ProjectServiceServer).ListProjects(ctx, req.(*ProjectListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
+// ProjectService_ServiceDesc is the grpc.ServiceDesc for ProjectService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AdminService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl2.project.AdminService",
-	HandlerType: (*AdminServiceServer)(nil),
+var ProjectService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "flyteidl2.project.ProjectService",
+	HandlerType: (*ProjectServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "RegisterProject",
-			Handler:    _AdminService_RegisterProject_Handler,
+			Handler:    _ProjectService_RegisterProject_Handler,
 		},
 		{
 			MethodName: "UpdateProject",
-			Handler:    _AdminService_UpdateProject_Handler,
+			Handler:    _ProjectService_UpdateProject_Handler,
 		},
 		{
 			MethodName: "GetProject",
-			Handler:    _AdminService_GetProject_Handler,
+			Handler:    _ProjectService_GetProject_Handler,
 		},
 		{
 			MethodName: "ListProjects",
-			Handler:    _AdminService_ListProjects_Handler,
+			Handler:    _ProjectService_ListProjects_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,15 +1,15 @@
 // @generated
 /// Generated client implementations.
-pub mod admin_service_client {
+pub mod project_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     ///
     #[derive(Debug, Clone)]
-    pub struct AdminServiceClient<T> {
+    pub struct ProjectServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl AdminServiceClient<tonic::transport::Channel> {
+    impl ProjectServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -20,7 +20,7 @@ pub mod admin_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> AdminServiceClient<T>
+    impl<T> ProjectServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -38,7 +38,7 @@ pub mod admin_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> AdminServiceClient<InterceptedService<T, F>>
+        ) -> ProjectServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -52,7 +52,7 @@ pub mod admin_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            AdminServiceClient::new(InterceptedService::new(inner, interceptor))
+            ProjectServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -104,12 +104,15 @@ pub mod admin_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.project.AdminService/RegisterProject",
+                "/flyteidl2.project.ProjectService/RegisterProject",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.project.AdminService", "RegisterProject"),
+                    GrpcMethod::new(
+                        "flyteidl2.project.ProjectService",
+                        "RegisterProject",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -133,12 +136,12 @@ pub mod admin_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.project.AdminService/UpdateProject",
+                "/flyteidl2.project.ProjectService/UpdateProject",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.project.AdminService", "UpdateProject"),
+                    GrpcMethod::new("flyteidl2.project.ProjectService", "UpdateProject"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -158,11 +161,13 @@ pub mod admin_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.project.AdminService/GetProject",
+                "/flyteidl2.project.ProjectService/GetProject",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.project.AdminService", "GetProject"));
+                .insert(
+                    GrpcMethod::new("flyteidl2.project.ProjectService", "GetProject"),
+                );
             self.inner.unary(req, path, codec).await
         }
         ///
@@ -181,24 +186,24 @@ pub mod admin_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.project.AdminService/ListProjects",
+                "/flyteidl2.project.ProjectService/ListProjects",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.project.AdminService", "ListProjects"),
+                    GrpcMethod::new("flyteidl2.project.ProjectService", "ListProjects"),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod admin_service_server {
+pub mod project_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with AdminServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with ProjectServiceServer.
     #[async_trait]
-    pub trait AdminService: Send + Sync + 'static {
+    pub trait ProjectService: Send + Sync + 'static {
         ///
         async fn register_project(
             &self,
@@ -229,14 +234,14 @@ pub mod admin_service_server {
     }
     ///
     #[derive(Debug)]
-    pub struct AdminServiceServer<T: AdminService> {
+    pub struct ProjectServiceServer<T: ProjectService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: AdminService> AdminServiceServer<T> {
+    impl<T: ProjectService> ProjectServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -287,9 +292,9 @@ pub mod admin_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for AdminServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ProjectServiceServer<T>
     where
-        T: AdminService,
+        T: ProjectService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -304,11 +309,11 @@ pub mod admin_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.project.AdminService/RegisterProject" => {
+                "/flyteidl2.project.ProjectService/RegisterProject" => {
                     #[allow(non_camel_case_types)]
-                    struct RegisterProjectSvc<T: AdminService>(pub Arc<T>);
+                    struct RegisterProjectSvc<T: ProjectService>(pub Arc<T>);
                     impl<
-                        T: AdminService,
+                        T: ProjectService,
                     > tonic::server::UnaryService<super::ProjectRegisterRequest>
                     for RegisterProjectSvc<T> {
                         type Response = super::ProjectRegisterResponse;
@@ -322,7 +327,8 @@ pub mod admin_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as AdminService>::register_project(&inner, request).await
+                                <T as ProjectService>::register_project(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -349,10 +355,10 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.project.AdminService/UpdateProject" => {
+                "/flyteidl2.project.ProjectService/UpdateProject" => {
                     #[allow(non_camel_case_types)]
-                    struct UpdateProjectSvc<T: AdminService>(pub Arc<T>);
-                    impl<T: AdminService> tonic::server::UnaryService<super::Project>
+                    struct UpdateProjectSvc<T: ProjectService>(pub Arc<T>);
+                    impl<T: ProjectService> tonic::server::UnaryService<super::Project>
                     for UpdateProjectSvc<T> {
                         type Response = super::ProjectUpdateResponse;
                         type Future = BoxFuture<
@@ -365,7 +371,7 @@ pub mod admin_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as AdminService>::update_project(&inner, request).await
+                                <T as ProjectService>::update_project(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -392,11 +398,11 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.project.AdminService/GetProject" => {
+                "/flyteidl2.project.ProjectService/GetProject" => {
                     #[allow(non_camel_case_types)]
-                    struct GetProjectSvc<T: AdminService>(pub Arc<T>);
+                    struct GetProjectSvc<T: ProjectService>(pub Arc<T>);
                     impl<
-                        T: AdminService,
+                        T: ProjectService,
                     > tonic::server::UnaryService<super::ProjectGetRequest>
                     for GetProjectSvc<T> {
                         type Response = super::Project;
@@ -410,7 +416,7 @@ pub mod admin_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as AdminService>::get_project(&inner, request).await
+                                <T as ProjectService>::get_project(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -437,11 +443,11 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.project.AdminService/ListProjects" => {
+                "/flyteidl2.project.ProjectService/ListProjects" => {
                     #[allow(non_camel_case_types)]
-                    struct ListProjectsSvc<T: AdminService>(pub Arc<T>);
+                    struct ListProjectsSvc<T: ProjectService>(pub Arc<T>);
                     impl<
-                        T: AdminService,
+                        T: ProjectService,
                     > tonic::server::UnaryService<super::ProjectListRequest>
                     for ListProjectsSvc<T> {
                         type Response = super::Projects;
@@ -455,7 +461,7 @@ pub mod admin_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as AdminService>::list_projects(&inner, request).await
+                                <T as ProjectService>::list_projects(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -500,7 +506,7 @@ pub mod admin_service_server {
             }
         }
     }
-    impl<T: AdminService> Clone for AdminServiceServer<T> {
+    impl<T: ProjectService> Clone for ProjectServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -512,7 +518,7 @@ pub mod admin_service_server {
             }
         }
     }
-    impl<T: AdminService> tonic::server::NamedService for AdminServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.project.AdminService";
+    impl<T: ProjectService> tonic::server::NamedService for ProjectServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.project.ProjectService";
     }
 }
