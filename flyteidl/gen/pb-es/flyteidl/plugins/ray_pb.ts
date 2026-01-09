@@ -161,6 +161,13 @@ export class HeadGroupSpec extends Message<HeadGroupSpec> {
    */
   k8sPod?: K8sPod;
 
+  /**
+   * Optional. Whether to enable an ingress on the ray cluster head node
+   *
+   * @generated from field: bool enable_ingress = 3;
+   */
+  enableIngress = false;
+
   constructor(data?: PartialMessage<HeadGroupSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -171,6 +178,7 @@ export class HeadGroupSpec extends Message<HeadGroupSpec> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "ray_start_params", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 2, name: "k8s_pod", kind: "message", T: K8sPod },
+    { no: 3, name: "enable_ingress", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HeadGroupSpec {
