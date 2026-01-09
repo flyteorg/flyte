@@ -1,531 +1,148 @@
 syntax = "proto3";
-package flyteidl.project;
+package flyteidl2.project;
+
+import "flyteidl2/project/common.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project";
 
-import "google/api/annotations.proto";
-import "flyteidl/admin/project.proto";
-import "flyteidl/admin/project_domain_attributes.proto";
-import "flyteidl/admin/project_attributes.proto";
-import "flyteidl/admin/org_attributes.proto";
-import "flyteidl/admin/task.proto";
-import "flyteidl/admin/workflow.proto";
-import "flyteidl/admin/workflow_attributes.proto";
-import "flyteidl/admin/launch_plan.proto";
-import "flyteidl/admin/event.proto";
-import "flyteidl/admin/execution.proto";
-import "flyteidl/admin/matchable_resource.proto";
-import "flyteidl/admin/node_execution.proto";
-import "flyteidl/admin/task_execution.proto";
-import "flyteidl/admin/version.proto";
-import "flyteidl/admin/common.proto";
-import "flyteidl/admin/description_entity.proto";
-import "flyteidl/admin/configuration.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
+// Namespace within a project commonly used to differentiate between different service instances.
+// e.g. "production", "development", etc.
+message Domain {
+  // Globally unique domain name.
+  string id = 1;
 
+  // Display name.
+  string name = 2;
+}
+
+message Project {
+  // Globally unique project name.
+  string id = 1;
+
+  // Display name.
+  string name = 2;
+
+  repeated Domain domains = 3;
+
+  string description = 4;
+
+  // Leverage Labels from flyteidl.admin.common.proto to
+  // tag projects with ownership information.
+  flyteidl2.project.Labels labels = 5;
+
+  // The state of the project is used to control its visibility in the UI and validity.
+  enum ProjectState {
+    // By default, all projects are considered active.
+    ACTIVE = 0;
+
+    // Archived projects are no longer visible in the UI and no longer valid.
+    ARCHIVED = 1;
+
+    // System generated projects that aren't explicitly created or managed by a user.
+    SYSTEM_GENERATED = 2;
+
+    // System archived projects that aren't explicitly archived by a user.
+    SYSTEM_ARCHIVED = 3;
+  }
+  ProjectState state = 6;
+
+  // Optional, org key applied to the resource.
+  string org = 7;
+}
+
+// Represents a list of projects.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message Projects {
+  repeated Project projects = 1;
+
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query. If there are no more results, this value will be empty.
+  string token = 2;
+}
+
+// Request to retrieve a list of projects matching specified filters.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectListRequest {
+  // Indicates the number of projects to be returned.
+  // +required
+  uint32 limit = 1;
+
+  // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+  // in a query.
+  // +optional
+  string token = 2;
+
+  // Indicates a list of filters passed as string.
+  // More info on constructing filters : <Link>
+  // +optional
+  string filters = 3;
+
+  // Sort ordering.
+  // +optional
+  flyteidl2.project.Sort sort_by = 4;
+
+  // Optional, org filter applied to list project requests.
+  string org = 5;
+}
+
+// Adds a new user-project within the Flyte deployment.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectRegisterRequest {
+  // +required
+  Project project = 1;
+}
+
+// Purposefully empty, may be updated in the future.
+message ProjectRegisterResponse {}
+
+// Purposefully empty, may be updated in the future.
+message ProjectUpdateResponse {}
+
+message ProjectGetRequest {
+  // Indicates a unique project.
+  // +required
+  string id = 1;
+
+  // Optional, org key applied to the resource.
+  string org = 2;
+}
 
 service AdminService {
-  // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
-  rpc RegisterProject (flyteidl.admin.ProjectRegisterRequest) returns (flyteidl.admin.ProjectRegisterResponse) {
+  rpc RegisterProject(ProjectRegisterRequest) returns (ProjectRegisterResponse) {
     option (google.api.http) = {
       post: "/api/v1/projects"
       body: "*"
-      additional_bindings {
+      additional_bindings: {
         post: "/api/v1/org/projects/{project.org}"
         body: "*"
       }
     };
   }
 
-  // Updates an existing :ref:`ref_flyteidl.admin.Project`
-  // flyteidl.admin.Project should be passed but the domains property should be empty;
   // it will be ignored in the handler as domains cannot be updated via this API.
-  rpc UpdateProject (flyteidl.admin.Project) returns (flyteidl.admin.ProjectUpdateResponse) {
+  rpc UpdateProject(Project) returns (ProjectUpdateResponse) {
     option (google.api.http) = {
       put: "/api/v1/projects/{id}"
       body: "*"
-      additional_bindings {
+      additional_bindings: {
         put: "/api/v1/org/projects/{org}/{id}"
         body: "*"
       }
     };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update a project."
-    };
   }
 
-  // Fetches a :ref:`ref_flyteidl.admin.Project`
-  rpc GetProject (flyteidl.admin.ProjectGetRequest) returns (flyteidl.admin.Project) {
+  rpc GetProject(ProjectGetRequest) returns (Project) {
     option (google.api.http) = {
       get: "/api/v1/projects/{id}"
-      additional_bindings {
-        get: "/api/v1/org/projects/{org}/{id}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch a registered project."
+      additional_bindings: {get: "/api/v1/org/projects/{org}/{id}"}
     };
   }
 
-  // Fetches a list of :ref:`ref_flyteidl.admin.Project`
-  rpc ListProjects (flyteidl.admin.ProjectListRequest) returns (flyteidl.admin.Projects) {
+  rpc ListProjects(ProjectListRequest) returns (Projects) {
     option (google.api.http) = {
-      get:  "/api/v1/projects"
-      additional_bindings {
-        get:  "/api/v1/org/projects/{org}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch registered projects."
-    };
-  }
-
-  rpc GetDomains (flyteidl.admin.GetDomainRequest) returns (flyteidl.admin.GetDomainsResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/domains"
-    };
-    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-    //   description: "Fetch registered domains."
-    // };
-  }
-
-  // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
-  rpc CreateWorkflowEvent (flyteidl.admin.WorkflowExecutionEventRequest) returns (flyteidl.admin.WorkflowExecutionEventResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/events/workflows"
-      body: "*"
-      additional_bindings {
-        post:  "/api/v1/org/events/{event.execution_id.org}/workflows"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Create a workflow execution event recording a phase transition."
-    };
-  }
-
-  // Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
-  rpc CreateNodeEvent (flyteidl.admin.NodeExecutionEventRequest) returns (flyteidl.admin.NodeExecutionEventResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/events/nodes"
-      body: "*"
-      additional_bindings {
-        post:  "/api/v1/org/events/{event.id.execution_id.org}/nodes"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Create a node execution event recording a phase transition."
-    };
-  }
-
-  // Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
-  rpc CreateTaskEvent (flyteidl.admin.TaskExecutionEventRequest) returns (flyteidl.admin.TaskExecutionEventResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/events/tasks"
-      body: "*"
-      additional_bindings {
-        post:  "/api/v1/org/events/{event.parent_node_execution_id.execution_id.org}/tasks"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Create a task execution event recording a phase transition."
-    };
-  }
-
-  // Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
-  rpc GetTaskExecution (flyteidl.admin.TaskExecutionGetRequest) returns (flyteidl.admin.TaskExecution) {
-    option (google.api.http) = {
-      get: "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
-      additional_bindings {
-        get: "/api/v1/org/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve an existing task execution."
-    };
-  }
-
-  // Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
-  rpc ListTaskExecutions (flyteidl.admin.TaskExecutionListRequest) returns (flyteidl.admin.TaskExecutionList) {
-    option (google.api.http) = {
-      get: "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
-      additional_bindings {
-        get: "/api/v1/org/task_executions/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch existing task executions matching input filters."
-    };
-
-  }
-
-  // Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
-  rpc GetTaskExecutionData (flyteidl.admin.TaskExecutionGetDataRequest) returns (flyteidl.admin.TaskExecutionGetDataResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
-      additional_bindings {
-        get: "/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.task_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve input and output data from an existing task execution."
-    };
-  }
-
-  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
-  rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
-      body: "*"
-      additional_bindings {
-        put: "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update the customized resource attributes associated with a project-domain combination"
-    };
-  }
-
-  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
-  rpc GetProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesGetRequest) returns (flyteidl.admin.ProjectDomainAttributesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/project_domain_attributes/{project}/{domain}"
-      additional_bindings {
-        get: "/api/v1/org/project_domain_attributes/{org}/{project}/{domain}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve the customized resource attributes associated with a project-domain combination"
-    };
-  }
-
-  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
-  rpc DeleteProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesDeleteRequest) returns (flyteidl.admin.ProjectDomainAttributesDeleteResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/project_domain_attributes/{project}/{domain}"
-      body: "*"
-      additional_bindings {
-        delete: "/api/v1/org/project_domain_attributes/{org}/{project}/{domain}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Delete the customized resource attributes associated with a project-domain combination"
-    };
-  }
-
-  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level
-  rpc UpdateProjectAttributes (flyteidl.admin.ProjectAttributesUpdateRequest) returns (flyteidl.admin.ProjectAttributesUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/project_attributes/{attributes.project}"
-      body: "*"
-      additional_bindings {
-        put: "/api/v1/org/project_attributes/{attributes.org}/{attributes.project}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update the customized resource attributes associated with a project"
-    };
-  }
-
-  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
-  rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/project_attributes/{project}"
-      additional_bindings {
-        get: "/api/v1/org/project_attributes/{org}/{project}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve the customized resource attributes associated with a project"
-    };
-  }
-
-  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
-  rpc DeleteProjectAttributes (flyteidl.admin.ProjectAttributesDeleteRequest) returns (flyteidl.admin.ProjectAttributesDeleteResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/project_attributes/{project}"
-      body: "*"
-      additional_bindings {
-        delete: "/api/v1/org/project_attributes/{org}/{project}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Delete the customized resource attributes associated with a project"
-    };
-  }
-  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
-  rpc UpdateWorkflowAttributes (flyteidl.admin.WorkflowAttributesUpdateRequest) returns (flyteidl.admin.WorkflowAttributesUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
-      body: "*"
-      additional_bindings {
-        put: "/api/v1/org/workflow_attributes/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update the customized resource attributes associated with a project, domain and workflow combination"
-    };
-  }
-
-  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
-  rpc GetWorkflowAttributes (flyteidl.admin.WorkflowAttributesGetRequest) returns (flyteidl.admin.WorkflowAttributesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
-      additional_bindings {
-        get: "/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve the customized resource attributes associated with a project, domain and workflow combination"
-    };
-  }
-
-  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
-  rpc UpdateOrgAttributes (flyteidl.admin.OrgAttributesUpdateRequest) returns (flyteidl.admin.OrgAttributesUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/org_attributes"
-      body: "*"
-      additional_bindings {
-        put: "/api/v1/org/org_attributes/{attributes.org}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update the customized resource attributes associated with a org"
-    };
-  }
-
-  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
-  rpc GetOrgAttributes (flyteidl.admin.OrgAttributesGetRequest) returns (flyteidl.admin.OrgAttributesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/org_attributes"
-      additional_bindings {
-        get: "/api/v1/org/org_attributes/{org}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve the customized resource attributes associated with a org"
-    };
-  }
-
-  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
-  rpc DeleteOrgAttributes (flyteidl.admin.OrgAttributesDeleteRequest) returns (flyteidl.admin.OrgAttributesDeleteResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/org_attributes"
-      body: "*"
-      additional_bindings {
-        delete: "/api/v1/org/org_attributes/{org}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Delete the customized resource attributes associated with a org"
-    };
-  }
-
-  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
-  rpc DeleteWorkflowAttributes (flyteidl.admin.WorkflowAttributesDeleteRequest) returns (flyteidl.admin.WorkflowAttributesDeleteResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
-      body: "*"
-      additional_bindings {
-        delete: "/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Delete the customized resource attributes associated with a project, domain and workflow combination"
-    };
-  }
-
-  // Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
-  rpc ListMatchableAttributes (flyteidl.admin.ListMatchableAttributesRequest) returns (flyteidl.admin.ListMatchableAttributesResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/matchable_attributes"
-      additional_bindings {
-        get: "/api/v1/org/matchable_attributes/{org}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve a list of MatchableAttributesConfiguration objects."
-    };
-  }
-
-  // Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
-  rpc ListNamedEntities (flyteidl.admin.NamedEntityListRequest) returns (flyteidl.admin.NamedEntityList) {
-    option (google.api.http) = {
-      get: "/api/v1/named_entities/{resource_type}/{project}/{domain}"
-      additional_bindings {
-        get: "/api/v1/org/named_entities/{org}/{resource_type}/{project}/{domain}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain."
-    };
-  }
-
-  // Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
-  rpc GetNamedEntity (flyteidl.admin.NamedEntityGetRequest) returns (flyteidl.admin.NamedEntity) {
-    option (google.api.http) = {
-      get: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve a NamedEntity object."
-    };
-  }
-
-  // Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
-  rpc UpdateNamedEntity (flyteidl.admin.NamedEntityUpdateRequest) returns (flyteidl.admin.NamedEntityUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
-      body: "*"
-      additional_bindings {
-        put: "/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Update the fields associated with a NamedEntity"
-    };
-  }
-
-  rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.GetVersionResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/version"
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve the Version (including the Build  information) for FlyteAdmin service"
-    };
-  }
-
-  // Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.
-  rpc GetDescriptionEntity (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.DescriptionEntity) {
-    option (google.api.http) = {
-      get: "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
-      additional_bindings {
-        get: "/api/v1/org/description_entities/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve an existing description entity description."
-    };
-  }
-
-  // Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.
-  rpc ListDescriptionEntities (flyteidl.admin.DescriptionEntityListRequest) returns (flyteidl.admin.DescriptionEntityList) {
-    option (google.api.http) = {
-      get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
-      }
-      additional_bindings {
-        get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}"
-      }
-      additional_bindings {
-        get: "/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch existing description entity definitions matching input filters."
-    };
-  }
-
-  // Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
-  rpc GetExecutionMetrics (flyteidl.admin.WorkflowExecutionGetMetricsRequest) returns (flyteidl.admin.WorkflowExecutionGetMetricsResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/org/metrics/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Retrieve metrics from an existing workflow execution."
-    };
-  };
-
-  // Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
-  rpc GetExecutionCounts (flyteidl.admin.ExecutionCountsGetRequest) returns (flyteidl.admin.ExecutionCountsGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/count/executions/{project}/{domain}"
-      additional_bindings {
-        get: "/api/v1/org/count/executions/{org}/{project}/{domain}"
-      }
-    };
-  }
-
-  rpc GetRunningExecutionsCount (flyteidl.admin.RunningExecutionsCountGetRequest) returns (flyteidl.admin.RunningExecutionsCountGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/running_count/executions/{project}/{domain}"
-      additional_bindings {
-        get: "/api/v1/org/running_count/executions/{org}/{project}/{domain}"
-      }
-    };
-  }
-
-  // Fetch the entire unified attribute configuration.
-  rpc GetConfiguration (flyteidl.admin.ConfigurationGetRequest) returns (flyteidl.admin.ConfigurationGetResponse) {
-    option (google.api.http) = {
-      // project-domain
-      get: "/api/v1/configuration/{id.project}/{id.domain}"
-      additional_bindings {
-        get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
-      }
-      // project
-      additional_bindings {
-        get: "/api/v1/configuration/{id.project}"
-      }
-      additional_bindings {
-        get: "/api/v1/org/configuration/{id.org}/{id.project}"
-      }
-      // org
-      additional_bindings {
-        get: "/api/v1/configuration"
-      }
-      additional_bindings {
-        get: "/api/v1/org/configuration/{id.org}"
-      }
-    };
-  }
-
-  // Update the entire unified attribute configuration.
-  // Requests will fail for stale values of version_to_update
-  rpc UpdateConfiguration (flyteidl.admin.ConfigurationUpdateRequest) returns (flyteidl.admin.ConfigurationUpdateResponse) {
-    option (google.api.http) = {
-      // project-domain
-      post: "/api/v1/configuration/{id.project}/{id.domain}"
-      body: "*"
-      additional_bindings {
-        post: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
-        body: "*"
-      }
-      // project
-      additional_bindings {
-        post: "/api/v1/configuration/{id.project}"
-        body: "*"
-      }
-      additional_bindings {
-        post: "/api/v1/org/configuration/{id.org}/{id.project}"
-        body: "*"
-      }
-      // org
-      additional_bindings {
-        post: "/api/v1/configuration"
-        body: "*"
-      }
-      additional_bindings {
-        post: "/api/v1/org/configuration/{id.org}"
-        body: "*"
-      }
+      get: "/api/v1/projects"
+      additional_bindings: {get: "/api/v1/org/projects/{org}"}
     };
   }
 }

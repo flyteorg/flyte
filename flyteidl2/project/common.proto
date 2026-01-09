@@ -1,0 +1,25 @@
+syntax = "proto3";
+package flyteidl2.project;
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project";
+
+// Specifies sort ordering in a list request.
+message Sort {
+  enum Direction {
+    // By default, fields are sorted in descending order.
+    DESCENDING = 0;
+    ASCENDING = 1;
+  }
+  // Indicates an attribute to sort the response values.
+  // +required
+  string key = 1;
+
+  // Indicates the direction to apply sort key for response values.
+  // +optional
+  Direction direction = 2;
+}
+
+message Labels {
+  // Map of custom labels to be applied to the execution resource.
+  map<string, string> values = 1;
+}

@@ -1,0 +1,620 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl2/project/project_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AdminService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/org/projects/{org}": {
+      "get": {
+        "operationId": "AdminService_ListProjects2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjects"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of projects to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/projects/{org}/{id}": {
+      "get": {
+        "operationId": "AdminService_GetProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/flyteidl2projectProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Indicates a unique project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "it will be ignored in the handler as domains cannot be updated via this API.",
+        "operationId": "AdminService_UpdateProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjectUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateProjectBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/projects/{project.org}": {
+      "post": {
+        "operationId": "AdminService_RegisterProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjectRegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceRegisterProjectBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/projects": {
+      "get": {
+        "operationId": "AdminService_ListProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjects"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "description": "Indicates the number of projects to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "post": {
+        "operationId": "AdminService_RegisterProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjectRegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/projectProjectRegisterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/projects/{id}": {
+      "get": {
+        "operationId": "AdminService_GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/flyteidl2projectProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Indicates a unique project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "it will be ignored in the handler as domains cannot be updated via this API.",
+        "operationId": "AdminService_UpdateProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/projectProjectUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateProjectBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AdminServiceRegisterProjectBody": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Globally unique project name."
+            },
+            "name": {
+              "type": "string",
+              "description": "Display name."
+            },
+            "domains": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/flyteidl2projectDomain"
+              }
+            },
+            "description": {
+              "type": "string"
+            },
+            "labels": {
+              "$ref": "#/definitions/flyteidl2projectLabels",
+              "description": "Leverage Labels from flyteidl.admin.common.proto to\ntag projects with ownership information."
+            },
+            "state": {
+              "$ref": "#/definitions/ProjectProjectState"
+            }
+          },
+          "title": "+required"
+        }
+      },
+      "title": "Adds a new user-project within the Flyte deployment.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
+    },
+    "AdminServiceUpdateProjectBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2projectDomain"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/definitions/flyteidl2projectLabels",
+          "description": "Leverage Labels from flyteidl.admin.common.proto to\ntag projects with ownership information."
+        },
+        "state": {
+          "$ref": "#/definitions/ProjectProjectState"
+        }
+      }
+    },
+    "ProjectProjectState": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "ARCHIVED",
+        "SYSTEM_GENERATED",
+        "SYSTEM_ARCHIVED"
+      ],
+      "default": "ACTIVE",
+      "description": "The state of the project is used to control its visibility in the UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.\n - SYSTEM_ARCHIVED: System archived projects that aren't explicitly archived by a user."
+    },
+    "flyteidl2projectDomain": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Globally unique domain name."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        }
+      },
+      "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
+    },
+    "flyteidl2projectLabels": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of custom labels to be applied to the execution resource."
+        }
+      }
+    },
+    "flyteidl2projectProject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Globally unique project name."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2projectDomain"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/definitions/flyteidl2projectLabels",
+          "description": "Leverage Labels from flyteidl.admin.common.proto to\ntag projects with ownership information."
+        },
+        "state": {
+          "$ref": "#/definitions/ProjectProjectState"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      }
+    },
+    "flyteidl2projectSort": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Indicates an attribute to sort the response values.\n+required"
+        },
+        "direction": {
+          "$ref": "#/definitions/flyteidl2projectSortDirection",
+          "title": "Indicates the direction to apply sort key for response values.\n+optional"
+        }
+      },
+      "description": "Specifies sort ordering in a list request."
+    },
+    "flyteidl2projectSortDirection": {
+      "type": "string",
+      "enum": [
+        "DESCENDING",
+        "ASCENDING"
+      ],
+      "default": "DESCENDING",
+      "description": " - DESCENDING: By default, fields are sorted in descending order."
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code]."
+        },
+        "message": {
+          "type": "string",
+          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client."
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use."
+        }
+      },
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "projectProjectRegisterRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/flyteidl2projectProject",
+          "title": "+required"
+        }
+      },
+      "title": "Adds a new user-project within the Flyte deployment.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
+    },
+    "projectProjectRegisterResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be updated in the future."
+    },
+    "projectProjectUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be updated in the future."
+    },
+    "projectProjects": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2projectProject"
+          }
+        },
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      },
+      "title": "Represents a list of projects.\nSee :ref:`ref_flyteidl.admin.Project` for more details"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    }
+  }
+}

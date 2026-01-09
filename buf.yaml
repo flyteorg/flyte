@@ -27,6 +27,8 @@ lint:
       - flyteidl2/plugins/spark.proto
       - flyteidl2/task/common.proto
       - flyteidl2/plugins/kubeflow/common.proto
+      - flyteidl2/project/project_service.proto
+      - flyteidl2/project/common.proto
     ENUM_ZERO_VALUE_SUFFIX:
       - flyteidl2/common/authorization.proto
       - flyteidl2/plugins/common.proto
@@ -47,14 +49,19 @@ lint:
       - flyteidl2/secret/definition.proto
       - flyteidl2/plugins/spark.proto
       - flyteidl2/plugins/kubeflow/common.proto
+      - flyteidl2/project/project_service.proto
+      - flyteidl2/project/common.proto
     RPC_REQUEST_RESPONSE_UNIQUE:
       - flyteidl2/cacheservice/cacheservice.proto
       - flyteidl2/cacheservice/v2/cacheservice.proto
+      - flyteidl2/project/project_service.proto
     RPC_REQUEST_STANDARD_NAME:
       - flyteidl2/cacheservice/cacheservice.proto
       - flyteidl2/cacheservice/v2/cacheservice.proto
+      - flyteidl2/project/project_service.proto
     RPC_RESPONSE_STANDARD_NAME:
       - flyteidl2/cacheservice/cacheservice.proto
       - flyteidl2/cacheservice/v2/cacheservice.proto
+      - flyteidl2/project/project_service.proto
     SERVICE_SUFFIX:
       - flyteidl2/datacatalog/datacatalog.proto
