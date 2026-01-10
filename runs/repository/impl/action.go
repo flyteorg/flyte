@@ -53,78 +53,22 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
-	// Determine run ID
-	var runID *common.RunIdentifier
-	switch id := req.Id.(type) {
-	case *workflow.CreateRunRequest_RunId:
-		runID = id.RunId
-	case *workflow.CreateRunRequest_ProjectId:
-		// Generate a run name (simplified - in production, use a better generator)
-		runID = &common.RunIdentifier{
-			Org:     id.ProjectId.Organization,
-			Project: id.ProjectId.Name,
-			Domain:  id.ProjectId.Domain,
-			Name:    fmt.Sprintf("run-%d", time.Now().Unix()),
-		}
-	default:
-		return nil, fmt.Errorf("invalid run ID type")
-	}
-
-	// Build ActionSpec from CreateRunRequest
-	actionSpec := &workflow.ActionSpec{
-		ActionId: &common.ActionIdentifier{
-			Run:  runID,
-			Name: runID.Name, // For root actions, action name = run name
-		},
-		ParentActionName: nil, // NULL for root actions
-		RunSpec:          req.RunSpec,
-		InputUri:         "", // TODO: build from inputs
-		RunOutputBase:    "", // TODO: build output path
-	}
-
-	// Set the task spec based on the request
-	switch taskSpec := req.Task.(type) {
-	case *workflow.CreateRunRequest_TaskSpec:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Spec: taskSpec.TaskSpec,
-			},
-		}
-	case *workflow.CreateRunRequest_TaskId:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Id: taskSpec.TaskId,
-			},
-		}
-	}
-
-	// Serialize the ActionSpec to JSON
-	actionSpecBytes, err := json.Marshal(actionSpec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
-	}
-
-	// Create root action (represents the run)
-	run := &models.Run{
-		Org:              runID.Org,
-		Project:          runID.Project,
-		Domain:           runID.Domain,
-		Name:             runID.Name,
-		ParentActionName: nil, // NULL for root actions/runs
-		Phase:            "PHASE_QUEUED",
-		ActionSpec:       datatypes.JSON(actionSpecBytes),
-		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
-	}
-
+func (r *actionRepo) CreateRun(ctx context.Context, run *models.Run) (*models.Run, error) {
+	// Save to database
 	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
 		return nil, fmt.Errorf("failed to create run: %w", err)
 	}
 
-	logger.Infof(ctx, "Created run: %s/%s/%s/%s (ID: %d)",
+	logger.Infof(ctx, "Created run:  %s/%s/%s/%s (ID: %d)",
 		run.Org, run.Project, run.Domain, run.Name, run.ID)
 
-	// Notify subscribers of run creation
+	// Notify subscribers
+	runID := &common.RunIdentifier{
+		Org:     run.Org,
+		Project: run.Project,
+		Domain:  run.Domain,
+		Name:    run.Name,
+	}
 	r.notifyRunUpdate(ctx, runID)
 
 	return run, nil
