@@ -91,7 +91,7 @@ func TestCreateRunRequest_WithRunId(t *testing.T) {
 	t.Log("✅ CreateRunRequest with RunId works")
 }
 
-// ⭐⭐⭐ NEW TEST - Actually calls service.CreateRun() ⭐⭐⭐
+// ⭐⭐⭐ UPDATED TEST - Now expects *models.Run ⭐⭐⭐
 // Test 4: Test actual CreateRun function with ProjectId
 func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 	// Setup mocks
@@ -124,15 +124,24 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 	// ⭐ Wrap in connect.Request
 	req := connect.NewRequest(reqMsg)
 
-	// Setup mock expectations
+	// ✅ NEW: Setup mock to expect *models.Run instead of protobuf
 	mockActionRepo.EXPECT().
-		CreateRun(mock.Anything, reqMsg). // Expects the unwrapped protobuf
+		CreateRun(mock.Anything, mock.MatchedBy(func(run *models.Run) bool {
+			// Verify the transformer correctly converted the request to a model
+			return run.Org == "test-org" &&
+				run.Project == "test-project" &&
+				run.Domain == "development" &&
+				run.Phase == "PHASE_QUEUED" &&
+				run.ParentActionName == nil &&
+				run.Name != "" // Name should be generated
+		})).
 		Return(&models.Run{
 			ID:      123,
 			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "development",
 			Name:    "generated-run-name",
+			Phase:   "PHASE_QUEUED",
 		}, nil)
 
 	// ⭐ Actually call CreateRun with connect.Request!
@@ -153,7 +162,7 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 	t.Log("✅ CreateRun with ProjectId successfully called and returned response")
 }
 
-// ⭐⭐⭐ NEW TEST - Test with RunId ⭐⭐⭐
+// ⭐⭐⭐ UPDATED TEST - Now expects *models.Run ⭐⭐⭐
 // Test 5: Test actual CreateRun function with RunId
 func TestRunService_CreateRun_WithRunId(t *testing.T) {
 	// Setup mocks
@@ -189,15 +198,24 @@ func TestRunService_CreateRun_WithRunId(t *testing.T) {
 	// ⭐ Wrap in connect.Request
 	req := connect.NewRequest(reqMsg)
 
-	// Setup mock expectations
+	// ✅ NEW: Setup mock to expect *models. Run
 	mockActionRepo.EXPECT().
-		CreateRun(mock.Anything, reqMsg).
+		CreateRun(mock.Anything, mock.MatchedBy(func(run *models.Run) bool {
+			// Verify the transformer correctly converted the request
+			return run.Org == "test-org" &&
+				run.Project == "test-project" &&
+				run.Domain == "development" &&
+				run.Name == "my-custom-run-123" && // ← Client specified this name
+				run.Phase == "PHASE_QUEUED" &&
+				run.ParentActionName == nil
+		})).
 		Return(&models.Run{
 			ID:      456,
 			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "development",
 			Name:    "my-custom-run-123",
+			Phase:   "PHASE_QUEUED",
 		}, nil)
 
 	// ⭐ Actually call CreateRun!

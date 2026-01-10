@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
 
 // RunService implements the RunServiceHandler interface
@@ -49,10 +50,17 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Create run in database
-	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg)
+	// Transform protobuf → domain model
+	runModel, err := transformers.CreateRunRequestToModel(ctx, req.Msg)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create run: %v", err)
+		logger.Errorf(ctx, "Failed to transform CreateRunRequest: %v", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	// Pass domain model to repository
+	run, err := s.repo.ActionRepo().CreateRun(ctx, runModel)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create run:  %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -91,15 +99,18 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Call queue service to enqueue the root action
-	_, err = s.queueClient.EnqueueAction(ctx, connect.NewRequest(enqueueReq))
-	if err != nil {
-		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
-		// Note: We don't fail the CreateRun if enqueue fails - the run is already created
-		// In production, you might want to mark the run as failed or retry the enqueue
-		logger.Warnf(ctx, "Run %s created but failed to enqueue root action", run.Name)
+	// Call queue service to enqueue the root action (if client is configured)
+	if s.queueClient != nil {
+		_, err = s.queueClient.EnqueueAction(ctx, connect.NewRequest(enqueueReq))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
+			// Note: We don't fail the CreateRun if enqueue fails - the run is already created
+			logger.Warnf(ctx, "Run %s created but failed to enqueue root action", run.Name)
+		} else {
+			logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
+		}
 	} else {
-		logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
+		logger.Warnf(ctx, "Queue client not configured, run %s created but not enqueued", run.Name)
 	}
 
 	// Build response (simplified - you'd convert the full Run model)
