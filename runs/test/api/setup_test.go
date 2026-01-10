@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -37,7 +38,23 @@ var (
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 	var exitCode int
+
 	defer func() {
+		// Stop server if it was started
+		if testServer != nil {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := testServer.Shutdown(shutdownCtx); err != nil {
+				log.Printf("Test server shutdown error: %v", err)
+			}
+			log.Println("Test server stopped")
+		}
+
+		// Remove test database file
+		if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
+			log.Printf("Warning: Failed to remove test database: %v", err)
+		}
+
 		os.Exit(exitCode)
 	}()
 
@@ -53,13 +70,17 @@ func TestMain(m *testing.M) {
 	var err error
 	testDB, err = database.GetDB(ctx, dbConfig, logCfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		log.Printf("Failed to initialize database: %v", err)
+		exitCode = 1
+		return
 	}
 	log.Println("Database initialized")
 
 	// Run migrations
 	if err := migrations.RunMigrations(testDB); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+		log.Printf("Failed to run migrations: %v", err)
+		exitCode = 1
+		return
 	}
 	log.Println("Database migrations completed")
 
@@ -85,34 +106,36 @@ func TestMain(m *testing.M) {
 	}
 
 	// Start server in background
+	errChan := make(chan error, 1)
 	go func() {
 		log.Printf("Test server starting on %s", endpoint)
 		if err := testServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("Server error: %v", err)
+			errChan <- err
 		}
 	}()
 
-	// Wait for server to be ready
-	if !waitForServer(endpoint, 10*time.Second) {
-		log.Fatal("Test server failed to start")
+	// Wait for either server readiness or startup error
+	readyChan := make(chan bool, 1)
+	go func() {
+		readyChan <- waitForServer(endpoint, 10*time.Second)
+	}()
+
+	select {
+	case err := <-errChan:
+		log.Printf("Test server failed to start: %v", err)
+		exitCode = 1
+		return
+	case ready := <-readyChan:
+		if !ready {
+			log.Printf("Test server failed to start (health check timeout)")
+			exitCode = 1
+			return
+		}
 	}
 	log.Println("Test server is ready")
 
 	// Run tests
 	exitCode = m.Run()
-
-	// Teardown: Stop server
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := testServer.Shutdown(shutdownCtx); err != nil {
-		log.Printf("Test server shutdown error: %v", err)
-	}
-	log.Println("Test server stopped")
-
-	// Cleanup: Remove test database file
-	if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
-		log.Printf("Warning: Failed to remove test database: %v", err)
-	}
 }
 
 // waitForServer waits for the server to be ready
@@ -144,13 +167,12 @@ func cleanupTestDB(t *testing.T) {
 		return
 	}
 
-	// Delete all records from all tables
-	// Order matters due to foreign key constraints (if any)
-	tables := []string{"tasks", "task_specs", "actions"}
+	// Loop through all models defined in migrations
+	for _, model := range migrations.AllModels {
+		tableName := testDB.NamingStrategy.TableName(reflect.TypeOf(model).Elem().Name())
 
-	for _, table := range tables {
-		if err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)).Error; err != nil {
-			t.Logf("Warning: Failed to cleanup table %s: %v", table, err)
+		if err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", tableName)).Error; err != nil {
+			t.Logf("Warning: Failed to cleanup table %s: %v", tableName, err)
 		}
 	}
 
