@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -104,31 +105,34 @@ func TestListTasks(t *testing.T) {
 
 	taskClient := taskconnect.NewTaskServiceClient(httpClient, endpoint, opts...)
 
-	// Deploy a task first
-	taskID := &task.TaskIdentifier{
-		Org:     testOrg,
-		Project: testProject,
-		Domain:  testDomain,
-		Name:    "list-test-task",
-		Version: uniqueString(),
-	}
+	// Deploy multiple tasks
+	count := 3
+	for i := range count {
+		taskID := &task.TaskIdentifier{
+			Org:     testOrg,
+			Project: testProject,
+			Domain:  testDomain,
+			Name:    fmt.Sprintf("test-task-%d", i+1),
+			Version: uniqueString(),
+		}
 
-	deployResp, err := taskClient.DeployTask(ctx, connect.NewRequest(&task.DeployTaskRequest{
-		TaskId: taskID,
-		Spec: &task.TaskSpec{
-			TaskTemplate: &core.TaskTemplate{
-				Type: "container",
-				Target: &core.TaskTemplate_Container{
-					Container: &core.Container{
-						Image: "alpine:latest",
-						Args:  []string{"echo", "hello"},
+		deployResp, err := taskClient.DeployTask(ctx, connect.NewRequest(&task.DeployTaskRequest{
+			TaskId: taskID,
+			Spec: &task.TaskSpec{
+				TaskTemplate: &core.TaskTemplate{
+					Type: "container",
+					Target: &core.TaskTemplate_Container{
+						Container: &core.Container{
+							Image: "alpine:latest",
+							Args:  []string{"echo", "hello"},
+						},
 					},
 				},
 			},
-		},
-	}))
-	require.NotNil(t, deployResp)
-	require.NoError(t, err)
+		}))
+		require.NotNil(t, deployResp)
+		require.NoError(t, err)
+	}
 
 	// List tasks
 	listResp, err := taskClient.ListTasks(ctx, connect.NewRequest(&task.ListTasksRequest{
@@ -143,6 +147,6 @@ func TestListTasks(t *testing.T) {
 	require.NotNil(t, listResp)
 
 	tasks := listResp.Msg.GetTasks()
-	assert.Equal(t, 1, len(tasks))
+	assert.Equal(t, count, len(tasks))
 	t.Logf("Listed %d tasks", len(tasks))
 }
