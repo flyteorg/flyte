@@ -885,7 +885,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
-	plg.OnTaskExecutionMetadata().Return(tskCtx)
+	plg.On("TaskExecutionMetadata").Return(tskCtx)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -897,7 +897,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 			return nil
 		})
 
-	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+	plg.On("PluginStateReader").Return(&pluginStateReaderMock)
 
 	return plg
 }
@@ -1393,7 +1393,7 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
-	pluginCtx.OnK8sReader().Return(reader)
+	pluginCtx.On("K8sReader").Return(reader)
 	return pluginCtx
 }
 
@@ -1411,7 +1411,7 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 func rayPluginContextWithPods(pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
 	reader := fake.NewFakeClient(pods...)
-	pluginCtx.OnK8sReader().Return(reader)
+	pluginCtx.On("K8sReader").Return(reader)
 	return pluginCtx
 }
 
@@ -1531,4 +1531,113 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.PrimaryContainerName)
 	assert.Equal(t, 1, len(headPodLogContext.Containers))
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		status         rayv1.JobDeploymentStatus
+		expectedResult bool
+	}{
+		{"Complete", rayv1.JobDeploymentStatusComplete, true},
+		{"Failed", rayv1.JobDeploymentStatusFailed, true},
+		{"Running", rayv1.JobDeploymentStatusRunning, false},
+		{"Initializing", rayv1.JobDeploymentStatusInitializing, false},
+		{"Suspended", rayv1.JobDeploymentStatusSuspended, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := &rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: tt.status,
+				},
+			}
+			result, err := rayJobResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *rayv1.RayJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses EndTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					EndTime:   &metav1.Time{Time: now},
+					StartTime: &metav1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					StartTime: &metav1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(now),
+				},
+				Status: rayv1.RayJobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := rayJobResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }
