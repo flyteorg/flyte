@@ -31,7 +31,7 @@ class RayCluster(_message.Message):
     def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ..., enable_autoscaling: bool = ...) -> None: ...
 
 class HeadGroupSpec(_message.Message):
-    __slots__ = ["ray_start_params", "k8s_pod", "enable_ingress"]
+    __slots__ = ["ray_start_params", "k8s_pod"]
     class RayStartParamsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -41,11 +41,9 @@ class HeadGroupSpec(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     RAY_START_PARAMS_FIELD_NUMBER: _ClassVar[int]
     K8S_POD_FIELD_NUMBER: _ClassVar[int]
-    ENABLE_INGRESS_FIELD_NUMBER: _ClassVar[int]
     ray_start_params: _containers.ScalarMap[str, str]
     k8s_pod: _tasks_pb2.K8sPod
-    enable_ingress: bool
-    def __init__(self, ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., enable_ingress: bool = ...) -> None: ...
+    def __init__(self, ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ...) -> None: ...
 
 class WorkerGroupSpec(_message.Message):
     __slots__ = ["group_name", "replicas", "min_replicas", "max_replicas", "ray_start_params", "k8s_pod"]

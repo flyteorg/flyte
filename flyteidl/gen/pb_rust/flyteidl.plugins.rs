@@ -258,9 +258,6 @@ pub struct HeadGroupSpec {
     /// Pod Spec for the ray head pod
     #[prost(message, optional, tag="2")]
     pub k8s_pod: ::core::option::Option<super::core::K8sPod>,
-    /// Optional. Whether to enable an ingress on the ray cluster head node
-    #[prost(bool, tag="3")]
-    pub enable_ingress: bool,
 }
 /// WorkerGroupSpec are the specs for the worker pods
 #[allow(clippy::derive_partial_eq_without_eq)]

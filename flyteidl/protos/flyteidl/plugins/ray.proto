@@ -39,9 +39,6 @@ message HeadGroupSpec {
   map<string, string> ray_start_params = 1;
   // Pod Spec for the ray head pod
   core.K8sPod k8s_pod = 2;
-
-  // Optional. Whether to enable an ingress on the ray cluster head node
-  bool enable_ingress = 3;
 }
 
 // WorkerGroupSpec are the specs for the worker pods

@@ -243,8 +243,11 @@ func TestBuildResourceRayEnableIngress(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{
+				EnableIngress: tc.enableIngress,
+			}))
+
 			rayJobInput := dummyRayCustomObj()
-			rayJobInput.RayCluster.HeadGroupSpec.EnableIngress = tc.enableIngress
 
 			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
 			taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)

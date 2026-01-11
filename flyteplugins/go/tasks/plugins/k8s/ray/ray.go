@@ -130,8 +130,9 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
-	enableIngress := rayJob.RayCluster.HeadGroupSpec.EnableIngress
 	cfg := GetConfig()
+
+	enableIngress := cfg.EnableIngress
 
 	headPodSpec := taskPodSpec.DeepCopy()
 	headPodTemplate, err := buildHeadPodTemplate(
