@@ -1,10 +1,9 @@
-// runs/service/run_service_test.go
-
 package service
 
 import (
 	"context"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -16,15 +15,25 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// Test 1: Verify RunService structure can be created
+// =============================================================================
+// RunService Tests
+//
+// Conventions:
+// - Tests follow Arrange / Act / Assert.
+// - Test names use the pattern: Test<Subject>_<Scenario>_<ExpectedResult>.
+// - Comments describe intent (what/why) rather than restating code (how).
+// =============================================================================
+
+// TestNewRunService verifies the service can be constructed
+// and returns a non-nil instance with minimal dependencies.
 func TestNewRunService(t *testing.T) {
 	service := NewRunService(nil, nil)
-
 	assert.NotNil(t, service)
 	t.Log("✅ RunService can be created")
 }
 
-// Test 2: Test CreateRunRequest structure (with ProjectId)
+// TestCreateRunRequest_WithProjectId verifies the request
+// can be constructed using the ProjectId oneof branch and the fields are readable via getters.
 func TestCreateRunRequest_WithProjectId(t *testing.T) {
 	projectId := &common.ProjectIdentifier{
 		Organization: "test-org",
@@ -44,7 +53,6 @@ func TestCreateRunRequest_WithProjectId(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_CLI,
 	}
 
-	// Verify we can read the data
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetProjectId())
 	assert.Equal(t, "test-org", req.GetProjectId().Organization)
@@ -54,7 +62,8 @@ func TestCreateRunRequest_WithProjectId(t *testing.T) {
 	t.Log("✅ CreateRunRequest with ProjectId works")
 }
 
-// Test 3: Test CreateRunRequest structure (with RunId)
+// TestCreateRunRequest_WithRunId verifies the request
+// can be constructed using the RunId oneof branch and references a TaskId variant.
 func TestCreateRunRequest_WithRunId(t *testing.T) {
 	runId := &common.RunIdentifier{
 		Org:     "test-org",
@@ -81,7 +90,6 @@ func TestCreateRunRequest_WithRunId(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_WEB,
 	}
 
-	// Verify
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetRunId())
 	assert.Equal(t, "my-run-123", req.GetRunId().Name)
@@ -91,20 +99,16 @@ func TestCreateRunRequest_WithRunId(t *testing.T) {
 	t.Log("✅ CreateRunRequest with RunId works")
 }
 
-// ⭐⭐⭐ UPDATED TEST - Now expects *models.Run ⭐⭐⭐
-// Test 4: Test actual CreateRun function with ProjectId
+// TestRunService_CreateRun_WithProjectId verifies:
+// - The service translates ProjectId + TaskSpec into a models.Run persisted via repo.
+// - The returned API response includes an Action with identifiers, status, and metadata populated.
 func TestRunService_CreateRun_WithProjectId(t *testing.T) {
-	// Setup mocks
 	mockRepo := interfaces.NewRepository(t)
 	mockActionRepo := interfaces.NewActionRepo(t)
-
-	// Configure mock repository
 	mockRepo.EXPECT().ActionRepo().Return(mockActionRepo)
 
-	// Create service with mocks (no queue client for now)
 	service := NewRunService(mockRepo, nil)
 
-	// Create the protobuf request
 	reqMsg := &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_ProjectId{
 			ProjectId: &common.ProjectIdentifier{
@@ -121,59 +125,66 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_CLI,
 	}
 
-	// ⭐ Wrap in connect.Request
 	req := connect.NewRequest(reqMsg)
 
-	// ✅ NEW: Setup mock to expect *models.Run instead of protobuf
 	mockActionRepo.EXPECT().
 		CreateRun(mock.Anything, mock.MatchedBy(func(run *models.Run) bool {
-			// Verify the transformer correctly converted the request to a model
 			return run.Org == "test-org" &&
 				run.Project == "test-project" &&
 				run.Domain == "development" &&
-				run.Phase == "PHASE_QUEUED" &&
+				run.Phase == "ACTION_PHASE_QUEUED" &&
 				run.ParentActionName == nil &&
-				run.Name != "" // Name should be generated
+				run.Name != ""
 		})).
 		Return(&models.Run{
-			ID:      123,
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "development",
-			Name:    "generated-run-name",
-			Phase:   "PHASE_QUEUED",
+			ID:        123,
+			Org:       "test-org",
+			Project:   "test-project",
+			Domain:    "development",
+			Name:      "generated-run-name",
+			Phase:     "ACTION_PHASE_QUEUED",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}, nil)
 
-	// ⭐ Actually call CreateRun with connect.Request!
 	resp, err := service.CreateRun(context.Background(), req)
 
-	// Verify the response
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotNil(t, resp.Msg)
 	assert.NotNil(t, resp.Msg.Run)
 	assert.NotNil(t, resp.Msg.Run.Action)
+
+	// Validate identifier projection into the API response.
 	assert.NotNil(t, resp.Msg.Run.Action.Id)
 	assert.Equal(t, "test-org", resp.Msg.Run.Action.Id.Run.Org)
 	assert.Equal(t, "test-project", resp.Msg.Run.Action.Id.Run.Project)
 	assert.Equal(t, "development", resp.Msg.Run.Action.Id.Run.Domain)
 	assert.Equal(t, "generated-run-name", resp.Msg.Run.Action.Id.Run.Name)
 
-	t.Log("✅ CreateRun with ProjectId successfully called and returned response")
+	// Validate default queued status semantics for newly-created runs.
+	assert.NotNil(t, resp.Msg.Run.Action.Status)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, resp.Msg.Run.Action.Status.Phase)
+	assert.NotNil(t, resp.Msg.Run.Action.Status.StartTime)
+	assert.Equal(t, uint32(1), resp.Msg.Run.Action.Status.Attempts)
+
+	// Validate request-derived metadata is preserved.
+	assert.NotNil(t, resp.Msg.Run.Action.Metadata)
+	assert.Equal(t, workflow.RunSource_RUN_SOURCE_CLI, resp.Msg.Run.Action.Metadata.Source)
+
+	t.Log("✅ CreateRun with ProjectId successfully called and returned complete response")
 }
 
-// ⭐⭐⭐ UPDATED TEST - Now expects *models.Run ⭐⭐⭐
-// Test 5: Test actual CreateRun function with RunId
+// TestRunService_CreateRun_WithRunId verifies:
+// - The service honors caller-specified RunId and TaskId references.
+// - The run is persisted in queued phase and the response reflects status + metadata.
 func TestRunService_CreateRun_WithRunId(t *testing.T) {
-	// Setup mocks
 	mockRepo := interfaces.NewRepository(t)
 	mockActionRepo := interfaces.NewActionRepo(t)
-
 	mockRepo.EXPECT().ActionRepo().Return(mockActionRepo)
 
 	service := NewRunService(mockRepo, nil)
 
-	// Create the protobuf request
 	reqMsg := &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
 			RunId: &common.RunIdentifier{
@@ -195,37 +206,48 @@ func TestRunService_CreateRun_WithRunId(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_WEB,
 	}
 
-	// ⭐ Wrap in connect.Request
 	req := connect.NewRequest(reqMsg)
 
-	// ✅ NEW: Setup mock to expect *models. Run
 	mockActionRepo.EXPECT().
 		CreateRun(mock.Anything, mock.MatchedBy(func(run *models.Run) bool {
-			// Verify the transformer correctly converted the request
 			return run.Org == "test-org" &&
 				run.Project == "test-project" &&
 				run.Domain == "development" &&
-				run.Name == "my-custom-run-123" && // ← Client specified this name
-				run.Phase == "PHASE_QUEUED" &&
+				run.Name == "my-custom-run-123" &&
+				run.Phase == "ACTION_PHASE_QUEUED" &&
 				run.ParentActionName == nil
 		})).
 		Return(&models.Run{
-			ID:      456,
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "development",
-			Name:    "my-custom-run-123",
-			Phase:   "PHASE_QUEUED",
+			ID:        456,
+			Org:       "test-org",
+			Project:   "test-project",
+			Domain:    "development",
+			Name:      "my-custom-run-123",
+			Phase:     "ACTION_PHASE_QUEUED",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}, nil)
 
-	// ⭐ Actually call CreateRun!
 	resp, err := service.CreateRun(context.Background(), req)
 
-	// Verify
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotNil(t, resp.Msg.Run)
 	assert.Equal(t, "my-custom-run-123", resp.Msg.Run.Action.Id.Run.Name)
 
-	t.Log("✅ CreateRun with RunId successfully called and returned response")
+	// Validate default queued status semantics for newly-created runs.
+	assert.NotNil(t, resp.Msg.Run.Action.Status)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, resp.Msg.Run.Action.Status.Phase)
+	assert.NotNil(t, resp.Msg.Run.Action.Status.StartTime)
+	if resp.Msg.Run.Action.Status != nil && resp.Msg.Run.Action.Status.StartTime != nil {
+		startTime := resp.Msg.Run.Action.Status.StartTime.AsTime()
+		t.Logf("📅 Created time: %v", startTime)
+		t.Logf("📅 Created time (formatted): %s", startTime.Format(time.RFC3339))
+	}
+
+	// Validate request-derived metadata is preserved.
+	assert.NotNil(t, resp.Msg.Run.Action.Metadata)
+	assert.Equal(t, workflow.RunSource_RUN_SOURCE_WEB, resp.Msg.Run.Action.Metadata.Source)
+
+	t.Log("✅ CreateRun with RunId successfully called and returned complete response")
 }
