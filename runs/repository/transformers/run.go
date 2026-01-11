@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/datatypes"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+)
+
+const (
+	InitialActionPhase = "ACTION_PHASE_QUEUED"
 )
 
 // CreateRunRequestToModel converts CreateRunRequest protobuf to Run domain model
@@ -63,7 +68,7 @@ func CreateRunRequestToModel(ctx context.Context, req *workflow.CreateRunRequest
 	}
 
 	// Serialize ActionSpec
-	actionSpecBytes, err := proto.Marshal(actionSpec)
+	actionSpecBytes, err := protojson.Marshal(actionSpec)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal ActionSpec: %v", err)
 		return nil, fmt.Errorf("failed to marshal action spec:  %w", err)
@@ -76,11 +81,52 @@ func CreateRunRequestToModel(ctx context.Context, req *workflow.CreateRunRequest
 		Domain:           runID.Domain,
 		Name:             runID.Name,
 		ParentActionName: nil,
-		Phase:            "PHASE_QUEUED",
+		Phase:            InitialActionPhase,
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
 
 	logger.Infof(ctx, "Created run model:  %s/%s/%s/%s", run.Org, run.Project, run.Domain, run.Name)
 	return run, nil
+}
+
+// RunModelToCreateRunResponse converts a domain model Run to a CreateRunResponse
+func RunModelToCreateRunResponse(run *models.Run, source workflow.RunSource) *workflow.CreateRunResponse {
+	if run == nil {
+		return nil
+	}
+
+	// Build the action identifier
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     run.Org,
+			Project: run.Project,
+			Domain:  run.Domain,
+			Name:    run.Name,
+		},
+		Name: run.Name, // For root actions, action name = run name
+	}
+
+	// Build action status
+	actionStatus := &workflow.ActionStatus{
+		Phase:     common.ActionPhase(common.ActionPhase_value[run.Phase]),
+		StartTime: timestamppb.New(run.CreatedAt),
+		Attempts:  1,
+	}
+
+	// Build action metadata
+	actionMetadata := &workflow.ActionMetadata{
+		Source: source, // ← Use the passed-in source
+	}
+
+	// Build the complete response
+	return &workflow.CreateRunResponse{
+		Run: &workflow.Run{
+			Action: &workflow.Action{
+				Id:       actionID,
+				Status:   actionStatus,
+				Metadata: actionMetadata,
+			},
+		},
+	}
 }

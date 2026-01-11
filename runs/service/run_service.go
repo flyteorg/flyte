@@ -57,7 +57,7 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Pass domain model to repository
+	// Pass domain model to repositorym
 	run, err := s.repo.ActionRepo().CreateRun(ctx, runModel)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run:  %v", err)
@@ -113,14 +113,7 @@ func (s *RunService) CreateRun(
 		logger.Warnf(ctx, "Queue client not configured, run %s created but not enqueued", run.Name)
 	}
 
-	// Build response (simplified - you'd convert the full Run model)
-	resp := &workflow.CreateRunResponse{
-		Run: &workflow.Run{
-			Action: &workflow.Action{
-				Id: actionID,
-			},
-		},
-	}
+	resp := transformers.RunModelToCreateRunResponse(run, req.Msg.Source)
 
 	return connect.NewResponse(resp), nil
 }

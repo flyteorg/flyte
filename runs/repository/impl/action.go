@@ -59,7 +59,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, run *models.Run) (*models.Ru
 		return nil, fmt.Errorf("failed to create run: %w", err)
 	}
 
-	logger.Infof(ctx, "Created run:  %s/%s/%s/%s (ID: %d)",
+	logger.Infof(ctx, "Created run: %s/%s/%s/%s (ID: %d)",
 		run.Org, run.Project, run.Domain, run.Name, run.ID)
 
 	// Notify subscribers
