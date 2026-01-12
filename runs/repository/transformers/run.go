@@ -11,13 +11,12 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-const (
-	InitialActionPhase = "ACTION_PHASE_QUEUED"
-)
+const InitialPhase = "PHASE_QUEUED"
 
 // CreateRunRequestToModel converts CreateRunRequest protobuf to Run domain model
 func CreateRunRequestToModel(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
@@ -81,7 +80,7 @@ func CreateRunRequestToModel(ctx context.Context, req *workflow.CreateRunRequest
 		Domain:           runID.Domain,
 		Name:             runID.Name,
 		ParentActionName: nil,
-		Phase:            InitialActionPhase,
+		Phase:            InitialPhase,
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
@@ -109,14 +108,17 @@ func RunModelToCreateRunResponse(run *models.Run, source workflow.RunSource) *wo
 
 	// Build action status
 	actionStatus := &workflow.ActionStatus{
-		Phase:     common.ActionPhase(common.ActionPhase_value[run.Phase]),
-		StartTime: timestamppb.New(run.CreatedAt),
-		Attempts:  1,
+		Phase:       DBPhaseToProtobufPhase(run.Phase),
+		StartTime:   timestamppb.New(run.CreatedAt),
+		Attempts:    0,
+		CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
 	}
 
 	// Build action metadata
 	actionMetadata := &workflow.ActionMetadata{
-		Source: source, // ← Use the passed-in source
+		Source:     source, // ← Use the passed-in source
+		Parent:     "",
+		ActionType: workflow.ActionType_ACTION_TYPE_TASK,
 	}
 
 	// Build the complete response
@@ -129,4 +131,14 @@ func RunModelToCreateRunResponse(run *models.Run, source workflow.RunSource) *wo
 			},
 		},
 	}
+}
+
+func DBPhaseToProtobufPhase(dbPhase string) common.ActionPhase {
+	protoPhaseStr := "ACTION_" + dbPhase // "PHASE_QUEUED" → "ACTION_PHASE_QUEUED"
+
+	if val, ok := common.ActionPhase_value[protoPhaseStr]; ok {
+		return common.ActionPhase(val)
+	}
+
+	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }

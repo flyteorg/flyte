@@ -132,7 +132,7 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 			return run.Org == "test-org" &&
 				run.Project == "test-project" &&
 				run.Domain == "development" &&
-				run.Phase == "ACTION_PHASE_QUEUED" &&
+				run.Phase == "PHASE_QUEUED" &&
 				run.ParentActionName == nil &&
 				run.Name != ""
 		})).
@@ -142,7 +142,7 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 			Project:   "test-project",
 			Domain:    "development",
 			Name:      "generated-run-name",
-			Phase:     "ACTION_PHASE_QUEUED",
+			Phase:     "PHASE_QUEUED",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}, nil)
@@ -166,7 +166,7 @@ func TestRunService_CreateRun_WithProjectId(t *testing.T) {
 	assert.NotNil(t, resp.Msg.Run.Action.Status)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, resp.Msg.Run.Action.Status.Phase)
 	assert.NotNil(t, resp.Msg.Run.Action.Status.StartTime)
-	assert.Equal(t, uint32(1), resp.Msg.Run.Action.Status.Attempts)
+	assert.Equal(t, uint32(0), resp.Msg.Run.Action.Status.Attempts)
 
 	// Validate request-derived metadata is preserved.
 	assert.NotNil(t, resp.Msg.Run.Action.Metadata)
@@ -214,7 +214,7 @@ func TestRunService_CreateRun_WithRunId(t *testing.T) {
 				run.Project == "test-project" &&
 				run.Domain == "development" &&
 				run.Name == "my-custom-run-123" &&
-				run.Phase == "ACTION_PHASE_QUEUED" &&
+				run.Phase == "PHASE_QUEUED" &&
 				run.ParentActionName == nil
 		})).
 		Return(&models.Run{
@@ -223,7 +223,7 @@ func TestRunService_CreateRun_WithRunId(t *testing.T) {
 			Project:   "test-project",
 			Domain:    "development",
 			Name:      "my-custom-run-123",
-			Phase:     "ACTION_PHASE_QUEUED",
+			Phase:     "PHASE_QUEUED",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}, nil)
