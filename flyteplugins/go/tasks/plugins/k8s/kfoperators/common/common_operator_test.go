@@ -358,7 +358,7 @@ func dummyTaskContext() *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -375,11 +375,11 @@ func dummyTaskContext() *k8smocks.PluginContext {
 		},
 		RetryAttempt: 0,
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return pCtx
 }
