@@ -129,25 +129,25 @@ func dummyPytorchTaskTemplate(id string, args ...interface{}) *core.TaskTemplate
 func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -156,67 +156,64 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return(containerImage)
-	overrides.OnGetPodTemplate().Return(nil)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetContainerImage().Return(containerImage)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = k8s.PluginState{}
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
 func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, pluginState k8s.PluginState) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.On("InputReader").Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.On("OutputWriter").Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.On("TaskReader").Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -225,42 +222,39 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(nil)
-	overrides.OnGetContainerImage().Return("")
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
-	pCtx.On("PluginStateReader").Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -734,7 +728,7 @@ func TestGetTaskPhase(t *testing.T) {
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
-	pluginContext.On("K8sReader").Return(reader)
+	pluginContext.EXPECT().K8sReader().Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -778,7 +772,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	pluginCtx := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, pluginState)
 	reader := fake.NewFakeClient()
-	pluginCtx.On("K8sReader").Return(reader)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
@@ -1368,7 +1362,7 @@ func TestGetTaskPhaseWithFailedPod(t *testing.T) {
 
 	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
 	reader := fake.NewFakeClient(pod)
-	pluginContext.On("K8sReader").Return(reader)
+	pluginContext.EXPECT().K8sReader().Return(reader)
 
 	// Even though PyTorchJob status is running, should return failure due to pod status
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
@@ -1419,7 +1413,7 @@ func TestGetTaskPhaseWithCrashLoopBackOff(t *testing.T) {
 
 	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
 	reader := fake.NewFakeClient(pod)
-	pluginContext.On("K8sReader").Return(reader)
+	pluginContext.EXPECT().K8sReader().Return(reader)
 
 	// CrashLoopBackOff should eventually lead to failure
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
