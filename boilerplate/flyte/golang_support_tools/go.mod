@@ -298,5 +298,4 @@ require (
 replace (
 	github.com/flyteorg/flyte/flytestdlib => ../../../flytestdlib
 	github.com/pseudomuto/protoc-gen-doc => github.com/flyteorg/protoc-gen-doc v1.4.2
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )
