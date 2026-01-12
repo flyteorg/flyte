@@ -262,6 +262,48 @@ func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
 	return logCtx
 }
 
+// IsTerminal returns true if the PyTorchJob is in a terminal state (Succeeded or Failed)
+func (pytorchOperatorResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*kubeflowv1.PyTorchJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *PyTorchJob, got %T", resource)
+	}
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// GetCompletionTime returns the completion time of the PyTorchJob
+func (pytorchOperatorResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*kubeflowv1.PyTorchJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *PyTorchJob, got %T", resource)
+	}
+
+	if job.Status.CompletionTime != nil {
+		return job.Status.CompletionTime.Time, nil
+	}
+
+	// Fallback to last condition transition time
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			if !condition.LastTransitionTime.IsZero() {
+				return condition.LastTransitionTime.Time, nil
+			}
+		}
+	}
+
+	// Fallback to start time or creation time
+	if job.Status.StartTime != nil {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
+}
+
 func init() {
 	if err := kubeflowv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
