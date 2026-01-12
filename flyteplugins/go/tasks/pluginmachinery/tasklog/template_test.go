@@ -32,6 +32,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 			Org:          "my-task-org",
 		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "my-node-id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my-execution-name",
 				Project: "my-execution-project",
@@ -150,6 +151,8 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.TaskProject, "my-task-project"},
 				{defaultRegexes.TaskDomain, "my-task-domain"},
 				{defaultRegexes.ExecutionName, "my-execution-name"},
+				{defaultRegexes.RunName, "my-execution-name"},
+				{defaultRegexes.ActionName, "my-node-id"},
 				{defaultRegexes.ExecutionProject, "my-execution-project"},
 				{defaultRegexes.ExecutionDomain, "my-execution-domain"},
 				{defaultRegexes.ExecutionOrg, "my-execution-org"},
@@ -678,4 +681,87 @@ func TestGetDynamicLogLinkTypes(t *testing.T) {
 		EnableVscode: true,
 	})
 	assert.Equal(t, []string{vscode, "wandb"}, linkTypes)
+}
+
+func TestTemplateLogPlugin_GeneratedName(t *testing.T) {
+	tests := []struct {
+		name   string
+		plugin TemplateLogPlugin
+		input  Input
+		want   string
+	}{
+		{
+			name: "generatedName in URL",
+			plugin: TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.generatedName}}/view"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			input: Input{
+				LogName:              "main_logs",
+				TaskExecutionID:      dummyTaskExecID(),
+				PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				PodUnixStartTime:     123,
+				PodUnixFinishTime:    12345,
+			},
+			want: "https://example.com/logs/generated-name/view",
+		},
+		{
+			name: "generatedName with multiple variables",
+			plugin: TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/org/{{.executionOrg}}/exec/{{.runName}}/pod/{{.generatedName}}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			input: Input{
+				LogName:              "main_logs",
+				TaskExecutionID:      dummyTaskExecID(),
+				PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				PodUnixStartTime:     123,
+				PodUnixFinishTime:    12345,
+			},
+			want: "https://example.com/org/my-execution-org/exec/my-execution-name/pod/generated-name",
+		},
+		{
+			name: "generatedName case insensitive",
+			plugin: TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.GeneratedName}}/view"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			input: Input{
+				LogName:              "main_logs",
+				TaskExecutionID:      dummyTaskExecID(),
+				PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				PodUnixStartTime:     123,
+				PodUnixFinishTime:    12345,
+			},
+			want: "https://example.com/logs/generated-name/view",
+		},
+		{
+			name: "generatedName with dollar sign prefix",
+			plugin: TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{$generatedName}}/view"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			input: Input{
+				LogName:              "main_logs",
+				TaskExecutionID:      dummyTaskExecID(),
+				PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				PodUnixStartTime:     123,
+				PodUnixFinishTime:    12345,
+			},
+			want: "https://example.com/logs/generated-name/view",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.plugin.GetTaskLogs(tt.input)
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(got.TaskLogs))
+			assert.Equal(t, tt.want, got.TaskLogs[0].Uri)
+		})
+	}
 }
