@@ -41,6 +41,7 @@ docs/tests
 empty-config.yaml
 
 **/rust/target
+**/rust/Cargo.lock
 **/flyteidl_new.egg-info
 **/flyteidl.egg-info
 **/flyteidl2.egg-info
