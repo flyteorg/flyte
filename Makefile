@@ -81,7 +81,7 @@ buf-rust:
 	@echo '🦀  Generating Rust protocol buffer files (local)'
 	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
 	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
-	@cd gen/rust && cargo update --aggressive
+	@cd gen/rust && cargo update
 	@$(MAKE) sep
 
 export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
