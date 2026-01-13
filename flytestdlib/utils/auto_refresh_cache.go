@@ -12,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 
 // AutoRefreshCache with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.
