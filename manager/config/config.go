@@ -8,11 +8,8 @@ const configSectionKey = "manager"
 
 // Config holds configuration for the unified Flyte Manager
 type Config struct {
-	// Runs Service configuration
-	RunsService ServiceConfig `json:"runsService"`
-
-	// Queue Service configuration
-	QueueService ServiceConfig `json:"queueService"`
+	// Server configuration - single port for all Connect services
+	Server ServerConfig `json:"server"`
 
 	// Executor configuration
 	Executor ExecutorConfig `json:"executor"`
@@ -21,8 +18,8 @@ type Config struct {
 	Kubernetes KubernetesConfig `json:"kubernetes"`
 }
 
-// ServiceConfig holds HTTP server configuration for a service
-type ServiceConfig struct {
+// ServerConfig holds HTTP server configuration
+type ServerConfig struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 }
@@ -39,13 +36,9 @@ type KubernetesConfig struct {
 }
 
 var defaultConfig = &Config{
-	RunsService: ServiceConfig{
+	Server: ServerConfig{
 		Host: "0.0.0.0",
 		Port: 8090,
-	},
-	QueueService: ServiceConfig{
-		Host: "0.0.0.0",
-		Port: 8089,
 	},
 	Executor: ExecutorConfig{
 		HealthProbePort: 8081,
