@@ -17,48 +17,140 @@ limitations under the License.
 package v1
 
 import (
-	"fmt"
-
-	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+type (
+	TaskActionConditionType   string
+	TaskActionConditionReason string
+)
+
+// Condition type constants
+// Following Kubernetes API conventions:
+// - Condition types describe the current observed state
+// - Use Reason field to track sub-states (like Queued, Initializing, Executing)
+const (
+	// ConditionTypeProgressing indicates whether the TaskAction is actively progressing.
+	// This is True when the TaskAction is queued, initializing, or executing.
+	// This is False when the TaskAction has completed or failed.
+	ConditionTypeProgressing TaskActionConditionType = "Progressing"
+
+	// ConditionTypeSucceeded indicates whether the TaskAction has completed successfully.
+	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
+	ConditionTypeSucceeded TaskActionConditionType = "Succeeded"
+
+	// ConditionTypeFailed indicates whether the TaskAction has failed.
+	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
+	ConditionTypeFailed TaskActionConditionType = "Failed"
+)
+
+// Condition reason constants
+// Reasons explain why a condition has a particular status.
+// These are used in the Reason field of conditions to provide detailed sub-state information.
+const (
+	// ConditionReasonQueued indicates the TaskAction is queued and waiting for resources
+	ConditionReasonQueued TaskActionConditionReason = "Queued"
+
+	// ConditionReasonInitializing indicates the TaskAction is being initialized
+	ConditionReasonInitializing TaskActionConditionReason = "Initializing"
+
+	// ConditionReasonExecuting indicates the TaskAction is actively executing
+	ConditionReasonExecuting TaskActionConditionReason = "Executing"
+
+	// ConditionReasonCompleted indicates the TaskAction has completed successfully
+	ConditionReasonCompleted TaskActionConditionReason = "Completed"
+)
+
 // TaskActionSpec defines the desired state of TaskAction
 type TaskActionSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-	// The following markers will use OpenAPI v3 schema to validate the value
-	// More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
+	// RunName is the name of the run this action belongs to
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=30
+	RunName string `json:"runName"`
 
-	// foo is an example field of TaskAction. Edit taskaction_types.go to remove/update
+	// Org this action belongs to
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	Org string `json:"org"`
+
+	// Project this action belongs to
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	Project string `json:"project"`
+
+	// Domain this action belongs to
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	Domain string `json:"domain"`
+
+	// ActionName is the unique name of this action within the run
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=30
+	ActionName string `json:"actionName"`
+
+	// ParentActionName is the optional name of the parent action
 	// +optional
-	TaskActionBytes []byte `json:"taskActionBytes,omitempty"`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=30
+	ParentActionName *string `json:"parentActionName,omitempty"`
+
+	// InputURI is the path to the input data for this action
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	InputURI string `json:"inputUri"`
+
+	// RunOutputBase is the base path where this action should write its output
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	RunOutputBase string `json:"runOutputBase"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
-	// Unmarshal from bytes to ActionSpec
-	spec := &workflow.ActionSpec{}
-	if in.TaskActionBytes != nil {
-		if err := proto.Unmarshal(in.TaskActionBytes, spec); err != nil {
-			return nil, fmt.Errorf("error unmarshalling TaskAction spec: %w", err)
-		}
+	// Build ActionSpec from structured fields
+	spec := &workflow.ActionSpec{
+		ActionId: &common.ActionIdentifier{
+			Run: &common.RunIdentifier{
+				Org:     in.Org,
+				Project: in.Project,
+				Domain:  in.Domain,
+				Name:    in.RunName,
+			},
+			Name: in.ActionName,
+		},
+		ParentActionName: in.ParentActionName,
+		InputUri:         in.InputURI,
+		RunOutputBase:    in.RunOutputBase,
 	}
 
 	return spec, nil
 }
 
 func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
-	raw, err := proto.Marshal(spec)
-	if err != nil {
-		return fmt.Errorf("error marshalling TaskAction spec: %w", err)
+	// Populate structured fields from ActionSpec
+	if spec.ActionId != nil {
+		if spec.ActionId.Run != nil {
+			in.Org = spec.ActionId.Run.Org
+			in.Project = spec.ActionId.Run.Project
+			in.Domain = spec.ActionId.Run.Domain
+			in.RunName = spec.ActionId.Run.Name
+		}
+		in.ActionName = spec.ActionId.Name
 	}
+	in.ParentActionName = spec.ParentActionName
+	in.InputURI = spec.InputUri
+	in.RunOutputBase = spec.RunOutputBase
 
-	in.TaskActionBytes = raw
 	return nil
 }
 
@@ -70,17 +162,9 @@ type TaskActionStatus struct {
 	// For Kubernetes API conventions, see:
 	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 
-	// Phase represents the current phase of the TaskAction execution
-	// +optional
-	Phase string `json:"phase,omitempty"`
-
 	// StateJSON is the JSON serialized NodeStatus that was last sent to the State Service
 	// +optional
 	StateJSON string `json:"stateJson,omitempty"`
-
-	// Message provides additional information about the current state
-	// +optional
-	Message string `json:"message,omitempty"`
 
 	// conditions represent the current state of the TaskAction resource.
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
@@ -99,9 +183,13 @@ type TaskActionStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-// +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.message`
+// +kubebuilder:printcolumn:name="Run",type="string",JSONPath=".spec.runName"
+// +kubebuilder:printcolumn:name="Action",type="string",JSONPath=".spec.actionName"
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].reason"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:printcolumn:name="Progressing",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].status",priority=1
+// +kubebuilder:printcolumn:name="Succeeded",type="string",JSONPath=".status.conditions[?(@.type=='Succeeded')].status",priority=1
+// +kubebuilder:printcolumn:name="Failed",type="string",JSONPath=".status.conditions[?(@.type=='Failed')].status",priority=1
 
 // TaskAction is the Schema for the taskactions API
 type TaskAction struct {

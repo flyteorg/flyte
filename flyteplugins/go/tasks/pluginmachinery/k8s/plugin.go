@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
-//go:generate mockery -all -case=underscore
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
@@ -98,6 +98,22 @@ type Plugin interface {
 
 	// Properties desired by the plugin
 	GetProperties() PluginProperties
+
+	// GarbageCollectable enables an external garbage collector to clean up resources created by the plugin
+	GarbageCollectable
+}
+
+// GarbageCollectable is an interface plugins implement to provide an external garbage collector information.
+type GarbageCollectable interface {
+	// IsTerminal returns true if the resource is in a terminal state
+	IsTerminal(ctx context.Context, resource client.Object) (bool, error)
+
+	// GetCompletionTime returns when the resource reached terminal state
+	GetCompletionTime(resource client.Object) (time.Time, error)
+
+	// Note: The external garbage collector uses PluginEntry.ResourceToWatch to determine
+	// which resource type to delete. If a plugin creates additional resources that require
+	// cleanup, this interface will need to be extended to return those resources.
 }
 
 // An optional interface a Plugin can implement to override its default OnAbort finalizer (deletion of the underlying resource).

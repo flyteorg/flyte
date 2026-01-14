@@ -180,25 +180,25 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.On("OutputWriter").Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -207,38 +207,35 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return(testTaskID)
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return(testTaskID)
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetAnnotations().Return(testAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(testLabels)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
-	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
-	taskExecutionMetadata.OnIsInterruptible().Return(isInterruptible)
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
-	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(testAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(testLabels)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&testPlatformResources)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(isInterruptible)
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(defaultServiceAccountName)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return(defaultNamespace)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetPodTemplate().Return(nil)
-	overrides.OnGetContainerImage().Return("")
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = k8s.PluginState{}
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
@@ -250,25 +247,25 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 	pCtx := &k8smocks.PluginContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.On("OutputWriter").Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -277,42 +274,39 @@ func dummyDaskPluginContextWithPods(taskTemplate *core.TaskTemplate, resources *
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return(testTaskID)
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return(testTaskID)
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetAnnotations().Return(testAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(testLabels)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
-	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
-	taskExecutionMetadata.OnIsInterruptible().Return(false)
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
-	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(testAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(testLabels)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&testPlatformResources)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(false)
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(defaultServiceAccountName)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return(defaultNamespace)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(nil)
-	overrides.OnGetContainerImage().Return("")
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
 	// Add K8sReader mock
 	reader := fake.NewFakeClient(pods...)
-	pCtx.OnK8sReader().Return(reader)
+	pCtx.EXPECT().K8sReader().Return(reader)
 
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -1099,4 +1093,109 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.PrimaryContainerName)
 	assert.Equal(t, 1, len(podLogContext.Containers))
 	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		status         daskAPI.JobStatus
+		expectedResult bool
+	}{
+		{"Successful", daskAPI.DaskJobSuccessful, true},
+		{"Failed", daskAPI.DaskJobFailed, true},
+		{"Running", daskAPI.DaskJobRunning, false},
+		{"Created", daskAPI.DaskJobCreated, false},
+		{"ClusterCreated", daskAPI.DaskJobClusterCreated, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := dummyDaskJob(tt.status)
+			result, err := daskResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &v1.Pod{}
+	result, err := daskResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *daskAPI.DaskJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses EndTime",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: daskAPI.DaskJobStatus{
+					EndTime:   metav1.NewTime(now),
+					StartTime: metav1.NewTime(earlier),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: daskAPI.DaskJobStatus{
+					StartTime: metav1.NewTime(now),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &daskAPI.DaskJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(now),
+				},
+				Status: daskAPI.DaskJobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := daskResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+
+	wrongResource := &v1.Pod{}
+	result, err := daskResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }
