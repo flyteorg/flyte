@@ -9,6 +9,11 @@ inpackage: false
 outpkg: "mocks"
 with-expecter: true
 packages:
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/connector/mocks'
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app:
     config:
       include-auto-generated: true
