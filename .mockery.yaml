@@ -59,6 +59,11 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'runs/repository/mocks'
+  github.com/flyteorg/flyte/v2/queue/service:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'queue/service/mocks'
 
   # flyteplugins
   github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core:
