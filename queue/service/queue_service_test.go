@@ -12,30 +12,11 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/queue/service/mocks"
 )
 
-// MockQueueClient is a mock implementation of k8s.QueueClient
-type MockQueueClient struct {
-	mock.Mock
-}
-
-func (m *MockQueueClient) EnqueueAction(ctx context.Context, req *workflow.EnqueueActionRequest) error {
-	args := m.Called(ctx, req)
-	return args.Error(0)
-}
-
-func (m *MockQueueClient) AbortQueuedRun(ctx context.Context, runID *common.RunIdentifier, reason *string) error {
-	args := m.Called(ctx, runID, reason)
-	return args.Error(0)
-}
-
-func (m *MockQueueClient) AbortQueuedAction(ctx context.Context, actionID *common.ActionIdentifier, reason *string) error {
-	args := m.Called(ctx, actionID, reason)
-	return args.Error(0)
-}
-
 func TestEnqueueAction(t *testing.T) {
-	mockClient := new(MockQueueClient)
+	mockClient := mocks.NewQueueClientInterface(t)
 	svc := NewQueueServiceWithClient(mockClient)
 
 	req := &workflow.EnqueueActionRequest{
@@ -67,7 +48,7 @@ func TestEnqueueAction(t *testing.T) {
 		},
 	}
 
-	mockClient.On("EnqueueAction", mock.Anything, req).Return(nil)
+	mockClient.EXPECT().EnqueueAction(mock.Anything, req).Return(nil)
 
 	connectReq := connect.NewRequest(req)
 	resp, err := svc.EnqueueAction(context.Background(), connectReq)
@@ -78,7 +59,7 @@ func TestEnqueueAction(t *testing.T) {
 }
 
 func TestAbortQueuedRun(t *testing.T) {
-	mockClient := new(MockQueueClient)
+	mockClient := mocks.NewQueueClientInterface(t)
 	svc := NewQueueServiceWithClient(mockClient)
 
 	runID := &common.RunIdentifier{
@@ -94,7 +75,7 @@ func TestAbortQueuedRun(t *testing.T) {
 		Reason: &reason,
 	}
 
-	mockClient.On("AbortQueuedRun", mock.Anything, runID, &reason).Return(nil)
+	mockClient.EXPECT().AbortQueuedRun(mock.Anything, runID, &reason).Return(nil)
 
 	connectReq := connect.NewRequest(req)
 	resp, err := svc.AbortQueuedRun(context.Background(), connectReq)
@@ -105,7 +86,7 @@ func TestAbortQueuedRun(t *testing.T) {
 }
 
 func TestAbortQueuedAction(t *testing.T) {
-	mockClient := new(MockQueueClient)
+	mockClient := mocks.NewQueueClientInterface(t)
 	svc := NewQueueServiceWithClient(mockClient)
 
 	actionID := &common.ActionIdentifier{
@@ -124,7 +105,7 @@ func TestAbortQueuedAction(t *testing.T) {
 		Reason:   &reason,
 	}
 
-	mockClient.On("AbortQueuedAction", mock.Anything, actionID, &reason).Return(nil)
+	mockClient.EXPECT().AbortQueuedAction(mock.Anything, actionID, &reason).Return(nil)
 
 	connectReq := connect.NewRequest(req)
 	resp, err := svc.AbortQueuedAction(context.Background(), connectReq)
