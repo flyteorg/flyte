@@ -1,0 +1,306 @@
+package connector
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/exp/maps"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCoreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	webapiPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service"
+	connectorMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service/mocks"
+)
+
+const defaultConnectorEndpoint = "localhost:8000"
+
+func TestPlugin(t *testing.T) {
+	fakeSetupContext := pluginCoreMocks.SetupContext{}
+	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
+
+	cfg := defaultConfig
+	cfg.WebAPI.Caching.Workers = 1
+	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
+	cfg.DefaultConnector = Deployment{Endpoint: "test-connector.flyte.svc.cluster.local:80"}
+	cfg.ConnectorDeployments = map[string]*Deployment{"spark_connector": {Endpoint: "localhost:80"}}
+	cfg.ConnectorForTaskTypes = map[string]string{"spark": "spark_connector", "bar": "bar_connector"}
+
+	sparkConnector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:80"}}
+	sparkKey := RegistryKey{domain: "", taskTypeName: "spark", taskTypeVersion: defaultTaskTypeVersion}
+	rayConnector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:8080"}}
+	rayKey := RegistryKey{domain: "production", taskTypeName: "ray", taskTypeVersion: defaultTaskTypeVersion}
+	connectorRegistry := Registry{sparkKey: sparkConnector, rayKey: rayConnector}
+	plugin := Plugin{
+		metricScope: fakeSetupContext.MetricsScope(),
+		cfg:         GetConfig(),
+		registry:    connectorRegistry,
+	}
+	t.Run("get config", func(t *testing.T) {
+		err := SetConfig(&cfg)
+		assert.NoError(t, err)
+		assert.Equal(t, cfg.WebAPI, plugin.GetConfig())
+	})
+	t.Run("get ResourceRequirements", func(t *testing.T) {
+		namespace, constraints, err := plugin.ResourceRequirements(context.TODO(), nil)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.ResourceNamespace("default"), namespace)
+		assert.Equal(t, plugin.cfg.ResourceConstraints, constraints)
+	})
+
+	t.Run("test newConnectorPlugin", func(t *testing.T) {
+		p := newMockAsyncConnectorPlugin()
+		assert.NotNil(t, p)
+		assert.Equal(t, "connector-service", p.ID)
+		assert.NotNil(t, p.PluginLoader)
+	})
+
+	t.Run("test getFinalConnector", func(t *testing.T) {
+		spark := &plugins.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		ray := &plugins.TaskCategory{Name: "ray", Version: defaultTaskTypeVersion}
+		foo := &plugins.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
+		bar := &plugins.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
+		connector, err := plugin.getFinalConnector(spark, &cfg, "")
+		assert.NoError(t, err)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, "localhost:80")
+		connector, err = plugin.getFinalConnector(foo, &cfg, "")
+		assert.NoError(t, err)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connector, err = plugin.getFinalConnector(bar, &cfg, "")
+		assert.NoError(t, err)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connector, err = plugin.getFinalConnector(ray, &cfg, "production")
+		assert.NoError(t, err)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, rayConnector.ConnectorDeployment.Endpoint)
+	})
+
+	t.Run("test getFinalTimeout", func(t *testing.T) {
+		timeout := getFinalTimeout("CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+		timeout = getFinalTimeout("GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+		timeout = getFinalTimeout("DeleteTask", &Deployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
+		assert.Equal(t, 10*time.Second, timeout.Duration)
+		timeout = getFinalTimeout("ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+	})
+
+	t.Run("test getFinalContext", func(t *testing.T) {
+
+		ctx, _ := getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
+		assert.Equal(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 10 * time.Second}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+	})
+
+	t.Run("test TaskExecution_UNDEFINED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_UNDEFINED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NotNil(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_QUEUED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_QUEUED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_WAITING_FOR_RESOURCES Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_WAITING_FOR_RESOURCES,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_INITIALIZING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_INITIALIZING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_RUNNING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_RUNNING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_ABORTED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_ABORTED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_FAILED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_FAILED,
+			Outputs:  nil,
+			Message:  "boom",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+		assert.Equal(t, "failed to run the job: boom", phase.Err().GetMessage())
+	})
+
+	t.Run("test TaskExecution_FAILED Status Without Connector Error", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_FAILED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+}
+
+func getMockMetadataServiceClient() *connectorMocks.ConnectorMetadataServiceClient {
+	mockMetadataServiceClient := new(connectorMocks.ConnectorMetadataServiceClient)
+	mockRequest := &plugins.ListConnectorsRequest{}
+	supportedTaskCategories := make([]*plugins.TaskCategory, 3)
+	supportedTaskCategories[0] = &plugins.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[1] = &plugins.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[2] = &plugins.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
+	mockResponse := &plugins.ListConnectorsResponse{
+		Connectors: []*plugins.Connector{
+			{
+				Name:                    "test-agent",
+				SupportedTaskCategories: supportedTaskCategories,
+			},
+		},
+	}
+
+	mockMetadataServiceClient.On("ListConnectors", mock.Anything, mockRequest).Return(mockResponse, nil)
+	return mockMetadataServiceClient
+}
+
+func TestInitializeConnectorRegistry(t *testing.T) {
+	connectorClients := make(map[string]service.AsyncConnectorServiceClient)
+	connectorMetadataClients := make(map[string]service.ConnectorMetadataServiceClient)
+	client := &connectorMocks.AsyncConnectorServiceClient{}
+	connectorClients[defaultConnectorEndpoint] = client
+	connectorMetadataClients[defaultConnectorEndpoint] = getMockMetadataServiceClient()
+
+	cs := &ClientSet{
+		asyncConnectorClients:    connectorClients,
+		connectorMetadataClients: connectorMetadataClients,
+	}
+
+	cfg := defaultConfig
+	cfg.ConnectorDeployments = map[string]*Deployment{"custom_connector": {Endpoint: defaultConnectorEndpoint}}
+	cfg.ConnectorForTaskTypes = map[string]string{"task1": "connector-deployment-1", "task2": "connector-deployment-2"}
+	err := SetConfig(&cfg)
+	assert.NoError(t, err)
+
+	connectorRegistry := getConnectorRegistry(context.Background(), cs)
+	connectorRegistryKeys := maps.Keys(connectorRegistry)
+	supportTaskTypes := []string{"task1", "task2", "task3", "task_type_3", "task_type_4"}
+	var expectedKeys []RegistryKey
+	for _, taskType := range supportTaskTypes {
+		expectedKeys = append(expectedKeys, RegistryKey{taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion})
+	}
+
+	for _, key := range expectedKeys {
+		assert.Contains(t, connectorRegistryKeys, key)
+	}
+}
