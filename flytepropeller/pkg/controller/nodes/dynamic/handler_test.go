@@ -1021,7 +1021,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 	})
 	t.Run("dynamicnodephase-failing-malformed-dynamic-workflow", func(t *testing.T) {
 
-		nCtx := createNodeContext(t, "test", "x")
+		nCtx := createNodeContext(t, "test-finalize", "y")
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
 
@@ -1060,7 +1060,7 @@ func TestDynamicNodeTaskNodeHandler_Abort(t *testing.T) {
 	t.Run("dynamicnodephase-failing-malformed-dynamic-workflow", func(t *testing.T) {
 		ctx := context.TODO()
 
-		nCtx := createNodeContext(t, "test", "x")
+		nCtx := createNodeContext(t, "test-abort", "y")
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
 
