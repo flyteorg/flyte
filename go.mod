@@ -18,6 +18,8 @@ require (
 	github.com/coocood/freecache v1.2.4
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.2.3
+	github.com/eko/gocache/store/freecache/v4 v4.2.4
+	github.com/eko/gocache/store/redis/v4 v4.2.6
 	github.com/fatih/color v1.13.0
 	github.com/flyteorg/stow v0.3.12
 	github.com/fsnotify/fsnotify v1.9.0
@@ -42,6 +44,8 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.4
 	github.com/ray-project/kuberay/ray-operator v1.1.0-rc.1
+	github.com/redis/go-redis/extra/redisprometheus/v9 v9.17.2
+	github.com/redis/go-redis/v9 v9.17.2
 	github.com/samber/lo v1.39.0
 	github.com/shamaton/msgpack/v2 v2.4.0
 	github.com/sirupsen/logrus v1.9.3
@@ -118,6 +122,7 @@ require (
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
