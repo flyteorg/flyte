@@ -8,9 +8,12 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
@@ -159,21 +162,22 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
 	}
-	//for k, v := range connection.GetSecrets() {
-	//	secretID, err := secret.GetSecretID(v, source, labels)
-	//	if err != nil {
-	//		errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
-	//		logger.Errorf(ctx, errString)
-	//		return nil, nil, status.Errorf(codes.Internal, errString)
-	//	}
-	//	secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
-	//	if err != nil {
-	//		errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
-	//		logger.Errorf(ctx, errString)
-	//		return nil, nil, status.Errorf(codes.Internal, errString)
-	//	}
-	//	conn.Secrets[k] = secretVal
-	//}
+	labels := taskCtx.TaskExecutionMetadata().GetLabels()
+	for k, v := range connection.GetSecrets() {
+		secretID, err := secret.GetSecretID(v, labels)
+		if err != nil {
+			errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
+			logger.Errorf(ctx, errString)
+			return nil, nil, status.Errorf(codes.Internal, errString)
+		}
+		secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
+		if err != nil {
+			errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
+			logger.Errorf(ctx, errString)
+			return nil, nil, status.Errorf(codes.Internal, errString)
+		}
+		connection.Secrets[k] = secretVal
+	}
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
