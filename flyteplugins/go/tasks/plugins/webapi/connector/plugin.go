@@ -159,7 +159,6 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
 	}
-	// TODO: Fetch secrets
 	//for k, v := range connection.GetSecrets() {
 	//	secretID, err := secret.GetSecretID(v, source, labels)
 	//	if err != nil {
