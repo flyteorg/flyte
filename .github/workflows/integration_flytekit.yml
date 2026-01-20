@@ -1,0 +1,57 @@
+name: Integration Test with Flytekit
+
+on:
+  pull_request:
+
+jobs:
+  test-flytesnacks-on-pr-sandbox:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR Code (flytesandbox)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Flytectl
+        run: |
+          mkdir -p flytectl_tmp/
+          cd flytectl_tmp/
+          curl -sL https://github.com/flyteorg/flytectl/releases/latest/download/flytectl_Linux_x86_64.tar.gz | tar -xz
+          sudo mv flytectl /usr/local/bin/
+          cd ..
+
+      - name: Build PR-based Flyte Sandbox Image
+        run: |
+          docker build -t pr-sandbox:${{ github.sha }} .
+
+      - name: Start Flyte Sandbox with PR Image
+        run: |
+          flytectl sandbox start --image pr-sandbox:${{ github.sha }}
+          sleep 60
+
+      - name: Clone flytesnacks (latest master)
+        run: |
+          git clone --depth=1 https://github.com/flyteorg/flytesnacks.git
+          cd flytesnacks && ls examples/basics/basics
+
+      - name: Install Latest Flytekit
+        run: |
+          pip install --upgrade pip
+          pip install flytekit==latest pyflyte
+
+      - name: Register Basics Examples to Sandbox
+        run: |
+          cd flytesnacks/examples/basics/basics
+          pyflyte register --project flytesnacks --domain development .
+
+      - name: Execute say_hello Workflow
+        run: |
+          cd flytesnacks/examples/basics/basics
+          pyflyte run --project flytesnacks --domain development workflows.py say_hello --name "Flyte PR Test"
