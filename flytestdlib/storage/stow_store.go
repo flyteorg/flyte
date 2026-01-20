@@ -168,26 +168,24 @@ func (s *StowStore) LoadContainer(ctx context.Context, container string, createI
 }
 
 func (s *StowStore) loadContainer(ctx context.Context, locID locationID, container string, createIfNotFound bool) (stow.Container, error) {
-	c, err := s.getLocation(locID).Container(container)
-	if err != nil {
-		// IsNotFound is not always guaranteed to be returned if the underlying container doesn't exist!
-		// As of stow v0.2.6, the call to get container elides the lookup when a bucket region is set for S3 containers.
-		if IsNotFound(err) && createIfNotFound {
-			c, err = s.createContainer(ctx, locID, container)
-			if err != nil {
-				logger.Errorf(ctx, "Call to create container [%s] failed. Error %s", container, err)
-				return nil, err
-			}
-		} else {
-			logger.Errorf(ctx, "Container [%s] lookup failed. Error %s", container, err)
+	if createIfNotFound {
+		logger.Infof(ctx, "Creating container with name %s", container)
+		_, err := s.createContainer(ctx, locID, container)
+		if err != nil {
+			logger.Errorf(ctx, "Call to create container [%s] failed. Error %s", container, err)
 			return nil, err
 		}
 	}
-
+	logger.Infof(ctx, "Loading container with name %s", container)
+	c, err := s.getLocation(locID).Container(container)
+	if err != nil {
+		logger.Errorf(ctx, "Container [%s] lookup failed. Error %s", container, err)
+		return nil, err
+	}
 	return c, nil
 }
 
-func (s *StowStore) getContainer(ctx context.Context, locID locationID, container string) (c stow.Container, err error) {
+func (s *StowStore) getContainer(ctx context.Context, locID locationID, container string, createIfNotFound bool) (c stow.Container, err error) {
 	if s.baseContainer != nil && s.baseContainer.Name() == container && locID == locationIDMain {
 		return s.baseContainer, nil
 	}
@@ -200,7 +198,8 @@ func (s *StowStore) getContainer(ctx context.Context, locID locationID, containe
 	containerID := locID.String() + container
 	iface, ok := s.dynamicContainerMap.Load(containerID)
 	if !ok {
-		c, err := s.loadContainer(ctx, locID, container, false)
+		logger.Infof(ctx, "Loading container with flag %v", createIfNotFound)
+		c, err := s.loadContainer(ctx, locID, container, createIfNotFound)
 		if err != nil {
 			logger.Errorf(ctx, "failed to load container [%s] dynamically, error %s", container, err)
 			return nil, err
@@ -220,7 +219,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 		return nil, err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, c, false)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +268,7 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 		return nil, NewCursorAtEnd(), err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, containerName)
+	container, err := s.getContainer(ctx, locationIDMain, containerName, false)
 	if err != nil {
 		return nil, NewCursorAtEnd(), err
 	}
@@ -323,7 +322,7 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		return nil, err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, c, false)
 	if err != nil {
 		return nil, err
 	}
@@ -360,7 +359,7 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, c, false)
 	if err != nil {
 		return err
 	}
@@ -396,7 +395,7 @@ func (s *StowStore) Delete(ctx context.Context, reference DataReference) error {
 		return err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, c, false)
 	if err != nil {
 		return err
 	}
@@ -422,8 +421,9 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	c, err := s.getContainer(ctx, locationIDSignedURL, container)
+	c, err := s.getContainer(ctx, locationIDSignedURL, container, true)
 	if err != nil {
+		logger.Errorf(ctx, "Error while loading container %s is %s", container, err)
 		return SignedURLResponse{}, err
 	}
 
@@ -434,14 +434,15 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 	})
 
 	if err != nil {
+		logger.Errorf(ctx, "Error while creating PreSignRequest %s", err)
 		return SignedURLResponse{}, err
 	}
 
 	urlVal, err := url.Parse(res.Url)
 	if err != nil {
+		logger.Errorf(ctx, "Error while parsing URL %s", err)
 		return SignedURLResponse{}, err
 	}
-
 	return SignedURLResponse{
 		URL:                    *urlVal,
 		RequiredRequestHeaders: res.RequiredRequestHeaders,
