@@ -10,7 +10,7 @@ dependencies:
     condition: contour.enabled
   - name: spark-operator
     alias: sparkoperator
-    version: 1.1.15
+    version: 2.1.1
     repository: https://kubeflow.github.io/spark-operator
     condition: sparkoperator.enabled
   - name: dask-kubernetes-operator
