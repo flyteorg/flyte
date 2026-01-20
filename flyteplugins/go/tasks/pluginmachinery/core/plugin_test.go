@@ -6,9 +6,8 @@ import (
 
 	"gotest.tools/assert"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func TestLoadPlugin(t *testing.T) {
@@ -16,7 +15,7 @@ func TestLoadPlugin(t *testing.T) {
 
 	t.Run("valid", func(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
-		corePlugin.On("GetID").Return(corePluginType)
+		corePlugin.EXPECT().GetID().Return(corePluginType)
 		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{})
 
 		corePluginEntry := core.PluginEntry{
@@ -34,7 +33,7 @@ func TestLoadPlugin(t *testing.T) {
 
 	t.Run("valid GeneratedNameMaxLength", func(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
-		corePlugin.On("GetID").Return(corePluginType)
+		corePlugin.EXPECT().GetID().Return(corePluginType)
 		length := 10
 		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
@@ -55,7 +54,7 @@ func TestLoadPlugin(t *testing.T) {
 
 	t.Run("valid GeneratedNameMaxLength", func(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
-		corePlugin.On("GetID").Return(corePluginType)
+		corePlugin.EXPECT().GetID().Return(corePluginType)
 		length := 10
 		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
@@ -75,7 +74,7 @@ func TestLoadPlugin(t *testing.T) {
 
 	t.Run("invalid GeneratedNameMaxLength", func(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
-		corePlugin.On("GetID").Return(corePluginType)
+		corePlugin.EXPECT().GetID().Return(corePluginType)
 		length := 5
 		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
@@ -93,18 +92,4 @@ func TestLoadPlugin(t *testing.T) {
 		assert.Error(t, err, "GeneratedNameMaxLength needs to be greater then 8")
 	})
 
-}
-
-func TestAgentService(t *testing.T) {
-	agentService := agent.AgentService{}
-	taskTypes := []core.TaskType{"sensor", "chatgpt"}
-
-	for _, taskType := range taskTypes {
-		assert.Equal(t, false, agentService.ContainTaskType(taskType))
-	}
-
-	agentService.SetSupportedTaskType(taskTypes)
-	for _, taskType := range taskTypes {
-		assert.Equal(t, true, agentService.ContainTaskType(taskType))
-	}
 }

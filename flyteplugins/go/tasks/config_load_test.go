@@ -8,11 +8,11 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/spark"
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	flyteK8sConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/spark"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -51,7 +51,7 @@ func TestLoadConfig(t *testing.T) {
 			Effect:   v1.TaintEffectNoSchedule,
 		}
 
-		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations["nvidia.com/gpu"])
+		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations[v1.ResourceName("nvidia.com/gpu")])
 		expectedCPU := resource.MustParse("1000m")
 		assert.True(t, expectedCPU.Equal(k8sConfig.DefaultCPURequest))
 		expectedMemory := resource.MustParse("1024Mi")
@@ -95,8 +95,13 @@ func TestLoadConfig(t *testing.T) {
 	})
 
 	t.Run("logs-config-test", func(t *testing.T) {
-		assert.NotNil(t, logs.GetLogConfig())
-		assert.True(t, logs.GetLogConfig().IsKubernetesEnabled)
+		logsConfig := logs.GetLogConfig()
+		assert.NotNil(t, logsConfig)
+		assert.True(t, logsConfig.IsKubernetesEnabled)
+
+		assert.Equal(t, 1, len(logsConfig.AzureLogTemplates))
+		assert.Equal(t, "Test Azure Logs", logsConfig.AzureLogTemplates[0].DisplayName)
+		assert.Equal(t, "https://portal.azure.com#@TEST_AZURE_URI/q/", logsConfig.AzureLogTemplates[0].TemplateURIs[0])
 	})
 
 	t.Run("spark-config-test", func(t *testing.T) {

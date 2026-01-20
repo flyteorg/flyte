@@ -1,8 +1,8 @@
 package logs
 
 import (
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 //go:generate pflags LogConfig --default-var=DefaultConfig
@@ -31,6 +31,8 @@ type LogConfig struct {
 	DynamicLogLinks map[string]tasklog.TemplateLogPlugin `json:"dynamic-log-links" pflag:"-,Map of dynamic log links"`
 
 	Templates []tasklog.TemplateLogPlugin `json:"templates" pflag:"-,"`
+
+	AzureLogTemplates []tasklog.AzureLogsTemplatePlugin `json:"azure-log-templates" pflag:"-,"`
 }
 
 var (

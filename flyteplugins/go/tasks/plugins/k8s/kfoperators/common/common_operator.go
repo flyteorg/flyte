@@ -10,16 +10,17 @@ import (
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	pluginsIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+	kfplugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow"
 )
 
 const (
@@ -49,11 +50,11 @@ func ExtractCurrentCondition(jobConditions []kubeflowv1.JobCondition) (kubeflowv
 func GetPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	if len(currentCondition.Type) == 0 {
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	}
 	switch currentCondition.Type {
 	case kubeflowv1.JobCreated:
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	case kubeflowv1.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case kubeflowv1.JobSucceeded:
@@ -73,7 +74,7 @@ func GetMPIPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.T
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	switch currentCondition.Type {
 	case kubeflowv1.JobCreated:
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator", &taskPhaseInfo), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator", &taskPhaseInfo), nil
 	case kubeflowv1.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case kubeflowv1.JobSucceeded:
@@ -248,11 +249,11 @@ func ParseCleanPodPolicy(flyteCleanPodPolicy kfplugins.CleanPodPolicy) kubeflowv
 }
 
 // Get k8s restart policy from flyte kubeflow plugins restart policy.
-func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) kubeflowv1.RestartPolicy {
-	restartPolicyMap := map[kfplugins.RestartPolicy]kubeflowv1.RestartPolicy{
-		kfplugins.RestartPolicy_RESTART_POLICY_NEVER:      kubeflowv1.RestartPolicyNever,
-		kfplugins.RestartPolicy_RESTART_POLICY_ON_FAILURE: kubeflowv1.RestartPolicyOnFailure,
-		kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS:     kubeflowv1.RestartPolicyAlways,
+func ParseRestartPolicy(flyteRestartPolicy pluginsIdl.RestartPolicy) kubeflowv1.RestartPolicy {
+	restartPolicyMap := map[pluginsIdl.RestartPolicy]kubeflowv1.RestartPolicy{
+		pluginsIdl.RestartPolicy_RESTART_POLICY_NEVER:      kubeflowv1.RestartPolicyNever,
+		pluginsIdl.RestartPolicy_RESTART_POLICY_ON_FAILURE: kubeflowv1.RestartPolicyOnFailure,
+		pluginsIdl.RestartPolicy_RESTART_POLICY_ALWAYS:     kubeflowv1.RestartPolicyAlways,
 	}
 	return restartPolicyMap[flyteRestartPolicy]
 }
@@ -300,8 +301,8 @@ type kfDistributedReplicaSpec interface {
 	GetReplicas() int32
 	GetImage() string
 	GetResources() *core.Resources
-	GetRestartPolicy() kfplugins.RestartPolicy
-	GetCommon() *kfplugins.CommonReplicaSpec
+	GetRestartPolicy() pluginsIdl.RestartPolicy
+	GetCommon() *pluginsIdl.CommonReplicaSpec
 }
 
 type allowsCommandOverride interface {
@@ -312,7 +313,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	var replicas int32
 	var image string
 	var resources *core.Resources
-	var restartPolicy kfplugins.RestartPolicy
+	var restartPolicy pluginsIdl.RestartPolicy
 
 	// replicas, image, resources, restartPolicy are deprecated since the common replica spec is introduced.
 	// Therefore, if the common replica spec is set, use that to get the common fields
@@ -330,11 +331,27 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	}
 
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if resources != nil && (len(resources.GetLimits()) > 0 || len(resources.GetRequests()) > 0) {
+	if resources != nil {
 		resources, err := flytek8s.ToK8sResourceRequirements(resources)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
 		}
+
+		// Get extended resources for GPU accelerator info
+		taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+		if err != nil {
+			return nil, err
+		}
+		extendedResources := flytek8s.ApplyExtendedResourcesOverrides(
+			taskTemplate.GetExtendedResources(),
+			taskCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+		)
+
+		// Normalize GPU resource names BEFORE applying overrides (e.g., "gpu" → "nvidia.com/gpu")
+		// This ensures ApplyK8sResourceOverrides can find GPU resources under the correct name and
+		// apply platform limits, and later toleration lookups succeed.
+		flytek8s.SanitizeGPUResourceRequirements(resources, extendedResources.GetGpuAccelerator())
+
 		*resources = flytek8s.ApplyK8sResourceOverrides(taskCtx.TaskExecutionMetadata(), resources)
 		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
 	}

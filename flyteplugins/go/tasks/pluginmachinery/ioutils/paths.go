@@ -3,8 +3,8 @@ package ioutils
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 const (
@@ -19,9 +19,6 @@ const (
 	// OutputsSuffix specifies that outputs are assumed to be written to this "file"/"suffix" under the given prefix
 	// The outputs file has a format of core.LiteralMap
 	OutputsSuffix = "outputs.pb"
-	// deckSuffix specifies that deck file are assumed to be written to this "file"/"suffix" under the given prefix
-	// The deck file has a format of HTML
-	deckSuffix = "deck.html"
 	// ErrorsSuffix specifies that the errors are written to this prefix/file under the given prefix. The Error File
 	// has a format of core.ErrorDocument
 	ErrorsSuffix      = "error.pb"

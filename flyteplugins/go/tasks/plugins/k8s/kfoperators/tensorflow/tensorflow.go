@@ -10,14 +10,14 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+	kfplugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow"
 )
 
 type tensorflowOperatorResourceHandler struct {
@@ -54,7 +54,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	replicaSpecMap := make(map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec)
 	runPolicy := kubeflowv1.RunPolicy{}
 
-	if taskTemplate.GetTaskTypeVersion() == 0 {
+	if taskTemplate.TaskTypeVersion == 0 {
 		tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs)
@@ -82,7 +82,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			}
 		}
 
-	} else if taskTemplate.GetTaskTypeVersion() == 1 {
+	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfTensorflowTaskExtraArgs := kfplugins.DistributedTensorflowTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfTensorflowTaskExtraArgs)
@@ -124,7 +124,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
 	if v, ok := replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker]; !ok || *v.Replicas <= 0 {
@@ -172,8 +172,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
-	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the tensorflow custom resource since creation time %v", app.CreationTimestamp)
 	}
 
@@ -186,6 +185,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: nil, // TODO populate log context
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
@@ -198,6 +198,48 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 	}
 
 	return phaseInfo, err
+}
+
+// IsTerminal returns true if the TFJob is in a terminal state (Succeeded or Failed)
+func (tensorflowOperatorResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*kubeflowv1.TFJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *TFJob, got %T", resource)
+	}
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// GetCompletionTime returns the completion time of the TFJob
+func (tensorflowOperatorResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*kubeflowv1.TFJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *TFJob, got %T", resource)
+	}
+
+	if job.Status.CompletionTime != nil {
+		return job.Status.CompletionTime.Time, nil
+	}
+
+	// Fallback to last condition transition time
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			if !condition.LastTransitionTime.IsZero() {
+				return condition.LastTransitionTime.Time, nil
+			}
+		}
+	}
+
+	// Fallback to start time or creation time
+	if job.Status.StartTime != nil {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
 }
 
 func init() {

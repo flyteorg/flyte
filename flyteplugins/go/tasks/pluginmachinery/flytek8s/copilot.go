@@ -11,14 +11,13 @@ import (
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/utils/ptr"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	core2 "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -36,10 +35,18 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	if err != nil {
 		return v1.Container{}, err
 	}
+
+	var storageCfg *storage.Config
+	if cfg.StorageConfigOverride != nil {
+		storageCfg = cfg.StorageConfigOverride
+	} else {
+		storageCfg = storage.GetConfig()
+	}
+
 	return v1.Container{
 		Name:       cfg.NamePrefix + name,
 		Image:      cfg.Image,
-		Command:    CopilotCommandArgs(storage.GetConfig()),
+		Command:    CopilotCommandArgs(storageCfg),
 		Args:       args,
 		WorkingDir: "/",
 		Resources: v1.ResourceRequirements{
@@ -163,7 +170,7 @@ func CalculateStorageSize(requirements *v1.ResourceRequirements) *resource.Quant
 }
 
 func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c *v1.Container, iFace *core.TypedInterface, pilot *core.DataLoadingConfig) error {
-	if pilot == nil || !pilot.GetEnabled() {
+	if pilot == nil || !pilot.Enabled {
 		return nil
 	}
 	logger.Infof(ctx, "Enabling CoPilot on main container [%s]", c.Name)
@@ -175,7 +182,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	}
 
 	if iFace != nil {
-		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
+		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -187,7 +194,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 			})
 		}
 
-		if iFace.GetOutputs() != nil && len(iFace.GetOutputs().GetVariables()) > 0 {
+		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
@@ -201,16 +208,15 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	return nil
 }
 
-func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilotPod *v1.PodSpec, iFace *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) (string, error) {
-	if pilot == nil || !pilot.GetEnabled() {
-		return "", nil
+func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilotPod *v1.PodSpec, iFace *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) error {
+	if pilot == nil || !pilot.Enabled {
+		return nil
 	}
 
 	//nolint:protogetter
 	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
-	primaryInitContainerName := ""
 	if iFace != nil {
-		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
+		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -218,39 +224,36 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 			// TODO we should calculate input volume size based on the size of the inputs which is known ahead of time. We should store that as part of the metadata
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			//nolint:protogetter
-			logger.Infof(ctx, "Adding Input path [%s] of Size [%v] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
+			logger.Infof(ctx, "Adding Input path [%s] of Size [%d] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
 			inputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.InputVolumeName,
 				MountPath: inPath,
 			}
 
-			format := pilot.GetFormat()
+			format := pilot.Format
 			// Lets add the InputsVolume
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.InputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.GetInputs())
+			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
 			if err != nil {
-				return primaryInitContainerName, err
+				return err
 			}
 			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
-				return primaryInitContainerName, err
+				return err
 			}
 			coPilotPod.InitContainers = append(coPilotPod.InitContainers, downloader)
-			primaryInitContainerName = downloader.Name
 		}
 
-		if iFace.GetOutputs() != nil && len(iFace.GetOutputs().GetVariables()) > 0 {
+		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
 			}
 
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			//nolint:protogetter
-			logger.Infof(ctx, "Adding Output path [%s] of size [%v] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
+			logger.Infof(ctx, "Adding Output path [%s] of size [%d] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
 
 			outputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.OutputVolumeName,
@@ -263,20 +266,22 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			// Lets add the Inputs init container
 			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.Timeout.Duration, iFace)
 			if err != nil {
-				return primaryInitContainerName, err
+				return err
 			}
 			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
 			// Make it into sidecar container
-			sidecar.RestartPolicy = ptr.To(v1.ContainerRestartPolicyAlways)
+			restartPolicy := v1.ContainerRestartPolicyAlways
+			sidecar.RestartPolicy = &restartPolicy
 			if err != nil {
-				return primaryInitContainerName, err
+				return err
 			}
 			// Let the sidecar container start before the downloader; it will ensure the signal watcher is started before the main container finishes.
 			coPilotPod.InitContainers = append([]v1.Container{sidecar}, coPilotPod.InitContainers...)
 
-			coPilotPod.TerminationGracePeriodSeconds = (*int64)(&cfg.Timeout.Duration)
+			timeoutSeconds := int64(cfg.Timeout.Duration.Seconds())
+			coPilotPod.TerminationGracePeriodSeconds = &timeoutSeconds
 		}
 	}
 
-	return primaryInitContainerName, nil
+	return nil
 }

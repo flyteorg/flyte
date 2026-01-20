@@ -4,22 +4,25 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var containerResourceRequirements = &v1.ResourceRequirements{
@@ -88,29 +91,29 @@ func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *cor
 
 func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool, containerImage string) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("test-namespace")
-	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
 	if returnsServiceAccount {
-		taskMetadata.On("GetK8sServiceAccount").Return(serviceAccount)
+		taskMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
 	} else {
-		taskMetadata.On("GetK8sServiceAccount").Return("")
+		taskMetadata.EXPECT().GetK8sServiceAccount().Return("")
 	}
-	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: securityContextServiceAccount},
 	})
-	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
 	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -119,18 +122,19 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
-	taskMetadata.On("GetTaskExecutionID").Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("my_project:my_domain:my_name")
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
-	to.On("GetPodTemplate").Return(nil)
+	to.EXPECT().GetResources().Return(resources)
+	to.EXPECT().GetExtendedResources().Return(extendedResources)
+	to.EXPECT().GetPodTemplate().Return(nil)
 
 	to.EXPECT().GetContainerImage().Return(containerImage)
-	taskMetadata.On("GetOverrides").Return(to)
-	taskMetadata.On("IsInterruptible").Return(true)
-	taskMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
+	taskMetadata.EXPECT().IsInterruptible().Return(true)
+	taskMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskMetadata
 }
@@ -163,6 +167,36 @@ func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata plu
 	taskCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
+}
+
+func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata pluginsCore.TaskExecutionMetadata) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginsIOMock.InputReader{}
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
+
+	outputReader := &pluginsIOMock.OutputWriter{}
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
+
+	taskReader := &pluginsCoreMock.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
+
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskMetadata)
+
+	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	pCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
+
+	return pCtx
 }
 
 func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
@@ -406,43 +440,90 @@ func TestContainerTaskExecutor_BuildResource_ContainerImage(t *testing.T) {
 	}
 }
 
-func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
+func TestContainerTaskExecutor_GetTaskPhase(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
 	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
-	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+	pluginContext := dummyContainerPluginContext(taskTemplate, taskMetadata)
 
 	j := &v1.Pod{
 		Status: v1.PodStatus{},
 	}
+	startTime := time.Now()
+	endTime := startTime.Add(time.Hour)
 
 	ctx := context.TODO()
 	t.Run("running", func(t *testing.T) {
 		j.Status.Phase = v1.PodRunning
+		j.Name = "exec-n0-0"
+		j.Namespace = "ns"
+		j.Spec.Containers = []v1.Container{{Name: "primary"}}
 		j.Status.ContainerStatuses = []v1.ContainerStatus{
 			{
+				Name: "primary",
 				State: v1.ContainerState{
-					Running: &v1.ContainerStateRunning{},
+					Running: &v1.ContainerStateRunning{
+						StartedAt: metav1.Time{Time: startTime},
+					},
+				},
+			},
+		}
+		j.Status.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Name: "init",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						StartedAt:  metav1.Time{Time: startTime},
+						FinishedAt: metav1.Time{Time: endTime},
+					},
+				},
+			},
+		}
+		logCtx := &core.LogContext{
+			PrimaryPodName: j.Name,
+			Pods: []*core.PodLogContext{
+				{
+					Namespace:            j.Namespace,
+					PodName:              j.Name,
+					PrimaryContainerName: "primary",
+					Containers: []*core.ContainerContext{
+						{
+							ContainerName: "primary",
+							Process: &core.ContainerContext_ProcessContext{
+								ContainerStartTime: timestamppb.New(startTime),
+							},
+						},
+					},
+					InitContainers: []*core.ContainerContext{
+						{
+							ContainerName: "init",
+							Process: &core.ContainerContext_ProcessContext{
+								ContainerStartTime: timestamppb.New(startTime),
+								ContainerEndTime:   timestamppb.New(endTime),
+							},
+						},
+					},
 				},
 			},
 		}
 
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
+		assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 	})
 
 	t.Run("queued", func(t *testing.T) {
 		j.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, phaseInfo.Phase())
 	})
 
 	t.Run("failNoCondition", func(t *testing.T) {
 		j.Status.Phase = v1.PodFailed
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -458,7 +539,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 				Type: v1.PodReasonUnschedulable,
 			},
 		}
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -477,14 +558,14 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 			},
 		}
 
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 
 	t.Run("success", func(t *testing.T) {
 		j.Status.Phase = v1.PodSucceeded
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.NotNil(t, phaseInfo)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
@@ -501,7 +582,7 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
 	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
-	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+	pluginContext := dummyContainerPluginContext(taskTemplate, taskMetadata)
 
 	ctx := context.TODO()
 	reason := "InvalidImageName"
@@ -534,11 +615,96 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 
 	t.Run("failInvalidImageName", func(t *testing.T) {
 		pendingPod.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, pendingPod)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, pendingPod)
 		finalReason := fmt.Sprintf("|%s", reason)
 		finalMessage := fmt.Sprintf("|%s", message)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 		assert.Equal(t, &core.ExecutionError{Code: finalReason, Message: finalMessage, Kind: core.ExecutionError_USER}, phaseInfo.Err())
 	})
+}
+
+func TestContainerTaskExecutor_BuildResource_VscodePort(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{}))
+
+	command := []string{"command"}
+	args := []string{"{{.Input}}"}
+
+	testCases := []struct {
+		name         string
+		envVars      []v1.EnvVar
+		expectedPort int32
+	}{
+		{
+			name: "ACTION_NAME env var present - port 6060",
+			envVars: []v1.EnvVar{
+				{
+					Name:  flytek8s.FlyteEnableVscode,
+					Value: "true",
+				},
+				{
+					Name:  "ACTION_NAME",
+					Value: "some-action",
+				},
+			},
+			expectedPort: 6060,
+		},
+		{
+			name: "ACTION_NAME env var absent - port 8080",
+			envVars: []v1.EnvVar{
+				{
+					Name:  flytek8s.FlyteEnableVscode,
+					Value: "true",
+				},
+			},
+			expectedPort: 8080,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a task template with VSCode enabled and environment variables
+			podSpec := v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:    "test-image",
+						Command: command,
+						Args:    args,
+						Env:     tc.envVars,
+					},
+				},
+			}
+
+			podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+			assert.NoError(t, err)
+
+			taskTemplate := &core.TaskTemplate{
+				Type: "test",
+				Target: &core.TaskTemplate_K8SPod{
+					K8SPod: &core.K8SPod{
+						PodSpec: podSpecPb,
+					},
+				},
+				Config: map[string]string{
+					"primary_container_name": "test-image",
+				},
+			}
+
+			taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
+			taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+
+			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
+			assert.NoError(t, err)
+			assert.NotNil(t, r)
+
+			pod, ok := r.(*v1.Pod)
+			assert.True(t, ok)
+
+			// Verify the readiness probe port
+			assert.NotEmpty(t, pod.Spec.Containers)
+			assert.NotNil(t, pod.Spec.Containers[0].ReadinessProbe)
+			assert.NotNil(t, pod.Spec.Containers[0].ReadinessProbe.HTTPGet)
+			assert.Equal(t, tc.expectedPort, pod.Spec.Containers[0].ReadinessProbe.HTTPGet.Port.IntVal)
+		})
+	}
 }

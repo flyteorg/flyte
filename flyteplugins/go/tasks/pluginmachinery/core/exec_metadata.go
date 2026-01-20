@@ -1,22 +1,45 @@
 package core
 
 import (
+	"fmt"
+
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
-
-//go:generate mockery --all --case=underscore --with-expecter
 
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
 type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
+	GetConfigMap() *v1.ConfigMap
 	GetPodTemplate() *core.K8SPod
-	GetConfig() *v1.ConfigMap
+	GetConfig() map[string]string
+}
+
+type ConnectionWrapper struct {
+	Connection core.Connection
+	Source     common.AttributesSource
+}
+
+// ExternalResourceAttributes is a wrapper around ExternalResourceAttributes to expose the source of the attributes
+type ExternalResourceAttributes struct {
+	Connections map[string]ConnectionWrapper
+}
+
+func (e ExternalResourceAttributes) GetConnection(name string) (*core.Connection, common.AttributesSource, error) {
+	if connWrapper, ok := e.Connections[name]; ok {
+		return &connWrapper.Connection, connWrapper.Source, nil
+	}
+	return nil, common.AttributesSource_SOURCE_UNSPECIFIED, fmt.Errorf("connection [%s] not found", name)
+}
+
+func (e ExternalResourceAttributes) GetConnections() map[string]ConnectionWrapper {
+	return e.Connections
 }
 
 // TaskExecutionID is a simple Interface to expose the ExecutionID of the running Task
@@ -30,7 +53,7 @@ type TaskExecutionID interface {
 	GetGeneratedNameWith(minLength, maxLength int) (string, error)
 
 	// GetID returns the underlying idl task identifier.
-	GetID() core.TaskExecutionIdentifier // TODO (whynopointer)
+	GetID() core.TaskExecutionIdentifier
 
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.
@@ -51,10 +74,11 @@ type TaskExecutionMetadata interface {
 	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
-	GetSecurityContext() core.SecurityContext // TODO (whynopointer)
+	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+	GetExternalResourceAttributes() ExternalResourceAttributes
 	GetConsoleURL() string
 }

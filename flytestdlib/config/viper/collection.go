@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/pflag"
 	viperLib "github.com/spf13/viper"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 type Viper interface {

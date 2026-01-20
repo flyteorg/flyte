@@ -2,15 +2,15 @@ package k8s
 
 import (
 	"context"
+	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
@@ -30,27 +30,6 @@ type PluginEntry struct {
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
 }
 
-type ErrorAggregationStrategy int
-
-const (
-	// Single error file from a single container
-	DefaultErrorAggregationStrategy ErrorAggregationStrategy = iota
-
-	// Earliest error from potentially multiple error files
-	EarliestErrorAggregationStrategy
-)
-
-func (e ErrorAggregationStrategy) String() string {
-	switch e {
-	case DefaultErrorAggregationStrategy:
-		return "Default"
-	case EarliestErrorAggregationStrategy:
-		return "Earliest"
-	default:
-		panic("Unknown enum value, cannot happen")
-	}
-}
-
 // System level properties that this Plugin supports
 type PluginProperties struct {
 	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.
@@ -66,8 +45,6 @@ type PluginProperties struct {
 	// override that behavior unless the resource that gets created for this plugin does not consume resources (cluster's
 	// cpu/memory... etc. or external resources) once the plugin's Plugin.GetTaskPhase() returns a terminal phase.
 	DisableDeleteResourceOnFinalize bool
-	// Specifies how errors are aggregated
-	ErrorAggregationStrategy ErrorAggregationStrategy
 }
 
 // Special context passed in to plugins when checking task phase
@@ -89,6 +66,9 @@ type PluginContext interface {
 
 	// Returns a reader that retrieves previously stored plugin internal state. the state itself is immutable
 	PluginStateReader() pluginsCore.PluginStateReader
+
+	// K8sReader returns a read-only k8s client that can fetch pod(s) for given node execution
+	K8sReader() client.Reader
 }
 
 // PluginState defines the state of a k8s plugin. This information must be maintained between propeller evaluations to
@@ -118,6 +98,22 @@ type Plugin interface {
 
 	// Properties desired by the plugin
 	GetProperties() PluginProperties
+
+	// GarbageCollectable enables an external garbage collector to clean up resources created by the plugin
+	GarbageCollectable
+}
+
+// GarbageCollectable is an interface plugins implement to provide an external garbage collector information.
+type GarbageCollectable interface {
+	// IsTerminal returns true if the resource is in a terminal state
+	IsTerminal(ctx context.Context, resource client.Object) (bool, error)
+
+	// GetCompletionTime returns when the resource reached terminal state
+	GetCompletionTime(resource client.Object) (time.Time, error)
+
+	// Note: The external garbage collector uses PluginEntry.ResourceToWatch to determine
+	// which resource type to delete. If a plugin creates additional resources that require
+	// cleanup, this interface will need to be extended to return those resources.
 }
 
 // An optional interface a Plugin can implement to override its default OnAbort finalizer (deletion of the underlying resource).
@@ -148,12 +144,12 @@ type UpdateResourceOperation struct {
 	Options []client.UpdateOption
 }
 
-// AbortBehaviorPatchDefaultResource that patches the default resource
+// AbortBehavior that patches the default resource
 func AbortBehaviorPatchDefaultResource(patchOperation PatchResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorPatch(patchOperation, deleteOnErr, nil)
 }
 
-// AbortBehaviorPatch that patches the specified resource
+// AbortBehavior that patches the specified resource
 func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -162,12 +158,12 @@ func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool,
 	}
 }
 
-// AbortBehaviorUpdateDefaultResource that updates the default resource
+// AbortBehavior that updates the default resource
 func AbortBehaviorUpdateDefaultResource(updateOperation UpdateResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorUpdate(updateOperation, deleteOnErr, nil)
 }
 
-// AbortBehaviorUpdate that updates the specified resource
+// AbortBehavior that updates the specified resource
 func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -176,12 +172,12 @@ func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bo
 	}
 }
 
-// AbortBehaviorDeleteDefaultResource that deletes the default resource
+// AbortBehavior that deletes the default resource
 func AbortBehaviorDeleteDefaultResource() AbortBehavior {
 	return AbortBehaviorDelete(nil)
 }
 
-// AbortBehaviorDelete that deletes the specified resource
+// AbortBehavior that deletes the specified resource
 func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:       resource,
@@ -194,7 +190,7 @@ func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 // Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
 
 func MaybeUpdatePhaseVersion(phaseInfo *pluginsCore.PhaseInfo, pluginState *PluginState) {
-	if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+	if phaseInfo.Phase() == pluginState.Phase &&
 		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
 
 		*phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)

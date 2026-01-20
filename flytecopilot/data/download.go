@@ -20,10 +20,10 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/futures"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/futures"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type Downloader struct {
@@ -102,6 +102,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
+			absPath := absPath
 
 			wg.Add(1)
 			go func() {

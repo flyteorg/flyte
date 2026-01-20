@@ -2,20 +2,24 @@ package pod
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -59,7 +63,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	}
 	primaryContainerName := ""
 
-	if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 0 {
+	if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 0 {
 		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
 		sidecarJob := sidecarJob{}
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
@@ -79,7 +83,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		// update annotations and labels
 		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, sidecarJob.Annotations)
 		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
-	} else if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 1 {
+	} else if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 1 {
 		// handles pod tasks that marshal the pod spec to the task custom.
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
 		if err != nil {
@@ -100,9 +104,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().GetMetadata() != nil {
-			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().GetMetadata().GetAnnotations())
-			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().GetMetadata().GetLabels())
+		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().Metadata != nil {
+			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().Metadata.Annotations)
+			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().Metadata.Labels)
 		}
 	} else {
 		// handles both container / pod tasks that use the TaskTemplate Container and K8sPod fields
@@ -119,10 +123,40 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		return nil, err
 	}
 
+	for i, c := range podSpec.Containers {
+		if len(podSpec.Containers) > 1 && c.Name != primaryContainerName {
+			continue
+		}
+		if !flytek8s.IsVscodeEnabled(ctx, podSpec.Containers[i].Env) {
+			break
+		}
+		port := 8080
+		// TODO: Will remove this logic once we have a better way to identify v2 tasks
+		for _, env := range podSpec.Containers[i].Env {
+			if env.Name != "ACTION_NAME" {
+				continue
+			}
+			port = 6060
+		}
+
+		newContainer := c.DeepCopy()
+		newContainer.ReadinessProbe = &v1.Probe{
+			ProbeHandler: v1.ProbeHandler{
+				HTTPGet: &v1.HTTPGetAction{
+					Port: intstr.FromInt32(int32(port)),
+				},
+			},
+			InitialDelaySeconds: 15,
+			PeriodSeconds:       5,
+			FailureThreshold:    50,
+		}
+		podSpec.Containers[i] = *newContainer
+	}
+
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.GetType() == SidecarTaskType || (len(podSpec.Containers) == 1 && taskTemplate.GetType() != rawContainerTaskType) {
+	if taskTemplate.Type == SidecarTaskType || (len(podSpec.Containers) == 1 && taskTemplate.Type != rawContainerTaskType) {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -143,7 +177,7 @@ func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContex
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, " (User)", nil)
+	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, "", nil)
 }
 
 func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme []tasklog.TemplateVar) (pluginsCore.PhaseInfo, error) {
@@ -172,26 +206,72 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
-	if err != nil {
-		return pluginsCore.PhaseInfoUndefined, err
+	if pod.Status.Phase != v1.PodUnknown {
+		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
+		if err != nil {
+			return pluginsCore.PhaseInfoUndefined, err
+		}
+		info.Logs = taskLogs
+		info.LogContext = &core.LogContext{
+			PrimaryPodName: pod.Name,
+			Pods:           []*core.PodLogContext{flytek8s.BuildPodLogContext(pod)},
+		}
 	}
-	info.Logs = taskLogs
 
 	phaseInfo, err := DemystifyPodStatus(ctx, pod, info)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
+
+	if phaseInfo.Phase() >= pluginsCore.PhaseRunning {
+		for _, tl := range info.Logs {
+			if tl != nil && tl.LinkType == core.TaskLog_IDE {
+				tl.Ready = IsPodReady(pod)
+				if tl.Ready {
+					phaseInfo.WithReason("Vscode server is ready")
+				} else {
+					phaseInfo.WithReason("Vscode server is not ready")
+				}
+				break
+			}
+		}
+	}
+
 	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
 }
 
+func IsPodReady(pod *v1.Pod) bool {
+	primaryContainerName := flytek8s.GetPrimaryContainerName(pod)
+	if len(primaryContainerName) == 0 {
+		// Check pod readiness only when primary container is nod defined.
+		for _, cond := range pod.Status.Conditions {
+			if cond.Type == v1.PodReady && cond.Status == v1.ConditionTrue {
+				return true
+			}
+		}
+	} else {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name == primaryContainerName && status.Ready {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (plugin) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
 func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	pluginState := k8s.PluginState{}
+	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
 	phaseInfo := pluginsCore.PhaseInfoUndefined
 	var err error
 	primaryContainerName, primaryContainerExists := pod.GetAnnotations()[flytek8s.PrimaryContainerKey]
 
+	hasLogs := len(info.Logs) > 0 || len(info.LogContext.GetPods()) > 0
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
 		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
@@ -200,10 +280,12 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
+	case v1.PodUnknown:
+		// DO NOTHING
 	default:
 		if !primaryContainerExists {
-			// if all of the containers and sidecars in the Pod are complete, as an optimization, we can declare the task as
+			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
 			// succeeded rather than waiting for the Pod to be marked completed.
 			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
 			for _, s := range pod.Status.ContainerStatuses {
@@ -228,7 +310,7 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 			// to succeed to declare success. therefore, if the pod is not in one of the above states we
 			// fallback to declaring the task as 'running'.
 			phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
-			if len(info.Logs) > 0 {
+			if hasLogs {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		} else {
@@ -244,7 +326,7 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 						break
 					}
 				}
-			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
+			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && hasLogs {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		}
@@ -258,8 +340,64 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 	return phaseInfo, err
 }
 
-func (plugin) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+// latestTime returns the latest non-zero time from the given times
+func latestTime(times []metav1.Time) time.Time {
+	var latest time.Time
+	for _, t := range times {
+		if !t.IsZero() && t.Time.After(latest) {
+			latest = t.Time
+		}
+	}
+	return latest
+}
+
+// IsTerminal returns true if the pod is in a terminal state (Succeeded or Failed)
+func (plugin) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	pod, ok := resource.(*v1.Pod)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *v1.Pod, got %T", resource)
+	}
+	return pod.Status.Phase == v1.PodSucceeded || pod.Status.Phase == v1.PodFailed, nil
+}
+
+// GetCompletionTime returns the latest container termination time, or falls back to other timestamps
+func (plugin) GetCompletionTime(resource client.Object) (time.Time, error) {
+	pod, ok := resource.(*v1.Pod)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *v1.Pod, got %T", resource)
+	}
+
+	var times []metav1.Time
+
+	for _, cs := range pod.Status.InitContainerStatuses {
+		if cs.State.Terminated != nil {
+			times = append(times, cs.State.Terminated.FinishedAt)
+		}
+		if cs.LastTerminationState.Terminated != nil {
+			times = append(times, cs.LastTerminationState.Terminated.FinishedAt)
+		}
+	}
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Terminated != nil {
+			times = append(times, cs.State.Terminated.FinishedAt)
+		}
+		if cs.LastTerminationState.Terminated != nil {
+			times = append(times, cs.LastTerminationState.Terminated.FinishedAt)
+		}
+	}
+
+	latest := latestTime(times)
+	if !latest.IsZero() {
+		return latest, nil
+	}
+
+	if pod.DeletionTimestamp != nil {
+		return pod.DeletionTimestamp.Time, nil
+	}
+	if pod.Status.StartTime != nil {
+		return pod.Status.StartTime.Time, nil
+	}
+	return pod.CreationTimestamp.Time, nil
 }
 
 func init() {

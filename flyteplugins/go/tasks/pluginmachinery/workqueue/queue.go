@@ -9,13 +9,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 //go:generate enumer --type=WorkStatus
 
 type WorkItemID = string
@@ -227,7 +226,6 @@ func (q *queue) Start(ctx context.Context) error {
 
 						wrapper.retryCount++
 						wrapper.err = err
-						// #nosec G115
 						if wrapper.retryCount >= uint(q.maxRetries) {
 							logger.Debugf(ctx, "WorkItem [%v] exhausted all retries. Last Error: %v.",
 								wrapper.ID(), err)

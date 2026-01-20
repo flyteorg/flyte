@@ -1,151 +1,249 @@
-export REPOSITORY=flyte
-include boilerplate/flyte/end2end/Makefile
-include boilerplate/flyte/golang_test_targets/Makefile
+.DEFAULT_GOAL := help
 
-define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
-endef
+# Docker CI image configuration
+DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
 
-GIT_VERSION := $(shell git describe --tags --long --match "v*" --first-parent)
-GIT_HASH := $(shell git rev-parse --short HEAD)
-TIMESTAMP := $(shell date '+%Y-%m-%d')
-PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
-LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
-TMP_BUILD_DIR := .tmp_build
+# Environment variable flags for Docker
+DOCKER_ENV_FLAGS :=
+ifdef GITHUB_TOKEN
+	DOCKER_ENV_FLAGS += -e GITHUB_TOKEN=$(GITHUB_TOKEN)
+endif
+ifdef BUF_TOKEN
+	DOCKER_ENV_FLAGS += -e BUF_TOKEN=$(BUF_TOKEN)
+endif
 
-.PHONY: cmd/single/dist
-cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
-cmd/single/dist:
-	script/get_flyteconsole_dist.sh
+DOCKER_RUN := docker run --rm -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE)
 
-.PHONY: compile
-compile: cmd/single/dist
-	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
-	mv ./flyte ${GOPATH}/bin/ || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
+SEPARATOR := \033[1;36m========================================\033[0m
 
-.PHONY: linux_compile
-linux_compile: cmd/single/dist
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
-
-.PHONY: update_boilerplate
-update_boilerplate:
-	@boilerplate/update.sh
-
-.PHONY: helm
-helm: ## Generate K8s Manifest from Helm Charts.
-	bash script/generate_helm.sh
-	make -C docker/sandbox-bundled manifests
-
-.PHONY: release_automation
-release_automation:
-	mkdir -p release
-	bash script/release.sh
-	bash script/generate_config_docs.sh
-	$(MAKE) -C docker/sandbox-bundled manifests
-
-.PHONY: deploy_sandbox
-deploy_sandbox:
-	bash script/deploy.sh
-
-.PHONY: install-piptools
-install-piptools: ## Install pip-tools
-	pip install -U pip-tools
-
-.PHONY: install-conda-lock
-install-conda-lock:
-	pip install conda-lock
-
-.PHONY: conda-lock
-conda-lock: install-conda-lock
-	conda-lock -f monodocs-environment.yaml --without-cuda \
-		--lockfile monodocs-environment.lock.yaml \
-		--platform=osx-64 --platform=osx-arm64 --platform=linux-64
-
-.PHONY: stats
-stats:
-	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller.dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin.dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser.dashboard.py
-
-.PHONY: prepare_artifacts
-prepare_artifacts:
-	bash script/prepare_artifacts.sh
-
-.PHONE: helm_update
-helm_update: ## Update helm charts' dependencies.
-	helm dep update ./charts/flyte/
-
-.PHONY: helm_install
-helm_install: ## Install helm charts
-	helm install flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
-
-.PHONY: helm_upgrade
-helm_upgrade: ## Upgrade helm charts
-	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
-
-# Used in CI
-.PHONY: docs
-docs:
-	make -C docs clean html SPHINXOPTS=-W
-
-$(TMP_BUILD_DIR):
-	mkdir $@
-
-$(TMP_BUILD_DIR)/conda-lock-image: docs/Dockerfile.conda-lock | $(TMP_BUILD_DIR)
-	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f docs/Dockerfile.conda-lock .
-	touch $(TMP_BUILD_DIR)/conda-lock-image
-
-monodocs-environment.lock.yaml: monodocs-environment.yaml $(TMP_BUILD_DIR)/conda-lock-image
-	docker run --platform=linux/amd64 --rm --pull never -v ./:/flyte flyte-conda-lock:latest lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml
-
-$(TMP_BUILD_DIR)/dev-docs-image: docs/Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
-	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f docs/Dockerfile.docs .
-	touch $(TMP_BUILD_DIR)/dev-docs-image
-
-# Build docs in docker container for local development
-.PHONY: dev-docs
-dev-docs: $(TMP_BUILD_DIR)/dev-docs-image
-	bash script/local_build_docs.sh
+# Include common Go targets
+include go.Makefile
 
 .PHONY: help
-help: SHELL := /bin/sh
-help: ## List available commands and their usage
-	@awk 'BEGIN {FS = ":.*?##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[0-9a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } ' $(MAKEFILE_LIST)
+help: ## Show this help message
+	@echo '🆘  Showing help message'
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Available targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: setup_local_dev
-setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
-	@bash script/setup_local_dev.sh
+.PHONY: sep
+sep:
+	@echo "$(SEPARATOR)"
 
-# This builds the flyte binary image for whatever architecture you're on. Don't push this image to the official
-# registry because we need those to be multi-arch.
-.PHONY: build_native_flyte
-build_native_flyte: FLYTECONSOLE_VERSION := latest
-build_native_flyte:
-	docker build \
-	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
-	--tag flyte-binary:native .
+# =============================================================================
+# Local Tool Commands (require buf, go, cargo, uv installed locally)
+# =============================================================================
+
+.PHONY: buf-dep
+buf-dep:
+	@echo '📦  Updating buf modules (local)'
+	buf dep update
+	@$(MAKE) sep
+
+.PHONY: buf-format
+buf-format:
+	@echo 'Running buf format (local)'
+	buf format -w
+	@$(MAKE) sep
+
+.PHONY: buf-lint
+buf-lint:
+	@echo '🧹  Linting protocol buffer files (local)'
+	buf lint --exclude-path flytestdlib/
+	@$(MAKE) sep
+
+.PHONY: buf-ts
+buf-ts:
+	@echo '🟦  Generating TypeScript protocol buffer files (local)'
+	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
+	@cp -r flyteidl2/gen_utils/ts/* gen/ts/
+	@echo '📦  Installing TypeScript dependencies'
+	@cd gen/ts && npm install --silent
+	@echo '✅  TypeScript generation complete'
+	@$(MAKE) sep
+
+.PHONY: buf-ts-check
+buf-ts-check: buf-ts
+	@echo '🔍  Type checking generated TypeScript files'
+	@cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0)
+	@echo '✅  Type checking complete'
+	@$(MAKE) sep
+
+.PHONY: buf-go
+buf-go:
+	@echo '🟩  Generating Go protocol buffer files (local)'
+	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/
+	@$(MAKE) sep
+
+.PHONY: buf-rust
+buf-rust:
+	@echo '🦀  Generating Rust protocol buffer files (local)'
+	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
+	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
+	@cd gen/rust && cargo update
+	@$(MAKE) sep
+
+export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
+.PHONY: buf-python
+buf-python:
+	@echo '🐍  Generating Python protocol buffer files (local)'
+	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
+	@cp flyteidl2/gen_utils/python/* gen/python/
+	@find gen/python -type d -exec touch {}/__init__.py \;
+	@cd gen/python && uv lock
+	@$(MAKE) sep
+
+.PHONY: buf
+buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
+	@echo '🛠️  Finished generating all protocol buffer files (local)'
+	@$(MAKE) sep
 
 .PHONY: go-tidy
 go-tidy:
-	go mod tidy
-	make -C datacatalog go-tidy
-	make -C flyteadmin go-tidy
-	make -C flyteidl go-tidy
-	make -C flytepropeller go-tidy
-	make -C flyteplugins go-tidy
-	make -C flytestdlib go-tidy
-	make -C flytecopilot go-tidy
-	make -C flytectl go-tidy
+	@echo '🧹  Running go mod tidy (local)'
+	@go mod tidy $(OUT_REDIRECT)
+	@$(MAKE) sep
 
-.PHONY: lint-helm-charts
-lint-helm-charts:
-	# This pressuposes that you have act installed
-	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+.PHONY: mocks
+mocks:
+	@echo "🧪  Generating go mocks (local)"
+	mockery $(OUT_REDIRECT)
+	@$(MAKE) sep
 
-.PHONY: spellcheck
-spellcheck:
-	act pull_request --container-architecture linux/amd64 -W .github/workflows/codespell.yml
+.PHONY: gen-local
+gen-local: buf mocks go-tidy ## Generate everything using local tools (requires buf, go, cargo, uv)
+	@echo '⚡  Finished generating everything in the gen directory (local)'
+	@$(MAKE) sep
 
-.PHONY: clean
-clean: ## Remove the HTML files related to the Flyteconsole and Makefile
-	rm -rf cmd/single/dist .tmp_build
+.PHONY: build-crate
+build-crate: ## Build Rust crate using local cargo
+	@echo 'Cargo build the generated rust code (local)'
+	cd gen/rust && cargo build
+	@$(MAKE) sep
+
+# =============================================================================
+# Package Dry-Run Commands (validate packages before publishing)
+# =============================================================================
+
+.PHONY: dry-run-npm
+dry-run-npm: ## Dry-run npm package (shows what will be published)
+	@echo '📦  NPM Package Dry Run'
+	@echo '─────────────────────────────────────────'
+	@echo '📄  Package files that will be included:'
+	@cd gen/ts && npm pack --dry-run 2>&1 | grep -v "npm notice" || true
+	@echo ''
+	@echo '📋  Package contents (from package.json "files" field):'
+	@cd gen/ts && cat package.json | grep -A 10 '"files"'
+	@echo ''
+	@echo '✅  Validation: Running npm pack to create tarball...'
+	@cd gen/ts && npm pack
+	@echo ''
+	@echo '📦  Contents of generated tarball:'
+	@cd gen/ts && tar -tzf flyteorg-flyteidl2-*.tgz | head -50
+	@echo ''
+	@echo '🧹  Cleaning up tarball...'
+	@cd gen/ts && rm -f flyteorg-flyteidl2-*.tgz
+	@echo '✅  NPM dry run complete!'
+	@$(MAKE) sep
+
+.PHONY: dry-run-python
+dry-run-python: ## Dry-run Python package (shows what will be published)
+	@echo '🐍  Python Package Dry Run'
+	@echo '─────────────────────────────────────────'
+	@echo '📦  Cleaning previous builds and venvs...'
+	@rm -rf .venv
+	@cd gen/python && rm -rf dist build *.egg-info .venv
+	@echo '📦  Building Python wheel (using Docker CI image)...'
+	@docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash -c "cd gen/python && export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 && uv venv && uv pip install build twine setuptools wheel && uv run python -m build --wheel --installer uv"
+	@echo ''
+	@echo '✅  Running twine check for validation...'
+	@docker run --rm -v $(CURDIR):/workspace -w /workspace $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash -c "cd gen/python && uv pip install twine && uv run python -m twine check dist/* --strict"
+	@echo ''
+	@echo '📋  Package metadata (from pyproject.toml):'
+	@cd gen/python && grep -A 5 "^\[tool.setuptools.packages.find\]" pyproject.toml
+	@echo ''
+	@echo '📦  Contents of wheel (first 100 files):'
+	@cd gen/python && unzip -l dist/*.whl | head -100
+	@echo ''
+	@echo '📊  Wheel file size:'
+	@cd gen/python && ls -lh dist/*.whl
+	@echo ''
+	@echo '🧹  Note: build artifacts preserved for inspection in gen/python/'
+	@echo '    Run: cd gen/python && rm -rf dist/ build/ *.egg-info to clean up'
+	@echo '✅  Python dry run complete!'
+	@$(MAKE) sep
+
+.PHONY: dry-run-rust
+dry-run-rust: ## Dry-run Rust package (shows what will be published)
+	@echo '🦀  Rust Package Dry Run'
+	@echo '─────────────────────────────────────────'
+	@echo '📋  Files that will be included in crate:'
+	@cd gen/rust && cargo package --list --allow-dirty | head -100
+	@echo ''
+	@echo '📦  Creating package tarball...'
+	@cd gen/rust && cargo package --allow-dirty
+	@echo ''
+	@echo '📊  Package tarball info:'
+	@cd gen/rust && ls -lh target/package/flyteidl2-*.crate
+	@echo ''
+	@echo '📦  Contents of crate tarball (first 50 files):'
+	@cd gen/rust && tar -tzf target/package/flyteidl2-*.crate | head -50
+	@echo ''
+	@echo '✅  Validation: Running cargo build on packaged crate...'
+	@cd gen/rust && cargo build --release
+	@echo ''
+	@echo '🧹  Note: target/package/ directory preserved for inspection'
+	@echo '    Run: rm -rf gen/rust/target/package/ to clean up'
+	@echo '✅  Rust dry run complete!'
+	@$(MAKE) sep
+
+.PHONY: dry-run-all
+dry-run-all: dry-run-npm dry-run-python dry-run-rust ## Run dry-run for all packages (TypeScript, Python, Rust)
+	@echo '🎉  All package dry runs complete!'
+	@echo ''
+	@echo 'Summary:'
+	@echo '  - TypeScript: gen/ts (npm package @flyteorg/flyteidl2)'
+	@echo '  - Python:     gen/python/dist/ (PyPI package flyteidl2)'
+	@echo '  - Rust:       gen/rust/target/package/ (crates.io package flyteidl2)'
+	@echo ''
+	@echo 'Clean up artifacts with:'
+	@echo '  - rm -f gen/ts/*.tgz'
+	@echo '  - rm -rf gen/python/dist/'
+	@echo '  - rm -rf gen/rust/target/package/'
+	@$(MAKE) sep
+
+# =============================================================================
+# Default Commands (use Docker - no local tools required)
+# =============================================================================
+
+.PHONY: gen
+gen: ## Generate everything (uses Docker - no local tools required)
+	$(DOCKER_RUN) make gen-local
+	@echo '⚡  Finished generating everything in the gen directory (Docker)'
+	@$(MAKE) sep
+
+# Docker-based development targets
+.PHONY: docker-pull
+docker-pull: ## Pull the latest CI Docker image
+	@echo '📦  Pulling latest CI Docker image'
+	docker pull $(DOCKER_CI_IMAGE)
+	@$(MAKE) sep
+
+.PHONY: docker-build
+docker-build: ## Build Docker CI image locally (faster iteration)
+	@echo '🔨  Building Docker CI image locally (fast mode)'
+	docker build -f gen.Dockerfile -t $(DOCKER_CI_IMAGE) --cache-from $(DOCKER_CI_IMAGE) .
+	@echo '✅  Image built: $(DOCKER_CI_IMAGE)'
+	@$(MAKE) sep
+
+.PHONY: docker-shell
+docker-shell: ## Start an interactive shell in the CI Docker container
+	@echo '🐳  Starting interactive shell in CI container'
+	docker run --rm -it -v $(CURDIR):/workspace -w /workspace -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv $(DOCKER_ENV_FLAGS) $(DOCKER_CI_IMAGE) bash
+
+# Combined workflow for fast iteration
+.PHONY: docker-dev
+docker-dev: docker-build gen ## Build local image and run generation (fast iteration)
+	@echo '✅  Local Docker image built and generation complete!'
+	@$(MAKE) sep

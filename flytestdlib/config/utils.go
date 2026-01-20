@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	stdLibErrs "github.com/flyteorg/flyte/flytestdlib/errors"
+	stdLibErrs "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
 
 // Uses Json marshal/unmarshal to make a deep copy of a config object.

@@ -18,10 +18,10 @@ import (
 	viperLib "github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/files"
-	stdLibErrs "github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config/files"
+	stdLibErrs "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 const (
@@ -112,7 +112,7 @@ func (v viperAccessor) bindViperConfigsEnvDepth(m map[string]interface{}, prefix
 		if asMap, ok := val.(map[string]interface{}); ok {
 			errs.Append(v.bindViperConfigsEnvDepth(asMap, subKey+keyDelim))
 		} else {
-			errs.Append(v.viper.BindEnv(subKey, strings.ToUpper(strings.Replace(subKey, "-", "_", -1))))
+			errs.Append(v.viper.BindEnv(subKey, strings.ToUpper(strings.ReplaceAll(subKey, "-", "_"))))
 		}
 	}
 

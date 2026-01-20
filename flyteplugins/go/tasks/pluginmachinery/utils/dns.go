@@ -6,13 +6,12 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/validation"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 )
 
 var dns1123InvalidRegex = regexp.MustCompile("[^-.a-z0-9]")
 var camelCaseRegex = regexp.MustCompile("([a-z0-9])([A-Z])")
-
-const maxUniqueIDLength = 20
 
 // ConvertToDNS1123SubdomainCompatibleString converts a string that doesn't conform to the definition of a subdomain in DNS (RFC 1123) to a string that conforms. It doesn't do well on labels (separated by dots) starting or ending with hyphens.
 func ConvertToDNS1123SubdomainCompatibleString(name string) string {
@@ -24,9 +23,9 @@ func ConvertToDNS1123SubdomainCompatibleString(name string) string {
 	name = dns1123InvalidRegex.ReplaceAllString(name, "")
 	name = strings.Trim(name, ".-")
 	if len(name) > validation.DNS1123SubdomainMaxLength {
-		fixedLengthID, err := encoding.FixedLengthUniqueID(name, maxUniqueIDLength)
+		fixedLengthID, err := encoding.FixedLengthUniqueID(name, utils.MaxUniqueIDLength)
 		if err == nil {
-			name = name[:validation.DNS1123SubdomainMaxLength-maxUniqueIDLength-1] + "-" + fixedLengthID
+			name = name[:validation.DNS1123SubdomainMaxLength-utils.MaxUniqueIDLength-1] + "-" + fixedLengthID
 		} else {
 			name = name[:validation.DNS1123SubdomainMaxLength]
 		}

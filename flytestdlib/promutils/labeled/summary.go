@@ -6,8 +6,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // Summary represents a summary labeled with values from the context. See labeled.SetMetricsKeys for information about
@@ -21,7 +21,7 @@ type Summary struct {
 
 // Observe adds a single observation to the summary.
 func (s Summary) Observe(ctx context.Context, v float64) {
-	summary, err := s.SummaryVec.GetMetricWith(contextutils.Values(ctx, s.labels...))
+	summary, err := s.GetMetricWith(contextutils.Values(ctx, s.labels...))
 	if err != nil {
 		panic(err.Error())
 	}

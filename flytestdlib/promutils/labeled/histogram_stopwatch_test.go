@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 func ExampleHistogramStopWatch_Start() {
@@ -202,7 +202,7 @@ func TestLabeledHistogramStopWatch(t *testing.T) {
 			`testscope_hist_stopwatch:s2_unlabeled_sum`:                0.0,
 			`testscope_hist_stopwatch:s2_unlabeled_count`:              1,
 		}
-		assertMetrics(t, s.HistogramStopWatch.Observer.(prometheus.Histogram), "testscope_hist_stopwatch:s2_unlabeled", header, expectedMetrics)
+		assertMetrics(t, s.Observer.(prometheus.Histogram), "testscope_hist_stopwatch:s2_unlabeled", header, expectedMetrics)
 	})
 
 	t.Run("AdditionalLabels", func(t *testing.T) {

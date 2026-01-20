@@ -58,14 +58,6 @@ func Errorf(errorCode ErrorCode, msgFmt string, args ...interface{}) error {
 	}
 }
 
-// Creates a new error using an error code and a message.
-func Error(errorCode ErrorCode, msg string) error {
-	return &err{
-		code:    errorCode,
-		message: msg,
-	}
-}
-
 // Wraps a root cause error with another. This is useful to unify an error type in a package.
 func Wrapf(code ErrorCode, cause error, msgFmt string, args ...interface{}) error {
 	return &errorWithCause{

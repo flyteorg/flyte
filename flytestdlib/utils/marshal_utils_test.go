@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 
-	"github.com/flyteorg/flyte/flytestdlib/utils/prototest"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils/prototest"
 )
 
 type SimpleType struct {

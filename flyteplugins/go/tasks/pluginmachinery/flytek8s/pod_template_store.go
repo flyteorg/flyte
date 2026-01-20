@@ -7,10 +7,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
-var DefaultPodTemplateStore = NewPodTemplateStore()
+var DefaultPodTemplateStore PodTemplateStore = NewPodTemplateStore()
 
 // PodTemplateStore maintains a thread-safe mapping of active PodTemplates with their associated
 // namespaces.
@@ -41,16 +41,15 @@ func (p *PodTemplateStore) Delete(podTemplate *v1.PodTemplate) {
 
 // LoadOrDefault returns the PodTemplate with the specified name in the given namespace. If one
 // does not exist it attempts to retrieve the one associated with the defaultNamespace.
-// Returns a deep copy of the cached PodTemplate to prevent state pollution between workflows.
 func (p *PodTemplateStore) LoadOrDefault(namespace string, podTemplateName string) *v1.PodTemplate {
 	if value, ok := p.Load(podTemplateName); ok {
 		podTemplates := value.(*sync.Map)
 		if podTemplate, ok := podTemplates.Load(namespace); ok {
-			return podTemplate.(*v1.PodTemplate).DeepCopy()
+			return podTemplate.(*v1.PodTemplate)
 		}
 
 		if podTemplate, ok := podTemplates.Load(p.defaultNamespace); ok {
-			return podTemplate.(*v1.PodTemplate).DeepCopy()
+			return podTemplate.(*v1.PodTemplate)
 		}
 	}
 

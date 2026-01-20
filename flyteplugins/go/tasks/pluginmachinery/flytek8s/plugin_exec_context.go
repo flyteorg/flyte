@@ -1,10 +1,16 @@
 package flytek8s
 
 import (
-	v1 "k8s.io/api/core/v1"
+	"context"
+	"reflect"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type pluginTaskOverrides struct {
@@ -128,4 +134,49 @@ func NewPluginTaskExecutionContext(tc pluginsCore.TaskExecutionContext, options 
 		o(ctx)
 	}
 	return ctx
+}
+
+type NodeExecutionK8sReader struct {
+	namespace   string
+	executionID string
+	nodeID      string
+	client      client.Reader
+}
+
+func NewNodeExecutionK8sReader(meta pluginsCore.TaskExecutionMetadata, client pluginsCore.KubeClient) *NodeExecutionK8sReader {
+	tID := meta.GetTaskExecutionID().GetID()
+	executionID := tID.GetNodeExecutionId().GetExecutionId().GetName()
+	nodeID := tID.GetNodeExecutionId().GetNodeId()
+	namespace := meta.GetNamespace()
+	return &NodeExecutionK8sReader{
+		namespace:   namespace,
+		executionID: executionID,
+		nodeID:      nodeID,
+		client:      client.GetCache(),
+	}
+}
+
+func (n NodeExecutionK8sReader) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+	key.Namespace = n.namespace
+	err := n.client.Get(ctx, key, obj, opts...)
+	if err != nil {
+		return err
+	}
+
+	if obj.GetLabels()["node-id"] != n.nodeID || obj.GetLabels()["execution-id"] != n.executionID {
+		// reset obj to default value, simulate not found
+		p := reflect.ValueOf(obj).Elem()
+		p.Set(reflect.Zero(p.Type()))
+		kind := obj.GetObjectKind().GroupVersionKind()
+		return errors.NewNotFound(schema.GroupResource{Group: kind.Group, Resource: kind.Kind}, obj.GetName())
+	}
+	return nil
+}
+
+func (n NodeExecutionK8sReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	opts = append(opts, client.InNamespace(n.namespace), client.MatchingLabels{
+		"execution-id": n.executionID,
+		"node-id":      n.nodeID,
+	})
+	return n.client.List(ctx, list, opts...)
 }

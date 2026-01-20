@@ -7,11 +7,11 @@ import (
 	"hash/fnv"
 	"reflect"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyte/v2/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const specialEncoderKey = "abcdefghijklmnopqrstuvwxyz123456"
@@ -41,7 +41,7 @@ func consistentHash(str string) (string, error) {
 
 func hashInputs(ctx context.Context, key Key) (string, error) {
 	inputs := &core.LiteralMap{}
-	if key.TypedInterface.GetInputs() != nil {
+	if key.TypedInterface.Inputs != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return "", err
@@ -88,7 +88,7 @@ func (c AsyncClientImpl) Download(ctx context.Context, requests ...DownloadReque
 			}
 
 			if readerWorkItem.IsCached() {
-				cachedResults.Set(uint(idx)) // #nosec G115
+				cachedResults.Set(uint(idx))
 				cachedCount++
 			}
 		case workqueue.WorkStatusFailed:

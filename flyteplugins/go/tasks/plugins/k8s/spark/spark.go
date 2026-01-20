@@ -15,23 +15,24 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const KindSparkApplication = "SparkApplication"
 const sparkDriverUI = "sparkDriverUI"
 const sparkHistoryUI = "sparkHistoryUI"
+const defaultDriverPrimaryContainerName = "spark-kubernetes-driver"
 
 var featureRegex = regexp.MustCompile(`^spark.((flyteorg)|(flyte)).(.+).enabled$`)
 
@@ -45,7 +46,7 @@ func validateSparkJob(sparkJob *plugins.SparkJob) error {
 		return fmt.Errorf("empty sparkJob")
 	}
 
-	if len(sparkJob.GetMainApplicationFile()) == 0 && len(sparkJob.GetMainClass()) == 0 {
+	if len(sparkJob.MainApplicationFile) == 0 && len(sparkJob.MainClass) == 0 {
 		return fmt.Errorf("either MainApplicationFile or MainClass must be set")
 	}
 
@@ -66,7 +67,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkJob := plugins.SparkJob{}
-	err = utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &sparkJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob)
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -142,27 +143,9 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(
-	taskCtx pluginsCore.TaskExecutionContext,
-	podSpec *v1.PodSpec,
-	container *v1.Container,
-	k8sPod *core.K8SPod,
-) *sparkOp.SparkPodSpec {
-
-	annotations := pluginsUtils.UnionMaps(
-		config.GetK8sPluginConfig().DefaultAnnotations,
-		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
-	)
-	labels := pluginsUtils.UnionMaps(
-		config.GetK8sPluginConfig().DefaultLabels,
-		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
-	)
-	if k8sPod.GetMetadata().GetAnnotations() != nil {
-		annotations = pluginsUtils.UnionMaps(annotations, k8sPod.GetMetadata().GetAnnotations())
-	}
-	if k8sPod.GetMetadata().GetLabels() != nil {
-		labels = pluginsUtils.UnionMaps(labels, k8sPod.GetMetadata().GetLabels())
-	}
+func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, container *v1.Container) *sparkOp.SparkPodSpec {
+	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
 	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
@@ -224,7 +207,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer, driverPod)
+	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer)
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	spec := driverSpec{
 		&sparkOp.DriverSpec{
@@ -276,7 +259,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer, sparkJob.GetExecutorPod())
+	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer)
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
 	spec := executorSpec{
 		primaryContainer,
@@ -326,10 +309,10 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 		app.Spec.BatchScheduler = &val
 	}
 
-	if sparkJob.GetMainApplicationFile() != "" {
+	if sparkJob.MainApplicationFile != "" {
 		app.Spec.MainApplicationFile = &sparkJob.MainApplicationFile
 	}
-	if sparkJob.GetMainClass() != "" {
+	if sparkJob.MainClass != "" {
 		app.Spec.MainClass = &sparkJob.MainClass
 	}
 	return app
@@ -385,10 +368,11 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 	}, nil
 }
 
-func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
 
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
+	var logCtx *core.LogContext
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
 	if sj.Status.DriverInfo.PodName != "" {
@@ -401,8 +385,8 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			o, err := p.GetTaskLogs(tasklog.Input{
 				PodName:         sj.Status.DriverInfo.PodName,
 				Namespace:       sj.Namespace,
-				LogName:         "(Driver Logs)",
 				TaskExecutionID: taskExecID,
+				EnableVscode:    flytek8s.IsVscodeEnabled(ctx, sj.Spec.Driver.Env),
 			})
 
 			if err != nil {
@@ -422,7 +406,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Status.DriverInfo.PodName,
 			Namespace:       sj.Namespace,
-			LogName:         "(User Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
@@ -431,6 +414,31 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		}
 
 		taskLogs = append(taskLogs, o.TaskLogs...)
+	}
+
+	logCtx = &core.LogContext{
+		PrimaryPodName: sj.Status.DriverInfo.PodName,
+	}
+	logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+		Namespace:            sj.Namespace,
+		PodName:              sj.Status.DriverInfo.PodName,
+		PrimaryContainerName: defaultDriverPrimaryContainerName,
+		Containers: []*core.ContainerContext{
+			{ContainerName: defaultDriverPrimaryContainerName},
+		},
+	})
+
+	for executorPodName, executorState := range sj.Status.ExecutorState {
+		if executorState != sparkOp.ExecutorPendingState && executorState != sparkOp.ExecutorUnknownState {
+			logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+				Namespace:            sj.Namespace,
+				PodName:              executorPodName,
+				PrimaryContainerName: "spark-kubernetes-executor",
+				Containers: []*core.ContainerContext{
+					{ContainerName: "spark-kubernetes-executor"},
+				},
+			})
+		}
 	}
 
 	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
@@ -442,7 +450,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Name,
 			Namespace:       sj.Namespace,
-			LogName:         "(System Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
@@ -462,7 +469,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Name,
 			Namespace:       sj.Namespace,
-			LogName:         "(Spark-Submit/All User Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
@@ -477,6 +483,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
+
 	customInfoMap := make(map[string]string)
 
 	// Spark UI.
@@ -487,7 +494,9 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			taskLogs = append(taskLogs, &core.TaskLog{
 				Uri:           customInfoMap[sparkHistoryUI],
 				Name:          "Spark History UI",
+				Ready:         true,
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_DASHBOARD,
 			})
 		}
 	} else if sj.Status.AppState.State == sparkOp.RunningState && sj.Status.DriverInfo.WebUIIngressAddress != "" {
@@ -502,7 +511,9 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:           customInfoMap[sparkDriverUI],
 			Name:          "Spark Driver UI",
+			Ready:         true,
 			MessageFormat: core.TaskLog_JSON,
+			LinkType:      core.TaskLog_DASHBOARD,
 		})
 	}
 
@@ -513,6 +524,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: logCtx,
 		CustomInfo: customInfo,
 	}, nil
 }
@@ -520,18 +532,25 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 
 	app := resource.(*sparkOp.SparkApplication)
-	info, err := getEventInfoForSpark(pluginContext, app)
+	info, err := getEventInfoForSpark(ctx, pluginContext, app)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	var phaseInfo pluginsCore.PhaseInfo
-
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *info, app.Namespace, app.Status.DriverInfo.PodName, defaultDriverPrimaryContainerName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for spark driver. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the spark driver pod is in a failure state, we can fail fast without checking the SparkJob status.
+		return phaseInfo, nil
+	}
+	occurredAt := time.Now()
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
-		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "job queued", info)
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info)
 	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "job submitted", info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info)
 	case sparkOp.FailedSubmissionState:
 		reason := fmt.Sprintf("Spark Job  Submission Failed with Error: %s", app.Status.AppState.ErrorMessage)
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)
@@ -544,12 +563,61 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
 	}
 
+	for _, tl := range info.Logs {
+		// TODO: Add readiness probe for spark driver pod. Need to upgrade spark-operator client version.
+		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD && strings.Contains(tl.Name, "Spark Driver UI") {
+			if phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				tl.Ready = false
+				phaseInfo.WithReason("Spark driver UI is not ready")
+			} else {
+				tl.Ready = true
+				phaseInfo.WithReason("Spark driver UI is ready")
+			}
+
+		} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			if phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Vscode server is not ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is ready")
+			}
+		}
+	}
+
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr
 	}
 
 	return phaseInfo, nil
+}
+
+// IsTerminal returns true if the SparkApplication is in a terminal state (Completed, Failed, or FailedSubmission)
+func (sparkResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	app, ok := resource.(*sparkOp.SparkApplication)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *SparkApplication, got %T", resource)
+	}
+	state := app.Status.AppState.State
+	return state == sparkOp.CompletedState || state == sparkOp.FailedState || state == sparkOp.FailedSubmissionState, nil
+}
+
+// GetCompletionTime returns the termination time of the SparkApplication
+func (sparkResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	app, ok := resource.(*sparkOp.SparkApplication)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *SparkApplication, got %T", resource)
+	}
+
+	if !app.Status.TerminationTime.IsZero() {
+		return app.Status.TerminationTime.Time, nil
+	}
+
+	// Fallback to submission time or creation time
+	if !app.Status.SubmissionTime.IsZero() {
+		return app.Status.SubmissionTime.Time, nil
+	}
+
+	return app.CreationTimestamp.Time, nil
 }
 
 func init() {

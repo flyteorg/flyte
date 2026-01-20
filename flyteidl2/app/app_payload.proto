@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+// Request message for creating an app.
+message CreateRequest {
+  // The app to be created.
+  App app = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for creating an app.
+message CreateResponse {
+  // The created app.
+  App app = 1;
+}
+
+// Request message for retrieving an app.
+message GetRequest {
+  oneof identifier {
+    option (buf.validate.oneof).required = true;
+
+    // Identifier of the app to be retrieved.
+    Identifier app_id = 1;
+
+    // Ingress of the app to be retrieved. Only one field need to be set.
+    // If multiple fields are set, they must resolve into the same app.
+    // Otherwise, an error is returned.
+    Ingress ingress = 2;
+  }
+}
+
+// Response message for retrieving an app.
+message GetResponse {
+  // The retrieved app.
+  App app = 1;
+}
+
+// Request message for updating an app.
+message UpdateRequest {
+  // The app to be updated.
+  App app = 1 [(buf.validate.field).required = true];
+  string reason = 2 [(buf.validate.field).string.max_len = 100];
+}
+
+// Response message for updating an app.
+message UpdateResponse {
+  // The updated app.
+  App app = 1;
+}
+
+// Request message for deleting an app.
+message DeleteRequest {
+  // Identifier of the app to be deleted.
+  Identifier app_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for deleting an app.
+message DeleteResponse {}
+
+// Request message for listing apps.
+message ListRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof filter_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering apps.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+    // Cluster identifier for filtering apps.
+    common.ClusterIdentifier cluster_id = 3;
+    // Project identifier for filtering apps.
+    common.ProjectIdentifier project = 4;
+  }
+}
+
+// Response message for listing apps.
+message ListResponse {
+  // List of apps.
+  repeated App apps = 1;
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+}
+
+// Request message for watching app events.
+message WatchRequest {
+  oneof target {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering events.
+    string org = 1 [(buf.validate.field).string.min_len = 1];
+    // Cluster identifier for filtering events.
+    common.ClusterIdentifier cluster_id = 2;
+    // Project identifier for filtering events.
+    common.ProjectIdentifier project = 3;
+    // App identifier for filtering events.
+    Identifier app_id = 4;
+  }
+}
+
+// Event message for app creation.
+message CreateEvent {
+  // The created app.
+  App app = 1;
+}
+
+// Event message for app update.
+message UpdateEvent {
+  // The updated app.
+  App updated_app = 1;
+  // The old app before the update.
+  App old_app = 2;
+}
+
+// Event message for app deletion.
+message DeleteEvent {
+  // The deleted app.
+  App app = 1;
+}
+
+// Response message for watching app events.
+message WatchResponse {
+  oneof event {
+    // Event for app creation.
+    CreateEvent create_event = 1;
+    // Event for app update.
+    UpdateEvent update_event = 2;
+    // Event for app deletion.
+    DeleteEvent delete_event = 3;
+  }
+}
+
+// Request message for updating app status.
+message UpdateStatusRequest {
+  // The app with updated status.
+  App app = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for updating app status.
+message UpdateStatusResponse {
+  // The app with updated status.
+  App app = 1;
+}
+
+// Request message for leasing apps.
+message LeaseRequest {
+  // Cluster identifier for leasing apps.
+  common.ClusterIdentifier id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for leasing apps.
+message LeaseResponse {
+  // List of leased apps.
+  repeated App apps = 1;
+}

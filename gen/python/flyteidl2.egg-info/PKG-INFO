@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: flyteidl2
+Version: 2.0.1.dev14+g0cb33099a.d20260118
+Summary: IDL for Flyte
+Author-email: Union Eng <support@union.ai>
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: googleapis-common-protos
+Requires-Dist: protoc-gen-openapiv2
+Requires-Dist: protobuf>=4.21.1
+Requires-Dist: protovalidate>=1.0.0
+
+# Python library of flyte IDL (protobuf)

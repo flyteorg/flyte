@@ -6,8 +6,8 @@ import (
 
 	"k8s.io/utils/strings/slices"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
@@ -27,7 +27,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	//   1. A collection of literals or
 	//   2. A map of literals
 	if literal.GetCollection() != nil {
-		literals := literal.GetCollection().GetLiterals()
+		literals := literal.GetCollection().Literals
 		literalsHash := make([]*core.Literal, 0)
 		for _, lit := range literals {
 			literalsHash = append(literalsHash, hashify(lit))
@@ -42,7 +42,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	}
 	if literal.GetMap() != nil {
 		literalsMap := make(map[string]*core.Literal)
-		for key, lit := range literal.GetMap().GetLiterals() {
+		for key, lit := range literal.GetMap().Literals {
 			literalsMap[key] = hashify(lit)
 		}
 		return &core.Literal{
@@ -58,14 +58,14 @@ func hashify(literal *core.Literal) *core.Literal {
 }
 
 func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
-	if literalMap == nil || len(literalMap.GetLiterals()) == 0 {
+	if literalMap == nil || len(literalMap.Literals) == 0 {
 		literalMap = &emptyLiteralMap
 	}
 
 	// Hashify, i.e. generate a copy of the literal map where each literal value is removed
 	// in case the corresponding hash is set.
-	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.GetLiterals()))
-	for name, literal := range literalMap.GetLiterals() {
+	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.Literals))
+	for name, literal := range literalMap.Literals {
 		if !slices.Contains(cacheIgnoreInputVars, name) {
 			hashifiedLiteralMap[name] = hashify(literal)
 		}
@@ -80,4 +80,23 @@ func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap, cacheIgnor
 	}
 
 	return base64.RawURLEncoding.EncodeToString(inputsHash), nil
+}
+
+func HashIdentifierExceptVersion(ctx context.Context, id core.Identifier) (string, error) {
+
+	// Exclude version from the ID hash to support cache hits across different versions of the same resource
+	idCopy := &core.Identifier{
+		ResourceType: id.ResourceType,
+		Project:      id.Project,
+		Domain:       id.Domain,
+		Name:         id.Name,
+		Org:          id.Org,
+	}
+
+	hash, err := pbhash.ComputeHashString(ctx, idCopy)
+	if err != nil {
+		return "", err
+	}
+
+	return hash, nil
 }

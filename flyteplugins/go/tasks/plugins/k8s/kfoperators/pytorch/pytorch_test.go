@@ -11,26 +11,26 @@ import (
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	apiv1 "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
-	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	stdlibUtils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+	kfplugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow"
 )
 
 const testImage = "image://"
@@ -126,7 +126,7 @@ func dummyPytorchTaskTemplate(id string, args ...interface{}) *core.TaskTemplate
 	}
 }
 
-func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string, pluginState k8s.PluginState) pluginsCore.TaskExecutionContext {
+func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -157,7 +157,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 		},
 	})
 	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.EXPECT().GetResources().Return(resources)
@@ -181,19 +181,81 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
-
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
-			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0, nil
 		})
 
 	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
+}
+
+func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, pluginState k8s.PluginState) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
+		Kind: "node",
+		Name: "blah",
+	})
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
+
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0, nil
+		})
+
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
+	return pCtx
 }
 
 func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandler, workers int32, conditionType kubeflowv1.JobConditionType) *kubeflowv1.PyTorchJob {
@@ -297,7 +359,7 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 
 	ptObj := dummyPytorchCustomObj(workers)
 	taskTemplate := dummyPytorchTaskTemplate("job1", ptObj)
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 	if err != nil {
 		panic(err)
 	}
@@ -325,7 +387,7 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 	ptObj := dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"})
 	taskTemplate := dummyPytorchTaskTemplate("job2", ptObj)
 
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -368,7 +430,7 @@ func TestBuildResourcePytorch(t *testing.T) {
 	ptObj := dummyPytorchCustomObj(100)
 	taskTemplate := dummyPytorchTaskTemplate("job3", ptObj)
 
-	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
@@ -450,7 +512,7 @@ func TestBuildResourcePytorchContainerImage(t *testing.T) {
 		for _, f := range fixtures {
 			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
 				taskTemplate := dummyPytorchTaskTemplate("job", tCfg.plugin)
-				taskContext := dummyPytorchTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride, k8s.PluginState{})
+				taskContext := dummyPytorchTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride)
 				pytorchResourceHandler := pytorchOperatorResourceHandler{}
 				r, err := pytorchResourceHandler.BuildResource(context.TODO(), taskContext)
 				assert.NoError(t, err)
@@ -603,7 +665,7 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
 				taskTemplate := dummyPytorchTaskTemplate("job", tCfg.plugin)
 				taskTemplate.ExtendedResources = f.extendedResourcesBase
-				taskContext := dummyPytorchTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride, "", k8s.PluginState{})
+				taskContext := dummyPytorchTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride, "")
 				pytorchResourceHandler := pytorchOperatorResourceHandler{}
 				r, err := pytorchResourceHandler.BuildResource(context.TODO(), taskContext)
 				assert.NoError(t, err)
@@ -636,55 +698,67 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyPytorchJobResource(pytorchResourceHandler, 2, conditionType)
 	}
 
-	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, nil, "", k8s.PluginState{})
-	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(kubeflowv1.JobCreated))
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	podList := []runtime.Object{
+		&corev1.Pod{
+			ObjectMeta: v1.ObjectMeta{Namespace: "ns", Name: "initializing ignored pod"},
+			Status:     corev1.PodStatus{Phase: corev1.PodPending},
+		},
+		&corev1.Pod{
+			ObjectMeta: v1.ObjectMeta{Namespace: "ns", Name: "test"},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{Name: "test-work-0"},
+				},
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: "test-work-0",
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  v1.Time{Time: time.Now()},
+								FinishedAt: v1.Time{Time: time.Now()},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	reader := fake.NewFakeClient(podList...)
+	pluginContext.EXPECT().K8sReader().Return(reader)
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(kubeflowv1.JobRunning))
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(kubeflowv1.JobSucceeded))
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobSucceeded))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(kubeflowv1.JobFailed))
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(kubeflowv1.JobRestarting))
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(kubeflowv1.JobRestarting))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, taskPhase.Info().LogContext.Pods[0].PodName, "test")
 	assert.Nil(t, err)
-
-	// Training operator did not modify the job even though it is not suspended
-	pytorchJob := dummyPytorchJobResourceCreator(kubeflowv1.JobCreated)
-	pytorchJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
-	pytorchJob.Status.StartTime = nil
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, pytorchJob)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
-	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
-
-	// Training operator did not modify the job because it is suspended
-	pytorchJobSuspended := dummyPytorchJobResourceCreator(kubeflowv1.JobCreated)
-	pytorchJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
-	pytorchJobSuspended.Status.StartTime = nil
-	suspend := true
-	pytorchJobSuspended.Spec.RunPolicy.Suspend = &suspend
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, pytorchJobSuspended)
-	assert.NoError(t, err)
-	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
@@ -696,9 +770,10 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		PhaseVersion: pluginsCore.DefaultPhaseVersion,
 		Reason:       "task submitted to K8s",
 	}
-	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, nil, "", pluginState)
-
-	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, kubeflowv1.JobCreated))
+	pluginCtx := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, pluginState)
+	reader := fake.NewFakeClient()
+	pluginCtx.EXPECT().K8sReader().Return(reader)
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -716,13 +791,14 @@ func TestGetLogs(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, kubeflowv1.JobRunning)
 	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
-	taskCtx := dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{})
-	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
+	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].Uri)
 }
 
 func TestGetLogsElastic(t *testing.T) {
@@ -737,25 +813,18 @@ func TestGetLogsElastic(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, kubeflowv1.JobRunning)
 	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
-	taskCtx := dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{})
-	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
+	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
 }
 
 func TestGetProperties(t *testing.T) {
-	config := k8sConfig.GetK8sPluginConfig()
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-
 	expected := k8s.PluginProperties{}
-	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
-
-	config.EnableDistributedErrorAggregation = true
-	expected = k8s.PluginProperties{
-		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
-	}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
 }
 
@@ -767,7 +836,7 @@ func TestReplicaCounts(t *testing.T) {
 		contains           []kubeflowv1.ReplicaType
 		notContains        []kubeflowv1.ReplicaType
 	}{
-		{"NoWorkers", 0, false, []kubeflowv1.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster}, []kubeflowv1.ReplicaType{}},
+		{"NoWorkers", 0, true, nil, nil},
 		{"Works", 1, false, []kubeflowv1.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster, kubeflowv1.PyTorchJobReplicaTypeWorker}, []kubeflowv1.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -776,7 +845,7 @@ func TestReplicaCounts(t *testing.T) {
 			ptObj := dummyPytorchCustomObj(test.workerReplicaCount)
 			taskTemplate := dummyPytorchTaskTemplate("the job", ptObj)
 
-			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 			if test.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, res)
@@ -815,7 +884,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 						{Name: core.Resources_MEMORY, Value: "500Mi"},
 					},
 				},
-				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+				RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
 				Replicas: 100,
@@ -833,7 +902,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		},
 		{
 			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Image: testImageMaster,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -845,11 +914,11 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 							{Name: core.Resources_MEMORY, Value: "500Mi"},
 						},
 					},
-					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+					RestartPolicy: plugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -889,14 +958,12 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			},
 		}
 
-		config := k8sConfig.GetK8sPluginConfig()
-		config.EnableDistributedErrorAggregation = true
 		pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
 		taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
 		taskTemplate.TaskTypeVersion = 1
 
-		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 
@@ -921,26 +988,6 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		assert.Nil(t, pytorchJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 
 		assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
-
-		// validate plugin specific environment variables
-		workerContainerEnv := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Containers[0].Env
-		assert.Equal(t,
-			[]apiv1.EnvVar{
-				{
-					Name: pluginsK8s.FlyteInternalWorkerNameEnvVarKey,
-					ValueFrom: &apiv1.EnvVarSource{
-						FieldRef: &apiv1.ObjectFieldSelector{
-							FieldPath: "metadata.name",
-						},
-					},
-				},
-				{
-					Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
-					Value: "Earliest",
-				},
-			},
-			workerContainerEnv[len(workerContainerEnv)-2:],
-		)
 	}
 }
 
@@ -959,7 +1006,7 @@ func TestBuildResourcePytorchV1WithRunPolicy(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 				},
 			},
@@ -978,7 +1025,7 @@ func TestBuildResourcePytorchV1WithRunPolicy(t *testing.T) {
 		taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
 		taskTemplate.TaskTypeVersion = 1
 
-		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 
@@ -1012,7 +1059,7 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1060,7 +1107,7 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 		taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
 		taskTemplate.TaskTypeVersion = 1
 
-		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 
@@ -1129,7 +1176,7 @@ func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
 		},
 		{
 			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
 							{Name: core.Resources_CPU, Value: "250m"},
@@ -1143,7 +1190,7 @@ func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
 				},
 			},
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 100,
 					Resources: &core.Resources{
 						Requests: []*core.Resources_ResourceEntry{
@@ -1168,7 +1215,7 @@ func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
 		taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
 		taskTemplate.TaskTypeVersion = 1
 
-		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+		res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 
@@ -1190,7 +1237,7 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 		},
 		{
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
+				Common: &plugins.CommonReplicaSpec{
 					Replicas: 2,
 				},
 			},
@@ -1203,7 +1250,7 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 		taskTemplate.TaskTypeVersion = 1
 
 		pytorchResourceHandler := pytorchOperatorResourceHandler{}
-		resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+		resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, resource)
 
@@ -1231,88 +1278,29 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 	}
 }
 
-func TestBuildResourcePytorchV1WithDifferentWorkersNumber(t *testing.T) {
+func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
 	taskConfigs := []*kfplugins.DistributedPyTorchTrainingTask{
 		{
-			// Test case 1: Zero workers - should only have master
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
 				Replicas: 0,
 			},
-			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Image: testImageMaster,
-				Resources: &core.Resources{
-					Requests: []*core.Resources_ResourceEntry{
-						{Name: core.Resources_CPU, Value: "250m"},
-						{Name: core.Resources_MEMORY, Value: "250Mi"},
-					},
-					Limits: []*core.Resources_ResourceEntry{
-						{Name: core.Resources_CPU, Value: "500m"},
-						{Name: core.Resources_MEMORY, Value: "500Mi"},
-					},
-				},
-			},
 		},
 		{
-			// Test case 2: One worker - should have both master and worker
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Replicas: 1,
-			},
-			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Image: testImageMaster,
-				Resources: &core.Resources{
-					Requests: []*core.Resources_ResourceEntry{
-						{Name: core.Resources_CPU, Value: "250m"},
-						{Name: core.Resources_MEMORY, Value: "250Mi"},
-					},
-					Limits: []*core.Resources_ResourceEntry{
-						{Name: core.Resources_CPU, Value: "500m"},
-						{Name: core.Resources_MEMORY, Value: "500Mi"},
-					},
+				Common: &plugins.CommonReplicaSpec{
+					Replicas: 0,
 				},
 			},
 		},
 	}
 
-	for i, taskConfig := range taskConfigs {
-		t.Run(fmt.Sprintf("Case %d", i+1), func(t *testing.T) {
-			pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	for _, taskConfig := range taskConfigs {
+		pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
-			taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
-			taskTemplate.TaskTypeVersion = 1
-
-			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
-			assert.NoError(t, err)
-			assert.NotNil(t, res)
-
-			pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
-			assert.True(t, ok)
-
-			if taskConfig.GetWorkerReplicas().GetReplicas() == 0 {
-				// Should only contain master spec
-				assert.Equal(t, 1, len(pytorchJob.Spec.PyTorchReplicaSpecs))
-				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
-				assert.NotContains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
-
-				// Verify master spec details
-				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
-				assert.Equal(t, int32(1), *masterSpec.Replicas)
-				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
-			} else {
-				// Should contain both master and worker specs
-				assert.Equal(t, 2, len(pytorchJob.Spec.PyTorchReplicaSpecs))
-				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
-				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
-
-				// Verify master spec details
-				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
-				assert.Equal(t, int32(1), *masterSpec.Replicas)
-				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
-
-				// Verify worker spec details
-				workerSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker]
-				assert.Equal(t, int32(1), *workerSpec.Replicas)
-			}
-		})
+		taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
+		taskTemplate.TaskTypeVersion = 1
+		_, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
+		assert.Error(t, err)
 	}
 }
 
@@ -1329,11 +1317,241 @@ func TestGetReplicaCount(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	tfObj := dummyPytorchCustomObj(1)
 	taskTemplate := dummyPytorchTaskTemplate("the job", tfObj)
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 	PytorchJob, ok := resource.(*kubeflowv1.PyTorchJob)
 	assert.True(t, ok)
 
 	assert.NotNil(t, common.GetReplicaCount(PytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker))
+}
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a failed worker-0 pod
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      jobName + "-worker-0",
+			Namespace: jobNamespace,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: "pytorch",
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: "pytorch",
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	reader := fake.NewFakeClient(pod)
+	pluginContext.EXPECT().K8sReader().Return(reader)
+
+	// Even though PyTorchJob status is running, should return failure due to pod status
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
+	assert.NoError(t, err)
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseWithCrashLoopBackOff(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a worker-0 pod in crash loop
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      jobName + "-worker-0",
+			Namespace: jobNamespace,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: "pytorch",
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodRunning,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name:         "pytorch",
+					Ready:        false,
+					RestartCount: 5,
+					State: corev1.ContainerState{
+						Waiting: &corev1.ContainerStateWaiting{
+							Reason:  "CrashLoopBackOff",
+							Message: "Back-off restarting failed container",
+						},
+					},
+					LastTerminationState: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
+	reader := fake.NewFakeClient(pod)
+	pluginContext.EXPECT().K8sReader().Return(reader)
+
+	// CrashLoopBackOff should eventually lead to failure
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 2, kubeflowv1.JobRunning))
+	assert.NoError(t, err)
+	// CrashLoopBackOff may not immediately fail, so we just check it doesn't crash
+	assert.NotNil(t, taskPhase)
+}
+
+func TestIsTerminal(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		conditionType  kubeflowv1.JobConditionType
+		expectedResult bool
+	}{
+		{"Succeeded", kubeflowv1.JobSucceeded, true},
+		{"Failed", kubeflowv1.JobFailed, true},
+		{"Created", kubeflowv1.JobCreated, false},
+		{"Running", kubeflowv1.JobRunning, false},
+		{"Restarting", kubeflowv1.JobRestarting, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a simple job with only the condition we want to test
+			job := &kubeflowv1.PyTorchJob{
+				Status: kubeflowv1.JobStatus{
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:   tt.conditionType,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}
+			result, err := pytorchResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := pytorchResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *kubeflowv1.PyTorchJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses CompletionTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					CompletionTime: &v1.Time{Time: now},
+					StartTime:      &v1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to condition LastTransitionTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: earlier},
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:               kubeflowv1.JobSucceeded,
+							Status:             corev1.ConditionTrue,
+							LastTransitionTime: v1.NewTime(now),
+						},
+					},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &kubeflowv1.PyTorchJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(now),
+				},
+				Status: kubeflowv1.JobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := pytorchResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := pytorchResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

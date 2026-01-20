@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	idlcore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -48,9 +48,13 @@ func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext
 		go func() {
 			echoConfig := ConfigSection.GetConfig().(*Config)
 			time.Sleep(echoConfig.SleepDuration.Duration)
-			if err := e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID()); err != nil {
-				logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
-			}
+			// TODO @pvditt fix
+			//labels := map[string]string{
+			//	k8s.WorkflowID: tCtx.TaskExecutionMetadata().GetOwnerID().String(),
+			//}
+			//if err := e.enqueueOwner(labels); err != nil {
+			//	logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
+			//}
 		}()
 	}
 	return startTime
@@ -104,7 +108,7 @@ func copyInputsToOutputs(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 		outputLiterals := make(map[string]*idlcore.Literal, len(inputToOutputVariableMappings))
 		for inputVariableName, outputVariableName := range inputToOutputVariableMappings {
-			outputLiterals[outputVariableName] = inputLiterals.GetLiterals()[inputVariableName]
+			outputLiterals[outputVariableName] = inputLiterals.Literals[inputVariableName]
 		}
 
 		outputLiteralMap := &idlcore.LiteralMap{
@@ -132,12 +136,12 @@ func compileInputToOutputVariableMappings(ctx context.Context, tCtx core.TaskExe
 	}
 
 	var inputs, outputs map[string]*idlcore.Variable
-	if taskTemplate.GetInterface() != nil {
-		if taskTemplate.GetInterface().GetInputs() != nil {
-			inputs = taskTemplate.GetInterface().GetInputs().GetVariables()
+	if taskTemplate.Interface != nil {
+		if taskTemplate.Interface.Inputs != nil {
+			inputs = taskTemplate.Interface.Inputs.Variables
 		}
-		if taskTemplate.GetInterface().GetOutputs() != nil {
-			outputs = taskTemplate.GetInterface().GetOutputs().GetVariables()
+		if taskTemplate.Interface.Outputs != nil {
+			outputs = taskTemplate.Interface.Outputs.Variables
 		}
 	}
 

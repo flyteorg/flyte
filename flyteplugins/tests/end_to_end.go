@@ -19,16 +19,17 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	idlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func createSampleContainerTask() *idlCore.Container {
@@ -83,8 +84,8 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	outputWriter.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputWriter.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	outputWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(ctx context.Context, or io.OutputReader) {
-		literals, ee, err := or.Read(ctx)
+	outputWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(ctx context.Context, reader io.OutputReader) {
+		literals, ee, err := reader.Read(ctx)
 		assert.NoError(t, err)
 
 		if ee != nil {
@@ -98,7 +99,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 
 	pluginStateWriter := &coreMocks.PluginStateWriter{}
 	latestKnownState := atomic.Value{}
-	pluginStateWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(stateVersion uint8, v interface{}) {
+	pluginStateWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(_ uint8, v interface{}) {
 		latestKnownState.Store(v)
 	})
 
@@ -107,10 +108,10 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	})
 
 	pluginStateReader := &coreMocks.PluginStateReader{}
-	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil).Run(func(o interface{}) {
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil).Run(func(state interface{}) {
 		x, err := json.Marshal(latestKnownState.Load())
 		assert.NoError(t, err)
-		assert.NoError(t, json.Unmarshal(x, &o))
+		assert.NoError(t, json.Unmarshal(x, &state))
 	})
 	pluginStateReader.EXPECT().GetStateVersion().Return(0)
 
@@ -137,7 +138,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
-	overrides.EXPECT().GetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		"dynamic-queue": "queue1",
 	}})
 	overrides.EXPECT().GetResources().Return(&v1.ResourceRequirements{
@@ -147,6 +148,17 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	overrides.EXPECT().GetExtendedResources().Return(&idlCore.ExtendedResources{})
 	overrides.EXPECT().GetContainerImage().Return("")
 	overrides.EXPECT().GetPodTemplate().Return(nil)
+
+	connections := map[string]pluginCore.ConnectionWrapper{
+		"my-openai": {
+			Connection: idlCore.Connection{
+				TaskType: "openai",
+				Secrets:  map[string]string{"key": "value"},
+				Configs:  map[string]string{"key": "value"},
+			},
+			Source: common.AttributesSource_GLOBAL,
+		},
+	}
 
 	tMeta := &coreMocks.TaskExecutionMetadata{}
 	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
@@ -159,7 +171,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			K8SServiceAccount: "s",
 		},
 	})
-	tMeta.EXPECT().GetLabels().Return(map[string]string{})
+	tMeta.EXPECT().GetLabels().Return(map[string]string{"organization": "flyte", "project": "flytesnacks", "domain": "development"})
 	tMeta.EXPECT().GetAnnotations().Return(map[string]string{})
 	tMeta.EXPECT().IsInterruptible().Return(true)
 	tMeta.EXPECT().GetOwnerReference().Return(v12.OwnerReference{})
@@ -170,6 +182,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.EXPECT().GetInterruptibleFailureThreshold().Return(2)
 	tMeta.EXPECT().GetEnvironmentVariables().Return(nil)
+	tMeta.EXPECT().GetExternalResourceAttributes().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
 	tMeta.EXPECT().GetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}
@@ -241,7 +254,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	tCtx.EXPECT().Catalog().Return(cat)
-	tCtx.EXPECT().EventsRecorder().Return(eRecorder)
 	tCtx.EXPECT().ResourceManager().Return(resourceManager)
 	tCtx.EXPECT().SecretManager().Return(secretManager)
 

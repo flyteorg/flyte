@@ -7,8 +7,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -53,8 +53,8 @@ func unmarshalSecret(encoded string) (*core.Secret, error) {
 func MarshalSecretsToMapStrings(secrets []*core.Secret) (map[string]string, error) {
 	res := make(map[string]string, len(secrets))
 	for index, s := range secrets {
-		if _, found := core.Secret_MountType_name[int32(s.GetMountRequirement())]; !found {
-			return nil, fmt.Errorf("invalid mount requirement [%v]", s.GetMountRequirement())
+		if _, found := core.Secret_MountType_name[int32(s.MountRequirement)]; !found {
+			return nil, fmt.Errorf("invalid mount requirement [%v]", s.MountRequirement)
 		}
 
 		encodedSecret := marshalSecret(s)

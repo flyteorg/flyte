@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // Filter provides an interface to check if a Key of type []byte was ever seen.
@@ -14,7 +14,6 @@ import (
 // resolution
 // The Data-structure is thread-safe and can be accessed by multiple threads concurrently.
 
-//go:generate mockery --name Filter --case=underscore --with-expecter
 
 type Filter interface {
 	// Contains returns a True if the id was previously seen or false otherwise

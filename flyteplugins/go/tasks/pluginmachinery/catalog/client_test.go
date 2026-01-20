@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var (
@@ -49,11 +49,11 @@ func TestStatus(t *testing.T) {
 	status := NewStatus(cacheStatus, &catalogMetadata)
 
 	assert.Equal(t, status.GetCacheStatus(), cacheStatus)
-	assert.Equal(t, status.GetMetadata().GetDatasetId().GetProject(), catalogMetadata.GetDatasetId().GetProject())
-	assert.Equal(t, status.GetMetadata().GetDatasetId().GetDomain(), catalogMetadata.GetDatasetId().GetDomain())
-	assert.Equal(t, status.GetMetadata().GetDatasetId().GetName(), catalogMetadata.GetDatasetId().GetName())
-	assert.Equal(t, status.GetMetadata().GetArtifactTag().GetArtifactId(), catalogMetadata.GetArtifactTag().GetArtifactId())
-	assert.Equal(t, status.GetMetadata().GetArtifactTag().GetName(), catalogMetadata.GetArtifactTag().GetName())
+	assert.Equal(t, status.GetMetadata().DatasetId.Project, catalogMetadata.DatasetId.Project)
+	assert.Equal(t, status.GetMetadata().DatasetId.Domain, catalogMetadata.DatasetId.Domain)
+	assert.Equal(t, status.GetMetadata().DatasetId.Name, catalogMetadata.DatasetId.Name)
+	assert.Equal(t, status.GetMetadata().ArtifactTag.ArtifactId, catalogMetadata.ArtifactTag.ArtifactId)
+	assert.Equal(t, status.GetMetadata().ArtifactTag.Name, catalogMetadata.ArtifactTag.Name)
 }
 
 func TestEntry(t *testing.T) {
@@ -75,11 +75,11 @@ func TestEntry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			status := tt.entry.GetStatus()
 			assert.Equal(t, status.GetCacheStatus(), cacheStatus)
-			assert.Equal(t, status.GetMetadata().GetDatasetId().GetProject(), catalogMetadata.GetDatasetId().GetProject())
-			assert.Equal(t, status.GetMetadata().GetDatasetId().GetDomain(), catalogMetadata.GetDatasetId().GetDomain())
-			assert.Equal(t, status.GetMetadata().GetDatasetId().GetName(), catalogMetadata.GetDatasetId().GetName())
-			assert.Equal(t, status.GetMetadata().GetArtifactTag().GetArtifactId(), catalogMetadata.GetArtifactTag().GetArtifactId())
-			assert.Equal(t, status.GetMetadata().GetArtifactTag().GetName(), catalogMetadata.GetArtifactTag().GetName())
+			assert.Equal(t, status.GetMetadata().DatasetId.Project, catalogMetadata.DatasetId.Project)
+			assert.Equal(t, status.GetMetadata().DatasetId.Domain, catalogMetadata.DatasetId.Domain)
+			assert.Equal(t, status.GetMetadata().DatasetId.Name, catalogMetadata.DatasetId.Name)
+			assert.Equal(t, status.GetMetadata().ArtifactTag.ArtifactId, catalogMetadata.ArtifactTag.ArtifactId)
+			assert.Equal(t, status.GetMetadata().ArtifactTag.Name, catalogMetadata.ArtifactTag.Name)
 		})
 	}
 }

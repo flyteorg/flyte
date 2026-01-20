@@ -8,11 +8,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/validation"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	pluginscore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const resourceGPU = "gpu"
@@ -20,7 +21,6 @@ const resourceGPU = "gpu"
 // ResourceNvidiaGPU is the name of the Nvidia GPU resource.
 // Copied from: k8s.io/autoscaler/cluster-autoscaler/utils/gpu/gpu.go
 const ResourceNvidiaGPU = "nvidia.com/gpu"
-const ResourceRDMAInfiniband = "rdma/infiniband"
 
 // Specifies whether resource resolution should assign unset resource requests or limits from platform defaults
 // or existing container values.
@@ -39,37 +39,6 @@ func MergeResources(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
 	} else if in.Requests != nil {
 		for key, val := range in.Requests {
 			out.Requests[key] = val
-		}
-	}
-}
-
-// MergeResourcesIfMissing merges resources from 'in' to 'out', but only for resources that are not already set in 'out'.
-// This is used for pod template resource merging where we want to preserve higher priority resources.
-func MergeResourcesIfMissing(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
-	if out.Limits == nil && in.Limits != nil {
-		out.Limits = make(v1.ResourceList)
-		for key, val := range in.Limits {
-			out.Limits[key] = val
-		}
-	} else if in.Limits != nil {
-		if out.Limits == nil {
-			out.Limits = make(v1.ResourceList)
-		}
-		for key, val := range in.Limits {
-			if _, exists := out.Limits[key]; !exists {
-				out.Limits[key] = val
-			}
-		}
-	}
-
-	if in.Requests != nil {
-		if out.Requests == nil {
-			out.Requests = make(v1.ResourceList)
-		}
-		for key, val := range in.Requests {
-			if _, exists := out.Requests[key]; !exists {
-				out.Requests[key] = val
-			}
 		}
 	}
 }
@@ -161,17 +130,20 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 	resourceRequirements.Limits[resourceName] = resourceValue.Limit
 }
 
-// Convert GPU resource requirements named 'gpu' the recognized 'nvidia.com/gpu' identifier.
-func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements) {
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+// SanitizeGPUResourceRequirements converts generic 'gpu' resource requirements to the desired accelerator resource name.
+func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements, accelerator *core.GPUAccelerator) {
+	resourceName := config.GetK8sPluginConfig().GpuResourceName
+	if accelerator != nil {
+		resourceName = getAcceleratorResourceName(accelerator)
+	}
 
 	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[gpuResourceName] = res
+		resources.Requests[resourceName] = res
 		delete(resources.Requests, resourceGPU)
 	}
 
 	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[gpuResourceName] = res
+		resources.Limits[resourceName] = res
 		delete(resources.Limits, resourceGPU)
 	}
 }
@@ -206,16 +178,14 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
 
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
-	shouldAdjustGPU := false
-	_, gpuRequested := resources.Requests[gpuResourceName]
-	_, gpuLimited := resources.Limits[gpuResourceName]
-	if gpuRequested || gpuLimited {
-		shouldAdjustGPU = true
-	}
-
-	if shouldAdjustGPU {
-		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
+	// Check for accelerator resources (GPU, TPU, Neuron, etc.)
+	acceleratorResourceNames := getAllAcceleratorResourceNames()
+	for acceleratorResourceName := range acceleratorResourceNames {
+		_, requested := resources.Requests[acceleratorResourceName]
+		_, limited := resources.Limits[acceleratorResourceName]
+		if requested || limited {
+			adjustResourceRequirement(acceleratorResourceName, resources, platformResources, assignIfUnset)
+		}
 	}
 
 	return resources
@@ -245,7 +215,7 @@ func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContex
 		containerName = rand.String(4)
 	}
 
-	res, err := ToK8sResourceRequirements(taskContainer.GetResources())
+	res, err := ToK8sResourceRequirements(taskContainer.Resources)
 	if err != nil {
 		return nil, err
 	}
@@ -273,6 +243,17 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		return nil, err
 	}
 
+	// extract task template and extended resources
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	extendedResources := ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
 	if container.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
 		container.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
 	}
@@ -285,7 +266,7 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		Task:             tCtx.TaskReader(),
 	}
 
-	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container); err != nil {
+	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container, extendedResources); err != nil {
 		return nil, err
 	}
 
@@ -307,72 +288,11 @@ const (
 	ResourceCustomizationModeEnsureExistingResourcesInRange
 )
 
-// ExtractContainerResourcesFromPodTemplate extracts container resources from a pod template for a specific container.
-// It returns the resources of the specified container if container names match or if PodTemplate contains
-// a "primary"/"primary-init" or "default"/"default-init" container, or an empty ResourceRequirements if not found.
-// This function supports both regular containers and init containers.
-func ExtractContainerResourcesFromPodTemplate(podTemplate *v1.PodTemplate, containerName string, initContainers bool) v1.ResourceRequirements {
-	if podTemplate == nil {
-		return v1.ResourceRequirements{}
-	}
-
-	if initContainers {
-		// Check for exact container name match in init containers
-		for _, container := range podTemplate.Template.Spec.InitContainers {
-			if container.Name == containerName {
-				return container.Resources
-			}
-		}
-
-		// Check for "primary-init" template container (for init containers)
-		for _, container := range podTemplate.Template.Spec.InitContainers {
-			if container.Name == "primary-init" {
-				return container.Resources
-			}
-		}
-		// Check for "default-init" template container (for init containers)
-		for _, container := range podTemplate.Template.Spec.InitContainers {
-			if container.Name == "default-init" {
-				return container.Resources
-			}
-		}
-	} else {
-		// Check for exact container name match in regular containers
-		for _, container := range podTemplate.Template.Spec.Containers {
-			if container.Name == containerName {
-				return container.Resources
-			}
-		}
-
-		// Check for "primary" template container (for regular containers)
-		for _, container := range podTemplate.Template.Spec.Containers {
-			if container.Name == "primary" {
-				return container.Resources
-			}
-		}
-
-		// Check for "default" template container (for regular containers)
-		for _, container := range podTemplate.Template.Spec.Containers {
-			if container.Name == "default" {
-				return container.Resources
-			}
-		}
-	}
-	return v1.ResourceRequirements{}
-}
-
 // AddFlyteCustomizationsToContainer takes a container definition which specifies how to run a Flyte task and fills in
 // templated command and argument values, updates resources and decorates environment variables with platform and
 // task-specific customizations.
 func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.Parameters,
-	mode ResourceCustomizationMode, container *v1.Container) error {
-	return AddFlyteCustomizationsToContainerWithPodTemplate(ctx, parameters, mode, container, nil)
-}
-
-// AddFlyteCustomizationsToContainerWithPodTemplate is the enhanced version of AddFlyteCustomizationsToContainer that
-// accepts pod template resources for proper resource priority handling.
-func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, parameters template.Parameters,
-	mode ResourceCustomizationMode, container *v1.Container, podTemplateResources *v1.ResourceRequirements) error {
+	mode ResourceCustomizationMode, container *v1.Container, extendedResources *core.ExtendedResources) error {
 	modifiedCommand, err := template.Render(ctx, container.Command, parameters)
 	if err != nil {
 		return err
@@ -392,6 +312,10 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 	}
 	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, container.EnvFrom, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID(), consoleURL)
 
+	// Sanitize base container GPU resource requirements
+	// Overrides for extendedResources have already been applied at this point
+	SanitizeGPUResourceRequirements(&container.Resources, extendedResources.GetGpuAccelerator())
+
 	// retrieve platformResources and overrideResources to use when aggregating container resources
 	platformResources := parameters.TaskExecMetadata.GetPlatformResources().DeepCopy()
 	if platformResources == nil {
@@ -405,17 +329,13 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 
 	if overrideResources == nil {
 		overrideResources = &v1.ResourceRequirements{}
+	} else {
+		// Sanitize override resource requirements
+		SanitizeGPUResourceRequirements(overrideResources, extendedResources.GetGpuAccelerator())
 	}
 
-	SanitizeGPUResourceRequirements(&container.Resources)
-	// Handle pod template resources with proper fallback
-	var effectivePodTemplateResources v1.ResourceRequirements
-	if podTemplateResources != nil {
-		effectivePodTemplateResources = *podTemplateResources
-	}
-
-	logger.Infof(ctx, "ApplyResourceOverrides to container [%v], with Resources [%v], Platform Resources [%v], Container "+
-		" Resources [%v], PodTemplate Resources [%v] with mode [%v]", container.Name, overrideResources, platformResources, container.Resources, effectivePodTemplateResources, mode)
+	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
+		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)
 
 	switch mode {
 	case ResourceCustomizationModeAssignResources:
@@ -423,21 +343,13 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 		// it is important to note that this ignores the existing container.Resources values.
 		container.Resources = ApplyResourceOverrides(*overrideResources, *platformResources, assignIfUnset)
 	case ResourceCustomizationModeMergeExistingResources:
-		// Priority order: 1) overrideResources, 2) container.Resources (inline), 3) podTemplateResources, 4) platformResources
 		// this merges the overrideResources on top of the existing container.Resources to apply the overrides, then it
-		// merges podTemplateResources for any missing resources, and finally uses the platformResource values to set defaults.
+		// uses the platformResource values to set defaults for any missing resource.
 		MergeResources(*overrideResources, &container.Resources)
-		// Merge pod template resources for any resources not already set
-		MergeResourcesIfMissing(effectivePodTemplateResources, &container.Resources)
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, assignIfUnset)
 	case ResourceCustomizationModeEnsureExistingResourcesInRange:
-		// This use the platformResources defaults to ensure that the container.Resources values are within the
-		// platformResources limits. It will override podTemplateResources with container.Resources and then
-		// will check whether effective resources are within defined platform limits (platformResources), and will
-		// override them if necessary
-
-		// Merge pod template resources for any resources not already set
-		MergeResourcesIfMissing(effectivePodTemplateResources, &container.Resources)
+		// this use the platformResources defaults to ensure that the container.Resources values are within the
+		// platformResources limits. it will not override any existing container.Resources values.
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
 	}
 

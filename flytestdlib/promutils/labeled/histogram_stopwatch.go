@@ -6,8 +6,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 type HistogramStopWatch struct {
@@ -19,12 +19,12 @@ type HistogramStopWatch struct {
 
 // Start creates a new Instance of the HistogramStopWatch called a Timer that is closeable/stoppable.
 func (c HistogramStopWatch) Start(ctx context.Context) Timer {
-	w, err := c.HistogramStopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	w, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
 
-	if c.HistogramStopWatch.Observer == nil {
+	if c.Observer == nil {
 		return w.Start()
 	}
 
@@ -39,13 +39,13 @@ func (c HistogramStopWatch) Start(ctx context.Context) Timer {
 // Observe observes specified duration between the start and end time. The data point will be labeled with values from context.
 // See labeled.SetMetricsKeys for information about how to configure that.
 func (c HistogramStopWatch) Observe(ctx context.Context, start, end time.Time) {
-	w, err := c.HistogramStopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	w, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
 	w.Observe(start, end)
 
-	if c.HistogramStopWatch.Observer != nil {
+	if c.Observer != nil {
 		c.HistogramStopWatch.Observe(start, end)
 	}
 }

@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
 
 type ItemID = string
@@ -13,7 +13,6 @@ const (
 	ErrNotFound errors.ErrorCode = "NOT_FOUND"
 )
 
-//go:generate mockery --all --with-expecter
 
 // AutoRefresh with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.

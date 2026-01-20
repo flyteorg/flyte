@@ -5,7 +5,7 @@ import (
 
 	"gotest.tools/assert"
 
-	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginmachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -32,6 +32,6 @@ func TestLoadDefaultServiceAccountConfig(t *testing.T) {
 
 	t.Run("serviceAccount", func(t *testing.T) {
 		config := GetConfig()
-		assert.Equal(t, config.ServiceAccount, "")
+		assert.Equal(t, config.ServiceAccount, "default")
 	})
 }

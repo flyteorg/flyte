@@ -3,24 +3,27 @@ package pytorch
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
-	apiv1 "k8s.io/api/core/v1"
+	"github.com/samber/lo"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+	kfplugins "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins/kubeflow"
 )
 
 type pytorchOperatorResourceHandler struct {
@@ -30,15 +33,7 @@ type pytorchOperatorResourceHandler struct {
 var _ k8s.Plugin = pytorchOperatorResourceHandler{}
 
 func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
-	config := k8sConfig.GetK8sPluginConfig()
-
-	if config.EnableDistributedErrorAggregation {
-		return k8s.PluginProperties{
-			ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
-		}
-	} else {
-		return k8s.PluginProperties{}
-	}
+	return k8s.PluginProperties{}
 }
 
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
@@ -53,7 +48,7 @@ func (pytorchOperatorResourceHandler) BuildIdentityResource(ctx context.Context,
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
-func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 
 	if err != nil {
@@ -67,7 +62,7 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 
 	var masterReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
-	if taskTemplate.GetTaskTypeVersion() == 0 {
+	if taskTemplate.TaskTypeVersion == 0 {
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs)
@@ -91,7 +86,7 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
 		}
-	} else if taskTemplate.GetTaskTypeVersion() == 1 {
+	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfPytorchTaskExtraArgs := kfplugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs)
@@ -109,28 +104,6 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}
 
-		updateEnvVars := func(container *apiv1.Container) {
-			if container.Env == nil {
-				container.Env = make([]apiv1.EnvVar, 0, 2)
-			}
-			container.Env = append(container.Env, apiv1.EnvVar{
-				Name: pluginsK8s.FlyteInternalWorkerNameEnvVarKey,
-				ValueFrom: &apiv1.EnvVarSource{
-					FieldRef: &apiv1.ObjectFieldSelector{
-						FieldPath: "metadata.name",
-					},
-				},
-			})
-
-			if p.GetProperties().ErrorAggregationStrategy == k8s.EarliestErrorAggregationStrategy {
-				container.Env = append(container.Env, apiv1.EnvVar{
-					Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
-					Value: k8s.EarliestErrorAggregationStrategy.String(),
-				})
-			}
-		}
-		updateEnvVars(&workerReplicaSpec.Template.Spec.Containers[0])
-
 		if kfPytorchTaskExtraArgs.GetRunPolicy() != nil {
 			runPolicy = common.ParseRunPolicy(*kfPytorchTaskExtraArgs.GetRunPolicy())
 		}
@@ -141,20 +114,19 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 		}
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
-	jobSpec := kubeflowv1.PyTorchJobSpec{}
-	replicaSpecs := map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec{
-		kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
-	}
-	if *workerReplicaSpec.Replicas > 0 {
-		replicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker] = workerReplicaSpec
+	if *workerReplicaSpec.Replicas <= 0 {
+		return nil, fmt.Errorf("number of workers must be greater than 0")
 	}
 
-	jobSpec = kubeflowv1.PyTorchJobSpec{
-		PyTorchReplicaSpecs: replicaSpecs,
-		RunPolicy:           runPolicy,
+	jobSpec := kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec{
+			kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
+			kubeflowv1.PyTorchJobReplicaTypeWorker: workerReplicaSpec,
+		},
+		RunPolicy: runPolicy,
 	}
 
 	if elasticPolicy != nil {
@@ -227,8 +199,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
-	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the pytorch custom resource since creation time %v", app.CreationTimestamp)
 	}
 	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)
@@ -238,13 +209,32 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 
 	occurredAt := time.Now()
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	podList := &v1.PodList{}
+	err = pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to list pytorch execution pods. Error: %w", err)
+	}
+	logger.Debugf(ctx, "podlist: %+v", podList)
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: logContextForPods(app.Name, podList.Items),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
-
-	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	var phaseInfo pluginsCore.PhaseInfo
+	podName := fmt.Sprintf("%s-%s", app.Name, "worker-0")
+	phaseInfo, err = flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, taskPhaseInfo, app.Namespace, podName, "pytorch")
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for pytorch worker-0/master. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the master node or worker-0 is in a failure state, we can fail fast without checking the PytorchJob status.
+		return phaseInfo, nil
+	}
+	logger.Debugf(ctx, "logcontext: %+v", taskPhaseInfo.LogContext)
+	logger.Debugf(ctx, "PyTorchJob phase is %s", phaseInfo.Phase())
+	logger.Debugf(ctx, "PytorchJob currentCondition: %v", currentCondition)
+	phaseInfo, err = common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
@@ -252,6 +242,66 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	}
 
 	return phaseInfo, err
+}
+
+func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
+	pods = lo.Filter(pods, func(item v1.Pod, _ int) bool {
+		// Running, Succeeded or Failed is OK
+		return item.Status.Phase != v1.PodPending
+	})
+	logCtx := &core.LogContext{
+		Pods: make([]*core.PodLogContext, len(pods)),
+	}
+	for i, pod := range pods {
+		p := pod
+		if strings.HasPrefix(p.Name, pytorchJobName) && strings.Contains(p.Name, "worker-0") {
+			logCtx.PrimaryPodName = p.Name
+		}
+		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
+	}
+	return logCtx
+}
+
+// IsTerminal returns true if the PyTorchJob is in a terminal state (Succeeded or Failed)
+func (pytorchOperatorResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*kubeflowv1.PyTorchJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *PyTorchJob, got %T", resource)
+	}
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// GetCompletionTime returns the completion time of the PyTorchJob
+func (pytorchOperatorResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*kubeflowv1.PyTorchJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *PyTorchJob, got %T", resource)
+	}
+
+	if job.Status.CompletionTime != nil {
+		return job.Status.CompletionTime.Time, nil
+	}
+
+	// Fallback to last condition transition time
+	for _, condition := range job.Status.Conditions {
+		if condition.Type == kubeflowv1.JobSucceeded || condition.Type == kubeflowv1.JobFailed {
+			if !condition.LastTransitionTime.IsZero() {
+				return condition.LastTransitionTime.Time, nil
+			}
+		}
+	}
+
+	// Fallback to start time or creation time
+	if job.Status.StartTime != nil {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
 }
 
 func init() {

@@ -4,23 +4,29 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	// TODO @pvditt fix
+	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const PodKind = "pod"
@@ -37,6 +43,7 @@ const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
 const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
+const FlyteEnableVscode = "_F_E_VS"
 
 var retryableStatusReasons = sets.NewString(
 	// Reasons that indicate the node was preempted aggressively.
@@ -74,6 +81,25 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 	}
 }
 
+// AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object's list of preferred scheduling terms.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity-weight
+// for how weights are used during scheduling.
+func AddPreferredNodeSelectorRequirements(base *v1.Affinity, weight int32, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(
+		base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		v1.PreferredSchedulingTerm{
+			Weight: weight,
+			Preference: v1.NodeSelectorTerm{
+				MatchExpressions: new,
+			},
+		},
+	)
+}
+
 // ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
 func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
 	// Determine node selector terms to add to node affinity
@@ -105,7 +131,7 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 // Specialized merging of overrides into a base *core.ExtendedResources object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.
-func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
+func ApplyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
 	// Handle case where base might be nil
 	var new *core.ExtendedResources
 	if base == nil {
@@ -168,7 +194,7 @@ func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedM
 
 	var quantity resource.Quantity
 	var err error
-	if SharedMemory.GetSizeLimit() != "" {
+	if len(SharedMemory.GetSizeLimit()) != 0 {
 		quantity, err = resource.ParseQuantity(SharedMemory.GetSizeLimit())
 		if err != nil {
 			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to parse size limit: %v", err.Error())
@@ -187,17 +213,62 @@ func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedM
 	return nil
 }
 
-func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
-	// Short circuit if pod spec does not contain any containers that use GPUs
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
-	requiresGPUs := false
-	for _, cnt := range podSpec.Containers {
-		if _, ok := cnt.Resources.Limits[gpuResourceName]; ok {
-			requiresGPUs = true
-			break
+// getAcceleratorConfig returns the configuration for the given accelerator device class.
+// It first attempts to get device-class-specific configuration from AcceleratorDeviceClasses.
+// If not found or incomplete, it falls back to the global GPU configuration fields for backward compatibility.
+func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.AcceleratorDeviceClassConfig {
+	cfg := config.GetK8sPluginConfig()
+
+	// Start with defaults from global GPU config
+	accelConfig := config.AcceleratorDeviceClassConfig{
+		ResourceName:                         cfg.GpuResourceName,
+		DeviceNodeLabel:                      cfg.GpuDeviceNodeLabel,
+		PartitionSizeNodeLabel:               cfg.GpuPartitionSizeNodeLabel,
+		UnpartitionedNodeSelectorRequirement: cfg.GpuUnpartitionedNodeSelectorRequirement,
+		UnpartitionedToleration:              cfg.GpuUnpartitionedToleration,
+	}
+
+	// Override with device-class-specific config if available
+	if gpuAccelerator != nil {
+		deviceClass := gpuAccelerator.GetDeviceClass().String()
+		if deviceClassConfig, ok := cfg.AcceleratorDeviceClasses[deviceClass]; ok {
+			logger.Debugf(context.TODO(), "Using device-class-specific configuration for accelerator class: %s", deviceClass)
+			// Override resource name if specified
+			if deviceClassConfig.ResourceName != "" {
+				accelConfig.ResourceName = deviceClassConfig.ResourceName
+			}
+			// Override device node label if specified
+			if deviceClassConfig.DeviceNodeLabel != "" {
+				accelConfig.DeviceNodeLabel = deviceClassConfig.DeviceNodeLabel
+			}
+			// Override partition size node label if specified
+			if deviceClassConfig.PartitionSizeNodeLabel != "" {
+				accelConfig.PartitionSizeNodeLabel = deviceClassConfig.PartitionSizeNodeLabel
+			}
+			// Override unpartitioned node selector requirement if specified
+			if deviceClassConfig.UnpartitionedNodeSelectorRequirement != nil {
+				accelConfig.UnpartitionedNodeSelectorRequirement = deviceClassConfig.UnpartitionedNodeSelectorRequirement
+			}
+			// Override unpartitioned toleration if specified
+			if deviceClassConfig.UnpartitionedToleration != nil {
+				accelConfig.UnpartitionedToleration = deviceClassConfig.UnpartitionedToleration
+			}
+			// Override PodTemplate if specified
+			if deviceClassConfig.PodTemplate != nil {
+				accelConfig.PodTemplate = deviceClassConfig.PodTemplate
+			}
+		} else {
+			logger.Warnf(context.TODO(), "Device class '%s' not found in AcceleratorDeviceClasses configuration, falling back to global GPU config. Available device classes: %v",
+				deviceClass, getConfiguredDeviceClasses(cfg.AcceleratorDeviceClasses))
 		}
 	}
-	if !requiresGPUs {
+
+	return accelConfig
+}
+
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
+	// Short circuit if pod spec does not contain any containers that use accelerators
+	if !podRequiresAccelerator(podSpec) {
 		return
 	}
 
@@ -205,20 +276,25 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		podSpec.Affinity = &v1.Affinity{}
 	}
 
+	// Get device-class-specific configuration
+	accelConfig := getAcceleratorConfig(gpuAccelerator)
+
 	// Apply changes for GPU device
-	device := gpuAccelerator.GetDevice()
-	if len(device) > 0 {
+	if device := gpuAccelerator.GetDevice(); len(device) > 0 {
+		// Normalize the device name
+		normalizedDevice := GetNormalizedAcceleratorDevice(device)
+
 		// Add node selector requirement for GPU device
 		deviceNsr := v1.NodeSelectorRequirement{
-			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Key:      accelConfig.DeviceNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{device},
+			Values:   []string{normalizedDevice},
 		}
 		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
 		// Add toleration for GPU device
 		deviceTol := v1.Toleration{
-			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-			Value:    device,
+			Key:      accelConfig.DeviceNodeLabel,
+			Value:    normalizedDevice,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
@@ -239,25 +315,25 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		if !p.Unpartitioned {
 			break
 		}
-		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
-			partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+		if accelConfig.UnpartitionedNodeSelectorRequirement != nil {
+			partitionSizeNsr = accelConfig.UnpartitionedNodeSelectorRequirement
 		} else {
 			partitionSizeNsr = &v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Key:      accelConfig.PartitionSizeNodeLabel,
 				Operator: v1.NodeSelectorOpDoesNotExist,
 			}
 		}
-		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
-			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+		if accelConfig.UnpartitionedToleration != nil {
+			partitionSizeTol = accelConfig.UnpartitionedToleration
 		}
 	case *core.GPUAccelerator_PartitionSize:
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
-			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Key:      accelConfig.PartitionSizeNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
 			Values:   []string{p.PartitionSize},
 		}
 		partitionSizeTol = &v1.Toleration{
-			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Key:      accelConfig.PartitionSizeNodeLabel,
 			Value:    p.PartitionSize,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
@@ -344,7 +420,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+		if podTemplate.GetPodSpec() != nil {
 			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
@@ -354,15 +430,15 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
-		if target.K8SPod.GetPodSpec() == nil {
+		if target.K8SPod.PodSpec == nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.GetPodSpec(), &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.GetPodSpec(), err.Error())
+				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
 		}
 
 		// get primary container name
@@ -373,14 +449,14 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod().GetMetadata() != nil {
-			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
-			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
+		if taskTemplate.GetK8SPod().Metadata != nil {
+			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
+			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
 		}
 
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+		if podTemplate.GetPodSpec() != nil {
 			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
@@ -419,12 +495,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	// Fetch base pod template early to extract container resources for proper priority handling
-	basePodTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
 		Inputs:            tCtx.InputReader(),
@@ -434,18 +504,17 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
+	// Merge overrides with base extended resources
+	extendedResources := ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
-		var resourceMode = ResourceCustomizationModeMergeExistingResources
+		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
 
-		// Extract pod template resources for this init container
-		var podTemplateResources *v1.ResourceRequirements
-		if basePodTemplate != nil {
-			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, podSpec.InitContainers[index].Name, true)
-			podTemplateResources = &resources
-		}
-
-		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index], podTemplateResources); err != nil {
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index], extendedResources); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -458,14 +527,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 			resourceMode = ResourceCustomizationModeMergeExistingResources
 		}
 
-		// Extract pod template resources for this container
-		var podTemplateResources *v1.ResourceRequirements
-		if basePodTemplate != nil {
-			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, container.Name, false)
-			podTemplateResources = &resources
-		}
-
-		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.Containers[index], podTemplateResources); err != nil {
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.Containers[index], extendedResources); err != nil {
 			return nil, nil, err
 		}
 
@@ -491,13 +553,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.GetInterface(), dataLoadingConfig); err != nil {
+			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
-		primaryInitContainerName, err = AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
-			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig)
-		if err != nil {
+		if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
+			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -508,18 +569,23 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		primaryContainer.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
 	}
 
+	// Apply device-class-specific PodTemplate (if applicable)
+	// This provides device-specific defaults while allowing task configs to override
+	podSpec, err = applyAcceleratorDeviceClassPodTemplate(ctx, podSpec, extendedResources, primaryContainerName, primaryInitContainerName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// merge PodSpec and ObjectMeta with configuration pod template (if exists)
 	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// handling for extended resources
-	// Merge overrides with base extended resources
-	extendedResources := applyExtendedResourcesOverrides(
-		taskTemplate.GetExtendedResources(),
-		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
-	)
+	// TODO @pvditt
+	//if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
+	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
+	//}
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
@@ -540,6 +606,22 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	return podSpec, objectMeta, nil
+}
+
+func IsVscodeEnabled(ctx context.Context, envVar []v1.EnvVar) bool {
+	for _, env := range envVar {
+		if env.Name != FlyteEnableVscode {
+			continue
+		}
+		var err error
+		enableVscode, err := strconv.ParseBool(env.Value)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse %s env var: [%s]", FlyteEnableVscode, env.Value)
+			return false
+		}
+		return enableVscode
+	}
+	return false
 }
 
 func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
@@ -656,11 +738,11 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	}
 
 	var podTemplate *v1.PodTemplate
-	if taskTemplate.GetMetadata() != nil && len(taskTemplate.GetMetadata().GetPodTemplateName()) > 0 {
+	if taskTemplate.Metadata != nil && len(taskTemplate.Metadata.PodTemplateName) > 0 {
 		// retrieve PodTemplate by name from PodTemplateStore
-		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.GetMetadata().GetPodTemplateName())
+		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.Metadata.PodTemplateName)
 		if podTemplate == nil {
-			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.GetMetadata().GetPodTemplateName())
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.Metadata.PodTemplateName)
 		}
 	} else {
 		// check for default PodTemplate
@@ -673,7 +755,7 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 // MergeWithBasePodTemplate attempts to merge the provided PodSpec and ObjectMeta with the configuration PodTemplate for
 // this task.
 func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
-	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 
 	// attempt to retrieve base PodTemplate
 	podTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
@@ -692,7 +774,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge PodTemplate PodSpec with podSpec
-	var mergedObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
+	var mergedObjectMeta *metav1.ObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
 	if err := mergo.Merge(mergedObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, nil, err
 	}
@@ -760,14 +842,13 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 		}
 
 		// Check for any name matching template containers
-		for _, templateContainer := range templatePodSpec.Containers {
-			// skip default and primary template containers as they are handled above
-			if container.Name == primaryContainerName || container.Name == defaultContainerTemplateName || templateContainer.Name != container.Name {
+		for i, templateContainer := range templatePodSpec.Containers {
+			if templateContainer.Name != container.Name {
 				continue
 			}
 
 			if mergedContainer == nil {
-				mergedContainer = &templateContainer
+				mergedContainer = &templatePodSpec.Containers[i]
 			} else {
 				err := mergo.Merge(mergedContainer, templateContainer, mergo.WithOverride, mergo.WithAppendSlice)
 				if err != nil {
@@ -814,14 +895,13 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 		}
 
 		// Check for any name matching template containers
-		for _, templateInitContainer := range templatePodSpec.InitContainers {
-			// skip default and primary template init containers as they are handled above
-			if initContainer.Name == primaryInitContainerName || initContainer.Name == defaultInitContainerTemplateName || templateInitContainer.Name != initContainer.Name {
+		for i, templateInitContainer := range templatePodSpec.InitContainers {
+			if templateInitContainer.Name != initContainer.Name {
 				continue
 			}
 
 			if mergedInitContainer == nil {
-				mergedInitContainer = &templateInitContainer
+				mergedInitContainer = &templatePodSpec.InitContainers[i]
 			} else {
 				err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
 				if err != nil {
@@ -901,6 +981,72 @@ func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.Pod
 	return mergedPodSpec, nil
 }
 
+// applyAcceleratorDeviceClassPodTemplate applies device-class-specific PodTemplate configuration
+// to the provided PodSpec using MergeBasePodSpecOntoTemplate. The device class PodTemplate serves as a base,
+// with task PodSpec values taking precedence.
+//
+// See AcceleratorDeviceClassConfig.PodTemplate documentation for detailed merge semantics,
+// precedence rules, and container template support.
+func applyAcceleratorDeviceClassPodTemplate(
+	ctx context.Context,
+	podSpec *v1.PodSpec,
+	extendedResources *core.ExtendedResources,
+	primaryContainerName string,
+	primaryInitContainerName string,
+) (*v1.PodSpec, error) {
+	if extendedResources == nil || extendedResources.GetGpuAccelerator() == nil {
+		return podSpec, nil
+	}
+
+	gpuAccelerator := extendedResources.GetGpuAccelerator()
+	accelConfig := getAcceleratorConfig(gpuAccelerator)
+
+	if accelConfig.PodTemplate == nil {
+		return podSpec, nil
+	}
+
+	deviceClass := gpuAccelerator.GetDeviceClass().String()
+	logger.Infof(ctx, "Applying PodTemplate for accelerator device class: %s", deviceClass)
+
+	// Use MergeBasePodSpecOntoTemplate with device class pod template as base
+	mergedPodSpec, err := MergeBasePodSpecOntoTemplate(&accelConfig.PodTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	if err != nil {
+		return nil, pluginserrors.Wrapf(
+			pluginserrors.DownstreamSystemError,
+			err,
+			"Failed to merge PodTemplate for accelerator device class '%s'. "+
+				"Check k8s.accelerator-device-classes[%s].pod-template configuration.",
+			deviceClass, deviceClass,
+		)
+	}
+
+	return mergedPodSpec, nil
+}
+
+// TODO @pvditt
+//func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
+//	cfg := propellerCfg.GetConfig().AcceleratedInputs
+//	hostPathType := v1.HostPathDirectory
+//	spec.Volumes = append(spec.Volumes, v1.Volume{
+//		Name: "union-persistent-data-volume",
+//		VolumeSource: v1.VolumeSource{
+//			HostPath: &v1.HostPathVolumeSource{
+//				Path: cfg.VolumePath,
+//				Type: &hostPathType,
+//			},
+//		},
+//	})
+//	for i, cont := range spec.Containers {
+//		if cont.Name == primaryName {
+//			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
+//				Name:      "union-persistent-data-volume",
+//				ReadOnly:  true,
+//				MountPath: cfg.LocalPathPrefix,
+//			})
+//		}
+//	}
+//}
+
 func BuildIdentityPod() *v1.Pod {
 	return &v1.Pod{
 		TypeMeta: metav1.TypeMeta{
@@ -935,7 +1081,7 @@ func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 
 	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
 	if podPendingTimeout > 0 && time.Since(t) >= podPendingTimeout {
-		return pluginsCore.PhaseInfoRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
+		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
 			OccurredAt: &t,
 		}), nil
 	}
@@ -944,13 +1090,44 @@ func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 		return phaseInfo, nil
 	}
 
-	return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", phaseInfo.Info()), nil
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", phaseInfo.Info()), nil
+}
+
+// DemystifyFailedOrPendingPod inspects the pod status of a failed or pending pod and attempts to determine the reason
+// for the failure or pending state. This function currently only handles pods in the Failed or Pending phase.
+// This is useful to check the specific error from the pod in the rayjob, sparkjob, etc.
+// For example, if the pod is in the Failed phase due to an image pull error, this function can return a more specific
+// error message indicating that the image could not be pulled.
+// Similarly, if the pod is in the Pending phase due to insufficient resources, this function can return an error
+// message indicating that the pod could not be scheduled due to lack of resources.
+func DemystifyFailedOrPendingPod(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	info pluginsCore.TaskInfo,
+	namespace string,
+	podName string,
+	primaryContainerName string,
+) (pluginsCore.PhaseInfo, error) {
+	pod := &v1.Pod{}
+	var phaseInfo pluginsCore.PhaseInfo
+
+	err := pluginContext.K8sReader().Get(ctx, client.ObjectKey{Namespace: namespace, Name: podName}, pod)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get pod %s in namespace %s. Error: %v", podName, namespace, err)
+	}
+	switch pod.Status.Phase {
+	case v1.PodFailed:
+		phaseInfo, err = DemystifyFailure(ctx, pod.Status, info, primaryContainerName)
+	case v1.PodPending:
+		phaseInfo, err = DemystifyPending(pod.Status, info)
+	}
+	return phaseInfo, err
 }
 
 func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
-	phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Demistify Pending", &info)
+	phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Demistify Pending", &info)
 
 	t := time.Now()
 	for _, c := range status.Conditions {
@@ -959,7 +1136,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
+				return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -972,7 +1149,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
+			return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {
@@ -1017,7 +1194,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
+								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
 
 							case "CreateContainerError":
 								// This may consist of:
@@ -1046,7 +1223,12 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 										OccurredAt: &t,
 									}), t
 								}
-								return pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t
 
 							case "CreateContainerConfigError":
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
@@ -1055,7 +1237,12 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 										OccurredAt: &t,
 									}), t
 								}
-								return pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t
 
 							case "InvalidImageName":
 								return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
@@ -1070,7 +1257,12 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 									}), t
 								}
 
-								return pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t
 
 							default:
 								// Since we are not checking for all error states, we may end up perpetually
@@ -1295,6 +1487,61 @@ func GetReportedAt(pod *v1.Pod) metav1.Time {
 	}
 
 	return reportedAt
+}
+
+func GetPrimaryContainerName(pod *v1.Pod) string {
+	defaultContainer := pod.Annotations["kubectl.kubernetes.io/default-container"]
+	if defaultContainer != "" {
+		return defaultContainer
+	}
+	primaryContainer := pod.Annotations[PrimaryContainerKey]
+	if primaryContainer != "" {
+		return primaryContainer
+	}
+
+	for _, container := range pod.Spec.Containers {
+		if container.Name == pod.Name {
+			return container.Name
+		}
+	}
+
+	// default to just 1st container name
+	if len(pod.Spec.Containers) > 0 {
+		return pod.Spec.Containers[0].Name
+	}
+	return ""
+}
+
+func makeContainerContexts(statuses []v1.ContainerStatus) []*core.ContainerContext {
+	ctxs := make([]*core.ContainerContext, len(statuses))
+	for i, status := range statuses {
+		var startTime, endTime *timestamppb.Timestamp
+		if status.State.Running != nil {
+			startTime = timestamppb.New(status.State.Running.StartedAt.Time)
+		}
+		if status.State.Terminated != nil {
+			startTime = timestamppb.New(status.State.Terminated.StartedAt.Time)
+			endTime = timestamppb.New(status.State.Terminated.FinishedAt.Time)
+		}
+		ctxs[i] = &core.ContainerContext{
+			ContainerName: status.Name,
+			Process: &core.ContainerContext_ProcessContext{
+				ContainerStartTime: startTime,
+				ContainerEndTime:   endTime,
+			},
+		}
+	}
+	return ctxs
+}
+
+func BuildPodLogContext(pod *v1.Pod) *core.PodLogContext {
+	return &core.PodLogContext{
+		Namespace:            pod.Namespace,
+		PodName:              pod.Name,
+		PrimaryContainerName: GetPrimaryContainerName(pod),
+		Containers:           makeContainerContexts(pod.Status.ContainerStatuses),
+		InitContainers:       makeContainerContexts(pod.Status.InitContainerStatuses),
+	}
 }
 
 func isTerminatedWithSigKill(state v1.ContainerState) bool {

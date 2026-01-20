@@ -12,9 +12,9 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	testingclock "k8s.io/utils/clock/testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 const fakeCacheItemValueLimit = 10
@@ -341,87 +341,4 @@ func TestInProcessing(t *testing.T) {
 	assert.False(t, cache.inProcessing("test1"))
 	_, found := cache.processing.Load("test1")
 	assert.False(t, found)
-}
-
-func TestFirstItemInBatchMarkedAsProcessing(t *testing.T) {
-	testResyncPeriod := 10 * time.Millisecond
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
-	fakeClock := testingclock.NewFakeClock(time.Now())
-
-	t.Run("single item batch - first item should be marked as processing", func(t *testing.T) {
-		cache, err := NewInMemoryAutoRefresh("fake_single", syncFakeItem, rateLimiter, testResyncPeriod, 1, 10, promutils.NewTestScope(), WithClock(fakeClock), WithSyncOnCreate(false))
-		assert.NoError(t, err)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		assert.NoError(t, cache.Start(ctx))
-		defer cancel()
-
-		assert.Eventually(t, func() bool { return cache.enqueueLoopRunning.Load() }, time.Second, time.Millisecond)
-
-		// Create a single item
-		itemID := "single_item"
-		_, err = cache.GetOrCreate(itemID, fakeCacheItem{val: 0})
-		assert.NoError(t, err)
-
-		fakeClock.Step(testResyncPeriod)
-
-		// Wait for the item to be enqueued and marked as processing
-		assert.Eventually(t, func() bool {
-			return cache.inProcessing(itemID)
-		}, time.Second, time.Millisecond, "First (and only) item in single-item batch should be marked as processing")
-
-		// Verify the processing map contains the item
-		_, found := cache.processing.Load(itemID)
-		assert.True(t, found, "Item should be in processing map")
-	})
-
-	t.Run("multi-item batch - all items should be marked as processing", func(t *testing.T) {
-		// Custom batch function that creates batches of 3 items
-		createBatches := func(_ context.Context, snapshot []ItemWrapper) ([]Batch, error) {
-			if len(snapshot) == 0 {
-				return []Batch{}, nil
-			}
-			batches := []Batch{{}}
-			for i, item := range snapshot {
-				batches[0] = append(batches[0], item)
-				if (i+1)%3 == 0 && i < len(snapshot)-1 {
-					batches = append(batches, Batch{})
-				}
-			}
-			return batches, nil
-		}
-
-		cache, err := NewInMemoryAutoRefresh("fake_multi", syncFakeItem, rateLimiter, testResyncPeriod, 1, 10, promutils.NewTestScope(), WithClock(fakeClock), WithCreateBatchesFunc(createBatches), WithSyncOnCreate(false))
-		assert.NoError(t, err)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		assert.NoError(t, cache.Start(ctx))
-		defer cancel()
-
-		assert.Eventually(t, func() bool { return cache.enqueueLoopRunning.Load() }, time.Second, time.Millisecond)
-
-		// Create 3 items that will be batched together
-		itemIDs := []string{"item_0", "item_1", "item_2"}
-		for _, id := range itemIDs {
-			_, err = cache.GetOrCreate(id, fakeCacheItem{val: 0})
-			assert.NoError(t, err)
-		}
-
-		// Trigger the enqueue loop
-		fakeClock.Step(testResyncPeriod)
-
-		// Wait for all items to be marked as processing
-		for _, id := range itemIDs {
-			assert.Eventually(t, func() bool {
-				return cache.inProcessing(id)
-			}, time.Second, time.Millisecond, "Item %s should be marked as processing", id)
-		}
-
-		// Verify the processing map contains all items
-		for i, id := range itemIDs {
-			_, found := cache.processing.Load(id)
-			assert.True(t, found, "Item at index %d (id=%s) should be in processing map", i, id)
-		}
-	})
-
 }

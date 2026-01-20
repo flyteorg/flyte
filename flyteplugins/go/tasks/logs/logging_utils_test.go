@@ -9,10 +9,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	pluginCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const podName = "PodName"
@@ -92,6 +92,30 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 	assert.Nil(t, p)
 }
 
+func TestGetLogsForContainerInPod_BadIndex_WithoutStatus(t *testing.T) {
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
+		IsCloudwatchEnabled: true,
+		CloudwatchRegion:    "us-east-1",
+		CloudwatchLogGroup:  "/kubernetes/flyte-production",
+	})
+	assert.NoError(t, err)
+
+	pod := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ContainerName",
+				},
+			},
+		},
+	}
+	pod.Name = podName
+
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	assert.NoError(t, err)
+	assert.Nil(t, p)
+}
+
 func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsCloudwatchEnabled: true,
@@ -151,6 +175,12 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsKubernetesEnabled: true,
 		KubernetesURL:       "k8s.com",
+		DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+			"vscode": {
+				TemplateURIs:  []tasklog.TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+		},
 	})
 	assert.NoError(t, err)
 
@@ -159,6 +189,12 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 			Containers: []v1.Container{
 				{
 					Name: "ContainerName",
+					Env: []v1.EnvVar{
+						{
+							Name:  FlyteEnableVscode,
+							Value: "True",
+						},
+					},
 				},
 			},
 		},
@@ -172,9 +208,9 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, &core.TaskTemplate{})
 	assert.Nil(t, err)
-	assert.Len(t, logs, 1)
+	assert.Len(t, logs, 2)
 }
 
 func TestGetLogsForContainerInPod_All(t *testing.T) {
@@ -291,18 +327,21 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 				Uri:           "https://k8s-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Kubernetes Logs my-Suffix",
+				Ready:         true,
 			},
 			{
 				Uri:           "https://cw-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Cloudwatch Logs my-Suffix",
+				Ready:         true,
 			},
 			{
 				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
-				Name:          "Stackdriver Logs my-Suffix",
+				Name:          "Google Cloud Logs my-Suffix",
+				Ready:         true,
 			},
-		}, "", "")
+		}, "")
 	})
 
 	t.Run("StackDriver", func(t *testing.T) {
@@ -313,13 +352,14 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 			{
 				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
-				Name:          "Stackdriver Logs my-Suffix",
+				Name:          "Google Cloud Logs my-Suffix",
+				Ready:         true,
 			},
-		}, "", "")
+		}, "")
 	})
 }
 
-func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string, nodeName string) {
+func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string) {
 	logPlugin, err := InitializeLogPlugins(config)
 	assert.NoError(tb, err)
 
@@ -335,7 +375,6 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.Ta
 				},
 			},
 			Hostname: hostname,
-			NodeName: nodeName,
 		},
 		Status: v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
@@ -363,6 +402,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 					"https://my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_EXTERNAL.String(),
 			},
 			{
 				DisplayName: "Internal",
@@ -370,6 +410,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 					"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs",
 				},
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_EXTERNAL.String(),
 			},
 		},
 	}, nil, []*core.TaskLog{
@@ -377,13 +418,17 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 			Uri:           "https://my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "StackDriver my-Suffix",
+			LinkType:      core.TaskLog_EXTERNAL,
+			Ready:         true,
 		},
 		{
 			Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/attempt/1/view/logs",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "Internal my-Suffix",
+			LinkType:      core.TaskLog_EXTERNAL,
+			Ready:         true,
 		},
-	}, "", "")
+	}, "")
 }
 
 func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
@@ -402,28 +447,9 @@ func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
 			Uri:           "my-hostname/my-namespace/my-pod/ContainerName/ContainerID",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "StackDriver my-Suffix",
+			Ready:         true,
 		},
-	}, "my-hostname", "")
-}
-
-func TestGetLogsForContainerInPodTemplates_NodeName(t *testing.T) {
-	assertTestSucceeded(t, &LogConfig{
-		Templates: []tasklog.TemplateLogPlugin{
-			{
-				DisplayName: "MyLog",
-				TemplateURIs: []string{
-					"{{ .nodeName }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-				},
-				MessageFormat: core.TaskLog_JSON,
-			},
-		},
-	}, nil, []*core.TaskLog{
-		{
-			Uri:           "ip-1-2-3-4/my-namespace/my-pod/ContainerName/ContainerID",
-			MessageFormat: core.TaskLog_JSON,
-			Name:          "MyLog my-Suffix",
-		},
-	}, "my-hostname", "ip-1-2-3-4")
+	}, "my-hostname")
 }
 
 func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
@@ -483,6 +509,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
 						},
+						LinkType: core.TaskLog_IDE.String(),
 					},
 				},
 			},
@@ -498,6 +525,8 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://abc.com:65535/a-route",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
+					Ready:         true,
 				},
 			},
 		},
@@ -524,6 +553,8 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://abc.com:65535:65535",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
+					Ready:         true,
 				},
 			},
 		},
@@ -544,6 +575,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "Kubernetes Logs my-Suffix",
+					Ready:         true,
 				},
 			},
 		},
@@ -572,18 +604,22 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "Kubernetes Logs my-Suffix",
+					LinkType:      core.TaskLog_EXTERNAL,
+					Ready:         true,
 				},
 				{
 					Uri:           "https://flyteinteractive.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
+					Ready:         true,
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "", "")
+			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "")
 		})
 	}
 }

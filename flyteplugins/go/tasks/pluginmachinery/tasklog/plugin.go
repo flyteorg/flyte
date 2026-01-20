@@ -3,13 +3,18 @@ package tasklog
 import (
 	"regexp"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 //go:generate enumer --type=TemplateScheme --trimprefix=TemplateScheme -json -yaml
 
 type TemplateScheme int
+
+const (
+	TemplateSchemePod TemplateScheme = iota
+	TemplateSchemeTaskExecution
+)
 
 // TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
 type TemplateURI = string
@@ -23,7 +28,6 @@ type TemplateVar struct {
 // log links.
 type Input struct {
 	HostName             string
-	NodeName             string
 	PodName              string
 	Namespace            string
 	ContainerName        string
@@ -37,6 +41,9 @@ type Input struct {
 	TaskExecutionID      pluginsCore.TaskExecutionID
 	ExtraTemplateVars    []TemplateVar
 	TaskTemplate         *core.TaskTemplate
+	EnableVscode         bool
+	AgentID              string
+	ConnectorID          string
 }
 
 // Output contains all task logs a plugin generates for a given Input.
@@ -60,4 +67,5 @@ type TemplateLogPlugin struct {
 	DeprecatedScheme TemplateScheme `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 	ShowWhilePending bool           `json:"showWhilePending" pflag:",If true, the log link will be shown even if the task is in a pending state."`
 	HideOnceFinished bool           `json:"hideOnceFinished" pflag:",If true, the log link will be hidden once the task has finished."`
+	LinkType         string         `json:"linkType" pflag:",Type of the log. (external, dashboard, or ide). This is used to distinguish between different log links."`
 }

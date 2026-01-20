@@ -6,7 +6,7 @@ import (
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const DefaultPhaseVersion = uint32(0)
@@ -85,6 +85,8 @@ type ExternalResource struct {
 	Index uint32
 	// Log information for the external resource
 	Logs []*core.TaskLog
+	// Contains metadata required to identify logs related to this task execution
+	LogContext *core.LogContext
 	// The number of times this external resource has been attempted
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
@@ -101,6 +103,8 @@ type ReasonInfo struct {
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog
+	// Contains metadata required to identify logs related to this task execution
+	LogContext *core.LogContext
 	// This value represents the time the status occurred at. If not provided, it will be defaulted to the time Flyte
 	// checked the task status.
 	OccurredAt *time.Time
@@ -174,6 +178,14 @@ func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
 	}
 }
 
+func (p *PhaseInfo) WithReason(reason string) {
+	if p.reason != "" {
+		p.reason += ", " + reason
+	} else {
+		p.reason = reason
+	}
+}
+
 func (p PhaseInfo) String() string {
 	if p.err != nil {
 		return fmt.Sprintf("Phase<%s:%d Error:%s>", p.phase, p.version, p.err)
@@ -208,8 +220,15 @@ func PhaseInfoNotReady(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
+// Deprecated: Please use PhaseInfoWaitingForResourcesInfo instead
+func PhaseInfoWaitingForResources(t time.Time, version uint32, reason string) PhaseInfo {
+	pi := phaseInfo(PhaseWaitingForResources, version, nil, &TaskInfo{OccurredAt: &t}, false)
+	pi.reason = reason
+	return pi
+}
+
 // PhaseInfoWaitingForResourcesInfo represents the case the plugin is not ready to start
-func PhaseInfoWaitingForResourcesInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoWaitingForResourcesInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseWaitingForResources, version, nil, info, false)
 	pi.reason = reason
 	return pi
@@ -221,13 +240,13 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoQueuedWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseQueued, version, nil, info, false)
 	pi.reason = reason
 	return pi
 }
 
-func PhaseInfoInitializing(version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseInitializing, version, nil, info, false)
 	pi.reason = reason
 	return pi

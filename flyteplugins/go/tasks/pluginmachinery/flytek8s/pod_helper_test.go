@@ -17,30 +17,30 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	config1 "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	config1 "github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string, podTemplate *core.K8SPod) pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
-	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.On("GetK8sServiceAccount").Return("service-account")
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -49,16 +49,16 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("some-acceptable-name")
-	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
-	to.On("GetContainerImage").Return(containerImage)
-	to.On("GetPodTemplate").Return(podTemplate)
-	taskExecutionMetadata.On("GetOverrides").Return(to)
-	taskExecutionMetadata.On("IsInterruptible").Return(true)
+	to.EXPECT().GetResources().Return(resources)
+	to.EXPECT().GetExtendedResources().Return(extendedResources)
+	to.EXPECT().GetContainerImage().Return(containerImage)
+	to.EXPECT().GetPodTemplate().Return(podTemplate)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(to)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
 	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
@@ -79,8 +79,8 @@ func dummyTaskTemplate() *core.TaskTemplate {
 
 func dummyInputReader() io.InputReader {
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
-	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference-prefix")
+	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	return inputReader
 }
@@ -98,7 +98,7 @@ func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirement
 	tCtx.EXPECT().OutputWriter().Return(ow)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
+	taskReader.EXPECT().Read( mock.Anything).Return(taskTemplate, nil)
 	tCtx.EXPECT().TaskReader().Return(taskReader)
 	return tCtx
 }
@@ -221,6 +221,121 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 	})
 }
 
+func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
+	t.Run("with empty node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 10,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "new",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"new"},
+							},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+
+	t.Run("with existing node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+					NodeSelectorTerms: []v1.NodeSelectorTerm{
+						v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "required",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"required"},
+								},
+							},
+						},
+					},
+				},
+				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
+					v1.PreferredSchedulingTerm{
+						Weight: 1,
+						Preference: v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "preferred",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"preferred"},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "required",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"required"},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 1,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "preferred",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"preferred"},
+							},
+						},
+					},
+				},
+				v1.PreferredSchedulingTerm{
+					Weight: 10,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "new",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"new"},
+							},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+}
+
 func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 	t.Run("WithInterruptibleNodeSelectorRequirement", func(t *testing.T) {
 		podSpec := v1.PodSpec{}
@@ -329,12 +444,12 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	}
 
 	t.Run("base and overrides are nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, nil)
+		final := ApplyExtendedResourcesOverrides(nil, nil)
 		assert.NotNil(t, final)
 	})
 
 	t.Run("base is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, t4)
+		final := ApplyExtendedResourcesOverrides(nil, t4)
 		assert.EqualValues(
 			t,
 			t4.GetGpuAccelerator(),
@@ -343,7 +458,7 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	})
 
 	t.Run("overrides is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(t4, nil)
+		final := ApplyExtendedResourcesOverrides(t4, nil)
 		assert.EqualValues(
 			t,
 			t4.GetGpuAccelerator(),
@@ -352,7 +467,7 @@ func TestApplyExtendedResourcesOverrides(t *testing.T) {
 	})
 
 	t.Run("merging", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(partitionedA100, unpartitionedA100)
+		final := ApplyExtendedResourcesOverrides(partitionedA100, unpartitionedA100)
 		assert.EqualValues(
 			t,
 			unpartitionedA100.GetGpuAccelerator(),
@@ -579,6 +694,956 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 			podSpec.Tolerations,
 		)
 	})
+
+	t.Run("with friendly device name normalization - NVIDIA H100", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"H100": "nvidia-h100",
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "H100"}, // Friendly name
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-h100"}, // Normalized name
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "gpu-device",
+					Value:    "nvidia-h100", // Normalized name
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("with friendly device name normalization - case insensitive", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"H100": "nvidia-h100",
+			},
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "h100"}, // Lowercase friendly name
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-h100"}, // Still normalized correctly
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("with friendly device name normalization - Google TPU", func(t *testing.T) {
+		// Configure for TPU usage
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "google.com/tpu",
+			GpuDeviceNodeLabel:        "tpu-device",
+			GpuPartitionSizeNodeLabel: "tpu-partition-size",
+			AcceleratorDevices: map[string]string{
+				"V5E": "tpu-v5-lite-podslice",
+				"V5P": "tpu-v5p-slice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("4"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{Device: "V5E"}, // Friendly name for TPU
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "tpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5-lite-podslice"}, // Normalized TPU name
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("with unmapped device uses device name as-is", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "gpu-device",
+			GpuPartitionSizeNodeLabel: "gpu-partition-size",
+			AcceleratorDevices:        map[string]string{}, // Empty mapping
+		}))
+
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{Device: "custom-gpu-device"},
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-device",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"custom-gpu-device"}, // Used as-is since not in mapping
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+}
+
+func TestApplyGPUNodeSelectors_DeviceClassOverrides(t *testing.T) {
+	// Test device class specific configuration overrides
+
+	t.Run("Google TPU with device class specific config", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName:           "google.com/tpu",
+					DeviceNodeLabel:        "cloud.google.com/gke-tpu-accelerator",
+					PartitionSizeNodeLabel: "cloud.google.com/gke-tpu-topology",
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"V5E": "tpu-v5-lite-podslice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("4"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{
+				Device:      "V5E",
+				DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+			},
+		)
+
+		// Verify it uses Google-specific node labels instead of AWS labels
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "cloud.google.com/gke-tpu-accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5-lite-podslice"},
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "cloud.google.com/gke-tpu-accelerator",
+					Value:    "tpu-v5-lite-podslice",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			tpuPodSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU fallback to global config", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					// DeviceNodeLabel not specified - should fallback to global
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+			},
+		)
+
+		// Verify it falls back to global GpuDeviceNodeLabel
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("TPU with partition size", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName:           "google.com/tpu",
+					DeviceNodeLabel:        "cloud.google.com/gke-tpu-accelerator",
+					PartitionSizeNodeLabel: "cloud.google.com/gke-tpu-topology",
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"V5P": "tpu-v5p-slice",
+			},
+		}))
+
+		tpuPodSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"google.com/tpu": resource.MustParse("8"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			tpuPodSpec,
+			&core.GPUAccelerator{
+				Device:      "V5P",
+				DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "2x2x2",
+				},
+			},
+		)
+
+		// Verify it uses Google-specific topology label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "cloud.google.com/gke-tpu-accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"tpu-v5p-slice"},
+						},
+						{
+							Key:      "cloud.google.com/gke-tpu-topology",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"2x2x2"},
+						},
+					},
+				},
+			},
+			tpuPodSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "cloud.google.com/gke-tpu-accelerator",
+					Value:    "tpu-v5p-slice",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "cloud.google.com/gke-tpu-topology",
+					Value:    "2x2x2",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			tpuPodSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU unpartitioned with custom node selector and toleration", func(t *testing.T) {
+		gpuUnpartitionedNodeSelectorRequirement := v1.NodeSelectorRequirement{
+			Key:      "gpu-unpartitioned",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"true"},
+		}
+		gpuUnpartitionedToleration := v1.Toleration{
+			Key:      "gpu-unpartitioned",
+			Value:    "true",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:                         "nvidia.com/gpu",
+					DeviceNodeLabel:                      "k8s.amazonaws.com/accelerator",
+					PartitionSizeNodeLabel:               "k8s.amazonaws.com/gpu-partition-size",
+					UnpartitionedNodeSelectorRequirement: &gpuUnpartitionedNodeSelectorRequirement,
+					UnpartitionedToleration:              &gpuUnpartitionedToleration,
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{
+					Unpartitioned: true,
+				},
+			},
+		)
+
+		// Verify it uses device-class-specific unpartitioned config
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						gpuUnpartitionedNodeSelectorRequirement,
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "k8s.amazonaws.com/accelerator",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				gpuUnpartitionedToleration,
+			},
+			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("NVIDIA GPU unpartitioned with fallback to default behavior", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:           "nvidia.com/gpu",
+					DeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+					PartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+					// No unpartitioned config - should use default DoesNotExist behavior
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{
+					Unpartitioned: true,
+				},
+			},
+		)
+
+		// Verify it uses default DoesNotExist behavior with GPU partition size label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "k8s.amazonaws.com/accelerator",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						{
+							Key:      "k8s.amazonaws.com/gpu-partition-size",
+							Operator: v1.NodeSelectorOpDoesNotExist,
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("Partial device class config merges with global defaults", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			GpuResourceName:           "nvidia.com/gpu",
+			GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+			GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName:    "nvidia.com/gpu",
+					DeviceNodeLabel: "nvidia.com/gpu.present",
+					// PartitionSizeNodeLabel not specified - should fall back to global
+				},
+			},
+			AcceleratorDevices: map[string]string{
+				"A100": "nvidia-tesla-a100",
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							"nvidia.com/gpu": resource.MustParse("1"),
+						},
+					},
+				},
+			},
+		}
+
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.GPUAccelerator{
+				Device:      "A100",
+				DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		)
+
+		// Verify it uses NVIDIA-specific device label but falls back to global partition label
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						{
+							Key:      "nvidia.com/gpu.present",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						{
+							// Falls back to global partition size label
+							Key:      "k8s.amazonaws.com/gpu-partition-size",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      "nvidia.com/gpu.present",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "k8s.amazonaws.com/gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+	})
+}
+
+func TestApplyAcceleratorDeviceClassPodTemplate(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("nil handling", func(t *testing.T) {
+		// Sub-test: Nil extendedResources returns immediately
+		t.Run("nil extendedResources", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				nil, // nil extendedResources
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Nil accelerator returns immediately
+		t.Run("nil accelerator", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Nil PodTemplate does nothing
+		t.Run("nil PodTemplate", func(t *testing.T) {
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+					"NVIDIA_GPU": {
+						ResourceName: "nvidia.com/gpu",
+						// PodTemplate: nil
+					},
+				},
+			}))
+
+			podSpec := &v1.PodSpec{SchedulerName: "original"}
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, "original", podSpec.SchedulerName)
+		})
+	})
+
+	t.Run("scalar field merge behavior", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								SchedulerName: "volcano", // Device class default
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		// Sub-test: Task value overrides device class default
+		t.Run("task overrides device class", func(t *testing.T) {
+			podSpec := &v1.PodSpec{SchedulerName: "default-scheduler"} // Task-specific value
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			// Task value should win (BASE semantics)
+			assert.Equal(t, "default-scheduler", podSpec.SchedulerName)
+		})
+
+		// Sub-test: Device class default applies when task doesn't set value
+		t.Run("device class applies when task unset", func(t *testing.T) {
+			podSpec := &v1.PodSpec{} // Task doesn't set schedulerName
+			podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+				ctx,
+				podSpec,
+				&core.ExtendedResources{
+					GpuAccelerator: &core.GPUAccelerator{
+						DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+					},
+				},
+				"primary",
+				"primary-init",
+			)
+			assert.NoError(t, err)
+			// Device class default should apply
+			assert.Equal(t, "volcano", podSpec.SchedulerName)
+		})
+	})
+
+	t.Run("merge semantics validation", func(t *testing.T) {
+		// Single comprehensive test validating slice append and map merge behaviors
+		overrideToleration := v1.Toleration{
+			Key:      "tpu-topology",
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Tolerations: []v1.Toleration{overrideToleration},
+								NodeSelector: map[string]string{
+									"new-key":      "new-value",
+									"existing-key": "default-value",
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		existingToleration := v1.Toleration{
+			Key:      "interruptible",
+			Value:    "true",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		podSpec := &v1.PodSpec{
+			Tolerations: []v1.Toleration{existingToleration},
+			NodeSelector: map[string]string{
+				"existing-key": "task-value",
+				"keep-key":     "keep-value",
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			"primary",
+			"primary-init",
+		)
+		assert.NoError(t, err)
+
+		// Validate slice append: tolerations from both device class and task
+		assert.Len(t, podSpec.Tolerations, 2)
+		assert.Contains(t, podSpec.Tolerations, existingToleration)
+		assert.Contains(t, podSpec.Tolerations, overrideToleration)
+
+		// Validate map merge: task values win for conflicts, device class adds new keys
+		assert.Len(t, podSpec.NodeSelector, 3)
+		assert.Equal(t, "task-value", podSpec.NodeSelector["existing-key"]) // Task wins
+		assert.Equal(t, "keep-value", podSpec.NodeSelector["keep-key"])     // Task only
+		assert.Equal(t, "new-value", podSpec.NodeSelector["new-key"])       // Device class adds
+	})
+
+	t.Run("default container template affects all containers", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "default",
+										Env: []v1.EnvVar{
+											{Name: "NVIDIA_VISIBLE_DEVICES", Value: "all"},
+											{Name: "NCCL_DEBUG", Value: "INFO"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "main", Image: "app:1.0"},
+				{Name: "sidecar", Image: "monitor:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				},
+			},
+			"main",
+			"main-init",
+		)
+		assert.NoError(t, err)
+
+		// Both containers should have the env vars from the default template
+		assert.Len(t, podSpec.Containers, 2)
+		for i, container := range podSpec.Containers {
+			assert.Contains(t, container.Env, v1.EnvVar{Name: "NVIDIA_VISIBLE_DEVICES", Value: "all"},
+				"Container %d (%s) missing env var", i, container.Name)
+			assert.Contains(t, container.Env, v1.EnvVar{Name: "NCCL_DEBUG", Value: "INFO"},
+				"Container %d (%s) missing env var", i, container.Name)
+		}
+	})
+
+	t.Run("primary container template affects only primary container", func(t *testing.T) {
+		gpuLimit := resource.MustParse("8")
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"NVIDIA_GPU": {
+					ResourceName: "nvidia.com/gpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "primary",
+										Env: []v1.EnvVar{
+											{Name: "CUDA_VISIBLE_DEVICES", Value: "all"},
+										},
+										Resources: v1.ResourceRequirements{
+											Limits: v1.ResourceList{
+												v1.ResourceName("nvidia.com/gpu"): gpuLimit,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "workload", Image: "gpu-app:1.0"},
+				{Name: "metrics", Image: "prometheus:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_NVIDIA_GPU,
+				},
+			},
+			"workload",
+			"workload-init",
+		)
+		assert.NoError(t, err)
+
+		// Primary container should have the template applied
+		assert.Contains(t, podSpec.Containers[0].Env, v1.EnvVar{Name: "CUDA_VISIBLE_DEVICES", Value: "all"})
+		gpuResource := podSpec.Containers[0].Resources.Limits[v1.ResourceName("nvidia.com/gpu")]
+		assert.Equal(t, "8", gpuResource.String())
+
+		// Sidecar should NOT have the template
+		assert.NotContains(t, podSpec.Containers[1].Env, v1.EnvVar{Name: "CUDA_VISIBLE_DEVICES", Value: "all"})
+		assert.Empty(t, podSpec.Containers[1].Resources.Limits)
+	})
+
+	t.Run("both default and primary templates merge correctly", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"GOOGLE_TPU": {
+					ResourceName: "google.com/tpu",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								Containers: []v1.Container{
+									{
+										Name: "default",
+										Env: []v1.EnvVar{
+											{Name: "BASE_VAR", Value: "from-default"},
+											{Name: "SHARED_VAR", Value: "shared"},
+										},
+										ImagePullPolicy: v1.PullAlways,
+									},
+									{
+										Name: "primary",
+										Env: []v1.EnvVar{
+											{Name: "BASE_VAR", Value: "from-primary"},
+											{Name: "PRIMARY_ONLY", Value: "primary-value"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		podSpec := &v1.PodSpec{
+			Containers: []v1.Container{
+				{Name: "trainer", Image: "tpu-trainer:1.0"},
+				{Name: "logger", Image: "log-collector:1.0"},
+			},
+		}
+
+		podSpec, err := applyAcceleratorDeviceClassPodTemplate(
+			ctx,
+			podSpec,
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					DeviceClass: core.GPUAccelerator_GOOGLE_TPU,
+				},
+			},
+			"trainer",
+			"trainer-init",
+		)
+		assert.NoError(t, err)
+
+		// Primary container: primary template overrides default for BASE_VAR
+		primaryContainer := podSpec.Containers[0]
+		assert.Equal(t, v1.PullAlways, primaryContainer.ImagePullPolicy)                                  // from default
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "BASE_VAR", Value: "from-primary"})      // primary wins
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "SHARED_VAR", Value: "shared"})          // from default
+		assert.Contains(t, primaryContainer.Env, v1.EnvVar{Name: "PRIMARY_ONLY", Value: "primary-value"}) // from primary
+
+		// Non-primary container: only gets default template
+		sidecarContainer := podSpec.Containers[1]
+		assert.Equal(t, v1.PullAlways, sidecarContainer.ImagePullPolicy)
+		assert.Contains(t, sidecarContainer.Env, v1.EnvVar{Name: "BASE_VAR", Value: "from-default"})
+		assert.Contains(t, sidecarContainer.Env, v1.EnvVar{Name: "SHARED_VAR", Value: "shared"})
+		assert.NotContains(t, sidecarContainer.Env, v1.EnvVar{Name: "PRIMARY_ONLY", Value: "primary-value"})
+	})
 }
 
 func updatePod(t *testing.T) {
@@ -761,8 +1826,8 @@ func TestToK8sPod(t *testing.T) {
 	}))
 
 	op := &pluginsIOMock.OutputFilePaths{}
-	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))
-	op.On("GetRawOutputPrefix").Return(storage.DataReference(""))
+	op.EXPECT().GetOutputPrefixPath().Return(storage.DataReference(""))
+	op.EXPECT().GetRawOutputPrefix().Return(storage.DataReference(""))
 
 	t.Run("WithGPU", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
@@ -936,6 +2001,31 @@ func TestToK8sPod(t *testing.T) {
 			}
 		}
 	})
+
+	// TODO @pvditt
+	//t.Run("AcceleratedInputsEnabled", func(t *testing.T) {
+	//	cfg := propellerCfg.GetConfig()
+	//	cfg.AcceleratedInputs.Enabled = true
+	//	cfg.AcceleratedInputs.VolumePath = "/test/path"
+	//	cfg.AcceleratedInputs.LocalPathPrefix = "/test/local"
+	//	defer func() { cfg.AcceleratedInputs.Enabled = false }()
+	//	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+	//
+	//	p, _, _, err := ToK8sPodSpec(ctx, x)
+	//
+	//	assert.NoError(t, err)
+	//	if assert.Len(t, p.Volumes, 1) {
+	//		vol := p.Volumes[0]
+	//		assert.Equal(t, "union-persistent-data-volume", vol.Name)
+	//		assert.Equal(t, cfg.AcceleratedInputs.VolumePath, vol.HostPath.Path)
+	//	}
+	//	if assert.Len(t, p.Containers, 1) && assert.Len(t, p.Containers[0].VolumeMounts, 1) {
+	//		mount := p.Containers[0].VolumeMounts[0]
+	//		assert.Equal(t, "union-persistent-data-volume", mount.Name)
+	//		assert.Equal(t, cfg.AcceleratedInputs.LocalPathPrefix, mount.MountPath)
+	//		assert.True(t, mount.ReadOnly)
+	//	}
+	//})
 }
 
 func TestToK8sPodContainerImage(t *testing.T) {
@@ -1112,6 +2202,127 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 			)
 		})
 	}
+}
+
+// TestToK8sPodDeviceClass validates the complete three-way merge order through ToK8sPodSpec:
+// Task PodSpec > Device Class PodTemplate > Base PodTemplate
+func TestToK8sPodDeviceClass(t *testing.T) {
+	t.Run("device class template merge", func(t *testing.T) {
+		// 1. Configure base PodTemplate in DefaultPodTemplateStore
+		basePodTemplate := v1.PodTemplate{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "base-template",
+				Namespace: "test-namespace",
+			},
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					SchedulerName: "base-scheduler",
+					DNSPolicy:     v1.DNSClusterFirst,
+					Tolerations: []v1.Toleration{
+						{Key: "base-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+					},
+					NodeSelector: map[string]string{
+						"base-key": "base-value",
+					},
+				},
+			},
+		}
+		DefaultPodTemplateStore.Store(&basePodTemplate)
+
+		// 2. Configure device class PodTemplate for AMAZON_NEURON
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+				"AMAZON_NEURON": {
+					ResourceName: "aws.amazon.com/neuron",
+					PodTemplate: &v1.PodTemplate{
+						Template: v1.PodTemplateSpec{
+							Spec: v1.PodSpec{
+								SchedulerName:     "device-scheduler", // Overrides base
+								PriorityClassName: "device-priority",
+								Tolerations: []v1.Toleration{
+									{Key: "device-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+								},
+								NodeSelector: map[string]string{
+									"device-key": "device-value",
+								},
+							},
+						},
+					},
+				},
+			},
+		}))
+
+		// 3. Configure task-level K8SPod override
+		taskPodSpec := v1.PodSpec{
+			PriorityClassName: "task-priority",
+			Tolerations: []v1.Toleration{
+				{Key: "task-tol", Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule},
+			},
+			NodeSelector: map[string]string{
+				"task-key": "task-value",
+			},
+			Containers: []v1.Container{
+				{
+					Name: "primary-container",
+				},
+			},
+		}
+		taskPodSpecStruct, err := utils.MarshalObjToStruct(taskPodSpec)
+		assert.NoError(t, err)
+
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.Metadata = &core.TaskMetadata{
+			PodTemplateName: "base-template",
+		}
+		taskTemplate.ExtendedResources = &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				DeviceClass: core.GPUAccelerator_AMAZON_NEURON,
+			},
+		}
+
+		k8sPod := &core.K8SPod{
+			PodSpec:              taskPodSpecStruct,
+			PrimaryContainerName: "primary-container",
+		}
+
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{}, nil, "", k8sPod)
+		podSpec, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+
+		// 4. Validate merge order: Task > Device Class > Base Template
+
+		// Scalars: Device class scalar overrides base
+		assert.Equal(t, "device-scheduler", podSpec.SchedulerName,
+			"Device class SchedulerName should override base")
+
+		// Device class scalar overridden by task
+		assert.Equal(t, "task-priority", podSpec.PriorityClassName,
+			"Task PriorityClassName should override device class")
+
+		// Base scalar preserved (not in task or device class)
+		assert.Equal(t, v1.DNSClusterFirst, podSpec.DNSPolicy,
+			"Base DNSPolicy should be preserved")
+
+		// Slices: All tolerations should be appended
+		tolerationKeys := make([]string, 0)
+		for _, tol := range podSpec.Tolerations {
+			tolerationKeys = append(tolerationKeys, tol.Key)
+		}
+		assert.Contains(t, tolerationKeys, "base-tol",
+			"Base toleration should be present")
+		assert.Contains(t, tolerationKeys, "device-tol",
+			"Device class toleration should be present")
+		assert.Contains(t, tolerationKeys, "task-tol",
+			"Task toleration should be present")
+
+		// Maps: All node selector entries should be merged
+		assert.Equal(t, "base-value", podSpec.NodeSelector["base-key"],
+			"Base node selector should be present")
+		assert.Equal(t, "device-value", podSpec.NodeSelector["device-key"],
+			"Device class node selector should be present")
+		assert.Equal(t, "task-value", podSpec.NodeSelector["task-key"],
+			"Task node selector should be present")
+	})
 }
 
 func TestDemystifyPending(t *testing.T) {
@@ -1459,7 +2670,8 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
-		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().GetCode())
+		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, taskStatus.Err().Kind)
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
@@ -1479,7 +2691,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
 	})
 
 	t.Run("InitContainer OOMKilled", func(t *testing.T) {
@@ -1496,7 +2708,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -1513,16 +2725,16 @@ func TestDemystifyFailure(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
 	})
 
 	t.Run("known-error", func(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "hello", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "hello", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("OOMKilled", func(t *testing.T) {
@@ -1540,8 +2752,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("SIGKILL non-primary container", func(t *testing.T) {
@@ -1560,8 +2772,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{}, "primary-container")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
 	t.Run("SIGKILL primary container", func(t *testing.T) {
@@ -1580,8 +2792,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{}, "primary-container")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
 	})
 
 	t.Run("GKE node preemption", func(t *testing.T) {
@@ -1657,8 +2869,8 @@ func TestDemystifyPending_testcases(t *testing.T) {
 					assert.NotNil(t, p)
 					assert.Equal(t, p.Phase(), pluginsCore.PhaseRetryableFailure)
 					if assert.NotNil(t, p.Err()) {
-						assert.Equal(t, p.Err().GetCode(), tt.errCode)
-						assert.Equal(t, p.Err().GetMessage(), tt.message)
+						assert.Equal(t, p.Err().Code, tt.errCode)
+						assert.Equal(t, p.Err().Message, tt.message)
 					}
 				}
 			}
@@ -1718,9 +2930,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
-		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+		assert.Equal(t, "foo", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 	t.Run("primary container failed - SIGKILL", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1736,9 +2948,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+		assert.Equal(t, "foo", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 	t.Run("primary container failed - SIGKILL unsigned", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1754,9 +2966,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+		assert.Equal(t, "foo", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 	t.Run("primary container succeeded", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1776,8 +2988,8 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			secondaryContainer,
 		}, info)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
-		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().GetCode())
-		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().GetMessage())
+		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().Code)
+		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
 	})
 	t.Run("primary container failed with OOMKilled", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1793,9 +3005,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
-		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
-		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 	t.Run("primary container failed with OOMKilled - SIGKILL", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1811,9 +3023,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
-		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
-		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 }
 
@@ -1834,7 +3046,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -1860,7 +3072,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -1887,7 +3099,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -1915,7 +3127,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -1943,14 +3155,6 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Name: "bar",
 			},
 		},
-		InitContainers: []v1.Container{
-			v1.Container{
-				Name: "foo-init",
-			},
-			v1.Container{
-				Name: "foo-bar",
-			},
-		},
 	}
 
 	objectMeta := metav1.ObjectMeta{
@@ -1965,7 +3169,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -2027,7 +3231,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.On("Read", mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -2040,9 +3244,6 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		primaryContainer := resultPodSpec.Containers[0]
 		assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 		assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
-		primaryInitContainer := resultPodSpec.InitContainers[0]
-		assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
-		assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
 
 		// test that template object metadata is copied
 		assert.Contains(t, resultObjectMeta.Labels, "fooKey")
@@ -2183,6 +3384,8 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 					},
 				},
 			},
+			primaryContainerName:     "task-1",
+			primaryInitContainerName: "task-init-1",
 			basePodSpec: &v1.PodSpec{
 				Containers:     []v1.Container{baseContainer1},
 				InitContainers: []v1.Container{initContainer1},
@@ -2330,116 +3533,6 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 			},
 			primaryContainerName:     "task-1",
 			primaryInitContainerName: "task-init-1",
-		},
-		{
-			name: "template with default container with env vars, base with default container",
-			templatePodSpec: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "default",
-						Image: "default-task-image",
-						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "default-init",
-						Image: "default-task-init-image",
-						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
-					},
-				},
-			},
-			basePodSpec: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "default",
-						Image: "task-image",
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "default-init",
-						Image: "task-init-image",
-					},
-				},
-			},
-			expectedResult: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "default",
-						Image: "task-image",
-						Env: []v1.EnvVar{
-							{Name: "FOO", Value: "BAR"},
-						},
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "default-init",
-						Image: "task-init-image",
-						Env: []v1.EnvVar{
-							{Name: "INIT_FOO", Value: "INIT_BAR"},
-						},
-					},
-				},
-			},
-			primaryContainerName:     "primary",
-			primaryInitContainerName: "primary-init",
-		},
-		{
-			name: "template with primary container with env vars, base with primary container",
-			templatePodSpec: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "primary",
-						Image: "default-task-image",
-						Env:   []v1.EnvVar{{Name: "FOO", Value: "BAR"}},
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "primary-init",
-						Image: "default-task-init-image",
-						Env:   []v1.EnvVar{{Name: "INIT_FOO", Value: "INIT_BAR"}},
-					},
-				},
-			},
-			basePodSpec: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "primary",
-						Image: "task-image",
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "primary-init",
-						Image: "task-init-image",
-					},
-				},
-			},
-			expectedResult: &v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name:  "primary",
-						Image: "task-image",
-						Env: []v1.EnvVar{
-							{Name: "FOO", Value: "BAR"},
-						},
-					},
-				},
-				InitContainers: []v1.Container{
-					{
-						Name:  "primary-init",
-						Image: "task-init-image",
-						Env: []v1.EnvVar{
-							{Name: "INIT_FOO", Value: "INIT_BAR"},
-						},
-					},
-				},
-			},
-			primaryContainerName:     "primary",
-			primaryInitContainerName: "primary-init",
 		},
 	}
 
@@ -2653,7 +3746,7 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 				},
 			}
 			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.includeConsoleURL, tt.consoleURL)
-			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container, nil)
 			assert.NoError(t, err)
 			if tt.expectedEnvVar == nil {
 				// Confirm that there is no env var FLYTE_EXECUTION_URL set
@@ -2800,7 +3893,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	}
 
 	t.Run("base is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(nil, SharedMemory)
+		final := ApplyExtendedResourcesOverrides(nil, SharedMemory)
 		assert.EqualValues(
 			t,
 			SharedMemory.GetSharedMemory(),
@@ -2809,7 +3902,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	})
 
 	t.Run("overrides is nil", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(SharedMemory, nil)
+		final := ApplyExtendedResourcesOverrides(SharedMemory, nil)
 		assert.EqualValues(
 			t,
 			SharedMemory.GetSharedMemory(),
@@ -2818,7 +3911,7 @@ func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
 	})
 
 	t.Run("merging", func(t *testing.T) {
-		final := applyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
+		final := ApplyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
 		assert.EqualValues(
 			t,
 			newSharedMemory.GetSharedMemory(),

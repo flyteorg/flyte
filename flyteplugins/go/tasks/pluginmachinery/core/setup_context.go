@@ -1,18 +1,18 @@
 package core
 
 import (
-	"k8s.io/apimachinery/pkg/types"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-// When a change is observed, the owning entity with id types.NamespacedName can be triggered for re-validation
-type EnqueueOwner func(id types.NamespacedName) error
+// When a change is observed, the owning entity can be triggered for re-validation
+type EnqueueOwner func(labels map[string]string) error
 
 // Passed to the Loader function when setting up a plugin
 type SetupContext interface {
 	// returns a callback mechanism that indicates that (workflow, task) is ready to be re-evaluated
 	EnqueueOwner() EnqueueOwner
+	// returns a list of labels that should be used to enqueue the owner
+	IncludeEnqueueLabels() []string
 	// provides a k8s specific owner kind
 	OwnerKind() string
 	// a metrics scope to publish stats under

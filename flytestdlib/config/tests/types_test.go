@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 )
 
 const testNameFormatter = "[%v] %v"

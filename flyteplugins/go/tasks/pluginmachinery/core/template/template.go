@@ -29,11 +29,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	idlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")
@@ -134,25 +134,26 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	// Replace namespace last, in case it was embedded in other templates
 	val = namespaceRegex.ReplaceAllString(val, params.TaskExecMetadata.GetNamespace())
 
-	inputs, err := params.Inputs.Get(ctx)
-	if err != nil {
-		return val, errors.Wrapf(err, "unable to read inputs")
-	}
-	if inputs == nil || inputs.Literals == nil {
-		return val, nil
-	}
-
 	var errs ErrorCollection
-	val = inputVarRegex.ReplaceAllStringFunc(val, func(s string) string {
-		matches := inputVarRegex.FindAllStringSubmatch(s, 1)
-		varName := matches[0][1]
-		replaced, err := transformVarNameToStringVal(ctx, varName, inputs)
+	if inputVarRegex.MatchString(val) {
+		inputs, err := params.Inputs.Get(ctx)
 		if err != nil {
-			errs.Errors = append(errs.Errors, errors.Wrapf(err, "input template [%s]", s))
-			return ""
+			return val, errors.Wrapf(err, "unable to read inputs")
 		}
-		return replaced
-	})
+		if inputs == nil || inputs.Literals == nil {
+			return val, nil
+		}
+		val = inputVarRegex.ReplaceAllStringFunc(val, func(s string) string {
+			matches := inputVarRegex.FindAllStringSubmatch(s, 1)
+			varName := matches[0][1]
+			replaced, err := transformVarNameToStringVal(ctx, varName, inputs)
+			if err != nil {
+				errs.Errors = append(errs.Errors, errors.Wrapf(err, "input template [%s]", s))
+				return ""
+			}
+			return replaced
+		})
+	}
 
 	if len(errs.Errors) > 0 {
 		return "", errs
@@ -162,7 +163,7 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 }
 
 func transformVarNameToStringVal(ctx context.Context, varName string, inputs *idlCore.LiteralMap) (string, error) {
-	inputVal, exists := inputs.GetLiterals()[varName]
+	inputVal, exists := inputs.Literals[varName]
 	if !exists {
 		return "", fmt.Errorf("requested input is not found [%s]", varName)
 	}
@@ -175,7 +176,7 @@ func transformVarNameToStringVal(ctx context.Context, varName string, inputs *id
 }
 
 func serializePrimitive(p *idlCore.Primitive) (string, error) {
-	switch o := p.GetValue().(type) {
+	switch o := p.Value.(type) {
 	case *idlCore.Primitive_Integer:
 		return fmt.Sprintf("%v", o.Integer), nil
 	case *idlCore.Primitive_Boolean:
@@ -189,22 +190,22 @@ func serializePrimitive(p *idlCore.Primitive) (string, error) {
 	case *idlCore.Primitive_StringValue:
 		return o.StringValue, nil
 	default:
-		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.GetValue()))
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.Value))
 	}
 }
 
 func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
-	switch o := l.GetValue().(type) {
+	switch o := l.Value.(type) {
 	case *idlCore.Scalar_Primitive:
 		return serializePrimitive(o.Primitive)
 	case *idlCore.Scalar_Blob:
-		return o.Blob.GetUri(), nil
+		return o.Blob.Uri, nil
 	case *idlCore.Scalar_Schema:
-		return o.Schema.GetUri(), nil
+		return o.Schema.Uri, nil
 	case *idlCore.Scalar_Binary:
-		binaryBytes := o.Binary.GetValue()
+		binaryBytes := o.Binary.Value
 		var currVal any
-		if o.Binary.GetTag() == coreutils.MESSAGEPACK {
+		if o.Binary.Tag == coreutils.MESSAGEPACK {
 			err := msgpack.Unmarshal(binaryBytes, &currVal)
 			if err != nil {
 				return "", fmt.Errorf("failed to unmarshal messagepack bytes with literal:[%v], err:[%v]", l, err)
@@ -212,18 +213,18 @@ func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
 			// TODO: Try to support Primitive_Datetime, Primitive_Duration, Flyte File, and Flyte Directory.
 			return fmt.Sprintf("%v", currVal), nil
 		}
-		return "", fmt.Errorf("unsupported binary tag [%v]", o.Binary.GetTag())
+		return "", fmt.Errorf("unsupported binary tag [%v]", o.Binary.Tag)
 
 	default:
-		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.GetValue()))
+		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
 	}
 }
 
 func serializeLiteral(ctx context.Context, l *idlCore.Literal) (string, error) {
-	switch o := l.GetValue().(type) {
+	switch o := l.Value.(type) {
 	case *idlCore.Literal_Collection:
-		res := make([]string, 0, len(o.Collection.GetLiterals()))
-		for _, sub := range o.Collection.GetLiterals() {
+		res := make([]string, 0, len(o.Collection.Literals))
+		for _, sub := range o.Collection.Literals {
 			s, err := serializeLiteral(ctx, sub)
 			if err != nil {
 				return "", err
@@ -237,6 +238,6 @@ func serializeLiteral(ctx context.Context, l *idlCore.Literal) (string, error) {
 		return serializeLiteralScalar(o.Scalar)
 	default:
 		logger.Debugf(ctx, "received unexpected primitive type")
-		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.GetValue()))
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.Value))
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 
@@ -15,12 +14,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	config2 "github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 var resourceRequirements = &v1.ResourceRequirements{
@@ -93,6 +92,26 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, 12, len(CopilotCommandArgs(storage.GetConfig())))
 	})
 
+	t.Run("storage override", func(t *testing.T) {
+
+		storageConfigOverride := storage.Config{}
+
+		storageConfigOverride.Type = storage.TypeStow
+		storageConfigOverride.InitContainer = "bucket"
+		storageConfigOverride.Stow.Kind = "google"
+		storageConfigOverride.Stow.Config = map[string]string{
+			"json":       "",
+			"project_id": "flyte-gcp",
+		}
+		cfg.StorageConfigOverride = &storageConfigOverride
+
+		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(c.VolumeMounts))
+
+		assert.ElementsMatch(t, c.Command, CopilotCommandArgs(&storageConfigOverride))
+	})
+
 	t.Run("bad-res-cpu", func(t *testing.T) {
 		old := cfg.CPU
 		cfg.CPU = "x"
@@ -107,12 +126,6 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.Memory = old
-	})
-
-	t.Run("sidecar-container-name-change", func(t *testing.T) {
-		c, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, []string{"hello"})
-		assert.NoError(t, err)
-		assert.Equal(t, "uploader", strings.Split(c.Name, "-")[1])
 	})
 }
 
@@ -139,11 +152,11 @@ func TestDownloadCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			vm := &core.VariableMap{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, vm))
-			assert.Len(t, vm.GetVariables(), 2)
-			for k, v := range iFace.GetVariables() {
-				v2, ok := vm.GetVariables()[k]
+			assert.Len(t, vm.Variables, 2)
+			for k, v := range iFace.Variables {
+				v2, ok := vm.Variables[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -174,11 +187,11 @@ func TestSidecarCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			if2 := &core.TypedInterface{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, if2))
-			assert.Len(t, if2.GetOutputs().GetVariables(), 2)
-			for k, v := range iFace.GetOutputs().GetVariables() {
-				v2, ok := if2.GetOutputs().GetVariables()[k]
+			assert.Len(t, if2.Outputs.Variables, 2)
+			for k, v := range iFace.Outputs.Variables {
+				v2, ok := if2.Outputs.Variables[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -203,20 +216,20 @@ func assertContainerHasVolumeMounts(t *testing.T, cfg config.FlyteCoPilotConfig,
 		for _, v := range c.VolumeMounts {
 			vmap[v.Name] = v
 		}
-		if iFace.GetInputs() != nil {
+		if iFace.Inputs != nil {
 			path := cfg.DefaultInputDataPath
-			if pilot.GetInputPath() != "" {
-				path = pilot.GetInputPath()
+			if pilot.InputPath != "" {
+				path = pilot.InputPath
 			}
 			v, found := vmap[cfg.InputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Input Path does not match")
 			assert.True(t, found, "Input volume mount expected but not found!")
 		}
 
-		if iFace.GetOutputs() != nil {
+		if iFace.Outputs != nil {
 			path := cfg.DefaultOutputPath
-			if pilot.GetOutputPath() != "" {
-				path = pilot.GetOutputPath()
+			if pilot.OutputPath != "" {
+				path = pilot.OutputPath
 			}
 			v, found := vmap[cfg.OutputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Output Path does not match")
@@ -240,10 +253,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 					for _, v := range c.VolumeMounts {
 						vmap[v.Name] = v
 					}
-					if iFace.GetInputs() != nil {
+					if iFace.Inputs != nil {
 						path := cfg.DefaultInputDataPath
 						if pilot != nil {
-							path = pilot.GetInputPath()
+							path = pilot.InputPath
 						}
 						v, found := vmap[cfg.InputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
@@ -254,10 +267,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 						}
 					}
 
-					if iFace.GetOutputs() != nil {
+					if iFace.Outputs != nil {
 						path := cfg.DefaultOutputPath
 						if pilot != nil {
-							path = pilot.GetOutputPath()
+							path = pilot.OutputPath
 						}
 						v, found := vmap[cfg.OutputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
@@ -508,9 +521,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
-		assert.NoError(t, err)
-		assert.Equal(t, "test-downloader", primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assert.Equal(t, pod.InitContainers[0].Name, cfg.NamePrefix+flyteSidecarContainerName)
 		assert.Equal(t, pod.InitContainers[1].Name, cfg.NamePrefix+flyteDownloaderContainerName)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
@@ -523,9 +534,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot)
-		assert.NoError(t, err)
-		assert.Empty(t, primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot))
 		assertPodHasCoPilot(t, cfg, pilot, nil, &pod)
 	})
 
@@ -544,9 +553,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
-		assert.NoError(t, err)
-		assert.Equal(t, "test-downloader", primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
 
@@ -564,9 +571,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
-		assert.NoError(t, err)
-		assert.Empty(t, primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
 
@@ -584,15 +589,11 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
-		assert.NoError(t, err)
-		assert.Empty(t, primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assert.Len(t, pod.Volumes, 0)
 	})
 
 	t.Run("nil", func(t *testing.T) {
-		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil)
-		assert.NoError(t, err)
-		assert.Empty(t, primaryInitContainerName)
+		assert.NoError(t, AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil))
 	})
 }

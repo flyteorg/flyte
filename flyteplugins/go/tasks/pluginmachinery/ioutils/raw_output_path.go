@@ -6,9 +6,9 @@ import (
 	"encoding/hex"
 	"strconv"
 
-	core2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	core2 "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type precomputedRawOutputPaths struct {
@@ -51,13 +51,17 @@ func NewRawOutputPaths(_ context.Context, rawOutputPrefix storage.DataReference)
 
 // Creates an OutputSandbox in the basePath using the uniqueID and a sharder
 // This implementation is faster than the Randomized strategy
-func NewShardedRawOutputPath(ctx context.Context, sharder ShardSelector, basePath storage.DataReference, uniqueID string, store storage.ReferenceConstructor) (io.RawOutputPaths, error) {
+// This returns a path in the format of protocol:///{bucket}/{shard}/{optional_suffix_path_parts}/{exec-id}-n0-0/
+func NewShardedRawOutputPath(ctx context.Context, sharder ShardSelector, basePath storage.DataReference, suffixPathParts []string, uniqueID string, store storage.ReferenceConstructor) (io.RawOutputPaths, error) {
 	o := []byte(uniqueID)
 	prefix, err := sharder.GetShardPrefix(ctx, o)
 	if err != nil {
 		return nil, err
 	}
-	path, err := store.ConstructReference(ctx, basePath, prefix, uniqueID)
+	suffix := []string{prefix}
+	suffix = append(suffix, suffixPathParts...)
+	suffix = append(suffix, uniqueID)
+	path, err := store.ConstructReference(ctx, basePath, suffix...)
 	if err != nil {
 		return nil, err
 	}

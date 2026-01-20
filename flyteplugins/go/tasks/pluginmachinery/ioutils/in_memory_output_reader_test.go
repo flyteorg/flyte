@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestInMemoryOutputReader(t *testing.T) {
@@ -39,7 +39,7 @@ func TestInMemoryOutputReader(t *testing.T) {
 	assert.NoError(t, err)
 
 	literalMap, executionErr, err := or.Read(ctx)
-	assert.Equal(t, lt, literalMap.GetLiterals())
+	assert.Equal(t, lt, literalMap.Literals)
 	assert.Nil(t, executionErr)
 	assert.NoError(t, err)
 }

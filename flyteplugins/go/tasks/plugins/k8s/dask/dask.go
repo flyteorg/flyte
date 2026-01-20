@@ -3,29 +3,35 @@ package dask
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
+	"github.com/samber/lo"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const (
-	daskTaskType = "dask"
-	KindDaskJob  = "DaskJob"
+	daskTaskType                             = "dask"
+	KindDaskJob                              = "DaskJob"
+	defaultDaskJobRunnerPrimaryContainerName = "job-runner"
 )
 
 func mergeMapInto(src map[string]string, dst map[string]string) {
@@ -66,7 +72,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	daskJob := plugins.DaskJob{}
-	err = utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &daskJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &daskJob)
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -85,13 +91,13 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetAnnotations(), objectMeta.Annotations)
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetLabels(), objectMeta.Labels)
 
-	workerSpec, err := createWorkerSpec(daskJob.GetWorkers(), podSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
+	workerSpec, err := createWorkerSpec(*daskJob.Workers, podSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	schedulerSpec, err := createSchedulerSpec(daskJob.GetScheduler(), clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
+	schedulerSpec, err := createSchedulerSpec(*daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +118,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return job, nil
 }
 
-func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string,
+func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string,
 	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.WorkerSpec, error) {
 	workerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(workerPodSpec, primaryContainerName)
@@ -177,7 +183,7 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 	}, nil
 }
 
-func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
+func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
 	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)
@@ -219,6 +225,19 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 			ContainerPort: 8787,
 			Protocol:      "TCP",
 		},
+	}
+
+	if primaryContainer.ReadinessProbe == nil {
+		primaryContainer.ReadinessProbe = &v1.Probe{
+			ProbeHandler: v1.ProbeHandler{
+				HTTPGet: &v1.HTTPGetAction{
+					Port: intstr.FromString("dashboard"),
+				},
+			},
+			InitialDelaySeconds: 5,
+			PeriodSeconds:       5,
+			FailureThreshold:    30,
+		}
 	}
 
 	schedulerPodSpec.RestartPolicy = v1.RestartPolicyAlways
@@ -298,28 +317,62 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	o, err := logPlugin.GetTaskLogs(
-		tasklog.Input{
-			Namespace:       job.ObjectMeta.Namespace,
-			PodName:         job.Status.JobRunnerPodName,
-			LogName:         "(Dask Runner Logs)",
-			TaskExecutionID: taskExecID,
+	schedulerPodName, err := getDaskSchedulerPodName(ctx, job.Name, pluginContext)
+	if err != nil {
+		logger.Debug(ctx, "Failed to get dask scheduler pod name. Error: %v", err)
+	}
+	var enableVscode bool
+	if len(job.Spec.Cluster.Spec.Scheduler.Spec.Containers) > 0 {
+		enableVscode = flytek8s.IsVscodeEnabled(ctx, job.Spec.Cluster.Spec.Scheduler.Spec.Containers[0].Env)
+	}
+	input := tasklog.Input{
+		Namespace:       job.ObjectMeta.Namespace,
+		PodName:         job.Status.JobRunnerPodName,
+		TaskExecutionID: taskExecID,
+		EnableVscode:    enableVscode,
+	}
+	input.ExtraTemplateVars = append(
+		input.ExtraTemplateVars,
+		tasklog.TemplateVar{
+			Regex: tasklog.MustCreateRegex("daskSchedulerName"),
+			Value: schedulerPodName,
 		},
 	)
+
+	o, err := logPlugin.GetTaskLogs(input)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 	info.Logs = o.TaskLogs
+	info.LogContext = &core.LogContext{
+		PrimaryPodName: job.Status.JobRunnerPodName,
+		Pods: []*core.PodLogContext{
+			{
+				Namespace:            job.ObjectMeta.Namespace,
+				PodName:              job.Status.JobRunnerPodName,
+				PrimaryContainerName: defaultDaskJobRunnerPrimaryContainerName,
+				Containers: []*core.ContainerContext{
+					{ContainerName: defaultDaskJobRunnerPrimaryContainerName},
+				},
+			},
+		},
+	}
 
-	var phaseInfo pluginsCore.PhaseInfo
-
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, info, job.ObjectMeta.Namespace, job.Status.JobRunnerPodName, defaultDaskJobRunnerPrimaryContainerName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to demystify pod status for dask job-runner. Error: %v", err)
+	}
+	if phaseInfo.Phase().IsFailure() {
+		// If the job-runner pod is in a failure state, we can fail fast without checking the DaskJob status.
+		return phaseInfo, nil
+	}
 	switch status {
 	case "":
-		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "unknown", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info)
 	case daskAPI.DaskJobCreated:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "job created", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job created", &info)
 	case daskAPI.DaskJobClusterCreated:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "cluster created", &info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "cluster created", &info)
 	case daskAPI.DaskJobFailed:
 		reason := "Dask Job failed"
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, &info)
@@ -329,16 +382,102 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
 	}
 
+	ready, err := isDaskSchedulerReady(ctx, job.Name, pluginContext)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to determine Dask dashboard readiness. Error: %v", err)
+	} else {
+		for _, tl := range info.Logs {
+			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
+				tl.Ready = ready
+				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+					phaseInfo.WithReason("Dask dashboard is not ready")
+				} else {
+					phaseInfo.WithReason("Dask dashboard is ready")
+				}
+			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+				tl.Ready = ready
+				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+					phaseInfo.WithReason("Vscode server is not ready")
+				} else {
+					phaseInfo.WithReason("Vscode server is ready")
+				}
+			}
+		}
+	}
+
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr
 	}
-
 	return phaseInfo, nil
+}
+
+func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (string, error) {
+	podList := &v1.PodList{}
+	err := pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return "", fmt.Errorf("failed to list dask execution pods. Error: %w", err)
+	}
+	pods := lo.Filter(podList.Items, func(pod v1.Pod, _ int) bool {
+		return strings.HasPrefix(pod.Name, daskJobName) && strings.Contains(pod.Name, "scheduler") && flytek8s.GetPrimaryContainerName(&pod) == "scheduler"
+	})
+	if len(pods) == 0 {
+		return "", fmt.Errorf("no dask scheduler pod found for dask job [%v]", daskJobName)
+	}
+	return pods[0].Name, nil
+}
+
+func isDaskSchedulerReady(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (bool, error) {
+	podList := &v1.PodList{}
+	err := pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return false, fmt.Errorf("failed to list dask execution pods. Error: %w", err)
+	}
+	pods := lo.Filter(podList.Items, func(p v1.Pod, _ int) bool {
+		return strings.HasPrefix(p.Name, daskJobName) && strings.Contains(p.Name, "scheduler")
+	})
+	if len(pods) == 0 {
+		return false, nil
+	} else if len(pods) == 1 {
+		return pod.IsPodReady(&pods[0]), nil
+	}
+
+	// More than one dask scheduler pod. Should not happen.
+	logger.Debug(ctx, "Cannot determine dask scheduler readiness as more than one dask scheduler pod found")
+	return false, fmt.Errorf("more than one dask scheduler pod found for dask job [%v]", daskJobName)
 }
 
 func (daskResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
+}
+
+// IsTerminal returns true if the DaskJob is in a terminal state (Successful or Failed)
+func (daskResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*daskAPI.DaskJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *DaskJob, got %T", resource)
+	}
+	status := job.Status.JobStatus
+	return status == daskAPI.DaskJobSuccessful || status == daskAPI.DaskJobFailed, nil
+}
+
+// GetCompletionTime returns the end time of the DaskJob
+func (daskResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*daskAPI.DaskJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *DaskJob, got %T", resource)
+	}
+
+	if !job.Status.EndTime.IsZero() {
+		return job.Status.EndTime.Time, nil
+	}
+
+	// Fallback to start time or creation time
+	if !job.Status.StartTime.IsZero() {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
 }
 
 func init() {

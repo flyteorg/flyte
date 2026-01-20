@@ -94,7 +94,8 @@ type SignedURLProperties struct {
 	Scope stow.ClientMethod
 	// ExpiresIn defines the expiration duration for the URL. It's strongly recommended setting it.
 	ExpiresIn time.Duration
-	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
+	// ContentMD5 defines the expected Base64-encoded 128-bit MD5 hash of the generated file.
+	// It's strongly recommended setting it.for data integrity checks on the storage backend.
 	ContentMD5 string
 	// AddContentMD5Metadata Add ContentMD5 to the metadata of signed URL if true.
 	AddContentMD5Metadata bool
@@ -105,7 +106,6 @@ type SignedURLResponse struct {
 	RequiredRequestHeaders map[string]string
 }
 
-//go:generate mockery --name RawStore --case=underscore --with-expecter
 
 // RawStore defines a low level interface for accessing and storing bytes.
 type RawStore interface {
@@ -134,7 +134,6 @@ type RawStore interface {
 	Delete(ctx context.Context, reference DataReference) error
 }
 
-//go:generate mockery --name ReferenceConstructor --case=underscore --with-expecter
 
 // ReferenceConstructor defines an interface for building data reference paths.
 type ReferenceConstructor interface {
@@ -154,7 +153,6 @@ type ProtobufStore interface {
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
 
-//go:generate mockery --name ComposedProtobufStore --case=underscore --with-expecter
 
 // ComposedProtobufStore interface includes all the necessary data to allow a ProtobufStore to interact with storage
 // through a RawStore.

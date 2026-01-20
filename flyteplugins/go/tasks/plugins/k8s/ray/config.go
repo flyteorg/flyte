@@ -5,11 +5,11 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginmachinery "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -22,7 +22,7 @@ var (
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
-		ServiceAccount:           "",
+		ServiceAccount:           "default",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{

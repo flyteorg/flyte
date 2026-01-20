@@ -10,17 +10,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 )
 
 const (
 	flyteExecutionURL = "FLYTE_EXECUTION_URL"
-
-	FlyteInternalWorkerNameEnvVarKey        = "_F_WN"  // "FLYTE_INTERNAL_WORKER_NAME"
-	FlyteInternalDistErrorStrategyEnvVarKey = "_F_DES" // "FLYTE_INTERNAL_DIST_ERROR_STRATEGY"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
@@ -44,26 +41,34 @@ func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
 
 func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1.EnvVar {
 
-	//nolint:protogetter
-	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.GetExecutionId() == nil {
+	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.ExecutionId == nil {
 		return []v1.EnvVar{}
 	}
 
 	// Execution level env variables.
-	nodeExecutionID := id.GetID().NodeExecutionId.GetExecutionId() //nolint:protogetter
-	attemptNumber := strconv.Itoa(int(id.GetID().RetryAttempt))    //nolint:protogetter
+	nodeExecutionID := id.GetID().NodeExecutionId.ExecutionId
+	attemptNumber := strconv.Itoa(int(id.GetID().RetryAttempt))
 	envVars := []v1.EnvVar{
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_ID",
-			Value: nodeExecutionID.GetName(),
+			Value: nodeExecutionID.Name,
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_PROJECT",
-			Value: nodeExecutionID.GetProject(),
+			Value: nodeExecutionID.Project,
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
-			Value: nodeExecutionID.GetDomain(),
+			Value: nodeExecutionID.Domain,
+		},
+		{
+			// FLYTE_INTERNAL_POD_NAME
+			Name: "_F_PN",
+			ValueFrom: &v1.EnvVarSource{
+				FieldRef: &v1.ObjectFieldSelector{
+					FieldPath: "metadata.name",
+				},
+			},
 		},
 		{
 			Name:  "FLYTE_ATTEMPT_NUMBER",
@@ -75,30 +80,48 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 		consoleURL = strings.TrimRight(consoleURL, "/")
 		envVars = append(envVars, v1.EnvVar{
 			Name:  flyteExecutionURL,
-			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.GetProject(), nodeExecutionID.GetDomain(), nodeExecutionID.GetName(), id.GetUniqueNodeID()),
+			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID()),
 		})
 	}
 
 	// Task definition Level env variables.
-	if id.GetID().TaskId != nil { //nolint:protogetter
-		taskID := id.GetID().TaskId //nolint:protogetter
+	if id.GetID().TaskId != nil {
+		taskID := id.GetID().TaskId
 
 		envVars = append(envVars,
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_PROJECT",
-				Value: taskID.GetProject(),
+				Value: taskID.Project,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_DOMAIN",
-				Value: taskID.GetDomain(),
+				Value: taskID.Domain,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_NAME",
-				Value: taskID.GetName(),
+				Value: taskID.Name,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_VERSION",
-				Value: taskID.GetVersion(),
+				Value: taskID.Version,
+			},
+			// Historic Task Definition Level env variables.
+			// Remove these once SDK is migrated to use the new ones.
+			v1.EnvVar{
+				Name:  "FLYTE_INTERNAL_PROJECT",
+				Value: taskID.Project,
+			},
+			v1.EnvVar{
+				Name:  "FLYTE_INTERNAL_DOMAIN",
+				Value: taskID.Domain,
+			},
+			v1.EnvVar{
+				Name:  "FLYTE_INTERNAL_NAME",
+				Value: taskID.Name,
+			},
+			v1.EnvVar{
+				Name:  "FLYTE_INTERNAL_VERSION",
+				Value: taskID.Version,
 			})
 
 	}
@@ -106,28 +129,29 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 }
 
 func GetLiteralOffloadingEnvVars() []v1.EnvVar {
-	propellerConfig := propellerCfg.GetConfig()
-	if !propellerConfig.LiteralOffloadingConfig.Enabled {
-		return []v1.EnvVar{}
-	}
+	// TODO @pvditt fix
+	//propellerConfig := propellerCfg.GetConfig()
+	//if !propellerConfig.LiteralOffloadingConfig.Enabled {
+	//	return []v1.EnvVar{}
+	//}
 
 	envVars := []v1.EnvVar{}
-	if propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading > 0 {
-		envVars = append(envVars,
-			v1.EnvVar{
-				Name:  "_F_L_MIN_SIZE_MB",
-				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, 10),
-			},
-		)
-	}
-	if propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading > 0 {
-		envVars = append(envVars,
-			v1.EnvVar{
-				Name:  "_F_L_MAX_SIZE_MB",
-				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, 10),
-			},
-		)
-	}
+	//if propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading > 0 {
+	//	envVars = append(envVars,
+	//		v1.EnvVar{
+	//			Name:  "_F_L_MIN_SIZE_MB",
+	//			Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, 10),
+	//		},
+	//	)
+	//}
+	//if propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading > 0 {
+	//	envVars = append(envVars,
+	//		v1.EnvVar{
+	//			Name:  "_F_L_MAX_SIZE_MB",
+	//			Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, 10),
+	//		},
+	//	)
+	//}
 	return envVars
 }
 

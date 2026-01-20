@@ -1,7 +1,7 @@
 package awsutils
 
 import (
-	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	core2 "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func GetRoleFromSecurityContext(roleKey string, taskExecutionMetadata core2.TaskExecutionMetadata) string {

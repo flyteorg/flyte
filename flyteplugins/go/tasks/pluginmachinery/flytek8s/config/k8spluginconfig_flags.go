@@ -70,6 +70,6 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "update-base-backoff-duration"), defaultK8sConfig.UpdateBaseBackoffDuration, "Initial delay in exponential backoff when updating a resource in milliseconds.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "update-backoff-retries"), defaultK8sConfig.UpdateBackoffRetries, "Number of retries for exponential backoff when updating a resource.")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "add-tolerations-for-extended-resources"), defaultK8sConfig.AddTolerationsForExtendedResources, "Name of the extended resources for which tolerations should be added.")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-distributed-error-aggregation"), defaultK8sConfig.EnableDistributedErrorAggregation, "If true,  will aggregate errors of different worker pods for distributed tasks.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "disable-inject-owner-references"), defaultK8sConfig.DisableInjectOwnerReferences, "Override to not set owner references on k8s resources. This is useful for V2 node execution")
 	return cmdFlags
 }

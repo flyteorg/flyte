@@ -88,3 +88,7 @@ plugins:
   logs:
     kubernetes-enabled: true
     kubernetes-url: "http://localhost:30082"
+    azure-log-templates:
+      - displayName: "Test Azure Logs"
+        templateUris:
+          - "https://portal.azure.com#@TEST_AZURE_URI/q/"

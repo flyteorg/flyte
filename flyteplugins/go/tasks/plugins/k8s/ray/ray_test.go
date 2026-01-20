@@ -3,7 +3,6 @@ package ray
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -13,23 +12,25 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const (
@@ -281,59 +282,6 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 	}
 }
 
-func TestBuildPodTemplate(t *testing.T) {
-	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
-	resources := &corev1.ResourceRequirements{
-		Limits: corev1.ResourceList{
-			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
-		},
-	}
-	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "container-imag", serviceAccount)
-	basePodSpec, objectMeta, _, err := flytek8s.ToK8sPodSpec(context.Background(), taskContext)
-	assert.Nil(t, err)
-
-	toleration := []corev1.Toleration{
-		{
-			Key:      "gpu-node-label",
-			Value:    "nvidia-tesla-t4",
-			Operator: corev1.TolerationOpEqual,
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-	}
-
-	customServiceAccount := "custom-sa"
-
-	customPodSpec :=
-		&core.K8SPod{
-			PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-				Tolerations:        toleration,
-				ServiceAccountName: customServiceAccount,
-			}),
-			Metadata: &core.K8SObjectMetadata{
-				Labels:      map[string]string{"new-label-1": "val1"},
-				Annotations: map[string]string{"new-annotation-1": "val1"},
-			},
-		}
-
-	headGroupSpec := plugins.HeadGroupSpec{K8SPod: customPodSpec}
-	podSpec, err := buildHeadPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &headGroupSpec)
-	assert.Nil(t, err)
-	assert.Equal(t, podSpec.Spec.Tolerations, toleration)
-	expectedLabels := map[string]string{"label-1": "val1", "new-label-1": "val1"}
-	expectedAnnotations := map[string]string{"annotation-1": "val1", "new-annotation-1": "val1"}
-	assert.Equal(t, expectedLabels, podSpec.Labels)
-	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
-	assert.Equal(t, customServiceAccount, podSpec.Spec.ServiceAccountName)
-
-	workerGroupSpec := plugins.WorkerGroupSpec{K8SPod: customPodSpec}
-	podSpec, err = buildWorkerPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &workerGroupSpec)
-	assert.Nil(t, err)
-	assert.Equal(t, toleration, podSpec.Spec.Tolerations)
-	assert.Equal(t, expectedLabels, podSpec.Labels)
-	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
-	assert.Equal(t, customServiceAccount, podSpec.Spec.ServiceAccountName)
-}
-
 func TestBuildResourceRayExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:                 "gpu-node-label",
@@ -487,13 +435,6 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 	}
 }
 
-type rayPodAssertions struct {
-	resources        *corev1.ResourceRequirements
-	runtimeClassName *string
-	tolerations      []corev1.Toleration
-	affinity         *corev1.Affinity
-}
-
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
@@ -506,6 +447,9 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 
 	expectedHeadResources, err := flytek8s.ToK8sResourceRequirements(headResources)
 	require.NoError(t, err)
+	// Add nvidia.com/gpu from task resources since mergeCustomPodSpec only replaces resources
+	expectedHeadResources.Limits[flytek8s.ResourceNvidiaGPU] = resource.MustParse("1")
+	expectedHeadResources.Requests[flytek8s.ResourceNvidiaGPU] = resource.MustParse("1")
 
 	workerResourceEntries := []*core.Resources_ResourceEntry{
 		{Name: core.Resources_CPU, Value: "20"},
@@ -516,183 +460,82 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 
 	expectedWorkerResources, err := flytek8s.ToK8sResourceRequirements(workerResources)
 	require.NoError(t, err)
+	// Add nvidia.com/gpu from task resources since mergeCustomPodSpec only replaces resources
+	expectedWorkerResources.Limits[flytek8s.ResourceNvidiaGPU] = resource.MustParse("1")
+	expectedWorkerResources.Requests[flytek8s.ResourceNvidiaGPU] = resource.MustParse("1")
 
 	nvidiaRuntimeClassName := "nvidia-cdi"
 
-	headTolerations := []corev1.Toleration{
-		{
-			Key:      "head",
-			Operator: corev1.TolerationOpEqual,
-			Value:    "true",
-			Effect:   corev1.TaintEffectNoSchedule,
+	headPodSpecCustomResources := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-head",
+				Resources: *expectedHeadResources,
+			},
 		},
 	}
-
-	workerTolerations := []corev1.Toleration{
-		{
-			Key:      "worker",
-			Operator: corev1.TolerationOpEqual,
-			Value:    "true",
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-	}
-
-	headPodSpecCustomTolerations := &corev1.PodSpec{
-		Tolerations: headTolerations,
-	}
-	workerPodSpecCustomTolerations := &corev1.PodSpec{
-		Tolerations: workerTolerations,
-	}
-
-	headAffinity := &corev1.Affinity{
-		NodeAffinity: &corev1.NodeAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-				NodeSelectorTerms: []corev1.NodeSelectorTerm{
-					{
-						MatchExpressions: []corev1.NodeSelectorRequirement{
-							{
-								Key:      "node-type",
-								Operator: corev1.NodeSelectorOpIn,
-								Values:   []string{"head-node"},
-							},
-						},
-					},
-				},
+	workerPodSpecCustomResources := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-worker",
+				Resources: *expectedWorkerResources,
 			},
 		},
 	}
 
-	workerAffinity := &corev1.Affinity{
-		NodeAffinity: &corev1.NodeAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-				NodeSelectorTerms: []corev1.NodeSelectorTerm{
-					{
-						MatchExpressions: []corev1.NodeSelectorRequirement{
-							{
-								Key:      "node-type",
-								Operator: corev1.NodeSelectorOpIn,
-								Values:   []string{"worker-node"},
-							},
-						},
-					},
-				},
-			},
-		},
+	headPodSpecCustomRuntimeClass := &corev1.PodSpec{
+		RuntimeClassName: &nvidiaRuntimeClassName,
+	}
+	workerPodSpecCustomRuntimeClass := &corev1.PodSpec{
+		RuntimeClassName: &nvidiaRuntimeClassName,
 	}
 
 	params := []struct {
-		name                string
-		headK8SPod          *core.K8SPod
-		workerK8SPod        *core.K8SPod
-		headPodAssertions   rayPodAssertions
-		workerPodAssertions rayPodAssertions
+		name                              string
+		taskResources                     *corev1.ResourceRequirements
+		headK8SPod                        *core.K8SPod
+		workerK8SPod                      *core.K8SPod
+		expectedSubmitterResources        *corev1.ResourceRequirements
+		expectedHeadResources             *corev1.ResourceRequirements
+		expectedWorkerResources           *corev1.ResourceRequirements
+		expectedSubmitterRuntimeClassName *string
+		expectedHeadRuntimeClassName      *string
+		expectedWorkerRuntimeClassName    *string
 	}{
 		{
-			name:         "no customizations",
-			headK8SPod:   &core.K8SPod{},
-			workerK8SPod: &core.K8SPod{},
-			headPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: resourceRequirements,
-			},
-			workerPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: resourceRequirements,
-			},
+			name:                       "task resources",
+			taskResources:              resourceRequirements,
+			expectedSubmitterResources: &submitterDefaultResourceRequirements,
+			expectedHeadResources:      resourceRequirements,
+			expectedWorkerResources:    resourceRequirements,
 		},
 		{
-			name: "custom worker and head resources",
+			name:          "custom worker and head resources",
+			taskResources: resourceRequirements,
 			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:      "ray-head",
-							Resources: *expectedHeadResources,
-						},
-					},
-				}),
+				PodSpec: transformStructToStructPB(t, headPodSpecCustomResources),
 			},
 			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:      "ray-worker",
-							Resources: *expectedWorkerResources,
-						},
-					},
-				}),
+				PodSpec: transformStructToStructPB(t, workerPodSpecCustomResources),
 			},
-			headPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: expectedHeadResources,
-			},
-			workerPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: expectedWorkerResources,
-			},
+			expectedSubmitterResources: &submitterDefaultResourceRequirements,
+			expectedHeadResources:      expectedHeadResources,
+			expectedWorkerResources:    expectedWorkerResources,
 		},
 		{
-			name: "custom runtime class name",
+			name:                       "custom runtime class name",
+			taskResources:              resourceRequirements,
+			expectedSubmitterResources: &submitterDefaultResourceRequirements,
+			expectedHeadResources:      resourceRequirements,
+			expectedWorkerResources:    resourceRequirements,
 			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					RuntimeClassName: &nvidiaRuntimeClassName,
-				}),
+				PodSpec: transformStructToStructPB(t, headPodSpecCustomRuntimeClass),
 			},
 			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					RuntimeClassName: &nvidiaRuntimeClassName,
-				}),
+				PodSpec: transformStructToStructPB(t, workerPodSpecCustomRuntimeClass),
 			},
-			headPodAssertions: rayPodAssertions{
-				affinity:         &corev1.Affinity{},
-				resources:        resourceRequirements,
-				runtimeClassName: &nvidiaRuntimeClassName,
-			},
-			workerPodAssertions: rayPodAssertions{
-				affinity:         &corev1.Affinity{},
-				resources:        resourceRequirements,
-				runtimeClassName: &nvidiaRuntimeClassName,
-			},
-		},
-		{
-			name: "custom tolerations",
-			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, headPodSpecCustomTolerations),
-			},
-			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, workerPodSpecCustomTolerations),
-			},
-			headPodAssertions: rayPodAssertions{
-				affinity:    &corev1.Affinity{},
-				resources:   resourceRequirements,
-				tolerations: headTolerations,
-			},
-			workerPodAssertions: rayPodAssertions{
-				affinity:    &corev1.Affinity{},
-				resources:   resourceRequirements,
-				tolerations: workerTolerations,
-			},
-		},
-		{
-			name: "custom affinity",
-			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					Affinity: headAffinity,
-				}),
-			},
-			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-					Affinity: workerAffinity,
-				}),
-			},
-			headPodAssertions: rayPodAssertions{
-				affinity:  headAffinity,
-				resources: resourceRequirements,
-			},
-			workerPodAssertions: rayPodAssertions{
-				affinity:  workerAffinity,
-				resources: resourceRequirements,
-			},
+			expectedHeadRuntimeClassName:   &nvidiaRuntimeClassName,
+			expectedWorkerRuntimeClassName: &nvidiaRuntimeClassName,
 		},
 	}
 
@@ -705,13 +548,13 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			}
 
 			if p.workerK8SPod != nil {
-				for _, spec := range rayJobInput.GetRayCluster().GetWorkerGroupSpec() {
+				for _, spec := range rayJobInput.RayCluster.WorkerGroupSpec {
 					spec.K8SPod = p.workerK8SPod
 				}
 			}
 
 			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
-			taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+			taskContext := dummyRayTaskContext(taskTemplate, p.taskResources, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -719,33 +562,29 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			rayJob, ok := r.(*rayv1.RayJob)
 			assert.True(t, ok)
 
+			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
+			assert.EqualValues(t,
+				p.expectedSubmitterResources,
+				&submitterPodResources,
+			)
+
 			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
 			headPodResources := headPodSpec.Containers[0].Resources
-			if p.headPodAssertions.resources != nil {
-				assert.EqualValues(t,
-					*p.headPodAssertions.resources,
-					headPodResources,
-				)
-			}
+			assert.EqualValues(t,
+				p.expectedHeadResources,
+				&headPodResources,
+			)
 
-			assert.EqualValues(t, p.headPodAssertions.runtimeClassName, headPodSpec.RuntimeClassName)
-			assert.EqualValues(t, p.headPodAssertions.tolerations, headPodSpec.Tolerations)
-			assert.EqualValues(t, p.headPodAssertions.affinity, headPodSpec.Affinity)
+			assert.EqualValues(t, p.expectedHeadRuntimeClassName, headPodSpec.RuntimeClassName)
 
 			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
 				workerPodSpec := workerGroupSpec.Template.Spec
 				workerPodResources := workerPodSpec.Containers[0].Resources
-
-				if p.workerPodAssertions.resources != nil {
-					assert.EqualValues(t,
-						*p.workerPodAssertions.resources,
-						workerPodResources,
-					)
-				}
-
-				assert.EqualValues(t, p.workerPodAssertions.runtimeClassName, workerPodSpec.RuntimeClassName)
-				assert.EqualValues(t, p.workerPodAssertions.tolerations, workerPodSpec.Tolerations)
-				assert.EqualValues(t, p.workerPodAssertions.affinity, workerPodSpec.Affinity)
+				assert.EqualValues(t,
+					p.expectedWorkerResources,
+					&workerPodResources,
+				)
+				assert.EqualValues(t, p.expectedWorkerRuntimeClassName, workerPodSpec.RuntimeClassName)
 			}
 		})
 	}
@@ -974,7 +813,8 @@ func TestInjectLogsSidecar(t *testing.T) {
 		},
 	}
 
-	for _, p := range params {
+	for i := range params {
+		p := params[i]
 		t.Run(p.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{
 				LogsSidecar: p.logsSidecarCfg,
@@ -996,7 +836,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 			foundPrimaryContainer := false
 			foundLogsSidecar := false
 			for _, cnt := range headPodSpec.Containers {
-				if cnt.Name == "ray-head" {
+				if cnt.Name == RayHeadContainerName {
 					foundPrimaryContainer = true
 					assert.EqualValues(
 						t,
@@ -1019,8 +859,8 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}
 }
 
-func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
-	plg := &mocks2.PluginContext{}
+func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+	plg := &k8smocks.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
 	taskExecID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
@@ -1048,13 +888,10 @@ func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
 	plg.EXPECT().TaskExecutionMetadata().Return(tskCtx)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
 	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
@@ -1076,7 +913,7 @@ func init() {
 func TestGetTaskPhase(t *testing.T) {
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := rayPluginContext(k8s.PluginState{})
 
 	testCases := []struct {
 		rayJobPhase       rayv1.JobDeploymentStatus
@@ -1091,19 +928,72 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
+	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	endTime := startTime.Add(time.Hour)
+	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
+	logCtx := &core.LogContext{
+		PrimaryPodName: podName,
+		Pods: []*core.PodLogContext{
+			{
+				Namespace:            "ns",
+				PodName:              podName,
+				PrimaryContainerName: contName,
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: contName,
+						Process: &core.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(startTime),
+							ContainerEndTime:   timestamppb.New(endTime),
+						},
+					},
+				},
+				InitContainers: []*core.ContainerContext{
+					{
+						ContainerName: initCont,
+						Process: &core.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(startTime),
+							ContainerEndTime:   timestamppb.New(endTime),
+						},
+					},
+				},
+			},
+		},
+	}
 	for _, tc := range testCases {
 		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
-			rayObject := &rayv1.RayJob{}
-			rayObject.Status.JobDeploymentStatus = tc.rayJobPhase
 			startTime := metav1.NewTime(time.Now())
-			rayObject.Status.StartTime = &startTime
+			rayObject := &rayv1.RayJob{
+				Spec: rayv1.RayJobSpec{
+					RayClusterSpec: &rayv1.RayClusterSpec{
+						HeadGroupSpec: rayv1.HeadGroupSpec{
+							Template: corev1.PodTemplateSpec{
+								Spec: corev1.PodSpec{
+									Containers: []corev1.Container{
+										{
+											Name:  "ray-head",
+											Image: "rayproject/ray:latest",
+											Env:   []corev1.EnvVar{},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: tc.rayJobPhase,
+					RayClusterName:      "ray-clust",
+					StartTime:           &startTime,
+				},
+			}
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
 			if tc.expectedError {
 				assert.Error(t, err)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+				assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 			}
-			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
 		})
 	}
 }
@@ -1118,7 +1008,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		PhaseVersion: pluginsCore.DefaultPhaseVersion,
 		Reason:       "task submitted to K8s",
 	}
-	pluginCtx := newPluginContext(pluginState)
+	pluginCtx := rayPluginContext(pluginState)
 
 	rayObject := &rayv1.RayJob{}
 	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
@@ -1129,7 +1019,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 }
 
 func TestGetEventInfo_LogTemplates(t *testing.T) {
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := rayPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -1149,8 +1039,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "namespace",
-					Uri:  "http://test/test-namespace",
+					Name:  "namespace",
+					Uri:   "http://test/test-namespace",
+					Ready: true,
 				},
 			},
 		},
@@ -1165,8 +1056,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "taskExecID",
-					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Name:  "taskExecID",
+					Uri:   "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Ready: true,
 				},
 			},
 		},
@@ -1186,8 +1078,9 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray cluster name",
-					Uri:  "http://test/test-namespace/ray-cluster",
+					Name:  "ray cluster name",
+					Uri:   "http://test/test-namespace/ray-cluster",
+					Ready: true,
 				},
 			},
 		},
@@ -1207,40 +1100,19 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray job ID",
-					Uri:  "http://test/test-namespace/ray-job-1",
-				},
-			},
-		},
-		{
-			name: "ray job start time",
-			rayJob: rayv1.RayJob{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "test-namespace",
-					CreationTimestamp: metav1.Time{
-						Time: time.Unix(0, 0),
-					},
-				},
-				Status: rayv1.RayJobStatus{
-					JobId: "ray-job-1",
-				},
-			},
-			logPlugin: tasklog.TemplateLogPlugin{
-				DisplayName:  "ray job ID",
-				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .PodRFC3339StartTime }}/{{ .PodUnixStartTime }}"},
-			},
-			expectedTaskLogs: []*core.TaskLog{
-				{
-					Name: "ray job ID",
-					Uri:  fmt.Sprintf("http://test/%s/0", time.Unix(0, 0).Format(time.RFC3339)),
+					Name:  "ray job ID",
+					Uri:   "http://test/test-namespace/ray-job-1",
+					Ready: true,
 				},
 			},
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
+				context.TODO(),
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
@@ -1252,7 +1124,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 }
 
 func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := rayPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -1272,8 +1144,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "namespace",
-					Uri:  "http://test/test-namespace",
+					Name:  "namespace",
+					Uri:   "http://test/test-namespace",
+					Ready: true,
 				},
 			},
 		},
@@ -1288,8 +1161,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "taskExecID",
-					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Name:  "taskExecID",
+					Uri:   "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+					Ready: true,
 				},
 			},
 		},
@@ -1309,8 +1183,9 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray cluster name",
-					Uri:  "http://test/test-namespace/ray-cluster",
+					Name:  "ray cluster name",
+					Uri:   "http://test/test-namespace/ray-cluster",
+					Ready: true,
 				},
 			},
 		},
@@ -1330,16 +1205,19 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "ray job ID",
-					Uri:  "http://test/test-namespace/ray-job-1",
+					Name:  "ray job ID",
+					Uri:   "http://test/test-namespace/ray-job-1",
+					Ready: true,
 				},
 			},
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
+				context.TODO(),
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
@@ -1351,7 +1229,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL(t *testing.T) {
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := rayPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1372,8 +1250,10 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "Ray Dashboard",
-					Uri:  "http://test/generated-name",
+					Name:     "Ray Dashboard",
+					Uri:      "http://test/generated-name",
+					LinkType: core.TaskLog_DASHBOARD,
+					Ready:    true,
 				},
 			},
 		},
@@ -1392,10 +1272,11 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(context.TODO(), logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
@@ -1403,7 +1284,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := rayPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1424,8 +1305,10 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "Ray Dashboard",
-					Uri:  "http://test/generated-name",
+					Name:     "Ray Dashboard",
+					Uri:      "http://test/generated-name",
+					LinkType: core.TaskLog_DASHBOARD,
+					Ready:    true,
 				},
 			},
 		},
@@ -1444,10 +1327,11 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(context.TODO(), logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
@@ -1456,8 +1340,58 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
-	expected := k8s.PluginProperties{GeneratedNameMaxLength: ptr.To[int](47)}
+	maxLength := 47
+	expected := k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
+}
+
+func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+	pluginCtx := newPluginContext(pluginState)
+	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	endTime := startTime.Add(time.Hour)
+	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
+	podList := []runtime.Object{
+		&corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "initializing ignored pod"},
+			Status:     corev1.PodStatus{Phase: corev1.PodPending},
+		},
+		&corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: podName},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{Name: contName},
+				},
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: contName,
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  metav1.Time{Time: startTime},
+								FinishedAt: metav1.Time{Time: endTime},
+							},
+						},
+					},
+				},
+				InitContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: initCont,
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  metav1.Time{Time: startTime},
+								FinishedAt: metav1.Time{Time: endTime},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	reader := fake.NewFakeClient(podList...)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
+	return pluginCtx
 }
 
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
@@ -1469,4 +1403,238 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 	s, err := structpb.NewStruct(podSpecMap)
 	assert.Nil(t, err)
 	return s
+}
+
+func rayPluginContextWithPods(pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
+	pluginCtx := newPluginContext(pluginState)
+	reader := fake.NewFakeClient(pods...)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
+	return pluginCtx
+}
+
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	rayJobName := "test-rayjob"
+	rayClusterName := "test-raycluster"
+	// Create a failed head pod - name must match pattern used in GetTaskPhase: {RayClusterName}-head
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rayClusterName + "-head",
+			Namespace: "ns",
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name: RayHeadContainerName,
+				},
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: RayHeadContainerName,
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := rayPluginContextWithPods(k8s.PluginState{}, pod)
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rayJobName,
+			Namespace: "ns",
+		},
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:  RayHeadContainerName,
+									Image: "rayproject/ray:latest",
+									Env:   []corev1.EnvVar{},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusRunning,
+			RayClusterName:      rayClusterName,
+			StartTime:           &startTime,
+		},
+	}
+
+	// Even though RayJob status is running, should return failure due to pod status
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	assert.True(t, phaseInfo.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+	pluginCtx := rayPluginContext(k8s.PluginState{})
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:  RayHeadContainerName,
+									Image: "rayproject/ray:latest",
+									Env:   []corev1.EnvVar{},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusComplete,
+			RayClusterName:      "ray-clust",
+			StartTime:           &startTime,
+		},
+	}
+
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	assert.NotNil(t, phaseInfo.Info())
+	assert.NotNil(t, phaseInfo.Info().LogContext)
+
+	// Verify the constant is used for head container names
+	assert.Equal(t, 1, len(phaseInfo.Info().LogContext.Pods))
+	headPodLogContext := phaseInfo.Info().LogContext.Pods[0]
+	assert.Equal(t, RayHeadContainerName, headPodLogContext.PrimaryContainerName)
+	assert.Equal(t, 1, len(headPodLogContext.Containers))
+	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		status         rayv1.JobDeploymentStatus
+		expectedResult bool
+	}{
+		{"Complete", rayv1.JobDeploymentStatusComplete, true},
+		{"Failed", rayv1.JobDeploymentStatusFailed, true},
+		{"Running", rayv1.JobDeploymentStatusRunning, false},
+		{"Initializing", rayv1.JobDeploymentStatusInitializing, false},
+		{"Suspended", rayv1.JobDeploymentStatusSuspended, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := &rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: tt.status,
+				},
+			}
+			result, err := rayJobResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *rayv1.RayJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses EndTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					EndTime:   &metav1.Time{Time: now},
+					StartTime: &metav1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					StartTime: &metav1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(now),
+				},
+				Status: rayv1.RayJobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := rayJobResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

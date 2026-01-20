@@ -2,31 +2,34 @@ package spark
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdlibUtils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const sparkMainClass = "MainClass"
@@ -98,14 +101,14 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
-	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
+	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), k8s.PluginState{})
+	info, err := getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
-	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.GetFields()[sparkDriverUI].GetStringValue())
+	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
 	generatedLinks := make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.GetUri())
+		generatedLinks = append(generatedLinks, l.Uri)
 	}
 
 	expectedLinks := []string{
@@ -119,16 +122,23 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.Equal(t, expectedLinks, generatedLinks)
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
-	assert.NoError(t, err)
-
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.SubmittedState))
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.GetUri())
+		generatedLinks = append(generatedLinks, l.Uri)
 	}
+	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
-	assert.True(t, info.Logs[4].GetShowWhilePending()) // All User Logs should be shown while pending
+	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
+	generatedLinks = make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
+	assert.NoError(t, err)
+	assert.Len(t, info.Logs, 5)
+	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
+	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -150,13 +160,13 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState))
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
-	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.GetFields()[sparkHistoryUI].GetStringValue())
+	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.GetUri())
+		generatedLinks = append(generatedLinks, l.Uri)
 	}
 
 	expectedLinks = []string{
@@ -172,67 +182,102 @@ func TestGetEventInfo(t *testing.T) {
 
 func TestGetTaskPhase(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
+	expectedLogCtx := &core.LogContext{
+		PrimaryPodName: "spark-pod",
+		Pods: []*core.PodLogContext{
+			{
+				Namespace:            "spark-namespace",
+				PodName:              "spark-pod",
+				PrimaryContainerName: "spark-kubernetes-driver",
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: "spark-kubernetes-driver",
+					},
+				},
+			},
+			{
+				Namespace:            "spark-namespace",
+				PodName:              "exec-pod-2",
+				PrimaryContainerName: "spark-kubernetes-executor",
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: "spark-kubernetes-executor",
+					},
+				},
+			},
+		},
+	}
 
 	ctx := context.TODO()
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, k8s.PluginState{})
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.NewState))
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
 	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SubmittedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.RunningState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.CompletedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseSuccess)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.InvalidatingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.InvalidatingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.PendingRerunState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.PendingRerunState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SucceedingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SucceedingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailedSubmissionState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedSubmissionState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 }
 
@@ -246,9 +291,8 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		Reason:       "task submitted to K8s",
 	}
 
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
-
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SubmittedState))
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), pluginState)
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -271,6 +315,10 @@ func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
 				WebUIIngressAddress: sparkUIAddress,
 			},
 			ExecutionAttempts: 1,
+			ExecutorState: map[string]sparkOp.ExecutorState{
+				"exec-pod-1": sparkOp.ExecutorPendingState,
+				"exec-pod-2": sparkOp.ExecutorRunningState,
+			},
 		},
 	}
 }
@@ -282,19 +330,6 @@ func dummySparkCustomObj(sparkConf map[string]string) *plugins.SparkJob {
 	sparkJob.MainApplicationFile = sparkApplicationFile
 	sparkJob.SparkConf = sparkConf
 	sparkJob.ApplicationType = plugins.SparkApplication_PYTHON
-	return &sparkJob
-}
-
-func dummySparkCustomObjDriverExecutor(sparkConf map[string]string, driverPod *core.K8SPod, executorPod *core.K8SPod) *plugins.SparkJob {
-	sparkJob := plugins.SparkJob{}
-
-	sparkJob.MainClass = sparkMainClass
-	sparkJob.MainApplicationFile = sparkApplicationFile
-	sparkJob.SparkConf = sparkConf
-	sparkJob.ApplicationType = plugins.SparkApplication_PYTHON
-
-	sparkJob.DriverPod = driverPod
-	sparkJob.ExecutorPod = executorPod
 	return &sparkJob
 }
 
@@ -352,37 +387,7 @@ func dummySparkTaskTemplateContainer(id string, sparkConf map[string]string) *co
 	}
 }
 
-func dummySparkTaskTemplateDriverExecutor(id string, sparkConf map[string]string, driverPod *core.K8SPod, executorPod *core.K8SPod, basePod *corev1.PodSpec) *core.TaskTemplate {
-
-	sparkJob := dummySparkCustomObjDriverExecutor(sparkConf, driverPod, executorPod)
-
-	structObj, err := utils.MarshalObjToStruct(sparkJob)
-	if err != nil {
-		panic(err)
-	}
-
-	basePodPb, err := utils.MarshalObjToStruct(basePod)
-	if err != nil {
-		panic(err)
-	}
-
-	return &core.TaskTemplate{
-		Id:   &core.Identifier{Name: id},
-		Type: "k8s_pod",
-		Target: &core.TaskTemplate_K8SPod{
-			K8SPod: &core.K8SPod{
-				PodSpec: basePodPb,
-			},
-		},
-		Config: map[string]string{
-			flytek8s.PrimaryContainerKey: "primary",
-		},
-		Custom: structObj,
-	}
-}
-
 func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *corev1.PodSpec) *core.TaskTemplate {
-	// add driver/executor pod below
 	sparkJob := dummySparkCustomObj(sparkConf)
 	sparkJobJSON, err := utils.MarshalToString(sparkJob)
 	if err != nil {
@@ -416,7 +421,7 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 	}
 }
 
-func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool, pluginState k8s.PluginState) pluginsCore.TaskExecutionContext {
+func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -431,7 +436,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool, 
 	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
 	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	taskCtx.On("OutputWriter").Return(outputReader)
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
@@ -447,49 +452,127 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool, 
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	overrides.EXPECT().GetResources().Return(&corev1.ResourceRequirements{})
 	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
-	overrides.On("GetExtendedResources").Return(nil)
-	overrides.On("GetPodTemplate").Return(nil)
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
-	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
-	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.On("GetOwnerReference").Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
-	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
-	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
-	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
-	taskExecutionMetadata.On("GetOverrides").Return(overrides)
-	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
-	taskExecutionMetadata.On("GetConsoleURL").Return("")
-	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
-
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(interruptible)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(nil)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("new-val")
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
-			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0, nil
 		})
 
 	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
+}
+
+func dummySparkPluginContext(taskTemplate *core.TaskTemplate, pluginState k8s.PluginState) k8s.PluginContext {
+	return dummySparkPluginContextWithPods(taskTemplate, pluginState)
+}
+
+func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginState k8s.PluginState, pods ...client.Object) k8s.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.EXPECT().GetResources().Return(&corev1.ResourceRequirements{})
+	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
+		Kind: "node",
+		Name: "blah",
+	})
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
+		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
+	})
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(false)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(nil)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("new-val")
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
+
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0, nil
+		})
+
+	// Add K8sReader mock for pods
+	objs := make([]client.Object, len(pods))
+	copy(objs, pods)
+	reader := fake.NewClientBuilder().WithObjects(objs...).Build()
+	pCtx.EXPECT().K8sReader().Return(reader)
+
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
+	return pCtx
 }
 
 func defaultPluginConfig() *config.K8sPluginConfig {
@@ -640,7 +723,7 @@ func TestBuildResourceContainer(t *testing.T) {
 
 	defaultConfig := defaultPluginConfig()
 	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
-	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true, k8s.PluginState{}))
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, resource)
@@ -788,7 +871,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	dummyConfWithRequest["spark.kubernetes.executor.request.cores"] = "4"
 
 	taskTemplate = dummySparkTaskTemplateContainer("blah-1", dummyConfWithRequest)
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
 	sparkApp, ok = resource.(*sj.SparkApplication)
@@ -798,7 +881,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	assert.Equal(t, dummyConfWithRequest["spark.kubernetes.executor.request.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.executor.limit.cores"])
 
 	// Case 3: Interruptible False
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
 	sparkApp, ok = resource.(*sj.SparkApplication)
@@ -846,7 +929,7 @@ func TestBuildResourceContainer(t *testing.T) {
 
 	// Case 4: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
 }
@@ -866,7 +949,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	taskTemplate.GetK8SPod()
 	sparkResourceHandler := sparkResourceHandler{}
 
-	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	taskCtx := dummySparkTaskContext(taskTemplate, true)
 	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
 
 	assert.Nil(t, err)
@@ -899,7 +982,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
-	assert.Equal(t, 9, len(sparkApp.Spec.Driver.Env))
+	assert.Equal(t, 10, len(sparkApp.Spec.Driver.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
 	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
@@ -936,7 +1019,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
-	assert.Equal(t, 9, len(sparkApp.Spec.Executor.Env))
+	assert.Equal(t, 10, len(sparkApp.Spec.Executor.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
 	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
@@ -977,177 +1060,227 @@ func TestGetPropertiesSpark(t *testing.T) {
 	assert.Equal(t, expected, sparkResourceHandler.GetProperties())
 }
 
-func TestBuildResourceCustomK8SPod(t *testing.T) {
-
-	defaultConfig := defaultPluginConfig()
-	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
-
-	basePodSpec := dummyPodSpec()
-	basePodSpec.NodeSelector = map[string]string{"x/custom": "foo"}
-
-	// add extraDriverToleration and extraExecutorToleration
-	driverExtraToleration := corev1.Toleration{
-		Key:      "x/flyte-driver",
-		Value:    "extra-driver",
-		Operator: "Equal",
-	}
-	executorExtraToleration := corev1.Toleration{
-		Key:      "x/flyte-executor",
-		Value:    "extra-executor",
-		Operator: "Equal",
-	}
-
-	// pod for driver and executor
-	driverPodSpec := dummyPodSpec()
-	executorPodSpec := dummyPodSpec()
-	driverPodSpec.Tolerations = append(driverPodSpec.Tolerations, driverExtraToleration)
-	driverPodSpec.NodeSelector = map[string]string{"x/custom": "foo-driver"}
-	executorPodSpec.Tolerations = append(executorPodSpec.Tolerations, executorExtraToleration)
-	executorPodSpec.NodeSelector = map[string]string{"x/custom": "foo-executor"}
-
-	driverK8SPod := &core.K8SPod{
-		PodSpec: transformStructToStructPB(t, driverPodSpec),
-		Metadata: &core.K8SObjectMetadata{
-			Annotations: map[string]string{"annotation-driver": "val-driver"},
-			Labels:      map[string]string{"label-driver": "val-driver"},
-		},
-	}
-	executorK8SPod := &core.K8SPod{
-		PodSpec: transformStructToStructPB(t, executorPodSpec),
-		Metadata: &core.K8SObjectMetadata{
-			Annotations: map[string]string{"annotation-executor": "val-executor"},
-			Labels:      map[string]string{"label-executor": "val-executor"},
-		},
-	}
-	taskTemplate := dummySparkTaskTemplateDriverExecutor("blah-1", dummySparkConf, driverK8SPod, executorK8SPod, basePodSpec)
+func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
 
-	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
-	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+	assert.Equal(t, 2, len(taskPhase.Info().LogContext.Pods))
 
-	assert.Nil(t, err)
-	assert.NotNil(t, resource)
-	sparkApp, ok := resource.(*sj.SparkApplication)
-	assert.True(t, ok)
-
-	// Application
-	assert.Equal(t, v1.TypeMeta{
-		Kind:       KindSparkApplication,
-		APIVersion: sparkOp.SchemeGroupVersion.String(),
-	}, sparkApp.TypeMeta)
-
-	// Application spec
-	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.ServiceAccount)
-	assert.Equal(t, sparkOp.PythonApplicationType, sparkApp.Spec.Type)
-	assert.Equal(t, testImage, *sparkApp.Spec.Image)
-	assert.Equal(t, append(testArgs, testArgs...), sparkApp.Spec.Arguments)
-	assert.Equal(t, sparkOp.RestartPolicy{
-		Type:                       sparkOp.OnFailure,
-		OnSubmissionFailureRetries: intPtr(int32(14)),
-	}, sparkApp.Spec.RestartPolicy)
-	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
-	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
-
-	// Driver
-	assert.Equal(t, utils.UnionMaps(
-		defaultConfig.DefaultAnnotations, map[string]string{
-			"annotation-1":      "val1",
-			"annotation-driver": "val-driver",
-		},
-	), sparkApp.Spec.Driver.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{
-		"label-1":      "val1",
-		"label-driver": "val-driver",
-	}), sparkApp.Spec.Driver.Labels)
-	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
-	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
-	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
-	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
-	assert.Equal(t, 11, len(sparkApp.Spec.Driver.Env))
-	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
-	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
-	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
-	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Driver.DNSConfig)
-	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Driver.HostNetwork)
-	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Driver.SchedulerName)
-	assert.Equal(t, []corev1.Toleration{
-		defaultConfig.DefaultTolerations[0],
-		driverExtraToleration,
-	}, sparkApp.Spec.Driver.Tolerations)
-	assert.Equal(t, map[string]string{
-		"x/default": "true",
-		"x/custom":  "foo-driver",
-	}, sparkApp.Spec.Driver.NodeSelector)
-	assert.Equal(t, &corev1.NodeAffinity{
-		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-			NodeSelectorTerms: []corev1.NodeSelectorTerm{
-				{
-					MatchExpressions: []corev1.NodeSelectorRequirement{
-						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-						*defaultConfig.NonInterruptibleNodeSelectorRequirement,
-					},
-				},
-			},
-		},
-	}, sparkApp.Spec.Driver.Affinity.NodeAffinity)
-	cores, _ := strconv.ParseInt(dummySparkConf["spark.driver.cores"], 10, 32)
-	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Driver.Cores)
-	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
-
-	// // Executor
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{
-		"annotation-1":        "val1",
-		"annotation-executor": "val-executor",
-	}), sparkApp.Spec.Executor.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{
-		"label-1":        "val1",
-		"label-executor": "val-executor",
-	}), sparkApp.Spec.Executor.Labels)
-	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
-	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
-	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
-	assert.Equal(t, 11, len(sparkApp.Spec.Executor.Env))
-	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
-	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
-	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
-	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Executor.HostNetwork)
-	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Executor.SchedulerName)
-	assert.ElementsMatch(t, []corev1.Toleration{
-		defaultConfig.DefaultTolerations[0],
-		executorExtraToleration,
-		defaultConfig.InterruptibleTolerations[0],
-	}, sparkApp.Spec.Executor.Tolerations)
-	assert.Equal(t, map[string]string{
-		"x/default":       "true",
-		"x/custom":        "foo-executor",
-		"x/interruptible": "true",
-	}, sparkApp.Spec.Executor.NodeSelector)
-	assert.Equal(t, &corev1.NodeAffinity{
-		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-			NodeSelectorTerms: []corev1.NodeSelectorTerm{
-				{
-					MatchExpressions: []corev1.NodeSelectorRequirement{
-						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-						*defaultConfig.InterruptibleNodeSelectorRequirement,
-					},
-				},
-			},
-		},
-	}, sparkApp.Spec.Executor.Affinity.NodeAffinity)
-	cores, _ = strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
-	instances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
-	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
-	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
-	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+	// Verify namespace is set in the driver pod log context
+	driverPodLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, "spark-namespace", driverPodLogContext.Namespace)
+	assert.Equal(t, "spark-pod", driverPodLogContext.PodName)
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.PrimaryContainerName)
 }
 
-func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
-	data, err := json.Marshal(obj)
-	assert.Nil(t, err)
-	podSpecMap := make(map[string]interface{})
-	err = json.Unmarshal(data, &podSpecMap)
-	assert.Nil(t, err)
-	s, err := structpb.NewStruct(podSpecMap)
-	assert.Nil(t, err)
-	return s
+func TestGetTaskPhaseWithFailedPod(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a failed driver pod
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "spark-pod",
+			Namespace: "spark-namespace",
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: defaultDriverPrimaryContainerName,
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{
+							ExitCode: 1,
+							Reason:   "Error",
+							Message:  "Container failed",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
+
+	// Even though SparkApplication status is running, should return failure due to pod status
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	assert.NoError(t, err)
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseWithPendingPodInvalidImage(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	// Create a pending driver pod with InvalidImageName - this should fail immediately
+	pod := &corev1.Pod{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "spark-pod",
+			Namespace: "spark-namespace",
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodPending,
+			Conditions: []corev1.PodCondition{
+				{
+					Type:               corev1.PodReady,
+					Status:             corev1.ConditionFalse,
+					LastTransitionTime: v1.Time{Time: time.Now()},
+					Reason:             "ContainersNotReady",
+					Message:            "containers with unready status: [spark-kubernetes-driver]",
+				},
+			},
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name:  defaultDriverPrimaryContainerName,
+					Ready: false,
+					State: corev1.ContainerState{
+						Waiting: &corev1.ContainerStateWaiting{
+							Reason:  "InvalidImageName",
+							Message: "Invalid image name",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
+
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+	assert.NoError(t, err)
+	// Should detect the InvalidImageName and return a failure phase
+	assert.True(t, taskPhase.Phase().IsFailure())
+}
+
+func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
+
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().LogContext)
+
+	// Verify the constant is used for driver container names
+	driverPodLogContext := taskPhase.Info().LogContext.Pods[0]
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.PrimaryContainerName)
+	assert.Equal(t, 1, len(driverPodLogContext.Containers))
+	assert.Equal(t, defaultDriverPrimaryContainerName, driverPodLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		state          sj.ApplicationStateType
+		expectedResult bool
+	}{
+		{"Completed", sj.CompletedState, true},
+		{"Failed", sj.FailedState, true},
+		{"FailedSubmission", sj.FailedSubmissionState, true},
+		{"New", sj.NewState, false},
+		{"Submitted", sj.SubmittedState, false},
+		{"Running", sj.RunningState, false},
+		{"PendingRerun", sj.PendingRerunState, false},
+		{"Invalidating", sj.InvalidatingState, false},
+		{"Succeeding", sj.SucceedingState, false},
+		{"Failing", sj.FailingState, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := dummySparkApplication(tt.state)
+			result, err := sparkResourceHandler.IsTerminal(ctx, app)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.Background()
+
+	var wrongResource client.Object = &corev1.ConfigMap{}
+	result, err := sparkResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		app          *sj.SparkApplication
+		expectedTime time.Time
+	}{
+		{
+			name: "uses TerminationTime",
+			app: &sj.SparkApplication{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: sj.SparkApplicationStatus{
+					TerminationTime: v1.NewTime(now),
+					SubmissionTime:  v1.NewTime(earlier),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to SubmissionTime",
+			app: &sj.SparkApplication{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: sj.SparkApplicationStatus{
+					SubmissionTime: v1.NewTime(now),
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			app: &sj.SparkApplication{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(now),
+				},
+				Status: sj.SparkApplicationStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := sparkResourceHandler.GetCompletionTime(tt.app)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+
+	var wrongResource client.Object = &corev1.ConfigMap{}
+	result, err := sparkResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

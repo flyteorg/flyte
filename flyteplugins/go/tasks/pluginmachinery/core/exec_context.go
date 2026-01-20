@@ -3,13 +3,12 @@ package core
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 
 // An interface to access a remote/sharable location that contains the serialized TaskTemplate
 type TaskTemplatePath interface {
@@ -60,9 +59,6 @@ type TaskExecutionContext interface {
 
 	// Get a handle to catalog client
 	Catalog() catalog.AsyncClient
-
-	// Returns a handle to the Task events recorder, which get stored in the Admin.
-	EventsRecorder() EventsRecorder
 }
 
 // A simple fire-and-forget func

@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
 
 const (
@@ -9,7 +9,9 @@ const (
 	DownstreamSystemError      errors.ErrorCode = "DownstreamSystemError"
 	TaskFailedUnknownError     errors.ErrorCode = "TaskFailedUnknownError"
 	BadTaskSpecification       errors.ErrorCode = "BadTaskSpecification"
+	TaskEventRecordingFailed   errors.ErrorCode = "TaskEventRecordingFailed"
 	MetadataAccessFailed       errors.ErrorCode = "MetadataAccessFailed"
+	MetadataTooLarge           errors.ErrorCode = "MetadataTooLarge"
 	PluginInitializationFailed errors.ErrorCode = "PluginInitializationFailed"
 	CacheFailed                errors.ErrorCode = "AutoRefreshCacheFailed"
 	RuntimeFailure             errors.ErrorCode = "RuntimeFailure"

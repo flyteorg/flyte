@@ -6,8 +6,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // Counter represents a counter labeled with values from the context. See labeled.SetMetricsKeys for information about to
@@ -22,7 +22,7 @@ type Counter struct {
 // Inc increments the counter by 1. Use Add to increment it by arbitrary non-negative values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Inc(ctx context.Context) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	counter, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -36,7 +36,7 @@ func (c Counter) Inc(ctx context.Context) {
 // Add adds the given value to the counter. It panics if the value is < 0.. The data point will be labeled with values
 // from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Add(ctx context.Context, v float64) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
+	counter, err := c.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}

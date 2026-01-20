@@ -1,0 +1,44 @@
+# Example configuration for Data Proxy with MinIO storage backend
+# This configuration is for local development and testing purposes.
+
+# Data Proxy Configuration
+dataproxy:
+  upload:
+    # Maximum size for uploads (100MB)
+    maxSize: "100Mi"
+    # Maximum expiration time for signed URLs (1 hour)
+    maxExpiresIn: 1h
+    # Default filename length when auto-generating names
+    defaultFileNameLength: 20
+    # Storage prefix for all uploads
+    storagePrefix: "uploads"
+
+  download:
+    # Maximum expiration time for download URLs (1 hour)
+    maxExpiresIn: 1h
+
+# Storage Configuration
+storage:
+  # Type of storage backend (options: s3, minio, local, mem, stow)
+  type: minio
+
+  # Initial bucket/container name
+  # This bucket will be created automatically if it doesn't exist
+  container: "flyte-data"
+  auto-create: false
+
+  # Enable multi-container support
+  # When true, allows accessing multiple buckets
+  enable-multicontainer: false
+
+  # Stow Configuration (recommended)
+  # This is the modern way to configure storage backends
+  stow:
+    kind: "s3"
+    config:
+      auth_type: "accesskey"
+      access_key_id: "minioadmin"
+      secret_key: "minioadmin"
+      region: "us-east-1"
+      endpoint: "http://localhost:9000"
+      disable_ssl: "true"

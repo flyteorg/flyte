@@ -44,10 +44,10 @@ func (a *CompactArray) SetItem(index int, value Item) {
 	// #nosec G115
 	for i := int(a.ItemSize - 1); i >= 0; i-- {
 		if x&value != 0 {
-			a.BitSet.Set(bitIndex + uint(i)) // #nosec G115
+			a.Set(bitIndex + uint(i)) // #nosec G115
 
 		} else {
-			a.BitSet.Clear(bitIndex + uint(i)) // #nosec G115
+			a.Clear(bitIndex + uint(i)) // #nosec G115
 
 		}
 
@@ -64,7 +64,7 @@ func (a *CompactArray) GetItem(index int) Item {
 	// #nosec G115
 	for i := int(a.ItemSize - 1); i >= 0; i-- {
 		// #nosec G115
-		if a.BitSet.IsSet(bitIndex + uint(i)) {
+		if a.IsSet(bitIndex + uint(i)) {
 			res |= x
 		}
 

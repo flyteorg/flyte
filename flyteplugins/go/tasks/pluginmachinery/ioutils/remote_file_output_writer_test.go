@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 func TestRemoteFileOutputWriter(t *testing.T) {
@@ -33,7 +33,7 @@ func TestRemoteFileOutputWriter(t *testing.T) {
 
 		assert.Equal(t, constructPath(memStore, rawOutputPrefix, CheckpointPrefix), checkpointPath.GetCheckpointPrefix())
 		assert.Equal(t, constructPath(memStore, outputPrefix, OutputsSuffix), checkpointPath.GetOutputPath())
-		assert.Equal(t, constructPath(memStore, outputPrefix, deckSuffix), checkpointPath.GetDeckPath())
+		assert.Equal(t, constructPath(memStore, outputPrefix, "deck.html"), checkpointPath.GetDeckPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, ErrorsSuffix), checkpointPath.GetErrorPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, FuturesSuffix), checkpointPath.GetFuturesPath())
 	})
@@ -43,7 +43,7 @@ func TestRemoteFileOutputWriter(t *testing.T) {
 
 		assert.Equal(t, constructPath(memStore, rawOutputPrefix, CheckpointPrefix), p.GetCheckpointPrefix())
 		assert.Equal(t, constructPath(memStore, outputPrefix, OutputsSuffix), p.GetOutputPath())
-		assert.Equal(t, constructPath(memStore, outputPrefix, deckSuffix), p.GetDeckPath())
+		assert.Equal(t, constructPath(memStore, outputPrefix, "deck.html"), p.GetDeckPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, ErrorsSuffix), p.GetErrorPath())
 	})
 }

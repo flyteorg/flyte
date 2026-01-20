@@ -6,8 +6,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 // Gauge represents a gauge labeled with values from the context. See labeled.SetMetricsKeys for more information
@@ -21,7 +21,7 @@ type Gauge struct {
 // Inc increments the gauge by 1. Use Add to increment by arbitrary values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Inc(ctx context.Context) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -35,7 +35,7 @@ func (g Gauge) Inc(ctx context.Context) {
 // Add adds the given value to the Gauge. (The value can be negative, resulting in a decrease of the Gauge.)
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Add(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -49,7 +49,7 @@ func (g Gauge) Add(ctx context.Context, v float64) {
 // Set sets the Gauge to an arbitrary value.
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Set(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -63,7 +63,7 @@ func (g Gauge) Set(ctx context.Context, v float64) {
 // Dec decrements the level by 1. Use Sub to decrement by arbitrary values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Dec(ctx context.Context) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -77,7 +77,7 @@ func (g Gauge) Dec(ctx context.Context) {
 // Sub adds the given value to the Gauge. The value can be negative, resulting in an increase of the Gauge.
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Sub(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -90,7 +90,7 @@ func (g Gauge) Sub(ctx context.Context, v float64) {
 
 // SetToCurrentTime sets the Gauge to the current Unix time in seconds.
 func (g Gauge) SetToCurrentTime(ctx context.Context) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, metricKeys...))
+	gauge, err := g.GetMetricWith(contextutils.Values(ctx, metricKeys...))
 	if err != nil {
 		panic(err.Error())
 	}

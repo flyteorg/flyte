@@ -18,14 +18,15 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	errors2 "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
@@ -56,25 +57,25 @@ func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
 
 func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("test-namespace")
-	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
 
-	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskMetadata.On("IsInterruptible").Return(true)
-	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{})
-	taskMetadata.On("GetK8sServiceAccount").Return("service-account")
-	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
+	taskMetadata.EXPECT().IsInterruptible().Return(true)
+	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+	taskMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
 	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -83,18 +84,18 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
-	taskMetadata.On("GetTaskExecutionID").Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("my_project:my_domain:my_name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
-	to.On("GetContainerImage").Return("")
-	to.On("GetPodTemplate").Return(nil)
-	taskMetadata.On("GetOverrides").Return(to)
-	taskMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskMetadata.On("GetConsoleURL").Return("")
+	to.EXPECT().GetResources().Return(resources)
+	to.EXPECT().GetExtendedResources().Return(extendedResources)
+	to.EXPECT().GetContainerImage().Return("")
+	to.EXPECT().GetPodTemplate().Return(nil)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
+	taskMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskMetadata.EXPECT().GetConsoleURL().Return("")
 
 	return taskMetadata
 }
@@ -127,6 +128,36 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	taskCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
+}
+
+func getDummySidecarPluginContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	dummyTaskMetadata := dummySidecarTaskMetadata(resources, nil)
+	inputReader := &pluginsIOMock.InputReader{}
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-prefix")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
+
+	outputReader := &pluginsIOMock.OutputWriter{}
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
+
+	taskReader := &pluginsCoreMock.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
+
+	pCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskMetadata)
+
+	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	pCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
+
+	return pCtx
 }
 
 func getPodSpec() v1.PodSpec {
@@ -751,6 +782,7 @@ func TestGetTaskSidecarStatus(t *testing.T) {
 		v1.PodSucceeded:           pluginsCore.PhaseSuccess,
 		v1.PodFailed:              pluginsCore.PhaseRetryableFailure,
 		v1.PodReasonUnschedulable: pluginsCore.PhaseQueued,
+		v1.PodUnknown:             pluginsCore.PhaseUndefined,
 	}
 
 	for podPhase, expectedTaskPhase := range testCases {
@@ -762,8 +794,10 @@ func TestGetTaskSidecarStatus(t *testing.T) {
 		res.SetAnnotations(map[string]string{
 			flytek8s.PrimaryContainerKey: "PrimaryContainer",
 		})
-		taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+		pluginContext := getDummySidecarPluginContext(task, sidecarResourceRequirements)
+
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
+
 		assert.Nil(t, err)
 		assert.Equal(t, expectedTaskPhase, phaseInfo.Phase(),
 			"Expected [%v] got [%v] instead, for podPhase [%v]", expectedTaskPhase, phaseInfo.Phase(), podPhase)
@@ -789,8 +823,8 @@ func TestDemystifiedSidecarStatus_PrimaryFailed(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
-	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	pluginContext := getDummySidecarPluginContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 }
@@ -814,8 +848,8 @@ func TestDemystifiedSidecarStatus_PrimarySucceeded(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
-	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	pluginContext := getDummySidecarPluginContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 }
@@ -839,8 +873,8 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
-	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	pluginContext := getDummySidecarPluginContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
@@ -866,8 +900,8 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
-	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	pluginContext := getDummySidecarPluginContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 }
@@ -893,8 +927,8 @@ func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
-	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	pluginContext := getDummySidecarPluginContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), pluginContext, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }

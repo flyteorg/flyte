@@ -1,0 +1,4 @@
+googleapis-common-protos
+protoc-gen-openapiv2
+protobuf>=4.21.1
+protovalidate>=1.0.0
