@@ -11,7 +11,7 @@ A Helm chart for Flyte Sandbox
 | file://../flyte-core | flyte(flyte-core) | v0.1.10 |
 | https://charts.bitnami.com/bitnami | contour | 7.10.1 |
 | https://helm.dask.org | daskoperator(dask-kubernetes-operator) | 2022.12.0 |
-| https://kubeflow.github.io/spark-operator | sparkoperator(spark-operator) | 1.1.15 |
+| https://kubeflow.github.io/spark-operator | sparkoperator(spark-operator) | 2.1.1 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
 **NOTE:** Flyte sandbox helm chart is deprecated, From now follow the sandbox [docs](https://docs.flyte.org/en/latest/deployment/sandbox.html) for installing it on cloud
