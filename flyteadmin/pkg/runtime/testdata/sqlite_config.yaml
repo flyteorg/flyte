@@ -1,3 +1,0 @@
-database:
-  sqlite:
-    file: admin.db

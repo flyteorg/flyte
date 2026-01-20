@@ -1,5 +1,0 @@
-apiVersion: v2
-name: flyteconnector
-description: A Helm chart for Flyte connector
-type: application
-version: v0.1.10  # VERSION

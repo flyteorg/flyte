@@ -1,5 +1,0 @@
-flytepropeller:
-  enabled: false
-
-flyteconnector:
-  enabled: false

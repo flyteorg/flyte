@@ -1,1 +1,0 @@
-{{range .}}{{if not .ID}}{{else}}[![{{.ID}}](https://images.weserv.nl/?url={{.AvatarURL}}&w=50&h=50&mask=circle)]({{.HTMLURL}}){{end}}{{end}}
