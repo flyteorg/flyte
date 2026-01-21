@@ -25,3 +25,11 @@ func TestNewTokenSource(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "Bearer abc", metadata["test"])
 }
+
+func TestExternalCommandTokenSource(t *testing.T) {
+	command := []string{"echo", "foobar"}
+	tokenSource := ExternalCommandTokenSource{command}
+	token, err := tokenSource.Token()
+	assert.NoError(t, err)
+	assert.Equal(t, "foobar", token.AccessToken)
+}
