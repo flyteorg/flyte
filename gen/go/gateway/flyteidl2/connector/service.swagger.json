@@ -1433,7 +1433,7 @@
           "$ref": "#/definitions/coreBinary"
         },
         "schema": {
-          "$ref": "#/definitions/coreSchema"
+          "$ref": "#/definitions/flyteidl2coreSchema"
         },
         "none_type": {
           "$ref": "#/definitions/coreVoid"
@@ -1451,18 +1451,6 @@
           "$ref": "#/definitions/coreUnion"
         }
       }
-    },
-    "coreSchema": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/coreSchemaType"
-        }
-      },
-      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
     "coreSchemaType": {
       "type": "object",
@@ -2015,6 +2003,18 @@
         "FLYTE_SDK"
       ],
       "default": "OTHER"
+    },
+    "flyteidl2coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
     "flyteidl2coreSecret": {
       "type": "object",

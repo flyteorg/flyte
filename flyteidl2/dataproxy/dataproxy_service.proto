@@ -3,15 +3,27 @@ syntax = "proto3";
 package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy";
 
 // DataProxyService provides an interface for managing data uploads and downloads.
 service DataProxyService {
   // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
-  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {}
+  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/dataproxy/artifact_urn"
+      body: "*"
+      additional_bindings: {
+        post: "/api/v1/org/dataproxy/artifact_urn"
+        body: "*"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates a write-only http location that is accessible for tasks at runtime."};
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
