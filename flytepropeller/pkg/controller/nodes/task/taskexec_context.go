@@ -92,6 +92,14 @@ func (t taskExecutionMetadata) GetEnvironmentVariables() map[string]string {
 	return t.environmentVariables
 }
 
+func (t taskExecutionMetadata) GetExecutionID() *core.WorkflowExecutionIdentifier {
+	return t.GetNodeExecutionID().GetExecutionId()
+}
+
+func (t taskExecutionMetadata) GetExecutionDomain() string {
+	return t.GetNodeExecutionID().GetExecutionId().GetDomain()
+}
+
 type taskExecutionContext struct {
 	interfaces.NodeExecutionContext
 	tm  taskExecutionMetadata
