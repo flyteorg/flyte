@@ -18,6 +18,10 @@ cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
 cmd/single/dist:
 	script/get_flyteconsole_dist.sh
 
+.PHONY: run
+run: cmd/single/dist
+	POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/flyte-single-binary-local.yaml
+
 .PHONY: compile
 compile: cmd/single/dist
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/

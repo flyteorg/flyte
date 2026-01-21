@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginmachinery_core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
@@ -20,6 +21,7 @@ func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 // TODO we should modify the container resources to contain a map of enum values?
 // Also we should probably create tolerations / taints, but we could do that as a post process
 func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceList, error) {
+	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
 	k8sResources := make(v1.ResourceList, len(resources))
 	for _, r := range resources {
 		rVal := r.GetValue()
@@ -38,7 +40,7 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {
-				k8sResources[ResourceNvidiaGPU] = v
+				k8sResources[gpuResourceName] = v
 			}
 		case core.Resources_EPHEMERAL_STORAGE:
 			if !v.IsZero() {
