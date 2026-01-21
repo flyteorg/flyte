@@ -128,7 +128,8 @@ func TestCheckStatus(t *testing.T) {
 
 			workersMap := sync.Map{}
 			queue := &environmentImpl{
-				workers: &workersMap,
+				activeTasks: &sync.Map{},
+				workers:     &workersMap,
 			}
 			store := newEnvironmentStore()
 			store.GetOrCreate(test.queueID, queue)
@@ -235,7 +236,8 @@ func TestCleanup(t *testing.T) {
 	workers1 := sync.Map{}
 	workers1.Store("w0", &workerImpl{id: "w0"})
 	env1.GetOrCreate("foo", &environmentImpl{
-		workers: &workers1,
+		activeTasks: &sync.Map{},
+		workers:     &workers1,
 	})
 
 	env2 := newEnvironmentStore()
@@ -243,7 +245,8 @@ func TestCleanup(t *testing.T) {
 	workers2.Store("w0", &workerImpl{id: "w0"})
 	workers2.Store("w1", &workerImpl{id: "w1"})
 	env2.GetOrCreate("foo", &environmentImpl{
-		workers: &workers2,
+		activeTasks: &sync.Map{},
+		workers:     &workers2,
 	})
 
 	env3 := newEnvironmentStore()
@@ -251,7 +254,8 @@ func TestCleanup(t *testing.T) {
 	workers3.Store("w0", &workerImpl{id: "w0"})
 	workers3.Store("w1", &workerImpl{id: "w1"})
 	env3.GetOrCreate("foo", &environmentImpl{
-		workers: &workers3,
+		activeTasks: &sync.Map{},
+		workers:     &workers3,
 	})
 
 	tests := []struct {
@@ -275,7 +279,7 @@ func TestCleanup(t *testing.T) {
 			taskStatusChannelExists: false,
 		},
 		{
-			name:                    "WorkerDoesNostExist",
+			name:                    "WorkerDoesNotExist",
 			taskID:                  "bar",
 			queueID:                 "foo",
 			workerID:                "w1",
@@ -443,7 +447,8 @@ func TestOfferOnQueue(t *testing.T) {
 		},
 	})
 	env1.GetOrCreate("foo", &environmentImpl{
-		workers: &workers1,
+		activeTasks: &sync.Map{},
+		workers:     &workers1,
 	})
 
 	env2 := newEnvironmentStore()
@@ -467,7 +472,8 @@ func TestOfferOnQueue(t *testing.T) {
 		},
 	})
 	env2.GetOrCreate("foo", &environmentImpl{
-		workers: &workers2,
+		activeTasks: &sync.Map{},
+		workers:     &workers2,
 	})
 
 	env3 := newEnvironmentStore()
@@ -482,7 +488,8 @@ func TestOfferOnQueue(t *testing.T) {
 		},
 	})
 	env3.GetOrCreate("foo", &environmentImpl{
-		workers: &workers3,
+		activeTasks: &sync.Map{},
+		workers:     &workers3,
 	})
 
 	tests := []struct {
@@ -605,6 +612,11 @@ func TestOfferOnQueue(t *testing.T) {
 				k8s.WorkflowID: workflowID.String(),
 			}
 
+			var taskCountBefore int
+			if env := test.envStore.Get(test.queueID); env != nil {
+				taskCountBefore = env.GetActiveTaskCount()
+			}
+
 			worker, err := fastTaskService.OfferTaskToEnvironment(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string), enqueueLabels)
 			if test.expectedError != nil {
 				assert.Nil(t, worker)
@@ -613,6 +625,10 @@ func TestOfferOnQueue(t *testing.T) {
 			}
 			assert.Equal(t, test.expectedWorkerID, worker.ID())
 			assert.Equal(t, test.expectedError, err)
+
+			if env := test.envStore.Get(test.queueID); env != nil {
+				assert.Equal(t, taskCountBefore+1, env.GetActiveTaskCount())
+			}
 
 			if len(worker.ID()) > 0 {
 				// validate ASSIGN response

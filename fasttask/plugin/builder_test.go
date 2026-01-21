@@ -282,7 +282,8 @@ func TestGetOrCreateEnvironment(t *testing.T) {
 			name: "Success - Return Existing Healthy Environment",
 			existingEnvironments: map[string]interfaces.Environment{
 				executionEnvID.String(): &environmentImpl{
-					state: interfaces.HEALTHY,
+					activeTasks: &sync.Map{},
+					state:       interfaces.HEALTHY,
 				},
 			},
 			expectCreateCalls: 0, // No new pods should be created
@@ -292,7 +293,8 @@ func TestGetOrCreateEnvironment(t *testing.T) {
 			name: "Success - Return Existing Tombstoned Environment",
 			existingEnvironments: map[string]interfaces.Environment{
 				executionEnvID.String(): &environmentImpl{
-					state: interfaces.TOMBSTONED,
+					activeTasks: &sync.Map{},
+					state:       interfaces.TOMBSTONED,
 				},
 			},
 			expectCreateCalls: 0, // No new pods should be created
@@ -302,7 +304,8 @@ func TestGetOrCreateEnvironment(t *testing.T) {
 			name: "Success - Recover Orphaned Environment",
 			existingEnvironments: map[string]interfaces.Environment{
 				executionEnvID.String(): &environmentImpl{
-					state: interfaces.ORPHANED,
+					activeTasks: &sync.Map{},
+					state:       interfaces.ORPHANED,
 				},
 			},
 			expectCreateCalls: 0, // We test the recovery process, not pod creation
@@ -454,8 +457,9 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			name: "Noop",
 			environments: map[string]interfaces.Environment{
 				executionEnvID.String(): &environmentImpl{
-					workers: &workersMap,
-					state:   interfaces.HEALTHY,
+					activeTasks: &sync.Map{},
+					workers:     &workersMap,
+					state:       interfaces.HEALTHY,
 				},
 			},
 			expectedEnvironmentCount: 1,
@@ -471,8 +475,9 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			name: "ExistingOrphanedEnvironment",
 			environments: map[string]interfaces.Environment{
 				executionEnvID.String(): &environmentImpl{
-					workers: &workersMap1,
-					state:   interfaces.ORPHANED,
+					activeTasks: &sync.Map{},
+					workers:     &workersMap1,
+					state:       interfaces.ORPHANED,
 				},
 			},
 			expectedEnvironmentCount: 1,
@@ -964,77 +969,7 @@ func TestScaleUp(t *testing.T) {
 		expectedWorkerCount    int
 	}{
 		{
-			name: "Scale up to minimum replicas",
-			setupEnv: func() *environmentImpl {
-				env := &environmentImpl{
-					createdAt: time.Now().Unix(),
-					envID: interfaces.ExecutionEnvID{
-						Name:    "test-env",
-						Project: "test-project",
-						Domain:  "test-domain",
-					},
-					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
-						PodTemplateSpec: podTemplateSpecBytes,
-						ReplicaCount:    3, // Want 3 replicas
-					},
-					lock:    sync.RWMutex{},
-					state:   interfaces.HEALTHY,
-					workers: &sync.Map{},
-				}
-
-				// Start with 1 worker
-				worker := &workerImpl{
-					id:    "worker-1",
-					state: interfaces.HEALTHY,
-					lock:  sync.RWMutex{},
-				}
-				env.workers.Store("worker-1", worker)
-
-				return env
-			},
-			expectedCreatePodCalls: 2,
-			expectedWorkerCount:    3,
-		},
-		{
-			name: "Already at desired replica count",
-			setupEnv: func() *environmentImpl {
-				env := &environmentImpl{
-					createdAt: time.Now().Unix(),
-					envID: interfaces.ExecutionEnvID{
-						Name:    "test-env",
-						Project: "test-project",
-						Domain:  "test-domain",
-					},
-					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
-						PodTemplateSpec: podTemplateSpecBytes,
-						ReplicaCount:    2,
-					},
-					lock:    sync.RWMutex{},
-					state:   interfaces.HEALTHY,
-					workers: &sync.Map{},
-				}
-
-				// Already have 2 workers
-				worker1 := &workerImpl{
-					id:    "worker-1",
-					state: interfaces.HEALTHY,
-					lock:  sync.RWMutex{},
-				}
-				worker2 := &workerImpl{
-					id:    "worker-2",
-					state: interfaces.HEALTHY,
-					lock:  sync.RWMutex{},
-				}
-				env.workers.Store("worker-1", worker1)
-				env.workers.Store("worker-2", worker2)
-
-				return env
-			},
-			expectedCreatePodCalls: 0,
-			expectedWorkerCount:    2,
-		},
-		{
-			name: "Skip scale up for unhealthy environment",
+			name: "BelowMinReplicas_ScalesUp",
 			setupEnv: func() *environmentImpl {
 				env := &environmentImpl{
 					createdAt: time.Now().Unix(),
@@ -1046,21 +981,23 @@ func TestScaleUp(t *testing.T) {
 					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
 						PodTemplateSpec: podTemplateSpecBytes,
 						ReplicaCount:    3,
+						MinReplicaCount: &wrappers.Int32Value{Value: 2},
+						Parallelism:     1,
 					},
 					lock:    sync.RWMutex{},
-					state:   interfaces.TOMBSTONED,
+					state:   interfaces.HEALTHY,
 					workers: &sync.Map{},
 				}
-
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(0)
 				return env
 			},
-			expectedCreatePodCalls: 0,
-			expectedWorkerCount:    0,
+			expectedCreatePodCalls: 1,
+			expectedWorkerCount:    2,
 		},
 		{
-			name: "Scale up by one when between min and max",
+			name: "AtMaxReplicas_NoOp",
 			setupEnv: func() *environmentImpl {
-				minReplicas := int32(2)
 				env := &environmentImpl{
 					createdAt: time.Now().Unix(),
 					envID: interfaces.ExecutionEnvID{
@@ -1070,28 +1007,153 @@ func TestScaleUp(t *testing.T) {
 					},
 					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
 						PodTemplateSpec: podTemplateSpecBytes,
-						ReplicaCount:    5,                                        // Max replicas
-						MinReplicaCount: &wrappers.Int32Value{Value: minReplicas}, // Min replicas
+						ReplicaCount:    2,
+						Parallelism:     1,
 					},
 					lock:    sync.RWMutex{},
 					state:   interfaces.HEALTHY,
 					workers: &sync.Map{},
 				}
-
-				// Have 3 workers (above min of 2, below max of 5)
-				for i := 1; i <= 3; i++ {
-					worker := &workerImpl{
-						id:    fmt.Sprintf("worker-%d", i),
-						state: interfaces.HEALTHY,
-						lock:  sync.RWMutex{},
-					}
-					env.workers.Store(worker.id, worker)
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.workers.Store("worker-2", &workerImpl{id: "worker-2", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(0)
+				return env
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    2,
+		},
+		{
+			name: "UnhealthyEnv_NoOp",
+			setupEnv: func() *environmentImpl {
+				return &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    3,
+						Parallelism:     1,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.TOMBSTONED,
+					workers: &sync.Map{},
 				}
-
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    0,
+		},
+		{
+			name: "DemandExceedsCapacity_ScalesUpByOne",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: &wrappers.Int32Value{Value: 1},
+						Parallelism:     2,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(3)
 				return env
 			},
 			expectedCreatePodCalls: 1,
-			expectedWorkerCount:    4,
+			expectedWorkerCount:    2,
+		},
+		{
+			name: "DemandWithinCapacity_NoOp",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: &wrappers.Int32Value{Value: 1},
+						Parallelism:     2,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(2)
+				return env
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    1,
+		},
+		{
+			name: "InitializingWorkersCountTowardCapacity",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: &wrappers.Int32Value{Value: 1},
+						Parallelism:     2,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.workers.Store("worker-2", &workerImpl{id: "worker-2", state: interfaces.INITIALIZING, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(4)
+				return env
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    2,
+		},
+		{
+			name: "OrphanedWorkersExcludedFromCapacity",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: &wrappers.Int32Value{Value: 1},
+						Parallelism:     2,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.workers.Store("worker-2", &workerImpl{id: "worker-2", state: interfaces.ORPHANED, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(3)
+				return env
+			},
+			expectedCreatePodCalls: 1,
+			expectedWorkerCount:    3,
 		},
 	}
 

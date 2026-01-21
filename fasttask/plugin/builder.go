@@ -349,8 +349,9 @@ func (e *environmentBuilderImpl) detectOrphanedEnvironments(ctx context.Context,
 			// create orphaned environment
 			now := time.Now().Unix()
 			env = &environmentImpl{
-				createdAt: now,
-				envID:     envID,
+				activeTasks: &sync.Map{},
+				createdAt:   now,
+				envID:       envID,
 				fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
 					PodTemplateSpec: podTemplateSpecBytes,
 					TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
@@ -396,6 +397,7 @@ func (e *environmentBuilderImpl) GetOrCreateEnvironment(ctx context.Context, tCt
 		// if environment did not exist then create it
 		now := time.Now().Unix()
 		env = &environmentImpl{
+			activeTasks:             &sync.Map{},
 			createdAt:               now,
 			envID:                   envID,
 			fastTaskEnvironmentSpec: fastTaskEnvironmentSpec,
@@ -645,8 +647,12 @@ func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Env
 
 	// verify we should perform scale up operation
 	workerCount := 0
+	usableWorkerCount := 0
 	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
 		workerCount++
+		if worker.State() != interfaces.ORPHANED {
+			usableWorkerCount++
+		}
 		return true
 	})
 
@@ -667,6 +673,14 @@ func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Env
 				logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, env.EnvID().String(), err)
 			}
 		}
+		return nil
+	}
+
+	demand := int32(env.GetActiveTaskCount())
+	parallelism := env.FastTaskEnvironmentSpec().GetParallelism()
+	availableCapacity := int32(usableWorkerCount) * parallelism
+	if demand <= availableCapacity {
+		logger.Debugf(ctx, "skipping scale up for environment '%s': demand [%d] <= availableCapacity [%d]", env.EnvID().String(), demand, availableCapacity)
 		return nil
 	}
 

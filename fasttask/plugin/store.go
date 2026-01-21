@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/unionai/flyte/fasttask/plugin/interfaces"
@@ -9,6 +10,8 @@ import (
 )
 
 type environmentImpl struct {
+	activeTasks             *sync.Map // map[taskID]struct{}
+	activeTaskCount         atomic.Int64
 	createdAt               int64
 	envID                   interfaces.ExecutionEnvID
 	failureMessage          string
@@ -116,6 +119,24 @@ func (e *environmentImpl) RangeWorkers(fn func(workerID string, worker interface
 
 func (e *environmentImpl) DeleteWorker(workerID string) {
 	e.workers.Delete(workerID)
+}
+
+func (e *environmentImpl) RegisterTask(taskID string) {
+	_, loaded := e.activeTasks.LoadOrStore(taskID, struct{}{})
+	if !loaded {
+		e.activeTaskCount.Add(1)
+	}
+}
+
+func (e *environmentImpl) UnregisterTask(taskID string) {
+	_, loaded := e.activeTasks.LoadAndDelete(taskID)
+	if loaded {
+		e.activeTaskCount.Add(-1)
+	}
+}
+
+func (e *environmentImpl) GetActiveTaskCount() int {
+	return int(e.activeTaskCount.Load())
 }
 
 type workerImpl struct {

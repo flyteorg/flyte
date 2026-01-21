@@ -237,6 +237,51 @@ func (_c *Environment_FastTaskEnvironmentSpec_Call) RunAndReturn(run func() *pb.
 	return _c
 }
 
+// GetActiveTaskCount provides a mock function with given fields:
+func (_m *Environment) GetActiveTaskCount() int {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActiveTaskCount")
+	}
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	return r0
+}
+
+// Environment_GetActiveTaskCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActiveTaskCount'
+type Environment_GetActiveTaskCount_Call struct {
+	*mock.Call
+}
+
+// GetActiveTaskCount is a helper method to define mock.On call
+func (_e *Environment_Expecter) GetActiveTaskCount() *Environment_GetActiveTaskCount_Call {
+	return &Environment_GetActiveTaskCount_Call{Call: _e.mock.On("GetActiveTaskCount")}
+}
+
+func (_c *Environment_GetActiveTaskCount_Call) Run(run func()) *Environment_GetActiveTaskCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Environment_GetActiveTaskCount_Call) Return(_a0 int) *Environment_GetActiveTaskCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Environment_GetActiveTaskCount_Call) RunAndReturn(run func() int) *Environment_GetActiveTaskCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrCreateWorker provides a mock function with given fields: workerID
 func (_m *Environment) GetOrCreateWorker(workerID string) interfaces.Worker {
 	ret := _m.Called(workerID)
@@ -445,6 +490,39 @@ func (_c *Environment_Recover_Call) RunAndReturn(run func(interfaces.ExecutionEn
 	return _c
 }
 
+// RegisterTask provides a mock function with given fields: taskID
+func (_m *Environment) RegisterTask(taskID string) {
+	_m.Called(taskID)
+}
+
+// Environment_RegisterTask_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RegisterTask'
+type Environment_RegisterTask_Call struct {
+	*mock.Call
+}
+
+// RegisterTask is a helper method to define mock.On call
+//   - taskID string
+func (_e *Environment_Expecter) RegisterTask(taskID interface{}) *Environment_RegisterTask_Call {
+	return &Environment_RegisterTask_Call{Call: _e.mock.On("RegisterTask", taskID)}
+}
+
+func (_c *Environment_RegisterTask_Call) Run(run func(taskID string)) *Environment_RegisterTask_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Environment_RegisterTask_Call) Return() *Environment_RegisterTask_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Environment_RegisterTask_Call) RunAndReturn(run func(string)) *Environment_RegisterTask_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetFailureMessage provides a mock function with given fields: failureMessage
 func (_m *Environment) SetFailureMessage(failureMessage string) {
 	_m.Called(failureMessage)
@@ -585,6 +663,39 @@ func (_c *Environment_State_Call) Return(_a0 interfaces.State) *Environment_Stat
 }
 
 func (_c *Environment_State_Call) RunAndReturn(run func() interfaces.State) *Environment_State_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UnregisterTask provides a mock function with given fields: taskID
+func (_m *Environment) UnregisterTask(taskID string) {
+	_m.Called(taskID)
+}
+
+// Environment_UnregisterTask_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UnregisterTask'
+type Environment_UnregisterTask_Call struct {
+	*mock.Call
+}
+
+// UnregisterTask is a helper method to define mock.On call
+//   - taskID string
+func (_e *Environment_Expecter) UnregisterTask(taskID interface{}) *Environment_UnregisterTask_Call {
+	return &Environment_UnregisterTask_Call{Call: _e.mock.On("UnregisterTask", taskID)}
+}
+
+func (_c *Environment_UnregisterTask_Call) Run(run func(taskID string)) *Environment_UnregisterTask_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Environment_UnregisterTask_Call) Return() *Environment_UnregisterTask_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Environment_UnregisterTask_Call) RunAndReturn(run func(string)) *Environment_UnregisterTask_Call {
 	_c.Call.Return(run)
 	return _c
 }

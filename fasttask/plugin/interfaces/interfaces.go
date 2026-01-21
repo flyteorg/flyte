@@ -110,6 +110,12 @@ type Environment interface {
 	SetState(state State)
 	Recover(envID ExecutionEnvID, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec)
 	FastTaskEnvironmentSpec() *pb.FastTaskEnvironmentSpec
+	// Task tracking for demand-based auto-scaling. Tracks active tasks to determine
+	// when to scale up workers. This reactive approach will be replaced with declarative
+	// reconciliation once the fast task service has persistence.
+	RegisterTask(taskID string)
+	UnregisterTask(taskID string)
+	GetActiveTaskCount() int
 }
 
 type EnvironmentBuilder interface {

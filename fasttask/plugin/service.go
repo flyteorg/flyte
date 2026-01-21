@@ -315,6 +315,7 @@ func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, work
 				Operation: pb.HeartbeatResponse_DELETE,
 			})
 		}
+		env.UnregisterTask(taskID)
 	}
 
 	// delete task context
@@ -420,6 +421,10 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 		}
 
 		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
+			// register task for demand-based scaling (backup for restart recovery)
+			// tasks remain registered until Cleanup is called, regardless of phase
+			env.RegisterTask(taskStatus.GetTaskId())
+
 			// if the taskContext exists then send the taskStatus to the statusChannel
 			// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
 			// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
@@ -474,6 +479,10 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 		f.metrics.taskNoWorkersAvailable.Inc()
 		return nil, fmt.Errorf("environment '%s' not found", environmentID)
 	}
+
+	// track task for demand-based scaling - register when attempting to offer
+	// so demand includes tasks waiting for capacity
+	env.RegisterTask(taskID)
 
 	// identify preferred (ie. has capacity) and acceptable (ie. has backlog capacity) worker(s)
 	preferredWorkers := make([]interfaces.Worker, 0)
