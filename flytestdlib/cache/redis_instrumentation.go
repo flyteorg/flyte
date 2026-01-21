@@ -7,7 +7,6 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/metrics"
 	flyteMetrics "github.com/flyteorg/flyte/v2/flytestdlib/metrics"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
@@ -58,6 +57,6 @@ func stopRedisTimer(ctx context.Context, timer flyteMetrics.OperationTimer, comm
 
 func NewRedisInstrumentationHook(scope promutils.Scope) *RedisInstrumentationHook {
 	return &RedisInstrumentationHook{
-		operation: metrics.NewOperationHistogram(scope),
+		operation: flyteMetrics.NewOperationHistogram(scope),
 	}
 }
