@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/metrics"
+	flyteMetrics "github.com/flyteorg/flyte/v2/flytestdlib/metrics"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
@@ -18,7 +19,7 @@ import (
 //	redisClient := redis.NewClient(...)
 //	redisClient.AddHook(NewRedisInstrumentationHook(scope.NewSubScope("redis_client")))
 type RedisInstrumentationHook struct {
-	operation metrics.Operation
+	operation flyteMetrics.Operation
 }
 
 func (hook RedisInstrumentationHook) DialHook(next redis.DialHook) redis.DialHook {
@@ -42,7 +43,7 @@ func (hook RedisInstrumentationHook) ProcessPipelineHook(next redis.ProcessPipel
 	}
 }
 
-func stopRedisTimer(ctx context.Context, timer metrics.OperationTimer, command string, err *error) {
+func stopRedisTimer(ctx context.Context, timer flyteMetrics.OperationTimer, command string, err *error) {
 	realError := *err
 	if *err == redis.Nil {
 		realError = nil
