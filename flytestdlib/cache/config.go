@@ -24,7 +24,7 @@ const (
 
 var (
 	defaultConfig = &Config{
-		Type: 0,
+		Type: TypeInMemoryFixedSize,
 		InMemoryFixedSize: InMemoryFixedSizeConfig{
 			Size: resource.NewScaledQuantity(100, resource.Mega),
 			DefaultExpiration: config.Duration{

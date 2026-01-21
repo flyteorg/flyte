@@ -77,7 +77,7 @@ func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 }
 
 func GetSecretID(secretKey string, labels map[string]string) (string, error) {
-	return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secretKey), nil
+	return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
 }
 
 func validateRequiredFieldsExist(labels map[string]string) error {
