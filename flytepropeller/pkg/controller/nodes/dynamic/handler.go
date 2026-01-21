@@ -98,7 +98,7 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
 			return handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoFailure(core.ExecutionError_USER, "DynamicWorkflowBuildFailed", err.Error(), nil),
-			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
+			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error(), IsFailurePermanent: true}, nil
 		}
 		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
@@ -188,8 +188,12 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx interfaces.
 	case v1alpha1.DynamicNodePhaseFailing:
 		err = d.Abort(ctx, nCtx, ds.Reason)
 		if err != nil {
-			logger.Errorf(ctx, "Failing to abort dynamic workflow")
-			return trns, err
+			if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
+				logger.Error(ctx, "Go to retry or failing handling")
+			} else {
+				logger.Errorf(ctx, "Failing to abort dynamic workflow")
+				return trns, err
+			}
 		}
 
 		// if DynamicNodeStatus is noted with permanent failures we report a non-recoverable failure
