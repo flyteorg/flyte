@@ -65,12 +65,13 @@ type PluginState struct {
 }
 
 type PluginMetrics struct {
-	Scope           promutils.Scope
-	GetCacheMiss    labeled.StopWatch
-	GetCacheHit     labeled.StopWatch
-	GetAPILatency   labeled.StopWatch
-	ResourceDeleted labeled.Counter
-	TaskPodErrors   *prometheus.CounterVec
+	Scope                   promutils.Scope
+	GetCacheMiss            labeled.StopWatch
+	GetCacheHit             labeled.StopWatch
+	GetAPILatency           labeled.StopWatch
+	ResourceDeleted         labeled.Counter
+	TaskPodErrors           *prometheus.CounterVec
+	ClearFinalizersFailures labeled.Counter
 }
 
 func newPluginMetrics(s promutils.Scope) PluginMetrics {
@@ -86,6 +87,7 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 			" called with a deleted resource.", s),
 		TaskPodErrors: s.MustNewCounterVec("task_pod_errors", "Counts how many times task pods failed in given phase with given code",
 			"phase", "error_code"),
+		ClearFinalizersFailures: labeled.NewCounter("clear_finalizers_failures", "Counts how many times clearing finalizers failed.", s),
 	}
 }
 
@@ -485,9 +487,14 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 
 func (e *PluginManager) clearFinalizers(ctx context.Context, o client.Object) error {
 	if len(o.GetFinalizers()) > 0 {
-		o.SetFinalizers([]string{})
-		err := e.kubeClient.GetClient().Update(ctx, o)
+		// Patch finalizers server-side to reduce conflicts caused by a stale informer cache vs full Update()
+		patch := client.RawPatch(
+			k8stypes.MergePatchType,
+			[]byte(`{"metadata":{"finalizers":[]}}`),
+		)
+		err := e.kubeClient.GetClient().Patch(ctx, o, patch)
 		if err != nil && !isK8sObjectNotExists(err) {
+			e.metrics.ClearFinalizersFailures.Inc(ctx)
 			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
 				o.GetNamespace(), o.GetName(), err)
 			return err
