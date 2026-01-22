@@ -14,7 +14,11 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"gorm.io/gorm"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -24,12 +28,19 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	dataproxyconfig "github.com/flyteorg/flyte/v2/dataproxy/config"
+	dataproxyservice "github.com/flyteorg/flyte/v2/dataproxy/service"
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorcontroller "github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	queuek8s "github.com/flyteorg/flyte/v2/queue/k8s"
@@ -84,13 +95,9 @@ func serve(ctx context.Context) error {
 
 	// Get configuration (use defaults if config doesn't load)
 	cfg := &managerconfig.Config{
-		RunsService: managerconfig.ServiceConfig{
+		Server: managerconfig.ServerConfig{
 			Host: "0.0.0.0",
-			Port: 8090,
-		},
-		QueueService: managerconfig.ServiceConfig{
-			Host: "0.0.0.0",
-			Port: 8089,
+			Port: 8090, // Single port for all Connect services
 		},
 		Executor: managerconfig.ExecutorConfig{
 			HealthProbePort: 8081,
@@ -119,7 +126,7 @@ func serve(ctx context.Context) error {
 	}
 
 	// Create repository
-	repo := repository.NewPostgresRepository(db)
+	repo := repository.NewRepository(db)
 
 	// Initialize Kubernetes client
 	k8sClient, k8sConfig, err := initKubernetesClient(ctx, &cfg.Kubernetes)
@@ -136,111 +143,98 @@ func serve(ctx context.Context) error {
 	queueK8sClient := queuek8s.NewQueueClient(k8sClient, cfg.Kubernetes.Namespace)
 	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
 
-	// Wait group for all services
+	// Initialize labeled metrics (required for storage)
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+
+	// Initialize storage for DataProxy
+	storageCfg := storage.GetConfig()
+	metricsScope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(storageCfg, metricsScope)
+	if err != nil {
+		return fmt.Errorf("failed to initialize storage: %w", err)
+	}
+	logger.Infof(ctx, "Storage initialized with type: %s", storageCfg.Type)
+
+	// Create queue service client (points to same server)
+	queueClient := workflowconnect.NewQueueServiceClient(
+		http.DefaultClient,
+		fmt.Sprintf("http://localhost:%d", cfg.Server.Port),
+	)
+
+	// Create all services
+	runsSvc := runsservice.NewRunService(repo, queueClient)
+	stateSvc := runsservice.NewStateService(repo)
+	queueSvc := queueservice.NewQueueService(queueK8sClient)
+	dataProxyCfg := dataproxyconfig.GetConfig()
+	dataProxySvc := dataproxyservice.NewService(*dataProxyCfg, dataStore)
+
+	// Setup single HTTP server with all services mounted
+	mux := http.NewServeMux()
+
+	// Mount all Connect services on the same mux
+	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
+	mux.Handle(runsPath, runsHandler)
+	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
+
+	statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
+	mux.Handle(statePath, stateHandler)
+	logger.Infof(ctx, "Mounted StateService at %s", statePath)
+
+	queuePath, queueHandler := workflowconnect.NewQueueServiceHandler(queueSvc)
+	mux.Handle(queuePath, queueHandler)
+	logger.Infof(ctx, "Mounted QueueService at %s", queuePath)
+
+	dataProxyPath, dataProxyHandler := dataproxyconnect.NewDataProxyServiceHandler(dataProxySvc)
+	mux.Handle(dataProxyPath, dataProxyHandler)
+	logger.Infof(ctx, "Mounted DataProxyService at %s", dataProxyPath)
+
+	// Health checks
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("OK"))
+	})
+
+	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		// Check database
+		sqlDB, err := db.DB()
+		if err != nil || sqlDB.Ping() != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = w.Write([]byte("Database unavailable"))
+			return
+		}
+		// Check storage
+		baseContainer := dataStore.GetBaseContainerFQN(r.Context())
+		if baseContainer == "" {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = w.Write([]byte("Storage connection error"))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("OK"))
+	})
+
+	// Wait group for both server and executor
 	var wg sync.WaitGroup
-	errCh := make(chan error, 3)
+	errCh := make(chan error, 2)
 
-	// 1. Start Runs Service (includes State Service)
+	// 1. Start unified HTTP server with all Connect services
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		logger.Infof(ctx, "Starting Runs Service on %s:%d", cfg.RunsService.Host, cfg.RunsService.Port)
-
-		// Create queue service client (for enqueuing actions)
-		queueClient := workflowconnect.NewQueueServiceClient(
-			http.DefaultClient,
-			fmt.Sprintf("http://localhost:%d", cfg.QueueService.Port),
-		)
-
-		// Create services
-		runsSvc := runsservice.NewRunService(repo, queueClient)
-		stateSvc := runsservice.NewStateService(repo)
-
-		// Setup HTTP server
-		mux := http.NewServeMux()
-
-		// Mount services
-		runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
-		mux.Handle(runsPath, runsHandler)
-
-		statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
-		mux.Handle(statePath, stateHandler)
-
-		// Health checks
-		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("OK"))
-		})
-
-		mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
-			sqlDB, err := db.DB()
-			if err != nil || sqlDB.Ping() != nil {
-				w.WriteHeader(http.StatusServiceUnavailable)
-				_, _ = w.Write([]byte("Database unavailable"))
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("OK"))
-		})
-
-		addr := fmt.Sprintf("%s:%d", cfg.RunsService.Host, cfg.RunsService.Port)
+		addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 		server := &http.Server{
 			Addr:    addr,
 			Handler: h2c.NewHandler(mux, &http2.Server{}),
 		}
 
-		logger.Infof(ctx, "Runs Service listening on %s", addr)
+		logger.Infof(ctx, "Flyte Connect Server listening on %s", addr)
+		logger.Infof(ctx, "All services (Runs, State, Queue, DataProxy) available on port %d", cfg.Server.Port)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errCh <- fmt.Errorf("runs service error: %w", err)
+			errCh <- fmt.Errorf("server error: %w", err)
 		}
 	}()
 
-	// 2. Start Queue Service
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		logger.Infof(ctx, "Starting Queue Service on %s:%d", cfg.QueueService.Host, cfg.QueueService.Port)
-
-		// Create queue service
-		queueSvc := queueservice.NewQueueService(queueK8sClient)
-
-		// Setup HTTP server
-		mux := http.NewServeMux()
-
-		// Mount queue service
-		path, handler := workflowconnect.NewQueueServiceHandler(queueSvc)
-		mux.Handle(path, handler)
-
-		// Health checks
-		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, err = w.Write([]byte("OK"))
-			if err != nil {
-				logger.Info(ctx, err)
-			}
-		})
-
-		mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, err = w.Write([]byte("OK"))
-			if err != nil {
-				logger.Info(ctx, err)
-			}
-		})
-
-		addr := fmt.Sprintf("%s:%d", cfg.QueueService.Host, cfg.QueueService.Port)
-		server := &http.Server{
-			Addr:    addr,
-			Handler: h2c.NewHandler(mux, &http2.Server{}),
-		}
-
-		logger.Infof(ctx, "Queue Service listening on %s", addr)
-		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errCh <- fmt.Errorf("queue service error: %w", err)
-		}
-	}()
-
-	// 3. Start Executor/Operator
+	// 2. Start Executor/Operator
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -258,7 +252,7 @@ func serve(ctx context.Context) error {
 		}
 
 		// Setup TaskAction controller
-		stateServiceURL := fmt.Sprintf("http://localhost:%d", cfg.RunsService.Port)
+		stateServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 		if err := executorcontroller.NewTaskActionReconciler(
 			mgr.GetClient(),
 			mgr.GetScheme(),
@@ -360,5 +354,42 @@ func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConf
 	}
 
 	logger.Infof(ctx, "Kubernetes client initialized successfully")
+
+	// Ensure the namespace exists
+	if err := ensureNamespaceExists(ctx, k8sClient, cfg.Namespace); err != nil {
+		return nil, nil, fmt.Errorf("failed to ensure namespace exists: %w", err)
+	}
+
 	return k8sClient, restConfig, nil
+}
+
+func ensureNamespaceExists(ctx context.Context, k8sClient client.Client, namespaceName string) error {
+	namespace := &corev1.Namespace{}
+	err := k8sClient.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)
+
+	if err == nil {
+		// Namespace already exists
+		logger.Infof(ctx, "Namespace '%s' already exists", namespaceName)
+		return nil
+	}
+
+	if !apierrors.IsNotFound(err) {
+		// Some other error occurred
+		return fmt.Errorf("failed to check if namespace exists: %w", err)
+	}
+
+	// Namespace doesn't exist, create it
+	logger.Infof(ctx, "Creating namespace '%s'", namespaceName)
+	namespace = &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespaceName,
+		},
+	}
+
+	if err := k8sClient.Create(ctx, namespace); err != nil {
+		return fmt.Errorf("failed to create namespace: %w", err)
+	}
+
+	logger.Infof(ctx, "Successfully created namespace '%s'", namespaceName)
+	return nil
 }

@@ -19,7 +19,10 @@ func init() {
 	})
 }
 
-var latencyBuckets = []float64{.0005, .001, .005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
+var (
+	scope          = NewScope("v2")
+	latencyBuckets = []float64{.0005, .001, .005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
+)
 
 type requestMetricsProvider struct {
 	requestLatency *prometheus.HistogramVec
@@ -35,32 +38,17 @@ func (r *requestMetricsProvider) Increment(ctx context.Context, code string, met
 }
 
 func newRequestMetricsProvider() requestMetricsProvider {
-	requestLatency := prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Name:    "k8s_client_request_latency",
-			Help:    "Kubernetes client request latency in seconds",
-			Buckets: latencyBuckets,
-		},
-		[]string{"verb"})
-	if err := prometheus.Register(requestLatency); err != nil {
-		// Ignore AlreadyRegisteredError to handle multiple package imports
-		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			panic(err)
-		}
-	}
-	requestResult := prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "k8s_client_request_total",
-			Help: "Kubernetes client request total",
-		},
-		[]string{"code", "method"},
+	requestLatency := scope.MustNewHistogramVecWithOptions(
+		"k8s_client_request_latency",
+		"Kubernetes client request latency in seconds",
+		HistogramOptions{Buckets: latencyBuckets},
+		"verb",
 	)
-	if err := prometheus.Register(requestResult); err != nil {
-		// Ignore AlreadyRegisteredError to handle multiple package imports
-		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			panic(err)
-		}
-	}
+	requestResult := scope.MustNewCounterVec(
+		"k8s_client_request_total",
+		"Kubernetes client request total",
+		"code", "method",
+	)
 	return requestMetricsProvider{
 		requestLatency,
 		requestResult,
@@ -76,19 +64,12 @@ func (r *rateLimiterMetricsProvider) Observe(ctx context.Context, verb string, _
 }
 
 func newRateLimiterMetricsAdapter() rateLimiterMetricsProvider {
-	rateLimiterLatency := prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Name:    "k8s_client_rate_limiter_latency",
-			Help:    "Kubernetes client rate limiter latency in seconds",
-			Buckets: latencyBuckets,
-		},
-		[]string{"verb"})
-	if err := prometheus.Register(rateLimiterLatency); err != nil {
-		// Ignore AlreadyRegisteredError to handle multiple package imports
-		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			panic(err)
-		}
-	}
+	rateLimiterLatency := scope.MustNewHistogramVecWithOptions(
+		"k8s_client_rate_limiter_latency",
+		"Kubernetes client rate limiter latency in seconds",
+		HistogramOptions{Buckets: latencyBuckets},
+		"verb",
+	)
 	return rateLimiterMetricsProvider{
 		rateLimiterLatency,
 	}

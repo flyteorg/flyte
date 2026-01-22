@@ -168,6 +168,9 @@ message ActionMetadata {
 
   // Trigger Type
   task.TriggerAutomationSpec trigger_type = 15;
+
+  // Who initiated this run
+  RunSource source = 16;
 }
 
 enum ActionType {
@@ -456,4 +459,12 @@ message TaskGroup {
 
   // short name (function name) of the task.
   string short_name = 11;
+
+  message ErrorCounts {
+    int64 user_error = 1;
+    int64 system_error = 2;
+    int64 unspecified_error = 3;
+  }
+
+  ErrorCounts error_counts = 12;
 }

@@ -50,7 +50,20 @@ docker-postgres-stop: ## Stop and remove PostgreSQL container
 	@docker stop flyte-runs-postgres || true
 	@docker rm flyte-runs-postgres || true
 
+##@ Testing
+
+# Override test to exclude API tests
+.PHONY: test
+test: ## Run unit tests only (excludes test/)
+	@echo "Running unit tests..."
+	@go test -v -race -cover $(shell go list ./... | grep -v '/test')
+
 ##@ Integration Tests
+
+.PHONY: api-test
+api-test: ## Run API integration tests
+	@echo "Running API integration tests..."
+	@go test -v -race ./test/api/...
 
 .PHONY: integration-test
 integration-test: build-fast build-client ## Run integration test with SQLite

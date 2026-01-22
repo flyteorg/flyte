@@ -6,4 +6,10 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: taskaction-sample
 spec:
-  # TODO(user): Add fields here
+  runName: "sample-run"
+  org: "demo"
+  project: "default"
+  domain: "dev"
+  actionName: "sample-task"
+  inputUri: "/tmp/input"
+  runOutputBase: "/tmp/output"

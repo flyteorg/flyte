@@ -73,6 +73,9 @@ message TriggerRevision {
   TriggerStatus status = 3;
 
   TriggerRevisionAction action = 4;
+
+  // Timestamp at which given revision was created.
+  google.protobuf.Timestamp created_at = 5;
 }
 
 // Full details about a trigger stored in DB

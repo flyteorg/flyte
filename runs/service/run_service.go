@@ -10,12 +10,13 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo        repository.Repository
+	repo        interfaces.Repository
 	queueClient workflowconnect.QueueServiceClient
 }
 
@@ -25,7 +26,7 @@ func (s *RunService) WatchGroups(ctx context.Context, c *connect.Request[workflo
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo repository.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
+func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
 	return &RunService{
 		repo:        repo,
 		queueClient: queueClient,
@@ -49,7 +50,7 @@ func (s *RunService) CreateRun(
 	}
 
 	// Create run in database
-	run, err := s.repo.CreateRun(ctx, req.Msg)
+	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -132,7 +133,7 @@ func (s *RunService) AbortRun(
 	}
 
 	// Abort in database
-	if err := s.repo.AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -153,7 +154,7 @@ func (s *RunService) GetRunDetails(
 	}
 
 	// Get run from database
-	run, err := s.repo.GetRun(ctx, req.Msg.RunId)
+	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get run: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
@@ -184,7 +185,7 @@ func (s *RunService) GetActionDetails(
 	}
 
 	// Get action from database
-	action, err := s.repo.GetAction(ctx, req.Msg.ActionId)
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get action: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
@@ -214,7 +215,7 @@ func (s *RunService) GetActionData(
 	}
 
 	// Get action from database
-	action, err := s.repo.GetAction(ctx, req.Msg.ActionId)
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get action: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
@@ -243,7 +244,7 @@ func (s *RunService) ListRuns(
 	}
 
 	// List runs from database
-	runs, nextToken, err := s.repo.ListRuns(ctx, req.Msg)
+	runs, nextToken, err := s.repo.ActionRepo().ListRuns(ctx, req.Msg)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list runs: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -294,7 +295,7 @@ func (s *RunService) ListActions(
 		limit = int(req.Msg.Request.Limit)
 	}
 
-	actions, nextToken, err := s.repo.ListActions(ctx, req.Msg.RunId, limit, "")
+	actions, nextToken, err := s.repo.ActionRepo().ListActions(ctx, req.Msg.RunId, limit, "")
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -343,7 +344,7 @@ func (s *RunService) AbortAction(
 	}
 
 	// Abort in database
-	if err := s.repo.AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -363,7 +364,7 @@ func (s *RunService) WatchRunDetails(
 
 	// For now, just send initial state and close
 	// TODO: Implement actual streaming with polling or database triggers
-	run, err := s.repo.GetRun(ctx, req.Msg.RunId)
+	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
@@ -381,10 +382,10 @@ func (s *RunService) WatchRunDetails(
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
 	// Keep connection open and send updates (simplified)
-	updates := make(chan *repository.Run)
+	updates := make(chan *models.Run)
 	errs := make(chan error)
 
-	go s.repo.WatchRunUpdates(ctx, req.Msg.RunId, updates, errs)
+	go s.repo.ActionRepo().WatchRunUpdates(ctx, req.Msg.RunId, updates, errs)
 
 	for {
 		select {
@@ -415,7 +416,7 @@ func (s *RunService) WatchActionDetails(
 	logger.Infof(ctx, "Received WatchActionDetails request")
 
 	// Send initial state
-	action, err := s.repo.GetAction(ctx, req.Msg.ActionId)
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
@@ -448,7 +449,7 @@ func (s *RunService) WatchRuns(
 	// Step 1: Send existing runs that match filter
 	listReq := s.convertWatchRequestToListRequest(req.Msg)
 
-	runs, _, err := s.repo.ListRuns(ctx, listReq)
+	runs, _, err := s.repo.ActionRepo().ListRuns(ctx, listReq)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list runs: %v", err)
 		// Continue even if list fails - still watch for new updates
@@ -468,11 +469,11 @@ func (s *RunService) WatchRuns(
 
 	// Step 2: Watch for run updates using repository notifications
 	// Create channels for receiving updates
-	updatesCh := make(chan *repository.Run, 10)
+	updatesCh := make(chan *models.Run, 10)
 	errsCh := make(chan error, 1)
 
 	// Start watching for updates in a goroutine
-	go s.repo.WatchAllRunUpdates(ctx, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	for {
 		select {
@@ -509,7 +510,7 @@ func (s *RunService) WatchActions(
 	logger.Infof(ctx, "Received WatchActions request for run: %s", req.Msg.RunId.Name)
 
 	// Step 1: Send existing actions for this run
-	actions, _, err := s.repo.ListActions(ctx, req.Msg.RunId, 100, "")
+	actions, _, err := s.repo.ActionRepo().ListActions(ctx, req.Msg.RunId, 100, "")
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
 		// Continue even if list fails - still watch for new updates
@@ -529,11 +530,11 @@ func (s *RunService) WatchActions(
 
 	// Step 2: Watch for action updates using repository notifications
 	// Create channels for receiving updates
-	updatesCh := make(chan *repository.Action, 10)
+	updatesCh := make(chan *models.Action, 10)
 	errsCh := make(chan error, 1)
 
 	// Start watching for updates in a goroutine
-	go s.repo.WatchActionUpdates(ctx, req.Msg.RunId, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, req.Msg.RunId, updatesCh, errsCh)
 
 	for {
 		select {
@@ -567,7 +568,7 @@ func (s *RunService) WatchClusterEvents(
 	// TODO: Implement cluster events watching
 	// Cluster events are now stored in ActionDetails JSON
 	// Need to:
-	// 1. Get action using s.repo.GetAction(ctx, req.Msg.Id)
+	// 1. Get action using s.repo.ActionRepo().GetAction(ctx, req.Msg.Id)
 	// 2. Unmarshal action.ActionDetails to extract cluster events for the specified attempt
 	// 3. Send existing events and watch for updates
 
@@ -578,19 +579,19 @@ func (s *RunService) WatchClusterEvents(
 // Helper functions
 
 // buildInputURI generates the input URI for the root action
-func buildInputURI(run *repository.Run) string {
+func buildInputURI(run *models.Run) string {
 	// TODO: In production, this should be a real storage path (e.g., s3://bucket/inputs/org/project/domain/run)
 	return ""
 }
 
 // buildRunOutputBase generates the output base path for the run
-func buildRunOutputBase(run *repository.Run) string {
+func buildRunOutputBase(run *models.Run) string {
 	// TODO: In production, this should be a real storage path (e.g., s3://bucket/outputs/org/project/domain/run)
 	return ""
 }
 
 // convertRunToProto converts a repository Run to a proto Run
-func (s *RunService) convertRunToProto(run *repository.Run) *workflow.Run {
+func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 	if run == nil {
 		return nil
 	}
@@ -624,7 +625,7 @@ func (s *RunService) convertRunToProto(run *repository.Run) *workflow.Run {
 }
 
 // convertActionToEnrichedProto converts a repository Action to an EnrichedAction proto
-func (s *RunService) convertActionToEnrichedProto(action *repository.Action) *workflow.EnrichedAction {
+func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workflow.EnrichedAction {
 	if action == nil {
 		return nil
 	}
@@ -687,7 +688,7 @@ func (s *RunService) convertWatchRequestToListRequest(req *workflow.WatchRunsReq
 }
 
 // runMatchesFilter checks if a run matches the WatchRunsRequest filter criteria
-func (s *RunService) runMatchesFilter(run *repository.Run, req *workflow.WatchRunsRequest) bool {
+func (s *RunService) runMatchesFilter(run *models.Run, req *workflow.WatchRunsRequest) bool {
 	if req.Target == nil {
 		// No filter, all runs match
 		return true

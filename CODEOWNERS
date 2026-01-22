@@ -1,0 +1,9 @@
+# This file defines code owners for the Flyte repository.
+# Each line is a file pattern followed by one or more owners.
+# Order matters - later patterns take precedence over earlier ones.
+
+# Default owners for everything in the repo
+* @flyteorg/flyte2-contributors
+
+# flyteidl2 directory requires approval from flyteidl2-contributors team
+/flyteidl2/ @flyteorg/flyteidl2-contributors
