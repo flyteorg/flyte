@@ -136,7 +136,9 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	}
 
 	varFutures := make(map[string]futures.Future, len(vars.GetVariables()))
-	for varName, variable := range vars.GetVariables() {
+	for _, variableEntry := range vars.GetVariables() {
+		varName := variableEntry.GetKey()
+		variable := variableEntry.GetValue()
 		varPath := path.Join(fromPath, varName)
 		varType := variable.GetType()
 		switch varType.GetType().(type) {
