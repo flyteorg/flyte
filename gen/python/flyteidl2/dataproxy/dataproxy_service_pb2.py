@@ -12,11 +12,13 @@ _sym_db = _symbol_database.Default()
 
 
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb2
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
+from protoc_gen_openapiv2.options import annotations_pb2 as protoc__gen__openapiv2_dot_options_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n+flyteidl2/dataproxy/dataproxy_service.proto\x12\x13\x66lyteidl2.dataproxy\x1a\x1b\x62uf/validate/validate.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf8\x02\n\x1b\x43reateUploadLocationRequest\x12!\n\x07project\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07project\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06\x64omain\x12\x1a\n\x08\x66ilename\x18\x03 \x01(\tR\x08\x66ilename\x12\x38\n\nexpires_in\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationR\texpiresIn\x12(\n\x0b\x63ontent_md5\x18\x05 \x01(\x0c\x42\x07\xbaH\x04z\x02h\x10R\ncontentMd5\x12#\n\rfilename_root\x18\x06 \x01(\tR\x0c\x66ilenameRoot\x12\x37\n\x18\x61\x64\x64_content_md5_metadata\x18\x07 \x01(\x08R\x15\x61\x64\x64\x43ontentMd5Metadata\x12\x10\n\x03org\x18\x08 \x01(\tR\x03org\x12%\n\x0e\x63ontent_length\x18\t \x01(\x03R\rcontentLength\"\xad\x02\n\x1c\x43reateUploadLocationResponse\x12\x1d\n\nsigned_url\x18\x01 \x01(\tR\tsignedUrl\x12\x1d\n\nnative_url\x18\x02 \x01(\tR\tnativeUrl\x12\x39\n\nexpires_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\texpiresAt\x12X\n\x07headers\x18\x04 \x03(\x0b\x32>.flyteidl2.dataproxy.CreateUploadLocationResponse.HeadersEntryR\x07headers\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x32\x91\x01\n\x10\x44\x61taProxyService\x12}\n\x14\x43reateUploadLocation\x12\x30.flyteidl2.dataproxy.CreateUploadLocationRequest\x1a\x31.flyteidl2.dataproxy.CreateUploadLocationResponse\"\x00\x42\xd8\x01\n\x17\x63om.flyteidl2.dataproxyB\x15\x44\x61taproxyServiceProtoH\x02P\x01Z7github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy\xa2\x02\x03\x46\x44X\xaa\x02\x13\x46lyteidl2.Dataproxy\xca\x02\x13\x46lyteidl2\\Dataproxy\xe2\x02\x1f\x46lyteidl2\\Dataproxy\\GPBMetadata\xea\x02\x14\x46lyteidl2::Dataproxyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n+flyteidl2/dataproxy/dataproxy_service.proto\x12\x13\x66lyteidl2.dataproxy\x1a\x1b\x62uf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\xf8\x02\n\x1b\x43reateUploadLocationRequest\x12!\n\x07project\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07project\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06\x64omain\x12\x1a\n\x08\x66ilename\x18\x03 \x01(\tR\x08\x66ilename\x12\x38\n\nexpires_in\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationR\texpiresIn\x12(\n\x0b\x63ontent_md5\x18\x05 \x01(\x0c\x42\x07\xbaH\x04z\x02h\x10R\ncontentMd5\x12#\n\rfilename_root\x18\x06 \x01(\tR\x0c\x66ilenameRoot\x12\x37\n\x18\x61\x64\x64_content_md5_metadata\x18\x07 \x01(\x08R\x15\x61\x64\x64\x43ontentMd5Metadata\x12\x10\n\x03org\x18\x08 \x01(\tR\x03org\x12%\n\x0e\x63ontent_length\x18\t \x01(\x03R\rcontentLength\"\xad\x02\n\x1c\x43reateUploadLocationResponse\x12\x1d\n\nsigned_url\x18\x01 \x01(\tR\tsignedUrl\x12\x1d\n\nnative_url\x18\x02 \x01(\tR\tnativeUrl\x12\x39\n\nexpires_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\texpiresAt\x12X\n\x07headers\x18\x04 \x03(\x0b\x32>.flyteidl2.dataproxy.CreateUploadLocationResponse.HeadersEntryR\x07headers\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x32\xb5\x02\n\x10\x44\x61taProxyService\x12\xa0\x02\n\x14\x43reateUploadLocation\x12\x30.flyteidl2.dataproxy.CreateUploadLocationRequest\x1a\x31.flyteidl2.dataproxy.CreateUploadLocationResponse\"\xa2\x01\x92\x41M\x1aKCreates a write-only http location that is accessible for tasks at runtime.\x82\xd3\xe4\x93\x02L\"\x1e/api/v1/dataproxy/artifact_urn:\x01*Z\'\"\"/api/v1/org/dataproxy/artifact_urn:\x01*B\xd8\x01\n\x17\x63om.flyteidl2.dataproxyB\x15\x44\x61taproxyServiceProtoH\x02P\x01Z7github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy\xa2\x02\x03\x46\x44X\xaa\x02\x13\x46lyteidl2.Dataproxy\xca\x02\x13\x46lyteidl2\\Dataproxy\xe2\x02\x1f\x46lyteidl2\\Dataproxy\\GPBMetadata\xea\x02\x14\x46lyteidl2::Dataproxyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,12 +34,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CREATEUPLOADLOCATIONREQUEST.fields_by_name['content_md5']._serialized_options = b'\272H\004z\002h\020'
   _CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY._options = None
   _CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY._serialized_options = b'8\001'
-  _globals['_CREATEUPLOADLOCATIONREQUEST']._serialized_start=163
-  _globals['_CREATEUPLOADLOCATIONREQUEST']._serialized_end=539
-  _globals['_CREATEUPLOADLOCATIONRESPONSE']._serialized_start=542
-  _globals['_CREATEUPLOADLOCATIONRESPONSE']._serialized_end=843
-  _globals['_CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY']._serialized_start=785
-  _globals['_CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY']._serialized_end=843
-  _globals['_DATAPROXYSERVICE']._serialized_start=846
-  _globals['_DATAPROXYSERVICE']._serialized_end=991
+  _DATAPROXYSERVICE.methods_by_name['CreateUploadLocation']._options = None
+  _DATAPROXYSERVICE.methods_by_name['CreateUploadLocation']._serialized_options = b'\222AM\032KCreates a write-only http location that is accessible for tasks at runtime.\202\323\344\223\002L\"\036/api/v1/dataproxy/artifact_urn:\001*Z\'\"\"/api/v1/org/dataproxy/artifact_urn:\001*'
+  _globals['_CREATEUPLOADLOCATIONREQUEST']._serialized_start=241
+  _globals['_CREATEUPLOADLOCATIONREQUEST']._serialized_end=617
+  _globals['_CREATEUPLOADLOCATIONRESPONSE']._serialized_start=620
+  _globals['_CREATEUPLOADLOCATIONRESPONSE']._serialized_end=921
+  _globals['_CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY']._serialized_start=863
+  _globals['_CREATEUPLOADLOCATIONRESPONSE_HEADERSENTRY']._serialized_end=921
+  _globals['_DATAPROXYSERVICE']._serialized_start=924
+  _globals['_DATAPROXYSERVICE']._serialized_end=1233
 # @@protoc_insertion_point(module_scope)
