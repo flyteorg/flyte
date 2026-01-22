@@ -87,6 +87,10 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
 	messageCollector := errorcollector.NewErrorMessageCollector()
+	inputResolver := newSubNodeInputResolver(nCtx, arrayNode)
+	if err := inputResolver.Initialize(ctx); err != nil {
+		return err
+	}
 
 	taskPhase := idlcore.TaskExecution_ABORTED
 	if arrayNodeState.Phase == v1alpha1.ArrayNodePhaseFailing {
@@ -105,7 +109,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, nil)
+				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, inputResolver)
 			if err != nil {
 				return err
 			}
@@ -163,6 +167,12 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	}
 
 	messageCollector := errorcollector.NewErrorMessageCollector()
+
+	inputResolver := newSubNodeInputResolver(nCtx, arrayNode)
+	if err := inputResolver.Initialize(ctx); err != nil {
+		return err
+	}
+
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing, v1alpha1.ArrayNodePhaseSucceeding:
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
@@ -176,7 +186,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, nil)
+				arrayNodeStateStore.buildArrayNodeContext(ctx, nCtx, arrayNode, i, subNodeEventRecorder, inputResolver)
 			if err != nil {
 				return err
 			}

@@ -100,15 +100,15 @@ func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfa
 		executors.NewExecutionContext(nCtx.ExecutionContext(), nCtx.ExecutionContext(), nCtx.ExecutionContext(), newParentInfo, executors.InitializeControlFlow()),
 		subNodeIndex)
 
-	var inputReader staticInputReader
-	var inputBindings []*v1alpha1.Binding
-	if inputResolver != nil {
-		var err error
-		inputReader, inputBindings, err = inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
-		if err != nil {
-			return nil, nil, nil, nil, nil, nil, err
-		}
+	if inputResolver == nil {
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf("failed to resolve input reader")
 	}
+
+	inputReader, inputBindings, err := inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
 	subNodeSpec.InputBindings = inputBindings
 
 	arrayNodeExecutionContextBuilder := newArrayNodeExecutionContextBuilder(f.arrayNodeHandler.nodeExecutor.GetNodeExecutionContextBuilder(),
@@ -226,15 +226,15 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	var inputReader staticInputReader
-	var inputBindings []*v1alpha1.Binding
-	if inputResolver != nil {
-		var err error
-		inputReader, inputBindings, err = inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
-		if err != nil {
-			return nil, nil, nil, nil, nil, nil, err
-		}
+	if inputResolver == nil {
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf("failed to resolve input reader")
 	}
+
+	inputReader, inputBindings, err := inputResolver.GetSubNodeInputs(ctx, subNodeIndex, subDataDir)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
 	subNodeSpec.InputBindings = inputBindings
 
 	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
