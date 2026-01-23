@@ -10,11 +10,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/datacatalog"
 )
 
-//go:generate mockery -all -case=underscore
 
 // Metadata to be associated with the catalog object
 type Metadata struct {
@@ -139,13 +138,13 @@ func NewReservationEntry(expiresAt time.Time, heartbeatInterval time.Duration, o
 	}
 }
 
-// Client represents the default Catalog client that allows memoization and indexing of intermediate data in Flyte
+// Client represents the default cache client that allows the memoization data in Flyte
 type Client interface {
 	// Get returns the artifact associated with the given key.
 	Get(ctx context.Context, key Key) (Entry, error)
 	// GetOrExtendReservation tries to retrieve a (valid) reservation for the given key, creating a new one using the
 	// specified owner ID if none was found or updating an existing one if it has expired.
-	GetOrExtendReservation(ctx context.Context, key Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error)
+	GetOrExtendReservation(ctx context.Context, key Key, ownerID string, heartbeatInterval time.Duration) (*cacheservice.Reservation, error)
 	// Put stores the given data using the specified key, creating artifact entries as required.
 	// To update an existing artifact, use Update instead.
 	Put(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
