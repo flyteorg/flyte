@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"sync/atomic"
 
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -24,6 +25,9 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
 func MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authorizationMetadataKey string,
 	perRPCCredentials *PerRPCCredentialsFuture) error {
+	if tokenSource == nil {
+		return fmt.Errorf("tokenSource is nil")
+	}
 	_, err := tokenSource.Token()
 	if err != nil {
 		return fmt.Errorf("failed to issue token. Error: %w", err)
@@ -121,7 +125,8 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 type OauthMetadataProvider struct {
 	authorizationMetadataKey string
 	tokenSource              oauth2.TokenSource
-	once                     sync.Once
+	initialized              atomic.Bool
+	mu                       sync.Mutex
 }
 
 func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCache cache.TokenCache, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
@@ -158,18 +163,27 @@ func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCach
 }
 
 func (o *OauthMetadataProvider) GetOauthMetadata(cfg *Config, tokenCache cache.TokenCache, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
-	// Ensure loadTokenRelated() is only executed once
-	var err error
-	o.once.Do(func() {
-		err = o.getTokenSourceAndMetadata(cfg, tokenCache, proxyCredentialsFuture)
-		if err != nil {
-			logger.Errorf(context.Background(), "Failed to load token related config. Error: %v", err)
-		}
-		logger.Debugf(context.Background(), "Successfully loaded token related metadata")
-	})
+	// Fast path: already initialized
+	if o.initialized.Load() {
+		return nil
+	}
+
+	o.mu.Lock()
+	defer o.mu.Unlock()
+
+	// Double-check after acquiring lock
+	if o.initialized.Load() {
+		return nil
+	}
+
+	err := o.getTokenSourceAndMetadata(cfg, tokenCache, proxyCredentialsFuture)
 	if err != nil {
+		logger.Errorf(context.Background(), "Failed to load token related config. Error: %v", err)
 		return err
 	}
+
+	logger.Debugf(context.Background(), "Successfully loaded token related metadata")
+	o.initialized.Store(true)
 	return nil
 }
 
@@ -185,9 +199,7 @@ func (o *OauthMetadataProvider) GetOauthMetadata(cfg *Config, tokenCache cache.T
 // be able to find and acquire a valid AccessToken to annotate the request with.
 func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
 
-	oauthMetadataProvider := OauthMetadataProvider{
-		once: sync.Once{},
-	}
+	oauthMetadataProvider := OauthMetadataProvider{}
 
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
