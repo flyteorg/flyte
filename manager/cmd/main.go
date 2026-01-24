@@ -48,6 +48,8 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	runsservice "github.com/flyteorg/flyte/v2/runs/service"
+	statek8s "github.com/flyteorg/flyte/v2/state/k8s"
+	stateservice "github.com/flyteorg/flyte/v2/state/service"
 )
 
 var (
@@ -128,20 +130,32 @@ func serve(ctx context.Context) error {
 	// Create repository
 	repo := repository.NewRepository(db)
 
-	// Initialize Kubernetes client
-	k8sClient, k8sConfig, err := initKubernetesClient(ctx, &cfg.Kubernetes)
-	if err != nil {
-		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
-	}
-
 	// Initialize the executor API scheme
 	if err := queuek8s.InitScheme(); err != nil {
 		return fmt.Errorf("failed to initialize scheme: %w", err)
 	}
 
+	// Initialize Kubernetes client with watch support
+	k8sClient, k8sConfig, err := initKubernetesClient(ctx, &cfg.Kubernetes)
+	if err != nil {
+		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
+	}
+
+	// Create a client.Client from the WithWatch client for services that don't need watch
+	var regularK8sClient client.Client = k8sClient
+
 	// Create queue client (for Kubernetes operations)
-	queueK8sClient := queuek8s.NewQueueClient(k8sClient, cfg.Kubernetes.Namespace)
+	queueK8sClient := queuek8s.NewQueueClient(regularK8sClient, cfg.Kubernetes.Namespace)
 	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
+
+	// Create state client (K8s-based, for watching TaskAction CRs)
+	stateK8sClient := statek8s.NewStateClient(k8sClient, cfg.Kubernetes.Namespace, 100)
+
+	// Start watching TaskActions for state service
+	if err := stateK8sClient.StartWatching(ctx); err != nil {
+		return fmt.Errorf("failed to start TaskAction watcher: %w", err)
+	}
+	defer stateK8sClient.StopWatching()
 
 	// Initialize labeled metrics (required for storage)
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
@@ -163,7 +177,7 @@ func serve(ctx context.Context) error {
 
 	// Create all services
 	runsSvc := runsservice.NewRunService(repo, queueClient)
-	stateSvc := runsservice.NewStateService(repo)
+	stateSvc := stateservice.NewStateService(stateK8sClient) // K8s-based state service
 	queueSvc := queueservice.NewQueueService(queueK8sClient)
 	dataProxyCfg := dataproxyconfig.GetConfig()
 	dataProxySvc := dataproxyservice.NewService(*dataProxyCfg, dataStore)
@@ -178,7 +192,7 @@ func serve(ctx context.Context) error {
 
 	statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
 	mux.Handle(statePath, stateHandler)
-	logger.Infof(ctx, "Mounted StateService at %s", statePath)
+	logger.Infof(ctx, "Mounted StateService at %s (K8s-based)", statePath)
 
 	queuePath, queueHandler := workflowconnect.NewQueueServiceHandler(queueSvc)
 	mux.Handle(queuePath, queueHandler)
@@ -251,12 +265,10 @@ func serve(ctx context.Context) error {
 			return
 		}
 
-		// Setup TaskAction controller
-		stateServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
+		// Setup TaskAction controller (no longer needs state service URL)
 		if err := executorcontroller.NewTaskActionReconciler(
 			mgr.GetClient(),
 			mgr.GetScheme(),
-			stateServiceURL,
 		).SetupWithManager(mgr); err != nil {
 			errCh <- fmt.Errorf("failed to setup controller: %w", err)
 			return
@@ -272,7 +284,7 @@ func serve(ctx context.Context) error {
 			return
 		}
 
-		logger.Infof(ctx, "Executor controller starting")
+		logger.Infof(ctx, "Executor controller starting (updates TaskAction CRs directly)")
 		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 			errCh <- fmt.Errorf("executor controller error: %w", err)
 		}
@@ -315,7 +327,7 @@ func initDB(ctx context.Context, cfg *database.DbConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConfig) (client.Client, *rest.Config, error) {
+func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConfig) (client.WithWatch, *rest.Config, error) {
 	var restConfig *rest.Config
 	var err error
 
@@ -347,8 +359,8 @@ func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConf
 		}
 	}
 
-	// Create the controller-runtime client
-	k8sClient, err := client.New(restConfig, client.Options{Scheme: scheme})
+	// Create the controller-runtime client with watch support
+	k8sClient, err := client.NewWithWatch(restConfig, client.Options{Scheme: scheme})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
