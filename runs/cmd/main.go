@@ -90,7 +90,6 @@ func serve(ctx context.Context) error {
 
 	// Create services
 	runsSvc := service.NewRunService(repo, queueClient)
-	stateSvc := service.NewStateService(repo)
 	taskSvc := service.NewTaskService(repo)
 
 	// Setup HTTP server with Connect handlers
@@ -100,16 +99,11 @@ func serve(ctx context.Context) error {
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
 	mux.Handle(runsPath, runsHandler)
 
-	// Mount the State Service
-	statePath, stateHandler := workflowconnect.NewStateServiceHandler(stateSvc)
-	mux.Handle(statePath, stateHandler)
-
 	// Mount the Task Service
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	mux.Handle(taskPath, taskHandler)
 
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
-	logger.Infof(ctx, "Mounted StateService at %s", statePath)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
 	// Add health check endpoint
