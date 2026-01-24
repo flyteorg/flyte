@@ -18,15 +18,10 @@ package controller
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"net"
-	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
-	"golang.org/x/net/http2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -37,9 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 type K8sEventType string
@@ -52,33 +45,15 @@ const (
 // TaskActionReconciler reconciles a TaskAction object
 type TaskActionReconciler struct {
 	client.Client
-	Scheme             *runtime.Scheme
-	StateServiceURL    string
-	stateServiceClient workflowconnect.StateServiceClient
-	Recorder           record.EventRecorder
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
-// NewTaskActionReconciler creates a new TaskActionReconciler with initialized clients
-func NewTaskActionReconciler(c client.Client, scheme *runtime.Scheme, stateServiceURL string) *TaskActionReconciler {
-	// Create HTTP/2 cleartext (h2c) client for buf connect
-	// This is required because the state service uses h2c (HTTP/2 without TLS)
-	httpClient := &http.Client{
-		Transport: &http2.Transport{
-			// Allow HTTP/2 without TLS (h2c)
-			AllowHTTP: true,
-			// Use HTTP/2 dialer
-			DialTLSContext: func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
-				// Dial without TLS for h2c
-				return net.Dial(network, addr)
-			},
-		},
-	}
-
+// NewTaskActionReconciler creates a new TaskActionReconciler
+func NewTaskActionReconciler(c client.Client, scheme *runtime.Scheme) *TaskActionReconciler {
 	return &TaskActionReconciler{
-		Client:             c,
-		Scheme:             scheme,
-		StateServiceURL:    stateServiceURL,
-		stateServiceClient: workflowconnect.NewStateServiceClient(httpClient, stateServiceURL),
+		Client: c,
+		Scheme: scheme,
 	}
 }
 
@@ -137,11 +112,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			setCondition(taskAction, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
 				flyteorgv1.ConditionReasonCompleted, "TaskAction completed successfully")
 
-			stateJSON := r.createStateJSON(actionSpec, "Succeeded")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
+			taskAction.Status.StateJSON = createStateJSON(actionSpec, "Succeeded")
 
 			if err := r.Status().Update(ctx, taskAction); err != nil {
 				return ctrl.Result{}, err
@@ -157,11 +128,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
 				flyteorgv1.ConditionReasonExecuting, "TaskAction is executing")
 
-			stateJSON := r.createStateJSON(actionSpec, "Running")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
+			taskAction.Status.StateJSON = createStateJSON(actionSpec, "Running")
 
 			if err := r.Status().Update(ctx, taskAction); err != nil {
 				return ctrl.Result{}, err
@@ -177,11 +144,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
 				flyteorgv1.ConditionReasonInitializing, "TaskAction is being initialized")
 
-			stateJSON := r.createStateJSON(actionSpec, "Initializing")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
+			taskAction.Status.StateJSON = createStateJSON(actionSpec, "Initializing")
 
 			if err := r.Status().Update(ctx, taskAction); err != nil {
 				return ctrl.Result{}, err
@@ -198,11 +161,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
 		flyteorgv1.ConditionReasonQueued, "TaskAction is queued and waiting for resources")
 
-	stateJSON := r.createStateJSON(actionSpec, "Queued")
-	if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-		logger.Error(err, "Failed to update state service")
-	}
-	taskAction.Status.StateJSON = stateJSON
+	taskAction.Status.StateJSON = createStateJSON(actionSpec, "Queued")
 
 	if err := r.Status().Update(ctx, taskAction); err != nil {
 		return ctrl.Result{}, err
@@ -211,7 +170,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 }
 
 // createStateJSON creates a simplified NodeStatus JSON representation
-func (r *TaskActionReconciler) createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
+func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 	// Create a simplified state object
 	state := map[string]interface{}{
 		"phase":     phase,
@@ -225,29 +184,6 @@ func (r *TaskActionReconciler) createStateJSON(actionSpec *workflow.ActionSpec, 
 	}
 
 	return string(stateBytes)
-}
-
-// updateStateService sends a state update to the State Service via unary RPC
-func (r *TaskActionReconciler) updateStateService(ctx context.Context, actionID *common.ActionIdentifier, parentActionName *string, stateJSON string) error {
-	// Create PutRequest
-	reqMsg := &workflow.PutRequest{
-		ActionId:         actionID,
-		ParentActionName: parentActionName,
-		State:            stateJSON,
-	}
-
-	// Make unary Put call
-	resp, err := r.stateServiceClient.Put(ctx, connect.NewRequest(reqMsg))
-	if err != nil {
-		return fmt.Errorf("failed to call put: %w", err)
-	}
-
-	// Check response status
-	if resp.Msg.Status.Code != 0 {
-		return fmt.Errorf("state service returned error: %s", resp.Msg.Status.Message)
-	}
-
-	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
