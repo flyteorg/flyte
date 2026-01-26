@@ -562,12 +562,6 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			rayJob, ok := r.(*rayv1.RayJob)
 			assert.True(t, ok)
 
-			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
-			assert.EqualValues(t,
-				p.expectedSubmitterResources,
-				&submitterPodResources,
-			)
-
 			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
 			headPodResources := headPodSpec.Containers[0].Resources
 			assert.EqualValues(t,

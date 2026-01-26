@@ -235,8 +235,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
-
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
@@ -254,7 +252,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
 		TTLSecondsAfterFinished:  *ttlSecondsAfterFinished,
 		RuntimeEnvYAML:           runtimeEnvYaml,
-		SubmitterPodTemplate:     &submitterPodTemplate,
 	}
 
 	return &rayv1.RayJob{
@@ -403,22 +400,6 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 
 	return podTemplateSpec, nil
-}
-
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
-
-	submitterPodSpec := rayClusterSpec.HeadGroupSpec.Template.DeepCopy()
-
-	submitterPodSpec.Spec.Containers = []v1.Container{
-		{
-			Name: "ray-job-submitter",
-			// Use the image of the Ray head to be defensive against version mismatch issues
-			Image:     rayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Image,
-			Resources: submitterDefaultResourceRequirements,
-		},
-	}
-
-	return *submitterPodSpec
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
