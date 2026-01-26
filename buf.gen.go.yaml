@@ -33,7 +33,7 @@ plugins:
       - module=github.com/flyteorg/flyte/v2/gen/go
       - standalone=true
       - allow_delete_body=true
-  - remote: buf.build/grpc-ecosystem/openapiv2
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.27.4
     out: gen/go/gateway
     opt:
       - json_names_for_fields=false
