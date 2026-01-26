@@ -467,4 +467,11 @@ message TaskGroup {
   }
 
   ErrorCounts error_counts = 12;
+
+  message PhaseCounts {
+    common.ActionPhase phase = 1;
+    int64 count = 2;
+  }
+
+  repeated PhaseCounts phase_counts = 13;
 }
