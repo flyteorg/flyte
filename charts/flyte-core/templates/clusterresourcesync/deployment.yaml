@@ -36,7 +36,7 @@ spec:
             {{- toYaml . | nindent 10 }}
             {{- end }}
           {{- end }}
-          image: "{{ .Values.cluster_resource_manager.image.repository }}:{{ .Values.cluster_resource_manager.image.tag }}"
+          image: "{{ tpl .Values.cluster_resource_manager.image.repository . }}:{{ .Values.cluster_resource_manager.image.tag }}"
           imagePullPolicy: "{{ .Values.cluster_resource_manager.image.pullPolicy }}"
           name: sync-cluster-resources
           {{- with .Values.cluster_resource_manager.resources }}

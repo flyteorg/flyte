@@ -31,7 +31,7 @@ spec:
         - {{ .Values.datacatalog.configPath }}
         - migrate
         - run
-        image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
+        image: "{{ tpl .Values.datacatalog.image.repository . }}:{{ .Values.datacatalog.image.tag }}"
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
         name: run-migrations
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}

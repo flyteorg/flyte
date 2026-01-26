@@ -50,7 +50,7 @@ spec:
 {{- if .Values.webhook.enabled }}
       initContainers:
       - name: generate-secrets
-        image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+        image: "{{ tpl .Values.flytepropeller.image.repository . }}:{{ .Values.flytepropeller.image.tag }}"
         imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
         command:
           - flytepropeller
@@ -83,7 +83,7 @@ spec:
 {{- end }}
       containers:
         - name: webhook
-          image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+          image: "{{ tpl .Values.flytepropeller.image.repository . }}:{{ .Values.flytepropeller.image.tag }}"
           imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
           command:
             - flytepropeller

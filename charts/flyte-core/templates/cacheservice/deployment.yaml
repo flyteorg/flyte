@@ -31,7 +31,7 @@ spec:
         - {{ .Values.cacheservice.configPath }}
         - migrate
         - run
-        image: "{{ .Values.cacheservice.image.repository }}:{{ .Values.cacheservice.image.tag }}"
+        image: "{{ tpl .Values.cacheservice.image.repository . }}:{{ .Values.cacheservice.image.tag }}"
         imagePullPolicy: "{{ .Values.cacheservice.image.pullPolicy }}"
         name: run-migrations
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
