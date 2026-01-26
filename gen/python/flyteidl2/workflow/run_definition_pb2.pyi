@@ -350,6 +350,13 @@ class ActionSpec(_message.Message):
 
 class TaskGroup(_message.Message):
     __slots__ = ["task_name", "environment_name", "total_runs", "latest_run_time", "recent_statuses", "average_failure_rate", "average_duration", "latest_finished_time", "created_by", "should_delete", "short_name", "error_counts", "phase_counts"]
+    class RecentStatus(_message.Message):
+        __slots__ = ["run_name", "phase"]
+        RUN_NAME_FIELD_NUMBER: _ClassVar[int]
+        PHASE_FIELD_NUMBER: _ClassVar[int]
+        run_name: str
+        phase: _phase_pb2.ActionPhase
+        def __init__(self, run_name: _Optional[str] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ...) -> None: ...
     class ErrorCounts(_message.Message):
         __slots__ = ["user_error", "system_error", "unspecified_error"]
         USER_ERROR_FIELD_NUMBER: _ClassVar[int]
@@ -383,7 +390,7 @@ class TaskGroup(_message.Message):
     environment_name: str
     total_runs: int
     latest_run_time: _timestamp_pb2.Timestamp
-    recent_statuses: _containers.RepeatedScalarFieldContainer[_phase_pb2.ActionPhase]
+    recent_statuses: _containers.RepeatedCompositeFieldContainer[TaskGroup.RecentStatus]
     average_failure_rate: float
     average_duration: _duration_pb2.Duration
     latest_finished_time: _timestamp_pb2.Timestamp
@@ -392,4 +399,4 @@ class TaskGroup(_message.Message):
     short_name: str
     error_counts: TaskGroup.ErrorCounts
     phase_counts: _containers.RepeatedCompositeFieldContainer[TaskGroup.PhaseCounts]
-    def __init__(self, task_name: _Optional[str] = ..., environment_name: _Optional[str] = ..., total_runs: _Optional[int] = ..., latest_run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., recent_statuses: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., average_failure_rate: _Optional[float] = ..., average_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., latest_finished_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Iterable[_Union[_identity_pb2.EnrichedIdentity, _Mapping]]] = ..., should_delete: bool = ..., short_name: _Optional[str] = ..., error_counts: _Optional[_Union[TaskGroup.ErrorCounts, _Mapping]] = ..., phase_counts: _Optional[_Iterable[_Union[TaskGroup.PhaseCounts, _Mapping]]] = ...) -> None: ...
+    def __init__(self, task_name: _Optional[str] = ..., environment_name: _Optional[str] = ..., total_runs: _Optional[int] = ..., latest_run_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., recent_statuses: _Optional[_Iterable[_Union[TaskGroup.RecentStatus, _Mapping]]] = ..., average_failure_rate: _Optional[float] = ..., average_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., latest_finished_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Iterable[_Union[_identity_pb2.EnrichedIdentity, _Mapping]]] = ..., should_delete: bool = ..., short_name: _Optional[str] = ..., error_counts: _Optional[_Union[TaskGroup.ErrorCounts, _Mapping]] = ..., phase_counts: _Optional[_Iterable[_Union[TaskGroup.PhaseCounts, _Mapping]]] = ...) -> None: ...
