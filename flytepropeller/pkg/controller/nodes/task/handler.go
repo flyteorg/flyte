@@ -3,7 +3,9 @@ package task
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 
@@ -677,6 +679,20 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p)
+
+	// Note: There is no intention of merging this as is.
+	// This is only supposed to demonstrate what would be needed to avoid the issue raised in this PR.
+	// If we agree that the desired behaviour is that the parallelism isn't incremented for each pod
+	// in a map task, we'd need a proper mechanism to detect whether we are in a map task which doesn't
+	// involve reflection and string matching.
+	ctxType := reflect.TypeOf(nCtx).String()
+	var isArrayNode bool
+	if strings.Contains(ctxType, "arrayNodeExecutionContext") {
+		isArrayNode = true
+	} else {
+		isArrayNode = false
+	}
+
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "unable to create Handler execution context")
 	}
@@ -723,7 +739,10 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		}
 		if pluginTrns.IsPreviouslyObserved() {
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
-			logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+
+			if !isArrayNode {
+				logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+			}
 
 			// This is a hack to ensure that we do not re-evaluate the same node again in the same round.
 			if err := nCtx.NodeStateWriter().PutTaskNodeState(ts); err != nil {
@@ -815,7 +834,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// increment parallelism if the final pluginTrns is not in a terminal state
-	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() && !isArrayNode {
 		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
 	}
 	return pluginTrns.FinalTransition(ctx)
