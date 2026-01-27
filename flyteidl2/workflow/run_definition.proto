@@ -1,0 +1,482 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/phase.proto";
+import "flyteidl2/core/catalog.proto";
+import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/types.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+message Run {
+  // Lightweight information about the root action.
+  Action action = 1;
+}
+
+message RunDetails {
+  // Run spec.
+  task.RunSpec run_spec = 1;
+
+  // Detailed information about the root action.
+  ActionDetails action = 2;
+}
+
+message TaskAction {
+  // a unique identifier for the task this action is associated with, if applicable.
+  task.TaskIdentifier id = 1;
+
+  // the definition of the task to be executed.
+  task.TaskSpec spec = 2 [(buf.validate.field).required = true];
+
+  // Enables caching when set and specifies the cache version to use.
+  google.protobuf.StringValue cache_key = 3;
+
+  // the specific cluster that this action should be executed on. if not set, the cluster from the
+  // `RunSpec` will be used.
+  string cluster = 4;
+}
+
+// TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
+// by the local worker. This can be used to bring determinism to code that's otherwise not deterministic (e.g. current
+// time).
+message TraceAction {
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Last known phase.
+  common.ActionPhase phase = 2;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 3;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 4;
+
+  // Output references.
+  task.OutputReferences outputs = 5;
+
+  // Task spec for the trace, useful for the typed interface inside.
+  task.TraceSpec spec = 6 [(buf.validate.field).required = true];
+}
+
+// ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
+// await a signal from an external system and can carry a value.
+message ConditionAction {
+  // Name is the unique identifier for the action. It must be unique within the defined scope below.
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  oneof scope {
+    option (buf.validate.oneof).required = true;
+    // RunId is the unique identifier for the run this action is associated with.
+    string run_id = 2 [(buf.validate.field).string.min_len = 1];
+
+    // ActionId is the unique identifier for the action this action is associated with.
+    string action_id = 3 [(buf.validate.field).string.min_len = 1];
+
+    // Global indicates the condition is global and can be used across all runs and actions.
+    bool global = 4;
+  }
+
+  // Type is the type of the value the condition is expected. This can be used to properly render
+  // a UI element for the condition or validate when a value is received that it is of the expected
+  // type.
+  flyteidl2.core.LiteralType type = 6;
+
+  // Prompt is the prompt that will be shown to the user when the condition is awaited.
+  string prompt = 7;
+
+  // Description is a description of the condition. This can be used to provide additional
+  // information to the user about the condition.
+  string description = 8;
+}
+
+message TaskActionMetadata {
+  // Id of the task this action is associated with.
+  task.TaskIdentifier id = 1;
+
+  // Extensible task type.
+  string task_type = 2;
+
+  // The short name for this task.
+  string short_name = 3;
+}
+
+message TraceActionMetadata {
+  string name = 1;
+}
+
+message ConditionActionMetadata {
+  string name = 1;
+  oneof scope {
+    option (buf.validate.oneof).required = true;
+    // RunId is the unique identifier for the run this action is associated with.
+    string run_id = 2 [(buf.validate.field).string.min_len = 1];
+
+    // ActionId is the unique identifier for the action this action is associated with.
+    string action_id = 3 [(buf.validate.field).string.min_len = 1];
+
+    // Global indicates the condition is global and can be used across all runs and actions.
+    bool global = 4;
+  }
+}
+
+// Static, lightweight metadata about an action.
+message ActionMetadata {
+  // Parent action if not the root.
+  string parent = 3;
+
+  // Group this action belongs to, if applicable.
+  string group = 5;
+
+  // Identity that executed this run.
+  common.EnrichedIdentity executed_by = 6;
+
+  oneof spec {
+    // Task action.
+    TaskActionMetadata task = 7;
+
+    // Trace action.
+    TraceActionMetadata trace = 8;
+
+    // Condition action.
+    ConditionActionMetadata condition = 9;
+  }
+
+  // Action type.
+  ActionType action_type = 10;
+
+  // If this run was initiated by a trigger, this will store the trigger identifier.
+  common.TriggerIdentifier trigger_id = 11;
+
+  // Environment name
+  string environment_name = 12;
+
+  // Function name
+  string funtion_name = 13;
+
+  // Trigger name
+  string trigger_name = 14;
+
+  // Trigger Type
+  task.TriggerAutomationSpec trigger_type = 15;
+
+  // Who initiated this run
+  RunSource source = 16;
+}
+
+enum ActionType {
+  ACTION_TYPE_UNSPECIFIED = 0;
+  ACTION_TYPE_TASK = 1;
+  ACTION_TYPE_TRACE = 2;
+  ACTION_TYPE_CONDITION = 3;
+}
+
+// Lightweight status of an action. For more detailed status see ActionDetails.
+message ActionStatus {
+  // Last known phase.
+  common.ActionPhase phase = 1;
+
+  // Time the action started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time the action ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 3;
+
+  // Number of action attempts.
+  uint32 attempts = 4 [(buf.validate.field).uint32.gt = 0];
+
+  // cache status of the action's latest attempt
+  flyteidl2.core.CatalogCacheStatus cache_status = 5;
+
+  // Duration of the action in milliseconds.
+  optional uint64 duration_ms = 6;
+}
+
+// Lightweight representation of an action.
+message Action {
+  // Id for this action.
+  common.ActionIdentifier id = 1;
+
+  // Metadata for this action.
+  ActionMetadata metadata = 2;
+
+  // Last known status.
+  ActionStatus status = 3;
+}
+
+// EnrichedAction is a wrapper around Action that contains additional information
+message EnrichedAction {
+  // The action itself.
+  Action action = 1;
+
+  // Whether this action meets specified filters of the request or not.
+  // If an action that was previously meeting the filter but no longer does, will be sent with this flag set to false
+  bool meets_filter = 2;
+
+  // Child phase info for this action (Map of phase to counts of children in given phase)
+  map<int32, int32> children_phase_counts = 3;
+}
+
+// ErrorInfo captures details of an error.
+message ErrorInfo {
+  // Error message.
+  string message = 1;
+
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_USER = 1;
+    KIND_SYSTEM = 2;
+  }
+
+  // Error kind.
+  Kind kind = 2;
+}
+
+// AbortInfo captures details of an aborted run.
+message AbortInfo {
+  // Reason provided for the abort.
+  string reason = 1;
+
+  // Identity that aborted the run.
+  common.EnrichedIdentity aborted_by = 2;
+}
+
+// ActionDetails is the full details of an action.
+message ActionDetails {
+  // Id for this action.
+  common.ActionIdentifier id = 1;
+
+  // Metadata for this action.
+  ActionMetadata metadata = 2;
+
+  // Last known status.
+  ActionStatus status = 3;
+
+  oneof result {
+    // Error info for the action, if failed.
+    ErrorInfo error_info = 4;
+    // Abort info for the action, if aborted.
+    AbortInfo abort_info = 5;
+  }
+
+  // Fully resolved spec of the action. Merges user submitted task spec with platform defaults.
+  oneof spec {
+    task.TaskSpec task = 6;
+    task.TraceSpec trace = 8;
+  }
+
+  // List of action attempts.
+  repeated ActionAttempt attempts = 7;
+}
+
+// ActionAttempt is a single attempt of an action.
+message ActionAttempt {
+  // Last known phase.
+  common.ActionPhase phase = 1;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 3;
+
+  // Error info for the attempt, if failed.
+  optional ErrorInfo error_info = 4;
+
+  // The attempt number, starting with 1.
+  uint32 attempt = 5 [(buf.validate.field).uint32.gt = 0];
+
+  // Log references.
+  repeated flyteidl2.core.TaskLog log_info = 6;
+
+  // Output references.
+  flyteidl2.task.OutputReferences outputs = 7;
+
+  // Indicates whether logs are available for tailing. It doesn't necessarily indicate the logs are present, but that
+  // we have the info we need to look them up.
+  bool logs_available = 8;
+
+  // cache status of the action attempt
+  flyteidl2.core.CatalogCacheStatus cache_status = 9;
+
+  // Cluster events like k8s events in a human-readable form.
+  repeated ClusterEvent cluster_events = 10;
+
+  // History of phase transitions.
+  repeated PhaseTransition phase_transitions = 11;
+
+  // The cluster this attempt is assigned to.
+  string cluster = 12;
+
+  // Contains corresponding k8s pods and containers information for this action attempt.
+  flyteidl2.core.LogContext log_context = 13;
+}
+
+message ClusterEvent {
+  // occurred_at is the timestamp indicating the instant that this reason happened.
+  google.protobuf.Timestamp occurred_at = 1;
+
+  // message is the explanation for the most recent phase transition or status update.
+  string message = 2;
+
+  // TODO add event_kind or event_type with a fixed set of classification values like "ScaleUp, OutOfResources... etc."
+}
+
+message PhaseTransition {
+  // The phase.
+  common.ActionPhase phase = 1;
+
+  // Time this phase started.
+  google.protobuf.Timestamp start_time = 2;
+
+  // Time this phase ended, if applicable. For terminal phases, start time will equal end time.
+  optional google.protobuf.Timestamp end_time = 3;
+}
+
+// Event payload for an action
+message ActionEvent {
+  // The action id.
+  common.ActionIdentifier id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+
+  // The phase for this attempt.
+  common.ActionPhase phase = 3;
+
+  // The version of this attempt and phase.
+  uint32 version = 4;
+
+  // Time the attempt started.
+  google.protobuf.Timestamp start_time = 5 [deprecated = true];
+
+  // Timestamp when the event occurred, as recorded by the underlying platform (e.g. Kubernetes).
+  google.protobuf.Timestamp updated_time = 6;
+
+  // Time the attempt ended, if applicable.
+  optional google.protobuf.Timestamp end_time = 7 [deprecated = true];
+
+  // Error info for the attempt, if failed.
+  optional ErrorInfo error_info = 8;
+
+  // Log references.
+  repeated flyteidl2.core.TaskLog log_info = 9;
+
+  // Metadata to associate containers with logs.
+  flyteidl2.core.LogContext log_context = 10;
+
+  // The cluster this attempt is running on.
+  string cluster = 11;
+
+  // Output references.
+  flyteidl2.task.OutputReferences outputs = 12;
+
+  // cache status of the action attempt
+  flyteidl2.core.CatalogCacheStatus cache_status = 13;
+
+  // Cluster events like k8s events in a human-readable form.
+  repeated ClusterEvent cluster_events = 14;
+
+  // Timestamp when the event was observed and reported by the executor
+  google.protobuf.Timestamp reported_time = 15;
+}
+
+message ActionSpec {
+  // the unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
+  // project, domain) will be the same as the action_id defined above.
+  optional string parent_action_name = 2;
+
+  // the run spec for this action
+  flyteidl2.task.RunSpec run_spec = 3;
+
+  // the path to the input data for this action.
+  string input_uri = 4 [(buf.validate.field).string.min_len = 1];
+
+  // the run base path this action should write its output to.
+  string run_output_base = 5 [(buf.validate.field).string.min_len = 1];
+
+  oneof spec {
+    option (buf.validate.oneof).required = true;
+    TaskAction task = 6;
+    ConditionAction condition = 7;
+    TraceAction trace = 10;
+  }
+
+  // group this action belongs to, if applicable.
+  string group = 8;
+}
+
+enum RunSource {
+  RUN_SOURCE_UNSPECIFIED = 0;
+  RUN_SOURCE_WEB = 1;
+  RUN_SOURCE_CLI = 2;
+  RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+}
+
+// TaskGroup represents a group of runs for a specific task.
+message TaskGroup {
+  // Task name.
+  string task_name = 1;
+
+  // Environment name.
+  string environment_name = 2;
+
+  // Total number of runs for this task.
+  int64 total_runs = 3;
+
+  // Timestamp of the most recent run.
+  google.protobuf.Timestamp latest_run_time = 4;
+
+  message RecentStatus {
+    string run_name = 1;
+    common.ActionPhase phase = 2;
+  }
+
+  // Recent run statuses, ordered from newest to oldest. Number of statuses determined by request.
+  repeated RecentStatus recent_statuses = 5;
+
+  // Average failure rate of runs in this group (0.0 to 1.0).
+  // Computed as number of root actions with phase FAILED divided by total root actions.
+  double average_failure_rate = 6;
+
+  // Average duration of runs in this group.
+  google.protobuf.Duration average_duration = 7;
+
+  // Timestamp of the most recent finished run (terminal phase).
+  google.protobuf.Timestamp latest_finished_time = 8;
+
+  // List of user/application's enriched identity that created runs in this group.
+  repeated common.EnrichedIdentity created_by = 9;
+
+  bool should_delete = 10;
+
+  // short name (function name) of the task.
+  string short_name = 11;
+
+  message ErrorCounts {
+    int64 user_error = 1;
+    int64 system_error = 2;
+    int64 unspecified_error = 3;
+  }
+
+  ErrorCounts error_counts = 12;
+
+  message PhaseCounts {
+    common.ActionPhase phase = 1;
+    int64 count = 2;
+  }
+
+  repeated PhaseCounts phase_counts = 13;
+}

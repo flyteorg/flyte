@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: queue-role
+rules:
+- apiGroups:
+  - flyte.org
+  resources:
+  - taskactions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch

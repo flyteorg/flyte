@@ -1,0 +1,50 @@
+[package]
+name = "flyteidl2"
+version = "0.1.0"
+edition = "2021"
+description = "Rust bindings and utilities for FlyteIDL protobufs."
+license = "Apache-2.0"
+
+[dependencies]
+pyo3 = { version = "0.24", features = ["experimental-async"] }
+pyo3-async-runtimes = { version = "0.24", features = ["tokio-runtime"] }
+tokio = { version = "1.0", features = ["full"] }
+tonic = "0.12.3"
+prost = { version = "0.13.5", features = ["std"] }
+prost-types = { version = "0.12", features = ["std"] }
+futures = "0.3"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+async-trait = "0.1"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+pbjson = { version = "0.7.0" }
+pbjson-types = { version = "0.7.0" }
+protobuf = { version = "4.31.1-release" }
+prost-build = "0.14"
+quote = "1.0"
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+prettyplease = "0.2"
+regex = "1.11.1"
+
+[lib]
+name = "flyteidl2"
+path = "src/lib.rs"
+#crate-type = ["cdylib"]
+
+[features]
+default = []
+## @@protoc_insertion_point(features)
+
+[build-dependencies]
+prost-build = "0.14"
+pbjson-build = { version = "0.7.0" }
+quote = "1.0"
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+prettyplease = "0.2"
+regex = "1.10"
+
+#[profile.dev.build-override]
+#debug = true
