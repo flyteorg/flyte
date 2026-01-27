@@ -4,16 +4,17 @@
 
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
-import type { Labels, Sort } from "./common_pb.ts";
-import { file_flyteidl2_project_common } from "./common_pb.ts";
-import { file_google_api_annotations } from "../../google/api/annotations_pb.ts";
+import type { Sort } from "../common/list_pb.ts";
+import { file_flyteidl2_common_list } from "../common/list_pb.ts";
+import type { Labels } from "../task/run_pb.ts";
+import { file_flyteidl2_task_run } from "../task/run_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/project/project_service.proto.
  */
 export const file_flyteidl2_project_project_service: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvcHJvamVjdC9wcm9qZWN0X3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5wcm9qZWN0IiIKBkRvbWFpbhIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJIqkCCgdQcm9qZWN0EgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSKgoHZG9tYWlucxgDIAMoCzIZLmZseXRlaWRsMi5wcm9qZWN0LkRvbWFpbhITCgtkZXNjcmlwdGlvbhgEIAEoCRIpCgZsYWJlbHMYBSABKAsyGS5mbHl0ZWlkbDIucHJvamVjdC5MYWJlbHMSNgoFc3RhdGUYBiABKA4yJy5mbHl0ZWlkbDIucHJvamVjdC5Qcm9qZWN0LlByb2plY3RTdGF0ZRILCgNvcmcYByABKAkiUwoMUHJvamVjdFN0YXRlEgoKBkFDVElWRRAAEgwKCEFSQ0hJVkVEEAESFAoQU1lTVEVNX0dFTkVSQVRFRBACEhMKD1NZU1RFTV9BUkNISVZFRBADIkcKCFByb2plY3RzEiwKCHByb2plY3RzGAEgAygLMhouZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdBINCgV0b2tlbhgCIAEoCSJ6ChJQcm9qZWN0TGlzdFJlcXVlc3QSDQoFbGltaXQYASABKA0SDQoFdG9rZW4YAiABKAkSDwoHZmlsdGVycxgDIAEoCRIoCgdzb3J0X2J5GAQgASgLMhcuZmx5dGVpZGwyLnByb2plY3QuU29ydBILCgNvcmcYBSABKAkiRQoWUHJvamVjdFJlZ2lzdGVyUmVxdWVzdBIrCgdwcm9qZWN0GAEgASgLMhouZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdCIZChdQcm9qZWN0UmVnaXN0ZXJSZXNwb25zZSIXChVQcm9qZWN0VXBkYXRlUmVzcG9uc2UiLAoRUHJvamVjdEdldFJlcXVlc3QSCgoCaWQYASABKAkSCwoDb3JnGAIgASgJMoEFCg5Qcm9qZWN0U2VydmljZRKuAQoPUmVnaXN0ZXJQcm9qZWN0EikuZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdFJlZ2lzdGVyUmVxdWVzdBoqLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3RSZWdpc3RlclJlc3BvbnNlIkSC0+STAj46ASpaJzoBKiIiL2FwaS92MS9vcmcvcHJvamVjdHMve3Byb2plY3Qub3JnfSIQL2FwaS92MS9wcm9qZWN0cxKdAQoNVXBkYXRlUHJvamVjdBIaLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3QaKC5mbHl0ZWlkbDIucHJvamVjdC5Qcm9qZWN0VXBkYXRlUmVzcG9uc2UiRoLT5JMCQDoBKlokOgEqGh8vYXBpL3YxL29yZy9wcm9qZWN0cy97b3JnfS97aWR9GhUvYXBpL3YxL3Byb2plY3RzL3tpZH0SkAEKCkdldFByb2plY3QSJC5mbHl0ZWlkbDIucHJvamVjdC5Qcm9qZWN0R2V0UmVxdWVzdBoaLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3QiQILT5JMCOlohEh8vYXBpL3YxL29yZy9wcm9qZWN0cy97b3JnfS97aWR9EhUvYXBpL3YxL3Byb2plY3RzL3tpZH0SigEKDExpc3RQcm9qZWN0cxIlLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3RMaXN0UmVxdWVzdBobLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3RzIjaC0+STAjBaHBIaL2FwaS92MS9vcmcvcHJvamVjdHMve29yZ30SEC9hcGkvdjEvcHJvamVjdHNCygEKFWNvbS5mbHl0ZWlkbDIucHJvamVjdEITUHJvamVjdFNlcnZpY2VQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9wcm9qZWN0ogIDRlBYqgIRRmx5dGVpZGwyLlByb2plY3TKAhFGbHl0ZWlkbDJcUHJvamVjdOICHUZseXRlaWRsMlxQcm9qZWN0XEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQcm9qZWN0YgZwcm90bzM", [file_flyteidl2_project_common, file_google_api_annotations]);
+  fileDesc("CidmbHl0ZWlkbDIvcHJvamVjdC9wcm9qZWN0X3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5wcm9qZWN0IiIKBkRvbWFpbhIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJIskBCgdQcm9qZWN0EgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSKgoHZG9tYWlucxgDIAMoCzIZLmZseXRlaWRsMi5wcm9qZWN0LkRvbWFpbhITCgtkZXNjcmlwdGlvbhgEIAEoCRImCgZsYWJlbHMYBSABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSLgoFc3RhdGUYBiABKA4yHy5mbHl0ZWlkbDIucHJvamVjdC5Qcm9qZWN0U3RhdGUSCwoDb3JnGAcgASgJIkcKCFByb2plY3RzEiwKCHByb2plY3RzGAEgAygLMhouZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdBINCgV0b2tlbhgCIAEoCSJDChRDcmVhdGVQcm9qZWN0UmVxdWVzdBIrCgdwcm9qZWN0GAEgASgLMhouZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdCIXChVDcmVhdGVQcm9qZWN0UmVzcG9uc2UiQwoUVXBkYXRlUHJvamVjdFJlcXVlc3QSKwoHcHJvamVjdBgBIAEoCzIaLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3QiFwoVVXBkYXRlUHJvamVjdFJlc3BvbnNlIiwKEUdldFByb2plY3RSZXF1ZXN0EgoKAmlkGAEgASgJEgsKA29yZxgCIAEoCSJBChJHZXRQcm9qZWN0UmVzcG9uc2USKwoHcHJvamVjdBgBIAEoCzIaLmZseXRlaWRsMi5wcm9qZWN0LlByb2plY3QiegoTTGlzdFByb2plY3RzUmVxdWVzdBINCgVsaW1pdBgBIAEoDRINCgV0b2tlbhgCIAEoCRIPCgdmaWx0ZXJzGAMgASgJEicKB3NvcnRfYnkYBCABKAsyFi5mbHl0ZWlkbDIuY29tbW9uLlNvcnQSCwoDb3JnGAUgASgJIkUKFExpc3RQcm9qZWN0c1Jlc3BvbnNlEi0KCHByb2plY3RzGAEgASgLMhsuZmx5dGVpZGwyLnByb2plY3QuUHJvamVjdHMqiwEKDFByb2plY3RTdGF0ZRIYChRQUk9KRUNUX1NUQVRFX0FDVElWRRAAEhoKFlBST0pFQ1RfU1RBVEVfQVJDSElWRUQQARIiCh5QUk9KRUNUX1NUQVRFX1NZU1RFTV9HRU5FUkFURUQQAhIhCh1QUk9KRUNUX1NUQVRFX1NZU1RFTV9BUkNISVZFRBADMpwDCg5Qcm9qZWN0U2VydmljZRJkCg1DcmVhdGVQcm9qZWN0EicuZmx5dGVpZGwyLnByb2plY3QuQ3JlYXRlUHJvamVjdFJlcXVlc3QaKC5mbHl0ZWlkbDIucHJvamVjdC5DcmVhdGVQcm9qZWN0UmVzcG9uc2UiABJkCg1VcGRhdGVQcm9qZWN0EicuZmx5dGVpZGwyLnByb2plY3QuVXBkYXRlUHJvamVjdFJlcXVlc3QaKC5mbHl0ZWlkbDIucHJvamVjdC5VcGRhdGVQcm9qZWN0UmVzcG9uc2UiABJbCgpHZXRQcm9qZWN0EiQuZmx5dGVpZGwyLnByb2plY3QuR2V0UHJvamVjdFJlcXVlc3QaJS5mbHl0ZWlkbDIucHJvamVjdC5HZXRQcm9qZWN0UmVzcG9uc2UiABJhCgxMaXN0UHJvamVjdHMSJi5mbHl0ZWlkbDIucHJvamVjdC5MaXN0UHJvamVjdHNSZXF1ZXN0GicuZmx5dGVpZGwyLnByb2plY3QuTGlzdFByb2plY3RzUmVzcG9uc2UiAELKAQoVY29tLmZseXRlaWRsMi5wcm9qZWN0QhNQcm9qZWN0U2VydmljZVByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Byb2plY3SiAgNGUFiqAhFGbHl0ZWlkbDIuUHJvamVjdMoCEUZseXRlaWRsMlxQcm9qZWN04gIdRmx5dGVpZGwyXFByb2plY3RcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlByb2plY3RiBnByb3RvMw", [file_flyteidl2_common_list, file_flyteidl2_task_run]);
 
 /**
  * Namespace within a project commonly used to differentiate between different service instances.
@@ -76,14 +77,14 @@ export type Project = Message<"flyteidl2.project.Project"> & {
    * Leverage Labels from flyteidl.admin.common.proto to
    * tag projects with ownership information.
    *
-   * @generated from field: flyteidl2.project.Labels labels = 5;
+   * @generated from field: flyteidl2.task.Labels labels = 5;
    */
   labels?: Labels;
 
   /**
-   * @generated from field: flyteidl2.project.Project.ProjectState state = 6;
+   * @generated from field: flyteidl2.project.ProjectState state = 6;
    */
-  state: Project_ProjectState;
+  state: ProjectState;
 
   /**
    * Optional, org key applied to the resource.
@@ -99,47 +100,6 @@ export type Project = Message<"flyteidl2.project.Project"> & {
  */
 export const ProjectSchema: GenMessage<Project> = /*@__PURE__*/
   messageDesc(file_flyteidl2_project_project_service, 1);
-
-/**
- * The state of the project is used to control its visibility in the UI and validity.
- *
- * @generated from enum flyteidl2.project.Project.ProjectState
- */
-export enum Project_ProjectState {
-  /**
-   * By default, all projects are considered active.
-   *
-   * @generated from enum value: ACTIVE = 0;
-   */
-  ACTIVE = 0,
-
-  /**
-   * Archived projects are no longer visible in the UI and no longer valid.
-   *
-   * @generated from enum value: ARCHIVED = 1;
-   */
-  ARCHIVED = 1,
-
-  /**
-   * System generated projects that aren't explicitly created or managed by a user.
-   *
-   * @generated from enum value: SYSTEM_GENERATED = 2;
-   */
-  SYSTEM_GENERATED = 2,
-
-  /**
-   * System archived projects that aren't explicitly archived by a user.
-   *
-   * @generated from enum value: SYSTEM_ARCHIVED = 3;
-   */
-  SYSTEM_ARCHIVED = 3,
-}
-
-/**
- * Describes the enum flyteidl2.project.Project.ProjectState.
- */
-export const Project_ProjectStateSchema: GenEnum<Project_ProjectState> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_project_project_service, 1, 0);
 
 /**
  * Represents a list of projects.
@@ -170,12 +130,129 @@ export const ProjectsSchema: GenMessage<Projects> = /*@__PURE__*/
   messageDesc(file_flyteidl2_project_project_service, 2);
 
 /**
+ * Adds a new user-project within the Flyte deployment.
+ * See :ref:`ref_flyteidl.admin.Project` for more details
+ *
+ * @generated from message flyteidl2.project.CreateProjectRequest
+ */
+export type CreateProjectRequest = Message<"flyteidl2.project.CreateProjectRequest"> & {
+  /**
+   * +required
+   *
+   * @generated from field: flyteidl2.project.Project project = 1;
+   */
+  project?: Project;
+};
+
+/**
+ * Describes the message flyteidl2.project.CreateProjectRequest.
+ * Use `create(CreateProjectRequestSchema)` to create a new message.
+ */
+export const CreateProjectRequestSchema: GenMessage<CreateProjectRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 3);
+
+/**
+ * Purposefully empty, may be updated in the future.
+ *
+ * @generated from message flyteidl2.project.CreateProjectResponse
+ */
+export type CreateProjectResponse = Message<"flyteidl2.project.CreateProjectResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.project.CreateProjectResponse.
+ * Use `create(CreateProjectResponseSchema)` to create a new message.
+ */
+export const CreateProjectResponseSchema: GenMessage<CreateProjectResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 4);
+
+/**
+ * @generated from message flyteidl2.project.UpdateProjectRequest
+ */
+export type UpdateProjectRequest = Message<"flyteidl2.project.UpdateProjectRequest"> & {
+  /**
+   * +required
+   *
+   * @generated from field: flyteidl2.project.Project project = 1;
+   */
+  project?: Project;
+};
+
+/**
+ * Describes the message flyteidl2.project.UpdateProjectRequest.
+ * Use `create(UpdateProjectRequestSchema)` to create a new message.
+ */
+export const UpdateProjectRequestSchema: GenMessage<UpdateProjectRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 5);
+
+/**
+ * Purposefully empty, may be updated in the future.
+ *
+ * @generated from message flyteidl2.project.UpdateProjectResponse
+ */
+export type UpdateProjectResponse = Message<"flyteidl2.project.UpdateProjectResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.project.UpdateProjectResponse.
+ * Use `create(UpdateProjectResponseSchema)` to create a new message.
+ */
+export const UpdateProjectResponseSchema: GenMessage<UpdateProjectResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 6);
+
+/**
+ * @generated from message flyteidl2.project.GetProjectRequest
+ */
+export type GetProjectRequest = Message<"flyteidl2.project.GetProjectRequest"> & {
+  /**
+   * Indicates a unique project.
+   * +required
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * Optional, org key applied to the resource.
+   *
+   * @generated from field: string org = 2;
+   */
+  org: string;
+};
+
+/**
+ * Describes the message flyteidl2.project.GetProjectRequest.
+ * Use `create(GetProjectRequestSchema)` to create a new message.
+ */
+export const GetProjectRequestSchema: GenMessage<GetProjectRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 7);
+
+/**
+ * @generated from message flyteidl2.project.GetProjectResponse
+ */
+export type GetProjectResponse = Message<"flyteidl2.project.GetProjectResponse"> & {
+  /**
+   * +required
+   *
+   * @generated from field: flyteidl2.project.Project project = 1;
+   */
+  project?: Project;
+};
+
+/**
+ * Describes the message flyteidl2.project.GetProjectResponse.
+ * Use `create(GetProjectResponseSchema)` to create a new message.
+ */
+export const GetProjectResponseSchema: GenMessage<GetProjectResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 8);
+
+/**
  * Request to retrieve a list of projects matching specified filters.
  * See :ref:`ref_flyteidl.admin.Project` for more details
  *
- * @generated from message flyteidl2.project.ProjectListRequest
+ * @generated from message flyteidl2.project.ListProjectsRequest
  */
-export type ProjectListRequest = Message<"flyteidl2.project.ProjectListRequest"> & {
+export type ListProjectsRequest = Message<"flyteidl2.project.ListProjectsRequest"> & {
   /**
    * Indicates the number of projects to be returned.
    * +required
@@ -206,7 +283,7 @@ export type ProjectListRequest = Message<"flyteidl2.project.ProjectListRequest">
    * Sort ordering.
    * +optional
    *
-   * @generated from field: flyteidl2.project.Sort sort_by = 4;
+   * @generated from field: flyteidl2.common.Sort sort_by = 4;
    */
   sortBy?: Sort;
 
@@ -219,102 +296,83 @@ export type ProjectListRequest = Message<"flyteidl2.project.ProjectListRequest">
 };
 
 /**
- * Describes the message flyteidl2.project.ProjectListRequest.
- * Use `create(ProjectListRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.project.ListProjectsRequest.
+ * Use `create(ListProjectsRequestSchema)` to create a new message.
  */
-export const ProjectListRequestSchema: GenMessage<ProjectListRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_project_project_service, 3);
+export const ListProjectsRequestSchema: GenMessage<ListProjectsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 9);
 
 /**
- * Adds a new user-project within the Flyte deployment.
- * See :ref:`ref_flyteidl.admin.Project` for more details
- *
- * @generated from message flyteidl2.project.ProjectRegisterRequest
+ * @generated from message flyteidl2.project.ListProjectsResponse
  */
-export type ProjectRegisterRequest = Message<"flyteidl2.project.ProjectRegisterRequest"> & {
+export type ListProjectsResponse = Message<"flyteidl2.project.ListProjectsResponse"> & {
   /**
    * +required
    *
-   * @generated from field: flyteidl2.project.Project project = 1;
+   * @generated from field: flyteidl2.project.Projects projects = 1;
    */
-  project?: Project;
+  projects?: Projects;
 };
 
 /**
- * Describes the message flyteidl2.project.ProjectRegisterRequest.
- * Use `create(ProjectRegisterRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.project.ListProjectsResponse.
+ * Use `create(ListProjectsResponseSchema)` to create a new message.
  */
-export const ProjectRegisterRequestSchema: GenMessage<ProjectRegisterRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_project_project_service, 4);
+export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_project_project_service, 10);
 
 /**
- * Purposefully empty, may be updated in the future.
+ * The state of the project is used to control its visibility in the UI and validity.
  *
- * @generated from message flyteidl2.project.ProjectRegisterResponse
+ * @generated from enum flyteidl2.project.ProjectState
  */
-export type ProjectRegisterResponse = Message<"flyteidl2.project.ProjectRegisterResponse"> & {
-};
-
-/**
- * Describes the message flyteidl2.project.ProjectRegisterResponse.
- * Use `create(ProjectRegisterResponseSchema)` to create a new message.
- */
-export const ProjectRegisterResponseSchema: GenMessage<ProjectRegisterResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_project_project_service, 5);
-
-/**
- * Purposefully empty, may be updated in the future.
- *
- * @generated from message flyteidl2.project.ProjectUpdateResponse
- */
-export type ProjectUpdateResponse = Message<"flyteidl2.project.ProjectUpdateResponse"> & {
-};
-
-/**
- * Describes the message flyteidl2.project.ProjectUpdateResponse.
- * Use `create(ProjectUpdateResponseSchema)` to create a new message.
- */
-export const ProjectUpdateResponseSchema: GenMessage<ProjectUpdateResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_project_project_service, 6);
-
-/**
- * @generated from message flyteidl2.project.ProjectGetRequest
- */
-export type ProjectGetRequest = Message<"flyteidl2.project.ProjectGetRequest"> & {
+export enum ProjectState {
   /**
-   * Indicates a unique project.
-   * +required
+   * By default, all projects are considered active.
    *
-   * @generated from field: string id = 1;
+   * @generated from enum value: PROJECT_STATE_ACTIVE = 0;
    */
-  id: string;
+  ACTIVE = 0,
 
   /**
-   * Optional, org key applied to the resource.
+   * Archived projects are no longer visible in the UI and no longer valid.
    *
-   * @generated from field: string org = 2;
+   * @generated from enum value: PROJECT_STATE_ARCHIVED = 1;
    */
-  org: string;
-};
+  ARCHIVED = 1,
+
+  /**
+   * System generated projects that aren't explicitly created or managed by a user.
+   *
+   * @generated from enum value: PROJECT_STATE_SYSTEM_GENERATED = 2;
+   */
+  SYSTEM_GENERATED = 2,
+
+  /**
+   * System archived projects that aren't explicitly archived by a user.
+   *
+   * @generated from enum value: PROJECT_STATE_SYSTEM_ARCHIVED = 3;
+   */
+  SYSTEM_ARCHIVED = 3,
+}
 
 /**
- * Describes the message flyteidl2.project.ProjectGetRequest.
- * Use `create(ProjectGetRequestSchema)` to create a new message.
+ * Describes the enum flyteidl2.project.ProjectState.
  */
-export const ProjectGetRequestSchema: GenMessage<ProjectGetRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_project_project_service, 7);
+export const ProjectStateSchema: GenEnum<ProjectState> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_project_project_service, 0);
 
 /**
  * @generated from service flyteidl2.project.ProjectService
  */
 export const ProjectService: GenService<{
   /**
-   * @generated from rpc flyteidl2.project.ProjectService.RegisterProject
+   * @generated from rpc flyteidl2.project.ProjectService.CreateProject
    */
-  registerProject: {
+  createProject: {
     methodKind: "unary";
-    input: typeof ProjectRegisterRequestSchema;
-    output: typeof ProjectRegisterResponseSchema;
+    input: typeof CreateProjectRequestSchema;
+    output: typeof CreateProjectResponseSchema;
   },
   /**
    * it will be ignored in the handler as domains cannot be updated via this API.
@@ -323,24 +381,24 @@ export const ProjectService: GenService<{
    */
   updateProject: {
     methodKind: "unary";
-    input: typeof ProjectSchema;
-    output: typeof ProjectUpdateResponseSchema;
+    input: typeof UpdateProjectRequestSchema;
+    output: typeof UpdateProjectResponseSchema;
   },
   /**
    * @generated from rpc flyteidl2.project.ProjectService.GetProject
    */
   getProject: {
     methodKind: "unary";
-    input: typeof ProjectGetRequestSchema;
-    output: typeof ProjectSchema;
+    input: typeof GetProjectRequestSchema;
+    output: typeof GetProjectResponseSchema;
   },
   /**
    * @generated from rpc flyteidl2.project.ProjectService.ListProjects
    */
   listProjects: {
     methodKind: "unary";
-    input: typeof ProjectListRequestSchema;
-    output: typeof ProjectsSchema;
+    input: typeof ListProjectsRequestSchema;
+    output: typeof ListProjectsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_project_project_service, 0);

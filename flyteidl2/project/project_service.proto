@@ -1,8 +1,8 @@
 syntax = "proto3";
 package flyteidl2.project;
 
-import "flyteidl2/project/common.proto";
-import "google/api/annotations.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/task/run.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project";
 
@@ -14,6 +14,21 @@ message Domain {
 
   // Display name.
   string name = 2;
+}
+
+// The state of the project is used to control its visibility in the UI and validity.
+enum ProjectState {
+  // By default, all projects are considered active.
+  PROJECT_STATE_ACTIVE = 0;
+
+  // Archived projects are no longer visible in the UI and no longer valid.
+  PROJECT_STATE_ARCHIVED = 1;
+
+  // System generated projects that aren't explicitly created or managed by a user.
+  PROJECT_STATE_SYSTEM_GENERATED = 2;
+
+  // System archived projects that aren't explicitly archived by a user.
+  PROJECT_STATE_SYSTEM_ARCHIVED = 3;
 }
 
 message Project {
@@ -29,22 +44,8 @@ message Project {
 
   // Leverage Labels from flyteidl.admin.common.proto to
   // tag projects with ownership information.
-  flyteidl2.project.Labels labels = 5;
+  flyteidl2.task.Labels labels = 5;
 
-  // The state of the project is used to control its visibility in the UI and validity.
-  enum ProjectState {
-    // By default, all projects are considered active.
-    ACTIVE = 0;
-
-    // Archived projects are no longer visible in the UI and no longer valid.
-    ARCHIVED = 1;
-
-    // System generated projects that aren't explicitly created or managed by a user.
-    SYSTEM_GENERATED = 2;
-
-    // System archived projects that aren't explicitly archived by a user.
-    SYSTEM_ARCHIVED = 3;
-  }
   ProjectState state = 6;
 
   // Optional, org key applied to the resource.
@@ -61,9 +62,41 @@ message Projects {
   string token = 2;
 }
 
+// Adds a new user-project within the Flyte deployment.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message CreateProjectRequest {
+  // +required
+  Project project = 1;
+}
+
+// Purposefully empty, may be updated in the future.
+message CreateProjectResponse {}
+
+message UpdateProjectRequest {
+  // +required
+  Project project = 1;
+}
+
+// Purposefully empty, may be updated in the future.
+message UpdateProjectResponse {}
+
+message GetProjectRequest {
+  // Indicates a unique project.
+  // +required
+  string id = 1;
+
+  // Optional, org key applied to the resource.
+  string org = 2;
+}
+
+message GetProjectResponse {
+  // +required
+  Project project = 1;
+}
+
 // Request to retrieve a list of projects matching specified filters.
 // See :ref:`ref_flyteidl.admin.Project` for more details
-message ProjectListRequest {
+message ListProjectsRequest {
   // Indicates the number of projects to be returned.
   // +required
   uint32 limit = 1;
@@ -80,69 +113,24 @@ message ProjectListRequest {
 
   // Sort ordering.
   // +optional
-  flyteidl2.project.Sort sort_by = 4;
+  flyteidl2.common.Sort sort_by = 4;
 
   // Optional, org filter applied to list project requests.
   string org = 5;
 }
 
-// Adds a new user-project within the Flyte deployment.
-// See :ref:`ref_flyteidl.admin.Project` for more details
-message ProjectRegisterRequest {
+message ListProjectsResponse {
   // +required
-  Project project = 1;
-}
-
-// Purposefully empty, may be updated in the future.
-message ProjectRegisterResponse {}
-
-// Purposefully empty, may be updated in the future.
-message ProjectUpdateResponse {}
-
-message ProjectGetRequest {
-  // Indicates a unique project.
-  // +required
-  string id = 1;
-
-  // Optional, org key applied to the resource.
-  string org = 2;
+  Projects projects = 1;
 }
 
 service ProjectService {
-  rpc RegisterProject(ProjectRegisterRequest) returns (ProjectRegisterResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/projects"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/projects/{project.org}"
-        body: "*"
-      }
-    };
-  }
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
 
   // it will be ignored in the handler as domains cannot be updated via this API.
-  rpc UpdateProject(Project) returns (ProjectUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/projects/{id}"
-      body: "*"
-      additional_bindings: {
-        put: "/api/v1/org/projects/{org}/{id}"
-        body: "*"
-      }
-    };
-  }
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {}
 
-  rpc GetProject(ProjectGetRequest) returns (Project) {
-    option (google.api.http) = {
-      get: "/api/v1/projects/{id}"
-      additional_bindings: {get: "/api/v1/org/projects/{org}/{id}"}
-    };
-  }
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {}
 
-  rpc ListProjects(ProjectListRequest) returns (Projects) {
-    option (google.api.http) = {
-      get: "/api/v1/projects"
-      additional_bindings: {get: "/api/v1/org/projects/{org}"}
-    };
-  }
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {}
 }

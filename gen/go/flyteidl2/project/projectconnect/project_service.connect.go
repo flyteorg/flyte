@@ -33,9 +33,9 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ProjectServiceRegisterProjectProcedure is the fully-qualified name of the ProjectService's
-	// RegisterProject RPC.
-	ProjectServiceRegisterProjectProcedure = "/flyteidl2.project.ProjectService/RegisterProject"
+	// ProjectServiceCreateProjectProcedure is the fully-qualified name of the ProjectService's
+	// CreateProject RPC.
+	ProjectServiceCreateProjectProcedure = "/flyteidl2.project.ProjectService/CreateProject"
 	// ProjectServiceUpdateProjectProcedure is the fully-qualified name of the ProjectService's
 	// UpdateProject RPC.
 	ProjectServiceUpdateProjectProcedure = "/flyteidl2.project.ProjectService/UpdateProject"
@@ -49,20 +49,20 @@ const (
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	projectServiceServiceDescriptor               = project.File_flyteidl2_project_project_service_proto.Services().ByName("ProjectService")
-	projectServiceRegisterProjectMethodDescriptor = projectServiceServiceDescriptor.Methods().ByName("RegisterProject")
-	projectServiceUpdateProjectMethodDescriptor   = projectServiceServiceDescriptor.Methods().ByName("UpdateProject")
-	projectServiceGetProjectMethodDescriptor      = projectServiceServiceDescriptor.Methods().ByName("GetProject")
-	projectServiceListProjectsMethodDescriptor    = projectServiceServiceDescriptor.Methods().ByName("ListProjects")
+	projectServiceServiceDescriptor             = project.File_flyteidl2_project_project_service_proto.Services().ByName("ProjectService")
+	projectServiceCreateProjectMethodDescriptor = projectServiceServiceDescriptor.Methods().ByName("CreateProject")
+	projectServiceUpdateProjectMethodDescriptor = projectServiceServiceDescriptor.Methods().ByName("UpdateProject")
+	projectServiceGetProjectMethodDescriptor    = projectServiceServiceDescriptor.Methods().ByName("GetProject")
+	projectServiceListProjectsMethodDescriptor  = projectServiceServiceDescriptor.Methods().ByName("ListProjects")
 )
 
 // ProjectServiceClient is a client for the flyteidl2.project.ProjectService service.
 type ProjectServiceClient interface {
-	RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error)
+	CreateProject(context.Context, *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
-	UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error)
-	GetProject(context.Context, *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error)
-	ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error)
+	UpdateProject(context.Context, *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)
+	GetProject(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)
+	ListProjects(context.Context, *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)
 }
 
 // NewProjectServiceClient constructs a client for the flyteidl2.project.ProjectService service. By
@@ -75,25 +75,25 @@ type ProjectServiceClient interface {
 func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProjectServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &projectServiceClient{
-		registerProject: connect.NewClient[project.ProjectRegisterRequest, project.ProjectRegisterResponse](
+		createProject: connect.NewClient[project.CreateProjectRequest, project.CreateProjectResponse](
 			httpClient,
-			baseURL+ProjectServiceRegisterProjectProcedure,
-			connect.WithSchema(projectServiceRegisterProjectMethodDescriptor),
+			baseURL+ProjectServiceCreateProjectProcedure,
+			connect.WithSchema(projectServiceCreateProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		updateProject: connect.NewClient[project.Project, project.ProjectUpdateResponse](
+		updateProject: connect.NewClient[project.UpdateProjectRequest, project.UpdateProjectResponse](
 			httpClient,
 			baseURL+ProjectServiceUpdateProjectProcedure,
 			connect.WithSchema(projectServiceUpdateProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getProject: connect.NewClient[project.ProjectGetRequest, project.Project](
+		getProject: connect.NewClient[project.GetProjectRequest, project.GetProjectResponse](
 			httpClient,
 			baseURL+ProjectServiceGetProjectProcedure,
 			connect.WithSchema(projectServiceGetProjectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		listProjects: connect.NewClient[project.ProjectListRequest, project.Projects](
+		listProjects: connect.NewClient[project.ListProjectsRequest, project.ListProjectsResponse](
 			httpClient,
 			baseURL+ProjectServiceListProjectsProcedure,
 			connect.WithSchema(projectServiceListProjectsMethodDescriptor),
@@ -104,39 +104,39 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // projectServiceClient implements ProjectServiceClient.
 type projectServiceClient struct {
-	registerProject *connect.Client[project.ProjectRegisterRequest, project.ProjectRegisterResponse]
-	updateProject   *connect.Client[project.Project, project.ProjectUpdateResponse]
-	getProject      *connect.Client[project.ProjectGetRequest, project.Project]
-	listProjects    *connect.Client[project.ProjectListRequest, project.Projects]
+	createProject *connect.Client[project.CreateProjectRequest, project.CreateProjectResponse]
+	updateProject *connect.Client[project.UpdateProjectRequest, project.UpdateProjectResponse]
+	getProject    *connect.Client[project.GetProjectRequest, project.GetProjectResponse]
+	listProjects  *connect.Client[project.ListProjectsRequest, project.ListProjectsResponse]
 }
 
-// RegisterProject calls flyteidl2.project.ProjectService.RegisterProject.
-func (c *projectServiceClient) RegisterProject(ctx context.Context, req *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
-	return c.registerProject.CallUnary(ctx, req)
+// CreateProject calls flyteidl2.project.ProjectService.CreateProject.
+func (c *projectServiceClient) CreateProject(ctx context.Context, req *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error) {
+	return c.createProject.CallUnary(ctx, req)
 }
 
 // UpdateProject calls flyteidl2.project.ProjectService.UpdateProject.
-func (c *projectServiceClient) UpdateProject(ctx context.Context, req *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
+func (c *projectServiceClient) UpdateProject(ctx context.Context, req *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error) {
 	return c.updateProject.CallUnary(ctx, req)
 }
 
 // GetProject calls flyteidl2.project.ProjectService.GetProject.
-func (c *projectServiceClient) GetProject(ctx context.Context, req *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
+func (c *projectServiceClient) GetProject(ctx context.Context, req *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error) {
 	return c.getProject.CallUnary(ctx, req)
 }
 
 // ListProjects calls flyteidl2.project.ProjectService.ListProjects.
-func (c *projectServiceClient) ListProjects(ctx context.Context, req *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
+func (c *projectServiceClient) ListProjects(ctx context.Context, req *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error) {
 	return c.listProjects.CallUnary(ctx, req)
 }
 
 // ProjectServiceHandler is an implementation of the flyteidl2.project.ProjectService service.
 type ProjectServiceHandler interface {
-	RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error)
+	CreateProject(context.Context, *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
-	UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error)
-	GetProject(context.Context, *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error)
-	ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error)
+	UpdateProject(context.Context, *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)
+	GetProject(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)
+	ListProjects(context.Context, *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)
 }
 
 // NewProjectServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -145,10 +145,10 @@ type ProjectServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	projectServiceRegisterProjectHandler := connect.NewUnaryHandler(
-		ProjectServiceRegisterProjectProcedure,
-		svc.RegisterProject,
-		connect.WithSchema(projectServiceRegisterProjectMethodDescriptor),
+	projectServiceCreateProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceCreateProjectProcedure,
+		svc.CreateProject,
+		connect.WithSchema(projectServiceCreateProjectMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceUpdateProjectHandler := connect.NewUnaryHandler(
@@ -171,8 +171,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 	)
 	return "/flyteidl2.project.ProjectService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ProjectServiceRegisterProjectProcedure:
-			projectServiceRegisterProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceCreateProjectProcedure:
+			projectServiceCreateProjectHandler.ServeHTTP(w, r)
 		case ProjectServiceUpdateProjectProcedure:
 			projectServiceUpdateProjectHandler.ServeHTTP(w, r)
 		case ProjectServiceGetProjectProcedure:
@@ -188,18 +188,18 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 // UnimplementedProjectServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedProjectServiceHandler struct{}
 
-func (UnimplementedProjectServiceHandler) RegisterProject(context.Context, *connect.Request[project.ProjectRegisterRequest]) (*connect.Response[project.ProjectRegisterResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.RegisterProject is not implemented"))
+func (UnimplementedProjectServiceHandler) CreateProject(context.Context, *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.CreateProject is not implemented"))
 }
 
-func (UnimplementedProjectServiceHandler) UpdateProject(context.Context, *connect.Request[project.Project]) (*connect.Response[project.ProjectUpdateResponse], error) {
+func (UnimplementedProjectServiceHandler) UpdateProject(context.Context, *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.UpdateProject is not implemented"))
 }
 
-func (UnimplementedProjectServiceHandler) GetProject(context.Context, *connect.Request[project.ProjectGetRequest]) (*connect.Response[project.Project], error) {
+func (UnimplementedProjectServiceHandler) GetProject(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.GetProject is not implemented"))
 }
 
-func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect.Request[project.ProjectListRequest]) (*connect.Response[project.Projects], error) {
+func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.project.ProjectService.ListProjects is not implemented"))
 }

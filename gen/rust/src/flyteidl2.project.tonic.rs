@@ -86,11 +86,11 @@ pub mod project_service_client {
             self
         }
         ///
-        pub async fn register_project(
+        pub async fn create_project(
             &mut self,
-            request: impl tonic::IntoRequest<super::ProjectRegisterRequest>,
+            request: impl tonic::IntoRequest<super::CreateProjectRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ProjectRegisterResponse>,
+            tonic::Response<super::CreateProjectResponse>,
             tonic::Status,
         > {
             self.inner
@@ -104,15 +104,12 @@ pub mod project_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.project.ProjectService/RegisterProject",
+                "/flyteidl2.project.ProjectService/CreateProject",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.project.ProjectService",
-                        "RegisterProject",
-                    ),
+                    GrpcMethod::new("flyteidl2.project.ProjectService", "CreateProject"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -120,9 +117,9 @@ pub mod project_service_client {
 */
         pub async fn update_project(
             &mut self,
-            request: impl tonic::IntoRequest<super::Project>,
+            request: impl tonic::IntoRequest<super::UpdateProjectRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ProjectUpdateResponse>,
+            tonic::Response<super::UpdateProjectResponse>,
             tonic::Status,
         > {
             self.inner
@@ -148,8 +145,11 @@ pub mod project_service_client {
         ///
         pub async fn get_project(
             &mut self,
-            request: impl tonic::IntoRequest<super::ProjectGetRequest>,
-        ) -> std::result::Result<tonic::Response<super::Project>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GetProjectRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetProjectResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -173,8 +173,11 @@ pub mod project_service_client {
         ///
         pub async fn list_projects(
             &mut self,
-            request: impl tonic::IntoRequest<super::ProjectListRequest>,
-        ) -> std::result::Result<tonic::Response<super::Projects>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::ListProjectsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListProjectsResponse>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -205,32 +208,38 @@ pub mod project_service_server {
     #[async_trait]
     pub trait ProjectService: Send + Sync + 'static {
         ///
-        async fn register_project(
+        async fn create_project(
             &self,
-            request: tonic::Request<super::ProjectRegisterRequest>,
+            request: tonic::Request<super::CreateProjectRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ProjectRegisterResponse>,
+            tonic::Response<super::CreateProjectResponse>,
             tonic::Status,
         >;
         /** it will be ignored in the handler as domains cannot be updated via this API.
 */
         async fn update_project(
             &self,
-            request: tonic::Request<super::Project>,
+            request: tonic::Request<super::UpdateProjectRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ProjectUpdateResponse>,
+            tonic::Response<super::UpdateProjectResponse>,
             tonic::Status,
         >;
         ///
         async fn get_project(
             &self,
-            request: tonic::Request<super::ProjectGetRequest>,
-        ) -> std::result::Result<tonic::Response<super::Project>, tonic::Status>;
+            request: tonic::Request<super::GetProjectRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetProjectResponse>,
+            tonic::Status,
+        >;
         ///
         async fn list_projects(
             &self,
-            request: tonic::Request<super::ProjectListRequest>,
-        ) -> std::result::Result<tonic::Response<super::Projects>, tonic::Status>;
+            request: tonic::Request<super::ListProjectsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListProjectsResponse>,
+            tonic::Status,
+        >;
     }
     ///
     #[derive(Debug)]
@@ -309,26 +318,25 @@ pub mod project_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.project.ProjectService/RegisterProject" => {
+                "/flyteidl2.project.ProjectService/CreateProject" => {
                     #[allow(non_camel_case_types)]
-                    struct RegisterProjectSvc<T: ProjectService>(pub Arc<T>);
+                    struct CreateProjectSvc<T: ProjectService>(pub Arc<T>);
                     impl<
                         T: ProjectService,
-                    > tonic::server::UnaryService<super::ProjectRegisterRequest>
-                    for RegisterProjectSvc<T> {
-                        type Response = super::ProjectRegisterResponse;
+                    > tonic::server::UnaryService<super::CreateProjectRequest>
+                    for CreateProjectSvc<T> {
+                        type Response = super::CreateProjectResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ProjectRegisterRequest>,
+                            request: tonic::Request<super::CreateProjectRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as ProjectService>::register_project(&inner, request)
-                                    .await
+                                <T as ProjectService>::create_project(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -339,7 +347,7 @@ pub mod project_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = RegisterProjectSvc(inner);
+                        let method = CreateProjectSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -358,16 +366,18 @@ pub mod project_service_server {
                 "/flyteidl2.project.ProjectService/UpdateProject" => {
                     #[allow(non_camel_case_types)]
                     struct UpdateProjectSvc<T: ProjectService>(pub Arc<T>);
-                    impl<T: ProjectService> tonic::server::UnaryService<super::Project>
+                    impl<
+                        T: ProjectService,
+                    > tonic::server::UnaryService<super::UpdateProjectRequest>
                     for UpdateProjectSvc<T> {
-                        type Response = super::ProjectUpdateResponse;
+                        type Response = super::UpdateProjectResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::Project>,
+                            request: tonic::Request<super::UpdateProjectRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -403,16 +413,16 @@ pub mod project_service_server {
                     struct GetProjectSvc<T: ProjectService>(pub Arc<T>);
                     impl<
                         T: ProjectService,
-                    > tonic::server::UnaryService<super::ProjectGetRequest>
+                    > tonic::server::UnaryService<super::GetProjectRequest>
                     for GetProjectSvc<T> {
-                        type Response = super::Project;
+                        type Response = super::GetProjectResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ProjectGetRequest>,
+                            request: tonic::Request<super::GetProjectRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -448,16 +458,16 @@ pub mod project_service_server {
                     struct ListProjectsSvc<T: ProjectService>(pub Arc<T>);
                     impl<
                         T: ProjectService,
-                    > tonic::server::UnaryService<super::ProjectListRequest>
+                    > tonic::server::UnaryService<super::ListProjectsRequest>
                     for ListProjectsSvc<T> {
-                        type Response = super::Projects;
+                        type Response = super::ListProjectsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ProjectListRequest>,
+                            request: tonic::Request<super::ListProjectsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {

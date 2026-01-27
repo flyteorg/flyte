@@ -19,21 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ProjectService_RegisterProject_FullMethodName = "/flyteidl2.project.ProjectService/RegisterProject"
-	ProjectService_UpdateProject_FullMethodName   = "/flyteidl2.project.ProjectService/UpdateProject"
-	ProjectService_GetProject_FullMethodName      = "/flyteidl2.project.ProjectService/GetProject"
-	ProjectService_ListProjects_FullMethodName    = "/flyteidl2.project.ProjectService/ListProjects"
+	ProjectService_CreateProject_FullMethodName = "/flyteidl2.project.ProjectService/CreateProject"
+	ProjectService_UpdateProject_FullMethodName = "/flyteidl2.project.ProjectService/UpdateProject"
+	ProjectService_GetProject_FullMethodName    = "/flyteidl2.project.ProjectService/GetProject"
+	ProjectService_ListProjects_FullMethodName  = "/flyteidl2.project.ProjectService/ListProjects"
 )
 
 // ProjectServiceClient is the client API for ProjectService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProjectServiceClient interface {
-	RegisterProject(ctx context.Context, in *ProjectRegisterRequest, opts ...grpc.CallOption) (*ProjectRegisterResponse, error)
+	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
-	UpdateProject(ctx context.Context, in *Project, opts ...grpc.CallOption) (*ProjectUpdateResponse, error)
-	GetProject(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*Project, error)
-	ListProjects(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*Projects, error)
+	UpdateProject(ctx context.Context, in *UpdateProjectRequest, opts ...grpc.CallOption) (*UpdateProjectResponse, error)
+	GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error)
+	ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error)
 }
 
 type projectServiceClient struct {
@@ -44,17 +44,17 @@ func NewProjectServiceClient(cc grpc.ClientConnInterface) ProjectServiceClient {
 	return &projectServiceClient{cc}
 }
 
-func (c *projectServiceClient) RegisterProject(ctx context.Context, in *ProjectRegisterRequest, opts ...grpc.CallOption) (*ProjectRegisterResponse, error) {
-	out := new(ProjectRegisterResponse)
-	err := c.cc.Invoke(ctx, ProjectService_RegisterProject_FullMethodName, in, out, opts...)
+func (c *projectServiceClient) CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error) {
+	out := new(CreateProjectResponse)
+	err := c.cc.Invoke(ctx, ProjectService_CreateProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *projectServiceClient) UpdateProject(ctx context.Context, in *Project, opts ...grpc.CallOption) (*ProjectUpdateResponse, error) {
-	out := new(ProjectUpdateResponse)
+func (c *projectServiceClient) UpdateProject(ctx context.Context, in *UpdateProjectRequest, opts ...grpc.CallOption) (*UpdateProjectResponse, error) {
+	out := new(UpdateProjectResponse)
 	err := c.cc.Invoke(ctx, ProjectService_UpdateProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,8 +62,8 @@ func (c *projectServiceClient) UpdateProject(ctx context.Context, in *Project, o
 	return out, nil
 }
 
-func (c *projectServiceClient) GetProject(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*Project, error) {
-	out := new(Project)
+func (c *projectServiceClient) GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*GetProjectResponse, error) {
+	out := new(GetProjectResponse)
 	err := c.cc.Invoke(ctx, ProjectService_GetProject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -71,8 +71,8 @@ func (c *projectServiceClient) GetProject(ctx context.Context, in *ProjectGetReq
 	return out, nil
 }
 
-func (c *projectServiceClient) ListProjects(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*Projects, error) {
-	out := new(Projects)
+func (c *projectServiceClient) ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error) {
+	out := new(ListProjectsResponse)
 	err := c.cc.Invoke(ctx, ProjectService_ListProjects_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,27 +84,27 @@ func (c *projectServiceClient) ListProjects(ctx context.Context, in *ProjectList
 // All implementations should embed UnimplementedProjectServiceServer
 // for forward compatibility
 type ProjectServiceServer interface {
-	RegisterProject(context.Context, *ProjectRegisterRequest) (*ProjectRegisterResponse, error)
+	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
 	// it will be ignored in the handler as domains cannot be updated via this API.
-	UpdateProject(context.Context, *Project) (*ProjectUpdateResponse, error)
-	GetProject(context.Context, *ProjectGetRequest) (*Project, error)
-	ListProjects(context.Context, *ProjectListRequest) (*Projects, error)
+	UpdateProject(context.Context, *UpdateProjectRequest) (*UpdateProjectResponse, error)
+	GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error)
+	ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error)
 }
 
 // UnimplementedProjectServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedProjectServiceServer struct {
 }
 
-func (UnimplementedProjectServiceServer) RegisterProject(context.Context, *ProjectRegisterRequest) (*ProjectRegisterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterProject not implemented")
+func (UnimplementedProjectServiceServer) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
 }
-func (UnimplementedProjectServiceServer) UpdateProject(context.Context, *Project) (*ProjectUpdateResponse, error) {
+func (UnimplementedProjectServiceServer) UpdateProject(context.Context, *UpdateProjectRequest) (*UpdateProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProject not implemented")
 }
-func (UnimplementedProjectServiceServer) GetProject(context.Context, *ProjectGetRequest) (*Project, error) {
+func (UnimplementedProjectServiceServer) GetProject(context.Context, *GetProjectRequest) (*GetProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
 }
-func (UnimplementedProjectServiceServer) ListProjects(context.Context, *ProjectListRequest) (*Projects, error) {
+func (UnimplementedProjectServiceServer) ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
 }
 
@@ -119,26 +119,26 @@ func RegisterProjectServiceServer(s grpc.ServiceRegistrar, srv ProjectServiceSer
 	s.RegisterService(&ProjectService_ServiceDesc, srv)
 }
 
-func _ProjectService_RegisterProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectRegisterRequest)
+func _ProjectService_CreateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProjectServiceServer).RegisterProject(ctx, in)
+		return srv.(ProjectServiceServer).CreateProject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ProjectService_RegisterProject_FullMethodName,
+		FullMethod: ProjectService_CreateProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).RegisterProject(ctx, req.(*ProjectRegisterRequest))
+		return srv.(ProjectServiceServer).CreateProject(ctx, req.(*CreateProjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ProjectService_UpdateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Project)
+	in := new(UpdateProjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -150,13 +150,13 @@ func _ProjectService_UpdateProject_Handler(srv interface{}, ctx context.Context,
 		FullMethod: ProjectService_UpdateProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).UpdateProject(ctx, req.(*Project))
+		return srv.(ProjectServiceServer).UpdateProject(ctx, req.(*UpdateProjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ProjectService_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectGetRequest)
+	in := new(GetProjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -168,13 +168,13 @@ func _ProjectService_GetProject_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: ProjectService_GetProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).GetProject(ctx, req.(*ProjectGetRequest))
+		return srv.(ProjectServiceServer).GetProject(ctx, req.(*GetProjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ProjectService_ListProjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectListRequest)
+	in := new(ListProjectsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func _ProjectService_ListProjects_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: ProjectService_ListProjects_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).ListProjects(ctx, req.(*ProjectListRequest))
+		return srv.(ProjectServiceServer).ListProjects(ctx, req.(*ListProjectsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -199,8 +199,8 @@ var ProjectService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ProjectServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RegisterProject",
-			Handler:    _ProjectService_RegisterProject_Handler,
+			MethodName: "CreateProject",
+			Handler:    _ProjectService_CreateProject_Handler,
 		},
 		{
 			MethodName: "UpdateProject",

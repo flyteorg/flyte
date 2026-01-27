@@ -11,11 +11,11 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl2.project import common_pb2 as flyteidl2_dot_project_dot_common__pb2
-from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
+from flyteidl2.common import list_pb2 as flyteidl2_dot_common_dot_list__pb2
+from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/project/project_service.proto\x12\x11\x66lyteidl2.project\x1a\x1e\x66lyteidl2/project/common.proto\x1a\x1cgoogle/api/annotations.proto\",\n\x06\x44omain\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"\xdd\x02\n\x07Project\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12\x33\n\x07\x64omains\x18\x03 \x03(\x0b\x32\x19.flyteidl2.project.DomainR\x07\x64omains\x12 \n\x0b\x64\x65scription\x18\x04 \x01(\tR\x0b\x64\x65scription\x12\x31\n\x06labels\x18\x05 \x01(\x0b\x32\x19.flyteidl2.project.LabelsR\x06labels\x12=\n\x05state\x18\x06 \x01(\x0e\x32\'.flyteidl2.project.Project.ProjectStateR\x05state\x12\x10\n\x03org\x18\x07 \x01(\tR\x03org\"S\n\x0cProjectState\x12\n\n\x06\x41\x43TIVE\x10\x00\x12\x0c\n\x08\x41RCHIVED\x10\x01\x12\x14\n\x10SYSTEM_GENERATED\x10\x02\x12\x13\n\x0fSYSTEM_ARCHIVED\x10\x03\"X\n\x08Projects\x12\x36\n\x08projects\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.project.ProjectR\x08projects\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x9e\x01\n\x12ProjectListRequest\x12\x14\n\x05limit\x18\x01 \x01(\rR\x05limit\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12\x18\n\x07\x66ilters\x18\x03 \x01(\tR\x07\x66ilters\x12\x30\n\x07sort_by\x18\x04 \x01(\x0b\x32\x17.flyteidl2.project.SortR\x06sortBy\x12\x10\n\x03org\x18\x05 \x01(\tR\x03org\"N\n\x16ProjectRegisterRequest\x12\x34\n\x07project\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.project.ProjectR\x07project\"\x19\n\x17ProjectRegisterResponse\"\x17\n\x15ProjectUpdateResponse\"5\n\x11ProjectGetRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n\x03org\x18\x02 \x01(\tR\x03org2\x81\x05\n\x0eProjectService\x12\xae\x01\n\x0fRegisterProject\x12).flyteidl2.project.ProjectRegisterRequest\x1a*.flyteidl2.project.ProjectRegisterResponse\"D\x82\xd3\xe4\x93\x02>\"\x10/api/v1/projects:\x01*Z\'\"\"/api/v1/org/projects/{project.org}:\x01*\x12\x9d\x01\n\rUpdateProject\x12\x1a.flyteidl2.project.Project\x1a(.flyteidl2.project.ProjectUpdateResponse\"F\x82\xd3\xe4\x93\x02@\x1a\x15/api/v1/projects/{id}:\x01*Z$\x1a\x1f/api/v1/org/projects/{org}/{id}:\x01*\x12\x90\x01\n\nGetProject\x12$.flyteidl2.project.ProjectGetRequest\x1a\x1a.flyteidl2.project.Project\"@\x82\xd3\xe4\x93\x02:\x12\x15/api/v1/projects/{id}Z!\x12\x1f/api/v1/org/projects/{org}/{id}\x12\x8a\x01\n\x0cListProjects\x12%.flyteidl2.project.ProjectListRequest\x1a\x1b.flyteidl2.project.Projects\"6\x82\xd3\xe4\x93\x02\x30\x12\x10/api/v1/projectsZ\x1c\x12\x1a/api/v1/org/projects/{org}B\xca\x01\n\x15\x63om.flyteidl2.projectB\x13ProjectServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project\xa2\x02\x03\x46PX\xaa\x02\x11\x46lyteidl2.Project\xca\x02\x11\x46lyteidl2\\Project\xe2\x02\x1d\x46lyteidl2\\Project\\GPBMetadata\xea\x02\x12\x46lyteidl2::Projectb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/project/project_service.proto\x12\x11\x66lyteidl2.project\x1a\x1b\x66lyteidl2/common/list.proto\x1a\x18\x66lyteidl2/task/run.proto\",\n\x06\x44omain\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"\xfd\x01\n\x07Project\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12\x33\n\x07\x64omains\x18\x03 \x03(\x0b\x32\x19.flyteidl2.project.DomainR\x07\x64omains\x12 \n\x0b\x64\x65scription\x18\x04 \x01(\tR\x0b\x64\x65scription\x12.\n\x06labels\x18\x05 \x01(\x0b\x32\x16.flyteidl2.task.LabelsR\x06labels\x12\x35\n\x05state\x18\x06 \x01(\x0e\x32\x1f.flyteidl2.project.ProjectStateR\x05state\x12\x10\n\x03org\x18\x07 \x01(\tR\x03org\"X\n\x08Projects\x12\x36\n\x08projects\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.project.ProjectR\x08projects\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"L\n\x14\x43reateProjectRequest\x12\x34\n\x07project\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.project.ProjectR\x07project\"\x17\n\x15\x43reateProjectResponse\"L\n\x14UpdateProjectRequest\x12\x34\n\x07project\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.project.ProjectR\x07project\"\x17\n\x15UpdateProjectResponse\"5\n\x11GetProjectRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n\x03org\x18\x02 \x01(\tR\x03org\"J\n\x12GetProjectResponse\x12\x34\n\x07project\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.project.ProjectR\x07project\"\x9e\x01\n\x13ListProjectsRequest\x12\x14\n\x05limit\x18\x01 \x01(\rR\x05limit\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12\x18\n\x07\x66ilters\x18\x03 \x01(\tR\x07\x66ilters\x12/\n\x07sort_by\x18\x04 \x01(\x0b\x32\x16.flyteidl2.common.SortR\x06sortBy\x12\x10\n\x03org\x18\x05 \x01(\tR\x03org\"O\n\x14ListProjectsResponse\x12\x37\n\x08projects\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.project.ProjectsR\x08projects*\x8b\x01\n\x0cProjectState\x12\x18\n\x14PROJECT_STATE_ACTIVE\x10\x00\x12\x1a\n\x16PROJECT_STATE_ARCHIVED\x10\x01\x12\"\n\x1ePROJECT_STATE_SYSTEM_GENERATED\x10\x02\x12!\n\x1dPROJECT_STATE_SYSTEM_ARCHIVED\x10\x03\x32\x9c\x03\n\x0eProjectService\x12\x64\n\rCreateProject\x12\'.flyteidl2.project.CreateProjectRequest\x1a(.flyteidl2.project.CreateProjectResponse\"\x00\x12\x64\n\rUpdateProject\x12\'.flyteidl2.project.UpdateProjectRequest\x1a(.flyteidl2.project.UpdateProjectResponse\"\x00\x12[\n\nGetProject\x12$.flyteidl2.project.GetProjectRequest\x1a%.flyteidl2.project.GetProjectResponse\"\x00\x12\x61\n\x0cListProjects\x12&.flyteidl2.project.ListProjectsRequest\x1a\'.flyteidl2.project.ListProjectsResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.projectB\x13ProjectServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project\xa2\x02\x03\x46PX\xaa\x02\x11\x46lyteidl2.Project\xca\x02\x11\x46lyteidl2\\Project\xe2\x02\x1d\x46lyteidl2\\Project\\GPBMetadata\xea\x02\x12\x46lyteidl2::Projectb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,32 +23,30 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.project.project_s
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\025com.flyteidl2.projectB\023ProjectServiceProtoH\002P\001Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project\242\002\003FPX\252\002\021Flyteidl2.Project\312\002\021Flyteidl2\\Project\342\002\035Flyteidl2\\Project\\GPBMetadata\352\002\022Flyteidl2::Project'
-  _PROJECTSERVICE.methods_by_name['RegisterProject']._options = None
-  _PROJECTSERVICE.methods_by_name['RegisterProject']._serialized_options = b'\202\323\344\223\002>\"\020/api/v1/projects:\001*Z\'\"\"/api/v1/org/projects/{project.org}:\001*'
-  _PROJECTSERVICE.methods_by_name['UpdateProject']._options = None
-  _PROJECTSERVICE.methods_by_name['UpdateProject']._serialized_options = b'\202\323\344\223\002@\032\025/api/v1/projects/{id}:\001*Z$\032\037/api/v1/org/projects/{org}/{id}:\001*'
-  _PROJECTSERVICE.methods_by_name['GetProject']._options = None
-  _PROJECTSERVICE.methods_by_name['GetProject']._serialized_options = b'\202\323\344\223\002:\022\025/api/v1/projects/{id}Z!\022\037/api/v1/org/projects/{org}/{id}'
-  _PROJECTSERVICE.methods_by_name['ListProjects']._options = None
-  _PROJECTSERVICE.methods_by_name['ListProjects']._serialized_options = b'\202\323\344\223\0020\022\020/api/v1/projectsZ\034\022\032/api/v1/org/projects/{org}'
-  _globals['_DOMAIN']._serialized_start=124
-  _globals['_DOMAIN']._serialized_end=168
-  _globals['_PROJECT']._serialized_start=171
-  _globals['_PROJECT']._serialized_end=520
-  _globals['_PROJECT_PROJECTSTATE']._serialized_start=437
-  _globals['_PROJECT_PROJECTSTATE']._serialized_end=520
-  _globals['_PROJECTS']._serialized_start=522
-  _globals['_PROJECTS']._serialized_end=610
-  _globals['_PROJECTLISTREQUEST']._serialized_start=613
-  _globals['_PROJECTLISTREQUEST']._serialized_end=771
-  _globals['_PROJECTREGISTERREQUEST']._serialized_start=773
-  _globals['_PROJECTREGISTERREQUEST']._serialized_end=851
-  _globals['_PROJECTREGISTERRESPONSE']._serialized_start=853
-  _globals['_PROJECTREGISTERRESPONSE']._serialized_end=878
-  _globals['_PROJECTUPDATERESPONSE']._serialized_start=880
-  _globals['_PROJECTUPDATERESPONSE']._serialized_end=903
-  _globals['_PROJECTGETREQUEST']._serialized_start=905
-  _globals['_PROJECTGETREQUEST']._serialized_end=958
-  _globals['_PROJECTSERVICE']._serialized_start=961
-  _globals['_PROJECTSERVICE']._serialized_end=1602
+  _globals['_PROJECTSTATE']._serialized_start=1089
+  _globals['_PROJECTSTATE']._serialized_end=1228
+  _globals['_DOMAIN']._serialized_start=117
+  _globals['_DOMAIN']._serialized_end=161
+  _globals['_PROJECT']._serialized_start=164
+  _globals['_PROJECT']._serialized_end=417
+  _globals['_PROJECTS']._serialized_start=419
+  _globals['_PROJECTS']._serialized_end=507
+  _globals['_CREATEPROJECTREQUEST']._serialized_start=509
+  _globals['_CREATEPROJECTREQUEST']._serialized_end=585
+  _globals['_CREATEPROJECTRESPONSE']._serialized_start=587
+  _globals['_CREATEPROJECTRESPONSE']._serialized_end=610
+  _globals['_UPDATEPROJECTREQUEST']._serialized_start=612
+  _globals['_UPDATEPROJECTREQUEST']._serialized_end=688
+  _globals['_UPDATEPROJECTRESPONSE']._serialized_start=690
+  _globals['_UPDATEPROJECTRESPONSE']._serialized_end=713
+  _globals['_GETPROJECTREQUEST']._serialized_start=715
+  _globals['_GETPROJECTREQUEST']._serialized_end=768
+  _globals['_GETPROJECTRESPONSE']._serialized_start=770
+  _globals['_GETPROJECTRESPONSE']._serialized_end=844
+  _globals['_LISTPROJECTSREQUEST']._serialized_start=847
+  _globals['_LISTPROJECTSREQUEST']._serialized_end=1005
+  _globals['_LISTPROJECTSRESPONSE']._serialized_start=1007
+  _globals['_LISTPROJECTSRESPONSE']._serialized_end=1086
+  _globals['_PROJECTSERVICE']._serialized_start=1231
+  _globals['_PROJECTSERVICE']._serialized_end=1643
 # @@protoc_insertion_point(module_scope)
