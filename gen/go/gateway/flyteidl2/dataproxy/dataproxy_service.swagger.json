@@ -15,8 +15,149 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/dataproxy/artifact_urn": {
+      "post": {
+        "summary": "CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.",
+        "description": "Creates a write-only http location that is accessible for tasks at runtime.",
+        "operationId": "DataProxyService_CreateUploadLocation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateUploadLocationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.\nThe data proxy service will generate a storage location with server-side configured prefixes.\nThe generated path follows one of these patterns:\n  - project/domain/(deterministic hash of content_md5)/filename (if filename is present); OR\n  - project/domain/filename_root/filename (if filename_root and filename are present).",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateUploadLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
+    "/api/v1/org/dataproxy/artifact_urn": {
+      "post": {
+        "summary": "CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.",
+        "description": "Creates a write-only http location that is accessible for tasks at runtime.",
+        "operationId": "DataProxyService_CreateUploadLocation2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateUploadLocationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.\nThe data proxy service will generate a storage location with server-side configured prefixes.\nThe generated path follows one of these patterns:\n  - project/domain/(deterministic hash of content_md5)/filename (if filename is present); OR\n  - project/domain/filename_root/filename (if filename_root and filename are present).",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateUploadLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    }
+  },
   "definitions": {
+    "dataproxyCreateUploadLocationRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "title": "Project to create the upload location for.\n+required"
+        },
+        "domain": {
+          "type": "string",
+          "title": "Domain to create the upload location for.\n+required"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Filename specifies the desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.\n+optional. By default, the service generates a consistent name based on the default filename length provided in the global config.."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines the requested expiration duration for the generated URL. The request will be rejected if this\nexceeds the platform's configured maximum.\n+optional. The default value comes from the global config."
+        },
+        "content_md5": {
+          "type": "string",
+          "format": "byte",
+          "title": "ContentMD5 restricts the upload location to the specific MD5 provided. The MD5 hash will also appear in the\ngenerated path for verification.\n+required"
+        },
+        "filename_root": {
+          "type": "string",
+          "title": "FilenameRoot, if present, will be used instead of the MD5 hash in the path. When combined with filename,\nthis makes the upload location deterministic. The native URL will still be prefixed by the upload location prefix\nconfigured in the data proxy. This option is useful when uploading multiple related files.\n+optional"
+        },
+        "add_content_md5_metadata": {
+          "type": "boolean",
+          "description": "If true, the data proxy will add content_md5 to the Signed URL requirements,\nforcing clients to send this checksum with the object.\nThis is required to enforce data integrity on backends like GCP, ensuring that\nthe uploaded file matches the hash."
+        },
+        "org": {
+          "type": "string",
+          "title": "Org is the organization key applied to the resource.\n+optional"
+        },
+        "content_length": {
+          "type": "string",
+          "format": "int64",
+          "title": "ContentLength specifies the size of the content to be uploaded in bytes.\nThis is validated against the platform's maximum upload size if provided.\n+optional"
+        }
+      },
+      "description": "CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.\nThe data proxy service will generate a storage location with server-side configured prefixes.\nThe generated path follows one of these patterns:\n  - project/domain/(deterministic hash of content_md5)/filename (if filename is present); OR\n  - project/domain/filename_root/filename (if filename_root and filename are present)."
+    },
+    "dataproxyCreateUploadLocationResponse": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "string",
+          "description": "SignedUrl is the URL to use for uploading content (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)."
+        },
+        "native_url": {
+          "type": "string",
+          "description": "NativeUrl is the URL in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when the signed URL will expire."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Headers are generated by the data proxy for the client. Clients must include these headers in the upload request."
+        }
+      },
+      "description": "CreateUploadLocationResponse specifies the response for the CreateUploadLocation API."
+    },
     "googlerpcStatus": {
       "type": "object",
       "properties": {
