@@ -91,6 +91,7 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ProjectServiceGetProjectProcedure,
 			connect.WithSchema(projectServiceGetProjectMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listProjects: connect.NewClient[project.ListProjectsRequest, project.ListProjectsResponse](
@@ -161,6 +162,7 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		ProjectServiceGetProjectProcedure,
 		svc.GetProject,
 		connect.WithSchema(projectServiceGetProjectMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceListProjectsHandler := connect.NewUnaryHandler(

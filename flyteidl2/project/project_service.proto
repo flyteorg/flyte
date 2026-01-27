@@ -130,7 +130,9 @@ service ProjectService {
   // it will be ignored in the handler as domains cannot be updated via this API.
   rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {}
 
-  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {}
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {}
 }

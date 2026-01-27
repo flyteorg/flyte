@@ -71,12 +71,14 @@ func NewAuthMetadataServiceClient(httpClient connect.HTTPClient, baseURL string,
 			httpClient,
 			baseURL+AuthMetadataServiceGetOAuth2MetadataProcedure,
 			connect.WithSchema(authMetadataServiceGetOAuth2MetadataMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getPublicClientConfig: connect.NewClient[auth.GetPublicClientConfigRequest, auth.GetPublicClientConfigResponse](
 			httpClient,
 			baseURL+AuthMetadataServiceGetPublicClientConfigProcedure,
 			connect.WithSchema(authMetadataServiceGetPublicClientConfigMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -118,12 +120,14 @@ func NewAuthMetadataServiceHandler(svc AuthMetadataServiceHandler, opts ...conne
 		AuthMetadataServiceGetOAuth2MetadataProcedure,
 		svc.GetOAuth2Metadata,
 		connect.WithSchema(authMetadataServiceGetOAuth2MetadataMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	authMetadataServiceGetPublicClientConfigHandler := connect.NewUnaryHandler(
 		AuthMetadataServiceGetPublicClientConfigProcedure,
 		svc.GetPublicClientConfig,
 		connect.WithSchema(authMetadataServiceGetPublicClientConfigMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.auth.AuthMetadataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

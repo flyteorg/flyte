@@ -72,12 +72,14 @@ message GetPublicClientConfigResponse {
 service AuthMetadataService {
   // Anonymously accessible. Retrieves local or external oauth authorization server metadata.
   rpc GetOAuth2Metadata(GetOAuth2MetadataRequest) returns (GetOAuth2MetadataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/.well-known/oauth-authorization-server"};
   }
 
   // Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
   // requests.
   rpc GetPublicClientConfig(GetPublicClientConfigRequest) returns (GetPublicClientConfigResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/config/v1/flyte_client"};
   }
 }
