@@ -1,8 +1,6 @@
 syntax = "proto3";
 package flyteidl2.auth;
 
-import "google/api/annotations.proto";
-
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth";
 
 message GetOAuth2MetadataRequest {}
@@ -73,13 +71,11 @@ service AuthMetadataService {
   // Anonymously accessible. Retrieves local or external oauth authorization server metadata.
   rpc GetOAuth2Metadata(GetOAuth2MetadataRequest) returns (GetOAuth2MetadataResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (google.api.http) = {get: "/.well-known/oauth-authorization-server"};
   }
 
   // Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
   // requests.
   rpc GetPublicClientConfig(GetPublicClientConfigRequest) returns (GetPublicClientConfigResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
-    option (google.api.http) = {get: "/config/v1/flyte_client"};
   }
 }

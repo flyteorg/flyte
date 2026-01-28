@@ -1,7 +1,6 @@
 syntax = "proto3";
 package flyteidl2.auth;
 
-import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth";
@@ -39,7 +38,5 @@ message UserInfoResponse {
 // IdentityService defines an RPC Service that interacts with user/app identities.
 service IdentityService {
   // Retrieves user information about the currently logged in user.
-  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {
-    option (google.api.http) = {get: "/me"};
-  }
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {}
 }

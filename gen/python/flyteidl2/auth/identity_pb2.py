@@ -11,11 +11,10 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl2/auth/identity.proto\x12\x0e\x66lyteidl2.auth\x1a\x1cgoogle/api/annotations.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x11\n\x0fUserInfoRequest\"\xa5\x02\n\x10UserInfoResponse\x12\x18\n\x07subject\x18\x01 \x01(\tR\x07subject\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12-\n\x12preferred_username\x18\x03 \x01(\tR\x11preferredUsername\x12\x1d\n\ngiven_name\x18\x04 \x01(\tR\tgivenName\x12\x1f\n\x0b\x66\x61mily_name\x18\x05 \x01(\tR\nfamilyName\x12\x14\n\x05\x65mail\x18\x06 \x01(\tR\x05\x65mail\x12\x18\n\x07picture\x18\x07 \x01(\tR\x07picture\x12\x44\n\x11\x61\x64\x64itional_claims\x18\x08 \x01(\x0b\x32\x17.google.protobuf.StructR\x10\x61\x64\x64itionalClaims2m\n\x0fIdentityService\x12Z\n\x08UserInfo\x12\x1f.flyteidl2.auth.UserInfoRequest\x1a .flyteidl2.auth.UserInfoResponse\"\x0b\x82\xd3\xe4\x93\x02\x05\x12\x03/meB\xb2\x01\n\x12\x63om.flyteidl2.authB\rIdentityProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl2.Auth\xca\x02\x0e\x46lyteidl2\\Auth\xe2\x02\x1a\x46lyteidl2\\Auth\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Authb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl2/auth/identity.proto\x12\x0e\x66lyteidl2.auth\x1a\x1cgoogle/protobuf/struct.proto\"\x11\n\x0fUserInfoRequest\"\xa5\x02\n\x10UserInfoResponse\x12\x18\n\x07subject\x18\x01 \x01(\tR\x07subject\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12-\n\x12preferred_username\x18\x03 \x01(\tR\x11preferredUsername\x12\x1d\n\ngiven_name\x18\x04 \x01(\tR\tgivenName\x12\x1f\n\x0b\x66\x61mily_name\x18\x05 \x01(\tR\nfamilyName\x12\x14\n\x05\x65mail\x18\x06 \x01(\tR\x05\x65mail\x12\x18\n\x07picture\x18\x07 \x01(\tR\x07picture\x12\x44\n\x11\x61\x64\x64itional_claims\x18\x08 \x01(\x0b\x32\x17.google.protobuf.StructR\x10\x61\x64\x64itionalClaims2b\n\x0fIdentityService\x12O\n\x08UserInfo\x12\x1f.flyteidl2.auth.UserInfoRequest\x1a .flyteidl2.auth.UserInfoResponse\"\x00\x42\xb2\x01\n\x12\x63om.flyteidl2.authB\rIdentityProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl2.Auth\xca\x02\x0e\x46lyteidl2\\Auth\xe2\x02\x1a\x46lyteidl2\\Auth\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Authb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,12 +22,10 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.auth.identity_pb2
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.authB\rIdentityProtoH\002P\001Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth\242\002\003FAX\252\002\016Flyteidl2.Auth\312\002\016Flyteidl2\\Auth\342\002\032Flyteidl2\\Auth\\GPBMetadata\352\002\017Flyteidl2::Auth'
-  _IDENTITYSERVICE.methods_by_name['UserInfo']._options = None
-  _IDENTITYSERVICE.methods_by_name['UserInfo']._serialized_options = b'\202\323\344\223\002\005\022\003/me'
-  _globals['_USERINFOREQUEST']._serialized_start=109
-  _globals['_USERINFOREQUEST']._serialized_end=126
-  _globals['_USERINFORESPONSE']._serialized_start=129
-  _globals['_USERINFORESPONSE']._serialized_end=422
-  _globals['_IDENTITYSERVICE']._serialized_start=424
-  _globals['_IDENTITYSERVICE']._serialized_end=533
+  _globals['_USERINFOREQUEST']._serialized_start=79
+  _globals['_USERINFOREQUEST']._serialized_end=96
+  _globals['_USERINFORESPONSE']._serialized_start=99
+  _globals['_USERINFORESPONSE']._serialized_end=392
+  _globals['_IDENTITYSERVICE']._serialized_start=394
+  _globals['_IDENTITYSERVICE']._serialized_end=492
 # @@protoc_insertion_point(module_scope)
