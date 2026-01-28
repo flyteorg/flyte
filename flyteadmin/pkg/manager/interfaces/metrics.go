@@ -6,7 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery --name=MetricsInterface --output=../mocks --case=underscore --with-expecter
 
 // Interface for managing Flyte execution metrics
 type MetricsInterface interface {

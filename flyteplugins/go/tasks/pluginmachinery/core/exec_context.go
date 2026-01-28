@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 
 // An interface to access a remote/sharable location that contains the serialized TaskTemplate
 type TaskTemplatePath interface {

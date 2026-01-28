@@ -6,7 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery --name=NamedEntityInterface --output=../mocks --case=underscore --with-expecter
 
 // Interface for managing metadata associated with NamedEntityIdentifiers
 type NamedEntityInterface interface {

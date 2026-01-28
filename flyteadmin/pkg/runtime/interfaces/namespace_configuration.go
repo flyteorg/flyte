@@ -6,7 +6,6 @@ type NamespaceMappingConfig struct {
 	TemplateData TemplateData `json:"templateData"`
 }
 
-//go:generate mockery --name NamespaceMappingConfiguration --output=../mocks --case=underscore --with-expecter
 
 type NamespaceMappingConfiguration interface {
 	GetNamespaceTemplate() string

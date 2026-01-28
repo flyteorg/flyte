@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 )
 
-//go:generate mockery --name Executor --output=mocks --case=underscore --with-expecter
 
 // Executor allows the ability to create scheduled executions on admin
 type Executor interface {

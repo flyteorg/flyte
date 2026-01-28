@@ -7,8 +7,6 @@ import (
 	"golang.org/x/time/rate"
 )
 
-//go:generate mockery --name Limiter --output ../mocks --case=snake --with-expecter
-//go:generate mockery --name Reservation --output ../mocks --case=snake --with-expecter
 
 type Limiter interface {
 	Allow() bool

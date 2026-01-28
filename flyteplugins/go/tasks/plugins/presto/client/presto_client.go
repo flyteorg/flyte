@@ -17,7 +17,6 @@ type PrestoExecuteResponse struct {
 	NextURI string `json:"nextUri,omitempty"`
 }
 
-//go:generate mockery --all --case=snake --with-expecter
 
 // Interface to interact with PrestoClient for Presto tasks
 type PrestoClient interface {
