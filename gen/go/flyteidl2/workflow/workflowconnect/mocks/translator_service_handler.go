@@ -25,6 +25,65 @@ func (_m *TranslatorServiceHandler) EXPECT() *TranslatorServiceHandler_Expecter 
 	return &TranslatorServiceHandler_Expecter{mock: &_m.Mock}
 }
 
+// JsonValuesToLiterals provides a mock function with given fields: _a0, _a1
+func (_m *TranslatorServiceHandler) JsonValuesToLiterals(_a0 context.Context, _a1 *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for JsonValuesToLiterals")
+	}
+
+	var r0 *connect.Response[workflow.JsonValuesToLiteralsResponse]
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) *connect.Response[workflow.JsonValuesToLiteralsResponse]); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.JsonValuesToLiteralsResponse])
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TranslatorServiceHandler_JsonValuesToLiterals_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'JsonValuesToLiterals'
+type TranslatorServiceHandler_JsonValuesToLiterals_Call struct {
+	*mock.Call
+}
+
+// JsonValuesToLiterals is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 *connect.Request[workflow.JsonValuesToLiteralsRequest]
+func (_e *TranslatorServiceHandler_Expecter) JsonValuesToLiterals(_a0 interface{}, _a1 interface{}) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
+	return &TranslatorServiceHandler_JsonValuesToLiterals_Call{Call: _e.mock.On("JsonValuesToLiterals", _a0, _a1)}
+}
+
+func (_c *TranslatorServiceHandler_JsonValuesToLiterals_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.JsonValuesToLiteralsRequest])) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*connect.Request[workflow.JsonValuesToLiteralsRequest]))
+	})
+	return _c
+}
+
+func (_c *TranslatorServiceHandler_JsonValuesToLiterals_Call) Return(_a0 *connect.Response[workflow.JsonValuesToLiteralsResponse], _a1 error) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TranslatorServiceHandler_JsonValuesToLiterals_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error)) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // LaunchFormJsonToLiterals provides a mock function with given fields: _a0, _a1
 func (_m *TranslatorServiceHandler) LaunchFormJsonToLiterals(_a0 context.Context, _a1 *connect.Request[workflow.LaunchFormJsonToLiteralsRequest]) (*connect.Response[workflow.LaunchFormJsonToLiteralsResponse], error) {
 	ret := _m.Called(_a0, _a1)
