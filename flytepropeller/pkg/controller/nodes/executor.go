@@ -233,7 +233,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		if uniqueIDErr != nil {
 			logger.Warnf(currentNodeCtx, "NodeVisit: Error generating unique node ID for [%v]: %v", currentNode.GetID(), uniqueIDErr)
 			// Fallback to using the current node ID if unique ID generation fails
-			// Note that the uniquIDErr will still be non-nil and used as inidicator that the Unique ID is not available.
+			// Note that the uniquIDErr will still be non-nil and used as indicator that the Unique ID is not available.
 			uniqueNodeID = currentNode.GetID()
 		} else {
 			logger.Debugf(currentNodeCtx, "NodeVisit: Unique node ID generated for [%v]: %v", currentNode.GetID(), uniqueNodeID)
@@ -253,7 +253,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
 			// Check if we can bypass parallelism limit for already-running workflow nodes
 			// Note that while this currently applies to workflow nodes, it could be extended to other node types which
-			// are potentally hitting the same parallelism limit behavior.
+			// are potentially hitting the same parallelism limit behavior.
 			canBypassParallelism := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes &&
 				currentNode.GetKind() == v1alpha1.NodeKindWorkflow &&
 				nodePhase != v1alpha1.NodePhaseNotYetStarted
