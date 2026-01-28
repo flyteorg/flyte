@@ -92,6 +92,7 @@ class Status(_message.Message):
         DEPLOYMENT_STATUS_SCALING_UP: _ClassVar[Status.DeploymentStatus]
         DEPLOYMENT_STATUS_SCALING_DOWN: _ClassVar[Status.DeploymentStatus]
         DEPLOYMENT_STATUS_DEPLOYING: _ClassVar[Status.DeploymentStatus]
+        DEPLOYMENT_STATUS_SCALING_COMPLETE: _ClassVar[Status.DeploymentStatus]
     DEPLOYMENT_STATUS_UNSPECIFIED: Status.DeploymentStatus
     DEPLOYMENT_STATUS_UNASSIGNED: Status.DeploymentStatus
     DEPLOYMENT_STATUS_ASSIGNED: Status.DeploymentStatus
@@ -103,6 +104,7 @@ class Status(_message.Message):
     DEPLOYMENT_STATUS_SCALING_UP: Status.DeploymentStatus
     DEPLOYMENT_STATUS_SCALING_DOWN: Status.DeploymentStatus
     DEPLOYMENT_STATUS_DEPLOYING: Status.DeploymentStatus
+    DEPLOYMENT_STATUS_SCALING_COMPLETE: Status.DeploymentStatus
     ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     CURRENT_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     INGRESS_FIELD_NUMBER: _ClassVar[int]
