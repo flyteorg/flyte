@@ -90,10 +90,11 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
 
+	// Use NewSchemaless to avoid schema URL conflicts between resource.Default()
+	// and semconv.SchemaURL (they may use different OpenTelemetry schema versions)
 	telemetryResource, err := resource.Merge(
 		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
+		resource.NewSchemaless(
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.ServiceVersionKey.String(version.Version),
 		),
