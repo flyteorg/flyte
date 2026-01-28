@@ -51,7 +51,6 @@ type Clusters struct {
 	DefaultExecutionLabel string                     `json:"defaultExecutionLabel"`
 }
 
-//go:generate mockery --name ClusterConfiguration --case=underscore --output=../mocks --case=underscore --with-expecter
 
 // Provides values set in runtime configuration files.
 // These files can be changed without requiring a full server restart.

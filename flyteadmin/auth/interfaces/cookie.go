@@ -9,7 +9,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-//go:generate mockery --name=CookieHandler --output=mocks/ --case=underscore --with-expecter
 
 type CookieHandler interface {
 	SetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) error

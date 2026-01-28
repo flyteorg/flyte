@@ -8,7 +8,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-//go:generate mockery --all --case=underscore --with-expecter
 
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
 type TaskOverrides interface {

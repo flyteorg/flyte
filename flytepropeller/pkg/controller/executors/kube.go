@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-//go:generate mockery --name Client --case=underscore --with-expecter
 
 // Client is a friendlier controller-runtime client that gets passed to executors
 type Client interface {

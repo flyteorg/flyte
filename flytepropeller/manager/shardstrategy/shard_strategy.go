@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery --name ShardStrategy --case=underscore --with-expecter
 
 // ShardStrategy defines necessary functionality for a sharding strategy.
 type ShardStrategy interface {

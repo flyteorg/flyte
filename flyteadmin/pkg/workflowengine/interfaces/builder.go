@@ -5,7 +5,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery --name FlyteWorkflowBuilder --output=../mocks --case=underscore --with-expecter
 
 // FlyteWorkflowBuilder produces a v1alpha1.FlyteWorkflow definition from a compiled workflow closure and execution inputs
 type FlyteWorkflowBuilder interface {

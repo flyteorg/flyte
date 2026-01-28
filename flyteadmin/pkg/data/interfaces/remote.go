@@ -6,7 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery --name=RemoteURLInterface --output=../mocks --case=underscore --with-expecter
 
 // Defines an interface for fetching pre-signed URLs.
 type RemoteURLInterface interface {

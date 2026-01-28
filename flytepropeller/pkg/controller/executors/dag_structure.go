@@ -6,7 +6,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery --name DAGStructure --name DAGStructureWithStartNode --case=underscore --with-expecter
 
 // An interface that captures the Directed Acyclic Graph structure in which the nodes are connected.
 // If NodeLookup and DAGStructure are used together a traversal can be implemented.
