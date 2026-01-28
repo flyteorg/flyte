@@ -141,6 +141,8 @@ message Status {
     DEPLOYMENT_STATUS_SCALING_DOWN = 9;
     // Triggered in response to the latest app spec changing
     DEPLOYMENT_STATUS_DEPLOYING = 10;
+    // Triggered when scaling process complete
+    DEPLOYMENT_STATUS_SCALING_COMPLETE = 11;
   }
 
   // Current number of replicas.
