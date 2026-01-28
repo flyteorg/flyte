@@ -871,3 +871,301 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskSpecToLaunchFormJsonResponseValidationError{}
+
+// Validate checks the field values on JsonValuesToLiteralsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *JsonValuesToLiteralsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on JsonValuesToLiteralsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// JsonValuesToLiteralsRequestMultiError, or nil if none found.
+func (m *JsonValuesToLiteralsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *JsonValuesToLiteralsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetVariables()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, JsonValuesToLiteralsRequestValidationError{
+					field:  "Variables",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, JsonValuesToLiteralsRequestValidationError{
+					field:  "Variables",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetVariables()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return JsonValuesToLiteralsRequestValidationError{
+				field:  "Variables",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetValues()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, JsonValuesToLiteralsRequestValidationError{
+					field:  "Values",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, JsonValuesToLiteralsRequestValidationError{
+					field:  "Values",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetValues()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return JsonValuesToLiteralsRequestValidationError{
+				field:  "Values",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return JsonValuesToLiteralsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// JsonValuesToLiteralsRequestMultiError is an error wrapping multiple
+// validation errors returned by JsonValuesToLiteralsRequest.ValidateAll() if
+// the designated constraints aren't met.
+type JsonValuesToLiteralsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m JsonValuesToLiteralsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m JsonValuesToLiteralsRequestMultiError) AllErrors() []error { return m }
+
+// JsonValuesToLiteralsRequestValidationError is the validation error returned
+// by JsonValuesToLiteralsRequest.Validate if the designated constraints
+// aren't met.
+type JsonValuesToLiteralsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JsonValuesToLiteralsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JsonValuesToLiteralsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JsonValuesToLiteralsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JsonValuesToLiteralsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JsonValuesToLiteralsRequestValidationError) ErrorName() string {
+	return "JsonValuesToLiteralsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e JsonValuesToLiteralsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJsonValuesToLiteralsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JsonValuesToLiteralsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JsonValuesToLiteralsRequestValidationError{}
+
+// Validate checks the field values on JsonValuesToLiteralsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *JsonValuesToLiteralsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on JsonValuesToLiteralsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// JsonValuesToLiteralsResponseMultiError, or nil if none found.
+func (m *JsonValuesToLiteralsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *JsonValuesToLiteralsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLiterals() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, JsonValuesToLiteralsResponseValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, JsonValuesToLiteralsResponseValidationError{
+						field:  fmt.Sprintf("Literals[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return JsonValuesToLiteralsResponseValidationError{
+					field:  fmt.Sprintf("Literals[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return JsonValuesToLiteralsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// JsonValuesToLiteralsResponseMultiError is an error wrapping multiple
+// validation errors returned by JsonValuesToLiteralsResponse.ValidateAll() if
+// the designated constraints aren't met.
+type JsonValuesToLiteralsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m JsonValuesToLiteralsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m JsonValuesToLiteralsResponseMultiError) AllErrors() []error { return m }
+
+// JsonValuesToLiteralsResponseValidationError is the validation error returned
+// by JsonValuesToLiteralsResponse.Validate if the designated constraints
+// aren't met.
+type JsonValuesToLiteralsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JsonValuesToLiteralsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JsonValuesToLiteralsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JsonValuesToLiteralsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JsonValuesToLiteralsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JsonValuesToLiteralsResponseValidationError) ErrorName() string {
+	return "JsonValuesToLiteralsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e JsonValuesToLiteralsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJsonValuesToLiteralsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JsonValuesToLiteralsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JsonValuesToLiteralsResponseValidationError{}
