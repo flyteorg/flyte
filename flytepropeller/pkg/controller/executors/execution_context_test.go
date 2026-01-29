@@ -98,3 +98,93 @@ func TestNewParentInfo(t *testing.T) {
 	assert.Equal(t, expectedID, parentInfo.uniqueID)
 	assert.Equal(t, expectedAttempt, parentInfo.currentAttempts)
 }
+
+func TestNewVisitedNodes(t *testing.T) {
+	vn := NewVisitedNodes()
+	assert.NotNil(t, vn)
+}
+
+func TestVisitedNodes_Add(t *testing.T) {
+	vn := NewVisitedNodes()
+	nodeID := "node1"
+	vn.Add(nodeID)
+	assert.True(t, vn.Contains(nodeID))
+}
+
+func TestVisitedNodes_Contains(t *testing.T) {
+	vn := NewVisitedNodes()
+	nodeID := "node1"
+
+	// Node should not be present initially
+	assert.False(t, vn.Contains(nodeID))
+
+	// Add node and verify it's present
+	vn.Add(nodeID)
+	assert.True(t, vn.Contains(nodeID))
+
+	// Check that other nodes are not present
+	assert.False(t, vn.Contains("node2"))
+}
+
+func TestVisitedNodes_MultipleNodes(t *testing.T) {
+	vn := NewVisitedNodes()
+
+	// Add multiple nodes
+	vn.Add("node1")
+	vn.Add("node2")
+	vn.Add("node3")
+
+	// Verify all nodes are present
+	assert.True(t, vn.Contains("node1"))
+	assert.True(t, vn.Contains("node2"))
+	assert.True(t, vn.Contains("node3"))
+
+	// Verify non-existent node is not present
+	assert.False(t, vn.Contains("node4"))
+}
+
+func TestControlFlow_VisitedNodes(t *testing.T) {
+	cFlow := InitializeControlFlow()
+	visitedNodes := cFlow.VisitedNodes()
+
+	// Should return non-nil visited nodes
+	assert.NotNil(t, visitedNodes)
+
+	// Should be able to add and retrieve nodes
+	nodeID := "testNode"
+	visitedNodes.Add(nodeID)
+	assert.True(t, visitedNodes.Contains(nodeID))
+}
+
+func TestInitializeControlFlow_VisitedNodes(t *testing.T) {
+	cFlow := InitializeControlFlow().(*controlFlow)
+
+	// Visited nodes should be initialized
+	assert.NotNil(t, cFlow.visitedNodes)
+
+	// Should start empty
+	assert.False(t, cFlow.visitedNodes.Contains("anyNode"))
+
+	// Should be able to add nodes through VisitedNodes() method
+	vn := cFlow.VisitedNodes()
+	vn.Add("node1")
+	assert.True(t, cFlow.visitedNodes.Contains("node1"))
+}
+
+func TestControlFlow_NodeExecutionCount(t *testing.T) {
+	cFlow := InitializeControlFlow().(*controlFlow)
+	assert.Equal(t, uint32(0), cFlow.CurrentNodeExecutionCount())
+	cFlow.IncrementNodeExecutionCount()
+	assert.Equal(t, uint32(1), cFlow.CurrentNodeExecutionCount())
+	cFlow.IncrementNodeExecutionCount()
+	assert.Equal(t, uint32(2), cFlow.CurrentNodeExecutionCount())
+}
+
+func TestControlFlow_TaskExecutionCount(t *testing.T) {
+	cFlow := InitializeControlFlow().(*controlFlow)
+	assert.Equal(t, uint32(0), cFlow.CurrentTaskExecutionCount())
+	cFlow.IncrementTaskExecutionCount()
+	assert.Equal(t, uint32(1), cFlow.CurrentTaskExecutionCount())
+	cFlow.IncrementTaskExecutionCount()
+	assert.Equal(t, uint32(2), cFlow.CurrentTaskExecutionCount())
+}

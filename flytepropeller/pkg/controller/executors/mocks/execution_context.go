@@ -1265,6 +1265,53 @@ func (_c *ExecutionContext_IsInterruptible_Call) RunAndReturn(run func() bool) *
 	return _c
 }
 
+// VisitedNodes provides a mock function with no fields
+func (_m *ExecutionContext) VisitedNodes() executors.VisitedNodes {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for VisitedNodes")
+	}
+
+	var r0 executors.VisitedNodes
+	if rf, ok := ret.Get(0).(func() executors.VisitedNodes); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(executors.VisitedNodes)
+		}
+	}
+
+	return r0
+}
+
+// ExecutionContext_VisitedNodes_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'VisitedNodes'
+type ExecutionContext_VisitedNodes_Call struct {
+	*mock.Call
+}
+
+// VisitedNodes is a helper method to define mock.On call
+func (_e *ExecutionContext_Expecter) VisitedNodes() *ExecutionContext_VisitedNodes_Call {
+	return &ExecutionContext_VisitedNodes_Call{Call: _e.mock.On("VisitedNodes")}
+}
+
+func (_c *ExecutionContext_VisitedNodes_Call) Run(run func()) *ExecutionContext_VisitedNodes_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutionContext_VisitedNodes_Call) Return(_a0 executors.VisitedNodes) *ExecutionContext_VisitedNodes_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ExecutionContext_VisitedNodes_Call) RunAndReturn(run func() executors.VisitedNodes) *ExecutionContext_VisitedNodes_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewExecutionContext creates a new instance of ExecutionContext. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewExecutionContext(t interface {
