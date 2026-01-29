@@ -95,6 +95,7 @@ def schedule_workflow_groups(
         non_succeeded_executions = []
         for execution in executions:
             if execution.closure.phase != WorkflowExecutionPhase.SUCCEEDED:
+                print(f"workflow is in {execution.closure.phase}")
                 non_succeeded_executions.append(execution)
         # Report failing cases
         if len(non_succeeded_executions) != 0:
