@@ -582,4 +582,3 @@ func intPtr(val int32) *int32 {
 	}
 	return &val
 }
-
