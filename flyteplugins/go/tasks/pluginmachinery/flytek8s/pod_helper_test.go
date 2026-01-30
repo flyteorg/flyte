@@ -1940,6 +1940,15 @@ func TestToK8sPod(t *testing.T) {
 		assert.False(t, p.HostNetwork)
 	})
 
+	t.Run("disableServiceLinks", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.NotNil(t, p.EnableServiceLinks)
+		assert.False(t, *p.EnableServiceLinks)
+	})
+
 	t.Run("default-pod-dns-config", func(t *testing.T) {
 		val1 := "1"
 		val2 := "1"

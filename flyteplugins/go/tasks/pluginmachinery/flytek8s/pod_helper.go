@@ -473,6 +473,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			"invalid TaskSpecification, unable to determine Pod configuration")
 	}
 
+	enableServiceLinks := false
+	podSpec.EnableServiceLinks = &enableServiceLinks
+
 	return podSpec, &objectMeta, primaryContainerName, nil
 }
 
