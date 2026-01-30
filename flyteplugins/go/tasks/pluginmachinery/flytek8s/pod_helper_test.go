@@ -98,7 +98,7 @@ func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirement
 	tCtx.EXPECT().OutputWriter().Return(ow)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.EXPECT().Read( mock.Anything).Return(taskTemplate, nil)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
 	tCtx.EXPECT().TaskReader().Return(taskReader)
 	return tCtx
 }
@@ -1939,6 +1939,15 @@ func TestToK8sPod(t *testing.T) {
 		assert.False(t, p.HostNetwork)
 	})
 
+	t.Run("disableServiceLinks", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.NotNil(t, p.EnableServiceLinks)
+		assert.False(t, *p.EnableServiceLinks)
+	})
+
 	t.Run("default-pod-dns-config", func(t *testing.T) {
 		val1 := "1"
 		val2 := "1"
@@ -3046,7 +3055,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -3072,7 +3081,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -3099,7 +3108,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -3127,7 +3136,7 @@ func TestGetPodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -3169,7 +3178,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
@@ -3231,7 +3240,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		}
 
 		taskReader := &pluginsCoreMock.TaskReader{}
-		taskReader.EXPECT().Read( mock.Anything).Return(task, nil)
+		taskReader.EXPECT().Read(mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
 		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
