@@ -17,7 +17,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/translator_service.proto.
  */
 export const file_flyteidl2_workflow_translator_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cigQEKH0xpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwSLgoJdmFyaWFibGVzGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuVmFyaWFibGVNYXAiSQogTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2USJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiSAofTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBIlCgRqc29uGAEgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJSCiBMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZRIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCJOCh9UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXF1ZXN0EisKCXRhc2tfc3BlYxgBIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjIkkKIFRhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlc3BvbnNlEiUKBGpzb24YASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0MroDChFUcmFuc2xhdG9yU2VydmljZRKKAQoYTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uEjMuZmx5dGVpZGwyLndvcmtmbG93LkxpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QaNC5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2UiA5ACARKKAQoYTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzEjMuZmx5dGVpZGwyLndvcmtmbG93LkxhdW5jaEZvcm1Kc29uVG9MaXRlcmFsc1JlcXVlc3QaNC5mbHl0ZWlkbDIud29ya2Zsb3cuTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVzcG9uc2UiA5ACARKKAQoYVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uEjMuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QaNC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2UiA5ACAULTAQoWY29tLmZseXRlaWRsMi53b3JrZmxvd0IWVHJhbnNsYXRvclNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_flyteidl2_core_interface, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_google_protobuf_struct]);
+  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cigQEKH0xpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwSLgoJdmFyaWFibGVzGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuVmFyaWFibGVNYXAiSQogTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2USJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiSAofTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBIlCgRqc29uGAEgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJSCiBMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZRIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCJOCh9UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXF1ZXN0EisKCXRhc2tfc3BlYxgBIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjIkkKIFRhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlc3BvbnNlEiUKBGpzb24YASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0InYKG0pzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBIuCgl2YXJpYWJsZXMYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcBInCgZ2YWx1ZXMYAiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ik4KHEpzb25WYWx1ZXNUb0xpdGVyYWxzUmVzcG9uc2USLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwyugQKEVRyYW5zbGF0b3JTZXJ2aWNlEooBChhMaXRlcmFsc1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MaXRlcmFsc1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEooBChhMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHMSMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZSIDkAIBEooBChhUYXNrU3BlY1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEn4KFEpzb25WYWx1ZXNUb0xpdGVyYWxzEi8uZmx5dGVpZGwyLndvcmtmbG93Lkpzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBowLmZseXRlaWRsMi53b3JrZmxvdy5Kc29uVmFsdWVzVG9MaXRlcmFsc1Jlc3BvbnNlIgOQAgFC0wEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCFlRyYW5zbGF0b3JTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_flyteidl2_core_interface, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_google_protobuf_struct]);
 
 /**
  * @generated from message flyteidl2.workflow.LiteralsToLaunchFormJsonRequest
@@ -140,6 +140,51 @@ export const TaskSpecToLaunchFormJsonResponseSchema: GenMessage<TaskSpecToLaunch
   messageDesc(file_flyteidl2_workflow_translator_service, 5);
 
 /**
+ * @generated from message flyteidl2.workflow.JsonValuesToLiteralsRequest
+ */
+export type JsonValuesToLiteralsRequest = Message<"flyteidl2.workflow.JsonValuesToLiteralsRequest"> & {
+  /**
+   * The type definitions (VariableMap) describing the expected structure.
+   *
+   * @generated from field: flyteidl2.core.VariableMap variables = 1;
+   */
+  variables?: VariableMap;
+
+  /**
+   * The raw JSON values to convert to literals.
+   *
+   * @generated from field: google.protobuf.Struct values = 2;
+   */
+  values?: JsonObject;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.JsonValuesToLiteralsRequest.
+ * Use `create(JsonValuesToLiteralsRequestSchema)` to create a new message.
+ */
+export const JsonValuesToLiteralsRequestSchema: GenMessage<JsonValuesToLiteralsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_translator_service, 6);
+
+/**
+ * @generated from message flyteidl2.workflow.JsonValuesToLiteralsResponse
+ */
+export type JsonValuesToLiteralsResponse = Message<"flyteidl2.workflow.JsonValuesToLiteralsResponse"> & {
+  /**
+   * The literals generated from the JSON values using the type definitions.
+   *
+   * @generated from field: repeated flyteidl2.task.NamedLiteral literals = 1;
+   */
+  literals: NamedLiteral[];
+};
+
+/**
+ * Describes the message flyteidl2.workflow.JsonValuesToLiteralsResponse.
+ * Use `create(JsonValuesToLiteralsResponseSchema)` to create a new message.
+ */
+export const JsonValuesToLiteralsResponseSchema: GenMessage<JsonValuesToLiteralsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_translator_service, 7);
+
+/**
  * TranslatorService provides an interface for all diferent types of translations for the platform.
  *
  * @generated from service flyteidl2.workflow.TranslatorService
@@ -168,6 +213,14 @@ export const TranslatorService: GenService<{
     methodKind: "unary";
     input: typeof TaskSpecToLaunchFormJsonRequestSchema;
     output: typeof TaskSpecToLaunchFormJsonResponseSchema;
+  },
+  /**
+   * @generated from rpc flyteidl2.workflow.TranslatorService.JsonValuesToLiterals
+   */
+  jsonValuesToLiterals: {
+    methodKind: "unary";
+    input: typeof JsonValuesToLiteralsRequestSchema;
+    output: typeof JsonValuesToLiteralsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_workflow_translator_service, 0);

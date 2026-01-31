@@ -20,6 +20,9 @@ service TranslatorService {
   rpc TaskSpecToLaunchFormJson(TaskSpecToLaunchFormJsonRequest) returns (TaskSpecToLaunchFormJsonResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+  rpc JsonValuesToLiterals(JsonValuesToLiteralsRequest) returns (JsonValuesToLiteralsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message LiteralsToLaunchFormJsonRequest {
@@ -52,4 +55,16 @@ message TaskSpecToLaunchFormJsonRequest {
 message TaskSpecToLaunchFormJsonResponse {
   // The JSON for the variables.
   google.protobuf.Struct json = 1;
+}
+
+message JsonValuesToLiteralsRequest {
+  // The type definitions (VariableMap) describing the expected structure.
+  flyteidl2.core.VariableMap variables = 1;
+  // The raw JSON values to convert to literals.
+  google.protobuf.Struct values = 2;
+}
+
+message JsonValuesToLiteralsResponse {
+  // The literals generated from the JSON values using the type definitions.
+  repeated task.NamedLiteral literals = 1;
 }
