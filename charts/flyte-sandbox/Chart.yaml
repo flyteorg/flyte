@@ -34,7 +34,7 @@ dependencies:
     condition: flyte-binary.enabled
   - name: kubernetes-dashboard
     version: 6.0.0
-    repository: https://kubernetes.github.io/dashboard/
+    repository: https://kubernetes-retired.github.io/dashboard/
     condition: kubernetes-dashboard.enabled
   - name: minio
     version: 12.6.7

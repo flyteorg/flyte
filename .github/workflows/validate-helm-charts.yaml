@@ -54,7 +54,7 @@ jobs:
             --chart-repos dask=https://helm.dask.org \
             --chart-repos bitnami=https://charts.bitnami.com/bitnami \
             --chart-repos twuni=https://twuni.github.io/docker-registry.helm \
-            --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
+            --chart-repos kubernetes-dashboard=https://kubernetes-retired.github.io/dashboard
 
   validate-manifests:
     needs:
