@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package flyteidl2.org;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+//import "org/settings_definition.proto";
+
+option go_package = "github.com/unionai/cloud/gen/pb-go/org";
+
+// Domain represents a customizable partition within an organization.
+// Examples: development, staging, production.
+// Each org defines its own domains, and projects exist across all domains.
+message Domain {
+  // ID is the sanitized identifier (lowercase, hyphenated).
+  // Used in APIs and as the database key.
+  // Must follow Kubernetes naming conventions:
+  // - Lowercase alphanumeric or hyphens
+  // - Must start and end with alphanumeric
+  // - Max 63 characters
+  string id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+    pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+  }];
+
+  // Friendly name for display purposes.
+  // Can contain spaces, capital letters, and most characters.
+  // Max 255 characters.
+  string friendly_name = 2 [(buf.validate.field).string.max_len = 255];
+
+  // Timestamp when the domain was created.
+  google.protobuf.Timestamp created_at = 3;
+
+  // Domain-level settings (optional, populated when include_settings=true).
+  //Settings settings = 4;
+
+  // Version hash for settings optimistic locking.
+  // Only populated when settings is populated.
+  //string settings_version = 5;
+}
