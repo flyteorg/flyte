@@ -6,7 +6,7 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 //import "org/settings_definition.proto";
 
-option go_package = "github.com/unionai/cloud/gen/pb-go/org";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
 
 // Domain represents a customizable partition within an organization.
 // Examples: development, staging, production.

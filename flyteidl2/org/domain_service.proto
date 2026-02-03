@@ -4,45 +4,30 @@ package flyteidl2.org;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/org/domain_definition.proto";
-import "google/api/annotations.proto";
 
-option go_package = "github.com/unionai/cloud/gen/pb-go/org";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
 
 // DomainService provides CRUD operations for domains within an organization.
 // Domains are customizable partitions (e.g., development, staging, production).
 service DomainService {
   // ListDomains returns all domains for an organization.
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
-    option (google.api.http) = {get: "/domains/api/v2/{org}"};
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
   // CreateDomain creates a new domain within an organization.
   // Domain creation is primarily an administrative operation.
-  rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {
-    option (google.api.http) = {
-      post: "/domains/api/v2/{org}"
-      body: "*"
-    };
-  }
+  rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {}
 
   // GetDomain returns a specific domain by ID.
   rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {
-    option (google.api.http) = {get: "/domains/api/v2/{org}/{id}"};
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
   // UpdateDomain updates a domain's metadata.
-  rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {
-    option (google.api.http) = {
-      put: "/domains/api/v2/{org}/{id}"
-      body: "*"
-    };
-  }
+  rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {}
 
-  rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {
-    option (google.api.http) = {delete: "/domains/api/v2/{org}/{id}"};
-  }
+  rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {}
 }
 
 // ListDomainsRequest requests all domains for an organization.
