@@ -42,6 +42,9 @@ const (
 	// TranslatorServiceTaskSpecToLaunchFormJsonProcedure is the fully-qualified name of the
 	// TranslatorService's TaskSpecToLaunchFormJson RPC.
 	TranslatorServiceTaskSpecToLaunchFormJsonProcedure = "/flyteidl2.workflow.TranslatorService/TaskSpecToLaunchFormJson"
+	// TranslatorServiceJsonValuesToLiteralsProcedure is the fully-qualified name of the
+	// TranslatorService's JsonValuesToLiterals RPC.
+	TranslatorServiceJsonValuesToLiteralsProcedure = "/flyteidl2.workflow.TranslatorService/JsonValuesToLiterals"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -50,6 +53,7 @@ var (
 	translatorServiceLiteralsToLaunchFormJsonMethodDescriptor = translatorServiceServiceDescriptor.Methods().ByName("LiteralsToLaunchFormJson")
 	translatorServiceLaunchFormJsonToLiteralsMethodDescriptor = translatorServiceServiceDescriptor.Methods().ByName("LaunchFormJsonToLiterals")
 	translatorServiceTaskSpecToLaunchFormJsonMethodDescriptor = translatorServiceServiceDescriptor.Methods().ByName("TaskSpecToLaunchFormJson")
+	translatorServiceJsonValuesToLiteralsMethodDescriptor     = translatorServiceServiceDescriptor.Methods().ByName("JsonValuesToLiterals")
 )
 
 // TranslatorServiceClient is a client for the flyteidl2.workflow.TranslatorService service.
@@ -57,6 +61,7 @@ type TranslatorServiceClient interface {
 	LiteralsToLaunchFormJson(context.Context, *connect.Request[workflow.LiteralsToLaunchFormJsonRequest]) (*connect.Response[workflow.LiteralsToLaunchFormJsonResponse], error)
 	LaunchFormJsonToLiterals(context.Context, *connect.Request[workflow.LaunchFormJsonToLiteralsRequest]) (*connect.Response[workflow.LaunchFormJsonToLiteralsResponse], error)
 	TaskSpecToLaunchFormJson(context.Context, *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest]) (*connect.Response[workflow.TaskSpecToLaunchFormJsonResponse], error)
+	JsonValuesToLiterals(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error)
 }
 
 // NewTranslatorServiceClient constructs a client for the flyteidl2.workflow.TranslatorService
@@ -90,6 +95,13 @@ func NewTranslatorServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		jsonValuesToLiterals: connect.NewClient[workflow.JsonValuesToLiteralsRequest, workflow.JsonValuesToLiteralsResponse](
+			httpClient,
+			baseURL+TranslatorServiceJsonValuesToLiteralsProcedure,
+			connect.WithSchema(translatorServiceJsonValuesToLiteralsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -98,6 +110,7 @@ type translatorServiceClient struct {
 	literalsToLaunchFormJson *connect.Client[workflow.LiteralsToLaunchFormJsonRequest, workflow.LiteralsToLaunchFormJsonResponse]
 	launchFormJsonToLiterals *connect.Client[workflow.LaunchFormJsonToLiteralsRequest, workflow.LaunchFormJsonToLiteralsResponse]
 	taskSpecToLaunchFormJson *connect.Client[workflow.TaskSpecToLaunchFormJsonRequest, workflow.TaskSpecToLaunchFormJsonResponse]
+	jsonValuesToLiterals     *connect.Client[workflow.JsonValuesToLiteralsRequest, workflow.JsonValuesToLiteralsResponse]
 }
 
 // LiteralsToLaunchFormJson calls flyteidl2.workflow.TranslatorService.LiteralsToLaunchFormJson.
@@ -115,12 +128,18 @@ func (c *translatorServiceClient) TaskSpecToLaunchFormJson(ctx context.Context, 
 	return c.taskSpecToLaunchFormJson.CallUnary(ctx, req)
 }
 
+// JsonValuesToLiterals calls flyteidl2.workflow.TranslatorService.JsonValuesToLiterals.
+func (c *translatorServiceClient) JsonValuesToLiterals(ctx context.Context, req *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error) {
+	return c.jsonValuesToLiterals.CallUnary(ctx, req)
+}
+
 // TranslatorServiceHandler is an implementation of the flyteidl2.workflow.TranslatorService
 // service.
 type TranslatorServiceHandler interface {
 	LiteralsToLaunchFormJson(context.Context, *connect.Request[workflow.LiteralsToLaunchFormJsonRequest]) (*connect.Response[workflow.LiteralsToLaunchFormJsonResponse], error)
 	LaunchFormJsonToLiterals(context.Context, *connect.Request[workflow.LaunchFormJsonToLiteralsRequest]) (*connect.Response[workflow.LaunchFormJsonToLiteralsResponse], error)
 	TaskSpecToLaunchFormJson(context.Context, *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest]) (*connect.Response[workflow.TaskSpecToLaunchFormJsonResponse], error)
+	JsonValuesToLiterals(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error)
 }
 
 // NewTranslatorServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -150,6 +169,13 @@ func NewTranslatorServiceHandler(svc TranslatorServiceHandler, opts ...connect.H
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	translatorServiceJsonValuesToLiteralsHandler := connect.NewUnaryHandler(
+		TranslatorServiceJsonValuesToLiteralsProcedure,
+		svc.JsonValuesToLiterals,
+		connect.WithSchema(translatorServiceJsonValuesToLiteralsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.TranslatorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TranslatorServiceLiteralsToLaunchFormJsonProcedure:
@@ -158,6 +184,8 @@ func NewTranslatorServiceHandler(svc TranslatorServiceHandler, opts ...connect.H
 			translatorServiceLaunchFormJsonToLiteralsHandler.ServeHTTP(w, r)
 		case TranslatorServiceTaskSpecToLaunchFormJsonProcedure:
 			translatorServiceTaskSpecToLaunchFormJsonHandler.ServeHTTP(w, r)
+		case TranslatorServiceJsonValuesToLiteralsProcedure:
+			translatorServiceJsonValuesToLiteralsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -177,4 +205,8 @@ func (UnimplementedTranslatorServiceHandler) LaunchFormJsonToLiterals(context.Co
 
 func (UnimplementedTranslatorServiceHandler) TaskSpecToLaunchFormJson(context.Context, *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest]) (*connect.Response[workflow.TaskSpecToLaunchFormJsonResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TranslatorService.TaskSpecToLaunchFormJson is not implemented"))
+}
+
+func (UnimplementedTranslatorServiceHandler) JsonValuesToLiterals(context.Context, *connect.Request[workflow.JsonValuesToLiteralsRequest]) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TranslatorService.JsonValuesToLiterals is not implemented"))
 }
