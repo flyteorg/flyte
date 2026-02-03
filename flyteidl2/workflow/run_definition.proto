@@ -479,4 +479,7 @@ message TaskGroup {
   }
 
   repeated PhaseCounts phase_counts = 13;
+
+  // Average time from run creation to entering RUNNING phase.
+  google.protobuf.Duration average_time_to_running = 14;
 }
