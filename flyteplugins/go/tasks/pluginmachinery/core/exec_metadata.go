@@ -57,4 +57,9 @@ type TaskExecutionMetadata interface {
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
 	GetConsoleURL() string
+	// GetExecutionID returns the workflow execution identifier. This is useful for plugins that need to pass
+	// the execution identity to external systems.
+	GetExecutionID() *core.WorkflowExecutionIdentifier
+	// GetExecutionDomain returns the domain of the workflow execution.
+	GetExecutionDomain() string
 }
