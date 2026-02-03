@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package flyteidl2.org;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/org/domain_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
+
+// DomainService provides CRUD operations for domains within an organization.
+// Domains are customizable partitions (e.g., development, staging, production).
+service DomainService {
+  // ListDomains returns all domains for an organization.
+  rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // CreateDomain creates a new domain within an organization.
+  // Domain creation is primarily an administrative operation.
+  rpc CreateDomain(CreateDomainRequest) returns (CreateDomainResponse) {}
+
+  // GetDomain returns a specific domain by ID.
+  rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // UpdateDomain updates a domain's metadata.
+  rpc UpdateDomain(UpdateDomainRequest) returns (UpdateDomainResponse) {}
+
+  rpc DeleteDomain(DeleteDomainRequest) returns (DeleteDomainResponse) {}
+}
+
+// ListDomainsRequest requests all domains for an organization.
+message ListDomainsRequest {
+  // Organization name (required).
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+
+  // If true, include settings for each domain in the response.
+  bool include_settings = 2;
+}
+
+// ListDomainsResponse contains the list of domains.
+message ListDomainsResponse {
+  // List of domains in the organization.
+  repeated Domain domains = 1;
+}
+
+// CreateDomainRequest creates a new domain.
+message CreateDomainRequest {
+  // Organization name (required).
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Domain ID - sanitized identifier (lowercase, hyphenated).
+  // Must follow Kubernetes naming conventions.
+  string id = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+    pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+  }];
+
+  // Friendly name for display (optional).
+  string friendly_name = 3 [(buf.validate.field).string.max_len = 255];
+
+  // Optional initial settings for this domain.
+  //Settings initial_settings = 4;
+}
+
+// CreateDomainResponse contains the created domain.
+message CreateDomainResponse {
+  // The created domain.
+  Domain domain = 1;
+}
+
+// GetDomainRequest requests a specific domain.
+message GetDomainRequest {
+  // Organization name (required).
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Domain ID (required).
+  string id = 2 [(buf.validate.field).string.min_len = 1];
+
+  // If true, include settings for the domain.
+  bool include_settings = 3;
+}
+
+// GetDomainResponse contains the requested domain.
+message GetDomainResponse {
+  // The requested domain.
+  Domain domain = 1;
+}
+
+// UpdateDomainRequest updates a domain's metadata.
+message UpdateDomainRequest {
+  // Organization name (required).
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Domain ID (required).
+  string id = 2 [(buf.validate.field).string.min_len = 1];
+
+  // New friendly name (optional, updates if provided).
+  string friendly_name = 3 [(buf.validate.field).string.max_len = 255];
+}
+
+// UpdateDomainResponse contains the updated domain.
+message UpdateDomainResponse {
+  // The updated domain.
+  Domain domain = 1;
+}
+
+message DeleteDomainRequest {
+  // Organization name (required).
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Domain ID (required).
+  string id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// Delete response is empty
+message DeleteDomainResponse {}
