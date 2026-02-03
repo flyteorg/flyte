@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import list_pb2 as _list_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -37,7 +38,7 @@ class PodResource(_message.Message):
     def __init__(self, namespace: _Optional[str] = ..., name: _Optional[str] = ..., container: _Optional[str] = ...) -> None: ...
 
 class LoggingContext(_message.Message):
-    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name", "execution_attempt_start_time", "execution_attempt_end_time", "kubernetes_pod_labels"]
+    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name", "execution_attempt_start_time", "execution_attempt_end_time", "kubernetes_pod_labels", "order", "number_of_batches"]
     class KubernetesPodLabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -52,6 +53,8 @@ class LoggingContext(_message.Message):
     EXECUTION_ATTEMPT_START_TIME_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_ATTEMPT_END_TIME_FIELD_NUMBER: _ClassVar[int]
     KUBERNETES_POD_LABELS_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
+    NUMBER_OF_BATCHES_FIELD_NUMBER: _ClassVar[int]
     cluster_name: str
     kubernetes_namespace: str
     kubernetes_pod_name: str
@@ -59,7 +62,9 @@ class LoggingContext(_message.Message):
     execution_attempt_start_time: _timestamp_pb2.Timestamp
     execution_attempt_end_time: _timestamp_pb2.Timestamp
     kubernetes_pod_labels: _containers.ScalarMap[str, str]
-    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., execution_attempt_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., execution_attempt_end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., kubernetes_pod_labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    order: _list_pb2.Sort.Direction
+    number_of_batches: int
+    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., execution_attempt_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., execution_attempt_end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., kubernetes_pod_labels: _Optional[_Mapping[str, str]] = ..., order: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ..., number_of_batches: _Optional[int] = ...) -> None: ...
 
 class ContainerIdentifier(_message.Message):
     __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name"]
