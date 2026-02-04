@@ -19,6 +19,7 @@ import (
 	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	config2 "github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -134,9 +135,9 @@ func TestDownloadCommandArgs(t *testing.T) {
 	assert.Error(t, err)
 
 	iFace := &core.VariableMap{
-		Variables: map[string]*core.Variable{
-			"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-			"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+		Variables: []*core.VariableEntry{
+			{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+			{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 		},
 	}
 	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, iFace)
@@ -153,10 +154,10 @@ func TestDownloadCommandArgs(t *testing.T) {
 			vm := &core.VariableMap{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, vm))
 			assert.Len(t, vm.Variables, 2)
-			for k, v := range iFace.Variables {
-				v2, ok := vm.Variables[k]
-				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+			for _, entry := range iFace.Variables {
+				v2 := utils.GetVariable(vm, entry.Key)
+				assert.NotNil(t, v2, "variable %s should exist", entry.Key)
+				assert.Equal(t, entry.Value.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", entry.Key)
 			}
 		}
 	}
@@ -168,9 +169,9 @@ func TestSidecarCommandArgs(t *testing.T) {
 
 	iFace := &core.TypedInterface{
 		Outputs: &core.VariableMap{
-			Variables: map[string]*core.Variable{
-				"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-				"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+			Variables: []*core.VariableEntry{
+				{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+				{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 			},
 		},
 	}
@@ -188,10 +189,10 @@ func TestSidecarCommandArgs(t *testing.T) {
 			if2 := &core.TypedInterface{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, if2))
 			assert.Len(t, if2.Outputs.Variables, 2)
-			for k, v := range iFace.Outputs.Variables {
-				v2, ok := if2.Outputs.Variables[k]
-				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+			for _, entry := range iFace.Outputs.Variables {
+				v2 := utils.GetVariable(if2.Outputs, entry.Key)
+				assert.NotNil(t, v2, "variable %s should exist", entry.Key)
+				assert.Equal(t, entry.Value.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", entry.Key)
 			}
 		}
 	}
@@ -360,14 +361,14 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		c := v1.Container{}
 		iface := &core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+					{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -381,14 +382,14 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		c := v1.Container{}
 		iface := &core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+					{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -406,9 +407,9 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		c := v1.Container{}
 		iface := &core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+					{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -426,8 +427,8 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		c := v1.Container{}
 		iface := &core.TypedInterface{
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -505,14 +506,14 @@ func TestAddCoPilotToPod(t *testing.T) {
 		pod := v1.PodSpec{}
 		iface := &core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+					{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -542,9 +543,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 		pod := v1.PodSpec{}
 		iface := &core.TypedInterface{
 			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"x": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
-					"y": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+					{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -561,8 +562,8 @@ func TestAddCoPilotToPod(t *testing.T) {
 		pod := v1.PodSpec{}
 		iface := &core.TypedInterface{
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
@@ -579,8 +580,8 @@ func TestAddCoPilotToPod(t *testing.T) {
 		pod := v1.PodSpec{}
 		iface := &core.TypedInterface{
 			Outputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 				},
 			},
 		}
