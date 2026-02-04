@@ -235,6 +235,8 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
+
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
@@ -252,6 +254,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
 		TTLSecondsAfterFinished:  *ttlSecondsAfterFinished,
 		RuntimeEnvYAML:           runtimeEnvYaml,
+		SubmitterPodTemplate:     &submitterPodTemplate,
 	}
 
 	return &rayv1.RayJob{
@@ -400,6 +403,33 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 
 	return podTemplateSpec, nil
+}
+
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
+
+	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
+
+	tolerations := make([]v1.Toleration, 0)
+	if config.GetK8sPluginConfig() != nil && len(config.GetK8sPluginConfig().DefaultTolerations) > 0 {
+		tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
+	}
+
+	enableServiceLinks := false
+	return v1.PodTemplateSpec{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ray-job-submitter",
+					// Use the image of the Ray head to be defensive against version mismatch issues
+					Image:     headPodSpec.Containers[0].Image,
+					Resources: submitterDefaultResourceRequirements,
+				},
+			},
+			RestartPolicy:      v1.RestartPolicyNever,
+			EnableServiceLinks: &enableServiceLinks,
+			Tolerations:        tolerations,
+		},
+	}
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
