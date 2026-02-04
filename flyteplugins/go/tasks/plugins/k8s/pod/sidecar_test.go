@@ -57,25 +57,25 @@ func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
 
 func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("test-namespace")
-	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
 
-	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskMetadata.On("IsInterruptible").Return(true)
-	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{})
-	taskMetadata.On("GetK8sServiceAccount").Return("service-account")
-	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
+	taskMetadata.EXPECT().IsInterruptible().Return(true)
+	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+	taskMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
-	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -84,18 +84,18 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
-	taskMetadata.On("GetTaskExecutionID").Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("my_project:my_domain:my_name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
-	to.On("GetContainerImage").Return("")
-	to.On("GetPodTemplate").Return(nil)
-	taskMetadata.On("GetOverrides").Return(to)
-	taskMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskMetadata.On("GetConsoleURL").Return("")
+	to.EXPECT().GetResources().Return(resources)
+	to.EXPECT().GetExtendedResources().Return(extendedResources)
+	to.EXPECT().GetContainerImage().Return("")
+	to.EXPECT().GetPodTemplate().Return(nil)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
+	taskMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskMetadata.EXPECT().GetConsoleURL().Return("")
 
 	return taskMetadata
 }
@@ -104,28 +104,28 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	dummyTaskMetadata := dummySidecarTaskMetadata(resources, extendedResources)
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
-	inputReader.OnGetInputPath().Return("test-data-reference")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-prefix")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
-	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	taskCtx.OnPluginStateReader().Return(pluginStateReader)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	taskCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
 }
@@ -134,28 +134,28 @@ func getDummySidecarPluginContext(taskTemplate *core.TaskTemplate, resources *v1
 	pCtx := &k8smocks.PluginContext{}
 	dummyTaskMetadata := dummySidecarTaskMetadata(resources, nil)
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
-	inputReader.OnGetInputPath().Return("test-data-reference")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-prefix")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
-	pCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
+	pCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	pCtx.OnPluginStateReader().Return(pluginStateReader)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	pCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return pCtx
 }

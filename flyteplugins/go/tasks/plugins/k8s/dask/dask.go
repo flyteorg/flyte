@@ -451,6 +451,35 @@ func (daskResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
 }
 
+// IsTerminal returns true if the DaskJob is in a terminal state (Successful or Failed)
+func (daskResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
+	job, ok := resource.(*daskAPI.DaskJob)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *DaskJob, got %T", resource)
+	}
+	status := job.Status.JobStatus
+	return status == daskAPI.DaskJobSuccessful || status == daskAPI.DaskJobFailed, nil
+}
+
+// GetCompletionTime returns the end time of the DaskJob
+func (daskResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
+	job, ok := resource.(*daskAPI.DaskJob)
+	if !ok {
+		return time.Time{}, fmt.Errorf("unexpected resource type: expected *DaskJob, got %T", resource)
+	}
+
+	if !job.Status.EndTime.IsZero() {
+		return job.Status.EndTime.Time, nil
+	}
+
+	// Fallback to start time or creation time
+	if !job.Status.StartTime.IsZero() {
+		return job.Status.StartTime.Time, nil
+	}
+
+	return job.CreationTimestamp.Time, nil
+}
+
 func init() {
 	if err := daskAPI.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)

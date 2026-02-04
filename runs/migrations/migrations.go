@@ -10,6 +10,13 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
+// AllModels contains all GORM models used in the runs service
+var AllModels = []interface{}{
+	&models.Action{},
+	&models.Task{},
+	&models.TaskSpec{},
+}
+
 // RunMigrations runs all database migrations for the runs service
 func RunMigrations(db *gorm.DB) error {
 	ctx := context.Background()
@@ -27,7 +34,7 @@ func RunMigrations(db *gorm.DB) error {
 	}
 
 	// AutoMigrate will create the new actions table with simplified schema
-	if err := db.AutoMigrate(&models.Action{}, &models.Task{}, &models.TaskSpec{}); err != nil {
+	if err := db.AutoMigrate(AllModels...); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 

@@ -27,8 +27,11 @@ import (
 
 	"connectrpc.com/connect"
 	"golang.org/x/net/http2"
-	"k8s.io/apimachinery/pkg/api/errors"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -39,12 +42,20 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
+type K8sEventType string
+
+const (
+	TaskActionDefaultRequeueDuration              = 5 * time.Second
+	FailedUnmarshal                  K8sEventType = "FailedUnmarshal"
+)
+
 // TaskActionReconciler reconciles a TaskAction object
 type TaskActionReconciler struct {
 	client.Client
 	Scheme             *runtime.Scheme
 	StateServiceURL    string
 	stateServiceClient workflowconnect.StateServiceClient
+	Recorder           record.EventRecorder
 }
 
 // NewTaskActionReconciler creates a new TaskActionReconciler with initialized clients
@@ -71,16 +82,6 @@ func NewTaskActionReconciler(c client.Client, scheme *runtime.Scheme, stateServi
 	}
 }
 
-// Phase constants
-const (
-	PhaseQueued       = "PHASE_QUEUED"
-	PhaseInitializing = "PHASE_INITIALIZING"
-	PhaseRunning      = "PHASE_RUNNING"
-	PhaseSucceeded    = "PHASE_SUCCEEDED"
-	PhaseFailed       = "PHASE_FAILED"
-	PhaseAborted      = "PHASE_ABORTED"
-)
-
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/finalizers,verbs=update
@@ -93,98 +94,120 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
 	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
-		if errors.IsNotFound(err) {
-			// TaskAction was deleted
-			logger.Info("TaskAction not found, likely deleted", "name", req.NamespacedName)
-			return ctrl.Result{}, nil
-		}
-		logger.Error(err, "Failed to get TaskAction")
-		return ctrl.Result{}, err
+		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	// Get the ActionSpec from the TaskAction
 	actionSpec, err := taskAction.Spec.GetActionSpec()
 	if err != nil {
-		logger.Error(err, "Failed to unmarshal ActionSpec")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedUnmarshal), "Failed to unmarshal ActionSpec %s/%s: %v", taskAction.Namespace, taskAction.Name, err)
 		return ctrl.Result{}, err
 	}
-
-	// Determine current phase (default to empty if new)
-	currentPhase := taskAction.Status.Phase
-
-	// State machine logic
-	var nextPhase string
-	var requeueAfter time.Duration
 
 	// TODO (haytham): Remove when we add real code that executes plugins. For now this is here so that watchers can see
 	//  things transition between states.
 	time.Sleep(2 * time.Second)
-	switch currentPhase {
-	case "":
-		// New TaskAction - transition to Queued
-		nextPhase = PhaseQueued
-		logger.Info("New TaskAction detected, transitioning to Queued",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
 
-	case PhaseQueued:
-		// Queued → Initializing
-		nextPhase = PhaseInitializing
-		logger.Info("Transitioning from Queued to Initializing",
+	// Check terminal conditions first
+	succeededCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeSucceeded)
+	if succeededCond != nil && succeededCond.Status == metav1.ConditionTrue {
+		logger.Info("TaskAction already succeeded",
 			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseInitializing:
-		// Initializing → Running
-		nextPhase = PhaseRunning
-		logger.Info("Transitioning from Initializing to Running",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseRunning:
-		// Running → Succeeded (simulated execution)
-		nextPhase = PhaseSucceeded
-		logger.Info("Transitioning from Running to Succeeded",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	case PhaseSucceeded, PhaseFailed, PhaseAborted:
-		// Terminal states - no further transitions
-		logger.Info("TaskAction in terminal state",
-			"name", taskAction.Name, "phase", currentPhase)
 		return ctrl.Result{}, nil
-
-	default:
-		logger.Info("Unknown phase, resetting to Queued",
-			"name", taskAction.Name, "phase", currentPhase)
-		nextPhase = PhaseQueued
 	}
 
-	// Create state JSON (simplified NodeStatus)
-	stateJSON := r.createStateJSON(actionSpec, nextPhase)
+	failedCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeFailed)
+	if failedCond != nil && failedCond.Status == metav1.ConditionTrue {
+		logger.Info("TaskAction already failed",
+			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+		return ctrl.Result{}, nil
+	}
 
-	// Send state update to State Service
+	// Sequential condition evaluation for Progressing
+	progressingCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeProgressing)
+	if progressingCond != nil && progressingCond.Status == metav1.ConditionTrue {
+		// Check the Reason to determine sub-state
+		if progressingCond.Reason == string(flyteorgv1.ConditionReasonExecuting) {
+			// Executing to Succeeded
+			logger.Info("TaskAction is executing, transitioning to Succeeded",
+				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+
+			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+				flyteorgv1.ConditionReasonCompleted, "TaskAction has completed")
+			setCondition(taskAction, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
+				flyteorgv1.ConditionReasonCompleted, "TaskAction completed successfully")
+
+			stateJSON := r.createStateJSON(actionSpec, "Succeeded")
+			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
+				logger.Error(err, "Failed to update state service")
+			}
+			taskAction.Status.StateJSON = stateJSON
+
+			if err := r.Status().Update(ctx, taskAction); err != nil {
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{}, nil
+		}
+
+		if progressingCond.Reason == string(flyteorgv1.ConditionReasonInitializing) {
+			// Initializing to Executing
+			logger.Info("TaskAction is initializing, transitioning to Executing",
+				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+
+			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+				flyteorgv1.ConditionReasonExecuting, "TaskAction is executing")
+
+			stateJSON := r.createStateJSON(actionSpec, "Running")
+			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
+				logger.Error(err, "Failed to update state service")
+			}
+			taskAction.Status.StateJSON = stateJSON
+
+			if err := r.Status().Update(ctx, taskAction); err != nil {
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+		}
+
+		if progressingCond.Reason == string(flyteorgv1.ConditionReasonQueued) {
+			// Queued to Initializing
+			logger.Info("TaskAction is queued, transitioning to Initializing",
+				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+
+			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+				flyteorgv1.ConditionReasonInitializing, "TaskAction is being initialized")
+
+			stateJSON := r.createStateJSON(actionSpec, "Initializing")
+			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
+				logger.Error(err, "Failed to update state service")
+			}
+			taskAction.Status.StateJSON = stateJSON
+
+			if err := r.Status().Update(ctx, taskAction); err != nil {
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+		}
+	}
+
+	// No conditions exist, this is the first reconcile
+	// Set Condition to Queued
+	logger.Info("New TaskAction, setting Progressing condition",
+		"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+
+	setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+		flyteorgv1.ConditionReasonQueued, "TaskAction is queued and waiting for resources")
+
+	stateJSON := r.createStateJSON(actionSpec, "Queued")
 	if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-		logger.Error(err, "Failed to update state service", "phase", nextPhase)
-		// Continue anyway - we'll try again on next reconcile
+		logger.Error(err, "Failed to update state service")
 	}
-
-	// Update TaskAction status
-	taskAction.Status.Phase = nextPhase
 	taskAction.Status.StateJSON = stateJSON
-	taskAction.Status.Message = fmt.Sprintf("Transitioned to %s", nextPhase)
 
 	if err := r.Status().Update(ctx, taskAction); err != nil {
-		logger.Error(err, "Failed to update TaskAction status")
 		return ctrl.Result{}, err
 	}
-
-	logger.Info("Successfully updated TaskAction status",
-		"name", taskAction.Name, "phase", nextPhase)
-
-	// Requeue after a delay to simulate state transitions
-	// For non-terminal states, requeue after 5 seconds
-	if nextPhase != PhaseSucceeded && nextPhase != PhaseFailed && nextPhase != PhaseAborted {
-		requeueAfter = 5 * time.Second
-	}
-
-	return ctrl.Result{RequeueAfter: requeueAfter}, nil
+	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 }
 
 // createStateJSON creates a simplified NodeStatus JSON representation
@@ -233,4 +256,26 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&flyteorgv1.TaskAction{}).
 		Named("taskaction").
 		Complete(r)
+}
+
+// findConditionByType finds a condition by type in the conditions list
+// Returns nil if not found
+func findConditionByType(conditions []metav1.Condition, condType flyteorgv1.TaskActionConditionType) *metav1.Condition {
+	for i := range conditions {
+		if conditions[i].Type == string(condType) {
+			return &conditions[i]
+		}
+	}
+	return nil
+}
+
+// setCondition sets or updates a condition on the TaskAction
+func setCondition(taskAction *flyteorgv1.TaskAction, conditionType flyteorgv1.TaskActionConditionType, status metav1.ConditionStatus, reason flyteorgv1.TaskActionConditionReason, message string) {
+	condition := metav1.Condition{
+		Type:    string(conditionType),
+		Status:  status,
+		Reason:  string(reason),
+		Message: message,
+	}
+	meta.SetStatusCondition(&taskAction.Status.Conditions, condition)
 }

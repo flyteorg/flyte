@@ -19,8 +19,8 @@ const podName = "PodName"
 
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("generated-name")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("generated-name")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -37,7 +37,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		},
 		RetryAttempt: 1,
 	})
-	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.EXPECT().GetUniqueNodeID().Return("n0-0-n0")
 	return tID
 }
 

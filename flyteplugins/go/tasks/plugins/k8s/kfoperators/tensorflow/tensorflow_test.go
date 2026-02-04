@@ -122,25 +122,25 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -149,67 +149,64 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return("")
-	overrides.OnGetPodTemplate().Return(nil)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetContainerImage().Return("")
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = k8s.PluginState{}
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
 func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, pluginState k8s.PluginState) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	pCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	pCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	pCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -218,41 +215,38 @@ func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *co
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
-	tID.On("GetUniqueNodeID").Return("an-unique-id")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetUniqueNodeID().Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return("")
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetContainerImage().Return("")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	pCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
-	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	pCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 
 	return pCtx
 }
@@ -1168,4 +1162,138 @@ func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
 		assert.NotContains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Template.Spec.Tolerations, gpuToleration)
 		assert.Contains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
 	}
+}
+
+func TestIsTerminal(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		conditionType  kubeflowv1.JobConditionType
+		expectedResult bool
+	}{
+		{"Succeeded", kubeflowv1.JobSucceeded, true},
+		{"Failed", kubeflowv1.JobFailed, true},
+		{"Created", kubeflowv1.JobCreated, false},
+		{"Running", kubeflowv1.JobRunning, false},
+		{"Restarting", kubeflowv1.JobRestarting, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a simple job with only the condition we want to test
+			job := &kubeflowv1.TFJob{
+				Status: kubeflowv1.JobStatus{
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:   tt.conditionType,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}
+			result, err := tensorflowResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := tensorflowResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *kubeflowv1.TFJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses CompletionTime",
+			job: &kubeflowv1.TFJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					CompletionTime: &v1.Time{Time: now},
+					StartTime:      &v1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to condition LastTransitionTime",
+			job: &kubeflowv1.TFJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: earlier},
+					Conditions: []kubeflowv1.JobCondition{
+						{
+							Type:               kubeflowv1.JobSucceeded,
+							Status:             corev1.ConditionTrue,
+							LastTransitionTime: v1.NewTime(now),
+						},
+					},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &kubeflowv1.TFJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(evenEarlier),
+				},
+				Status: kubeflowv1.JobStatus{
+					StartTime: &v1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &kubeflowv1.TFJob{
+				ObjectMeta: v1.ObjectMeta{
+					CreationTimestamp: v1.NewTime(now),
+				},
+				Status: kubeflowv1.JobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tensorflowResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := tensorflowResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

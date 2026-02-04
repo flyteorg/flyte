@@ -113,25 +113,25 @@ func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate 
 func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -140,33 +140,33 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return(containerImage)
-	overrides.OnGetPodTemplate().Return(nil)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetContainerImage().Return(containerImage)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetSecurityContext().Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: serviceAccount},
 	})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }
 
@@ -863,7 +863,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	plg := &k8smocks.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
-	taskExecID.OnGetID().Return(core.TaskExecutionIdentifier{
+	taskExecID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -880,24 +880,21 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		},
 		RetryAttempt: 1,
 	})
-	taskExecID.OnGetUniqueNodeID().Return("unique-node")
-	taskExecID.OnGetGeneratedName().Return("generated-name")
+	taskExecID.EXPECT().GetUniqueNodeID().Return("unique-node")
+	taskExecID.EXPECT().GetGeneratedName().Return("generated-name")
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
-	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
-	plg.OnTaskExecutionMetadata().Return(tskCtx)
+	tskCtx.EXPECT().GetTaskExecutionID().Return(taskExecID)
+	plg.EXPECT().TaskExecutionMetadata().Return(tskCtx)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
-		func(v interface{}) uint8 {
+	pluginStateReaderMock.EXPECT().Get(mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).RunAndReturn(
+		func(v interface{}) (uint8, error) {
 			*(v.(*k8s.PluginState)) = pluginState
-			return 0
-		},
-		func(v interface{}) error {
-			return nil
+			return 0, nil
 		})
 
-	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 
 	return plg
 }
@@ -1393,7 +1390,7 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
-	pluginCtx.OnK8sReader().Return(reader)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
 	return pluginCtx
 }
 
@@ -1411,7 +1408,7 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 func rayPluginContextWithPods(pluginState k8s.PluginState, pods ...runtime.Object) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
 	reader := fake.NewFakeClient(pods...)
-	pluginCtx.OnK8sReader().Return(reader)
+	pluginCtx.EXPECT().K8sReader().Return(reader)
 	return pluginCtx
 }
 
@@ -1531,4 +1528,113 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.PrimaryContainerName)
 	assert.Equal(t, 1, len(headPodLogContext.Containers))
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
+}
+
+func TestIsTerminal(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		status         rayv1.JobDeploymentStatus
+		expectedResult bool
+	}{
+		{"Complete", rayv1.JobDeploymentStatusComplete, true},
+		{"Failed", rayv1.JobDeploymentStatusFailed, true},
+		{"Running", rayv1.JobDeploymentStatusRunning, false},
+		{"Initializing", rayv1.JobDeploymentStatusInitializing, false},
+		{"Suspended", rayv1.JobDeploymentStatusSuspended, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := &rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: tt.status,
+				},
+			}
+			result, err := rayJobResourceHandler.IsTerminal(ctx, job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}
+
+func TestIsTerminal_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	ctx := context.Background()
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.IsTerminal(ctx, wrongResource)
+	assert.Error(t, err)
+	assert.False(t, result)
+	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+func TestGetCompletionTime(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	now := time.Now().Truncate(time.Second)
+	earlier := now.Add(-1 * time.Hour)
+	evenEarlier := now.Add(-2 * time.Hour)
+
+	tests := []struct {
+		name         string
+		job          *rayv1.RayJob
+		expectedTime time.Time
+	}{
+		{
+			name: "uses EndTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					EndTime:   &metav1.Time{Time: now},
+					StartTime: &metav1.Time{Time: earlier},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to StartTime",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(evenEarlier),
+				},
+				Status: rayv1.RayJobStatus{
+					StartTime: &metav1.Time{Time: now},
+				},
+			},
+			expectedTime: now,
+		},
+		{
+			name: "falls back to CreationTimestamp",
+			job: &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					CreationTimestamp: metav1.NewTime(now),
+				},
+				Status: rayv1.RayJobStatus{},
+			},
+			expectedTime: now,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := rayJobResourceHandler.GetCompletionTime(tt.job)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
+		})
+	}
+}
+
+func TestGetCompletionTime_WrongResourceType(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	wrongResource := &corev1.ConfigMap{}
+	result, err := rayJobResourceHandler.GetCompletionTime(wrongResource)
+	assert.Error(t, err)
+	assert.True(t, result.IsZero())
+	assert.Contains(t, err.Error(), "unexpected resource type")
 }

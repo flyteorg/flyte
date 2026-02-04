@@ -4,7 +4,16 @@ disable-version-string: True
 issue-845-fix: True
 structname: ""
 mockname: "{{.InterfaceName}}"
+filename: "{{.InterfaceName | snakecase}}.go"
+inpackage: false
+outpkg: "mocks"
+with-expecter: true
 packages:
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/connector/mocks'
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app:
     config:
       include-auto-generated: true
@@ -15,6 +24,11 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'gen/go/flyteidl2/workflow/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/workflow/workflowconnect/mocks'
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret:
     config:
       include-auto-generated: true
@@ -49,5 +63,60 @@ packages:
     config:
       include-auto-generated: true
       all: true
-      with-expecter: true
       dir: 'runs/repository/mocks'
+  github.com/flyteorg/flyte/v2/queue/service:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'queue/service/mocks'
+
+  # flyteplugins
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core:
+    config:
+      all: true
+      dir: 'flyteplugins/go/tasks/pluginmachinery/core/mocks'
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue:
+    config:
+      all: true
+      dir: 'flyteplugins/go/tasks/pluginmachinery/workqueue/mocks'
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s:
+    config:
+      all: true
+      dir: 'flyteplugins/go/tasks/pluginmachinery/k8s/mocks'
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog:
+    config:
+      all: true
+      dir: 'flyteplugins/go/tasks/pluginmachinery/catalog/mocks'
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io:
+    config:
+      all: true
+      dir: 'flyteplugins/go/tasks/pluginmachinery/io/mocks'
+
+  # flytestdlib
+  github.com/flyteorg/flyte/v2/flytestdlib/cache:
+    config:
+      all: true
+      dir: 'flytestdlib/cache/mocks'
+  github.com/flyteorg/flyte/v2/flytestdlib/utils:
+    config:
+      all: true
+      dir: 'flytestdlib/utils/mocks'
+  github.com/flyteorg/flyte/v2/flytestdlib/storage:
+    config:
+      all: false
+      dir: 'flytestdlib/storage/mocks'
+    interfaces:
+      RawStore:
+      ReferenceConstructor:
+      ComposedProtobufStore:
+      Metadata:
+  github.com/flyteorg/flyte/v2/flytestdlib/fastcheck:
+    config:
+      all: false
+      dir: 'flytestdlib/fastcheck/mocks'
+    interfaces:
+      Filter:
+  github.com/flyteorg/flyte/v2/flytestdlib/random:
+    config:
+      all: true
+      dir: 'flytestdlib/random/mocks'
