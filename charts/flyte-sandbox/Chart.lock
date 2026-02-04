@@ -6,7 +6,7 @@ dependencies:
   repository: file://../flyte-binary
   version: v0.1.10
 - name: kubernetes-dashboard
-  repository: https://kubernetes.github.io/dashboard/
+  repository: https://kubernetes-retired.github.io/dashboard/
   version: 6.0.0
 - name: minio
   repository: https://charts.bitnami.com/bitnami
@@ -14,5 +14,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.8.1
-digest: sha256:91238033c75676f44125aa05e1566231b0fa852fe03fe77e694723af7c0123ee
-generated: "2025-11-10T19:46:20.764261-08:00"
+digest: sha256:47284b9ae82884038544cf6562717d9709c4ff735c926b02e74cb0968a6963f8
+generated: "2026-01-30T05:55:31.841384443+08:00"
