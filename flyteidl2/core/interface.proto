@@ -31,7 +31,7 @@ message VariableEntry {
 
 // A map of Variables
 message VariableMap {
-  // Use repeated key value pair
+  // Use repeated key value pair to maintain ordering across different languages.
   repeated VariableEntry variables = 1;
 }
 

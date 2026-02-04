@@ -90,7 +90,7 @@ export const VariableEntrySchema: GenMessage<VariableEntry> = /*@__PURE__*/
  */
 export type VariableMap = Message<"flyteidl2.core.VariableMap"> & {
   /**
-   * Use repeated key value pair
+   * Use repeated key value pair to maintain ordering across different languages.
    *
    * @generated from field: repeated flyteidl2.core.VariableEntry variables = 1;
    */

@@ -158,7 +158,7 @@ type VariableMap struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Use repeated key value pair
+	// Use repeated key value pair to maintain ordering across different languages.
 	Variables []*VariableEntry `protobuf:"bytes,1,rep,name=variables,proto3" json:"variables,omitempty"`
 }
 

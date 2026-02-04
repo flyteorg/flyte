@@ -19,7 +19,7 @@ func GetVariable(vm *core.VariableMap, key string) *core.Variable {
 // SetVariable adds or updates a variable in a VariableMap.
 // If the key already exists, it updates the value. Otherwise, it appends a new entry.
 func SetVariable(vm *core.VariableMap, key string, variable *core.Variable) {
-	if vm == nil {
+	if vm == nil || variable == nil {
 		return
 	}
 	// Update the value of existing key
