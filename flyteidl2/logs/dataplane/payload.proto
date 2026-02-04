@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.logs.dataplane;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/list.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane";
@@ -31,6 +32,8 @@ message LoggingContext {
   google.protobuf.Timestamp execution_attempt_start_time = 7;
   google.protobuf.Timestamp execution_attempt_end_time = 8;
   map<string, string> kubernetes_pod_labels = 9;
+  common.Sort.Direction order = 10;
+  uint64 number_of_batches = 11;
 }
 
 // Parameters of environment in which logs were collected. Should contain everything
