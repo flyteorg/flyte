@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	goCache "github.com/eko/gocache/lib/v4/cache"
+	slices2 "golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -253,10 +254,14 @@ func (i *EmbeddedSecretManagerInjector) addImagePullSecretToPod(
 	// Add the image pull secret reference if it doesn't already exist
 	if !secretExists {
 		if pod.Spec.ImagePullSecrets == nil {
-			pod.Spec.ImagePullSecrets = make([]corev1.LocalObjectReference, 0)
+			pod.Spec.ImagePullSecrets = make([]corev1.LocalObjectReference, 0, 1)
 		}
 
 		pod.Spec.ImagePullSecrets = append(pod.Spec.ImagePullSecrets, imagePullSecretRef)
+		slices2.SortStableFunc(pod.Spec.ImagePullSecrets, func(e corev1.LocalObjectReference, e2 corev1.LocalObjectReference) int {
+			return strings.Compare(e.Name, e2.Name)
+		})
+
 		logger.Infof(ctx, "Added image pull secret [%s] to pod [%s/%s]",
 			mirroredSecret.GetName(), pod.Namespace, pod.Name)
 		return pod, nil

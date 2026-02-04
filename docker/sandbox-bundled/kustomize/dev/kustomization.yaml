@@ -2,8 +2,8 @@ helmGlobals:
   chartHome: ../../../../charts
 helmCharts:
 - name: flyte-sandbox
-  releaseName: flyte-sandbox
   namespace: flyte
+  releaseName: flyte-sandbox
   valuesInline:
     flyte-binary:
       enabled: false
@@ -12,3 +12,5 @@ helmCharts:
 namespace: flyte
 resources:
 - ../namespace.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization

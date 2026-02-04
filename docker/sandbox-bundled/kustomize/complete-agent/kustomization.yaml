@@ -2,15 +2,17 @@ helmGlobals:
   chartHome: ../../../../charts
 helmCharts:
 - name: flyte-sandbox
-  releaseName: flyte-sandbox
   namespace: flyte
+  releaseName: flyte-sandbox
   valuesInline:
     flyte-binary:
       flyteagent:
-        enabled: True
+        enabled: true
 namespace: flyte
 resources:
 - ../namespace.yaml
 
-patchesStrategicMerge:
-  - add-agent-secret-patch.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+patches:
+- path: add-agent-secret-patch.yaml
