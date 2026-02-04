@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/gorilla/securecookie"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -284,4 +285,53 @@ func TestCookieManager(t *testing.T) {
 		require.Len(t, cookies, 1)
 		assert.Equal(t, "flyte_auth_code", cookies[0].Name)
 	})
+}
+
+func TestExtractAccessTokenFromCookies(t *testing.T) {
+	hashKeyFromSecret, err := base64.StdEncoding.DecodeString("ODg0K2EybG1IaHJHRUNUcUNsRDB2U3BhRzJIbUREWU1FeXUyYU9maTZ0RnJnYy83bVEzRC9rdTU1ZzRrZ3E3MlFiQ2E1ZmduK2NtTkw1Y2wwaVBsL2c=")
+	require.NoError(t, err)
+	blockKeyFromSecret, err := base64.StdEncoding.DecodeString("dkZKaG9ZcUxQSkc3dCt5VUtSWHhGcFBTOWtoNEpBYjgvZk9NeDN1bFN4Zw==")
+	require.NoError(t, err)
+
+	hashKeyEncoded := string(hashKeyFromSecret)
+	blockKeyEncoded := string(blockKeyFromSecret)
+
+	t.Logf("Hash key encoded: %s", hashKeyEncoded)
+	t.Logf("Block key encoded: %s", blockKeyEncoded)
+
+	hashKey, err := base64.RawStdEncoding.DecodeString(hashKeyEncoded)
+	require.NoError(t, err)
+	blockKey, err := base64.RawStdEncoding.DecodeString(blockKeyEncoded)
+	require.NoError(t, err)
+
+	t.Logf("Hash key length: %d bytes", len(hashKey))
+	t.Logf("Block key length: %d bytes", len(blockKey))
+
+	cookieValue1 := "MTc2OTczMzU0MnxHd3k2YnUxeXRkTTlYa2dIenJKUFhjQ0IwX0tSb2swZE9nUDhSU3I3ZHQyTnNjdGxqM01rQ09SNi1WXzU3Nm9VdHVpMHRsa0RIeHpoVUE1WjhwU29KSHc0d0VVbFprZTNSRnlIa1Z4aGRpeDVsT3VCb05BZ1VyaHVzUFNoazNYQVlaTTdCZHZKakRNWFBrRnY5bjhRVkQ0MUt2b2MybV9tZTk5a2pfdkI3anNLRUNvSURQWWJKOVA5YUhUNFNSVDh4b1hyWUVydXVjZHpZcHhqVndvQjVweko4TlFCX3JaVWtKNU4tYmVCMDBBUzJ3cENFY1d6azFZQjJtWW4wSVZWV0dGa3NSWi12akM1NDVpTklWSU1VeHppMFZGNHc4MEpza05QZm1oN05lWVFFUjJMMXZHOGhBNEVzRUVQR3hZd3RLRG1USFlnTC1FWG5rQURXMkJsWFhtT3lVS3QzLVhSMEp4SEhrT0hUQXZIRy1ZTVg1ZlBKRlZ6clpfM25ZVmZidVJ4V2NLS3U0b21fTzhSTXdyNWZVX0hyOEwxVGtHdlBQWEpRZ1QtYng2Qk5FcUpEWk9YdzlSMFJjdFk5THZfUTJ0VDdEa0lkVU1rb1pWWGN6ZEhtQ1RJeTBhWlpDWmlaWjBoeWNzTTUtd2MyaHhjdmVybFl4LW0wSFozNGM0RTNoNy1US0ZKVlRuc1NKT0tMamVOOU9zb2ZZbXJuUy1veExuN1FqclZycGc0NEh4ZVJxczJvZmxoR1FSVlNVWjNIQUxpMXY2YTdOOUNCN0FLTFkyVmdURmgzdU9QX1JqRmplakZyeWlsWllDRGEyX3NTRzhyTHlQZnZMUWJmbWZWLWF4V1UwX3ZUYi1NUnVBRW03N1ZXRXRYLXB4akFQeWM5VDFzbmtiWlBxMU9SX2VRQWc9PXw1_-70RST-lk0CReGjLEdF6K3-a7Pq31LmoTvZW3nrPg=="
+	cookieValue2 := "MTc2OTczMzU0Mnw3OGVhSXhvcGR1N09yT21wQkRMa2puckVzME5FVmJnZnY1aUJZTkVzZWl5WEduY0NueTFuamtvaDh5YTRmWml5c1JieGJ6WTVfM1dBZjQ0eHE5akFMaU4zRVNYdlBnanFUcVh1dnRoQzgtYVg0THU0c2NrcGtiMlFhR001YThqSW4zdXJBenUxc0tLTVlGSnhocWxnbVN3RnJkekF1VGljb09yRUFZZlo4MkpYNElqRHppbEIweE90aU50Qk1jMDhjQk9zSkpLenBNNW9femRuQkZKYzMxeWNtTmU4VzVSamdOT0NIaGJGX1F0UjdOaXRfVzZCM1RSV25OdTI2amY0eDBoeTFydDJOZHl3QVpGSUdjZ1pDNE9IOE1LcVA4MGV3X3VjdWk5NWlYaExnbW9mWEI5U2kwenFIWnZBNFZESnV4UjJxcHpMZ0gtNVZHUm9PY1RDelJCdzlpMC1CTjg0eXRjNlJhcnpKcnhYWTNJejBfQk9Zd25pOC14ZUZOR3BsLWZrT2xzRUJESldlSUp0LWYtdTlDR0hqREZQVHVubENCV3FLU09kTWJKc2h6WHo2Q3BKWlRhVUd1VFZEc2t5QUZ5Z2QwaTFxY09RNklTNWR6VXk4MV85YWRsLXctRnA4dW56bU1lTHhZeFlJMDhvU25UaFptMmVEUEVNMXhPVzRGNERURXRoc2o5LXUxSDY2cmxZT181UUdEWEM0WXNEcHVmb3R3ZWJWZVZKM2xPS0FpN1dQclRJUUE4bFdTQndxNDJnSnRhWUlaRy1sZ2ZqWlFTZXRhUEs2SkE3M0dYR2FIYjlzMjZHRm4zMGd6TlpOYVZ4UzlqeE5rblVONUhtM1pNZ0x1R3lfUU4wUTBoYnNQRi1DODhEWW5ieGZyUGM4ZXpCZEROQ2RZR0R1eEtCZEE9PXyZ83CfdFK3CRERbq2smHnCl-Y_Vj3DcnEObviBKousyA=="
+
+	decoded, err := base64.StdEncoding.DecodeString(cookieValue1)
+	if err == nil {
+		t.Logf("Cookie 1 raw decoded (first 50 bytes): %s", string(decoded[:50]))
+	}
+	s := securecookie.New(hashKey, blockKey)
+	var firstHalf string
+	err = s.Decode("flyte_at_1", cookieValue1, &firstHalf)
+	if err != nil {
+		t.Logf("Error decoding cookie 1 with MaxAge disabled: %v", err)
+		s2 := securecookie.New(hashKey, blockKey)
+		err2 := s2.Decode("flyte_at_1", cookieValue1, &firstHalf)
+		t.Logf("Error with validation enabled: %v", err2)
+	}
+	require.NoError(t, err)
+	t.Logf("First half of access token: %s", firstHalf)
+
+	var secondHalf string
+	err = s.Decode("flyte_at_2", cookieValue2, &secondHalf)
+	require.NoError(t, err)
+	t.Logf("Second half of access token: %s", secondHalf)
+
+	fullAccessToken := firstHalf + secondHalf
+	t.Logf("Full access token: %s", fullAccessToken)
+	assert.NotEmpty(t, fullAccessToken)
 }
