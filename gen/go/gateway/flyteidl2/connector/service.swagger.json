@@ -33,7 +33,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -67,7 +67,7 @@
                   "$ref": "#/definitions/connectorGetTaskLogsResponse"
                 },
                 "error": {
-                  "$ref": "#/definitions/googleRpcStatus"
+                  "$ref": "#/definitions/googlerpcStatus"
                 }
               },
               "title": "Stream result of connectorGetTaskLogsResponse"
@@ -76,7 +76,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -140,7 +140,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -222,7 +222,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -298,7 +298,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -367,7 +367,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -399,7 +399,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/googleRpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -502,14 +502,6 @@
       "default": "UNKNOWN",
       "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
     },
-    "RuntimeMetadataRuntimeType": {
-      "type": "string",
-      "enum": [
-        "OTHER",
-        "FLYTE_SDK"
-      ],
-      "default": "OTHER"
-    },
     "SchemaColumnSchemaColumnType": {
       "type": "string",
       "enum": [
@@ -569,22 +561,6 @@
         }
       }
     },
-    "TaskExecutionPhase": {
-      "type": "string",
-      "enum": [
-        "UNDEFINED",
-        "QUEUED",
-        "RUNNING",
-        "SUCCEEDED",
-        "ABORTED",
-        "FAILED",
-        "INITIALIZING",
-        "WAITING_FOR_RESOURCES",
-        "RETRYABLE_FAILED"
-      ],
-      "default": "UNDEFINED",
-      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
-    },
     "TaskLogLinkType": {
       "type": "string",
       "enum": [
@@ -638,7 +614,7 @@
           "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
         },
         "task_execution_metadata": {
-          "$ref": "#/definitions/connectorTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidl2connectorTaskExecutionMetadata",
           "description": "subset of runtime task execution metadata."
         },
         "connection": {
@@ -723,7 +699,7 @@
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/connectorResource"
+          "$ref": "#/definitions/flyteidl2connectorResource"
         }
       },
       "description": "Response to get an individual task resource."
@@ -741,35 +717,6 @@
       },
       "description": "A response containing a list of connectors."
     },
-    "connectorResource": {
-      "type": "object",
-      "properties": {
-        "outputs": {
-          "$ref": "#/definitions/taskOutputs",
-          "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
-        },
-        "message": {
-          "type": "string",
-          "description": "A descriptive message for the current state. e.g. waiting for cluster."
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "log information for the task execution."
-        },
-        "phase": {
-          "$ref": "#/definitions/TaskExecutionPhase",
-          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
-        },
-        "custom_info": {
-          "type": "object",
-          "description": "Custom data specific to the connector."
-        }
-      }
-    },
     "connectorTaskCategory": {
       "type": "object",
       "properties": {
@@ -783,62 +730,6 @@
           "description": "The version of the task type."
         }
       }
-    },
-    "connectorTaskExecutionMetadata": {
-      "type": "object",
-      "properties": {
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier"
-        },
-        "namespace": {
-          "type": "string",
-          "title": "k8s namespace where the task is executed in"
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Labels attached to the task execution"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Annotations attached to the task execution"
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "title": "k8s service account associated with the task execution"
-        },
-        "environment_variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Environment variables attached to the task execution"
-        },
-        "max_attempts": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
-        },
-        "interruptible_failure_threshold": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
-        },
-        "identity": {
-          "$ref": "#/definitions/coreIdentity",
-          "title": "Identity of user running this task execution"
-        }
-      },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
     },
     "coreArtifactBindingData": {
       "type": "object",
@@ -1161,58 +1052,6 @@
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
-    "coreIdentity": {
-      "type": "object",
-      "properties": {
-        "iam_role": {
-          "type": "string",
-          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "description": "k8s_service_account references a kubernetes service account to impersonate."
-        },
-        "oauth2_client": {
-          "$ref": "#/definitions/coreOAuth2Client",
-          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
-        },
-        "execution_identity": {
-          "type": "string",
-          "title": "execution_identity references the subject who makes the execution"
-        }
-      },
-      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
-    },
     "coreInputBindingData": {
       "type": "object",
       "properties": {
@@ -1401,7 +1240,7 @@
           "description": "A blob might have specialized implementation details depending on associated metadata."
         },
         "enum_type": {
-          "$ref": "#/definitions/flyteidl2CoreEnumType",
+          "$ref": "#/definitions/flyteidl2coreEnumType",
           "description": "Defines an enum with pre-defined string values."
         },
         "structured_dataset_type": {
@@ -1447,7 +1286,7 @@
           "title": "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the\nsecret requested matches the client_id indicated here.\n+required"
         },
         "client_secret": {
-          "$ref": "#/definitions/coreSecret",
+          "$ref": "#/definitions/flyteidl2coreSecret",
           "title": "client_secret is a reference to the secret used to authenticate the OAuth2 client.\n+required"
         }
       },
@@ -1581,24 +1420,6 @@
     "coreRuntimeBinding": {
       "type": "object"
     },
-    "coreRuntimeMetadata": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/RuntimeMetadataRuntimeType",
-          "description": "Type of runtime."
-        },
-        "version": {
-          "type": "string",
-          "description": "Version of the runtime. All versions should be backward compatible. However, certain cases call for version\nchecks to ensure tighter validation or setting expectations."
-        },
-        "flavor": {
-          "type": "string",
-          "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
-        }
-      },
-      "description": "Runtime information. This is loosely defined to allow for extensibility."
-    },
     "coreScalar": {
       "type": "object",
       "properties": {
@@ -1612,7 +1433,7 @@
           "$ref": "#/definitions/coreBinary"
         },
         "schema": {
-          "$ref": "#/definitions/flyteidl2CoreSchema"
+          "$ref": "#/definitions/flyteidl2coreSchema"
         },
         "none_type": {
           "$ref": "#/definitions/coreVoid"
@@ -1644,58 +1465,6 @@
         }
       },
       "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
-    },
-    "coreSecret": {
-      "type": "object",
-      "properties": {
-        "group": {
-          "type": "string",
-          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
-        },
-        "group_version": {
-          "type": "string",
-          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
-        },
-        "key": {
-          "type": "string",
-          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
-        },
-        "mount_requirement": {
-          "$ref": "#/definitions/SecretMountType",
-          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
-        },
-        "env_var": {
-          "type": "string",
-          "title": "env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,\nthen the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.\n+optional"
-        }
-      },
-      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
-    },
-    "coreSecurityContext": {
-      "type": "object",
-      "properties": {
-        "run_as": {
-          "$ref": "#/definitions/coreIdentity",
-          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
-        },
-        "secrets": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreSecret"
-          },
-          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        },
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreOAuth2TokenRequest"
-          },
-          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
-        }
-      },
-      "description": "SecurityContext holds security attributes that apply to tasks."
     },
     "coreSharedMemory": {
       "type": "object",
@@ -1796,7 +1565,7 @@
       "type": "object",
       "properties": {
         "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/flyteidl2coreIdentifier"
         },
         "node_execution_id": {
           "$ref": "#/definitions/coreNodeExecutionIdentifier"
@@ -1807,6 +1576,22 @@
         }
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
+    "coreTaskExecutionPhase": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "ABORTED",
+        "FAILED",
+        "INITIALIZING",
+        "WAITING_FOR_RESOURCES",
+        "RETRYABLE_FAILED"
+      ],
+      "default": "UNDEFINED",
+      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
     },
     "coreTaskLog": {
       "type": "object",
@@ -1841,90 +1626,11 @@
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
     },
-    "coreTaskMetadata": {
-      "type": "object",
-      "properties": {
-        "discoverable": {
-          "type": "boolean",
-          "description": "Indicates whether the system should attempt to lookup this task's output to avoid duplication of work."
-        },
-        "runtime": {
-          "$ref": "#/definitions/coreRuntimeMetadata",
-          "description": "Runtime information about the task."
-        },
-        "timeout": {
-          "type": "string",
-          "description": "The overall timeout of a task including user-triggered retries."
-        },
-        "retries": {
-          "$ref": "#/definitions/coreRetryStrategy",
-          "description": "Number of retries per task."
-        },
-        "discovery_version": {
-          "type": "string",
-          "description": "Indicates a logical version to apply to this task for the purpose of discovery."
-        },
-        "deprecated_error_message": {
-          "type": "string",
-          "description": "If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers\nof the ending of support for a given task."
-        },
-        "interruptible": {
-          "type": "boolean"
-        },
-        "cache_serializable": {
-          "type": "boolean",
-          "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
-        },
-        "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
-        },
-        "pod_template_name": {
-          "type": "string",
-          "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
-        },
-        "cache_ignore_input_vars": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
-        },
-        "is_eager": {
-          "type": "boolean",
-          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
-        },
-        "generates_deck": {
-          "type": "boolean",
-          "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
-        },
-        "metadata": {
-          "$ref": "#/definitions/coreK8sObjectMetadata",
-          "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
-        },
-        "debuggable": {
-          "type": "boolean",
-          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "Log links associated with this task."
-        }
-      },
-      "title": "Task Metadata"
-    },
     "coreTaskTemplate": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidl2coreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -1932,7 +1638,7 @@
           "description": "A predefined yet extensible Task type identifier. This can be used to customize any of the components. If no\nextensions are provided in the system, Flyte will resolve the this task to its TaskCategory and default the\nimplementation registered for the TaskCategory."
         },
         "metadata": {
-          "$ref": "#/definitions/coreTaskMetadata",
+          "$ref": "#/definitions/flyteidl2coreTaskMetadata",
           "description": "Extra metadata about the task."
         },
         "interface": {
@@ -1958,7 +1664,7 @@
           "description": "This can be used to customize task handling at execution time for the same task type."
         },
         "security_context": {
-          "$ref": "#/definitions/coreSecurityContext",
+          "$ref": "#/definitions/flyteidl2coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
         },
         "extended_resources": {
@@ -2135,7 +1841,92 @@
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
     },
-    "flyteidl2CoreEnumType": {
+    "flyteidl2connectorResource": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/taskOutputs",
+          "title": "The outputs of the execution. It's typically used by sql task. connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
+        },
+        "message": {
+          "type": "string",
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
+        },
+        "custom_info": {
+          "type": "object",
+          "description": "Custom data specific to the connector."
+        }
+      }
+    },
+    "flyteidl2connectorTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "k8s namespace where the task is executed in"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels attached to the task execution"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Annotations attached to the task execution"
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "title": "k8s service account associated with the task execution"
+        },
+        "environment_variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Environment variables attached to the task execution"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
+        },
+        "interruptible_failure_threshold": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
+        },
+        "identity": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "title": "Identity of user running this task execution"
+        }
+      },
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
+    },
+    "flyteidl2coreEnumType": {
       "type": "object",
       "properties": {
         "values": {
@@ -2148,7 +1939,85 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
-    "flyteidl2CoreSchema": {
+    "flyteidl2coreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
+    },
+    "flyteidl2coreIdentity": {
+      "type": "object",
+      "properties": {
+        "iam_role": {
+          "type": "string",
+          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "description": "k8s_service_account references a kubernetes service account to impersonate."
+        },
+        "oauth2_client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
+        },
+        "execution_identity": {
+          "type": "string",
+          "title": "execution_identity references the subject who makes the execution"
+        }
+      },
+      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
+    },
+    "flyteidl2coreRuntimeMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/flyteidl2coreRuntimeMetadataRuntimeType",
+          "description": "Type of runtime."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the runtime. All versions should be backward compatible. However, certain cases call for version\nchecks to ensure tighter validation or setting expectations."
+        },
+        "flavor": {
+          "type": "string",
+          "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
+        }
+      },
+      "description": "Runtime information. This is loosely defined to allow for extensibility."
+    },
+    "flyteidl2coreRuntimeMetadataRuntimeType": {
+      "type": "string",
+      "enum": [
+        "OTHER",
+        "FLYTE_SDK"
+      ],
+      "default": "OTHER"
+    },
+    "flyteidl2coreSchema": {
       "type": "object",
       "properties": {
         "uri": {
@@ -2160,26 +2029,138 @@
       },
       "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
-    "protobufAny": {
+    "flyteidl2coreSecret": {
       "type": "object",
       "properties": {
-        "@type": {
+        "group": {
           "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
+        },
+        "group_version": {
+          "type": "string",
+          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
+        },
+        "key": {
+          "type": "string",
+          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
+        },
+        "mount_requirement": {
+          "$ref": "#/definitions/SecretMountType",
+          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        },
+        "env_var": {
+          "type": "string",
+          "title": "env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,\nthen the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.\n+optional"
         }
       },
-      "additionalProperties": {},
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
     },
-    "protobufNullValue": {
-      "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
-      "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    "flyteidl2coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/flyteidl2coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/flyteidl2coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
     },
-    "rpcStatus": {
+    "flyteidl2coreTaskMetadata": {
+      "type": "object",
+      "properties": {
+        "discoverable": {
+          "type": "boolean",
+          "description": "Indicates whether the system should attempt to lookup this task's output to avoid duplication of work."
+        },
+        "runtime": {
+          "$ref": "#/definitions/flyteidl2coreRuntimeMetadata",
+          "description": "Runtime information about the task."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "The overall timeout of a task including user-triggered retries."
+        },
+        "retries": {
+          "$ref": "#/definitions/coreRetryStrategy",
+          "description": "Number of retries per task."
+        },
+        "discovery_version": {
+          "type": "string",
+          "description": "Indicates a logical version to apply to this task for the purpose of discovery."
+        },
+        "deprecated_error_message": {
+          "type": "string",
+          "description": "If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers\nof the ending of support for a given task."
+        },
+        "interruptible": {
+          "type": "boolean"
+        },
+        "cache_serializable": {
+          "type": "boolean",
+          "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+        },
+        "pod_template_name": {
+          "type": "string",
+          "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
+        },
+        "cache_ignore_input_vars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
+        },
+        "generates_deck": {
+          "type": "boolean",
+          "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreK8sObjectMetadata",
+          "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
+        },
+        "debuggable": {
+          "type": "boolean",
+          "description": "Whether the task is able to run the debugger (vscode server) inside the task container."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "Log links associated with this task."
+        }
+      },
+      "title": "Task Metadata"
+    },
+    "googlerpcStatus": {
       "type": "object",
       "properties": {
         "code": {
@@ -2201,6 +2182,25 @@
         }
       },
       "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "taskInputs": {
       "type": "object",
