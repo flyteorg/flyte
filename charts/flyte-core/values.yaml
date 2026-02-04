@@ -855,12 +855,18 @@ db:
       username: postgres
       host: postgres
       dbname: "datacatalog"
+      # If using common.databaseSecret, this parameter is required.
+      # Ensure the secret key matches the specified filename below:
+      # E.g. `kubectl create secret generic flyte-db-password --from-literal=pass.txt='xxx'`
+      # passwordPath: /etc/db/pass.txt
   admin:
     database:
       port: 5432
       username: postgres
       host: postgres
       dbname: "flyteadmin"
+      # See comment above about passwordPath usage
+      # passwordPath: /etc/db/pass.txt
 # --------------------------------------------------------------------
 # Specializing your deployment using configuration
 # -------------------------------------------------------------------
