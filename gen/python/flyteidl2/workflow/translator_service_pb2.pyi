@@ -46,3 +46,17 @@ class TaskSpecToLaunchFormJsonResponse(_message.Message):
     JSON_FIELD_NUMBER: _ClassVar[int]
     json: _struct_pb2.Struct
     def __init__(self, json: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+
+class JsonValuesToLiteralsRequest(_message.Message):
+    __slots__ = ["variables", "values"]
+    VARIABLES_FIELD_NUMBER: _ClassVar[int]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    variables: _interface_pb2.VariableMap
+    values: _struct_pb2.Struct
+    def __init__(self, variables: _Optional[_Union[_interface_pb2.VariableMap, _Mapping]] = ..., values: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+
+class JsonValuesToLiteralsResponse(_message.Message):
+    __slots__ = ["literals"]
+    LITERALS_FIELD_NUMBER: _ClassVar[int]
+    literals: _containers.RepeatedCompositeFieldContainer[_common_pb2.NamedLiteral]
+    def __init__(self, literals: _Optional[_Iterable[_Union[_common_pb2.NamedLiteral, _Mapping]]] = ...) -> None: ...
