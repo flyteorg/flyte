@@ -99,7 +99,7 @@ func (w *worker) run() {
 			gatherOutputsRequest.responseChannel <- struct {
 				literalMap map[string]*idlcore.Literal
 				error
-			}{literalMap, nil}
+			}{literalMap, err}
 		}
 	}
 }
