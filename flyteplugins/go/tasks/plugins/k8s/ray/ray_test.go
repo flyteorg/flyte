@@ -1339,24 +1339,17 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 }
 
 func TestBuildResourceRaySubmitterPodAffinity(t *testing.T) {
-	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		GpuDeviceNodeLabel:                 "gpu-node-label",
-		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
-		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
-		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
-	}))
-
-	// Create a custom affinity for the head pod
-	expectedAffinity := &corev1.Affinity{
+	// Create a default affinity to be set in the K8s plugin config
+	defaultAffinity := &corev1.Affinity{
 		NodeAffinity: &corev1.NodeAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
 				NodeSelectorTerms: []corev1.NodeSelectorTerm{
 					{
 						MatchExpressions: []corev1.NodeSelectorRequirement{
 							{
-								Key:      "gpu-node-label",
+								Key:      "node-type",
 								Operator: corev1.NodeSelectorOpIn,
-								Values:   []string{"nvidia-tesla-t4"},
+								Values:   []string{"ray-submitter"},
 							},
 						},
 					},
@@ -1365,16 +1358,11 @@ func TestBuildResourceRaySubmitterPodAffinity(t *testing.T) {
 		},
 	}
 
-	headPodSpecWithAffinity := &corev1.PodSpec{
-		Affinity: expectedAffinity,
-	}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: defaultAffinity,
+	}))
 
-	rayJobInput := dummyRayCustomObj()
-	rayJobInput.RayCluster.HeadGroupSpec.K8SPod = &core.K8SPod{
-		PodSpec: transformStructToStructPB(t, headPodSpecWithAffinity),
-	}
-
-	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
 	taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
 	rayJobResourceHandler := rayJobResourceHandler{}
 	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
@@ -1383,10 +1371,10 @@ func TestBuildResourceRaySubmitterPodAffinity(t *testing.T) {
 	rayJob, ok := r.(*rayv1.RayJob)
 	assert.True(t, ok)
 
-	// Verify the submitter pod template has the same affinity as the head pod
+	// Verify the submitter pod template has the default affinity from K8s plugin config
 	submitterPodAffinity := rayJob.Spec.SubmitterPodTemplate.Spec.Affinity
 	assert.NotNil(t, submitterPodAffinity, "submitter pod should have affinity set")
-	assert.EqualValues(t, expectedAffinity, submitterPodAffinity, "submitter pod affinity should match head pod affinity")
+	assert.EqualValues(t, defaultAffinity, submitterPodAffinity, "submitter pod affinity should match default affinity from config")
 }
 
 func TestGetPropertiesRay(t *testing.T) {

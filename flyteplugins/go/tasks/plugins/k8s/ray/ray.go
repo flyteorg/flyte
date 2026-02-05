@@ -427,8 +427,9 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 			},
 			RestartPolicy:      v1.RestartPolicyNever,
 			EnableServiceLinks: &enableServiceLinks,
-			Tolerations:        tolerations,
-			Affinity:           config.GetK8sPluginConfig().DefaultAffinity,
+			// Run the RayJob submitter pod with the default affinity/tolerations so it lands on the default node.
+			Tolerations: tolerations,
+			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
 		},
 	}
 }
