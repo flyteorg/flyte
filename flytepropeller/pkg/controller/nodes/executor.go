@@ -98,12 +98,13 @@ type nodeMetrics struct {
 // recursiveNodeExector implements the executors.Node interfaces and is the starting point for
 // executing any node in the workflow.
 type recursiveNodeExecutor struct {
-	nodeExecutor       interfaces.NodeExecutor
-	nCtxBuilder        interfaces.NodeExecutionContextBuilder
-	enqueueWorkflow    v1alpha1.EnqueueWorkflow
-	nodeHandlerFactory interfaces.HandlerFactory
-	store              *storage.DataStore
-	metrics            *nodeMetrics
+	nodeExecutor          interfaces.NodeExecutor
+	nCtxBuilder           interfaces.NodeExecutionContextBuilder
+	enqueueWorkflow       v1alpha1.EnqueueWorkflow
+	nodeHandlerFactory    interfaces.HandlerFactory
+	store                 *storage.DataStore
+	metrics               *nodeMetrics
+	enableCRDebugMetadata bool
 }
 
 func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (interfaces.NodeStatus, error) {
@@ -295,6 +296,9 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 	partialNodeCompletion := false
 	onFailurePolicy := execContext.GetOnFailurePolicy()
 	stateOnComplete := interfaces.NodeStatusComplete
+	// Track the node status that should keep its error. When a new failure is encountered,
+	// we clear the previous one's error to reduce etcd state size.
+	var nodeStatusWithError v1alpha1.ExecutableNodeStatus
 	for _, downstreamNodeName := range downstreamNodes {
 		downstreamNode, ok := nl.GetNode(downstreamNodeName)
 		if !ok {
@@ -317,6 +321,17 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 				// If the failure policy allows other nodes to continue running, do not exit the loop,
 				// Keep track of the last failed state in the loop since it'll be the one to return.
 				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
+				nodeStatus := nl.GetNodeExecutionStatus(ctx, downstreamNode.GetID())
+				// Only consider this as a "new" failure if it still has an error.
+				// This check is critical for determinism: once an error is cleared, we don't
+				// re-process that node, preventing all errors from being cleared if iteration
+				// order varies between reconciliation rounds.
+				if nodeStatus.GetExecutionError() != nil {
+					if nodeStatusWithError != nil && !c.enableCRDebugMetadata {
+						nodeStatusWithError.ClearExecutionError()
+					}
+					nodeStatusWithError = nodeStatus
+				}
 				stateOnComplete = state
 			} else {
 				return state, nil
@@ -481,12 +496,13 @@ func (c *recursiveNodeExecutor) GetNodeExecutionContextBuilder() interfaces.Node
 // WithNodeExecutionContextBuilder returns a new Node with the given NodeExecutionContextBuilder
 func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder) interfaces.Node {
 	return &recursiveNodeExecutor{
-		nodeExecutor:       c.nodeExecutor,
-		nCtxBuilder:        nCtxBuilder,
-		enqueueWorkflow:    c.enqueueWorkflow,
-		nodeHandlerFactory: c.nodeHandlerFactory,
-		store:              c.store,
-		metrics:            c.metrics,
+		nodeExecutor:          c.nodeExecutor,
+		nCtxBuilder:           nCtxBuilder,
+		enqueueWorkflow:       c.enqueueWorkflow,
+		nodeHandlerFactory:    c.nodeHandlerFactory,
+		store:                 c.store,
+		metrics:               c.metrics,
+		enableCRDebugMetadata: c.enableCRDebugMetadata,
 	}
 }
 
@@ -1517,12 +1533,13 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	}
 
 	exec := &recursiveNodeExecutor{
-		nodeExecutor:       nodeExecutor,
-		nCtxBuilder:        nodeExecutor,
-		nodeHandlerFactory: nodeHandlerFactory,
-		enqueueWorkflow:    enQWorkflow,
-		store:              store,
-		metrics:            metrics,
+		nodeExecutor:          nodeExecutor,
+		nCtxBuilder:           nodeExecutor,
+		nodeHandlerFactory:    nodeHandlerFactory,
+		enqueueWorkflow:       enQWorkflow,
+		store:                 store,
+		metrics:               metrics,
+		enableCRDebugMetadata: nodeConfig.EnableCRDebugMetadata,
 	}
 	return exec, err
 }
