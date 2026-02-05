@@ -222,7 +222,6 @@ func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedM
 // If not found or incomplete, it falls back to the global GPU configuration fields for backward compatibility.
 func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.AcceleratorDeviceClassConfig {
 	cfg := config.GetK8sPluginConfig()
-
 	// Start with defaults from global GPU config
 	accelConfig := config.AcceleratorDeviceClassConfig{
 		ResourceName:                         cfg.GpuResourceName,
