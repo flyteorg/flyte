@@ -1,0 +1,65 @@
+name: Publish Python Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flyteorg/flyte/ci:v2
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ./gen/python
+    env:
+      PUBLISH_TO_TESTPYPI: ${{ vars.PUBLISH_TO_TESTPYPI || 'false' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Debug Info
+        run: |
+          pwd
+          ls -la
+
+      - name: Set version from tag
+        run: |
+          # Convert 1.2.3-b1 to 1.2.3b1 for Python versioning
+          VERSION="${{ github.ref_name }}"
+          VERSION_NO_V="${VERSION#v}"
+          VERSION_PY=$(echo "$VERSION_NO_V" | sed -E 's/-//')
+          export SETUPTOOLS_SCM_PRETEND_VERSION="$VERSION_PY"
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=$SETUPTOOLS_SCM_PRETEND_VERSION" >> $GITHUB_ENV
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=$SETUPTOOLS_SCM_PRETEND_VERSION"
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv pip install build twine setuptools wheel
+
+      - name: Build
+        run: |
+          uv run python -m build --wheel --installer uv
+      - name: Publish to Test
+        if: ${{ env.PUBLISH_TO_TESTPYPI == 'true' }}
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TEST_PASSWORD }}
+        run: |
+          REPOSITORY_URL="https://test.pypi.org/legacy/"
+          uv run python -m twine upload --repository-url "$REPOSITORY_URL" --verbose dist/*
+      - name: Publish to Pypi
+        if: ${{ env.PUBLISH_TO_TESTPYPI == 'false' }}
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          REPOSITORY_URL="https://upload.pypi.org/legacy/"
+          uv run python -m twine upload --repository-url "$REPOSITORY_URL" --verbose dist/*

@@ -1,0 +1,16 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: optimize_for
+      value: CODE_SIZE
+  # Use managed mode: https://buf.build/docs/generate/managed-mode/#managed-mode
+  disable:
+    - module: buf.build/bufbuild/protovalidate
+plugins:
+  - remote: buf.build/bufbuild/es:v2.2.5
+    out: gen/ts
+    include_imports: true
+    opt:
+      - target=ts
+      - import_extension=.ts

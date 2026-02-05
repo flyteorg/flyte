@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package flyteidl2.task;
+
+import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/security.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
+
+// Label values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge labels defined at registration and execution time.
+message Labels {
+  // Map of custom labels to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Annotation values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge annotations defined at registration and execution time.
+message Annotations {
+  // Map of custom annotations to be applied to the execution resource.
+  map<string, string> values = 1;
+}
+
+// Environment variable values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge environment variables defined at registration and execution time.
+message Envs {
+  // Map of custom environment variables to be applied to the execution resource.
+  repeated flyteidl2.core.KeyValuePair values = 1;
+}
+
+message RawDataStorage {
+  // Prefix for where offloaded data from user actions will be written
+  // e.g. s3://bucket/key or s3://bucket/
+  string raw_data_prefix = 1;
+}
+
+enum CacheLookupScope {
+  // CACHE_LOOKUP_SCOPE_UNSPECIFIED instructs cache lookup to follow the default behavior (global unless configured
+  // otherwise)
+  CACHE_LOOKUP_SCOPE_UNSPECIFIED = 0;
+
+  // CACHE_LOOKUP_SCOPE_GLOBAL instructs cache lookups to do a global lookup (unless overridden by a system config).
+  // This has traditionally been the default behavior. It requires all workloads running in all projects/domains
+  // to have access to the same artifacts/buckets. Otherwise it risks runtime failures.
+  CACHE_LOOKUP_SCOPE_GLOBAL = 1;
+
+  // CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN instructs cache lookups to do a project-domain scoped lookup. This ensures
+  // data access success at the expense of potentially more cache misses and recomputation happening. This should not
+  // be considered a security enforcement (that can happen through the system-wide config).
+  CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN = 2;
+}
+
+// CacheConfig contains configurations that influence the behavior of cache reads and writes
+message CacheConfig {
+  // If true, recompute outputs for this run and overwrite any existing cache.
+  bool overwrite_cache = 1;
+
+  // CacheLookupScope defines the cache lookup behavior. If left unspecified, the default value from the system config
+  // will be used (global unless configured otherwise).
+  CacheLookupScope cache_lookup_scope = 2;
+}
+
+message RunSpec {
+  // Labels to apply to the run.
+  Labels labels = 1;
+
+  // Annotations to apply to the run.
+  Annotations annotations = 2;
+
+  // Envs to apply to the run.
+  Envs envs = 3;
+
+  // Explicit override for executing this run as interruptible or not. If not set, use the default.
+  google.protobuf.BoolValue interruptible = 4;
+
+  // If true, recompute outputs for this run and overwrite any existing cache.
+  // Deprecated, please use CacheConfig.OverwriteCache instead
+  bool overwrite_cache = 5 [deprecated = true];
+
+  // the specific cluster that this action should be executed on. this value will be used as the
+  // default for all actions in the run unless overridden.
+  string cluster = 6;
+
+  // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+  RawDataStorage raw_data_storage = 7;
+
+  // SecurityContext holds security attributes that apply to tasks.
+  flyteidl2.core.SecurityContext security_context = 8;
+
+  // CacheConfig contains configurations that influence the behavior of cache reads and writes
+  CacheConfig cache_config = 9;
+}

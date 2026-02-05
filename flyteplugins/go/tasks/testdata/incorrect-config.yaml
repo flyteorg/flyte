@@ -1,0 +1,7 @@
+# Sample plugins config
+plugins:
+  # Logging configuration
+  logs:
+    config:
+      kubernetes-enabled: true
+      kubernetes-url: "http://localhost:30082"
