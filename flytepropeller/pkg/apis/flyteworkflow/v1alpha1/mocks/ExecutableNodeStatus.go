@@ -92,6 +92,38 @@ func (_c *ExecutableNodeStatus_ClearDynamicNodeStatus_Call) RunAndReturn(run fun
 	return _c
 }
 
+// ClearExecutionError provides a mock function with no fields
+func (_m *ExecutableNodeStatus) ClearExecutionError() {
+	_m.Called()
+}
+
+// ExecutableNodeStatus_ClearExecutionError_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearExecutionError'
+type ExecutableNodeStatus_ClearExecutionError_Call struct {
+	*mock.Call
+}
+
+// ClearExecutionError is a helper method to define mock.On call
+func (_e *ExecutableNodeStatus_Expecter) ClearExecutionError() *ExecutableNodeStatus_ClearExecutionError_Call {
+	return &ExecutableNodeStatus_ClearExecutionError_Call{Call: _e.mock.On("ClearExecutionError")}
+}
+
+func (_c *ExecutableNodeStatus_ClearExecutionError_Call) Run(run func()) *ExecutableNodeStatus_ClearExecutionError_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_ClearExecutionError_Call) Return() *ExecutableNodeStatus_ClearExecutionError_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_ClearExecutionError_Call) RunAndReturn(run func()) *ExecutableNodeStatus_ClearExecutionError_Call {
+	_c.Run(run)
+	return _c
+}
+
 // ClearGateNodeStatus provides a mock function with no fields
 func (_m *ExecutableNodeStatus) ClearGateNodeStatus() {
 	_m.Called()
