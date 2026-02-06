@@ -33,7 +33,6 @@ var (
 	testDB     *gorm.DB // Expose DB for cleanup
 )
 
-
 // TestMain sets up the test environment with SQLite database and runs service
 func TestMain(m *testing.M) {
 	ctx := context.Background()
