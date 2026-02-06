@@ -84,6 +84,9 @@ enum Action {
 
   // View system logs
   ACTION_SUPPORT_SYSTEM_LOGS = 16;
+
+  // View users
+  ACTION_VIEW_USERS = 17;
 }
 
 // Defines a set of allowed actions on a specific authorization resource.
