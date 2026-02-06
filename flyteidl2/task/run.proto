@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
 import "google/protobuf/wrappers.proto";
@@ -93,4 +94,9 @@ message RunSpec {
 
   // CacheConfig contains configurations that influence the behavior of cache reads and writes
   CacheConfig cache_config = 9;
+
+  // Identity of the user or application that created this run. Populated at creation time
+  // from authentication context claims so that downstream consumers (UI, audit) can display
+  // the owner without querying the identity provider.
+  flyteidl2.common.EnrichedIdentity executed_by = 10;
 }
