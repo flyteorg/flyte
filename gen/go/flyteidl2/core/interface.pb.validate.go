@@ -223,6 +223,137 @@ var _ interface {
 	ErrorName() string
 } = VariableValidationError{}
 
+// Validate checks the field values on VariableEntry with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *VariableEntry) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on VariableEntry with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in VariableEntryMultiError, or
+// nil if none found.
+func (m *VariableEntry) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *VariableEntry) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Key
+
+	if all {
+		switch v := interface{}(m.GetValue()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, VariableEntryValidationError{
+					field:  "Value",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, VariableEntryValidationError{
+					field:  "Value",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VariableEntryValidationError{
+				field:  "Value",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return VariableEntryMultiError(errors)
+	}
+
+	return nil
+}
+
+// VariableEntryMultiError is an error wrapping multiple validation errors
+// returned by VariableEntry.ValidateAll() if the designated constraints
+// aren't met.
+type VariableEntryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m VariableEntryMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m VariableEntryMultiError) AllErrors() []error { return m }
+
+// VariableEntryValidationError is the validation error returned by
+// VariableEntry.Validate if the designated constraints aren't met.
+type VariableEntryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e VariableEntryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e VariableEntryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e VariableEntryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e VariableEntryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e VariableEntryValidationError) ErrorName() string { return "VariableEntryValidationError" }
+
+// Error satisfies the builtin error interface
+func (e VariableEntryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sVariableEntry.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = VariableEntryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = VariableEntryValidationError{}
+
 // Validate checks the field values on VariableMap with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -245,50 +376,38 @@ func (m *VariableMap) validate(all bool) error {
 
 	var errors []error
 
-	{
-		sorted_keys := make([]string, len(m.GetVariables()))
-		i := 0
-		for key := range m.GetVariables() {
-			sorted_keys[i] = key
-			i++
-		}
-		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
-		for _, key := range sorted_keys {
-			val := m.GetVariables()[key]
-			_ = val
+	for idx, item := range m.GetVariables() {
+		_, _ = idx, item
 
-			// no validation rules for Variables[key]
-
-			if all {
-				switch v := interface{}(val).(type) {
-				case interface{ ValidateAll() error }:
-					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, VariableMapValidationError{
-							field:  fmt.Sprintf("Variables[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				case interface{ Validate() error }:
-					if err := v.Validate(); err != nil {
-						errors = append(errors, VariableMapValidationError{
-							field:  fmt.Sprintf("Variables[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				}
-			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
-				if err := v.Validate(); err != nil {
-					return VariableMapValidationError{
-						field:  fmt.Sprintf("Variables[%v]", key),
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, VariableMapValidationError{
+						field:  fmt.Sprintf("Variables[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
-					}
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, VariableMapValidationError{
+						field:  fmt.Sprintf("Variables[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
 				}
 			}
-
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return VariableMapValidationError{
+					field:  fmt.Sprintf("Variables[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
+
 	}
 
 	if len(errors) > 0 {
