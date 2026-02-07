@@ -954,67 +954,7 @@ pub mod actions_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn update_action_status(
-            &mut self,
-            request: impl tonic::IntoRequest<super::UpdateActionStatusRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UpdateActionStatusResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.ActionsService/UpdateActionStatus",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.ActionsService",
-                        "UpdateActionStatus",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn get_action_state(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetActionStateRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetActionStateResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.ActionsService/GetActionState",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.ActionsService",
-                        "GetActionState",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn enqueue_action(
+        pub async fn enqueue(
             &mut self,
             request: impl tonic::IntoRequest<super::EnqueueActionRequest>,
         ) -> std::result::Result<
@@ -1032,20 +972,18 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.ActionsService/EnqueueAction",
+                "/flyteidl2.workflow.ActionsService/Enqueue",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.workflow.ActionsService", "EnqueueAction"),
-                );
+                .insert(GrpcMethod::new("flyteidl2.workflow.ActionsService", "Enqueue"));
             self.inner.unary(req, path, codec).await
         }
-        pub async fn abort_queued_action(
+        pub async fn get_latest_state(
             &mut self,
-            request: impl tonic::IntoRequest<super::AbortQueuedActionRequest>,
+            request: impl tonic::IntoRequest<super::GetLatestStateRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::AbortQueuedActionResponse>,
+            tonic::Response<super::GetLatestStateResponse>,
             tonic::Status,
         > {
             self.inner
@@ -1059,19 +997,19 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.ActionsService/AbortQueuedAction",
+                "/flyteidl2.workflow.ActionsService/GetLatestState",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl2.workflow.ActionsService",
-                        "AbortQueuedAction",
+                        "GetLatestState",
                     ),
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn watch(
+        pub async fn watch_for_updates(
             &mut self,
             request: impl tonic::IntoRequest<super::WatchRequest>,
         ) -> std::result::Result<
@@ -1089,12 +1027,64 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.ActionsService/Watch",
+                "/flyteidl2.workflow.ActionsService/WatchForUpdates",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.workflow.ActionsService", "Watch"));
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.ActionsService",
+                        "WatchForUpdates",
+                    ),
+                );
             self.inner.server_streaming(req, path, codec).await
+        }
+        pub async fn update(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateRequest>,
+        ) -> std::result::Result<tonic::Response<super::UpdateResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.ActionsService/Update",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.workflow.ActionsService", "Update"));
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn abort(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AbortQueuedActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.ActionsService/Abort",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.workflow.ActionsService", "Abort"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -1105,44 +1095,44 @@ pub mod actions_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with ActionsServiceServer.
     #[async_trait]
     pub trait ActionsService: Send + Sync + 'static {
-        async fn update_action_status(
-            &self,
-            request: tonic::Request<super::UpdateActionStatusRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UpdateActionStatusResponse>,
-            tonic::Status,
-        >;
-        async fn get_action_state(
-            &self,
-            request: tonic::Request<super::GetActionStateRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetActionStateResponse>,
-            tonic::Status,
-        >;
-        async fn enqueue_action(
+        async fn enqueue(
             &self,
             request: tonic::Request<super::EnqueueActionRequest>,
         ) -> std::result::Result<
             tonic::Response<super::EnqueueActionResponse>,
             tonic::Status,
         >;
-        async fn abort_queued_action(
+        async fn get_latest_state(
+            &self,
+            request: tonic::Request<super::GetLatestStateRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetLatestStateResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the WatchForUpdates method.
+        type WatchForUpdatesStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::WatchResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn watch_for_updates(
+            &self,
+            request: tonic::Request<super::WatchRequest>,
+        ) -> std::result::Result<
+            tonic::Response<Self::WatchForUpdatesStream>,
+            tonic::Status,
+        >;
+        async fn update(
+            &self,
+            request: tonic::Request<super::UpdateRequest>,
+        ) -> std::result::Result<tonic::Response<super::UpdateResponse>, tonic::Status>;
+        async fn abort(
             &self,
             request: tonic::Request<super::AbortQueuedActionRequest>,
         ) -> std::result::Result<
             tonic::Response<super::AbortQueuedActionResponse>,
             tonic::Status,
         >;
-        /// Server streaming response type for the Watch method.
-        type WatchStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<super::WatchResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
-        async fn watch(
-            &self,
-            request: tonic::Request<super::WatchRequest>,
-        ) -> std::result::Result<tonic::Response<Self::WatchStream>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ActionsServiceServer<T: ActionsService> {
@@ -1220,105 +1210,13 @@ pub mod actions_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.ActionsService/UpdateActionStatus" => {
+                "/flyteidl2.workflow.ActionsService/Enqueue" => {
                     #[allow(non_camel_case_types)]
-                    struct UpdateActionStatusSvc<T: ActionsService>(pub Arc<T>);
-                    impl<
-                        T: ActionsService,
-                    > tonic::server::UnaryService<super::UpdateActionStatusRequest>
-                    for UpdateActionStatusSvc<T> {
-                        type Response = super::UpdateActionStatusResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::UpdateActionStatusRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as ActionsService>::update_action_status(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = UpdateActionStatusSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.workflow.ActionsService/GetActionState" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetActionStateSvc<T: ActionsService>(pub Arc<T>);
-                    impl<
-                        T: ActionsService,
-                    > tonic::server::UnaryService<super::GetActionStateRequest>
-                    for GetActionStateSvc<T> {
-                        type Response = super::GetActionStateResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetActionStateRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as ActionsService>::get_action_state(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = GetActionStateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.workflow.ActionsService/EnqueueAction" => {
-                    #[allow(non_camel_case_types)]
-                    struct EnqueueActionSvc<T: ActionsService>(pub Arc<T>);
+                    struct EnqueueSvc<T: ActionsService>(pub Arc<T>);
                     impl<
                         T: ActionsService,
                     > tonic::server::UnaryService<super::EnqueueActionRequest>
-                    for EnqueueActionSvc<T> {
+                    for EnqueueSvc<T> {
                         type Response = super::EnqueueActionResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -1330,7 +1228,7 @@ pub mod actions_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as ActionsService>::enqueue_action(&inner, request).await
+                                <T as ActionsService>::enqueue(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1341,7 +1239,7 @@ pub mod actions_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = EnqueueActionSvc(inner);
+                        let method = EnqueueSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1357,25 +1255,25 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.ActionsService/AbortQueuedAction" => {
+                "/flyteidl2.workflow.ActionsService/GetLatestState" => {
                     #[allow(non_camel_case_types)]
-                    struct AbortQueuedActionSvc<T: ActionsService>(pub Arc<T>);
+                    struct GetLatestStateSvc<T: ActionsService>(pub Arc<T>);
                     impl<
                         T: ActionsService,
-                    > tonic::server::UnaryService<super::AbortQueuedActionRequest>
-                    for AbortQueuedActionSvc<T> {
-                        type Response = super::AbortQueuedActionResponse;
+                    > tonic::server::UnaryService<super::GetLatestStateRequest>
+                    for GetLatestStateSvc<T> {
+                        type Response = super::GetLatestStateResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::AbortQueuedActionRequest>,
+                            request: tonic::Request<super::GetLatestStateRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as ActionsService>::abort_queued_action(&inner, request)
+                                <T as ActionsService>::get_latest_state(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -1387,7 +1285,7 @@ pub mod actions_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = AbortQueuedActionSvc(inner);
+                        let method = GetLatestStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1403,15 +1301,15 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.ActionsService/Watch" => {
+                "/flyteidl2.workflow.ActionsService/WatchForUpdates" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchSvc<T: ActionsService>(pub Arc<T>);
+                    struct WatchForUpdatesSvc<T: ActionsService>(pub Arc<T>);
                     impl<
                         T: ActionsService,
                     > tonic::server::ServerStreamingService<super::WatchRequest>
-                    for WatchSvc<T> {
+                    for WatchForUpdatesSvc<T> {
                         type Response = super::WatchResponse;
-                        type ResponseStream = T::WatchStream;
+                        type ResponseStream = T::WatchForUpdatesStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
                             tonic::Status,
@@ -1422,7 +1320,8 @@ pub mod actions_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as ActionsService>::watch(&inner, request).await
+                                <T as ActionsService>::watch_for_updates(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -1433,7 +1332,7 @@ pub mod actions_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = WatchSvc(inner);
+                        let method = WatchForUpdatesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -1445,6 +1344,96 @@ pub mod actions_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.ActionsService/Update" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateSvc<T: ActionsService>(pub Arc<T>);
+                    impl<
+                        T: ActionsService,
+                    > tonic::server::UnaryService<super::UpdateRequest>
+                    for UpdateSvc<T> {
+                        type Response = super::UpdateResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::UpdateRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ActionsService>::update(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = UpdateSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.ActionsService/Abort" => {
+                    #[allow(non_camel_case_types)]
+                    struct AbortSvc<T: ActionsService>(pub Arc<T>);
+                    impl<
+                        T: ActionsService,
+                    > tonic::server::UnaryService<super::AbortQueuedActionRequest>
+                    for AbortSvc<T> {
+                        type Response = super::AbortQueuedActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AbortQueuedActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ActionsService>::abort(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = AbortSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

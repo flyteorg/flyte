@@ -25,12 +25,12 @@ func (_m *ActionsServiceClient) EXPECT() *ActionsServiceClient_Expecter {
 	return &ActionsServiceClient_Expecter{mock: &_m.Mock}
 }
 
-// AbortQueuedAction provides a mock function with given fields: _a0, _a1
-func (_m *ActionsServiceClient) AbortQueuedAction(_a0 context.Context, _a1 *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
+// Abort provides a mock function with given fields: _a0, _a1
+func (_m *ActionsServiceClient) Abort(_a0 context.Context, _a1 *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AbortQueuedAction")
+		panic("no return value specified for Abort")
 	}
 
 	var r0 *connect.Response[workflow.AbortQueuedActionResponse]
@@ -55,41 +55,41 @@ func (_m *ActionsServiceClient) AbortQueuedAction(_a0 context.Context, _a1 *conn
 	return r0, r1
 }
 
-// ActionsServiceClient_AbortQueuedAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AbortQueuedAction'
-type ActionsServiceClient_AbortQueuedAction_Call struct {
+// ActionsServiceClient_Abort_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Abort'
+type ActionsServiceClient_Abort_Call struct {
 	*mock.Call
 }
 
-// AbortQueuedAction is a helper method to define mock.On call
+// Abort is a helper method to define mock.On call
 //   - _a0 context.Context
 //   - _a1 *connect.Request[workflow.AbortQueuedActionRequest]
-func (_e *ActionsServiceClient_Expecter) AbortQueuedAction(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_AbortQueuedAction_Call {
-	return &ActionsServiceClient_AbortQueuedAction_Call{Call: _e.mock.On("AbortQueuedAction", _a0, _a1)}
+func (_e *ActionsServiceClient_Expecter) Abort(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_Abort_Call {
+	return &ActionsServiceClient_Abort_Call{Call: _e.mock.On("Abort", _a0, _a1)}
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.AbortQueuedActionRequest])) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.AbortQueuedActionRequest])) *ActionsServiceClient_Abort_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*connect.Request[workflow.AbortQueuedActionRequest]))
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) Return(_a0 *connect.Response[workflow.AbortQueuedActionResponse], _a1 error) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) Return(_a0 *connect.Response[workflow.AbortQueuedActionResponse], _a1 error) *ActionsServiceClient_Abort_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)) *ActionsServiceClient_Abort_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// EnqueueAction provides a mock function with given fields: _a0, _a1
-func (_m *ActionsServiceClient) EnqueueAction(_a0 context.Context, _a1 *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
+// Enqueue provides a mock function with given fields: _a0, _a1
+func (_m *ActionsServiceClient) Enqueue(_a0 context.Context, _a1 *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for EnqueueAction")
+		panic("no return value specified for Enqueue")
 	}
 
 	var r0 *connect.Response[workflow.EnqueueActionResponse]
@@ -114,57 +114,57 @@ func (_m *ActionsServiceClient) EnqueueAction(_a0 context.Context, _a1 *connect.
 	return r0, r1
 }
 
-// ActionsServiceClient_EnqueueAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EnqueueAction'
-type ActionsServiceClient_EnqueueAction_Call struct {
+// ActionsServiceClient_Enqueue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Enqueue'
+type ActionsServiceClient_Enqueue_Call struct {
 	*mock.Call
 }
 
-// EnqueueAction is a helper method to define mock.On call
+// Enqueue is a helper method to define mock.On call
 //   - _a0 context.Context
 //   - _a1 *connect.Request[workflow.EnqueueActionRequest]
-func (_e *ActionsServiceClient_Expecter) EnqueueAction(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_EnqueueAction_Call {
-	return &ActionsServiceClient_EnqueueAction_Call{Call: _e.mock.On("EnqueueAction", _a0, _a1)}
+func (_e *ActionsServiceClient_Expecter) Enqueue(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_Enqueue_Call {
+	return &ActionsServiceClient_Enqueue_Call{Call: _e.mock.On("Enqueue", _a0, _a1)}
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.EnqueueActionRequest])) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.EnqueueActionRequest])) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*connect.Request[workflow.EnqueueActionRequest]))
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) Return(_a0 *connect.Response[workflow.EnqueueActionResponse], _a1 error) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) Return(_a0 *connect.Response[workflow.EnqueueActionResponse], _a1 error) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetActionState provides a mock function with given fields: _a0, _a1
-func (_m *ActionsServiceClient) GetActionState(_a0 context.Context, _a1 *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error) {
+// GetLatestState provides a mock function with given fields: _a0, _a1
+func (_m *ActionsServiceClient) GetLatestState(_a0 context.Context, _a1 *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetActionState")
+		panic("no return value specified for GetLatestState")
 	}
 
-	var r0 *connect.Response[workflow.GetActionStateResponse]
+	var r0 *connect.Response[workflow.GetLatestStateResponse]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionStateRequest]) *connect.Response[workflow.GetActionStateResponse]); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetLatestStateRequest]) *connect.Response[workflow.GetLatestStateResponse]); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[workflow.GetActionStateResponse])
+			r0 = ret.Get(0).(*connect.Response[workflow.GetLatestStateResponse])
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetActionStateRequest]) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetLatestStateRequest]) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -173,57 +173,57 @@ func (_m *ActionsServiceClient) GetActionState(_a0 context.Context, _a1 *connect
 	return r0, r1
 }
 
-// ActionsServiceClient_GetActionState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionState'
-type ActionsServiceClient_GetActionState_Call struct {
+// ActionsServiceClient_GetLatestState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLatestState'
+type ActionsServiceClient_GetLatestState_Call struct {
 	*mock.Call
 }
 
-// GetActionState is a helper method to define mock.On call
+// GetLatestState is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *connect.Request[workflow.GetActionStateRequest]
-func (_e *ActionsServiceClient_Expecter) GetActionState(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_GetActionState_Call {
-	return &ActionsServiceClient_GetActionState_Call{Call: _e.mock.On("GetActionState", _a0, _a1)}
+//   - _a1 *connect.Request[workflow.GetLatestStateRequest]
+func (_e *ActionsServiceClient_Expecter) GetLatestState(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_GetLatestState_Call {
+	return &ActionsServiceClient_GetLatestState_Call{Call: _e.mock.On("GetLatestState", _a0, _a1)}
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.GetActionStateRequest])) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.GetLatestStateRequest])) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*connect.Request[workflow.GetActionStateRequest]))
+		run(args[0].(context.Context), args[1].(*connect.Request[workflow.GetLatestStateRequest]))
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) Return(_a0 *connect.Response[workflow.GetActionStateResponse], _a1 error) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) Return(_a0 *connect.Response[workflow.GetLatestStateResponse], _a1 error) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error)) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error)) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateActionStatus provides a mock function with given fields: _a0, _a1
-func (_m *ActionsServiceClient) UpdateActionStatus(_a0 context.Context, _a1 *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error) {
+// Update provides a mock function with given fields: _a0, _a1
+func (_m *ActionsServiceClient) Update(_a0 context.Context, _a1 *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateActionStatus")
+		panic("no return value specified for Update")
 	}
 
-	var r0 *connect.Response[workflow.UpdateActionStatusResponse]
+	var r0 *connect.Response[workflow.UpdateResponse]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) *connect.Response[workflow.UpdateActionStatusResponse]); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.UpdateRequest]) *connect.Response[workflow.UpdateResponse]); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[workflow.UpdateActionStatusResponse])
+			r0 = ret.Get(0).(*connect.Response[workflow.UpdateResponse])
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.UpdateRequest]) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -232,41 +232,41 @@ func (_m *ActionsServiceClient) UpdateActionStatus(_a0 context.Context, _a1 *con
 	return r0, r1
 }
 
-// ActionsServiceClient_UpdateActionStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateActionStatus'
-type ActionsServiceClient_UpdateActionStatus_Call struct {
+// ActionsServiceClient_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type ActionsServiceClient_Update_Call struct {
 	*mock.Call
 }
 
-// UpdateActionStatus is a helper method to define mock.On call
+// Update is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *connect.Request[workflow.UpdateActionStatusRequest]
-func (_e *ActionsServiceClient_Expecter) UpdateActionStatus(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_UpdateActionStatus_Call {
-	return &ActionsServiceClient_UpdateActionStatus_Call{Call: _e.mock.On("UpdateActionStatus", _a0, _a1)}
+//   - _a1 *connect.Request[workflow.UpdateRequest]
+func (_e *ActionsServiceClient_Expecter) Update(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_Update_Call {
+	return &ActionsServiceClient_Update_Call{Call: _e.mock.On("Update", _a0, _a1)}
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.UpdateActionStatusRequest])) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.UpdateRequest])) *ActionsServiceClient_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*connect.Request[workflow.UpdateActionStatusRequest]))
+		run(args[0].(context.Context), args[1].(*connect.Request[workflow.UpdateRequest]))
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) Return(_a0 *connect.Response[workflow.UpdateActionStatusResponse], _a1 error) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) Return(_a0 *connect.Response[workflow.UpdateResponse], _a1 error) *ActionsServiceClient_Update_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error)) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error)) *ActionsServiceClient_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Watch provides a mock function with given fields: _a0, _a1
-func (_m *ActionsServiceClient) Watch(_a0 context.Context, _a1 *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error) {
+// WatchForUpdates provides a mock function with given fields: _a0, _a1
+func (_m *ActionsServiceClient) WatchForUpdates(_a0 context.Context, _a1 *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Watch")
+		panic("no return value specified for WatchForUpdates")
 	}
 
 	var r0 *connect.ServerStreamForClient[workflow.WatchResponse]
@@ -291,31 +291,31 @@ func (_m *ActionsServiceClient) Watch(_a0 context.Context, _a1 *connect.Request[
 	return r0, r1
 }
 
-// ActionsServiceClient_Watch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Watch'
-type ActionsServiceClient_Watch_Call struct {
+// ActionsServiceClient_WatchForUpdates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchForUpdates'
+type ActionsServiceClient_WatchForUpdates_Call struct {
 	*mock.Call
 }
 
-// Watch is a helper method to define mock.On call
+// WatchForUpdates is a helper method to define mock.On call
 //   - _a0 context.Context
 //   - _a1 *connect.Request[workflow.WatchRequest]
-func (_e *ActionsServiceClient_Expecter) Watch(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_Watch_Call {
-	return &ActionsServiceClient_Watch_Call{Call: _e.mock.On("Watch", _a0, _a1)}
+func (_e *ActionsServiceClient_Expecter) WatchForUpdates(_a0 interface{}, _a1 interface{}) *ActionsServiceClient_WatchForUpdates_Call {
+	return &ActionsServiceClient_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", _a0, _a1)}
 }
 
-func (_c *ActionsServiceClient_Watch_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.WatchRequest])) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Run(run func(_a0 context.Context, _a1 *connect.Request[workflow.WatchRequest])) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*connect.Request[workflow.WatchRequest]))
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_Watch_Call) Return(_a0 *connect.ServerStreamForClient[workflow.WatchResponse], _a1 error) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Return(_a0 *connect.ServerStreamForClient[workflow.WatchResponse], _a1 error) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Watch_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) RunAndReturn(run func(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Return(run)
 	return _c
 }

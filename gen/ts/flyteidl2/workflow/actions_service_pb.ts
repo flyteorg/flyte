@@ -19,14 +19,14 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/actions_service.proto.
  */
 export const file_flyteidl2_workflow_actions_service: GenFile = /*@__PURE__*/
-  fileDesc("CihmbHl0ZWlkbDIvd29ya2Zsb3cvYWN0aW9uc19zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cixgEKGVVwZGF0ZUFjdGlvblN0YXR1c1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgABI4CgZzdGF0dXMYAyABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uU3RhdHVzQga6SAPIAQESFgoFc3RhdGUYBCABKAlCB7pIBHICEAIiHAoaVXBkYXRlQWN0aW9uU3RhdHVzUmVzcG9uc2UicAoVR2V0QWN0aW9uU3RhdGVSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAAiMAoWR2V0QWN0aW9uU3RhdGVSZXNwb25zZRIWCgVzdGF0ZRgBIAEoCUIHukgEcgIQATKgBAoOQWN0aW9uc1NlcnZpY2USdQoSVXBkYXRlQWN0aW9uU3RhdHVzEi0uZmx5dGVpZGwyLndvcmtmbG93LlVwZGF0ZUFjdGlvblN0YXR1c1JlcXVlc3QaLi5mbHl0ZWlkbDIud29ya2Zsb3cuVXBkYXRlQWN0aW9uU3RhdHVzUmVzcG9uc2UiABJpCg5HZXRBY3Rpb25TdGF0ZRIpLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25TdGF0ZVJlcXVlc3QaKi5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uU3RhdGVSZXNwb25zZSIAEmYKDUVucXVldWVBY3Rpb24SKC5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuRW5xdWV1ZUFjdGlvblJlc3BvbnNlIgAScgoRQWJvcnRRdWV1ZWRBY3Rpb24SLC5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXF1ZXN0Gi0uZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UXVldWVkQWN0aW9uUmVzcG9uc2UiABJQCgVXYXRjaBIgLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJlcXVlc3QaIS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSZXNwb25zZSIAMAFC0AEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCE0FjdGlvbnNTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_workflow_queue_service, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
+  fileDesc("CihmbHl0ZWlkbDIvd29ya2Zsb3cvYWN0aW9uc19zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3ciugEKDVVwZGF0ZVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgABI4CgZzdGF0dXMYAyABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uU3RhdHVzQga6SAPIAQESFgoFc3RhdGUYBCABKAlCB7pIBHICEAIiEAoOVXBkYXRlUmVzcG9uc2UicAoVR2V0TGF0ZXN0U3RhdGVSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAAiMAoWR2V0TGF0ZXN0U3RhdGVSZXNwb25zZRIWCgVzdGF0ZRgBIAEoCUIHukgEcgIQATL0AwoOQWN0aW9uc1NlcnZpY2USYAoHRW5xdWV1ZRIoLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5FbnF1ZXVlQWN0aW9uUmVzcG9uc2UiABJpCg5HZXRMYXRlc3RTdGF0ZRIpLmZseXRlaWRsMi53b3JrZmxvdy5HZXRMYXRlc3RTdGF0ZVJlcXVlc3QaKi5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0TGF0ZXN0U3RhdGVSZXNwb25zZSIAEloKD1dhdGNoRm9yVXBkYXRlcxIgLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJlcXVlc3QaIS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSZXNwb25zZSIAMAESUQoGVXBkYXRlEiEuZmx5dGVpZGwyLndvcmtmbG93LlVwZGF0ZVJlcXVlc3QaIi5mbHl0ZWlkbDIud29ya2Zsb3cuVXBkYXRlUmVzcG9uc2UiABJmCgVBYm9ydBIsLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFF1ZXVlZEFjdGlvblJlcXVlc3QaLS5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRRdWV1ZWRBY3Rpb25SZXNwb25zZSIAQtABChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhNBY3Rpb25zU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_workflow_queue_service, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
 
 /**
- * UpdateActionStatusRequest is the request message for updating the status of an action.
+ * UpdateRequest is the request message for updating the status of an action.
  *
- * @generated from message flyteidl2.workflow.UpdateActionStatusRequest
+ * @generated from message flyteidl2.workflow.UpdateRequest
  */
-export type UpdateActionStatusRequest = Message<"flyteidl2.workflow.UpdateActionStatusRequest"> & {
+export type UpdateRequest = Message<"flyteidl2.workflow.UpdateRequest"> & {
   /**
    * A unique identifier for the action.
    *
@@ -57,33 +57,33 @@ export type UpdateActionStatusRequest = Message<"flyteidl2.workflow.UpdateAction
 };
 
 /**
- * Describes the message flyteidl2.workflow.UpdateActionStatusRequest.
- * Use `create(UpdateActionStatusRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.UpdateRequest.
+ * Use `create(UpdateRequestSchema)` to create a new message.
  */
-export const UpdateActionStatusRequestSchema: GenMessage<UpdateActionStatusRequest> = /*@__PURE__*/
+export const UpdateRequestSchema: GenMessage<UpdateRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_actions_service, 0);
 
 /**
- * UpdateActionStatusResponse is the response message for updating the status of an action.
+ * UpdateResponse is the response message for updating the status of an action.
  *
- * @generated from message flyteidl2.workflow.UpdateActionStatusResponse
+ * @generated from message flyteidl2.workflow.UpdateResponse
  */
-export type UpdateActionStatusResponse = Message<"flyteidl2.workflow.UpdateActionStatusResponse"> & {
+export type UpdateResponse = Message<"flyteidl2.workflow.UpdateResponse"> & {
 };
 
 /**
- * Describes the message flyteidl2.workflow.UpdateActionStatusResponse.
- * Use `create(UpdateActionStatusResponseSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.UpdateResponse.
+ * Use `create(UpdateResponseSchema)` to create a new message.
  */
-export const UpdateActionStatusResponseSchema: GenMessage<UpdateActionStatusResponse> = /*@__PURE__*/
+export const UpdateResponseSchema: GenMessage<UpdateResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_actions_service, 1);
 
 /**
- * GetActionStateRequest is the request message for getting the state of an action.
+ * GetLatestStateRequest is the request message for getting the state of an action.
  *
- * @generated from message flyteidl2.workflow.GetActionStateRequest
+ * @generated from message flyteidl2.workflow.GetLatestStateRequest
  */
-export type GetActionStateRequest = Message<"flyteidl2.workflow.GetActionStateRequest"> & {
+export type GetLatestStateRequest = Message<"flyteidl2.workflow.GetLatestStateRequest"> & {
   /**
    * A unique identifier for the action.
    *
@@ -100,18 +100,18 @@ export type GetActionStateRequest = Message<"flyteidl2.workflow.GetActionStateRe
 };
 
 /**
- * Describes the message flyteidl2.workflow.GetActionStateRequest.
- * Use `create(GetActionStateRequestSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.GetLatestStateRequest.
+ * Use `create(GetLatestStateRequestSchema)` to create a new message.
  */
-export const GetActionStateRequestSchema: GenMessage<GetActionStateRequest> = /*@__PURE__*/
+export const GetLatestStateRequestSchema: GenMessage<GetLatestStateRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_actions_service, 2);
 
 /**
- * GetActionStateResponse is the response message for getting the state of an action.
+ * GetLatestStateResponse is the response message for getting the state of an action.
  *
- * @generated from message flyteidl2.workflow.GetActionStateResponse
+ * @generated from message flyteidl2.workflow.GetLatestStateResponse
  */
-export type GetActionStateResponse = Message<"flyteidl2.workflow.GetActionStateResponse"> & {
+export type GetLatestStateResponse = Message<"flyteidl2.workflow.GetLatestStateResponse"> & {
   /**
    * A JSON serialized `NodeStatus` object.
    *
@@ -121,10 +121,10 @@ export type GetActionStateResponse = Message<"flyteidl2.workflow.GetActionStateR
 };
 
 /**
- * Describes the message flyteidl2.workflow.GetActionStateResponse.
- * Use `create(GetActionStateResponseSchema)` to create a new message.
+ * Describes the message flyteidl2.workflow.GetLatestStateResponse.
+ * Use `create(GetLatestStateResponseSchema)` to create a new message.
  */
-export const GetActionStateResponseSchema: GenMessage<GetActionStateResponse> = /*@__PURE__*/
+export const GetLatestStateResponseSchema: GenMessage<GetLatestStateResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_actions_service, 3);
 
 /**
@@ -136,58 +136,58 @@ export const GetActionStateResponseSchema: GenMessage<GetActionStateResponse> = 
  */
 export const ActionsService: GenService<{
   /**
-   * UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-   * This deprecates Put in the current StateService.
+   * Enqueue queues a new action for execution.
    *
-   * @generated from rpc flyteidl2.workflow.ActionsService.UpdateActionStatus
+   * @generated from rpc flyteidl2.workflow.ActionsService.Enqueue
    */
-  updateActionStatus: {
-    methodKind: "unary";
-    input: typeof UpdateActionStatusRequestSchema;
-    output: typeof UpdateActionStatusResponseSchema;
-  },
-  /**
-   * GetActionState returns the `NodeStatus` of an action.
-   * This deprecates Get in the current StateService.
-   *
-   * @generated from rpc flyteidl2.workflow.ActionsService.GetActionState
-   */
-  getActionState: {
-    methodKind: "unary";
-    input: typeof GetActionStateRequestSchema;
-    output: typeof GetActionStateResponseSchema;
-  },
-  /**
-   * EnqueueAction queues a new action for execution.
-   *
-   * @generated from rpc flyteidl2.workflow.ActionsService.EnqueueAction
-   */
-  enqueueAction: {
+  enqueue: {
     methodKind: "unary";
     input: typeof EnqueueActionRequestSchema;
     output: typeof EnqueueActionResponseSchema;
   },
   /**
-   * AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-   * Note that this will cascade aborts to all descendant actions of the specified action.
+   * GetLatestState returns the latest `NodeStatus` of an action.
+   * This deprecates Get in the current StateService.
    *
-   * @generated from rpc flyteidl2.workflow.ActionsService.AbortQueuedAction
+   * @generated from rpc flyteidl2.workflow.ActionsService.GetLatestState
    */
-  abortQueuedAction: {
+  getLatestState: {
     methodKind: "unary";
-    input: typeof AbortQueuedActionRequestSchema;
-    output: typeof AbortQueuedActionResponseSchema;
+    input: typeof GetLatestStateRequestSchema;
+    output: typeof GetLatestStateResponseSchema;
   },
   /**
-   * Watch watches for updates to the state of actions.
+   * WatchForUpdates watches for updates to the state of actions.
    * This API guarantees at-least-once delivery semantics.
    *
-   * @generated from rpc flyteidl2.workflow.ActionsService.Watch
+   * @generated from rpc flyteidl2.workflow.ActionsService.WatchForUpdates
    */
-  watch: {
+  watchForUpdates: {
     methodKind: "server_streaming";
     input: typeof WatchRequestSchema;
     output: typeof WatchResponseSchema;
+  },
+  /**
+   * Update updates the status of an action and saves serialized NodeStatus.
+   * This deprecates Put in the current StateService.
+   *
+   * @generated from rpc flyteidl2.workflow.ActionsService.Update
+   */
+  update: {
+    methodKind: "unary";
+    input: typeof UpdateRequestSchema;
+    output: typeof UpdateResponseSchema;
+  },
+  /**
+   * Abort aborts a single action that was previously queued or is currently being processed by a worker.
+   * Note that this will cascade aborts to all descendant actions of the specified action.
+   *
+   * @generated from rpc flyteidl2.workflow.ActionsService.Abort
+   */
+  abort: {
+    methodKind: "unary";
+    input: typeof AbortQueuedActionRequestSchema;
+    output: typeof AbortQueuedActionResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_workflow_actions_service, 0);

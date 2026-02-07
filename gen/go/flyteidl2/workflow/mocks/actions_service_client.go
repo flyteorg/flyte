@@ -25,8 +25,8 @@ func (_m *ActionsServiceClient) EXPECT() *ActionsServiceClient_Expecter {
 	return &ActionsServiceClient_Expecter{mock: &_m.Mock}
 }
 
-// AbortQueuedAction provides a mock function with given fields: ctx, in, opts
-func (_m *ActionsServiceClient) AbortQueuedAction(ctx context.Context, in *workflow.AbortQueuedActionRequest, opts ...grpc.CallOption) (*workflow.AbortQueuedActionResponse, error) {
+// Abort provides a mock function with given fields: ctx, in, opts
+func (_m *ActionsServiceClient) Abort(ctx context.Context, in *workflow.AbortQueuedActionRequest, opts ...grpc.CallOption) (*workflow.AbortQueuedActionResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -37,7 +37,7 @@ func (_m *ActionsServiceClient) AbortQueuedAction(ctx context.Context, in *workf
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AbortQueuedAction")
+		panic("no return value specified for Abort")
 	}
 
 	var r0 *workflow.AbortQueuedActionResponse
@@ -62,21 +62,21 @@ func (_m *ActionsServiceClient) AbortQueuedAction(ctx context.Context, in *workf
 	return r0, r1
 }
 
-// ActionsServiceClient_AbortQueuedAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AbortQueuedAction'
-type ActionsServiceClient_AbortQueuedAction_Call struct {
+// ActionsServiceClient_Abort_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Abort'
+type ActionsServiceClient_Abort_Call struct {
 	*mock.Call
 }
 
-// AbortQueuedAction is a helper method to define mock.On call
+// Abort is a helper method to define mock.On call
 //   - ctx context.Context
 //   - in *workflow.AbortQueuedActionRequest
 //   - opts ...grpc.CallOption
-func (_e *ActionsServiceClient_Expecter) AbortQueuedAction(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_AbortQueuedAction_Call {
-	return &ActionsServiceClient_AbortQueuedAction_Call{Call: _e.mock.On("AbortQueuedAction",
+func (_e *ActionsServiceClient_Expecter) Abort(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_Abort_Call {
+	return &ActionsServiceClient_Abort_Call{Call: _e.mock.On("Abort",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) Run(run func(ctx context.Context, in *workflow.AbortQueuedActionRequest, opts ...grpc.CallOption)) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) Run(run func(ctx context.Context, in *workflow.AbortQueuedActionRequest, opts ...grpc.CallOption)) *ActionsServiceClient_Abort_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -89,18 +89,18 @@ func (_c *ActionsServiceClient_AbortQueuedAction_Call) Run(run func(ctx context.
 	return _c
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) Return(_a0 *workflow.AbortQueuedActionResponse, _a1 error) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) Return(_a0 *workflow.AbortQueuedActionResponse, _a1 error) *ActionsServiceClient_Abort_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_AbortQueuedAction_Call) RunAndReturn(run func(context.Context, *workflow.AbortQueuedActionRequest, ...grpc.CallOption) (*workflow.AbortQueuedActionResponse, error)) *ActionsServiceClient_AbortQueuedAction_Call {
+func (_c *ActionsServiceClient_Abort_Call) RunAndReturn(run func(context.Context, *workflow.AbortQueuedActionRequest, ...grpc.CallOption) (*workflow.AbortQueuedActionResponse, error)) *ActionsServiceClient_Abort_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// EnqueueAction provides a mock function with given fields: ctx, in, opts
-func (_m *ActionsServiceClient) EnqueueAction(ctx context.Context, in *workflow.EnqueueActionRequest, opts ...grpc.CallOption) (*workflow.EnqueueActionResponse, error) {
+// Enqueue provides a mock function with given fields: ctx, in, opts
+func (_m *ActionsServiceClient) Enqueue(ctx context.Context, in *workflow.EnqueueActionRequest, opts ...grpc.CallOption) (*workflow.EnqueueActionResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -111,7 +111,7 @@ func (_m *ActionsServiceClient) EnqueueAction(ctx context.Context, in *workflow.
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for EnqueueAction")
+		panic("no return value specified for Enqueue")
 	}
 
 	var r0 *workflow.EnqueueActionResponse
@@ -136,21 +136,21 @@ func (_m *ActionsServiceClient) EnqueueAction(ctx context.Context, in *workflow.
 	return r0, r1
 }
 
-// ActionsServiceClient_EnqueueAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EnqueueAction'
-type ActionsServiceClient_EnqueueAction_Call struct {
+// ActionsServiceClient_Enqueue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Enqueue'
+type ActionsServiceClient_Enqueue_Call struct {
 	*mock.Call
 }
 
-// EnqueueAction is a helper method to define mock.On call
+// Enqueue is a helper method to define mock.On call
 //   - ctx context.Context
 //   - in *workflow.EnqueueActionRequest
 //   - opts ...grpc.CallOption
-func (_e *ActionsServiceClient_Expecter) EnqueueAction(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_EnqueueAction_Call {
-	return &ActionsServiceClient_EnqueueAction_Call{Call: _e.mock.On("EnqueueAction",
+func (_e *ActionsServiceClient_Expecter) Enqueue(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_Enqueue_Call {
+	return &ActionsServiceClient_Enqueue_Call{Call: _e.mock.On("Enqueue",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) Run(run func(ctx context.Context, in *workflow.EnqueueActionRequest, opts ...grpc.CallOption)) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) Run(run func(ctx context.Context, in *workflow.EnqueueActionRequest, opts ...grpc.CallOption)) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -163,18 +163,18 @@ func (_c *ActionsServiceClient_EnqueueAction_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) Return(_a0 *workflow.EnqueueActionResponse, _a1 error) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) Return(_a0 *workflow.EnqueueActionResponse, _a1 error) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_EnqueueAction_Call) RunAndReturn(run func(context.Context, *workflow.EnqueueActionRequest, ...grpc.CallOption) (*workflow.EnqueueActionResponse, error)) *ActionsServiceClient_EnqueueAction_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) RunAndReturn(run func(context.Context, *workflow.EnqueueActionRequest, ...grpc.CallOption) (*workflow.EnqueueActionResponse, error)) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetActionState provides a mock function with given fields: ctx, in, opts
-func (_m *ActionsServiceClient) GetActionState(ctx context.Context, in *workflow.GetActionStateRequest, opts ...grpc.CallOption) (*workflow.GetActionStateResponse, error) {
+// GetLatestState provides a mock function with given fields: ctx, in, opts
+func (_m *ActionsServiceClient) GetLatestState(ctx context.Context, in *workflow.GetLatestStateRequest, opts ...grpc.CallOption) (*workflow.GetLatestStateResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -185,23 +185,23 @@ func (_m *ActionsServiceClient) GetActionState(ctx context.Context, in *workflow
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetActionState")
+		panic("no return value specified for GetLatestState")
 	}
 
-	var r0 *workflow.GetActionStateResponse
+	var r0 *workflow.GetLatestStateResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetActionStateRequest, ...grpc.CallOption) (*workflow.GetActionStateResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetLatestStateRequest, ...grpc.CallOption) (*workflow.GetLatestStateResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetActionStateRequest, ...grpc.CallOption) *workflow.GetActionStateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.GetLatestStateRequest, ...grpc.CallOption) *workflow.GetLatestStateResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*workflow.GetActionStateResponse)
+			r0 = ret.Get(0).(*workflow.GetLatestStateResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *workflow.GetActionStateRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.GetLatestStateRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -210,21 +210,21 @@ func (_m *ActionsServiceClient) GetActionState(ctx context.Context, in *workflow
 	return r0, r1
 }
 
-// ActionsServiceClient_GetActionState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionState'
-type ActionsServiceClient_GetActionState_Call struct {
+// ActionsServiceClient_GetLatestState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLatestState'
+type ActionsServiceClient_GetLatestState_Call struct {
 	*mock.Call
 }
 
-// GetActionState is a helper method to define mock.On call
+// GetLatestState is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *workflow.GetActionStateRequest
+//   - in *workflow.GetLatestStateRequest
 //   - opts ...grpc.CallOption
-func (_e *ActionsServiceClient_Expecter) GetActionState(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_GetActionState_Call {
-	return &ActionsServiceClient_GetActionState_Call{Call: _e.mock.On("GetActionState",
+func (_e *ActionsServiceClient_Expecter) GetLatestState(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_GetLatestState_Call {
+	return &ActionsServiceClient_GetLatestState_Call{Call: _e.mock.On("GetLatestState",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) Run(run func(ctx context.Context, in *workflow.GetActionStateRequest, opts ...grpc.CallOption)) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) Run(run func(ctx context.Context, in *workflow.GetLatestStateRequest, opts ...grpc.CallOption)) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -232,23 +232,23 @@ func (_c *ActionsServiceClient_GetActionState_Call) Run(run func(ctx context.Con
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*workflow.GetActionStateRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*workflow.GetLatestStateRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) Return(_a0 *workflow.GetActionStateResponse, _a1 error) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) Return(_a0 *workflow.GetLatestStateResponse, _a1 error) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_GetActionState_Call) RunAndReturn(run func(context.Context, *workflow.GetActionStateRequest, ...grpc.CallOption) (*workflow.GetActionStateResponse, error)) *ActionsServiceClient_GetActionState_Call {
+func (_c *ActionsServiceClient_GetLatestState_Call) RunAndReturn(run func(context.Context, *workflow.GetLatestStateRequest, ...grpc.CallOption) (*workflow.GetLatestStateResponse, error)) *ActionsServiceClient_GetLatestState_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateActionStatus provides a mock function with given fields: ctx, in, opts
-func (_m *ActionsServiceClient) UpdateActionStatus(ctx context.Context, in *workflow.UpdateActionStatusRequest, opts ...grpc.CallOption) (*workflow.UpdateActionStatusResponse, error) {
+// Update provides a mock function with given fields: ctx, in, opts
+func (_m *ActionsServiceClient) Update(ctx context.Context, in *workflow.UpdateRequest, opts ...grpc.CallOption) (*workflow.UpdateResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -259,23 +259,23 @@ func (_m *ActionsServiceClient) UpdateActionStatus(ctx context.Context, in *work
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateActionStatus")
+		panic("no return value specified for Update")
 	}
 
-	var r0 *workflow.UpdateActionStatusResponse
+	var r0 *workflow.UpdateResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.UpdateActionStatusRequest, ...grpc.CallOption) (*workflow.UpdateActionStatusResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.UpdateRequest, ...grpc.CallOption) (*workflow.UpdateResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.UpdateActionStatusRequest, ...grpc.CallOption) *workflow.UpdateActionStatusResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.UpdateRequest, ...grpc.CallOption) *workflow.UpdateResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*workflow.UpdateActionStatusResponse)
+			r0 = ret.Get(0).(*workflow.UpdateResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *workflow.UpdateActionStatusRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.UpdateRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -284,21 +284,21 @@ func (_m *ActionsServiceClient) UpdateActionStatus(ctx context.Context, in *work
 	return r0, r1
 }
 
-// ActionsServiceClient_UpdateActionStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateActionStatus'
-type ActionsServiceClient_UpdateActionStatus_Call struct {
+// ActionsServiceClient_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type ActionsServiceClient_Update_Call struct {
 	*mock.Call
 }
 
-// UpdateActionStatus is a helper method to define mock.On call
+// Update is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *workflow.UpdateActionStatusRequest
+//   - in *workflow.UpdateRequest
 //   - opts ...grpc.CallOption
-func (_e *ActionsServiceClient_Expecter) UpdateActionStatus(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_UpdateActionStatus_Call {
-	return &ActionsServiceClient_UpdateActionStatus_Call{Call: _e.mock.On("UpdateActionStatus",
+func (_e *ActionsServiceClient_Expecter) Update(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_Update_Call {
+	return &ActionsServiceClient_Update_Call{Call: _e.mock.On("Update",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) Run(run func(ctx context.Context, in *workflow.UpdateActionStatusRequest, opts ...grpc.CallOption)) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) Run(run func(ctx context.Context, in *workflow.UpdateRequest, opts ...grpc.CallOption)) *ActionsServiceClient_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -306,23 +306,23 @@ func (_c *ActionsServiceClient_UpdateActionStatus_Call) Run(run func(ctx context
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*workflow.UpdateActionStatusRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*workflow.UpdateRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) Return(_a0 *workflow.UpdateActionStatusResponse, _a1 error) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) Return(_a0 *workflow.UpdateResponse, _a1 error) *ActionsServiceClient_Update_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_UpdateActionStatus_Call) RunAndReturn(run func(context.Context, *workflow.UpdateActionStatusRequest, ...grpc.CallOption) (*workflow.UpdateActionStatusResponse, error)) *ActionsServiceClient_UpdateActionStatus_Call {
+func (_c *ActionsServiceClient_Update_Call) RunAndReturn(run func(context.Context, *workflow.UpdateRequest, ...grpc.CallOption) (*workflow.UpdateResponse, error)) *ActionsServiceClient_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Watch provides a mock function with given fields: ctx, in, opts
-func (_m *ActionsServiceClient) Watch(ctx context.Context, in *workflow.WatchRequest, opts ...grpc.CallOption) (workflow.ActionsService_WatchClient, error) {
+// WatchForUpdates provides a mock function with given fields: ctx, in, opts
+func (_m *ActionsServiceClient) WatchForUpdates(ctx context.Context, in *workflow.WatchRequest, opts ...grpc.CallOption) (workflow.ActionsService_WatchForUpdatesClient, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -333,19 +333,19 @@ func (_m *ActionsServiceClient) Watch(ctx context.Context, in *workflow.WatchReq
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Watch")
+		panic("no return value specified for WatchForUpdates")
 	}
 
-	var r0 workflow.ActionsService_WatchClient
+	var r0 workflow.ActionsService_WatchForUpdatesClient
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) (workflow.ActionsService_WatchClient, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) (workflow.ActionsService_WatchForUpdatesClient, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) workflow.ActionsService_WatchClient); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) workflow.ActionsService_WatchForUpdatesClient); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(workflow.ActionsService_WatchClient)
+			r0 = ret.Get(0).(workflow.ActionsService_WatchForUpdatesClient)
 		}
 	}
 
@@ -358,21 +358,21 @@ func (_m *ActionsServiceClient) Watch(ctx context.Context, in *workflow.WatchReq
 	return r0, r1
 }
 
-// ActionsServiceClient_Watch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Watch'
-type ActionsServiceClient_Watch_Call struct {
+// ActionsServiceClient_WatchForUpdates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchForUpdates'
+type ActionsServiceClient_WatchForUpdates_Call struct {
 	*mock.Call
 }
 
-// Watch is a helper method to define mock.On call
+// WatchForUpdates is a helper method to define mock.On call
 //   - ctx context.Context
 //   - in *workflow.WatchRequest
 //   - opts ...grpc.CallOption
-func (_e *ActionsServiceClient_Expecter) Watch(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_Watch_Call {
-	return &ActionsServiceClient_Watch_Call{Call: _e.mock.On("Watch",
+func (_e *ActionsServiceClient_Expecter) WatchForUpdates(ctx interface{}, in interface{}, opts ...interface{}) *ActionsServiceClient_WatchForUpdates_Call {
+	return &ActionsServiceClient_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *ActionsServiceClient_Watch_Call) Run(run func(ctx context.Context, in *workflow.WatchRequest, opts ...grpc.CallOption)) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Run(run func(ctx context.Context, in *workflow.WatchRequest, opts ...grpc.CallOption)) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -385,12 +385,12 @@ func (_c *ActionsServiceClient_Watch_Call) Run(run func(ctx context.Context, in 
 	return _c
 }
 
-func (_c *ActionsServiceClient_Watch_Call) Return(_a0 workflow.ActionsService_WatchClient, _a1 error) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Return(_a0 workflow.ActionsService_WatchForUpdatesClient, _a1 error) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Watch_Call) RunAndReturn(run func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) (workflow.ActionsService_WatchClient, error)) *ActionsServiceClient_Watch_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) RunAndReturn(run func(context.Context, *workflow.WatchRequest, ...grpc.CallOption) (workflow.ActionsService_WatchForUpdatesClient, error)) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Return(run)
 	return _c
 }

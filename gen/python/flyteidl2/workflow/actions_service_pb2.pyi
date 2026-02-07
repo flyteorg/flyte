@@ -9,7 +9,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class UpdateActionStatusRequest(_message.Message):
+class UpdateRequest(_message.Message):
     __slots__ = ["action_id", "attempt", "status", "state"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
@@ -21,11 +21,11 @@ class UpdateActionStatusRequest(_message.Message):
     state: str
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ..., state: _Optional[str] = ...) -> None: ...
 
-class UpdateActionStatusResponse(_message.Message):
+class UpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class GetActionStateRequest(_message.Message):
+class GetLatestStateRequest(_message.Message):
     __slots__ = ["action_id", "attempt"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
@@ -33,7 +33,7 @@ class GetActionStateRequest(_message.Message):
     attempt: int
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
 
-class GetActionStateResponse(_message.Message):
+class GetLatestStateResponse(_message.Message):
     __slots__ = ["state"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     state: str

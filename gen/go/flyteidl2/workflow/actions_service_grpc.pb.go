@@ -19,31 +19,31 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ActionsService_UpdateActionStatus_FullMethodName = "/flyteidl2.workflow.ActionsService/UpdateActionStatus"
-	ActionsService_GetActionState_FullMethodName     = "/flyteidl2.workflow.ActionsService/GetActionState"
-	ActionsService_EnqueueAction_FullMethodName      = "/flyteidl2.workflow.ActionsService/EnqueueAction"
-	ActionsService_AbortQueuedAction_FullMethodName  = "/flyteidl2.workflow.ActionsService/AbortQueuedAction"
-	ActionsService_Watch_FullMethodName              = "/flyteidl2.workflow.ActionsService/Watch"
+	ActionsService_Enqueue_FullMethodName         = "/flyteidl2.workflow.ActionsService/Enqueue"
+	ActionsService_GetLatestState_FullMethodName  = "/flyteidl2.workflow.ActionsService/GetLatestState"
+	ActionsService_WatchForUpdates_FullMethodName = "/flyteidl2.workflow.ActionsService/WatchForUpdates"
+	ActionsService_Update_FullMethodName          = "/flyteidl2.workflow.ActionsService/Update"
+	ActionsService_Abort_FullMethodName           = "/flyteidl2.workflow.ActionsService/Abort"
 )
 
 // ActionsServiceClient is the client API for ActionsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ActionsServiceClient interface {
-	// UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-	// This deprecates Put in the current StateService.
-	UpdateActionStatus(ctx context.Context, in *UpdateActionStatusRequest, opts ...grpc.CallOption) (*UpdateActionStatusResponse, error)
-	// GetActionState returns the `NodeStatus` of an action.
+	// Enqueue queues a new action for execution.
+	Enqueue(ctx context.Context, in *EnqueueActionRequest, opts ...grpc.CallOption) (*EnqueueActionResponse, error)
+	// GetLatestState returns the latest `NodeStatus` of an action.
 	// This deprecates Get in the current StateService.
-	GetActionState(ctx context.Context, in *GetActionStateRequest, opts ...grpc.CallOption) (*GetActionStateResponse, error)
-	// EnqueueAction queues a new action for execution.
-	EnqueueAction(ctx context.Context, in *EnqueueActionRequest, opts ...grpc.CallOption) (*EnqueueActionResponse, error)
-	// AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-	// Note that this will cascade aborts to all descendant actions of the specified action.
-	AbortQueuedAction(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error)
-	// Watch watches for updates to the state of actions.
+	GetLatestState(ctx context.Context, in *GetLatestStateRequest, opts ...grpc.CallOption) (*GetLatestStateResponse, error)
+	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (ActionsService_WatchClient, error)
+	WatchForUpdates(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (ActionsService_WatchForUpdatesClient, error)
+	// Update updates the status of an action and saves serialized NodeStatus.
+	// This deprecates Put in the current StateService.
+	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
+	// Note that this will cascade aborts to all descendant actions of the specified action.
+	Abort(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error)
 }
 
 type actionsServiceClient struct {
@@ -54,48 +54,30 @@ func NewActionsServiceClient(cc grpc.ClientConnInterface) ActionsServiceClient {
 	return &actionsServiceClient{cc}
 }
 
-func (c *actionsServiceClient) UpdateActionStatus(ctx context.Context, in *UpdateActionStatusRequest, opts ...grpc.CallOption) (*UpdateActionStatusResponse, error) {
-	out := new(UpdateActionStatusResponse)
-	err := c.cc.Invoke(ctx, ActionsService_UpdateActionStatus_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *actionsServiceClient) GetActionState(ctx context.Context, in *GetActionStateRequest, opts ...grpc.CallOption) (*GetActionStateResponse, error) {
-	out := new(GetActionStateResponse)
-	err := c.cc.Invoke(ctx, ActionsService_GetActionState_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *actionsServiceClient) EnqueueAction(ctx context.Context, in *EnqueueActionRequest, opts ...grpc.CallOption) (*EnqueueActionResponse, error) {
+func (c *actionsServiceClient) Enqueue(ctx context.Context, in *EnqueueActionRequest, opts ...grpc.CallOption) (*EnqueueActionResponse, error) {
 	out := new(EnqueueActionResponse)
-	err := c.cc.Invoke(ctx, ActionsService_EnqueueAction_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ActionsService_Enqueue_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *actionsServiceClient) AbortQueuedAction(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error) {
-	out := new(AbortQueuedActionResponse)
-	err := c.cc.Invoke(ctx, ActionsService_AbortQueuedAction_FullMethodName, in, out, opts...)
+func (c *actionsServiceClient) GetLatestState(ctx context.Context, in *GetLatestStateRequest, opts ...grpc.CallOption) (*GetLatestStateResponse, error) {
+	out := new(GetLatestStateResponse)
+	err := c.cc.Invoke(ctx, ActionsService_GetLatestState_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *actionsServiceClient) Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (ActionsService_WatchClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ActionsService_ServiceDesc.Streams[0], ActionsService_Watch_FullMethodName, opts...)
+func (c *actionsServiceClient) WatchForUpdates(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (ActionsService_WatchForUpdatesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ActionsService_ServiceDesc.Streams[0], ActionsService_WatchForUpdates_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &actionsServiceWatchClient{stream}
+	x := &actionsServiceWatchForUpdatesClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -105,16 +87,16 @@ func (c *actionsServiceClient) Watch(ctx context.Context, in *WatchRequest, opts
 	return x, nil
 }
 
-type ActionsService_WatchClient interface {
+type ActionsService_WatchForUpdatesClient interface {
 	Recv() (*WatchResponse, error)
 	grpc.ClientStream
 }
 
-type actionsServiceWatchClient struct {
+type actionsServiceWatchForUpdatesClient struct {
 	grpc.ClientStream
 }
 
-func (x *actionsServiceWatchClient) Recv() (*WatchResponse, error) {
+func (x *actionsServiceWatchForUpdatesClient) Recv() (*WatchResponse, error) {
 	m := new(WatchResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -122,44 +104,62 @@ func (x *actionsServiceWatchClient) Recv() (*WatchResponse, error) {
 	return m, nil
 }
 
+func (c *actionsServiceClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
+	out := new(UpdateResponse)
+	err := c.cc.Invoke(ctx, ActionsService_Update_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *actionsServiceClient) Abort(ctx context.Context, in *AbortQueuedActionRequest, opts ...grpc.CallOption) (*AbortQueuedActionResponse, error) {
+	out := new(AbortQueuedActionResponse)
+	err := c.cc.Invoke(ctx, ActionsService_Abort_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActionsServiceServer is the server API for ActionsService service.
 // All implementations should embed UnimplementedActionsServiceServer
 // for forward compatibility
 type ActionsServiceServer interface {
-	// UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-	// This deprecates Put in the current StateService.
-	UpdateActionStatus(context.Context, *UpdateActionStatusRequest) (*UpdateActionStatusResponse, error)
-	// GetActionState returns the `NodeStatus` of an action.
+	// Enqueue queues a new action for execution.
+	Enqueue(context.Context, *EnqueueActionRequest) (*EnqueueActionResponse, error)
+	// GetLatestState returns the latest `NodeStatus` of an action.
 	// This deprecates Get in the current StateService.
-	GetActionState(context.Context, *GetActionStateRequest) (*GetActionStateResponse, error)
-	// EnqueueAction queues a new action for execution.
-	EnqueueAction(context.Context, *EnqueueActionRequest) (*EnqueueActionResponse, error)
-	// AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-	// Note that this will cascade aborts to all descendant actions of the specified action.
-	AbortQueuedAction(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error)
-	// Watch watches for updates to the state of actions.
+	GetLatestState(context.Context, *GetLatestStateRequest) (*GetLatestStateResponse, error)
+	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	Watch(*WatchRequest, ActionsService_WatchServer) error
+	WatchForUpdates(*WatchRequest, ActionsService_WatchForUpdatesServer) error
+	// Update updates the status of an action and saves serialized NodeStatus.
+	// This deprecates Put in the current StateService.
+	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
+	// Note that this will cascade aborts to all descendant actions of the specified action.
+	Abort(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error)
 }
 
 // UnimplementedActionsServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedActionsServiceServer struct {
 }
 
-func (UnimplementedActionsServiceServer) UpdateActionStatus(context.Context, *UpdateActionStatusRequest) (*UpdateActionStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateActionStatus not implemented")
+func (UnimplementedActionsServiceServer) Enqueue(context.Context, *EnqueueActionRequest) (*EnqueueActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Enqueue not implemented")
 }
-func (UnimplementedActionsServiceServer) GetActionState(context.Context, *GetActionStateRequest) (*GetActionStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetActionState not implemented")
+func (UnimplementedActionsServiceServer) GetLatestState(context.Context, *GetLatestStateRequest) (*GetLatestStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLatestState not implemented")
 }
-func (UnimplementedActionsServiceServer) EnqueueAction(context.Context, *EnqueueActionRequest) (*EnqueueActionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EnqueueAction not implemented")
+func (UnimplementedActionsServiceServer) WatchForUpdates(*WatchRequest, ActionsService_WatchForUpdatesServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchForUpdates not implemented")
 }
-func (UnimplementedActionsServiceServer) AbortQueuedAction(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AbortQueuedAction not implemented")
+func (UnimplementedActionsServiceServer) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedActionsServiceServer) Watch(*WatchRequest, ActionsService_WatchServer) error {
-	return status.Errorf(codes.Unimplemented, "method Watch not implemented")
+func (UnimplementedActionsServiceServer) Abort(context.Context, *AbortQueuedActionRequest) (*AbortQueuedActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
 }
 
 // UnsafeActionsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -173,97 +173,97 @@ func RegisterActionsServiceServer(s grpc.ServiceRegistrar, srv ActionsServiceSer
 	s.RegisterService(&ActionsService_ServiceDesc, srv)
 }
 
-func _ActionsService_UpdateActionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateActionStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ActionsServiceServer).UpdateActionStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ActionsService_UpdateActionStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServiceServer).UpdateActionStatus(ctx, req.(*UpdateActionStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ActionsService_GetActionState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetActionStateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ActionsServiceServer).GetActionState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ActionsService_GetActionState_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServiceServer).GetActionState(ctx, req.(*GetActionStateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ActionsService_EnqueueAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ActionsService_Enqueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EnqueueActionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActionsServiceServer).EnqueueAction(ctx, in)
+		return srv.(ActionsServiceServer).Enqueue(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ActionsService_EnqueueAction_FullMethodName,
+		FullMethod: ActionsService_Enqueue_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServiceServer).EnqueueAction(ctx, req.(*EnqueueActionRequest))
+		return srv.(ActionsServiceServer).Enqueue(ctx, req.(*EnqueueActionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ActionsService_AbortQueuedAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ActionsService_GetLatestState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLatestStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServiceServer).GetLatestState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ActionsService_GetLatestState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServiceServer).GetLatestState(ctx, req.(*GetLatestStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ActionsService_WatchForUpdates_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ActionsServiceServer).WatchForUpdates(m, &actionsServiceWatchForUpdatesServer{stream})
+}
+
+type ActionsService_WatchForUpdatesServer interface {
+	Send(*WatchResponse) error
+	grpc.ServerStream
+}
+
+type actionsServiceWatchForUpdatesServer struct {
+	grpc.ServerStream
+}
+
+func (x *actionsServiceWatchForUpdatesServer) Send(m *WatchResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _ActionsService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ActionsService_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServiceServer).Update(ctx, req.(*UpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ActionsService_Abort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AbortQueuedActionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActionsServiceServer).AbortQueuedAction(ctx, in)
+		return srv.(ActionsServiceServer).Abort(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ActionsService_AbortQueuedAction_FullMethodName,
+		FullMethod: ActionsService_Abort_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServiceServer).AbortQueuedAction(ctx, req.(*AbortQueuedActionRequest))
+		return srv.(ActionsServiceServer).Abort(ctx, req.(*AbortQueuedActionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
-}
-
-func _ActionsService_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(WatchRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ActionsServiceServer).Watch(m, &actionsServiceWatchServer{stream})
-}
-
-type ActionsService_WatchServer interface {
-	Send(*WatchResponse) error
-	grpc.ServerStream
-}
-
-type actionsServiceWatchServer struct {
-	grpc.ServerStream
-}
-
-func (x *actionsServiceWatchServer) Send(m *WatchResponse) error {
-	return x.ServerStream.SendMsg(m)
 }
 
 // ActionsService_ServiceDesc is the grpc.ServiceDesc for ActionsService service.
@@ -274,26 +274,26 @@ var ActionsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ActionsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "UpdateActionStatus",
-			Handler:    _ActionsService_UpdateActionStatus_Handler,
+			MethodName: "Enqueue",
+			Handler:    _ActionsService_Enqueue_Handler,
 		},
 		{
-			MethodName: "GetActionState",
-			Handler:    _ActionsService_GetActionState_Handler,
+			MethodName: "GetLatestState",
+			Handler:    _ActionsService_GetLatestState_Handler,
 		},
 		{
-			MethodName: "EnqueueAction",
-			Handler:    _ActionsService_EnqueueAction_Handler,
+			MethodName: "Update",
+			Handler:    _ActionsService_Update_Handler,
 		},
 		{
-			MethodName: "AbortQueuedAction",
-			Handler:    _ActionsService_AbortQueuedAction_Handler,
+			MethodName: "Abort",
+			Handler:    _ActionsService_Abort_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Watch",
-			Handler:       _ActionsService_Watch_Handler,
+			StreamName:    "WatchForUpdates",
+			Handler:       _ActionsService_WatchForUpdates_Handler,
 			ServerStreams: true,
 		},
 	},

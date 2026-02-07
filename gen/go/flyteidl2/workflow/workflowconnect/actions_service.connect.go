@@ -33,48 +33,46 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ActionsServiceUpdateActionStatusProcedure is the fully-qualified name of the ActionsService's
-	// UpdateActionStatus RPC.
-	ActionsServiceUpdateActionStatusProcedure = "/flyteidl2.workflow.ActionsService/UpdateActionStatus"
-	// ActionsServiceGetActionStateProcedure is the fully-qualified name of the ActionsService's
-	// GetActionState RPC.
-	ActionsServiceGetActionStateProcedure = "/flyteidl2.workflow.ActionsService/GetActionState"
-	// ActionsServiceEnqueueActionProcedure is the fully-qualified name of the ActionsService's
-	// EnqueueAction RPC.
-	ActionsServiceEnqueueActionProcedure = "/flyteidl2.workflow.ActionsService/EnqueueAction"
-	// ActionsServiceAbortQueuedActionProcedure is the fully-qualified name of the ActionsService's
-	// AbortQueuedAction RPC.
-	ActionsServiceAbortQueuedActionProcedure = "/flyteidl2.workflow.ActionsService/AbortQueuedAction"
-	// ActionsServiceWatchProcedure is the fully-qualified name of the ActionsService's Watch RPC.
-	ActionsServiceWatchProcedure = "/flyteidl2.workflow.ActionsService/Watch"
+	// ActionsServiceEnqueueProcedure is the fully-qualified name of the ActionsService's Enqueue RPC.
+	ActionsServiceEnqueueProcedure = "/flyteidl2.workflow.ActionsService/Enqueue"
+	// ActionsServiceGetLatestStateProcedure is the fully-qualified name of the ActionsService's
+	// GetLatestState RPC.
+	ActionsServiceGetLatestStateProcedure = "/flyteidl2.workflow.ActionsService/GetLatestState"
+	// ActionsServiceWatchForUpdatesProcedure is the fully-qualified name of the ActionsService's
+	// WatchForUpdates RPC.
+	ActionsServiceWatchForUpdatesProcedure = "/flyteidl2.workflow.ActionsService/WatchForUpdates"
+	// ActionsServiceUpdateProcedure is the fully-qualified name of the ActionsService's Update RPC.
+	ActionsServiceUpdateProcedure = "/flyteidl2.workflow.ActionsService/Update"
+	// ActionsServiceAbortProcedure is the fully-qualified name of the ActionsService's Abort RPC.
+	ActionsServiceAbortProcedure = "/flyteidl2.workflow.ActionsService/Abort"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	actionsServiceServiceDescriptor                  = workflow.File_flyteidl2_workflow_actions_service_proto.Services().ByName("ActionsService")
-	actionsServiceUpdateActionStatusMethodDescriptor = actionsServiceServiceDescriptor.Methods().ByName("UpdateActionStatus")
-	actionsServiceGetActionStateMethodDescriptor     = actionsServiceServiceDescriptor.Methods().ByName("GetActionState")
-	actionsServiceEnqueueActionMethodDescriptor      = actionsServiceServiceDescriptor.Methods().ByName("EnqueueAction")
-	actionsServiceAbortQueuedActionMethodDescriptor  = actionsServiceServiceDescriptor.Methods().ByName("AbortQueuedAction")
-	actionsServiceWatchMethodDescriptor              = actionsServiceServiceDescriptor.Methods().ByName("Watch")
+	actionsServiceServiceDescriptor               = workflow.File_flyteidl2_workflow_actions_service_proto.Services().ByName("ActionsService")
+	actionsServiceEnqueueMethodDescriptor         = actionsServiceServiceDescriptor.Methods().ByName("Enqueue")
+	actionsServiceGetLatestStateMethodDescriptor  = actionsServiceServiceDescriptor.Methods().ByName("GetLatestState")
+	actionsServiceWatchForUpdatesMethodDescriptor = actionsServiceServiceDescriptor.Methods().ByName("WatchForUpdates")
+	actionsServiceUpdateMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Update")
+	actionsServiceAbortMethodDescriptor           = actionsServiceServiceDescriptor.Methods().ByName("Abort")
 )
 
 // ActionsServiceClient is a client for the flyteidl2.workflow.ActionsService service.
 type ActionsServiceClient interface {
-	// UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-	// This deprecates Put in the current StateService.
-	UpdateActionStatus(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error)
-	// GetActionState returns the `NodeStatus` of an action.
+	// Enqueue queues a new action for execution.
+	Enqueue(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
+	// GetLatestState returns the latest `NodeStatus` of an action.
 	// This deprecates Get in the current StateService.
-	GetActionState(context.Context, *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error)
-	// EnqueueAction queues a new action for execution.
-	EnqueueAction(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
-	// AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-	// Note that this will cascade aborts to all descendant actions of the specified action.
-	AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
-	// Watch watches for updates to the state of actions.
+	GetLatestState(context.Context, *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error)
+	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	Watch(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)
+	WatchForUpdates(context.Context, *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error)
+	// Update updates the status of an action and saves serialized NodeStatus.
+	// This deprecates Put in the current StateService.
+	Update(context.Context, *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error)
+	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
+	// Note that this will cascade aborts to all descendant actions of the specified action.
+	Abort(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
 }
 
 // NewActionsServiceClient constructs a client for the flyteidl2.workflow.ActionsService service. By
@@ -87,34 +85,34 @@ type ActionsServiceClient interface {
 func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ActionsServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &actionsServiceClient{
-		updateActionStatus: connect.NewClient[workflow.UpdateActionStatusRequest, workflow.UpdateActionStatusResponse](
+		enqueue: connect.NewClient[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse](
 			httpClient,
-			baseURL+ActionsServiceUpdateActionStatusProcedure,
-			connect.WithSchema(actionsServiceUpdateActionStatusMethodDescriptor),
+			baseURL+ActionsServiceEnqueueProcedure,
+			connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getActionState: connect.NewClient[workflow.GetActionStateRequest, workflow.GetActionStateResponse](
+		getLatestState: connect.NewClient[workflow.GetLatestStateRequest, workflow.GetLatestStateResponse](
 			httpClient,
-			baseURL+ActionsServiceGetActionStateProcedure,
-			connect.WithSchema(actionsServiceGetActionStateMethodDescriptor),
+			baseURL+ActionsServiceGetLatestStateProcedure,
+			connect.WithSchema(actionsServiceGetLatestStateMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		enqueueAction: connect.NewClient[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse](
+		watchForUpdates: connect.NewClient[workflow.WatchRequest, workflow.WatchResponse](
 			httpClient,
-			baseURL+ActionsServiceEnqueueActionProcedure,
-			connect.WithSchema(actionsServiceEnqueueActionMethodDescriptor),
+			baseURL+ActionsServiceWatchForUpdatesProcedure,
+			connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		abortQueuedAction: connect.NewClient[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse](
+		update: connect.NewClient[workflow.UpdateRequest, workflow.UpdateResponse](
 			httpClient,
-			baseURL+ActionsServiceAbortQueuedActionProcedure,
-			connect.WithSchema(actionsServiceAbortQueuedActionMethodDescriptor),
+			baseURL+ActionsServiceUpdateProcedure,
+			connect.WithSchema(actionsServiceUpdateMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		watch: connect.NewClient[workflow.WatchRequest, workflow.WatchResponse](
+		abort: connect.NewClient[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse](
 			httpClient,
-			baseURL+ActionsServiceWatchProcedure,
-			connect.WithSchema(actionsServiceWatchMethodDescriptor),
+			baseURL+ActionsServiceAbortProcedure,
+			connect.WithSchema(actionsServiceAbortMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -122,54 +120,54 @@ func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // actionsServiceClient implements ActionsServiceClient.
 type actionsServiceClient struct {
-	updateActionStatus *connect.Client[workflow.UpdateActionStatusRequest, workflow.UpdateActionStatusResponse]
-	getActionState     *connect.Client[workflow.GetActionStateRequest, workflow.GetActionStateResponse]
-	enqueueAction      *connect.Client[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse]
-	abortQueuedAction  *connect.Client[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse]
-	watch              *connect.Client[workflow.WatchRequest, workflow.WatchResponse]
+	enqueue         *connect.Client[workflow.EnqueueActionRequest, workflow.EnqueueActionResponse]
+	getLatestState  *connect.Client[workflow.GetLatestStateRequest, workflow.GetLatestStateResponse]
+	watchForUpdates *connect.Client[workflow.WatchRequest, workflow.WatchResponse]
+	update          *connect.Client[workflow.UpdateRequest, workflow.UpdateResponse]
+	abort           *connect.Client[workflow.AbortQueuedActionRequest, workflow.AbortQueuedActionResponse]
 }
 
-// UpdateActionStatus calls flyteidl2.workflow.ActionsService.UpdateActionStatus.
-func (c *actionsServiceClient) UpdateActionStatus(ctx context.Context, req *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error) {
-	return c.updateActionStatus.CallUnary(ctx, req)
+// Enqueue calls flyteidl2.workflow.ActionsService.Enqueue.
+func (c *actionsServiceClient) Enqueue(ctx context.Context, req *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
+	return c.enqueue.CallUnary(ctx, req)
 }
 
-// GetActionState calls flyteidl2.workflow.ActionsService.GetActionState.
-func (c *actionsServiceClient) GetActionState(ctx context.Context, req *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error) {
-	return c.getActionState.CallUnary(ctx, req)
+// GetLatestState calls flyteidl2.workflow.ActionsService.GetLatestState.
+func (c *actionsServiceClient) GetLatestState(ctx context.Context, req *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error) {
+	return c.getLatestState.CallUnary(ctx, req)
 }
 
-// EnqueueAction calls flyteidl2.workflow.ActionsService.EnqueueAction.
-func (c *actionsServiceClient) EnqueueAction(ctx context.Context, req *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
-	return c.enqueueAction.CallUnary(ctx, req)
+// WatchForUpdates calls flyteidl2.workflow.ActionsService.WatchForUpdates.
+func (c *actionsServiceClient) WatchForUpdates(ctx context.Context, req *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error) {
+	return c.watchForUpdates.CallServerStream(ctx, req)
 }
 
-// AbortQueuedAction calls flyteidl2.workflow.ActionsService.AbortQueuedAction.
-func (c *actionsServiceClient) AbortQueuedAction(ctx context.Context, req *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
-	return c.abortQueuedAction.CallUnary(ctx, req)
+// Update calls flyteidl2.workflow.ActionsService.Update.
+func (c *actionsServiceClient) Update(ctx context.Context, req *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error) {
+	return c.update.CallUnary(ctx, req)
 }
 
-// Watch calls flyteidl2.workflow.ActionsService.Watch.
-func (c *actionsServiceClient) Watch(ctx context.Context, req *connect.Request[workflow.WatchRequest]) (*connect.ServerStreamForClient[workflow.WatchResponse], error) {
-	return c.watch.CallServerStream(ctx, req)
+// Abort calls flyteidl2.workflow.ActionsService.Abort.
+func (c *actionsServiceClient) Abort(ctx context.Context, req *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
+	return c.abort.CallUnary(ctx, req)
 }
 
 // ActionsServiceHandler is an implementation of the flyteidl2.workflow.ActionsService service.
 type ActionsServiceHandler interface {
-	// UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-	// This deprecates Put in the current StateService.
-	UpdateActionStatus(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error)
-	// GetActionState returns the `NodeStatus` of an action.
+	// Enqueue queues a new action for execution.
+	Enqueue(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
+	// GetLatestState returns the latest `NodeStatus` of an action.
 	// This deprecates Get in the current StateService.
-	GetActionState(context.Context, *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error)
-	// EnqueueAction queues a new action for execution.
-	EnqueueAction(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error)
-	// AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-	// Note that this will cascade aborts to all descendant actions of the specified action.
-	AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
-	// Watch watches for updates to the state of actions.
+	GetLatestState(context.Context, *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error)
+	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	Watch(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error
+	WatchForUpdates(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error
+	// Update updates the status of an action and saves serialized NodeStatus.
+	// This deprecates Put in the current StateService.
+	Update(context.Context, *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error)
+	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
+	// Note that this will cascade aborts to all descendant actions of the specified action.
+	Abort(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error)
 }
 
 // NewActionsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -178,48 +176,48 @@ type ActionsServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	actionsServiceUpdateActionStatusHandler := connect.NewUnaryHandler(
-		ActionsServiceUpdateActionStatusProcedure,
-		svc.UpdateActionStatus,
-		connect.WithSchema(actionsServiceUpdateActionStatusMethodDescriptor),
+	actionsServiceEnqueueHandler := connect.NewUnaryHandler(
+		ActionsServiceEnqueueProcedure,
+		svc.Enqueue,
+		connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	actionsServiceGetActionStateHandler := connect.NewUnaryHandler(
-		ActionsServiceGetActionStateProcedure,
-		svc.GetActionState,
-		connect.WithSchema(actionsServiceGetActionStateMethodDescriptor),
+	actionsServiceGetLatestStateHandler := connect.NewUnaryHandler(
+		ActionsServiceGetLatestStateProcedure,
+		svc.GetLatestState,
+		connect.WithSchema(actionsServiceGetLatestStateMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	actionsServiceEnqueueActionHandler := connect.NewUnaryHandler(
-		ActionsServiceEnqueueActionProcedure,
-		svc.EnqueueAction,
-		connect.WithSchema(actionsServiceEnqueueActionMethodDescriptor),
+	actionsServiceWatchForUpdatesHandler := connect.NewServerStreamHandler(
+		ActionsServiceWatchForUpdatesProcedure,
+		svc.WatchForUpdates,
+		connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	actionsServiceAbortQueuedActionHandler := connect.NewUnaryHandler(
-		ActionsServiceAbortQueuedActionProcedure,
-		svc.AbortQueuedAction,
-		connect.WithSchema(actionsServiceAbortQueuedActionMethodDescriptor),
+	actionsServiceUpdateHandler := connect.NewUnaryHandler(
+		ActionsServiceUpdateProcedure,
+		svc.Update,
+		connect.WithSchema(actionsServiceUpdateMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	actionsServiceWatchHandler := connect.NewServerStreamHandler(
-		ActionsServiceWatchProcedure,
-		svc.Watch,
-		connect.WithSchema(actionsServiceWatchMethodDescriptor),
+	actionsServiceAbortHandler := connect.NewUnaryHandler(
+		ActionsServiceAbortProcedure,
+		svc.Abort,
+		connect.WithSchema(actionsServiceAbortMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.workflow.ActionsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ActionsServiceUpdateActionStatusProcedure:
-			actionsServiceUpdateActionStatusHandler.ServeHTTP(w, r)
-		case ActionsServiceGetActionStateProcedure:
-			actionsServiceGetActionStateHandler.ServeHTTP(w, r)
-		case ActionsServiceEnqueueActionProcedure:
-			actionsServiceEnqueueActionHandler.ServeHTTP(w, r)
-		case ActionsServiceAbortQueuedActionProcedure:
-			actionsServiceAbortQueuedActionHandler.ServeHTTP(w, r)
-		case ActionsServiceWatchProcedure:
-			actionsServiceWatchHandler.ServeHTTP(w, r)
+		case ActionsServiceEnqueueProcedure:
+			actionsServiceEnqueueHandler.ServeHTTP(w, r)
+		case ActionsServiceGetLatestStateProcedure:
+			actionsServiceGetLatestStateHandler.ServeHTTP(w, r)
+		case ActionsServiceWatchForUpdatesProcedure:
+			actionsServiceWatchForUpdatesHandler.ServeHTTP(w, r)
+		case ActionsServiceUpdateProcedure:
+			actionsServiceUpdateHandler.ServeHTTP(w, r)
+		case ActionsServiceAbortProcedure:
+			actionsServiceAbortHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -229,22 +227,22 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 // UnimplementedActionsServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedActionsServiceHandler struct{}
 
-func (UnimplementedActionsServiceHandler) UpdateActionStatus(context.Context, *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.UpdateActionStatus is not implemented"))
+func (UnimplementedActionsServiceHandler) Enqueue(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.Enqueue is not implemented"))
 }
 
-func (UnimplementedActionsServiceHandler) GetActionState(context.Context, *connect.Request[workflow.GetActionStateRequest]) (*connect.Response[workflow.GetActionStateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.GetActionState is not implemented"))
+func (UnimplementedActionsServiceHandler) GetLatestState(context.Context, *connect.Request[workflow.GetLatestStateRequest]) (*connect.Response[workflow.GetLatestStateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.GetLatestState is not implemented"))
 }
 
-func (UnimplementedActionsServiceHandler) EnqueueAction(context.Context, *connect.Request[workflow.EnqueueActionRequest]) (*connect.Response[workflow.EnqueueActionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.EnqueueAction is not implemented"))
+func (UnimplementedActionsServiceHandler) WatchForUpdates(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.WatchForUpdates is not implemented"))
 }
 
-func (UnimplementedActionsServiceHandler) AbortQueuedAction(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.AbortQueuedAction is not implemented"))
+func (UnimplementedActionsServiceHandler) Update(context.Context, *connect.Request[workflow.UpdateRequest]) (*connect.Response[workflow.UpdateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.Update is not implemented"))
 }
 
-func (UnimplementedActionsServiceHandler) Watch(context.Context, *connect.Request[workflow.WatchRequest], *connect.ServerStream[workflow.WatchResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.Watch is not implemented"))
+func (UnimplementedActionsServiceHandler) Abort(context.Context, *connect.Request[workflow.AbortQueuedActionRequest]) (*connect.Response[workflow.AbortQueuedActionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.ActionsService.Abort is not implemented"))
 }

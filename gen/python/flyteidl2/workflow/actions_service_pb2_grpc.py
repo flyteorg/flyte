@@ -19,30 +19,30 @@ class ActionsServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.UpdateActionStatus = channel.unary_unary(
-                '/flyteidl2.workflow.ActionsService/UpdateActionStatus',
-                request_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusResponse.FromString,
-                )
-        self.GetActionState = channel.unary_unary(
-                '/flyteidl2.workflow.ActionsService/GetActionState',
-                request_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateResponse.FromString,
-                )
-        self.EnqueueAction = channel.unary_unary(
-                '/flyteidl2.workflow.ActionsService/EnqueueAction',
+        self.Enqueue = channel.unary_unary(
+                '/flyteidl2.workflow.ActionsService/Enqueue',
                 request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
                 )
-        self.AbortQueuedAction = channel.unary_unary(
-                '/flyteidl2.workflow.ActionsService/AbortQueuedAction',
-                request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
+        self.GetLatestState = channel.unary_unary(
+                '/flyteidl2.workflow.ActionsService/GetLatestState',
+                request_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateResponse.FromString,
                 )
-        self.Watch = channel.unary_stream(
-                '/flyteidl2.workflow.ActionsService/Watch',
+        self.WatchForUpdates = channel.unary_stream(
+                '/flyteidl2.workflow.ActionsService/WatchForUpdates',
                 request_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
+                )
+        self.Update = channel.unary_unary(
+                '/flyteidl2.workflow.ActionsService/Update',
+                request_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateResponse.FromString,
+                )
+        self.Abort = channel.unary_unary(
+                '/flyteidl2.workflow.ActionsService/Abort',
+                request_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
                 )
 
 
@@ -52,40 +52,40 @@ class ActionsServiceServicer(object):
     the state and execution of actions.
     """
 
-    def UpdateActionStatus(self, request, context):
-        """UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-        This deprecates Put in the current StateService.
+    def Enqueue(self, request, context):
+        """Enqueue queues a new action for execution.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetActionState(self, request, context):
-        """GetActionState returns the `NodeStatus` of an action.
+    def GetLatestState(self, request, context):
+        """GetLatestState returns the latest `NodeStatus` of an action.
         This deprecates Get in the current StateService.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def EnqueueAction(self, request, context):
-        """EnqueueAction queues a new action for execution.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def AbortQueuedAction(self, request, context):
-        """AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-        Note that this will cascade aborts to all descendant actions of the specified action.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def Watch(self, request, context):
-        """Watch watches for updates to the state of actions.
+    def WatchForUpdates(self, request, context):
+        """WatchForUpdates watches for updates to the state of actions.
         This API guarantees at-least-once delivery semantics.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Update(self, request, context):
+        """Update updates the status of an action and saves serialized NodeStatus.
+        This deprecates Put in the current StateService.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Abort(self, request, context):
+        """Abort aborts a single action that was previously queued or is currently being processed by a worker.
+        Note that this will cascade aborts to all descendant actions of the specified action.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -94,30 +94,30 @@ class ActionsServiceServicer(object):
 
 def add_ActionsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'UpdateActionStatus': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateActionStatus,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusResponse.SerializeToString,
-            ),
-            'GetActionState': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetActionState,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateResponse.SerializeToString,
-            ),
-            'EnqueueAction': grpc.unary_unary_rpc_method_handler(
-                    servicer.EnqueueAction,
+            'Enqueue': grpc.unary_unary_rpc_method_handler(
+                    servicer.Enqueue,
                     request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.SerializeToString,
             ),
-            'AbortQueuedAction': grpc.unary_unary_rpc_method_handler(
-                    servicer.AbortQueuedAction,
-                    request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.SerializeToString,
+            'GetLatestState': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetLatestState,
+                    request_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateResponse.SerializeToString,
             ),
-            'Watch': grpc.unary_stream_rpc_method_handler(
-                    servicer.Watch,
+            'WatchForUpdates': grpc.unary_stream_rpc_method_handler(
+                    servicer.WatchForUpdates,
                     request_deserializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.SerializeToString,
+            ),
+            'Update': grpc.unary_unary_rpc_method_handler(
+                    servicer.Update,
+                    request_deserializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateResponse.SerializeToString,
+            ),
+            'Abort': grpc.unary_unary_rpc_method_handler(
+                    servicer.Abort,
+                    request_deserializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -133,7 +133,7 @@ class ActionsService(object):
     """
 
     @staticmethod
-    def UpdateActionStatus(request,
+    def Enqueue(request,
             target,
             options=(),
             channel_credentials=None,
@@ -143,48 +143,14 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/UpdateActionStatus',
-            flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateActionStatusResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def GetActionState(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/GetActionState',
-            flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions__service__pb2.GetActionStateResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def EnqueueAction(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/EnqueueAction',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/Enqueue',
             flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_queue__service__pb2.EnqueueActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def AbortQueuedAction(request,
+    def GetLatestState(request,
             target,
             options=(),
             channel_credentials=None,
@@ -194,14 +160,14 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/AbortQueuedAction',
-            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/GetLatestState',
+            flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_actions__service__pb2.GetLatestStateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Watch(request,
+    def WatchForUpdates(request,
             target,
             options=(),
             channel_credentials=None,
@@ -211,8 +177,42 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.ActionsService/Watch',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.ActionsService/WatchForUpdates',
             flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Update(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/Update',
+            flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_actions__service__pb2.UpdateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Abort(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.ActionsService/Abort',
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_queue__service__pb2.AbortQueuedActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
