@@ -1338,6 +1338,45 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 	}
 }
 
+func TestBuildResourceRaySubmitterPodAffinity(t *testing.T) {
+	// Create a default affinity to be set in the K8s plugin config
+	defaultAffinity := &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "node-type",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"ray-submitter"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: defaultAffinity,
+	}))
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	rayJobResourceHandler := rayJobResourceHandler{}
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.Nil(t, err)
+	assert.NotNil(t, r)
+	rayJob, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	// Verify the submitter pod template has the default affinity from K8s plugin config
+	submitterPodAffinity := rayJob.Spec.SubmitterPodTemplate.Spec.Affinity
+	assert.NotNil(t, submitterPodAffinity, "submitter pod should have affinity set")
+	assert.EqualValues(t, defaultAffinity, submitterPodAffinity, "submitter pod affinity should match default affinity from config")
+}
+
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	maxLength := 47

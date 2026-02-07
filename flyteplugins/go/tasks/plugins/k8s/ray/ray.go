@@ -407,18 +407,31 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 
 func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
 
-	submitterPodSpec := rayClusterSpec.HeadGroupSpec.Template.DeepCopy()
+	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
 
-	submitterPodSpec.Spec.Containers = []v1.Container{
-		{
-			Name: "ray-job-submitter",
-			// Use the image of the Ray head to be defensive against version mismatch issues
-			Image:     rayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Image,
-			Resources: submitterDefaultResourceRequirements,
-		},
+	tolerations := make([]v1.Toleration, 0)
+	if config.GetK8sPluginConfig() != nil && len(config.GetK8sPluginConfig().DefaultTolerations) > 0 {
+		tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
 	}
 
-	return *submitterPodSpec
+	enableServiceLinks := false
+	return v1.PodTemplateSpec{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ray-job-submitter",
+					// Use the image of the Ray head to be defensive against version mismatch issues
+					Image:     headPodSpec.Containers[0].Image,
+					Resources: submitterDefaultResourceRequirements,
+				},
+			},
+			RestartPolicy:      v1.RestartPolicyNever,
+			EnableServiceLinks: &enableServiceLinks,
+			// Run the RayJob submitter pod with the default affinity/tolerations so it lands on the default node.
+			Tolerations: tolerations,
+			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
+		},
+	}
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {

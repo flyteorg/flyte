@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	// TODO @pvditt fix
 	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -468,6 +469,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 			"invalid TaskSpecification, unable to determine Pod configuration")
 	}
+
+	enableServiceLinks := false
+	podSpec.EnableServiceLinks = &enableServiceLinks
 
 	return podSpec, &objectMeta, primaryContainerName, nil
 }

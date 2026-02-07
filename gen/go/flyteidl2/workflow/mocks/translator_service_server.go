@@ -22,6 +22,65 @@ func (_m *TranslatorServiceServer) EXPECT() *TranslatorServiceServer_Expecter {
 	return &TranslatorServiceServer_Expecter{mock: &_m.Mock}
 }
 
+// JsonValuesToLiterals provides a mock function with given fields: _a0, _a1
+func (_m *TranslatorServiceServer) JsonValuesToLiterals(_a0 context.Context, _a1 *workflow.JsonValuesToLiteralsRequest) (*workflow.JsonValuesToLiteralsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for JsonValuesToLiterals")
+	}
+
+	var r0 *workflow.JsonValuesToLiteralsResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.JsonValuesToLiteralsRequest) (*workflow.JsonValuesToLiteralsResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.JsonValuesToLiteralsRequest) *workflow.JsonValuesToLiteralsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*workflow.JsonValuesToLiteralsResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.JsonValuesToLiteralsRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// TranslatorServiceServer_JsonValuesToLiterals_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'JsonValuesToLiterals'
+type TranslatorServiceServer_JsonValuesToLiterals_Call struct {
+	*mock.Call
+}
+
+// JsonValuesToLiterals is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 *workflow.JsonValuesToLiteralsRequest
+func (_e *TranslatorServiceServer_Expecter) JsonValuesToLiterals(_a0 interface{}, _a1 interface{}) *TranslatorServiceServer_JsonValuesToLiterals_Call {
+	return &TranslatorServiceServer_JsonValuesToLiterals_Call{Call: _e.mock.On("JsonValuesToLiterals", _a0, _a1)}
+}
+
+func (_c *TranslatorServiceServer_JsonValuesToLiterals_Call) Run(run func(_a0 context.Context, _a1 *workflow.JsonValuesToLiteralsRequest)) *TranslatorServiceServer_JsonValuesToLiterals_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*workflow.JsonValuesToLiteralsRequest))
+	})
+	return _c
+}
+
+func (_c *TranslatorServiceServer_JsonValuesToLiterals_Call) Return(_a0 *workflow.JsonValuesToLiteralsResponse, _a1 error) *TranslatorServiceServer_JsonValuesToLiterals_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TranslatorServiceServer_JsonValuesToLiterals_Call) RunAndReturn(run func(context.Context, *workflow.JsonValuesToLiteralsRequest) (*workflow.JsonValuesToLiteralsResponse, error)) *TranslatorServiceServer_JsonValuesToLiterals_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // LaunchFormJsonToLiterals provides a mock function with given fields: _a0, _a1
 func (_m *TranslatorServiceServer) LaunchFormJsonToLiterals(_a0 context.Context, _a1 *workflow.LaunchFormJsonToLiteralsRequest) (*workflow.LaunchFormJsonToLiteralsResponse, error) {
 	ret := _m.Called(_a0, _a1)

@@ -4,7 +4,7 @@ from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -20,18 +20,19 @@ class Variable(_message.Message):
     artifact_tag: _artifact_id_pb2.ArtifactTag
     def __init__(self, type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., description: _Optional[str] = ..., artifact_partial_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., artifact_tag: _Optional[_Union[_artifact_id_pb2.ArtifactTag, _Mapping]] = ...) -> None: ...
 
+class VariableEntry(_message.Message):
+    __slots__ = ["key", "value"]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    key: str
+    value: Variable
+    def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Variable, _Mapping]] = ...) -> None: ...
+
 class VariableMap(_message.Message):
     __slots__ = ["variables"]
-    class VariablesEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: Variable
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Variable, _Mapping]] = ...) -> None: ...
     VARIABLES_FIELD_NUMBER: _ClassVar[int]
-    variables: _containers.MessageMap[str, Variable]
-    def __init__(self, variables: _Optional[_Mapping[str, Variable]] = ...) -> None: ...
+    variables: _containers.RepeatedCompositeFieldContainer[VariableEntry]
+    def __init__(self, variables: _Optional[_Iterable[_Union[VariableEntry, _Mapping]]] = ...) -> None: ...
 
 class TypedInterface(_message.Message):
     __slots__ = ["inputs", "outputs"]

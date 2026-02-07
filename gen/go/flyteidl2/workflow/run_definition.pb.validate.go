@@ -4171,6 +4171,40 @@ func (m *TaskGroup) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetRecentStatuses() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("RecentStatuses[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("RecentStatuses[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskGroupValidationError{
+					field:  fmt.Sprintf("RecentStatuses[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	// no validation rules for AverageFailureRate
 
 	if all {
@@ -4298,6 +4332,40 @@ func (m *TaskGroup) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetPhaseCounts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("PhaseCounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskGroupValidationError{
+						field:  fmt.Sprintf("PhaseCounts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskGroupValidationError{
+					field:  fmt.Sprintf("PhaseCounts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return TaskGroupMultiError(errors)
 	}
@@ -4374,6 +4442,112 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskGroupValidationError{}
+
+// Validate checks the field values on TaskGroup_RecentStatus with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TaskGroup_RecentStatus) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskGroup_RecentStatus with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TaskGroup_RecentStatusMultiError, or nil if none found.
+func (m *TaskGroup_RecentStatus) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskGroup_RecentStatus) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RunName
+
+	// no validation rules for Phase
+
+	if len(errors) > 0 {
+		return TaskGroup_RecentStatusMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskGroup_RecentStatusMultiError is an error wrapping multiple validation
+// errors returned by TaskGroup_RecentStatus.ValidateAll() if the designated
+// constraints aren't met.
+type TaskGroup_RecentStatusMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskGroup_RecentStatusMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskGroup_RecentStatusMultiError) AllErrors() []error { return m }
+
+// TaskGroup_RecentStatusValidationError is the validation error returned by
+// TaskGroup_RecentStatus.Validate if the designated constraints aren't met.
+type TaskGroup_RecentStatusValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskGroup_RecentStatusValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskGroup_RecentStatusValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskGroup_RecentStatusValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskGroup_RecentStatusValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskGroup_RecentStatusValidationError) ErrorName() string {
+	return "TaskGroup_RecentStatusValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskGroup_RecentStatusValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskGroup_RecentStatus.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskGroup_RecentStatusValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskGroup_RecentStatusValidationError{}
 
 // Validate checks the field values on TaskGroup_ErrorCounts with the rules
 // defined in the proto definition for this message. If any rules are
@@ -4482,3 +4656,109 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskGroup_ErrorCountsValidationError{}
+
+// Validate checks the field values on TaskGroup_PhaseCounts with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TaskGroup_PhaseCounts) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskGroup_PhaseCounts with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TaskGroup_PhaseCountsMultiError, or nil if none found.
+func (m *TaskGroup_PhaseCounts) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskGroup_PhaseCounts) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Phase
+
+	// no validation rules for Count
+
+	if len(errors) > 0 {
+		return TaskGroup_PhaseCountsMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskGroup_PhaseCountsMultiError is an error wrapping multiple validation
+// errors returned by TaskGroup_PhaseCounts.ValidateAll() if the designated
+// constraints aren't met.
+type TaskGroup_PhaseCountsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskGroup_PhaseCountsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskGroup_PhaseCountsMultiError) AllErrors() []error { return m }
+
+// TaskGroup_PhaseCountsValidationError is the validation error returned by
+// TaskGroup_PhaseCounts.Validate if the designated constraints aren't met.
+type TaskGroup_PhaseCountsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskGroup_PhaseCountsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskGroup_PhaseCountsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskGroup_PhaseCountsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskGroup_PhaseCountsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskGroup_PhaseCountsValidationError) ErrorName() string {
+	return "TaskGroup_PhaseCountsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskGroup_PhaseCountsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskGroup_PhaseCounts.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskGroup_PhaseCountsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskGroup_PhaseCountsValidationError{}
