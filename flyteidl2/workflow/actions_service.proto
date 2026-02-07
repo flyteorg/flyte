@@ -14,32 +14,32 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 // This service is intended to replace StateService and QueueService, providing a single interface for managing both
 // the state and execution of actions.
 service ActionsService {
-  // UpdateActionStatus updates the status of an action and saves serialized NodeStatus.
-  // This deprecates Put in the current StateService.
-  rpc UpdateActionStatus(UpdateActionStatusRequest) returns (UpdateActionStatusResponse) {}
+  // Enqueue queues a new action for execution.
+  rpc Enqueue(flyteidl2.workflow.EnqueueActionRequest) returns (flyteidl2.workflow.EnqueueActionResponse) {}
 
-  // GetActionState returns the `NodeStatus` of an action.
+  // GetLatestState returns the latest `NodeStatus` of an action.
   // This deprecates Get in the current StateService.
-  rpc GetActionState(GetActionStateRequest) returns (GetActionStateResponse) {}
+  rpc GetLatestState(GetLatestStateRequest) returns (GetLatestStateResponse) {}
 
-  // EnqueueAction queues a new action for execution.
-  rpc EnqueueAction(flyteidl2.workflow.EnqueueActionRequest) returns (flyteidl2.workflow.EnqueueActionResponse) {}
-
-  // AbortQueuedAction aborts a single action that was previously queued or is currently being processed by a worker.
-  // Note that this will cascade aborts to all descendant actions of the specified action.
-  rpc AbortQueuedAction(flyteidl2.workflow.AbortQueuedActionRequest) returns (flyteidl2.workflow.AbortQueuedActionResponse) {}
-
-  // Watch watches for updates to the state of actions.
+  // WatchForUpdates watches for updates to the state of actions.
   // This API guarantees at-least-once delivery semantics.
-  rpc Watch(flyteidl2.workflow.WatchRequest) returns (stream flyteidl2.workflow.WatchResponse) {}
+  rpc WatchForUpdates(flyteidl2.workflow.WatchRequest) returns (stream flyteidl2.workflow.WatchResponse) {}
+
+  // Update updates the status of an action and saves serialized NodeStatus.
+  // This deprecates Put in the current StateService.
+  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+
+  // Abort aborts a single action that was previously queued or is currently being processed by a worker.
+  // Note that this will cascade aborts to all descendant actions of the specified action.
+  rpc Abort(flyteidl2.workflow.AbortQueuedActionRequest) returns (flyteidl2.workflow.AbortQueuedActionResponse) {}
 }
 
 // ============================================================================
-// UpdateActionStatus
+// Update
 // ============================================================================
 
-// UpdateActionStatusRequest is the request message for updating the status of an action.
-message UpdateActionStatusRequest {
+// UpdateRequest is the request message for updating the status of an action.
+message UpdateRequest {
   // A unique identifier for the action.
   flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
@@ -53,15 +53,15 @@ message UpdateActionStatusRequest {
   string state = 4 [(buf.validate.field).string.min_len = 2];
 }
 
-// UpdateActionStatusResponse is the response message for updating the status of an action.
-message UpdateActionStatusResponse {}
+// UpdateResponse is the response message for updating the status of an action.
+message UpdateResponse {}
 
 // ============================================================================
-// GetActionState
+// GetLatestState
 // ============================================================================
 
-// GetActionStateRequest is the request message for getting the state of an action.
-message GetActionStateRequest {
+// GetLatestStateRequest is the request message for getting the state of an action.
+message GetLatestStateRequest {
   // A unique identifier for the action.
   flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 
@@ -69,8 +69,8 @@ message GetActionStateRequest {
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 }
 
-// GetActionStateResponse is the response message for getting the state of an action.
-message GetActionStateResponse {
+// GetLatestStateResponse is the response message for getting the state of an action.
+message GetLatestStateResponse {
   // A JSON serialized `NodeStatus` object.
   string state = 1 [(buf.validate.field).string.min_len = 1];
 }
