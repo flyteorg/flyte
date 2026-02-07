@@ -18,7 +18,7 @@ from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_
 from flyteidl2.workflow import state_service_pb2 as flyteidl2_dot_workflow_dot_state__service__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(flyteidl2/workflow/actions_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a&flyteidl2/workflow/queue_service.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xdf\x01\n\x19UpdateActionStatusRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x18\n\x07\x61ttempt\x18\x02 \x01(\rR\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\x12\x1d\n\x05state\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x02R\x05state\"\x1c\n\x1aUpdateActionStatusResponse\"z\n\x15GetActionStateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x18\n\x07\x61ttempt\x18\x02 \x01(\rR\x07\x61ttempt\"7\n\x16GetActionStateResponse\x12\x1d\n\x05state\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x05state2\xa0\x04\n\x0e\x41\x63tionsService\x12u\n\x12UpdateActionStatus\x12-.flyteidl2.workflow.UpdateActionStatusRequest\x1a..flyteidl2.workflow.UpdateActionStatusResponse\"\x00\x12i\n\x0eGetActionState\x12).flyteidl2.workflow.GetActionStateRequest\x1a*.flyteidl2.workflow.GetActionStateResponse\"\x00\x12\x66\n\rEnqueueAction\x12(.flyteidl2.workflow.EnqueueActionRequest\x1a).flyteidl2.workflow.EnqueueActionResponse\"\x00\x12r\n\x11\x41\x62ortQueuedAction\x12,.flyteidl2.workflow.AbortQueuedActionRequest\x1a-.flyteidl2.workflow.AbortQueuedActionResponse\"\x00\x12P\n\x05Watch\x12 .flyteidl2.workflow.WatchRequest\x1a!.flyteidl2.workflow.WatchResponse\"\x00\x30\x01\x42\xd0\x01\n\x16\x63om.flyteidl2.workflowB\x13\x41\x63tionsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(flyteidl2/workflow/actions_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a&flyteidl2/workflow/queue_service.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xe8\x01\n\x19UpdateActionStatusRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\x12\x1d\n\x05state\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x02R\x05state\"\x1c\n\x1aUpdateActionStatusResponse\"\x83\x01\n\x15GetActionStateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"7\n\x16GetActionStateResponse\x12\x1d\n\x05state\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x05state2\xa0\x04\n\x0e\x41\x63tionsService\x12u\n\x12UpdateActionStatus\x12-.flyteidl2.workflow.UpdateActionStatusRequest\x1a..flyteidl2.workflow.UpdateActionStatusResponse\"\x00\x12i\n\x0eGetActionState\x12).flyteidl2.workflow.GetActionStateRequest\x1a*.flyteidl2.workflow.GetActionStateResponse\"\x00\x12\x66\n\rEnqueueAction\x12(.flyteidl2.workflow.EnqueueActionRequest\x1a).flyteidl2.workflow.EnqueueActionResponse\"\x00\x12r\n\x11\x41\x62ortQueuedAction\x12,.flyteidl2.workflow.AbortQueuedActionRequest\x1a-.flyteidl2.workflow.AbortQueuedActionResponse\"\x00\x12P\n\x05Watch\x12 .flyteidl2.workflow.WatchRequest\x1a!.flyteidl2.workflow.WatchResponse\"\x00\x30\x01\x42\xd0\x01\n\x16\x63om.flyteidl2.workflowB\x13\x41\x63tionsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,22 +28,26 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\023ActionsServiceProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['action_id']._options = None
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
+  _UPDATEACTIONSTATUSREQUEST.fields_by_name['attempt']._options = None
+  _UPDATEACTIONSTATUSREQUEST.fields_by_name['attempt']._serialized_options = b'\272H\004*\002 \000'
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['status']._options = None
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['status']._serialized_options = b'\272H\003\310\001\001'
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['state']._options = None
   _UPDATEACTIONSTATUSREQUEST.fields_by_name['state']._serialized_options = b'\272H\004r\002\020\002'
   _GETACTIONSTATEREQUEST.fields_by_name['action_id']._options = None
   _GETACTIONSTATEREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
+  _GETACTIONSTATEREQUEST.fields_by_name['attempt']._options = None
+  _GETACTIONSTATEREQUEST.fields_by_name['attempt']._serialized_options = b'\272H\004*\002 \000'
   _GETACTIONSTATERESPONSE.fields_by_name['state']._options = None
   _GETACTIONSTATERESPONSE.fields_by_name['state']._serialized_options = b'\272H\004r\002\020\001'
   _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_start=250
-  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_end=473
-  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_start=475
-  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_end=503
-  _globals['_GETACTIONSTATEREQUEST']._serialized_start=505
-  _globals['_GETACTIONSTATEREQUEST']._serialized_end=627
-  _globals['_GETACTIONSTATERESPONSE']._serialized_start=629
-  _globals['_GETACTIONSTATERESPONSE']._serialized_end=684
-  _globals['_ACTIONSSERVICE']._serialized_start=687
-  _globals['_ACTIONSSERVICE']._serialized_end=1231
+  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_end=482
+  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_start=484
+  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_end=512
+  _globals['_GETACTIONSTATEREQUEST']._serialized_start=515
+  _globals['_GETACTIONSTATEREQUEST']._serialized_end=646
+  _globals['_GETACTIONSTATERESPONSE']._serialized_start=648
+  _globals['_GETACTIONSTATERESPONSE']._serialized_end=703
+  _globals['_ACTIONSSERVICE']._serialized_start=706
+  _globals['_ACTIONSSERVICE']._serialized_end=1250
 # @@protoc_insertion_point(module_scope)
