@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/workflow/queue_service.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/workflow/state_service.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// ActionsService provides an interface for managing the state and execution of actions.
+// This service is intended to replace StateService and QueueService, providing a single interface for managing both
+// the state and execution of actions.
+service ActionsService {
+  // Enqueue queues a new action for execution.
+  rpc Enqueue(flyteidl2.workflow.EnqueueActionRequest) returns (flyteidl2.workflow.EnqueueActionResponse) {}
+
+  // GetLatestState returns the latest `NodeStatus` of an action.
+  // This deprecates Get in the current StateService.
+  rpc GetLatestState(GetLatestStateRequest) returns (GetLatestStateResponse) {}
+
+  // WatchForUpdates watches for updates to the state of actions.
+  // This API guarantees at-least-once delivery semantics.
+  rpc WatchForUpdates(flyteidl2.workflow.WatchRequest) returns (stream flyteidl2.workflow.WatchResponse) {}
+
+  // Update updates the status of an action and saves serialized NodeStatus.
+  // This deprecates Put in the current StateService.
+  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+
+  // Abort aborts a single action that was previously queued or is currently being processed by a worker.
+  // Note that this will cascade aborts to all descendant actions of the specified action.
+  rpc Abort(flyteidl2.workflow.AbortQueuedActionRequest) returns (flyteidl2.workflow.AbortQueuedActionResponse) {}
+}
+
+// ============================================================================
+// Update
+// ============================================================================
+
+// UpdateRequest is the request message for updating the status of an action.
+message UpdateRequest {
+  // A unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number (starts at 1, incremented on retry).
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+
+  // The new status of the action.
+  flyteidl2.workflow.ActionStatus status = 3 [(buf.validate.field).required = true];
+
+  // The new state in form of a JSON serialized `NodeStatus` object.
+  string state = 4 [(buf.validate.field).string.min_len = 2];
+}
+
+// UpdateResponse is the response message for updating the status of an action.
+message UpdateResponse {}
+
+// ============================================================================
+// GetLatestState
+// ============================================================================
+
+// GetLatestStateRequest is the request message for getting the state of an action.
+message GetLatestStateRequest {
+  // A unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number (starts at 1, incremented on retry).
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// GetLatestStateResponse is the response message for getting the state of an action.
+message GetLatestStateResponse {
+  // A JSON serialized `NodeStatus` object.
+  string state = 1 [(buf.validate.field).string.min_len = 1];
+}
