@@ -30,8 +30,8 @@ func (t *taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string
 	return name, nil
 }
 
-func (t *taskExecutionID) GetID() core.TaskExecutionIdentifier {
-	return t.id
+func (t *taskExecutionID) GetID() *core.TaskExecutionIdentifier {
+	return &t.id
 }
 
 func (t *taskExecutionID) GetUniqueNodeID() string {
@@ -99,8 +99,8 @@ func (m *taskExecutionMetadata) GetOverrides() pluginsCore.TaskOverrides {
 	return &taskOverrides{}
 }
 
-func (m *taskExecutionMetadata) GetSecurityContext() core.SecurityContext {
-	return core.SecurityContext{}
+func (m *taskExecutionMetadata) GetSecurityContext() *core.SecurityContext {
+	return &core.SecurityContext{}
 }
 
 func (m *taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {

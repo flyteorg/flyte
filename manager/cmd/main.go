@@ -32,6 +32,8 @@ import (
 	dataproxyservice "github.com/flyteorg/flyte/v2/dataproxy/service"
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorcontroller "github.com/flyteorg/flyte/v2/executor/pkg/controller"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
@@ -50,6 +52,9 @@ import (
 	runsservice "github.com/flyteorg/flyte/v2/runs/service"
 	statek8s "github.com/flyteorg/flyte/v2/state/k8s"
 	stateservice "github.com/flyteorg/flyte/v2/state/service"
+
+	// Plugin registrations -- blank imports trigger init() which registers plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 var (
@@ -265,10 +270,28 @@ func serve(ctx context.Context) error {
 			return
 		}
 
-		// Setup TaskAction controller (no longer needs state service URL)
+		// Create SetupContext and initialize plugin registry
+		setupCtx := plugin.NewSetupContext(
+			mgr, // KubeClient
+			nil, // SecretManager -- TODO: implement
+			nil, // ResourceRegistrar -- not needed for manager
+			nil, // EnqueueOwner -- not needed, controller-runtime handles reconciliation
+			nil, // EnqueueLabels
+			"TaskAction",
+			promutils.NewScope("executor"),
+		)
+		registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
+		if err := registry.Initialize(ctx); err != nil {
+			errCh <- fmt.Errorf("failed to initialize plugin registry: %w", err)
+			return
+		}
+
+		// Setup TaskAction controller
 		if err := executorcontroller.NewTaskActionReconciler(
 			mgr.GetClient(),
 			mgr.GetScheme(),
+			registry,
+			dataStore,
 		).SetupWithManager(mgr); err != nil {
 			errCh <- fmt.Errorf("failed to setup controller: %w", err)
 			return
