@@ -27,37 +27,40 @@ import (
 )
 
 var (
-	cfgFile string
-	port    int
-	host    string
+	cfgFile        string
+	port           int
+	host           string
+	configAccessor stdconfig.Accessor
+)
 
-	rootCmd = &cobra.Command{
+func newRootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
 		Use:   "dataproxy-service",
 		Short: "Data Proxy Service for Flyte",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return initConfig(cmd)
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return serve(cmd.Context())
 		},
 	}
-)
 
-func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.flyte/config.yaml)")
 	rootCmd.PersistentFlags().IntVar(&port, "port", 8088, "server port")
 	rootCmd.PersistentFlags().StringVar(&host, "host", "0.0.0.0", "server host")
+	configAccessor = viper.NewAccessor(stdconfig.Options{StrictMode: false})
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
+
+	return rootCmd
 }
 
 func main() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := newRootCmd().Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
 func serve(ctx context.Context) error {
-	// Initialize config
-	if err := initConfig(); err != nil {
-		return fmt.Errorf("failed to initialize config: %w", err)
-	}
-
 	// Initialize logger
 	logConfig := logger.GetConfig()
 	if err := logger.SetConfig(logConfig); err != nil {
@@ -150,12 +153,19 @@ func serve(ctx context.Context) error {
 	return nil
 }
 
-func initConfig() error {
-	// Use viper to load config
-	configAccessor := viper.NewAccessor(stdconfig.Options{
+func initConfig(cmd *cobra.Command) error {
+	configAccessor = viper.NewAccessor(stdconfig.Options{
 		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config"},
 		StrictMode:  false,
 	})
+
+	// Traverse to root command
+	rootCmd := cmd
+	for rootCmd.Parent() != nil {
+		rootCmd = rootCmd.Parent()
+	}
+
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
 	return configAccessor.UpdateConfig(context.Background())
 }

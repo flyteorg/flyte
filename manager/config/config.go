@@ -20,19 +20,19 @@ type Config struct {
 
 // ServerConfig holds HTTP server configuration
 type ServerConfig struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
 }
 
 // ExecutorConfig holds executor-specific configuration
 type ExecutorConfig struct {
-	HealthProbePort int `json:"healthProbePort"`
+	HealthProbePort int `json:"healthProbePort" pflag:",Port for executor health probes"`
 }
 
 // KubernetesConfig holds Kubernetes client configuration
 type KubernetesConfig struct {
-	Namespace  string `json:"namespace"`
-	KubeConfig string `json:"kubeconfig"` // Optional, defaults to in-cluster or ~/.kube/config
+	Namespace  string `json:"namespace" pflag:",Kubernetes namespace"`
+	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
 }
 
 var defaultConfig = &Config{

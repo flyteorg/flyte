@@ -58,37 +58,43 @@ import (
 )
 
 var (
-	cfgFile string
-	rootCmd = &cobra.Command{
-		Use:   "flyte",
-		Short: "Unified Flyte Service - Runs all services and operator",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return serve(cmd.Context())
-		},
-	}
-	scheme = runtime.NewScheme()
+	cfgFile        string
+	configAccessor config.Accessor
+	scheme         = runtime.NewScheme()
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./config.yaml)")
-
 	// Register Kubernetes schemes
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(flyteorgv1.AddToScheme(scheme))
 }
 
+func newRootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "flyte",
+		Short: "Unified Flyte Service - Runs all services and operator",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return initConfig(cmd)
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return serve(cmd.Context())
+		},
+	}
+
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./config.yaml)")
+	configAccessor = viper.NewAccessor(config.Options{StrictMode: false})
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
+
+	return rootCmd
+}
+
 func main() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := newRootCmd().Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
 func serve(ctx context.Context) error {
-	// Initialize config
-	if err := initConfig(); err != nil {
-		return fmt.Errorf("failed to initialize config: %w", err)
-	}
-
 	// Initialize logger
 	logConfig := logger.GetConfig()
 	if err := logger.SetConfig(logConfig); err != nil {
@@ -329,11 +335,19 @@ func serve(ctx context.Context) error {
 	return nil
 }
 
-func initConfig() error {
-	configAccessor := viper.NewAccessor(config.Options{
+func initConfig(cmd *cobra.Command) error {
+	configAccessor = viper.NewAccessor(config.Options{
 		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config"},
 		StrictMode:  false,
 	})
+
+	// Traverse to root command
+	rootCmd := cmd
+	for rootCmd.Parent() != nil {
+		rootCmd = rootCmd.Parent()
+	}
+
+	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
 	return configAccessor.UpdateConfig(context.Background())
 }
