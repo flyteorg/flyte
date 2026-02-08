@@ -127,11 +127,11 @@ func TestCheckFileExists(t *testing.T) {
 	}
 
 	tests := []struct {
-		name             string
-		req              *dataproxy.CreateUploadLocationRequest
-		existingFileMD5  string // Empty means file doesn't exist
-		expectErr          bool
-		errContains      string
+		name            string
+		req             *dataproxy.CreateUploadLocationRequest
+		existingFileMD5 string // Empty means file doesn't exist
+		expectErr       bool
+		errContains     string
 	}{
 		{
 			name: "file does not exist",
@@ -142,7 +142,7 @@ func TestCheckFileExists(t *testing.T) {
 				FilenameRoot: "test-root",
 			},
 			existingFileMD5: "", // File doesn't exist
-			expectErr:         false,
+			expectErr:       false,
 		},
 		{
 			name: "file exists without hash provided",
@@ -154,7 +154,7 @@ func TestCheckFileExists(t *testing.T) {
 				// No ContentMd5 provided
 			},
 			existingFileMD5: "existing-hash",
-			expectErr:         true,
+			expectErr:       true,
 			errContains:     "content_md5 is required to verify safe overwrite",
 		},
 		{
@@ -167,7 +167,7 @@ func TestCheckFileExists(t *testing.T) {
 				ContentMd5:   []byte("test-hash-123"),
 			},
 			existingFileMD5: base64.StdEncoding.EncodeToString([]byte("test-hash-123")),
-			expectErr:         false,
+			expectErr:       false,
 		},
 		{
 			name: "file exists with different hash",
@@ -179,7 +179,7 @@ func TestCheckFileExists(t *testing.T) {
 				ContentMd5:   []byte("different-hash"),
 			},
 			existingFileMD5: base64.StdEncoding.EncodeToString([]byte("existing-hash")),
-			expectErr:         true,
+			expectErr:       true,
 			errContains:     "with different content (hash mismatch)",
 		},
 		{
@@ -191,7 +191,7 @@ func TestCheckFileExists(t *testing.T) {
 				FilenameRoot: "test-root",
 			},
 			existingFileMD5: "",
-			expectErr:         false,
+			expectErr:       false,
 		},
 		{
 			name: "skip check when filename_root is empty",
@@ -202,7 +202,7 @@ func TestCheckFileExists(t *testing.T) {
 				FilenameRoot: "", // Empty filename_root
 			},
 			existingFileMD5: "",
-			expectErr:         false,
+			expectErr:       false,
 		},
 	}
 

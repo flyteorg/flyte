@@ -10,7 +10,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
-
 // Interface to use the Weighted Random
 type WeightedRandomList interface {
 	Get() Comparable
