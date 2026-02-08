@@ -12,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-
 // AutoRefreshCache with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.
 // The cache doesn't provide apis to update items.

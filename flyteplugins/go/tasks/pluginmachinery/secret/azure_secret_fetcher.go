@@ -27,28 +27,28 @@ func (a AzureSecretFetcher) GetSecretValue(ctx context.Context, secretID string)
 	secretName, err := EncodeAzureSecretName(secretID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to encode secret name %v: %w", secretID, err)
-		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 	}
 	resp, err := a.client.GetSecret(ctx, secretName, azureLatestVersion, nil)
 	if err != nil {
 		var notFound *azcore.ResponseError
 		if errors.As(err, &notFound) && notFound.StatusCode == http.StatusNotFound {
 			logger.Errorf(ctx, "Azure secret not found: %w", secretID)
-			return nil, stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, fmt.Sprintf(SecretNotFoundErrorFormat, secretID))
+			return nil, stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, SecretNotFoundErrorFormat, secretID)
 		}
 		logger.Errorf(ctx, "Failed to fetch secret %v: %w", secretID, err)
-		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 	}
 
 	if resp.Value == nil || len(*resp.Value) == 0 {
 		logger.Errorf(ctx, "Secret %v returned empty value", secretID)
-		return nil, stdlibErrors.Wrapf(ErrCodeSecretNil, err, fmt.Sprintf(SecretNilErrorFormat, secretID))
+		return nil, stdlibErrors.Wrapf(ErrCodeSecretNil, err, SecretNilErrorFormat, secretID)
 	}
 
 	sv, err := AzureToUnionSecret(resp.Secret)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to convert Azure secret %v to Union secret", secretID)
-		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 	}
 	return sv, nil
 }

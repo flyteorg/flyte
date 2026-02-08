@@ -262,8 +262,8 @@ var testTaskExecutionIdentifier = core.TaskExecutionIdentifier{
 
 type mockTaskExecutionIdentifier struct{}
 
-func (m mockTaskExecutionIdentifier) GetID() core.TaskExecutionIdentifier {
-	return testTaskExecutionIdentifier
+func (m mockTaskExecutionIdentifier) GetID() *core.TaskExecutionIdentifier {
+	return &testTaskExecutionIdentifier
 }
 
 func (m mockTaskExecutionIdentifier) GetGeneratedNameWith(minLength, maxLength int) (string, error) {

@@ -116,7 +116,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		}
 
 		if kfMPITaskExtraArgs.GetRunPolicy() != nil {
-			runPolicy = common.ParseRunPolicy(*kfMPITaskExtraArgs.GetRunPolicy())
+			runPolicy = common.ParseRunPolicy(kfMPITaskExtraArgs.GetRunPolicy())
 		}
 
 	} else {

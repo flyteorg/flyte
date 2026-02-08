@@ -3,7 +3,6 @@ package secret
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awssm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -33,17 +32,17 @@ func (a AWSSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (
 	if err != nil {
 		var notFound *types.ResourceNotFoundException
 		if errors.As(err, &notFound) {
-			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, fmt.Sprintf(SecretNotFoundErrorFormat, secretID))
+			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, SecretNotFoundErrorFormat, secretID)
 			logger.Warn(ctx, wrappedErr)
 			return nil, wrappedErr
 		}
-		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 		logger.Error(ctx, wrappedErr)
 		return nil, wrappedErr
 	}
 
 	if (resp.SecretString == nil || *resp.SecretString == "") && resp.SecretBinary == nil {
-		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, err, fmt.Sprintf(SecretNilErrorFormat, secretID))
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, err, SecretNilErrorFormat, secretID)
 		logger.Error(ctx, wrappedErr)
 		return nil, wrappedErr
 	}
