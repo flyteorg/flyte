@@ -22,7 +22,7 @@ type TaskOverrides interface {
 }
 
 type ConnectionWrapper struct {
-	Connection core.Connection
+	Connection *core.Connection
 	Source     common.AttributesSource
 }
 
@@ -33,7 +33,7 @@ type ExternalResourceAttributes struct {
 
 func (e ExternalResourceAttributes) GetConnection(name string) (*core.Connection, common.AttributesSource, error) {
 	if connWrapper, ok := e.Connections[name]; ok {
-		return &connWrapper.Connection, connWrapper.Source, nil
+		return connWrapper.Connection, connWrapper.Source, nil
 	}
 	return nil, common.AttributesSource_SOURCE_UNSPECIFIED, fmt.Errorf("connection [%s] not found", name)
 }
@@ -53,7 +53,7 @@ type TaskExecutionID interface {
 	GetGeneratedNameWith(minLength, maxLength int) (string, error)
 
 	// GetID returns the underlying idl task identifier.
-	GetID() core.TaskExecutionIdentifier
+	GetID() *core.TaskExecutionIdentifier
 
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.
@@ -74,7 +74,7 @@ type TaskExecutionMetadata interface {
 	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
-	GetSecurityContext() core.SecurityContext
+	GetSecurityContext() *core.SecurityContext
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32

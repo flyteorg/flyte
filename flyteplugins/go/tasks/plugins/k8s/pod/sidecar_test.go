@@ -12,6 +12,7 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -66,7 +67,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 		Name: "blah",
 	})
 	taskMetadata.EXPECT().IsInterruptible().Return(true)
-	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+	taskMetadata.EXPECT().GetSecurityContext().Return(&core.SecurityContext{})
 	taskMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
 	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
@@ -75,7 +76,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -700,18 +701,18 @@ func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 	}
 	testConfigs := []struct {
 		name         string
-		taskTemplate core.TaskTemplate
+		taskTemplate *core.TaskTemplate
 	}{
 		{
 			"v0",
-			*getSidecarTaskTemplateForTest(sidecarJob{
+			getSidecarTaskTemplateForTest(sidecarJob{
 				PrimaryContainerName: podSpec.Containers[0].Name,
 				PodSpec:              &podSpec,
 			}),
 		},
 		{
 			"v1",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Type:            SidecarTaskType,
 				Custom:          structObj,
 				TaskTypeVersion: 1,
@@ -722,7 +723,7 @@ func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 		},
 		{
 			"v2",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Type:            SidecarTaskType,
 				TaskTypeVersion: 2,
 				Config: map[string]string{
@@ -740,9 +741,9 @@ func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 	for _, tCfg := range testConfigs {
 		for _, f := range fixtures {
 			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
-				taskTemplate := tCfg.taskTemplate
+				taskTemplate := proto.Clone(tCfg.taskTemplate).(*core.TaskTemplate)
 				taskTemplate.ExtendedResources = f.extendedResourcesBase
-				taskContext := getDummySidecarTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+				taskContext := getDummySidecarTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
 				r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
 				assert.Nil(t, err)
 				assert.NotNil(t, r)

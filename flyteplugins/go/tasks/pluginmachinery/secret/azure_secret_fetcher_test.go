@@ -117,7 +117,7 @@ func Test_AzureSecretFetcher_GetSecretValue(t *testing.T) {
 		client.OnGetSecret(ctx, validEncodedSecretID, azureLatestVersion, nil).Return(azsecrets.GetSecretResponse{}, respError)
 
 		_, err = fetcher.GetSecretValue(ctx, validSecretID)
-		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, respError, fmt.Sprintf(SecretNotFoundErrorFormat, validSecretID)), err)
+		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, respError, SecretNotFoundErrorFormat, validSecretID), err)
 	})
 
 	t.Run("Azure Key Vault returns unexpected error", func(t *testing.T) {
@@ -126,7 +126,7 @@ func Test_AzureSecretFetcher_GetSecretValue(t *testing.T) {
 		client.OnGetSecret(ctx, validEncodedSecretID, azureLatestVersion, nil).Return(azsecrets.GetSecretResponse{}, cause)
 
 		_, err := fetcher.GetSecretValue(ctx, validSecretID)
-		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, validSecretID)), err)
+		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, SecretReadFailureErrorFormat, validSecretID), err)
 	})
 
 	emptyStr := ""
@@ -152,7 +152,7 @@ func Test_AzureSecretFetcher_GetSecretValue(t *testing.T) {
 			fetcher, client := setupAzureSecretFetcherTest()
 			client.OnGetSecret(ctx, validEncodedSecretID, azureLatestVersion, nil).Return(azsecrets.GetSecretResponse{Secret: azsecrets.Secret{Value: tt.returnValue}}, nil)
 			_, err := fetcher.GetSecretValue(ctx, tt.secretIDArg)
-			assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNil, nil, fmt.Sprintf(SecretNilErrorFormat, tt.secretIDArg)), err)
+			assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNil, nil, SecretNilErrorFormat, tt.secretIDArg), err)
 		})
 	}
 }

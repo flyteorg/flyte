@@ -11,6 +11,7 @@ import (
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -140,7 +141,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -206,7 +207,7 @@ func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *co
 	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -588,10 +589,10 @@ func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
 		for _, tCfg := range testConfigs {
 			for _, f := range fixtures {
 				t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
-					taskTemplate := *tCfg.taskTemplate
+					taskTemplate := proto.Clone(tCfg.taskTemplate).(*core.TaskTemplate)
 					taskTemplate.ExtendedResources = f.extendedResourcesBase
 					tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-					taskContext := dummyTensorFlowTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+					taskContext := dummyTensorFlowTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
 					r, err := tensorflowResourceHandler.BuildResource(context.TODO(), taskContext)
 					assert.NoError(t, err)
 					assert.NotNil(t, r)
