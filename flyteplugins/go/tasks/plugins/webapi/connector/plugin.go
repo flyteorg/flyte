@@ -97,9 +97,9 @@ func (r ResourceWrapper) IsTerminal() bool {
 type ResourceMetaWrapper struct {
 	OutputPrefix          string
 	ConnectorResourceMeta []byte
-	TaskCategory          connectorPb.TaskCategory
+	TaskCategory          *connectorPb.TaskCategory
 	Domain                string
-	Connection            flyteIdl.Connection
+	Connection            *flyteIdl.Connection
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -168,13 +168,13 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		if err != nil {
 			errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
 			logger.Errorf(ctx, errString)
-			return nil, nil, status.Errorf(codes.Internal, errString)
+			return nil, nil, status.Error(codes.Internal, errString)
 		}
 		secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
 		if err != nil {
 			errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
 			logger.Errorf(ctx, errString)
-			return nil, nil, status.Errorf(codes.Internal, errString)
+			return nil, nil, status.Error(codes.Internal, errString)
 		}
 		connection.Secrets[k] = secretVal
 	}
@@ -213,15 +213,15 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	return ResourceMetaWrapper{
 		OutputPrefix:          outputPrefix,
 		ConnectorResourceMeta: res.GetResourceMeta(),
-		TaskCategory:          taskCategory,
-		Connection:            connection,
+		TaskCategory:          &taskCategory,
+		Connection:            &connection,
 		Domain:                taskTemplate.GetId().GetDomain(),
 	}, nil, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
 	if err != nil {
 		return nil, err
 	}
@@ -234,10 +234,10 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	defer cancel()
 
 	request := &connectorPb.GetTaskRequest{
-		TaskCategory: &metadata.TaskCategory,
+		TaskCategory: metadata.TaskCategory,
 		ResourceMeta: metadata.ConnectorResourceMeta,
 		OutputPrefix: metadata.OutputPrefix,
-		Connection:   &metadata.Connection,
+		Connection:   metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -260,7 +260,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
 	if err != nil {
 		return err
 	}
@@ -273,9 +273,9 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	defer cancel()
 
 	request := &connectorPb.DeleteTaskRequest{
-		TaskCategory: &metadata.TaskCategory,
+		TaskCategory: metadata.TaskCategory,
 		ResourceMeta: metadata.ConnectorResourceMeta,
-		Connection:   &metadata.Connection,
+		Connection:   metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	if err != nil {
@@ -433,7 +433,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 
 	return connectorPb.TaskExecutionMetadata{
-		TaskExecutionId:      &taskExecutionID,
+		TaskExecutionId:      taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
 		Labels:               taskExecutionMetadata.GetLabels(),
 		Annotations:          taskExecutionMetadata.GetAnnotations(),

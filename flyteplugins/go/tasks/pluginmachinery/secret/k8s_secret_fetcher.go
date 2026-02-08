@@ -3,7 +3,6 @@ package secret
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,18 +23,18 @@ func (s K8sSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (
 
 	if err != nil {
 		if k8sErrors.IsNotFound(err) {
-			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, fmt.Sprintf(SecretNotFoundErrorFormat, secretID))
+			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, SecretNotFoundErrorFormat, secretID)
 			logger.Warn(ctx, wrappedErr)
 			return nil, wrappedErr
 		} else {
-			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 			logger.Error(ctx, wrappedErr)
 			return nil, wrappedErr
 		}
 	}
 
 	if _, ok := secret.Data[secretID]; !ok {
-		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, errors.New("secret data is nil"), fmt.Sprintf(SecretNilErrorFormat, secretID))
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, errors.New("secret data is nil"), SecretNilErrorFormat, secretID)
 		logger.Error(ctx, wrappedErr)
 		return nil, wrappedErr
 	}
