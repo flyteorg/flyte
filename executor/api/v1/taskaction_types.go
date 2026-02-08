@@ -65,6 +65,18 @@ const (
 
 	// ConditionReasonCompleted indicates the TaskAction has completed successfully
 	ConditionReasonCompleted TaskActionConditionReason = "Completed"
+
+	// ConditionReasonRetryableFailure indicates the TaskAction experienced a retryable failure
+	ConditionReasonRetryableFailure TaskActionConditionReason = "RetryableFailure"
+
+	// ConditionReasonPermanentFailure indicates the TaskAction experienced a permanent failure
+	ConditionReasonPermanentFailure TaskActionConditionReason = "PermanentFailure"
+
+	// ConditionReasonAborted indicates the TaskAction was aborted
+	ConditionReasonAborted TaskActionConditionReason = "Aborted"
+
+	// ConditionReasonPluginNotFound indicates no plugin was found for the task type
+	ConditionReasonPluginNotFound TaskActionConditionReason = "PluginNotFound"
 )
 
 // TaskActionSpec defines the desired state of TaskAction
@@ -114,6 +126,17 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	RunOutputBase string `json:"runOutputBase"`
+
+	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray")
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	TaskType string `json:"taskType"`
+
+	// TaskTemplateURI is the storage URI where the serialized core.TaskTemplate can be read
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	TaskTemplateURI string `json:"taskTemplateUri"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
@@ -166,6 +189,22 @@ type TaskActionStatus struct {
 	// +optional
 	StateJSON string `json:"stateJson,omitempty"`
 
+	// PluginState is the Gob-encoded plugin state from the last reconciliation round.
+	// +optional
+	PluginState []byte `json:"pluginState,omitempty"`
+
+	// PluginStateVersion tracks the version of the plugin state schema for compatibility.
+	// +optional
+	PluginStateVersion uint8 `json:"pluginStateVersion,omitempty"`
+
+	// PluginPhase is a human-readable representation of the plugin's current phase.
+	// +optional
+	PluginPhase string `json:"pluginPhase,omitempty"`
+
+	// PluginPhaseVersion is the version of the current plugin phase.
+	// +optional
+	PluginPhaseVersion uint32 `json:"pluginPhaseVersion,omitempty"`
+
 	// conditions represent the current state of the TaskAction resource.
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
 	//
@@ -185,6 +224,7 @@ type TaskActionStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Run",type="string",JSONPath=".spec.runName"
 // +kubebuilder:printcolumn:name="Action",type="string",JSONPath=".spec.actionName"
+// +kubebuilder:printcolumn:name="TaskType",type="string",JSONPath=".spec.taskType"
 // +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].reason"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Progressing",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].status",priority=1
