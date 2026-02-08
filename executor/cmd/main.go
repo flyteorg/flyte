@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"os"
@@ -36,6 +37,13 @@ import (
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+
+	// Plugin registrations -- blank imports trigger init() which registers plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 var (
@@ -176,10 +184,41 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := controller.NewTaskActionReconciler(
+	// Create DataStore for plugin I/O (task templates, inputs, outputs)
+	dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewScope("executor:storage"))
+	if err != nil {
+		setupLog.Error(err, "unable to create data store")
+		os.Exit(1)
+	}
+
+	// Create SetupContext for plugin initialization.
+	// ctrl.Manager satisfies pluginsCore.KubeClient (GetClient + GetCache).
+	setupCtx := plugin.NewSetupContext(
+		mgr,  // KubeClient
+		nil,  // SecretManager -- TODO: implement
+		nil,  // ResourceRegistrar -- not needed for executor
+		nil,  // EnqueueOwner -- not needed, controller-runtime handles reconciliation
+		nil,  // EnqueueLabels
+		"TaskAction",
+		promutils.NewScope("executor"),
+	)
+
+	// Initialize plugin registry from the global pluginmachinery singleton.
+	// Plugins are registered via blank imports above (e.g. pod plugin).
+	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
+	if err := registry.Initialize(context.Background()); err != nil {
+		setupLog.Error(err, "unable to initialize plugin registry")
+		os.Exit(1)
+	}
+
+	reconciler := controller.NewTaskActionReconciler(
 		mgr.GetClient(),
 		mgr.GetScheme(),
-	).SetupWithManager(mgr); err != nil {
+		registry,
+		dataStore,
+	)
+	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
+	if err := reconciler.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TaskAction")
 		os.Exit(1)
 	}
