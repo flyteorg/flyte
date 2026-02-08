@@ -3,7 +3,6 @@ package secret
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/samber/lo"
@@ -47,7 +46,7 @@ func TestGetSecretValue(t *testing.T) {
 			secretsName:      []string{},
 			targetSecretName: "test-secret",
 			expectSuccess:    false,
-			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretNotFound, k8sErrors.NewNotFound(v1.Resource("secrets"), EncodeK8sSecretName("test-secret")), fmt.Sprintf(SecretNotFoundErrorFormat, "test-secret")),
+			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretNotFound, k8sErrors.NewNotFound(v1.Resource("secrets"), EncodeK8sSecretName("test-secret")), SecretNotFoundErrorFormat, "test-secret"),
 			includeData:      false,
 		},
 		{
@@ -57,7 +56,7 @@ func TestGetSecretValue(t *testing.T) {
 			},
 			targetSecretName: "test-secret",
 			expectSuccess:    false,
-			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretNil, errors.New("secret data is nil"), fmt.Sprintf(SecretNilErrorFormat, "test-secret")),
+			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretNil, errors.New("secret data is nil"), SecretNilErrorFormat, "test-secret"),
 			includeData:      false,
 		},
 		{
@@ -67,7 +66,7 @@ func TestGetSecretValue(t *testing.T) {
 			},
 			targetSecretName: "test-secret",
 			expectSuccess:    false,
-			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretReadFailure, errors.New("k8s client error"), fmt.Sprintf(SecretReadFailureErrorFormat, "test-secret")),
+			expectedError:    stdlibErrors.Wrapf(ErrCodeSecretReadFailure, errors.New("k8s client error"), SecretReadFailureErrorFormat, "test-secret"),
 			includeData:      false,
 			reactors: []func(action k8sTesting.Action) (handled bool, ret runtime.Object, err error){
 				func(action k8sTesting.Action) (handled bool, ret runtime.Object, err error) {

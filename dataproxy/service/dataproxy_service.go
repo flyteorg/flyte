@@ -72,9 +72,9 @@ func (s *Service) CreateUploadLocation(
 	// Create signed URL properties
 	expiresIn := req.Msg.GetExpiresIn().AsDuration()
 	props := storage.SignedURLProperties{
-		Scope:      stow.ClientMethodPut,
-		ExpiresIn:  expiresIn,
-		ContentMD5: base64.StdEncoding.EncodeToString(req.Msg.GetContentMd5()),
+		Scope:                 stow.ClientMethodPut,
+		ExpiresIn:             expiresIn,
+		ContentMD5:            base64.StdEncoding.EncodeToString(req.Msg.GetContentMd5()),
 		AddContentMD5Metadata: req.Msg.GetAddContentMd5Metadata(),
 	}
 
