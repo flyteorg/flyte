@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package flyteidl2.workflow.actions;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/workflow/state_service.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/actions";
+
+// ActionsService provides an interface for managing the state and execution of actions.
+// This service is intended to replace StateService and QueueService, providing a single interface for managing both
+// the state and execution of actions.
+service ActionsService {
+  // Enqueue queues a new action for execution.
+  rpc Enqueue(EnqueueRequest) returns (EnqueueResponse) {}
+
+  // GetLatestState returns the latest `NodeStatus` of an action.
+  // This deprecates Get in the current StateService.
+  rpc GetLatestState(GetLatestStateRequest) returns (GetLatestStateResponse) {}
+
+  // WatchForUpdates watches for updates to the state of actions.
+  // This API guarantees at-least-once delivery semantics.
+  rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {}
+
+  // Update updates the status of an action and saves serialized NodeStatus.
+  // This deprecates Put in the current StateService.
+  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+
+  // Abort aborts a single action that was previously queued or is currently being processed by a worker.
+  // Note that this will cascade aborts to all descendant actions of the specified action.
+  rpc Abort(AbortRequest) returns (AbortResponse) {}
+}
+
+// ============================================================================
+// Enqueue
+// ============================================================================
+
+// EnqueueRequest is a request message for queuing an action.
+message EnqueueRequest {
+  // the unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
+  // project, domain) will be the same as the action_id defined above.
+  optional string parent_action_name = 2;
+
+  // Optional run spec passed in by the root action to be utilized by all downstream actions in the run.
+  flyteidl2.task.RunSpec run_spec = 3;
+
+  // the path to the input data for this action.
+  string input_uri = 6 [(buf.validate.field).string.min_len = 1];
+
+  // the run base path this action should write its output to.
+  string run_output_base = 7 [(buf.validate.field).string.min_len = 1];
+
+  // group this action belongs to, if applicable.
+  string group = 8;
+
+  // subject that created the run, if known.
+  string subject = 9;
+
+  oneof spec {
+    option (buf.validate.oneof).required = true;
+    flyteidl2.workflow.TaskAction task = 10;
+    flyteidl2.workflow.TraceAction trace = 11;
+    flyteidl2.workflow.ConditionAction condition = 12;
+  }
+}
+
+// EnqueueResponse is a response message for queuing an action.
+message EnqueueResponse {}
+
+// ============================================================================
+// Update
+// ============================================================================
+
+// UpdateRequest is the request message for updating the status of an action.
+message UpdateRequest {
+  // A unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number (starts at 1, incremented on retry).
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+
+  // The new status of the action.
+  flyteidl2.workflow.ActionStatus status = 3 [(buf.validate.field).required = true];
+
+  // The new state in form of a JSON serialized `NodeStatus` object.
+  string state = 4 [(buf.validate.field).string.min_len = 2];
+}
+
+// UpdateResponse is the response message for updating the status of an action.
+message UpdateResponse {}
+
+// ============================================================================
+// GetLatestState
+// ============================================================================
+
+// GetLatestStateRequest is the request message for getting the state of an action.
+message GetLatestStateRequest {
+  // A unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number (starts at 1, incremented on retry).
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// GetLatestStateResponse is the response message for getting the state of an action.
+message GetLatestStateResponse {
+  // A JSON serialized `NodeStatus` object.
+  string state = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// ============================================================================
+// Watch
+// ============================================================================
+
+// WatchForUpdatesRequest is a request message for watching updates to the state of actions.
+message WatchForUpdatesRequest {
+  // criteria for filtering which actions to watch.
+  oneof filter {
+    option (buf.validate.oneof).required = true;
+
+    // a unique identifier for the parent action to watch. this will result in updates for all child
+    // actions.
+    flyteidl2.common.ActionIdentifier parent_action_id = 1;
+  }
+}
+
+// WatchForUpdatesRequest is a response message for watching updates to the state of actions.
+message WatchForUpdatesResponse {
+  // an update to the state of a specific action.
+  oneof message {
+    flyteidl2.workflow.ActionUpdate action_update = 1;
+    flyteidl2.workflow.ControlMessage control_message = 2;
+  }
+}
+
+// ============================================================================
+// Abort
+// ============================================================================
+
+// AbortRequest is the request message for aborting a queued or running action.
+message AbortRequest {
+  // ActionId is the unique identifier for the action to be aborted
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Reason for aborting the action, if applicable.
+  optional string reason = 2;
+}
+
+// AbortResponse is the response message for aborting a queued or running action.
+message AbortResponse {}
