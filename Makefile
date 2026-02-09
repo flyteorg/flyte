@@ -88,15 +88,23 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python:
 	@echo '🐍  Generating Python protocol buffer files (local)'
+	@if [ -f gen/python/uv.lock ]; then cp gen/python/uv.lock gen/.uv.lock.bak; fi
 	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
 	@cp flyteidl2/gen_utils/python/* gen/python/
+	@if [ -f gen/.uv.lock.bak ]; then mv gen/.uv.lock.bak gen/python/uv.lock; fi
 	@find gen/python -type d -exec touch {}/__init__.py \;
-	@cd gen/python && uv lock
+	@cd gen/python && uv lock --check
 	@$(MAKE) sep
 
 .PHONY: buf
 buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
 	@echo '🛠️  Finished generating all protocol buffer files (local)'
+	@$(MAKE) sep
+
+.PHONY: uv-lock
+uv-lock:
+	@echo '🐍  Updating Python uv.lock dependencies (local)'
+	@cd gen/python && uv lock
 	@$(MAKE) sep
 
 .PHONY: go-tidy
