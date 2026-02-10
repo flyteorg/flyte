@@ -243,6 +243,12 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx interfaces.N
 		if err != nil {
 			if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
 				logger.Errorf(ctx, "failed to build dynamic workflow, user error: %s", err)
+				// If the dynamic workflow cannot be built because of a user error, i.e. malformed dynamic workflow,
+				// the error is deterministic and there are no nodes that need to be cleaned up as the dynamic worklow
+				// was never able to launch sub nodes.
+				// Returning an error on Abort would be treated as a transient system error that is retried as often as the
+				// system retry budget allows, surfacing the underlying user error only later aftr the system retry budget is exhausted.
+				return nil
 			}
 			return err
 		}
@@ -277,7 +283,15 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx interface
 		logger.Infof(ctx, "Finalizing dynamic workflow RetryAttempt [%d]", nCtx.CurrentAttempt())
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
-			errs = append(errs, err)
+			if !stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
+				// If the dynamic workflow cannot be built because of a user error, i.e. malformed dynamic workflow,
+				// the error is deterministic and there are no nodes that need to be cleaned up as the dynamic worklow
+				// was never able to launch sub nodes.
+				// Including the user error in the errors returned by Finalize would cause a transient system error
+				// that is retried as often as the system retry budget allows, surfacing the underlying user error only
+				// after the system retry budget is exhausted.
+				errs = append(errs, err)
+			}
 		} else {
 			if dCtx.isDynamic {
 				if err := d.nodeExecutor.FinalizeHandler(ctx, dCtx.execContext, dCtx.subWorkflow, dCtx.nodeLookup, dCtx.subWorkflow.StartNode()); err != nil {

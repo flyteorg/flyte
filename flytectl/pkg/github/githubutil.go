@@ -25,6 +25,7 @@ const (
 	flyte                   = "flyte"
 	flytectl                = "flytectl"
 	sandboxSupportedVersion = "v0.10.0"
+	sandboxMaxVersion       = "v2.0.0"
 	flytectlRepository      = "github.com/flyteorg/flyte"
 	commonMessage           = "\n A new release of flytectl is available: %s → %s \n"
 	brewMessage             = "To upgrade, run: brew update && brew upgrade flytectl \n"
@@ -129,6 +130,17 @@ func GetSandboxImageSha(tag string, pre bool, g GHRepoService) (string, string, 
 			return "", release.GetTagName(), err
 		}
 		for _, v := range releases {
+			tagName := v.GetTagName()
+
+			// Skip versions >= sandboxMaxVersion (v2.x and above)
+			// flytectl only supports flyte v1
+			isLessThan, err := util.IsVersionGreaterThan(sandboxMaxVersion, tagName)
+			if err == nil && !isLessThan {
+				// tagName >= sandboxMaxVersion, skip it
+				logger.Debugf(context.Background(), "skipping release %s (>= %s)", tagName, sandboxMaxVersion)
+				continue
+			}
+
 			// When pre-releases are allowed, simply choose the latest release
 			if pre {
 				release = v

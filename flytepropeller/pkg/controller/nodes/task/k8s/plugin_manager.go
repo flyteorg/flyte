@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -606,7 +607,51 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	logger.Infof(ctx, "Initializing K8s plugin [%s]", entry.ID)
-	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)
+
+	metricsScope := iCtx.MetricsScope().NewSubScope(entry.ID)
+	updateCount := labeled.NewCounter("informer_update", "Update events from informer", metricsScope)
+	droppedUpdateCount := labeled.NewCounter("informer_update_dropped", "Update events from informer that have the same resource version", metricsScope)
+	genericCount := labeled.NewCounter("informer_generic", "Generic events from informer", metricsScope)
+
+	enqueueOwner := iCtx.EnqueueOwner()
+
+	handlers := handler.Funcs{
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, q2 workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+			logger.Debugf(context.Background(), "Create received for %s, ignoring.", evt.Object.GetName())
+		},
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, q2 workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+			if evt.ObjectNew == nil {
+				logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
+			} else if evt.ObjectOld == nil || evt.ObjectOld.GetResourceVersion() != evt.ObjectNew.GetResourceVersion() {
+				// attempt to enqueue this tasks owner by retrieving the workfowID from the resource labels
+				newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
+
+				workflowID, exists := evt.ObjectNew.GetLabels()[compiler.ExecutionIDLabel]
+				if exists {
+					logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
+					namespacedName := k8stypes.NamespacedName{
+						Name:      workflowID,
+						Namespace: evt.ObjectNew.GetNamespace(),
+					}
+
+					if err := enqueueOwner(namespacedName); err != nil {
+						logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", namespacedName)
+					}
+					updateCount.Inc(newCtx)
+				}
+			} else {
+				newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
+				droppedUpdateCount.Inc(newCtx)
+			}
+		},
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, q2 workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+			logger.Debugf(context.Background(), "Delete received for %s, ignoring.", evt.Object.GetName())
+		},
+		GenericFunc: func(ctx context.Context, evt event.GenericEvent, q2 workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+			logger.Debugf(context.Background(), "Generic received for %s, ignoring.", evt.Object.GetName())
+			genericCount.Inc(ctx)
+		},
+	}
 
 	workflowParentPredicate := func(o metav1.Object) bool {
 		if entry.Plugin.GetProperties().DisableInjectOwnerReferences {
@@ -623,72 +668,32 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return false
 	}
 
-	metricsScope := iCtx.MetricsScope().NewSubScope(entry.ID)
-	updateCount := labeled.NewCounter("informer_update", "Update events from informer", metricsScope)
-	droppedUpdateCount := labeled.NewCounter("informer_update_dropped", "Update events from informer that have the same resource version", metricsScope)
-	genericCount := labeled.NewCounter("informer_generic", "Generic events from informer", metricsScope)
+	predicates := predicate.Funcs{
+		CreateFunc: func(createEvent event.CreateEvent) bool {
+			return false
+		},
+		UpdateFunc: func(updateEvent event.UpdateEvent) bool {
+			// TODO we should filter out events in case there are no updates observed between the old and new?
+			return workflowParentPredicate(updateEvent.ObjectNew)
+		},
+		DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
+			return false
+		},
+		GenericFunc: func(genericEvent event.GenericEvent) bool {
+			return workflowParentPredicate(genericEvent.Object)
+		},
+	}
 
-	enqueueOwner := iCtx.EnqueueOwner()
+	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch, handlers, predicates)
+
 	err := src.Start(
 		ctx,
-		// Handlers
-		handler.Funcs{
-			CreateFunc: func(ctx context.Context, evt event.CreateEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Create received for %s, ignoring.", evt.Object.GetName())
-			},
-			UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, q2 workqueue.RateLimitingInterface) {
-				if evt.ObjectNew == nil {
-					logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
-				} else if evt.ObjectOld == nil || evt.ObjectOld.GetResourceVersion() != evt.ObjectNew.GetResourceVersion() {
-					// attempt to enqueue this tasks owner by retrieving the workfowID from the resource labels
-					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
-
-					workflowID, exists := evt.ObjectNew.GetLabels()[compiler.ExecutionIDLabel]
-					if exists {
-						logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
-						namespacedName := k8stypes.NamespacedName{
-							Name:      workflowID,
-							Namespace: evt.ObjectNew.GetNamespace(),
-						}
-
-						if err := enqueueOwner(namespacedName); err != nil {
-							logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", namespacedName)
-						}
-						updateCount.Inc(newCtx)
-					}
-				} else {
-					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
-					droppedUpdateCount.Inc(newCtx)
-				}
-			},
-			DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Delete received for %s, ignoring.", evt.Object.GetName())
-			},
-			GenericFunc: func(ctx context.Context, evt event.GenericEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Generic received for %s, ignoring.", evt.Object.GetName())
-				genericCount.Inc(ctx)
-			},
-		},
 		// Queue - configured for high throughput so we very infrequently rate limit node updates
-		workqueue.NewNamedRateLimitingQueue(&workqueue.BucketRateLimiter{
+		workqueue.NewTypedRateLimitingQueueWithConfig[reconcile.Request](&workqueue.TypedBucketRateLimiter[reconcile.Request]{
 			Limiter: rate.NewLimiter(rate.Limit(10000), 10000),
-		}, entry.ResourceToWatch.GetObjectKind().GroupVersionKind().Kind),
-		// Predicates
-		predicate.Funcs{
-			CreateFunc: func(createEvent event.CreateEvent) bool {
-				return false
-			},
-			UpdateFunc: func(updateEvent event.UpdateEvent) bool {
-				// TODO we should filter out events in case there are no updates observed between the old and new?
-				return workflowParentPredicate(updateEvent.ObjectNew)
-			},
-			DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
-				return false
-			},
-			GenericFunc: func(genericEvent event.GenericEvent) bool {
-				return workflowParentPredicate(genericEvent.Object)
-			},
-		})
+		}, workqueue.TypedRateLimitingQueueConfig[reconcile.Request]{
+			Name: entry.ResourceToWatch.GetObjectKind().GroupVersionKind().Kind,
+		}))
 
 	if err != nil {
 		return nil, err

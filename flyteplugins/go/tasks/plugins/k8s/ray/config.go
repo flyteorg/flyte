@@ -20,6 +20,7 @@ var (
 		TTLSecondsAfterFinished:  3600,
 		ServiceType:              "NodePort",
 		IncludeDashboard:         true,
+		DisableIngress:           false,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
 		ServiceAccount:           "",
@@ -71,6 +72,11 @@ type Config struct {
 
 	// IncludeDashboard is used to start a Ray Dashboard if set to true
 	IncludeDashboard bool `json:"includeDashboard,omitempty"`
+
+	// DisableIngress controls whether KubeRay will create an Ingress for the head service.
+	// Nginx ingress is now officially retired, in favor of Gateway API.
+	// If true, ingress creation is disabled.
+	DisableIngress bool `json:"disableIngress,omitempty"`
 
 	// DashboardHost the host to bind the dashboard server to, either localhost (127.0.0.1)
 	// or 0.0.0.0 (available from all interfaces). By default, this is localhost.
