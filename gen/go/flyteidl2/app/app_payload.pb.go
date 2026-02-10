@@ -885,6 +885,73 @@ func (x *DeleteEvent) GetApp() *App {
 	return nil
 }
 
+// Event message for app list.
+type AppLists struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// List of apps.
+	ListedApps []*App `protobuf:"bytes,1,rep,name=listed_apps,json=listedApps,proto3" json:"listed_apps,omitempty"`
+	// Created apps
+	CreatedApps []*App `protobuf:"bytes,2,rep,name=created_apps,json=createdApps,proto3" json:"created_apps,omitempty"`
+	// Updatted apps
+	UpdatedApps []*App `protobuf:"bytes,3,rep,name=updated_apps,json=updatedApps,proto3" json:"updated_apps,omitempty"`
+}
+
+func (x *AppLists) Reset() {
+	*x = AppLists{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AppLists) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppLists) ProtoMessage() {}
+
+func (x *AppLists) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppLists.ProtoReflect.Descriptor instead.
+func (*AppLists) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *AppLists) GetListedApps() []*App {
+	if x != nil {
+		return x.ListedApps
+	}
+	return nil
+}
+
+func (x *AppLists) GetCreatedApps() []*App {
+	if x != nil {
+		return x.CreatedApps
+	}
+	return nil
+}
+
+func (x *AppLists) GetUpdatedApps() []*App {
+	if x != nil {
+		return x.UpdatedApps
+	}
+	return nil
+}
+
 // Response message for watching app events.
 type WatchResponse struct {
 	state         protoimpl.MessageState
@@ -902,7 +969,7 @@ type WatchResponse struct {
 func (x *WatchResponse) Reset() {
 	*x = WatchResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[14]
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -915,7 +982,7 @@ func (x *WatchResponse) String() string {
 func (*WatchResponse) ProtoMessage() {}
 
 func (x *WatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[14]
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -928,7 +995,7 @@ func (x *WatchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchResponse.ProtoReflect.Descriptor instead.
 func (*WatchResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{14}
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{15}
 }
 
 func (m *WatchResponse) GetEvent() isWatchResponse_Event {
@@ -984,6 +1051,172 @@ func (*WatchResponse_UpdateEvent) isWatchResponse_Event() {}
 
 func (*WatchResponse_DeleteEvent) isWatchResponse_Event() {}
 
+// Request message for listing and watching apps.
+type ListAndWatchRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Common list request parameters.
+	Request *common.ListRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
+	// Types that are assignable to FilterBy:
+	//
+	//	*ListAndWatchRequest_Org
+	//	*ListAndWatchRequest_ClusterId
+	//	*ListAndWatchRequest_Project
+	FilterBy isListAndWatchRequest_FilterBy `protobuf_oneof:"filter_by"`
+}
+
+func (x *ListAndWatchRequest) Reset() {
+	*x = ListAndWatchRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListAndWatchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAndWatchRequest) ProtoMessage() {}
+
+func (x *ListAndWatchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAndWatchRequest.ProtoReflect.Descriptor instead.
+func (*ListAndWatchRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListAndWatchRequest) GetRequest() *common.ListRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (m *ListAndWatchRequest) GetFilterBy() isListAndWatchRequest_FilterBy {
+	if m != nil {
+		return m.FilterBy
+	}
+	return nil
+}
+
+func (x *ListAndWatchRequest) GetOrg() string {
+	if x, ok := x.GetFilterBy().(*ListAndWatchRequest_Org); ok {
+		return x.Org
+	}
+	return ""
+}
+
+func (x *ListAndWatchRequest) GetClusterId() *common.ClusterIdentifier {
+	if x, ok := x.GetFilterBy().(*ListAndWatchRequest_ClusterId); ok {
+		return x.ClusterId
+	}
+	return nil
+}
+
+func (x *ListAndWatchRequest) GetProject() *common.ProjectIdentifier {
+	if x, ok := x.GetFilterBy().(*ListAndWatchRequest_Project); ok {
+		return x.Project
+	}
+	return nil
+}
+
+type isListAndWatchRequest_FilterBy interface {
+	isListAndWatchRequest_FilterBy()
+}
+
+type ListAndWatchRequest_Org struct {
+	// Organization name for filtering apps.
+	Org string `protobuf:"bytes,2,opt,name=org,proto3,oneof"`
+}
+
+type ListAndWatchRequest_ClusterId struct {
+	// Cluster identifier for filtering apps.
+	ClusterId *common.ClusterIdentifier `protobuf:"bytes,3,opt,name=cluster_id,json=clusterId,proto3,oneof"`
+}
+
+type ListAndWatchRequest_Project struct {
+	// Project identifier for filtering apps.
+	Project *common.ProjectIdentifier `protobuf:"bytes,4,opt,name=project,proto3,oneof"`
+}
+
+func (*ListAndWatchRequest_Org) isListAndWatchRequest_FilterBy() {}
+
+func (*ListAndWatchRequest_ClusterId) isListAndWatchRequest_FilterBy() {}
+
+func (*ListAndWatchRequest_Project) isListAndWatchRequest_FilterBy() {}
+
+// Response message for list and watching apps status.
+type ListAndWatchResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// List of apps.
+	AppLists *AppLists `protobuf:"bytes,1,opt,name=app_lists,json=appLists,proto3" json:"app_lists,omitempty"`
+	// Indicates when the initial List call is complete, and subsequent messages are updates.
+	Sentinel bool `protobuf:"varint,2,opt,name=sentinel,proto3" json:"sentinel,omitempty"`
+}
+
+func (x *ListAndWatchResponse) Reset() {
+	*x = ListAndWatchResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListAndWatchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAndWatchResponse) ProtoMessage() {}
+
+func (x *ListAndWatchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAndWatchResponse.ProtoReflect.Descriptor instead.
+func (*ListAndWatchResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListAndWatchResponse) GetAppLists() *AppLists {
+	if x != nil {
+		return x.AppLists
+	}
+	return nil
+}
+
+func (x *ListAndWatchResponse) GetSentinel() bool {
+	if x != nil {
+		return x.Sentinel
+	}
+	return false
+}
+
 // Request message for updating app status.
 type UpdateStatusRequest struct {
 	state         protoimpl.MessageState
@@ -997,7 +1230,7 @@ type UpdateStatusRequest struct {
 func (x *UpdateStatusRequest) Reset() {
 	*x = UpdateStatusRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[15]
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1010,7 +1243,7 @@ func (x *UpdateStatusRequest) String() string {
 func (*UpdateStatusRequest) ProtoMessage() {}
 
 func (x *UpdateStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[15]
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1023,7 +1256,7 @@ func (x *UpdateStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateStatusRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{15}
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *UpdateStatusRequest) GetApp() *App {
@@ -1046,7 +1279,7 @@ type UpdateStatusResponse struct {
 func (x *UpdateStatusResponse) Reset() {
 	*x = UpdateStatusResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[16]
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1059,7 +1292,7 @@ func (x *UpdateStatusResponse) String() string {
 func (*UpdateStatusResponse) ProtoMessage() {}
 
 func (x *UpdateStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[16]
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1072,7 +1305,7 @@ func (x *UpdateStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStatusResponse.ProtoReflect.Descriptor instead.
 func (*UpdateStatusResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{16}
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *UpdateStatusResponse) GetApp() *App {
@@ -1095,7 +1328,7 @@ type LeaseRequest struct {
 func (x *LeaseRequest) Reset() {
 	*x = LeaseRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[17]
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1108,7 +1341,7 @@ func (x *LeaseRequest) String() string {
 func (*LeaseRequest) ProtoMessage() {}
 
 func (x *LeaseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[17]
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1121,7 +1354,7 @@ func (x *LeaseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaseRequest.ProtoReflect.Descriptor instead.
 func (*LeaseRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{17}
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *LeaseRequest) GetId() *common.ClusterIdentifier {
@@ -1144,7 +1377,7 @@ type LeaseResponse struct {
 func (x *LeaseResponse) Reset() {
 	*x = LeaseResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[18]
+		mi := &file_flyteidl2_app_app_payload_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1157,7 +1390,7 @@ func (x *LeaseResponse) String() string {
 func (*LeaseResponse) ProtoMessage() {}
 
 func (x *LeaseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[18]
+	mi := &file_flyteidl2_app_app_payload_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1170,7 +1403,7 @@ func (x *LeaseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaseResponse.ProtoReflect.Descriptor instead.
 func (*LeaseResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{18}
+	return file_flyteidl2_app_app_payload_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LeaseResponse) GetApps() []*App {
@@ -1279,7 +1512,18 @@ var file_flyteidl2_app_app_payload_proto_rawDesc = []byte{
 	0x0b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x24, 0x0a, 0x03,
 	0x61, 0x70, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74,
 	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x03, 0x61,
-	0x70, 0x70, 0x22, 0xdb, 0x01, 0x0a, 0x0d, 0x57, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70,
+	0x70, 0x70, 0x22, 0xad, 0x01, 0x0a, 0x08, 0x41, 0x70, 0x70, 0x4c, 0x69, 0x73, 0x74, 0x73, 0x12,
+	0x33, 0x0a, 0x0b, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x70, 0x70, 0x73, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
+	0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x0a, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x64,
+	0x41, 0x70, 0x70, 0x73, 0x12, 0x35, 0x0a, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f,
+	0x61, 0x70, 0x70, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x0b,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x12, 0x35, 0x0a, 0x0c, 0x75,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x70, 0x70, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70,
+	0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x70,
+	0x70, 0x73, 0x22, 0xdb, 0x01, 0x0a, 0x0d, 0x57, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x5f, 0x65,
 	0x76, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x66, 0x6c, 0x79,
 	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
@@ -1293,35 +1537,58 @@ var file_flyteidl2_app_app_payload_proto_rawDesc = []byte{
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x44, 0x65, 0x6c,
 	0x65, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x48, 0x00, 0x52, 0x0b, 0x64, 0x65, 0x6c, 0x65,
 	0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x07, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74,
-	0x22, 0x43, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c, 0x0a, 0x03, 0x61, 0x70, 0x70, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
-	0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01,
-	0x52, 0x03, 0x61, 0x70, 0x70, 0x22, 0x3c, 0x0a, 0x14, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53,
-	0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a,
-	0x03, 0x61, 0x70, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x03,
-	0x61, 0x70, 0x70, 0x22, 0x4b, 0x0a, 0x0c, 0x4c, 0x65, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x12, 0x3b, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x23, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
-	0x6f, 0x6e, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69,
-	0x66, 0x69, 0x65, 0x72, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01, 0x52, 0x02, 0x69, 0x64,
-	0x22, 0x37, 0x0a, 0x0d, 0x4c, 0x65, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x26, 0x0a, 0x04, 0x61, 0x70, 0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
-	0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e,
-	0x41, 0x70, 0x70, 0x52, 0x04, 0x61, 0x70, 0x70, 0x73, 0x42, 0xae, 0x01, 0x0a, 0x11, 0x63, 0x6f,
-	0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x42,
-	0x0f, 0x41, 0x70, 0x70, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x48, 0x02, 0x50, 0x01, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f,
-	0x76, 0x32, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
-	0x64, 0x6c, 0x32, 0x2f, 0x61, 0x70, 0x70, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58, 0xaa, 0x02, 0x0d,
-	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x41, 0x70, 0x70, 0xca, 0x02, 0x0d,
-	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x41, 0x70, 0x70, 0xe2, 0x02, 0x19,
-	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x41, 0x70, 0x70, 0x5c, 0x47, 0x50,
-	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x32, 0x3a, 0x3a, 0x41, 0x70, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x22, 0x86, 0x02, 0x0a, 0x13, 0x4c, 0x69, 0x73, 0x74, 0x41, 0x6e, 0x64, 0x57, 0x61, 0x74, 0x63,
+	0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x37, 0x0a, 0x07, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x4c, 0x69, 0x73,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x1b, 0x0a, 0x03, 0x6f, 0x72, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x07,
+	0xba, 0x48, 0x04, 0x72, 0x02, 0x10, 0x01, 0x48, 0x00, 0x52, 0x03, 0x6f, 0x72, 0x67, 0x12, 0x44,
+	0x0a, 0x0a, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x23, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63,
+	0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x65,
+	0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x48, 0x00, 0x52, 0x09, 0x63, 0x6c, 0x75, 0x73, 0x74,
+	0x65, 0x72, 0x49, 0x64, 0x12, 0x3f, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74,
+	0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x48, 0x00, 0x52, 0x07, 0x70, 0x72,
+	0x6f, 0x6a, 0x65, 0x63, 0x74, 0x42, 0x12, 0x0a, 0x09, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x5f,
+	0x62, 0x79, 0x12, 0x05, 0xba, 0x48, 0x02, 0x08, 0x01, 0x22, 0x68, 0x0a, 0x14, 0x4c, 0x69, 0x73,
+	0x74, 0x41, 0x6e, 0x64, 0x57, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x34, 0x0a, 0x09, 0x61, 0x70, 0x70, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
+	0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x4c, 0x69, 0x73, 0x74, 0x73, 0x52, 0x08, 0x61,
+	0x70, 0x70, 0x4c, 0x69, 0x73, 0x74, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x65, 0x6e, 0x74, 0x69,
+	0x6e, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x73, 0x65, 0x6e, 0x74, 0x69,
+	0x6e, 0x65, 0x6c, 0x22, 0x43, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x74, 0x61,
+	0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c, 0x0a, 0x03, 0x61, 0x70,
+	0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x42, 0x06, 0xba, 0x48, 0x03,
+	0xc8, 0x01, 0x01, 0x52, 0x03, 0x61, 0x70, 0x70, 0x22, 0x3c, 0x0a, 0x14, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x24, 0x0a, 0x03, 0x61, 0x70, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x41, 0x70,
+	0x70, 0x52, 0x03, 0x61, 0x70, 0x70, 0x22, 0x4b, 0x0a, 0x0c, 0x4c, 0x65, 0x61, 0x73, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3b, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x23, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63,
+	0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x65,
+	0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01, 0x52,
+	0x02, 0x69, 0x64, 0x22, 0x37, 0x0a, 0x0d, 0x4c, 0x65, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x26, 0x0a, 0x04, 0x61, 0x70, 0x70, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61,
+	0x70, 0x70, 0x2e, 0x41, 0x70, 0x70, 0x52, 0x04, 0x61, 0x70, 0x70, 0x73, 0x42, 0xae, 0x01, 0x0a,
+	0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x61,
+	0x70, 0x70, 0x42, 0x0f, 0x41, 0x70, 0x70, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x48, 0x02, 0x50, 0x01, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x61, 0x70, 0x70, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58,
+	0xaa, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x41, 0x70, 0x70,
+	0xca, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x41, 0x70, 0x70,
+	0xe2, 0x02, 0x19, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x41, 0x70, 0x70,
+	0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x46,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x3a, 0x3a, 0x41, 0x70, 0x70, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1336,7 +1603,7 @@ func file_flyteidl2_app_app_payload_proto_rawDescGZIP() []byte {
 	return file_flyteidl2_app_app_payload_proto_rawDescData
 }
 
-var file_flyteidl2_app_app_payload_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_flyteidl2_app_app_payload_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_flyteidl2_app_app_payload_proto_goTypes = []interface{}{
 	(*CreateRequest)(nil),            // 0: flyteidl2.app.CreateRequest
 	(*CreateResponse)(nil),           // 1: flyteidl2.app.CreateResponse
@@ -1352,50 +1619,60 @@ var file_flyteidl2_app_app_payload_proto_goTypes = []interface{}{
 	(*CreateEvent)(nil),              // 11: flyteidl2.app.CreateEvent
 	(*UpdateEvent)(nil),              // 12: flyteidl2.app.UpdateEvent
 	(*DeleteEvent)(nil),              // 13: flyteidl2.app.DeleteEvent
-	(*WatchResponse)(nil),            // 14: flyteidl2.app.WatchResponse
-	(*UpdateStatusRequest)(nil),      // 15: flyteidl2.app.UpdateStatusRequest
-	(*UpdateStatusResponse)(nil),     // 16: flyteidl2.app.UpdateStatusResponse
-	(*LeaseRequest)(nil),             // 17: flyteidl2.app.LeaseRequest
-	(*LeaseResponse)(nil),            // 18: flyteidl2.app.LeaseResponse
-	(*App)(nil),                      // 19: flyteidl2.app.App
-	(*Identifier)(nil),               // 20: flyteidl2.app.Identifier
-	(*Ingress)(nil),                  // 21: flyteidl2.app.Ingress
-	(*common.ListRequest)(nil),       // 22: flyteidl2.common.ListRequest
-	(*common.ClusterIdentifier)(nil), // 23: flyteidl2.common.ClusterIdentifier
-	(*common.ProjectIdentifier)(nil), // 24: flyteidl2.common.ProjectIdentifier
+	(*AppLists)(nil),                 // 14: flyteidl2.app.AppLists
+	(*WatchResponse)(nil),            // 15: flyteidl2.app.WatchResponse
+	(*ListAndWatchRequest)(nil),      // 16: flyteidl2.app.ListAndWatchRequest
+	(*ListAndWatchResponse)(nil),     // 17: flyteidl2.app.ListAndWatchResponse
+	(*UpdateStatusRequest)(nil),      // 18: flyteidl2.app.UpdateStatusRequest
+	(*UpdateStatusResponse)(nil),     // 19: flyteidl2.app.UpdateStatusResponse
+	(*LeaseRequest)(nil),             // 20: flyteidl2.app.LeaseRequest
+	(*LeaseResponse)(nil),            // 21: flyteidl2.app.LeaseResponse
+	(*App)(nil),                      // 22: flyteidl2.app.App
+	(*Identifier)(nil),               // 23: flyteidl2.app.Identifier
+	(*Ingress)(nil),                  // 24: flyteidl2.app.Ingress
+	(*common.ListRequest)(nil),       // 25: flyteidl2.common.ListRequest
+	(*common.ClusterIdentifier)(nil), // 26: flyteidl2.common.ClusterIdentifier
+	(*common.ProjectIdentifier)(nil), // 27: flyteidl2.common.ProjectIdentifier
 }
 var file_flyteidl2_app_app_payload_proto_depIdxs = []int32{
-	19, // 0: flyteidl2.app.CreateRequest.app:type_name -> flyteidl2.app.App
-	19, // 1: flyteidl2.app.CreateResponse.app:type_name -> flyteidl2.app.App
-	20, // 2: flyteidl2.app.GetRequest.app_id:type_name -> flyteidl2.app.Identifier
-	21, // 3: flyteidl2.app.GetRequest.ingress:type_name -> flyteidl2.app.Ingress
-	19, // 4: flyteidl2.app.GetResponse.app:type_name -> flyteidl2.app.App
-	19, // 5: flyteidl2.app.UpdateRequest.app:type_name -> flyteidl2.app.App
-	19, // 6: flyteidl2.app.UpdateResponse.app:type_name -> flyteidl2.app.App
-	20, // 7: flyteidl2.app.DeleteRequest.app_id:type_name -> flyteidl2.app.Identifier
-	22, // 8: flyteidl2.app.ListRequest.request:type_name -> flyteidl2.common.ListRequest
-	23, // 9: flyteidl2.app.ListRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
-	24, // 10: flyteidl2.app.ListRequest.project:type_name -> flyteidl2.common.ProjectIdentifier
-	19, // 11: flyteidl2.app.ListResponse.apps:type_name -> flyteidl2.app.App
-	23, // 12: flyteidl2.app.WatchRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
-	24, // 13: flyteidl2.app.WatchRequest.project:type_name -> flyteidl2.common.ProjectIdentifier
-	20, // 14: flyteidl2.app.WatchRequest.app_id:type_name -> flyteidl2.app.Identifier
-	19, // 15: flyteidl2.app.CreateEvent.app:type_name -> flyteidl2.app.App
-	19, // 16: flyteidl2.app.UpdateEvent.updated_app:type_name -> flyteidl2.app.App
-	19, // 17: flyteidl2.app.UpdateEvent.old_app:type_name -> flyteidl2.app.App
-	19, // 18: flyteidl2.app.DeleteEvent.app:type_name -> flyteidl2.app.App
-	11, // 19: flyteidl2.app.WatchResponse.create_event:type_name -> flyteidl2.app.CreateEvent
-	12, // 20: flyteidl2.app.WatchResponse.update_event:type_name -> flyteidl2.app.UpdateEvent
-	13, // 21: flyteidl2.app.WatchResponse.delete_event:type_name -> flyteidl2.app.DeleteEvent
-	19, // 22: flyteidl2.app.UpdateStatusRequest.app:type_name -> flyteidl2.app.App
-	19, // 23: flyteidl2.app.UpdateStatusResponse.app:type_name -> flyteidl2.app.App
-	23, // 24: flyteidl2.app.LeaseRequest.id:type_name -> flyteidl2.common.ClusterIdentifier
-	19, // 25: flyteidl2.app.LeaseResponse.apps:type_name -> flyteidl2.app.App
-	26, // [26:26] is the sub-list for method output_type
-	26, // [26:26] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	22, // 0: flyteidl2.app.CreateRequest.app:type_name -> flyteidl2.app.App
+	22, // 1: flyteidl2.app.CreateResponse.app:type_name -> flyteidl2.app.App
+	23, // 2: flyteidl2.app.GetRequest.app_id:type_name -> flyteidl2.app.Identifier
+	24, // 3: flyteidl2.app.GetRequest.ingress:type_name -> flyteidl2.app.Ingress
+	22, // 4: flyteidl2.app.GetResponse.app:type_name -> flyteidl2.app.App
+	22, // 5: flyteidl2.app.UpdateRequest.app:type_name -> flyteidl2.app.App
+	22, // 6: flyteidl2.app.UpdateResponse.app:type_name -> flyteidl2.app.App
+	23, // 7: flyteidl2.app.DeleteRequest.app_id:type_name -> flyteidl2.app.Identifier
+	25, // 8: flyteidl2.app.ListRequest.request:type_name -> flyteidl2.common.ListRequest
+	26, // 9: flyteidl2.app.ListRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
+	27, // 10: flyteidl2.app.ListRequest.project:type_name -> flyteidl2.common.ProjectIdentifier
+	22, // 11: flyteidl2.app.ListResponse.apps:type_name -> flyteidl2.app.App
+	26, // 12: flyteidl2.app.WatchRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
+	27, // 13: flyteidl2.app.WatchRequest.project:type_name -> flyteidl2.common.ProjectIdentifier
+	23, // 14: flyteidl2.app.WatchRequest.app_id:type_name -> flyteidl2.app.Identifier
+	22, // 15: flyteidl2.app.CreateEvent.app:type_name -> flyteidl2.app.App
+	22, // 16: flyteidl2.app.UpdateEvent.updated_app:type_name -> flyteidl2.app.App
+	22, // 17: flyteidl2.app.UpdateEvent.old_app:type_name -> flyteidl2.app.App
+	22, // 18: flyteidl2.app.DeleteEvent.app:type_name -> flyteidl2.app.App
+	22, // 19: flyteidl2.app.AppLists.listed_apps:type_name -> flyteidl2.app.App
+	22, // 20: flyteidl2.app.AppLists.created_apps:type_name -> flyteidl2.app.App
+	22, // 21: flyteidl2.app.AppLists.updated_apps:type_name -> flyteidl2.app.App
+	11, // 22: flyteidl2.app.WatchResponse.create_event:type_name -> flyteidl2.app.CreateEvent
+	12, // 23: flyteidl2.app.WatchResponse.update_event:type_name -> flyteidl2.app.UpdateEvent
+	13, // 24: flyteidl2.app.WatchResponse.delete_event:type_name -> flyteidl2.app.DeleteEvent
+	25, // 25: flyteidl2.app.ListAndWatchRequest.request:type_name -> flyteidl2.common.ListRequest
+	26, // 26: flyteidl2.app.ListAndWatchRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
+	27, // 27: flyteidl2.app.ListAndWatchRequest.project:type_name -> flyteidl2.common.ProjectIdentifier
+	14, // 28: flyteidl2.app.ListAndWatchResponse.app_lists:type_name -> flyteidl2.app.AppLists
+	22, // 29: flyteidl2.app.UpdateStatusRequest.app:type_name -> flyteidl2.app.App
+	22, // 30: flyteidl2.app.UpdateStatusResponse.app:type_name -> flyteidl2.app.App
+	26, // 31: flyteidl2.app.LeaseRequest.id:type_name -> flyteidl2.common.ClusterIdentifier
+	22, // 32: flyteidl2.app.LeaseResponse.apps:type_name -> flyteidl2.app.App
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_app_app_payload_proto_init() }
@@ -1574,7 +1851,7 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			}
 		}
 		file_flyteidl2_app_app_payload_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*WatchResponse); i {
+			switch v := v.(*AppLists); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1586,7 +1863,7 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			}
 		}
 		file_flyteidl2_app_app_payload_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateStatusRequest); i {
+			switch v := v.(*WatchResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1598,7 +1875,7 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			}
 		}
 		file_flyteidl2_app_app_payload_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateStatusResponse); i {
+			switch v := v.(*ListAndWatchRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1610,7 +1887,7 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			}
 		}
 		file_flyteidl2_app_app_payload_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LeaseRequest); i {
+			switch v := v.(*ListAndWatchResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1622,6 +1899,42 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			}
 		}
 		file_flyteidl2_app_app_payload_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateStatusRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_app_app_payload_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateStatusResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_app_app_payload_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LeaseRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_app_app_payload_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LeaseResponse); i {
 			case 0:
 				return &v.state
@@ -1649,10 +1962,15 @@ func file_flyteidl2_app_app_payload_proto_init() {
 		(*WatchRequest_Project)(nil),
 		(*WatchRequest_AppId)(nil),
 	}
-	file_flyteidl2_app_app_payload_proto_msgTypes[14].OneofWrappers = []interface{}{
+	file_flyteidl2_app_app_payload_proto_msgTypes[15].OneofWrappers = []interface{}{
 		(*WatchResponse_CreateEvent)(nil),
 		(*WatchResponse_UpdateEvent)(nil),
 		(*WatchResponse_DeleteEvent)(nil),
+	}
+	file_flyteidl2_app_app_payload_proto_msgTypes[16].OneofWrappers = []interface{}{
+		(*ListAndWatchRequest_Org)(nil),
+		(*ListAndWatchRequest_ClusterId)(nil),
+		(*ListAndWatchRequest_Project)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1660,7 +1978,7 @@ func file_flyteidl2_app_app_payload_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_app_app_payload_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

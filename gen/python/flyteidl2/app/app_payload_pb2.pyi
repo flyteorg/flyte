@@ -111,6 +111,16 @@ class DeleteEvent(_message.Message):
     app: _app_definition_pb2.App
     def __init__(self, app: _Optional[_Union[_app_definition_pb2.App, _Mapping]] = ...) -> None: ...
 
+class AppLists(_message.Message):
+    __slots__ = ["listed_apps", "created_apps", "updated_apps"]
+    LISTED_APPS_FIELD_NUMBER: _ClassVar[int]
+    CREATED_APPS_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_APPS_FIELD_NUMBER: _ClassVar[int]
+    listed_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    created_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    updated_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    def __init__(self, listed_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., created_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., updated_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ...) -> None: ...
+
 class WatchResponse(_message.Message):
     __slots__ = ["create_event", "update_event", "delete_event"]
     CREATE_EVENT_FIELD_NUMBER: _ClassVar[int]
@@ -120,6 +130,26 @@ class WatchResponse(_message.Message):
     update_event: UpdateEvent
     delete_event: DeleteEvent
     def __init__(self, create_event: _Optional[_Union[CreateEvent, _Mapping]] = ..., update_event: _Optional[_Union[UpdateEvent, _Mapping]] = ..., delete_event: _Optional[_Union[DeleteEvent, _Mapping]] = ...) -> None: ...
+
+class ListAndWatchRequest(_message.Message):
+    __slots__ = ["request", "org", "cluster_id", "project"]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    request: _list_pb2.ListRequest
+    org: str
+    cluster_id: _identifier_pb2.ClusterIdentifier
+    project: _identifier_pb2.ProjectIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+
+class ListAndWatchResponse(_message.Message):
+    __slots__ = ["app_lists", "sentinel"]
+    APP_LISTS_FIELD_NUMBER: _ClassVar[int]
+    SENTINEL_FIELD_NUMBER: _ClassVar[int]
+    app_lists: AppLists
+    sentinel: bool
+    def __init__(self, app_lists: _Optional[_Union[AppLists, _Mapping]] = ..., sentinel: bool = ...) -> None: ...
 
 class UpdateStatusRequest(_message.Message):
     __slots__ = ["app"]

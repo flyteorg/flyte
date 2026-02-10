@@ -575,6 +575,33 @@ pub mod app_service_client {
                 .insert(GrpcMethod::new("flyteidl2.app.AppService", "Lease"));
             self.inner.server_streaming(req, path, codec).await
         }
+        /** ListAndWatch returns the current list of apps and then streams updates.
+*/
+        pub async fn list_and_watch(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListAndWatchRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::ListAndWatchResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.app.AppService/ListAndWatch",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.app.AppService", "ListAndWatch"));
+            self.inner.server_streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -647,6 +674,21 @@ pub mod app_service_server {
             &self,
             request: tonic::Request<super::LeaseRequest>,
         ) -> std::result::Result<tonic::Response<Self::LeaseStream>, tonic::Status>;
+        /// Server streaming response type for the ListAndWatch method.
+        type ListAndWatchStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::ListAndWatchResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        /** ListAndWatch returns the current list of apps and then streams updates.
+*/
+        async fn list_and_watch(
+            &self,
+            request: tonic::Request<super::ListAndWatchRequest>,
+        ) -> std::result::Result<
+            tonic::Response<Self::ListAndWatchStream>,
+            tonic::Status,
+        >;
     }
     /** AppService defines the service for managing apps.
 */
@@ -1063,6 +1105,52 @@ pub mod app_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = LeaseSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.app.AppService/ListAndWatch" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListAndWatchSvc<T: AppService>(pub Arc<T>);
+                    impl<
+                        T: AppService,
+                    > tonic::server::ServerStreamingService<super::ListAndWatchRequest>
+                    for ListAndWatchSvc<T> {
+                        type Response = super::ListAndWatchResponse;
+                        type ResponseStream = T::ListAndWatchStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListAndWatchRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as AppService>::list_and_watch(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = ListAndWatchSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

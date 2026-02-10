@@ -125,6 +125,18 @@ message DeleteEvent {
   App app = 1;
 }
 
+// Event message for app list.
+message AppLists {
+  // List of apps.
+  repeated App listed_apps = 1;
+
+  // Created apps
+  repeated App created_apps = 2;
+
+  // Updatted apps
+  repeated App updated_apps = 3;
+}
+
 // Response message for watching app events.
 message WatchResponse {
   oneof event {
@@ -135,6 +147,32 @@ message WatchResponse {
     // Event for app deletion.
     DeleteEvent delete_event = 3;
   }
+}
+
+// Request message for listing and watching apps.
+message ListAndWatchRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof filter_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering apps.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+    // Cluster identifier for filtering apps.
+    common.ClusterIdentifier cluster_id = 3;
+    // Project identifier for filtering apps.
+    common.ProjectIdentifier project = 4;
+  }
+}
+
+// Response message for list and watching apps status.
+message ListAndWatchResponse {
+  // List of apps.
+  AppLists app_lists = 1;
+
+  // Indicates when the initial List call is complete, and subsequent messages are updates.
+  bool sentinel = 2;
 }
 
 // Request message for updating app status.
