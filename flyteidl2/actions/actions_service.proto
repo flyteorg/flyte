@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl2.workflow.actions;
+package flyteidl2.actions;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
@@ -8,7 +8,7 @@ import "flyteidl2/task/run.proto";
 import "flyteidl2/workflow/run_definition.proto";
 import "flyteidl2/workflow/state_service.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/actions";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions";
 
 // ActionsService provides an interface for managing the state and execution of actions.
 // This service is intended to replace StateService and QueueService, providing a single interface for managing both
