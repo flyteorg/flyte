@@ -14,6 +14,10 @@ manager:
     # Optional: specify custom kubeconfig path
     # kubeconfig: "/path/to/kubeconfig"
 
+# Runs service configuration
+runs:
+  storagePrefix: "s3://flyte-data"
+
 # Database configuration (SQLite)
 database:
   type: "sqlite"
@@ -35,8 +39,17 @@ dataproxy:
   download:
     maxExpiresIn: 1h
 
+# Default env vars injected into task pods by the executor.
+# host.docker.internal resolves to the host from k3d/orbstack pods.
+plugins:
+  k8s:
+    default-env-vars:
+      - FLYTE_AWS_ENDPOINT: "http://host.docker.internal:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "minioadmin"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "minioadmin"
+
 # Storage Configuration
-# For local development, using MinIO (make sure MinIO is running on localhost:9000)
+# For local development, using RustFS (run: bash start-rustfs.sh)
 # You can also use "mem" type for in-memory storage during testing
 storage:
   type: minio

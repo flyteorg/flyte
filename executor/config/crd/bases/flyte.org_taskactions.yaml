@@ -21,6 +21,9 @@ spec:
     - jsonPath: .spec.actionName
       name: Action
       type: string
+    - jsonPath: .spec.taskType
+      name: TaskType
+      type: string
     - jsonPath: .status.conditions[?(@.type=='Progressing')].reason
       name: Status
       type: string
@@ -104,6 +107,17 @@ spec:
                   write its output
                 minLength: 1
                 type: string
+              taskTemplate:
+                description: TaskTemplate is the proto-serialized core.TaskTemplate
+                  stored inline in etcd
+                format: byte
+                type: string
+              taskType:
+                description: TaskType identifies which plugin handles this task (e.g.
+                  "container", "spark", "ray")
+                maxLength: 63
+                minLength: 1
+                type: string
             required:
             - actionName
             - domain
@@ -112,6 +126,8 @@ spec:
             - project
             - runName
             - runOutputBase
+            - taskTemplate
+            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
@@ -185,6 +201,24 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              pluginPhase:
+                description: PluginPhase is a human-readable representation of the
+                  plugin's current phase.
+                type: string
+              pluginPhaseVersion:
+                description: PluginPhaseVersion is the version of the current plugin
+                  phase.
+                format: int32
+                type: integer
+              pluginState:
+                description: PluginState is the Gob-encoded plugin state from the
+                  last reconciliation round.
+                format: byte
+                type: string
+              pluginStateVersion:
+                description: PluginStateVersion tracks the version of the plugin state
+                  schema for compatibility.
+                type: integer
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service

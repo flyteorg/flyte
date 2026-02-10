@@ -33,6 +33,9 @@ type ExecutorConfig struct {
 type KubernetesConfig struct {
 	Namespace  string `json:"namespace" pflag:",Kubernetes namespace"`
 	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
+	QPS        int    `json:"qps" pflag:",Max sustained queries per second to the API server"`
+	Burst      int    `json:"burst" pflag:",Max burst queries to the API server"`
+	Timeout    string `json:"timeout" pflag:",Default timeout for API server requests (e.g. 30s)"`
 }
 
 var defaultConfig = &Config{
@@ -46,6 +49,9 @@ var defaultConfig = &Config{
 	Kubernetes: KubernetesConfig{
 		Namespace:  "flyte",
 		KubeConfig: "",
+		QPS:        1000,
+		Burst:      2000,
+		Timeout:    "30s",
 	},
 }
 

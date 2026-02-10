@@ -112,6 +112,19 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
+	// Validate required spec fields before proceeding
+	if err := validateSpec(taskAction); err != nil {
+		logger.Error(err, "TaskAction spec is invalid")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(flyteorgv1.ConditionReasonInvalidSpec),
+			"Invalid spec: %v", err)
+		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
+		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
+		_ = r.Status().Update(ctx, taskAction)
+		return ctrl.Result{}, nil // terminal — do not requeue
+	}
+
 	// Ensure finalizer is present
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
@@ -361,6 +374,27 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
 		Complete(r)
+}
+
+// validateSpec checks that the TaskAction spec has all required fields populated.
+func validateSpec(taskAction *flyteorgv1.TaskAction) error {
+	var missing []string
+	if taskAction.Spec.TaskType == "" {
+		missing = append(missing, "taskType")
+	}
+	if len(taskAction.Spec.TaskTemplate) == 0 {
+		missing = append(missing, "taskTemplate")
+	}
+	if taskAction.Spec.InputURI == "" {
+		missing = append(missing, "inputUri")
+	}
+	if taskAction.Spec.RunOutputBase == "" {
+		missing = append(missing, "runOutputBase")
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("required spec fields are empty: %v", missing)
+	}
+	return nil
 }
 
 // setCondition sets or updates a condition on the TaskAction.

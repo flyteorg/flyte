@@ -10,7 +10,7 @@ const configSectionKey = "executor"
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:     "0",
+		MetricsBindAddress:     "10254",
 		HealthProbeBindAddress: ":8081",
 		LeaderElect:            false,
 		MetricsSecure:          true,

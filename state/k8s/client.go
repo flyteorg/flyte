@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -22,6 +23,7 @@ type ActionUpdate struct {
 	Phase            string
 	IsDeleted        bool
 	ParentActionName string
+	OutputUri string
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -262,6 +264,7 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		Phase:            getPhaseFromConditions(taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
 		ParentActionName: parentActionName,
+		OutputUri: buildOutputUri(taskAction),
 	}
 
 	c.notifySubscribers(ctx, update)
@@ -329,6 +332,14 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 		actionID.Run.Name,
 		actionID.Name,
 	)
+}
+
+// buildOutputUri computes the action-specific output URI from the TaskAction spec.
+func buildOutputUri(ta *executorv1.TaskAction) string {
+	if ta.Spec.RunOutputBase == "" {
+		return ""
+	}
+	return strings.TrimRight(ta.Spec.RunOutputBase, "/") + "/" + ta.Spec.ActionName
 }
 
 // InitScheme adds the executor API types to the scheme

@@ -55,5 +55,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "executor.healthProbePort"), defaultConfig.Executor.HealthProbePort, "Port for executor health probes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.namespace"), defaultConfig.Kubernetes.Namespace, "Kubernetes namespace")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.kubeconfig"), defaultConfig.Kubernetes.KubeConfig, "Path to kubeconfig file (optional)")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.qps"), defaultConfig.Kubernetes.QPS, "Max sustained queries per second to the API server")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.burst"), defaultConfig.Kubernetes.Burst, "Max burst queries to the API server")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.timeout"), defaultConfig.Kubernetes.Timeout, "Default timeout for API server requests (e.g. 30s)")
 	return cmdFlags
 }

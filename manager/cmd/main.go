@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/net/http2"
@@ -27,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	dataproxyconfig "github.com/flyteorg/flyte/v2/dataproxy/config"
 	dataproxyservice "github.com/flyteorg/flyte/v2/dataproxy/service"
@@ -47,6 +49,7 @@ import (
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	queuek8s "github.com/flyteorg/flyte/v2/queue/k8s"
 	queueservice "github.com/flyteorg/flyte/v2/queue/service"
+	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	runsservice "github.com/flyteorg/flyte/v2/runs/service"
@@ -155,6 +158,18 @@ func serve(ctx context.Context) error {
 	// Create a client.Client from the WithWatch client for services that don't need watch
 	var k8sClientWithoutWatch client.Client = k8sClient
 
+	// Initialize labeled metrics (required for storage)
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+
+	// Initialize storage
+	storageCfg := storage.GetConfig()
+	metricsScope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(storageCfg, metricsScope)
+	if err != nil {
+		return fmt.Errorf("failed to initialize storage: %w", err)
+	}
+	logger.Infof(ctx, "Storage initialized with type: %s", storageCfg.Type)
+
 	// Create queue client (for Kubernetes operations)
 	queueK8sClient := queuek8s.NewQueueClient(k8sClientWithoutWatch, cfg.Kubernetes.Namespace)
 	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
@@ -168,18 +183,6 @@ func serve(ctx context.Context) error {
 	}
 	defer stateK8sClient.StopWatching()
 
-	// Initialize labeled metrics (required for storage)
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-
-	// Initialize storage for DataProxy
-	storageCfg := storage.GetConfig()
-	metricsScope := promutils.NewTestScope()
-	dataStore, err := storage.NewDataStore(storageCfg, metricsScope)
-	if err != nil {
-		return fmt.Errorf("failed to initialize storage: %w", err)
-	}
-	logger.Infof(ctx, "Storage initialized with type: %s", storageCfg.Type)
-
 	// Create queue service client (points to same server)
 	queueClient := workflowconnect.NewQueueServiceClient(
 		http.DefaultClient,
@@ -187,7 +190,8 @@ func serve(ctx context.Context) error {
 	)
 
 	// Create all services
-	runsSvc := runsservice.NewRunService(repo, queueClient)
+	runsCfg := runsconfig.GetConfig()
+	runsSvc := runsservice.NewRunService(repo, queueClient, runsCfg.StoragePrefix, dataStore)
 	stateSvc := stateservice.NewStateService(stateK8sClient) // K8s-based state service
 	queueSvc := queueservice.NewQueueService(queueK8sClient)
 	dataProxyCfg := dataproxyconfig.GetConfig()
@@ -249,7 +253,7 @@ func serve(ctx context.Context) error {
 		addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 		server := &http.Server{
 			Addr:    addr,
-			Handler: h2c.NewHandler(mux, &http2.Server{}),
+			Handler: h2c.NewHandler(corsMiddleware(mux), &http2.Server{}),
 		}
 
 		logger.Infof(ctx, "Flyte Connect Server listening on %s", addr)
@@ -265,10 +269,19 @@ func serve(ctx context.Context) error {
 		defer wg.Done()
 		logger.Infof(ctx, "Starting Executor/Operator")
 
+		// Metrics endpoint is enabled in 'config/default/kustomization.yaml'. The Metrics options configure the server.
+		// More info:
+		// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.22.1/pkg/metrics/server
+		// - https://book.kubebuilder.io/reference/metrics.html
+		metricsServerOptions := metricsserver.Options{
+			BindAddress: ":10254",
+		}
+
 		// Create controller manager
 		mgr, err := ctrl.NewManager(k8sConfig, ctrl.Options{
 			Scheme:                 scheme,
 			HealthProbeBindAddress: fmt.Sprintf(":%d", cfg.Executor.HealthProbePort),
+			Metrics:                metricsServerOptions,
 			LeaderElection:         false, // Single instance for now
 		})
 		if err != nil {
@@ -293,12 +306,14 @@ func serve(ctx context.Context) error {
 		}
 
 		// Setup TaskAction controller
-		if err := executorcontroller.NewTaskActionReconciler(
+		reconciler := executorcontroller.NewTaskActionReconciler(
 			mgr.GetClient(),
 			mgr.GetScheme(),
 			registry,
 			dataStore,
-		).SetupWithManager(mgr); err != nil {
+		)
+		reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
+		if err := reconciler.SetupWithManager(mgr); err != nil {
 			errCh <- fmt.Errorf("failed to setup controller: %w", err)
 			return
 		}
@@ -396,6 +411,23 @@ func initKubernetesClient(ctx context.Context, cfg *managerconfig.KubernetesConf
 		}
 	}
 
+	// Apply rate limits
+	if cfg.QPS > 0 {
+		restConfig.QPS = float32(cfg.QPS)
+	}
+	if cfg.Burst > 0 {
+		restConfig.Burst = cfg.Burst
+	}
+	if cfg.Timeout != "" {
+		d, err := time.ParseDuration(cfg.Timeout)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid kubernetes.timeout %q: %w", cfg.Timeout, err)
+		}
+		restConfig.Timeout = d
+	}
+
+	logger.Infof(ctx, "K8s client rate limits: QPS=%.0f, Burst=%d", restConfig.QPS, restConfig.Burst)
+
 	// Create the controller-runtime client with watch support
 	k8sClient, err := client.NewWithWatch(restConfig, client.Options{Scheme: scheme})
 	if err != nil {
@@ -441,4 +473,32 @@ func ensureNamespaceExists(ctx context.Context, k8sClient client.Client, namespa
 
 	logger.Infof(ctx, "Successfully created namespace '%s'", namespaceName)
 	return nil
+}
+
+// corsMiddleware wraps an http.Handler with permissive CORS headers for local
+// development (UI on localhost:8080 → manager on localhost:8090).
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			origin = "*"
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers",
+			"Accept, Authorization, Content-Type, "+
+				"Connect-Protocol-Version, Connect-Timeout-Ms, "+
+				"Grpc-Timeout, X-Grpc-Web, X-User-Agent")
+		w.Header().Set("Access-Control-Expose-Headers",
+			"Grpc-Status, Grpc-Message, Grpc-Status-Details-Bin")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Max-Age", "86400")
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

@@ -2,11 +2,15 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -16,8 +20,10 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo        interfaces.Repository
-	queueClient workflowconnect.QueueServiceClient
+	repo          interfaces.Repository
+	queueClient   workflowconnect.QueueServiceClient
+	storagePrefix string
+	dataStore     *storage.DataStore
 }
 
 func (s *RunService) WatchGroups(ctx context.Context, c *connect.Request[workflow.WatchGroupsRequest], c2 *connect.ServerStream[workflow.WatchGroupsResponse]) error {
@@ -26,10 +32,12 @@ func (s *RunService) WatchGroups(ctx context.Context, c *connect.Request[workflo
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient) *RunService {
+func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient, storagePrefix string, dataStore *storage.DataStore) *RunService {
 	return &RunService{
-		repo:        repo,
-		queueClient: queueClient,
+		repo:          repo,
+		queueClient:   queueClient,
+		storagePrefix: storagePrefix,
+		dataStore:     dataStore,
 	}
 }
 
@@ -56,6 +64,18 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	// Persist inputs to storage
+	inputPrefix := buildInputPrefix(s.storagePrefix, run)
+	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
+		literalMap := inputsToLiteralMap(req.Msg.Inputs)
+		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+		}
+		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+	}
+
 	// Enqueue the root action to the queue service
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
@@ -71,8 +91,8 @@ func (s *RunService) CreateRun(
 	enqueueReq := &workflow.EnqueueActionRequest{
 		ActionId:      actionID,
 		RunSpec:       req.Msg.RunSpec,
-		InputUri:      buildInputURI(run),
-		RunOutputBase: buildRunOutputBase(run),
+		InputUri:      inputPrefix,
+		RunOutputBase: buildRunOutputBase(s.storagePrefix, run),
 	}
 
 	// Set the spec based on the task type in CreateRunRequest
@@ -578,16 +598,30 @@ func (s *RunService) WatchClusterEvents(
 
 // Helper functions
 
-// buildInputURI generates the input URI for the root action
-func buildInputURI(run *models.Run) string {
-	// TODO: In production, this should be a real storage path (e.g., s3://bucket/inputs/org/project/domain/run)
-	return ""
+// buildInputPrefix generates the input path prefix for the root action.
+// The executor appends "inputs.pb" to this prefix when reading.
+// Example: s3://bucket/org/project/domain/run-name/inputs
+func buildInputPrefix(storagePrefix string, run *models.Run) string {
+	return fmt.Sprintf("%s/%s/%s/%s/%s/inputs",
+		strings.TrimRight(storagePrefix, "/"),
+		run.Org, run.Project, run.Domain, run.Name)
 }
 
-// buildRunOutputBase generates the output base path for the run
-func buildRunOutputBase(run *models.Run) string {
-	// TODO: In production, this should be a real storage path (e.g., s3://bucket/outputs/org/project/domain/run)
-	return ""
+// inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
+func inputsToLiteralMap(inputs *task.Inputs) *core.LiteralMap {
+	m := make(map[string]*core.Literal, len(inputs.Literals))
+	for _, nl := range inputs.Literals {
+		m[nl.Name] = nl.Value
+	}
+	return &core.LiteralMap{Literals: m}
+}
+
+// buildRunOutputBase generates the output base path for the run.
+// Example: s3://bucket/org/project/domain/run-name/
+func buildRunOutputBase(storagePrefix string, run *models.Run) string {
+	return fmt.Sprintf("%s/%s/%s/%s/%s/",
+		strings.TrimRight(storagePrefix, "/"),
+		run.Org, run.Project, run.Domain, run.Name)
 }
 
 // convertRunToProto converts a repository Run to a proto Run

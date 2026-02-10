@@ -77,6 +77,9 @@ const (
 
 	// ConditionReasonPluginNotFound indicates no plugin was found for the task type
 	ConditionReasonPluginNotFound TaskActionConditionReason = "PluginNotFound"
+
+	// ConditionReasonInvalidSpec indicates the TaskAction spec is missing required fields
+	ConditionReasonInvalidSpec TaskActionConditionReason = "InvalidSpec"
 )
 
 // TaskActionSpec defines the desired state of TaskAction
@@ -133,10 +136,9 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=63
 	TaskType string `json:"taskType"`
 
-	// TaskTemplateURI is the storage URI where the serialized core.TaskTemplate can be read
+	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
-	TaskTemplateURI string `json:"taskTemplateUri"`
+	TaskTemplate []byte `json:"taskTemplate"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {

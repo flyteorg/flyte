@@ -169,4 +169,46 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_kubernetes.qps", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.qps", testValue)
+			if vInt, err := cmdFlags.GetInt("kubernetes.qps"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.Kubernetes.QPS)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes.burst", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("kubernetes.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.Kubernetes.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes.timeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.timeout", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

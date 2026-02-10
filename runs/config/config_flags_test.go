@@ -351,4 +351,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_storagePrefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("storagePrefix", testValue)
+			if vString, err := cmdFlags.GetString("storagePrefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.StoragePrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

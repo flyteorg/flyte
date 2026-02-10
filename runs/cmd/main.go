@@ -17,8 +17,12 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
@@ -85,6 +89,18 @@ func serve(ctx context.Context) error {
 	// Create repository
 	repo := repository.NewRepository(db)
 
+	// Initialize labeled metrics (required for storage)
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+
+	// Initialize storage
+	storageCfg := storage.GetConfig()
+	metricsScope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(storageCfg, metricsScope)
+	if err != nil {
+		return fmt.Errorf("failed to initialize storage: %w", err)
+	}
+	logger.Infof(ctx, "Storage initialized with type: %s", storageCfg.Type)
+
 	// Create queue service client
 	queueClient := workflowconnect.NewQueueServiceClient(
 		http.DefaultClient,
@@ -93,7 +109,7 @@ func serve(ctx context.Context) error {
 	logger.Infof(ctx, "Queue service client configured for: %s", cfg.QueueServiceURL)
 
 	// Create services
-	runsSvc := service.NewRunService(repo, queueClient)
+	runsSvc := service.NewRunService(repo, queueClient, cfg.StoragePrefix, dataStore)
 	taskSvc := service.NewTaskService(repo)
 
 	// Setup HTTP server with Connect handlers
