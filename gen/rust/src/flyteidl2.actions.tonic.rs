@@ -102,16 +102,11 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.actions.ActionsService/Enqueue",
+                "/flyteidl2.actions.ActionsService/Enqueue",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.actions.ActionsService",
-                        "Enqueue",
-                    ),
-                );
+                .insert(GrpcMethod::new("flyteidl2.actions.ActionsService", "Enqueue"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn get_latest_state(
@@ -132,15 +127,12 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.actions.ActionsService/GetLatestState",
+                "/flyteidl2.actions.ActionsService/GetLatestState",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.actions.ActionsService",
-                        "GetLatestState",
-                    ),
+                    GrpcMethod::new("flyteidl2.actions.ActionsService", "GetLatestState"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -162,13 +154,13 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.actions.ActionsService/WatchForUpdates",
+                "/flyteidl2.actions.ActionsService/WatchForUpdates",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.actions.ActionsService",
+                        "flyteidl2.actions.ActionsService",
                         "WatchForUpdates",
                     ),
                 );
@@ -189,16 +181,11 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.actions.ActionsService/Update",
+                "/flyteidl2.actions.ActionsService/Update",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.actions.ActionsService",
-                        "Update",
-                    ),
-                );
+                .insert(GrpcMethod::new("flyteidl2.actions.ActionsService", "Update"));
             self.inner.unary(req, path, codec).await
         }
         pub async fn abort(
@@ -216,13 +203,11 @@ pub mod actions_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.actions.ActionsService/Abort",
+                "/flyteidl2.actions.ActionsService/Abort",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.workflow.actions.ActionsService", "Abort"),
-                );
+                .insert(GrpcMethod::new("flyteidl2.actions.ActionsService", "Abort"));
             self.inner.unary(req, path, codec).await
         }
     }
@@ -343,7 +328,7 @@ pub mod actions_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.actions.ActionsService/Enqueue" => {
+                "/flyteidl2.actions.ActionsService/Enqueue" => {
                     #[allow(non_camel_case_types)]
                     struct EnqueueSvc<T: ActionsService>(pub Arc<T>);
                     impl<
@@ -388,7 +373,7 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.actions.ActionsService/GetLatestState" => {
+                "/flyteidl2.actions.ActionsService/GetLatestState" => {
                     #[allow(non_camel_case_types)]
                     struct GetLatestStateSvc<T: ActionsService>(pub Arc<T>);
                     impl<
@@ -434,7 +419,7 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.actions.ActionsService/WatchForUpdates" => {
+                "/flyteidl2.actions.ActionsService/WatchForUpdates" => {
                     #[allow(non_camel_case_types)]
                     struct WatchForUpdatesSvc<T: ActionsService>(pub Arc<T>);
                     impl<
@@ -482,7 +467,7 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.actions.ActionsService/Update" => {
+                "/flyteidl2.actions.ActionsService/Update" => {
                     #[allow(non_camel_case_types)]
                     struct UpdateSvc<T: ActionsService>(pub Arc<T>);
                     impl<
@@ -527,7 +512,7 @@ pub mod actions_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.actions.ActionsService/Abort" => {
+                "/flyteidl2.actions.ActionsService/Abort" => {
                     #[allow(non_camel_case_types)]
                     struct AbortSvc<T: ActionsService>(pub Arc<T>);
                     impl<
@@ -602,6 +587,6 @@ pub mod actions_service_server {
         }
     }
     impl<T: ActionsService> tonic::server::NamedService for ActionsServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.actions.ActionsService";
+        const NAME: &'static str = "flyteidl2.actions.ActionsService";
     }
 }

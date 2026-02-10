@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from flyteidl2.workflow.actions import actions_service_pb2 as flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2
+from flyteidl2.actions import actions_service_pb2 as flyteidl2_dot_actions_dot_actions__service__pb2
 
 
 class ActionsServiceStub(object):
@@ -18,29 +18,29 @@ class ActionsServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Enqueue = channel.unary_unary(
-                '/flyteidl2.workflow.actions.ActionsService/Enqueue',
-                request_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
+                '/flyteidl2.actions.ActionsService/Enqueue',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
                 )
         self.GetLatestState = channel.unary_unary(
-                '/flyteidl2.workflow.actions.ActionsService/GetLatestState',
-                request_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
+                '/flyteidl2.actions.ActionsService/GetLatestState',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
                 )
         self.WatchForUpdates = channel.unary_stream(
-                '/flyteidl2.workflow.actions.ActionsService/WatchForUpdates',
-                request_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.FromString,
+                '/flyteidl2.actions.ActionsService/WatchForUpdates',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.FromString,
                 )
         self.Update = channel.unary_unary(
-                '/flyteidl2.workflow.actions.ActionsService/Update',
-                request_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateResponse.FromString,
+                '/flyteidl2.actions.ActionsService/Update',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.UpdateRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.UpdateResponse.FromString,
                 )
         self.Abort = channel.unary_unary(
-                '/flyteidl2.workflow.actions.ActionsService/Abort',
-                request_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
+                '/flyteidl2.actions.ActionsService/Abort',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
                 )
 
 
@@ -94,32 +94,32 @@ def add_ActionsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Enqueue': grpc.unary_unary_rpc_method_handler(
                     servicer.Enqueue,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.SerializeToString,
             ),
             'GetLatestState': grpc.unary_unary_rpc_method_handler(
                     servicer.GetLatestState,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.SerializeToString,
             ),
             'WatchForUpdates': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchForUpdates,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.SerializeToString,
             ),
             'Update': grpc.unary_unary_rpc_method_handler(
                     servicer.Update,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.UpdateRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.UpdateResponse.SerializeToString,
             ),
             'Abort': grpc.unary_unary_rpc_method_handler(
                     servicer.Abort,
-                    request_deserializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.workflow.actions.ActionsService', rpc_method_handlers)
+            'flyteidl2.actions.ActionsService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -141,9 +141,9 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.actions.ActionsService/Enqueue',
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Enqueue',
+            flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -158,9 +158,9 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.actions.ActionsService/GetLatestState',
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/GetLatestState',
+            flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -175,9 +175,9 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.actions.ActionsService/WatchForUpdates',
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.FromString,
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.actions.ActionsService/WatchForUpdates',
+            flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -192,9 +192,9 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.actions.ActionsService/Update',
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.UpdateResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Update',
+            flyteidl2_dot_actions_dot_actions__service__pb2.UpdateRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.UpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -209,8 +209,8 @@ class ActionsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.actions.ActionsService/Abort',
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Abort',
+            flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

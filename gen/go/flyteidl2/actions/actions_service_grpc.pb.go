@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: flyteidl2/workflow/actions/actions_service.proto
+// source: flyteidl2/actions/actions_service.proto
 
 package actions
 
@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ActionsService_Enqueue_FullMethodName         = "/flyteidl2.workflow.actions.ActionsService/Enqueue"
-	ActionsService_GetLatestState_FullMethodName  = "/flyteidl2.workflow.actions.ActionsService/GetLatestState"
-	ActionsService_WatchForUpdates_FullMethodName = "/flyteidl2.workflow.actions.ActionsService/WatchForUpdates"
-	ActionsService_Update_FullMethodName          = "/flyteidl2.workflow.actions.ActionsService/Update"
-	ActionsService_Abort_FullMethodName           = "/flyteidl2.workflow.actions.ActionsService/Abort"
+	ActionsService_Enqueue_FullMethodName         = "/flyteidl2.actions.ActionsService/Enqueue"
+	ActionsService_GetLatestState_FullMethodName  = "/flyteidl2.actions.ActionsService/GetLatestState"
+	ActionsService_WatchForUpdates_FullMethodName = "/flyteidl2.actions.ActionsService/WatchForUpdates"
+	ActionsService_Update_FullMethodName          = "/flyteidl2.actions.ActionsService/Update"
+	ActionsService_Abort_FullMethodName           = "/flyteidl2.actions.ActionsService/Abort"
 )
 
 // ActionsServiceClient is the client API for ActionsService service.
@@ -270,7 +270,7 @@ func _ActionsService_Abort_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ActionsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl2.workflow.actions.ActionsService",
+	ServiceName: "flyteidl2.actions.ActionsService",
 	HandlerType: (*ActionsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -297,5 +297,5 @@ var ActionsService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "flyteidl2/workflow/actions/actions_service.proto",
+	Metadata: "flyteidl2/actions/actions_service.proto",
 }
