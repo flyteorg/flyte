@@ -25,6 +25,7 @@ const (
 )
 
 // Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
+// Note: This is different from the Action protobuf defined in flyteidl2/workflow/run_definition.proto.
 type Action struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
