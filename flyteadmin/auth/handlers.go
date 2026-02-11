@@ -463,7 +463,6 @@ func GetHTTPRefreshedRequestCookieToMetadataHandler(authCtx interfaces.Authentic
 				meta.Set(GRPCMetaKeyIDToken, idToken)
 				meta.Set(GRPCMetaKeyAccessToken, accessToken)
 				meta.Set(GRPCMetaKeyRefreshToken, refreshToken)
-				meta.Set(GRPCMetaKeyUserInfo, rawUserInfoStr)
 			}
 		} else {
 			logger.Debugf(ctx, "Tokens are not refreshed.")
@@ -633,7 +632,7 @@ func GetRefreshCookiesResponseHandler(authCtx interfaces.AuthenticationContext) 
 		idToken := meta.Get(GRPCMetaKeyIDToken)
 		accessToken := meta.Get(GRPCMetaKeyAccessToken)
 		refreshToken := meta.Get(GRPCMetaKeyRefreshToken)
-		userInfoStr := meta.Get(GRPCMetaKeyUserInfo)
+		userInfoStr := meta.Get(UserInfoMDKey)
 
 		if len(idToken) > 0 {
 			logger.Infof(ctx, "Setting new tokens in cookies.")
