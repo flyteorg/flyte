@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -35,4 +36,7 @@ type ActionRepo interface {
 	// Event notification (for state updates)
 	NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error
 	WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error)
+
+	// Aggregation operations
+	ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error)
 }

@@ -1,35 +1,13 @@
-/*
-Copyright 2025.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package main
 
 import (
 	"context"
-	"crypto/tls"
-	"flag"
+	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"k8s.io/apimachinery/pkg/runtime"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/executor"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -51,46 +29,30 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 )
 
-var (
-	scheme         = runtime.NewScheme()
-	setupLog       = ctrl.Log.WithName("setup")
-	cfgFile        string
-	configAccessor stdconfig.Accessor
-)
-
-func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(flyteorgv1.AddToScheme(scheme))
-	// +kubebuilder:scaffold:scheme
-
-	// Add go flags (for zap logger) to pflag
-	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
-
-	// Parse empty to avoid errors from Go's flag package
-	_ = flag.CommandLine.Parse([]string{})
-}
-
-func newRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "executor",
+func main() {
+	a := &app.App{
+		Name:  "executor",
 		Short: "Executor controller manager for Flyte TaskActions",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return initConfig(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return run()
+		Setup: func(ctx context.Context, sc *app.SetupContext) error {
+			cfg := executorconfig.GetConfig()
+
+			// Executor doesn't serve HTTP — it uses controller-runtime's own
+			// health probe port. Set a dummy port so the app skeleton starts
+			// its HTTP server on a non-conflicting address (or 0 to disable).
+			sc.Port = 0
+
+			k8sConfig := ctrl.GetConfigOrDie()
+			sc.K8sConfig = k8sConfig
+
+			if err := executor.Setup(ctx, sc); err != nil {
+				return fmt.Errorf("executor setup failed: %w", err)
+			}
+
+			_ = cfg // config is read inside executor.Setup's worker
+			return nil
 		},
 	}
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.flyte/config.yaml)")
-	configAccessor = viper.NewAccessor(stdconfig.Options{StrictMode: false})
-	configAccessor.InitializePflags(rootCmd.PersistentFlags())
-
-	return rootCmd
-}
-
-func main() {
-	if err := newRootCmd().Execute(); err != nil {
+	if err := a.Run(); err != nil {
 		os.Exit(1)
 	}
 }

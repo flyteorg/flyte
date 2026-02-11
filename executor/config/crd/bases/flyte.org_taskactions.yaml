@@ -201,6 +201,31 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              phaseHistory:
+                description: |-
+                  PhaseHistory is an append-only log of phase transitions. Unlike conditions
+                  (which are updated in-place by type), this preserves the full timeline:
+                  Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+                items:
+                  description: PhaseTransition records a phase change with its timestamp.
+                  properties:
+                    message:
+                      description: Message is an optional human-readable message about
+                        the transition.
+                      type: string
+                    occurredAt:
+                      description: OccurredAt is when this phase transition happened.
+                      format: date-time
+                      type: string
+                    phase:
+                      description: Phase is the phase that was entered (e.g. "Queued",
+                        "Initializing", "Executing", "Succeeded", "Failed").
+                      type: string
+                  required:
+                  - occurredAt
+                  - phase
+                  type: object
+                type: array
               pluginPhase:
                 description: PluginPhase is a human-readable representation of the
                   plugin's current phase.

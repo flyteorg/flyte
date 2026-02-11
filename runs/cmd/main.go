@@ -2,219 +2,54 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
-	"github.com/spf13/cobra"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
-	"gorm.io/gorm"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/config"
-	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
-	"github.com/flyteorg/flyte/v2/runs/migrations"
-	"github.com/flyteorg/flyte/v2/runs/repository"
-	"github.com/flyteorg/flyte/v2/runs/service"
 )
-
-var (
-	cfgFile        string
-	configAccessor config.Accessor
-)
-
-func newRootCmd() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "runs-service",
-		Short: "Runs Service for Flyte",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return initConfig(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return serve(cmd.Context())
-		},
-	}
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.flyte/config.yaml)")
-	configAccessor = viper.NewAccessor(config.Options{StrictMode: false})
-	configAccessor.InitializePflags(rootCmd.PersistentFlags())
-
-	return rootCmd
-}
 
 func main() {
-	if err := newRootCmd().Execute(); err != nil {
+	a := &app.App{
+		Name:  "runs-service",
+		Short: "Runs Service for Flyte",
+		Setup: func(ctx context.Context, sc *app.SetupContext) error {
+			cfg := runsconfig.GetConfig()
+			sc.Host = cfg.Server.Host
+			sc.Port = cfg.Server.Port
+			sc.Namespace = "flyte" // TODO: make configurable
+
+			db, err := app.InitDB(ctx, database.GetConfig())
+			if err != nil {
+				return fmt.Errorf("failed to initialize database: %w", err)
+			}
+			sc.DB = db
+
+			k8sClient, _, err := app.InitKubernetesClient(ctx, app.K8sConfig{
+				Namespace: sc.Namespace,
+			}, nil)
+			if err != nil {
+				return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
+			}
+			sc.K8sClient = k8sClient
+
+			labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewTestScope())
+			if err != nil {
+				return fmt.Errorf("failed to initialize storage: %w", err)
+			}
+			sc.DataStore = dataStore
+
+			return runs.Setup(ctx, sc)
+		},
+	}
+	if err := a.Run(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func serve(ctx context.Context) error {
-	// Initialize logger
-	logConfig := logger.GetConfig()
-	if err := logger.SetConfig(logConfig); err != nil {
-		return fmt.Errorf("failed to initialize logger: %w", err)
-	}
-
-	logger.Infof(ctx, "Starting Runs Service")
-
-	// Get configuration
-	cfg := runsconfig.GetConfig()
-	dbCfg := database.GetConfig()
-
-	// Initialize database
-	db, err := initDB(ctx, dbCfg)
-	if err != nil {
-		return fmt.Errorf("failed to initialize database: %w", err)
-	}
-
-	// Run migrations
-	logger.Infof(ctx, "Running database migrations")
-	if err := migrations.RunMigrations(db); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
-	// Create repository
-	repo := repository.NewRepository(db)
-
-	// Initialize labeled metrics (required for storage)
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-
-	// Initialize storage
-	storageCfg := storage.GetConfig()
-	metricsScope := promutils.NewTestScope()
-	dataStore, err := storage.NewDataStore(storageCfg, metricsScope)
-	if err != nil {
-		return fmt.Errorf("failed to initialize storage: %w", err)
-	}
-	logger.Infof(ctx, "Storage initialized with type: %s", storageCfg.Type)
-
-	// Create queue service client
-	queueClient := workflowconnect.NewQueueServiceClient(
-		http.DefaultClient,
-		cfg.QueueServiceURL,
-	)
-	logger.Infof(ctx, "Queue service client configured for: %s", cfg.QueueServiceURL)
-
-	// Create services
-	runsSvc := service.NewRunService(repo, queueClient, cfg.StoragePrefix, dataStore)
-	taskSvc := service.NewTaskService(repo)
-
-	// Setup HTTP server with Connect handlers
-	mux := http.NewServeMux()
-
-	// Mount the Run Service
-	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
-	mux.Handle(runsPath, runsHandler)
-
-	// Mount the Task Service
-	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
-	mux.Handle(taskPath, taskHandler)
-
-	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
-	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
-
-	// Add health check endpoint
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("OK"))
-	})
-
-	// Add readiness check endpoint
-	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
-		// Check database connection
-		sqlDB, err := db.DB()
-		if err != nil {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			_, _ = w.Write([]byte("Database connection error"))
-			return
-		}
-		if err := sqlDB.Ping(); err != nil {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			_, _ = w.Write([]byte("Database ping failed"))
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("OK"))
-	})
-
-	// Setup HTTP/2 support (required for gRPC)
-	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-	server := &http.Server{
-		Addr:    addr,
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
-	}
-
-	// Start server in a goroutine
-	errCh := make(chan error, 1)
-	go func() {
-		logger.Infof(ctx, "Runs Service listening on %s", addr)
-		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errCh <- fmt.Errorf("server error: %w", err)
-		}
-	}()
-
-	// Wait for interrupt signal or error
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-
-	select {
-	case sig := <-sigCh:
-		logger.Infof(ctx, "Received signal %v, shutting down gracefully...", sig)
-	case err := <-errCh:
-		return err
-	}
-
-	// Graceful shutdown
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		return fmt.Errorf("server shutdown failed: %w", err)
-	}
-
-	logger.Infof(ctx, "Runs Service stopped")
-	return nil
-}
-
-func initConfig(cmd *cobra.Command) error {
-	configAccessor = viper.NewAccessor(config.Options{
-		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config"},
-		StrictMode:  false,
-	})
-
-	// Traverse to root command
-	rootCmd := cmd
-	for rootCmd.Parent() != nil {
-		rootCmd = rootCmd.Parent()
-	}
-
-	configAccessor.InitializePflags(rootCmd.PersistentFlags())
-
-	return configAccessor.UpdateConfig(context.Background())
-}
-
-func initDB(ctx context.Context, cfg *database.DbConfig) (*gorm.DB, error) {
-	logCfg := logger.GetConfig()
-
-	// Use flytestdlib's GetDB which handles both SQLite and PostgreSQL
-	db, err := database.GetDB(ctx, cfg, logCfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize database: %w", err)
-	}
-
-	logger.Infof(ctx, "Database connection established")
-	return db, nil
 }

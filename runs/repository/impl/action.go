@@ -752,6 +752,38 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 	}
 }
 
+// ListRootActions lists root actions (runs) matching scope and date filters.
+func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	query := r.db.WithContext(ctx).Model(&models.Action{}).
+		Where("parent_action_name IS NULL")
+
+	if org != "" {
+		query = query.Where("org = ?", org)
+	}
+	if project != "" {
+		query = query.Where("project = ?", project)
+	}
+	if domain != "" {
+		query = query.Where("domain = ?", domain)
+	}
+	if startDate != nil {
+		query = query.Where("created_at >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("created_at <= ?", *endDate)
+	}
+	if limit <= 0 {
+		limit = 1000
+	}
+
+	var actions []*models.Action
+	result := query.Order("created_at DESC").Limit(limit).Find(&actions)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list root actions: %w", result.Error)
+	}
+	return actions, nil
+}
+
 // notifyActionUpdate sends a notification about an action update
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
 	if !r.isPostgres {

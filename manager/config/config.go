@@ -55,13 +55,9 @@ var defaultConfig = &Config{
 	},
 }
 
-var cfg Config
+var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 // GetConfig retrieves the current config value or default.
 func GetConfig() *Config {
-	return &cfg
-}
-
-func init() {
-	config.MustRegisterSection(configSectionKey, &cfg)
+	return configSection.GetConfig().(*Config)
 }

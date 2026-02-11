@@ -179,6 +179,19 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
+// PhaseTransition records a phase change with its timestamp.
+type PhaseTransition struct {
+	// Phase is the phase that was entered (e.g. "Queued", "Initializing", "Executing", "Succeeded", "Failed").
+	Phase string `json:"phase"`
+
+	// OccurredAt is when this phase transition happened.
+	OccurredAt metav1.Time `json:"occurredAt"`
+
+	// Message is an optional human-readable message about the transition.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
 // TaskActionStatus defines the observed state of TaskAction.
 type TaskActionStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
@@ -220,6 +233,12 @@ type TaskActionStatus struct {
 	// +listMapKey=type
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// PhaseHistory is an append-only log of phase transitions. Unlike conditions
+	// (which are updated in-place by type), this preserves the full timeline:
+	// Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+	// +optional
+	PhaseHistory []PhaseTransition `json:"phaseHistory,omitempty"`
 }
 
 // +kubebuilder:object:root=true

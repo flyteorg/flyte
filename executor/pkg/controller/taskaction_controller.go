@@ -294,27 +294,39 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 
 // mapPhaseToConditions maps a plugin PhaseInfo to TaskAction conditions.
 func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo) {
+	var phaseName string
+	var msg string
+
 	switch info.Phase() {
 	case pluginsCore.PhaseNotReady, pluginsCore.PhaseQueued, pluginsCore.PhaseWaitingForResources, pluginsCore.PhaseWaitingForCache:
+		phaseName = string(flyteorgv1.ConditionReasonQueued)
+		msg = info.Reason()
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonQueued, info.Reason())
+			flyteorgv1.ConditionReasonQueued, msg)
 
 	case pluginsCore.PhaseInitializing:
+		phaseName = string(flyteorgv1.ConditionReasonInitializing)
+		msg = info.Reason()
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonInitializing, info.Reason())
+			flyteorgv1.ConditionReasonInitializing, msg)
 
 	case pluginsCore.PhaseRunning:
+		phaseName = string(flyteorgv1.ConditionReasonExecuting)
+		msg = info.Reason()
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonExecuting, info.Reason())
+			flyteorgv1.ConditionReasonExecuting, msg)
 
 	case pluginsCore.PhaseSuccess:
+		phaseName = string(flyteorgv1.ConditionReasonCompleted)
+		msg = "TaskAction completed successfully"
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonCompleted, "TaskAction has completed")
 		setCondition(ta, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonCompleted, "TaskAction completed successfully")
+			flyteorgv1.ConditionReasonCompleted, msg)
 
 	case pluginsCore.PhasePermanentFailure:
-		msg := info.Reason()
+		phaseName = string(flyteorgv1.ConditionReasonPermanentFailure)
+		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 		}
@@ -324,7 +336,8 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonPermanentFailure, msg)
 
 	case pluginsCore.PhaseRetryableFailure:
-		msg := info.Reason()
+		phaseName = string(flyteorgv1.ConditionReasonRetryableFailure)
+		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 		}
@@ -332,10 +345,24 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonRetryableFailure, msg)
 
 	case pluginsCore.PhaseAborted:
+		phaseName = string(flyteorgv1.ConditionReasonAborted)
+		msg = "TaskAction was aborted"
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-			flyteorgv1.ConditionReasonAborted, "TaskAction was aborted")
+			flyteorgv1.ConditionReasonAborted, msg)
 		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonAborted, "TaskAction was aborted")
+			flyteorgv1.ConditionReasonAborted, msg)
+	}
+
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	if phaseName != "" {
+		n := len(ta.Status.PhaseHistory)
+		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
+			ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
+				Phase:      phaseName,
+				OccurredAt: metav1.Now(),
+				Message:    msg,
+			})
+		}
 	}
 }
 

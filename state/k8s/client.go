@@ -19,11 +19,11 @@ import (
 // ActionUpdate represents an update to a TaskAction
 type ActionUpdate struct {
 	ActionID         *common.ActionIdentifier
+	ParentActionName string
 	StateJSON        string
 	Phase            string
+	OutputUri        string
 	IsDeleted        bool
-	ParentActionName string
-	OutputUri string
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -95,6 +95,30 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 
 	logger.Infof(ctx, "Updated state for TaskAction: %s", taskActionName)
 	return nil
+}
+
+// ListRunActions lists all TaskActions belonging to a run.
+func (c *StateClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
+	taskActionList := &executorv1.TaskActionList{}
+	listOpts := []client.ListOption{
+		client.InNamespace(c.namespace),
+		client.MatchingLabels{
+			"flyte.org/org":     runID.Org,
+			"flyte.org/project": runID.Project,
+			"flyte.org/domain":  runID.Domain,
+			"flyte.org/run":     runID.Name,
+		},
+	}
+
+	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
+		return nil, fmt.Errorf("failed to list TaskActions for run: %w", err)
+	}
+
+	result := make([]*executorv1.TaskAction, len(taskActionList.Items))
+	for i := range taskActionList.Items {
+		result[i] = &taskActionList.Items[i]
+	}
+	return result, nil
 }
 
 // ListChildActions lists all TaskActions that are children of the given parent action
@@ -245,9 +269,9 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		return
 	}
 
-	parentActionName := ""
+	var parentName string
 	if taskAction.Spec.ParentActionName != nil {
-		parentActionName = *taskAction.Spec.ParentActionName
+		parentName = *taskAction.Spec.ParentActionName
 	}
 
 	update := &ActionUpdate{
@@ -260,11 +284,11 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 			},
 			Name: taskAction.Spec.ActionName,
 		},
+		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
-		Phase:            getPhaseFromConditions(taskAction),
+		Phase:            GetPhaseFromConditions(taskAction),
+		OutputUri:        buildOutputUri(taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
-		ParentActionName: parentActionName,
-		OutputUri: buildOutputUri(taskAction),
 	}
 
 	c.notifySubscribers(ctx, update)
@@ -295,8 +319,8 @@ func (c *StateClient) StopWatching() {
 	}
 }
 
-// getPhaseFromConditions extracts the phase from TaskAction conditions
-func getPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+// GetPhaseFromConditions extracts the phase from TaskAction conditions.
+func GetPhaseFromConditions(taskAction *executorv1.TaskAction) string {
 	for _, cond := range taskAction.Status.Conditions {
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
