@@ -9,7 +9,7 @@
 * chore: execute goimports to format the code by @findfluctuate in https://github.com/flyteorg/flyte/pull/6801
 * Fix issue with assertions with time zones by @Sovietaced in https://github.com/flyteorg/flyte/pull/6812
 * [FlyteCTL] only get v1 sandbox image by @machichima in https://github.com/flyteorg/flyte/pull/6834
-* Unpin k8s client library verison by @Sovietaced in https://github.com/flyteorg/flyte/pull/6835
+* Unpin k8s client library version by @Sovietaced in https://github.com/flyteorg/flyte/pull/6835
 * Unpin controller runtime dependency by @Sovietaced in https://github.com/flyteorg/flyte/pull/6843
 * Fix: Correctly handle malformed dynamic workflows to avoid 'failed + succeeded + running' Schroedinger state by @fg91 in https://github.com/flyteorg/flyte/pull/6854
 * fixed: Remove print that breaks json output by @honnix in https://github.com/flyteorg/flyte/pull/6872
