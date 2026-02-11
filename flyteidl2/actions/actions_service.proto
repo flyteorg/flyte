@@ -140,7 +140,7 @@ message WatchForUpdatesRequest {
   }
 }
 
-// WatchForUpdatesRequest is a response message for watching updates to the state of actions.
+// WatchForUpdatesResponse is a response message for watching updates to the state of actions.
 message WatchForUpdatesResponse {
   // an update to the state of a specific action.
   oneof message {
