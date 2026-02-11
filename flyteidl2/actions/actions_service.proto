@@ -34,8 +34,7 @@ service ActionsService {
   rpc Abort(AbortRequest) returns (AbortResponse) {}
 }
 
-// Action represents a unit of work to be executed. This is a more generic version of the Run concept in Flyte,
-// as it can represent not only task executions, but also other types of actions such as traces and conditions.
+// Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
 message Action {
   // the unique identifier for the action.
   flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
