@@ -19,7 +19,7 @@ use pyo3::prelude::*;
 // Re-export all generated protobuf modules
 pub mod flyteidl {
 
-    pub mod auth {
+    pub mod app {
         include!("flyteidl2.app.rs");
     }
 
