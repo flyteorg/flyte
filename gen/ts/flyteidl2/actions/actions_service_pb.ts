@@ -19,14 +19,15 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/actions/actions_service.proto.
  */
 export const file_flyteidl2_actions_actions_service: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIrsDCg5FbnF1ZXVlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIpCghydW5fc3BlYxgDIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSGgoJaW5wdXRfdXJpGAYgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgHIAEoCUIHukgEcgIQARINCgVncm91cBgIIAEoCRIPCgdzdWJqZWN0GAkgASgJEi4KBHRhc2sYCiABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAsgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAwgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUiEQoPRW5xdWV1ZVJlc3BvbnNlIroBCg1VcGRhdGVSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAASOAoGc3RhdHVzGAMgASgLMiAuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvblN0YXR1c0IGukgDyAEBEhYKBXN0YXRlGAQgASgJQge6SARyAhACIhAKDlVwZGF0ZVJlc3BvbnNlInAKFUdldExhdGVzdFN0YXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIjAKFkdldExhdGVzdFN0YXRlUmVzcG9uc2USFgoFc3RhdGUYASABKAlCB7pIBHICEAEiaQoWV2F0Y2hGb3JVcGRhdGVzUmVxdWVzdBI+ChBwYXJlbnRfYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVySABCDwoGZmlsdGVyEgW6SAIIASKeAQoXV2F0Y2hGb3JVcGRhdGVzUmVzcG9uc2USOQoNYWN0aW9uX3VwZGF0ZRgBIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25VcGRhdGVIABI9Cg9jb250cm9sX21lc3NhZ2UYAiABKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuQ29udHJvbE1lc3NhZ2VIAEIJCgdtZXNzYWdlIm0KDEFib3J0UmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIg8KDUFib3J0UmVzcG9uc2Uy2gMKDkFjdGlvbnNTZXJ2aWNlElIKB0VucXVldWUSIS5mbHl0ZWlkbDIuYWN0aW9ucy5FbnF1ZXVlUmVxdWVzdBoiLmZseXRlaWRsMi5hY3Rpb25zLkVucXVldWVSZXNwb25zZSIAEmcKDkdldExhdGVzdFN0YXRlEiguZmx5dGVpZGwyLmFjdGlvbnMuR2V0TGF0ZXN0U3RhdGVSZXF1ZXN0GikuZmx5dGVpZGwyLmFjdGlvbnMuR2V0TGF0ZXN0U3RhdGVSZXNwb25zZSIAEmwKD1dhdGNoRm9yVXBkYXRlcxIpLmZseXRlaWRsMi5hY3Rpb25zLldhdGNoRm9yVXBkYXRlc1JlcXVlc3QaKi5mbHl0ZWlkbDIuYWN0aW9ucy5XYXRjaEZvclVwZGF0ZXNSZXNwb25zZSIAMAESTwoGVXBkYXRlEiAuZmx5dGVpZGwyLmFjdGlvbnMuVXBkYXRlUmVxdWVzdBohLmZseXRlaWRsMi5hY3Rpb25zLlVwZGF0ZVJlc3BvbnNlIgASTAoFQWJvcnQSHy5mbHl0ZWlkbDIuYWN0aW9ucy5BYm9ydFJlcXVlc3QaIC5mbHl0ZWlkbDIuYWN0aW9ucy5BYm9ydFJlc3BvbnNlIgBCygEKFWNvbS5mbHl0ZWlkbDIuYWN0aW9uc0ITQWN0aW9uc1NlcnZpY2VQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hY3Rpb25zogIDRkFYqgIRRmx5dGVpZGwyLkFjdGlvbnPKAhFGbHl0ZWlkbDJcQWN0aW9uc+ICHUZseXRlaWRsMlxBY3Rpb25zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpBY3Rpb25zYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
+  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIogDCgZBY3Rpb24SPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESGgoJaW5wdXRfdXJpGAMgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgEIAEoCUIHukgEcgIQARINCgVncm91cBgFIAEoCRIPCgdzdWJqZWN0GAYgASgJEi4KBHRhc2sYByABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAggASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAkgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUibgoORW5xdWV1ZVJlcXVlc3QSMQoGYWN0aW9uGAEgASgLMhkuZmx5dGVpZGwyLmFjdGlvbnMuQWN0aW9uQga6SAPIAQESKQoIcnVuX3NwZWMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjIhEKD0VucXVldWVSZXNwb25zZSK6AQoNVXBkYXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEjgKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXNCBrpIA8gBARIWCgVzdGF0ZRgEIAEoCUIHukgEcgIQAiIQCg5VcGRhdGVSZXNwb25zZSJwChVHZXRMYXRlc3RTdGF0ZVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACIwChZHZXRMYXRlc3RTdGF0ZVJlc3BvbnNlEhYKBXN0YXRlGAEgASgJQge6SARyAhABImkKFldhdGNoRm9yVXBkYXRlc1JlcXVlc3QSPgoQcGFyZW50X2FjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckgAQg8KBmZpbHRlchIFukgCCAEingEKF1dhdGNoRm9yVXBkYXRlc1Jlc3BvbnNlEjkKDWFjdGlvbl91cGRhdGUYASABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uVXBkYXRlSAASPQoPY29udHJvbF9tZXNzYWdlGAIgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LkNvbnRyb2xNZXNzYWdlSABCCQoHbWVzc2FnZSJtCgxBYm9ydFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIPCg1BYm9ydFJlc3BvbnNlMtoDCg5BY3Rpb25zU2VydmljZRJSCgdFbnF1ZXVlEiEuZmx5dGVpZGwyLmFjdGlvbnMuRW5xdWV1ZVJlcXVlc3QaIi5mbHl0ZWlkbDIuYWN0aW9ucy5FbnF1ZXVlUmVzcG9uc2UiABJnCg5HZXRMYXRlc3RTdGF0ZRIoLmZseXRlaWRsMi5hY3Rpb25zLkdldExhdGVzdFN0YXRlUmVxdWVzdBopLmZseXRlaWRsMi5hY3Rpb25zLkdldExhdGVzdFN0YXRlUmVzcG9uc2UiABJsCg9XYXRjaEZvclVwZGF0ZXMSKS5mbHl0ZWlkbDIuYWN0aW9ucy5XYXRjaEZvclVwZGF0ZXNSZXF1ZXN0GiouZmx5dGVpZGwyLmFjdGlvbnMuV2F0Y2hGb3JVcGRhdGVzUmVzcG9uc2UiADABEk8KBlVwZGF0ZRIgLmZseXRlaWRsMi5hY3Rpb25zLlVwZGF0ZVJlcXVlc3QaIS5mbHl0ZWlkbDIuYWN0aW9ucy5VcGRhdGVSZXNwb25zZSIAEkwKBUFib3J0Eh8uZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXF1ZXN0GiAuZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXNwb25zZSIAQsoBChVjb20uZmx5dGVpZGwyLmFjdGlvbnNCE0FjdGlvbnNTZXJ2aWNlUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvYWN0aW9uc6ICA0ZBWKoCEUZseXRlaWRsMi5BY3Rpb25zygIRRmx5dGVpZGwyXEFjdGlvbnPiAh1GbHl0ZWlkbDJcQWN0aW9uc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6QWN0aW9uc2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
 
 /**
- * EnqueueRequest is a request message for queuing an action.
+ * Action represents a unit of work to be executed. This is a more generic version of the Run concept in Flyte,
+ * as it can represent not only task executions, but also other types of actions such as traces and conditions.
  *
- * @generated from message flyteidl2.actions.EnqueueRequest
+ * @generated from message flyteidl2.actions.Action
  */
-export type EnqueueRequest = Message<"flyteidl2.actions.EnqueueRequest"> & {
+export type Action = Message<"flyteidl2.actions.Action"> & {
   /**
    * the unique identifier for the action.
    *
@@ -43,58 +44,57 @@ export type EnqueueRequest = Message<"flyteidl2.actions.EnqueueRequest"> & {
   parentActionName?: string;
 
   /**
-   * Optional run spec passed in by the root action to be utilized by all downstream actions in the run.
-   *
-   * @generated from field: flyteidl2.task.RunSpec run_spec = 3;
-   */
-  runSpec?: RunSpec;
-
-  /**
    * the path to the input data for this action.
    *
-   * @generated from field: string input_uri = 6;
+   * @generated from field: string input_uri = 3;
    */
   inputUri: string;
 
   /**
    * the run base path this action should write its output to.
    *
-   * @generated from field: string run_output_base = 7;
+   * @generated from field: string run_output_base = 4;
    */
   runOutputBase: string;
 
   /**
    * group this action belongs to, if applicable.
    *
-   * @generated from field: string group = 8;
+   * @generated from field: string group = 5;
    */
   group: string;
 
   /**
    * subject that created the run, if known.
    *
-   * @generated from field: string subject = 9;
+   * @generated from field: string subject = 6;
    */
   subject: string;
 
   /**
-   * @generated from oneof flyteidl2.actions.EnqueueRequest.spec
+   * @generated from oneof flyteidl2.actions.Action.spec
    */
   spec: {
     /**
-     * @generated from field: flyteidl2.workflow.TaskAction task = 10;
+     * the spec for a task action. this will be required if the action is to execute a task.
+     *
+     * @generated from field: flyteidl2.workflow.TaskAction task = 7;
      */
     value: TaskAction;
     case: "task";
   } | {
     /**
-     * @generated from field: flyteidl2.workflow.TraceAction trace = 11;
+     * the spec for a trace action. this will be required if the action is to execute a trace.
+     *
+     * @generated from field: flyteidl2.workflow.TraceAction trace = 8;
      */
     value: TraceAction;
     case: "trace";
   } | {
     /**
-     * @generated from field: flyteidl2.workflow.ConditionAction condition = 12;
+     * the spec for a condition action. this will be required if the action is to execute a condition.
+     *
+     * @generated from field: flyteidl2.workflow.ConditionAction condition = 9;
      */
     value: ConditionAction;
     case: "condition";
@@ -102,11 +102,37 @@ export type EnqueueRequest = Message<"flyteidl2.actions.EnqueueRequest"> & {
 };
 
 /**
+ * Describes the message flyteidl2.actions.Action.
+ * Use `create(ActionSchema)` to create a new message.
+ */
+export const ActionSchema: GenMessage<Action> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_actions_actions_service, 0);
+
+/**
+ * EnqueueRequest is a request message for queuing an action.
+ *
+ * @generated from message flyteidl2.actions.EnqueueRequest
+ */
+export type EnqueueRequest = Message<"flyteidl2.actions.EnqueueRequest"> & {
+  /**
+   * @generated from field: flyteidl2.actions.Action action = 1;
+   */
+  action?: Action;
+
+  /**
+   * Optional run spec passed in by the root action to be utilized by all downstream actions in the run.
+   *
+   * @generated from field: flyteidl2.task.RunSpec run_spec = 2;
+   */
+  runSpec?: RunSpec;
+};
+
+/**
  * Describes the message flyteidl2.actions.EnqueueRequest.
  * Use `create(EnqueueRequestSchema)` to create a new message.
  */
 export const EnqueueRequestSchema: GenMessage<EnqueueRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 0);
+  messageDesc(file_flyteidl2_actions_actions_service, 1);
 
 /**
  * EnqueueResponse is a response message for queuing an action.
@@ -121,7 +147,7 @@ export type EnqueueResponse = Message<"flyteidl2.actions.EnqueueResponse"> & {
  * Use `create(EnqueueResponseSchema)` to create a new message.
  */
 export const EnqueueResponseSchema: GenMessage<EnqueueResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 1);
+  messageDesc(file_flyteidl2_actions_actions_service, 2);
 
 /**
  * UpdateRequest is the request message for updating the status of an action.
@@ -163,7 +189,7 @@ export type UpdateRequest = Message<"flyteidl2.actions.UpdateRequest"> & {
  * Use `create(UpdateRequestSchema)` to create a new message.
  */
 export const UpdateRequestSchema: GenMessage<UpdateRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 2);
+  messageDesc(file_flyteidl2_actions_actions_service, 3);
 
 /**
  * UpdateResponse is the response message for updating the status of an action.
@@ -178,7 +204,7 @@ export type UpdateResponse = Message<"flyteidl2.actions.UpdateResponse"> & {
  * Use `create(UpdateResponseSchema)` to create a new message.
  */
 export const UpdateResponseSchema: GenMessage<UpdateResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 3);
+  messageDesc(file_flyteidl2_actions_actions_service, 4);
 
 /**
  * GetLatestStateRequest is the request message for getting the state of an action.
@@ -206,7 +232,7 @@ export type GetLatestStateRequest = Message<"flyteidl2.actions.GetLatestStateReq
  * Use `create(GetLatestStateRequestSchema)` to create a new message.
  */
 export const GetLatestStateRequestSchema: GenMessage<GetLatestStateRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 4);
+  messageDesc(file_flyteidl2_actions_actions_service, 5);
 
 /**
  * GetLatestStateResponse is the response message for getting the state of an action.
@@ -227,7 +253,7 @@ export type GetLatestStateResponse = Message<"flyteidl2.actions.GetLatestStateRe
  * Use `create(GetLatestStateResponseSchema)` to create a new message.
  */
 export const GetLatestStateResponseSchema: GenMessage<GetLatestStateResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 5);
+  messageDesc(file_flyteidl2_actions_actions_service, 6);
 
 /**
  * WatchForUpdatesRequest is a request message for watching updates to the state of actions.
@@ -242,8 +268,7 @@ export type WatchForUpdatesRequest = Message<"flyteidl2.actions.WatchForUpdatesR
    */
   filter: {
     /**
-     * a unique identifier for the parent action to watch. this will result in updates for all child
-     * actions.
+     * a unique identifier for the parent action to watch. this will result in updates for all child actions.
      *
      * @generated from field: flyteidl2.common.ActionIdentifier parent_action_id = 1;
      */
@@ -257,7 +282,7 @@ export type WatchForUpdatesRequest = Message<"flyteidl2.actions.WatchForUpdatesR
  * Use `create(WatchForUpdatesRequestSchema)` to create a new message.
  */
 export const WatchForUpdatesRequestSchema: GenMessage<WatchForUpdatesRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 6);
+  messageDesc(file_flyteidl2_actions_actions_service, 7);
 
 /**
  * WatchForUpdatesRequest is a response message for watching updates to the state of actions.
@@ -272,12 +297,16 @@ export type WatchForUpdatesResponse = Message<"flyteidl2.actions.WatchForUpdates
    */
   message: {
     /**
+     * an update to the status of an action.
+     *
      * @generated from field: flyteidl2.workflow.ActionUpdate action_update = 1;
      */
     value: ActionUpdate;
     case: "actionUpdate";
   } | {
     /**
+     * a control message for the workflow execution.
+     *
      * @generated from field: flyteidl2.workflow.ControlMessage control_message = 2;
      */
     value: ControlMessage;
@@ -290,7 +319,7 @@ export type WatchForUpdatesResponse = Message<"flyteidl2.actions.WatchForUpdates
  * Use `create(WatchForUpdatesResponseSchema)` to create a new message.
  */
 export const WatchForUpdatesResponseSchema: GenMessage<WatchForUpdatesResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 7);
+  messageDesc(file_flyteidl2_actions_actions_service, 8);
 
 /**
  * AbortRequest is the request message for aborting a queued or running action.
@@ -318,7 +347,7 @@ export type AbortRequest = Message<"flyteidl2.actions.AbortRequest"> & {
  * Use `create(AbortRequestSchema)` to create a new message.
  */
 export const AbortRequestSchema: GenMessage<AbortRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 8);
+  messageDesc(file_flyteidl2_actions_actions_service, 9);
 
 /**
  * AbortResponse is the response message for aborting a queued or running action.
@@ -333,7 +362,7 @@ export type AbortResponse = Message<"flyteidl2.actions.AbortResponse"> & {
  * Use `create(AbortResponseSchema)` to create a new message.
  */
 export const AbortResponseSchema: GenMessage<AbortResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 9);
+  messageDesc(file_flyteidl2_actions_actions_service, 10);
 
 /**
  * ActionsService provides an interface for managing the state and execution of actions.
