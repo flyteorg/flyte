@@ -24,8 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Action represents a unit of work to be executed. This is a more generic version of the Run concept in Flyte,
-// as it can represent not only task executions, but also other types of actions such as traces and conditions.
+// Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
 type Action struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -568,7 +567,7 @@ type WatchForUpdatesRequest_ParentActionId struct {
 
 func (*WatchForUpdatesRequest_ParentActionId) isWatchForUpdatesRequest_Filter() {}
 
-// WatchForUpdatesRequest is a response message for watching updates to the state of actions.
+// WatchForUpdatesResponse is a response message for watching updates to the state of actions.
 type WatchForUpdatesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
