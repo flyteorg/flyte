@@ -39,3 +39,4 @@ docs/_src
 docs/_projects
 docs/tests
 empty-config.yaml
+.claude/
