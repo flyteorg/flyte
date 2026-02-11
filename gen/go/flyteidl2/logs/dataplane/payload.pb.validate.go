@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.Sort_Direction(0)
 )
 
 // Validate checks the field values on PodResource with the rules defined in
@@ -229,6 +233,10 @@ func (m *LoggingContext) validate(all bool) error {
 	}
 
 	// no validation rules for KubernetesPodLabels
+
+	// no validation rules for Order
+
+	// no validation rules for NumberOfBatches
 
 	if len(errors) > 0 {
 		return LoggingContextMultiError(errors)
