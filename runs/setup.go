@@ -58,6 +58,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(taskPath, taskHandler)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
+	translatorSvc := service.NewTranslatorService()
+	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc)
+	sc.Mux.Handle(translatorPath, translatorHandler)
+	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
+
 	sc.AddReadyCheck(func(r *http.Request) error {
 		sqlDB, err := sc.DB.DB()
 		if err != nil {
