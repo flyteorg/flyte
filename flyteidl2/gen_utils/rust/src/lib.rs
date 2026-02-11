@@ -24,6 +24,10 @@ pub mod flyteidl {
     }
 
     pub mod auth {
+        include!("flyteidl2.app.rs");
+    }
+
+    pub mod auth {
         include!("flyteidl2.auth.rs");
     }
 
