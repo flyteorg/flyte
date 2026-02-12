@@ -9,11 +9,10 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class EnqueueRequest(_message.Message):
-    __slots__ = ["action_id", "parent_action_name", "run_spec", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition"]
+class Action(_message.Message):
+    __slots__ = ["action_id", "parent_action_name", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
-    RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     INPUT_URI_FIELD_NUMBER: _ClassVar[int]
     RUN_OUTPUT_BASE_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
@@ -23,7 +22,6 @@ class EnqueueRequest(_message.Message):
     CONDITION_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
-    run_spec: _run_pb2.RunSpec
     input_uri: str
     run_output_base: str
     group: str
@@ -31,7 +29,15 @@ class EnqueueRequest(_message.Message):
     task: _run_definition_pb2.TaskAction
     trace: _run_definition_pb2.TraceAction
     condition: _run_definition_pb2.ConditionAction
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ...) -> None: ...
+
+class EnqueueRequest(_message.Message):
+    __slots__ = ["action", "run_spec"]
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
+    action: Action
+    run_spec: _run_pb2.RunSpec
+    def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ...) -> None: ...
 
 class EnqueueResponse(_message.Message):
     __slots__ = []
