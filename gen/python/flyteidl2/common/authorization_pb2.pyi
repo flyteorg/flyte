@@ -27,7 +27,7 @@ class Action(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: _ClassVar[Action]
     ACTION_EDIT_UNUSED_ATTRIBUTES: _ClassVar[Action]
     ACTION_SUPPORT_SYSTEM_LOGS: _ClassVar[Action]
-    ACTION_VIEW_USERS: _ClassVar[Action]
+    ACTION_VIEW_IDENTITIES: _ClassVar[Action]
 ACTION_NONE: Action
 ACTION_CREATE: Action
 ACTION_READ: Action
@@ -45,7 +45,7 @@ ACTION_EDIT_EXECUTION_RELATED_ATTRIBUTES: Action
 ACTION_EDIT_CLUSTER_RELATED_ATTRIBUTES: Action
 ACTION_EDIT_UNUSED_ATTRIBUTES: Action
 ACTION_SUPPORT_SYSTEM_LOGS: Action
-ACTION_VIEW_USERS: Action
+ACTION_VIEW_IDENTITIES: Action
 
 class Organization(_message.Message):
     __slots__ = ["name"]
