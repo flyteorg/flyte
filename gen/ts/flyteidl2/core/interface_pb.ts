@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/interface.proto.
  */
 export const file_flyteidl2_core_interface: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9pbnRlcmZhY2UucHJvdG8SDmZseXRlaWRsMi5jb3JlIrYBCghWYXJpYWJsZRIpCgR0eXBlGAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUSEwoLZGVzY3JpcHRpb24YAiABKAkSNwoTYXJ0aWZhY3RfcGFydGlhbF9pZBgDIAEoCzIaLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SUQSMQoMYXJ0aWZhY3RfdGFnGAQgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RUYWcimAEKC1ZhcmlhYmxlTWFwEj0KCXZhcmlhYmxlcxgBIAMoCzIqLmZseXRlaWRsMi5jb3JlLlZhcmlhYmxlTWFwLlZhcmlhYmxlc0VudHJ5GkoKDlZhcmlhYmxlc0VudHJ5EgsKA2tleRgBIAEoCRInCgV2YWx1ZRgCIAEoCzIYLmZseXRlaWRsMi5jb3JlLlZhcmlhYmxlOgI4ASJrCg5UeXBlZEludGVyZmFjZRIrCgZpbnB1dHMYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcBIsCgdvdXRwdXRzGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuVmFyaWFibGVNYXAi6gEKCVBhcmFtZXRlchIlCgN2YXIYASABKAsyGC5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZRIqCgdkZWZhdWx0GAIgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbEgAEhIKCHJlcXVpcmVkGAMgASgISAASNwoOYXJ0aWZhY3RfcXVlcnkYBCABKAsyHS5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdFF1ZXJ5SAASMQoLYXJ0aWZhY3RfaWQYBSABKAsyGi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdElESABCCgoIYmVoYXZpb3IingEKDFBhcmFtZXRlck1hcBJACgpwYXJhbWV0ZXJzGAEgAygLMiwuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyTWFwLlBhcmFtZXRlcnNFbnRyeRpMCg9QYXJhbWV0ZXJzRW50cnkSCwoDa2V5GAEgASgJEigKBXZhbHVlGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyOgI4AUKzAQoSY29tLmZseXRlaWRsMi5jb3JlQg5JbnRlcmZhY2VQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types]);
+  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9pbnRlcmZhY2UucHJvdG8SDmZseXRlaWRsMi5jb3JlIrYBCghWYXJpYWJsZRIpCgR0eXBlGAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUSEwoLZGVzY3JpcHRpb24YAiABKAkSNwoTYXJ0aWZhY3RfcGFydGlhbF9pZBgDIAEoCzIaLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SUQSMQoMYXJ0aWZhY3RfdGFnGAQgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RUYWciRQoNVmFyaWFibGVFbnRyeRILCgNrZXkYASABKAkSJwoFdmFsdWUYAiABKAsyGC5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZSI/CgtWYXJpYWJsZU1hcBIwCgl2YXJpYWJsZXMYASADKAsyHS5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZUVudHJ5ImsKDlR5cGVkSW50ZXJmYWNlEisKBmlucHV0cxgBIAEoCzIbLmZseXRlaWRsMi5jb3JlLlZhcmlhYmxlTWFwEiwKB291dHB1dHMYAiABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcCLqAQoJUGFyYW1ldGVyEiUKA3ZhchgBIAEoCzIYLmZseXRlaWRsMi5jb3JlLlZhcmlhYmxlEioKB2RlZmF1bHQYAiABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsSAASEgoIcmVxdWlyZWQYAyABKAhIABI3Cg5hcnRpZmFjdF9xdWVyeRgEIAEoCzIdLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0UXVlcnlIABIxCgthcnRpZmFjdF9pZBgFIAEoCzIaLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SURIAEIKCghiZWhhdmlvciKeAQoMUGFyYW1ldGVyTWFwEkAKCnBhcmFtZXRlcnMYASADKAsyLC5mbHl0ZWlkbDIuY29yZS5QYXJhbWV0ZXJNYXAuUGFyYW1ldGVyc0VudHJ5GkwKD1BhcmFtZXRlcnNFbnRyeRILCgNrZXkYASABKAkSKAoFdmFsdWUYAiABKAsyGS5mbHl0ZWlkbDIuY29yZS5QYXJhbWV0ZXI6AjgBQrMBChJjb20uZmx5dGVpZGwyLmNvcmVCDkludGVyZmFjZVByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvcmWiAgNGQ1iqAg5GbHl0ZWlkbDIuQ29yZcoCDkZseXRlaWRsMlxDb3Jl4gIaRmx5dGVpZGwyXENvcmVcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OkNvcmViBnByb3RvMw", [file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types]);
 
 /**
  * Defines a strongly typed variable.
@@ -60,17 +60,41 @@ export const VariableSchema: GenMessage<Variable> = /*@__PURE__*/
   messageDesc(file_flyteidl2_core_interface, 0);
 
 /**
+ * Defines a single entity for variable.
+ *
+ * @generated from message flyteidl2.core.VariableEntry
+ */
+export type VariableEntry = Message<"flyteidl2.core.VariableEntry"> & {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key: string;
+
+  /**
+   * @generated from field: flyteidl2.core.Variable value = 2;
+   */
+  value?: Variable;
+};
+
+/**
+ * Describes the message flyteidl2.core.VariableEntry.
+ * Use `create(VariableEntrySchema)` to create a new message.
+ */
+export const VariableEntrySchema: GenMessage<VariableEntry> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_interface, 1);
+
+/**
  * A map of Variables
  *
  * @generated from message flyteidl2.core.VariableMap
  */
 export type VariableMap = Message<"flyteidl2.core.VariableMap"> & {
   /**
-   * Defines a map of variable names to variables.
+   * Use repeated key value pair to maintain ordering across different languages.
    *
-   * @generated from field: map<string, flyteidl2.core.Variable> variables = 1;
+   * @generated from field: repeated flyteidl2.core.VariableEntry variables = 1;
    */
-  variables: { [key: string]: Variable };
+  variables: VariableEntry[];
 };
 
 /**
@@ -78,7 +102,7 @@ export type VariableMap = Message<"flyteidl2.core.VariableMap"> & {
  * Use `create(VariableMapSchema)` to create a new message.
  */
 export const VariableMapSchema: GenMessage<VariableMap> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_interface, 1);
+  messageDesc(file_flyteidl2_core_interface, 2);
 
 /**
  * Defines strongly typed inputs and outputs.
@@ -102,7 +126,7 @@ export type TypedInterface = Message<"flyteidl2.core.TypedInterface"> & {
  * Use `create(TypedInterfaceSchema)` to create a new message.
  */
 export const TypedInterfaceSchema: GenMessage<TypedInterface> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_interface, 2);
+  messageDesc(file_flyteidl2_core_interface, 3);
 
 /**
  * A parameter is used as input to a launch plan and has
@@ -162,7 +186,7 @@ export type Parameter = Message<"flyteidl2.core.Parameter"> & {
  * Use `create(ParameterSchema)` to create a new message.
  */
 export const ParameterSchema: GenMessage<Parameter> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_interface, 3);
+  messageDesc(file_flyteidl2_core_interface, 4);
 
 /**
  * A map of Parameters.
@@ -183,5 +207,5 @@ export type ParameterMap = Message<"flyteidl2.core.ParameterMap"> & {
  * Use `create(ParameterMapSchema)` to create a new message.
  */
 export const ParameterMapSchema: GenMessage<ParameterMap> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_interface, 4);
+  messageDesc(file_flyteidl2_core_interface, 5);
 
