@@ -85,7 +85,7 @@ enum Action {
   // View system logs
   ACTION_SUPPORT_SYSTEM_LOGS = 16;
 
-  // View users
+  // View identities, this includes human users and machine apps (client creds)
   ACTION_VIEW_IDENTITIES = 17;
 }
 

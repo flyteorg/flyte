@@ -315,7 +315,7 @@ export enum Action {
   SUPPORT_SYSTEM_LOGS = 16,
 
   /**
-   * View users
+   * View identities, this includes human users and machine apps (client creds)
    *
    * @generated from enum value: ACTION_VIEW_IDENTITIES = 17;
    */

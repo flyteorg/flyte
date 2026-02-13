@@ -57,7 +57,7 @@ const (
 	Action_ACTION_EDIT_UNUSED_ATTRIBUTES Action = 15
 	// View system logs
 	Action_ACTION_SUPPORT_SYSTEM_LOGS Action = 16
-	// View users
+	// View identities, this includes human users and machine apps (client creds)
 	Action_ACTION_VIEW_IDENTITIES Action = 17
 )
 
