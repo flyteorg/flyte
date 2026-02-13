@@ -125,18 +125,6 @@ message DeleteEvent {
   App app = 1;
 }
 
-// Event message for app list.
-message AppLists {
-  // List of apps.
-  repeated App listed_apps = 1;
-
-  // Created apps
-  repeated App created_apps = 2;
-
-  // Updatted apps
-  repeated App updated_apps = 3;
-}
-
 // Response message for watching app events.
 message WatchResponse {
   oneof event {
@@ -169,7 +157,7 @@ message ListAndWatchRequest {
 // Response message for list and watching apps status.
 message ListAndWatchResponse {
   // List of apps.
-  AppLists app_lists = 1;
+  repeated App apps = 1;
 
   // Indicates when the initial List call is complete, and subsequent messages are updates.
   bool sentinel = 2;

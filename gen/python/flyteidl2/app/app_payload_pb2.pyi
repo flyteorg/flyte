@@ -111,16 +111,6 @@ class DeleteEvent(_message.Message):
     app: _app_definition_pb2.App
     def __init__(self, app: _Optional[_Union[_app_definition_pb2.App, _Mapping]] = ...) -> None: ...
 
-class AppLists(_message.Message):
-    __slots__ = ["listed_apps", "created_apps", "updated_apps"]
-    LISTED_APPS_FIELD_NUMBER: _ClassVar[int]
-    CREATED_APPS_FIELD_NUMBER: _ClassVar[int]
-    UPDATED_APPS_FIELD_NUMBER: _ClassVar[int]
-    listed_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
-    created_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
-    updated_apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
-    def __init__(self, listed_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., created_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., updated_apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ...) -> None: ...
-
 class WatchResponse(_message.Message):
     __slots__ = ["create_event", "update_event", "delete_event"]
     CREATE_EVENT_FIELD_NUMBER: _ClassVar[int]
@@ -144,12 +134,12 @@ class ListAndWatchRequest(_message.Message):
     def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
 
 class ListAndWatchResponse(_message.Message):
-    __slots__ = ["app_lists", "sentinel"]
-    APP_LISTS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["apps", "sentinel"]
+    APPS_FIELD_NUMBER: _ClassVar[int]
     SENTINEL_FIELD_NUMBER: _ClassVar[int]
-    app_lists: AppLists
+    apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
     sentinel: bool
-    def __init__(self, app_lists: _Optional[_Union[AppLists, _Mapping]] = ..., sentinel: bool = ...) -> None: ...
+    def __init__(self, apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., sentinel: bool = ...) -> None: ...
 
 class UpdateStatusRequest(_message.Message):
     __slots__ = ["app"]
