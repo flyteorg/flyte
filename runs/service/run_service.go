@@ -110,15 +110,28 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Create run in database
-	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to create run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	// Resolve run identity from request (mirrors repo logic for name generation)
+	var org, project, domain, name string
+	switch id := req.Msg.Id.(type) {
+	case *workflow.CreateRunRequest_RunId:
+		org = id.RunId.Org
+		project = id.RunId.Project
+		domain = id.RunId.Domain
+		name = id.RunId.Name
+	case *workflow.CreateRunRequest_ProjectId:
+		org = id.ProjectId.Organization
+		project = id.ProjectId.Name
+		domain = id.ProjectId.Domain
+		name = fmt.Sprintf("run-%d", time.Now().Unix())
+	default:
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
 	}
 
+	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
+	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
+	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
+
 	// Persist inputs to storage
-	inputPrefix := buildInputPrefix(s.storagePrefix, run)
 	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
 		literalMap := inputsToLiteralMap(req.Msg.Inputs)
 		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
@@ -127,6 +140,13 @@ func (s *RunService) CreateRun(
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 		}
 		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+	}
+
+	// Create run in database with storage URIs
+	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg, inputPrefix, runOutputBase)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// Enqueue the root action to the queue service
@@ -145,7 +165,7 @@ func (s *RunService) CreateRun(
 		ActionId:      actionID,
 		RunSpec:       req.Msg.RunSpec,
 		InputUri:      inputPrefix,
-		RunOutputBase: buildRunOutputBase(s.storagePrefix, run),
+		RunOutputBase: runOutputBase,
 	}
 
 	// Set the spec based on the task type in CreateRunRequest
@@ -656,7 +676,11 @@ func (s *RunService) WatchActions(
 	runID := req.Msg.RunId
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
-	// Step 1: Send existing TaskAction CRs for this run
+	// Step 1: Subscribe to K8s watch events, filter to this run
+	updatesCh := s.stateClient.Subscribe()
+	defer s.stateClient.Unsubscribe(updatesCh)
+
+	// Step 2: Send existing TaskAction CRs for this run
 	taskActions, err := s.stateClient.ListRunActions(ctx, runID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list TaskAction CRs: %v", err)
@@ -672,10 +696,6 @@ func (s *RunService) WatchActions(
 			return err
 		}
 	}
-
-	// Step 2: Subscribe to K8s watch events, filter to this run
-	updatesCh := s.stateClient.Subscribe()
-	defer s.stateClient.Unsubscribe(updatesCh)
 
 	for {
 		select {
@@ -695,6 +715,12 @@ func (s *RunService) WatchActions(
 
 			metadata := &workflow.ActionMetadata{
 				ActionType: workflow.ActionType_ACTION_TYPE_TASK,
+				Spec: &workflow.ActionMetadata_Task{
+					Task: &workflow.TaskActionMetadata{
+						TaskType:  update.TaskType,
+						ShortName: update.ShortName,
+					},
+				},
 			}
 			if update.ParentActionName != "" {
 				metadata.Parent = update.ParentActionName
@@ -821,10 +847,10 @@ func diffClusterEvents(prev, current []metav1.Condition) []*workflow.ClusterEven
 // buildInputPrefix generates the input path prefix for the root action.
 // The executor appends "inputs.pb" to this prefix when reading.
 // Example: s3://bucket/org/project/domain/run-name/inputs
-func buildInputPrefix(storagePrefix string, run *models.Run) string {
+func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
 	return fmt.Sprintf("%s/%s/%s/%s/%s/inputs",
 		strings.TrimRight(storagePrefix, "/"),
-		run.Org, run.Project, run.Domain, run.Name)
+		org, project, domain, name)
 }
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
@@ -872,10 +898,10 @@ func actionOutputURI(ta *executorv1.TaskAction) string {
 
 // buildRunOutputBase generates the output base path for the run.
 // Example: s3://bucket/org/project/domain/run-name/
-func buildRunOutputBase(storagePrefix string, run *models.Run) string {
+func buildRunOutputBase(storagePrefix, org, project, domain, name string) string {
 	return fmt.Sprintf("%s/%s/%s/%s/%s/",
 		strings.TrimRight(storagePrefix, "/"),
-		run.Org, run.Project, run.Domain, run.Name)
+		org, project, domain, name)
 }
 
 // convertRunToProto converts a repository Run to a proto Run
@@ -958,8 +984,23 @@ func (s *RunService) taskActionToEnrichedProto(ta *executorv1.TaskAction) *workf
 		Name: ta.Spec.ActionName,
 	}
 
+	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	shortName := ta.Spec.ShortName
+	if shortName == "" && len(ta.Spec.TaskTemplate) > 0 {
+		tmpl := &core.TaskTemplate{}
+		if err := proto.Unmarshal(ta.Spec.TaskTemplate, tmpl); err == nil && tmpl.GetId() != nil {
+			shortName = extractShortName(tmpl.GetId().GetName())
+		}
+	}
+
 	metadata := &workflow.ActionMetadata{
 		ActionType: workflow.ActionType_ACTION_TYPE_TASK,
+		Spec: &workflow.ActionMetadata_Task{
+			Task: &workflow.TaskActionMetadata{
+				TaskType:  ta.Spec.TaskType,
+				ShortName: shortName,
+			},
+		},
 	}
 	if ta.Spec.ParentActionName != nil {
 		metadata.Parent = *ta.Spec.ParentActionName
@@ -1155,6 +1196,21 @@ func extractTaskName(specJSON []byte) string {
 	return ""
 }
 
+// extractShortName extracts a human-readable function name from a task template ID name.
+// It removes any environment name prefix (format: "envName.functionName") or if no prefix,
+// splits on '.' and returns the last part.
+func extractShortName(name string) string {
+	if name == "" {
+		return ""
+	}
+	// Split on '.' and take the last part
+	parts := strings.Split(name, ".")
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return name
+}
+
 // taskActionToActionDetails converts a K8s TaskAction CR to a full ActionDetails proto.
 func (s *RunService) taskActionToActionDetails(ta *executorv1.TaskAction) (*workflow.ActionDetails, error) {
 	actionID := &common.ActionIdentifier{
@@ -1167,12 +1223,29 @@ func (s *RunService) taskActionToActionDetails(ta *executorv1.TaskAction) (*work
 		Name: ta.Spec.ActionName,
 	}
 
+	// Deserialize TaskTemplate from spec first (needed for shortName fallback)
+	var tmpl *core.TaskTemplate
+	if len(ta.Spec.TaskTemplate) > 0 {
+		tmpl = &core.TaskTemplate{}
+		if err := proto.Unmarshal(ta.Spec.TaskTemplate, tmpl); err != nil {
+			logger.Warnf(context.Background(), "Failed to unmarshal TaskTemplate: %v", err)
+			tmpl = nil
+		}
+	}
+
+	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	shortName := ta.Spec.ShortName
+	if shortName == "" && tmpl != nil && tmpl.GetId() != nil {
+		shortName = extractShortName(tmpl.GetId().GetName())
+	}
+
 	// Build metadata
 	metadata := &workflow.ActionMetadata{
 		ActionType: workflow.ActionType_ACTION_TYPE_TASK,
 		Spec: &workflow.ActionMetadata_Task{
 			Task: &workflow.TaskActionMetadata{
-				TaskType: ta.Spec.TaskType,
+				TaskType:  ta.Spec.TaskType,
+				ShortName: shortName,
 			},
 		},
 	}
@@ -1195,21 +1268,16 @@ func (s *RunService) taskActionToActionDetails(ta *executorv1.TaskAction) (*work
 		}
 	}
 
-	// Deserialize TaskTemplate from spec
+	// Build details
 	details := &workflow.ActionDetails{
 		Id:       actionID,
 		Metadata: metadata,
 		Status:   status,
 	}
 
-	if len(ta.Spec.TaskTemplate) > 0 {
-		tmpl := &core.TaskTemplate{}
-		if err := proto.Unmarshal(ta.Spec.TaskTemplate, tmpl); err != nil {
-			logger.Warnf(context.Background(), "Failed to unmarshal TaskTemplate: %v", err)
-		} else {
-			details.Spec = &workflow.ActionDetails_Task{
-				Task: &task.TaskSpec{TaskTemplate: tmpl},
-			}
+	if tmpl != nil {
+		details.Spec = &workflow.ActionDetails_Task{
+			Task: &task.TaskSpec{TaskTemplate: tmpl},
 		}
 	}
 

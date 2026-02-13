@@ -136,6 +136,11 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=63
 	TaskType string `json:"taskType"`
 
+	// ShortName is the human-readable display name for this task
+	// +optional
+	// +kubebuilder:validation:MaxLength=63
+	ShortName string `json:"shortName,omitempty"`
+
 	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
 	// +kubebuilder:validation:Required
 	TaskTemplate []byte `json:"taskTemplate"`

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -14,6 +15,7 @@ import (
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // ActionUpdate represents an update to a TaskAction
@@ -24,6 +26,8 @@ type ActionUpdate struct {
 	Phase            string
 	OutputUri        string
 	IsDeleted        bool
+	TaskType         string
+	ShortName        string
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -274,6 +278,12 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		parentName = *taskAction.Spec.ParentActionName
 	}
 
+	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	shortName := taskAction.Spec.ShortName
+	if shortName == "" && len(taskAction.Spec.TaskTemplate) > 0 {
+		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
+	}
+
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
@@ -289,6 +299,8 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		Phase:            GetPhaseFromConditions(taskAction),
 		OutputUri:        buildOutputUri(taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
+		TaskType:         taskAction.Spec.TaskType,
+		ShortName:        shortName,
 	}
 
 	c.notifySubscribers(ctx, update)
@@ -369,4 +381,26 @@ func buildOutputUri(ta *executorv1.TaskAction) string {
 // InitScheme adds the executor API types to the scheme
 func InitScheme() error {
 	return executorv1.AddToScheme(scheme.Scheme)
+}
+
+// extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.
+// It splits on '.' and returns the last part.
+func extractShortNameFromTemplate(templateBytes []byte) string {
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(templateBytes, tmpl); err != nil {
+		return ""
+	}
+	if tmpl.GetId() == nil {
+		return ""
+	}
+	name := tmpl.GetId().GetName()
+	if name == "" {
+		return ""
+	}
+	// Split on '.' and take the last part
+	parts := strings.Split(name, ".")
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return name
 }

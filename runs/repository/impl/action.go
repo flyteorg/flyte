@@ -53,7 +53,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
+func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error) {
 	// Determine run ID
 	var runID *common.RunIdentifier
 	switch id := req.Id.(type) {
@@ -79,8 +79,8 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         "", // TODO: build from inputs
-		RunOutputBase:    "", // TODO: build output path
+		InputUri:         inputUri,
+		RunOutputBase:    runOutputBase,
 	}
 
 	// Set the task spec based on the request

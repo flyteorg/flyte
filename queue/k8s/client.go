@@ -201,8 +201,10 @@ func embedTaskTemplate(req *workflow.EnqueueActionRequest, taskAction *executorv
 		return fmt.Errorf("enqueue request does not contain an inline task template")
 	}
 
-	tmpl := taskReq.Task.Spec.TaskTemplate
+	taskSpec := taskReq.Task.Spec
+	tmpl := taskSpec.TaskTemplate
 	taskAction.Spec.TaskType = tmpl.Type
+	taskAction.Spec.ShortName = taskSpec.ShortName
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
