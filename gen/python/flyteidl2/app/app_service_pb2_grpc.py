@@ -55,6 +55,11 @@ class AppServiceStub(object):
                 request_serializer=flyteidl2_dot_app_dot_app__payload__pb2.LeaseRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_app_dot_app__payload__pb2.LeaseResponse.FromString,
                 )
+        self.ListAndWatch = channel.unary_stream(
+                '/flyteidl2.app.AppService/ListAndWatch',
+                request_serializer=flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchResponse.FromString,
+                )
 
 
 class AppServiceServicer(object):
@@ -117,6 +122,13 @@ class AppServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListAndWatch(self, request, context):
+        """ListAndWatch returns the current list of apps and then streams updates.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AppServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -159,6 +171,11 @@ def add_AppServiceServicer_to_server(servicer, server):
                     servicer.Lease,
                     request_deserializer=flyteidl2_dot_app_dot_app__payload__pb2.LeaseRequest.FromString,
                     response_serializer=flyteidl2_dot_app_dot_app__payload__pb2.LeaseResponse.SerializeToString,
+            ),
+            'ListAndWatch': grpc.unary_stream_rpc_method_handler(
+                    servicer.ListAndWatch,
+                    request_deserializer=flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchRequest.FromString,
+                    response_serializer=flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -304,5 +321,22 @@ class AppService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.app.AppService/Lease',
             flyteidl2_dot_app_dot_app__payload__pb2.LeaseRequest.SerializeToString,
             flyteidl2_dot_app_dot_app__payload__pb2.LeaseResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListAndWatch(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.app.AppService/ListAndWatch',
+            flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchRequest.SerializeToString,
+            flyteidl2_dot_app_dot_app__payload__pb2.ListAndWatchResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

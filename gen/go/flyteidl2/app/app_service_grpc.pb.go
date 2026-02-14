@@ -27,6 +27,7 @@ const (
 	AppService_List_FullMethodName         = "/flyteidl2.app.AppService/List"
 	AppService_Watch_FullMethodName        = "/flyteidl2.app.AppService/Watch"
 	AppService_Lease_FullMethodName        = "/flyteidl2.app.AppService/Lease"
+	AppService_ListAndWatch_FullMethodName = "/flyteidl2.app.AppService/ListAndWatch"
 )
 
 // AppServiceClient is the client API for AppService service.
@@ -49,6 +50,8 @@ type AppServiceClient interface {
 	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (AppService_WatchClient, error)
 	// Lease leases apps.
 	Lease(ctx context.Context, in *LeaseRequest, opts ...grpc.CallOption) (AppService_LeaseClient, error)
+	// ListAndWatch returns the current list of apps and then streams updates.
+	ListAndWatch(ctx context.Context, in *ListAndWatchRequest, opts ...grpc.CallOption) (AppService_ListAndWatchClient, error)
 }
 
 type appServiceClient struct {
@@ -177,6 +180,38 @@ func (x *appServiceLeaseClient) Recv() (*LeaseResponse, error) {
 	return m, nil
 }
 
+func (c *appServiceClient) ListAndWatch(ctx context.Context, in *ListAndWatchRequest, opts ...grpc.CallOption) (AppService_ListAndWatchClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AppService_ServiceDesc.Streams[2], AppService_ListAndWatch_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &appServiceListAndWatchClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type AppService_ListAndWatchClient interface {
+	Recv() (*ListAndWatchResponse, error)
+	grpc.ClientStream
+}
+
+type appServiceListAndWatchClient struct {
+	grpc.ClientStream
+}
+
+func (x *appServiceListAndWatchClient) Recv() (*ListAndWatchResponse, error) {
+	m := new(ListAndWatchResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // AppServiceServer is the server API for AppService service.
 // All implementations should embed UnimplementedAppServiceServer
 // for forward compatibility
@@ -197,6 +232,8 @@ type AppServiceServer interface {
 	Watch(*WatchRequest, AppService_WatchServer) error
 	// Lease leases apps.
 	Lease(*LeaseRequest, AppService_LeaseServer) error
+	// ListAndWatch returns the current list of apps and then streams updates.
+	ListAndWatch(*ListAndWatchRequest, AppService_ListAndWatchServer) error
 }
 
 // UnimplementedAppServiceServer should be embedded to have forward compatible implementations.
@@ -226,6 +263,9 @@ func (UnimplementedAppServiceServer) Watch(*WatchRequest, AppService_WatchServer
 }
 func (UnimplementedAppServiceServer) Lease(*LeaseRequest, AppService_LeaseServer) error {
 	return status.Errorf(codes.Unimplemented, "method Lease not implemented")
+}
+func (UnimplementedAppServiceServer) ListAndWatch(*ListAndWatchRequest, AppService_ListAndWatchServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListAndWatch not implemented")
 }
 
 // UnsafeAppServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -389,6 +429,27 @@ func (x *appServiceLeaseServer) Send(m *LeaseResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _AppService_ListAndWatch_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListAndWatchRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AppServiceServer).ListAndWatch(m, &appServiceListAndWatchServer{stream})
+}
+
+type AppService_ListAndWatchServer interface {
+	Send(*ListAndWatchResponse) error
+	grpc.ServerStream
+}
+
+type appServiceListAndWatchServer struct {
+	grpc.ServerStream
+}
+
+func (x *appServiceListAndWatchServer) Send(m *ListAndWatchResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // AppService_ServiceDesc is the grpc.ServiceDesc for AppService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -430,6 +491,11 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Lease",
 			Handler:       _AppService_Lease_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListAndWatch",
+			Handler:       _AppService_ListAndWatch_Handler,
 			ServerStreams: true,
 		},
 	},

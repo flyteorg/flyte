@@ -49,6 +49,8 @@ const (
 	AppServiceWatchProcedure = "/flyteidl2.app.AppService/Watch"
 	// AppServiceLeaseProcedure is the fully-qualified name of the AppService's Lease RPC.
 	AppServiceLeaseProcedure = "/flyteidl2.app.AppService/Lease"
+	// AppServiceListAndWatchProcedure is the fully-qualified name of the AppService's ListAndWatch RPC.
+	AppServiceListAndWatchProcedure = "/flyteidl2.app.AppService/ListAndWatch"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -62,6 +64,7 @@ var (
 	appServiceListMethodDescriptor         = appServiceServiceDescriptor.Methods().ByName("List")
 	appServiceWatchMethodDescriptor        = appServiceServiceDescriptor.Methods().ByName("Watch")
 	appServiceLeaseMethodDescriptor        = appServiceServiceDescriptor.Methods().ByName("Lease")
+	appServiceListAndWatchMethodDescriptor = appServiceServiceDescriptor.Methods().ByName("ListAndWatch")
 )
 
 // AppServiceClient is a client for the flyteidl2.app.AppService service.
@@ -82,6 +85,8 @@ type AppServiceClient interface {
 	Watch(context.Context, *connect.Request[app.WatchRequest]) (*connect.ServerStreamForClient[app.WatchResponse], error)
 	// Lease leases apps.
 	Lease(context.Context, *connect.Request[app.LeaseRequest]) (*connect.ServerStreamForClient[app.LeaseResponse], error)
+	// ListAndWatch returns the current list of apps and then streams updates.
+	ListAndWatch(context.Context, *connect.Request[app.ListAndWatchRequest]) (*connect.ServerStreamForClient[app.ListAndWatchResponse], error)
 }
 
 // NewAppServiceClient constructs a client for the flyteidl2.app.AppService service. By default, it
@@ -145,6 +150,13 @@ func NewAppServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(appServiceLeaseMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		listAndWatch: connect.NewClient[app.ListAndWatchRequest, app.ListAndWatchResponse](
+			httpClient,
+			baseURL+AppServiceListAndWatchProcedure,
+			connect.WithSchema(appServiceListAndWatchMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -158,6 +170,7 @@ type appServiceClient struct {
 	list         *connect.Client[app.ListRequest, app.ListResponse]
 	watch        *connect.Client[app.WatchRequest, app.WatchResponse]
 	lease        *connect.Client[app.LeaseRequest, app.LeaseResponse]
+	listAndWatch *connect.Client[app.ListAndWatchRequest, app.ListAndWatchResponse]
 }
 
 // Create calls flyteidl2.app.AppService.Create.
@@ -200,6 +213,11 @@ func (c *appServiceClient) Lease(ctx context.Context, req *connect.Request[app.L
 	return c.lease.CallServerStream(ctx, req)
 }
 
+// ListAndWatch calls flyteidl2.app.AppService.ListAndWatch.
+func (c *appServiceClient) ListAndWatch(ctx context.Context, req *connect.Request[app.ListAndWatchRequest]) (*connect.ServerStreamForClient[app.ListAndWatchResponse], error) {
+	return c.listAndWatch.CallServerStream(ctx, req)
+}
+
 // AppServiceHandler is an implementation of the flyteidl2.app.AppService service.
 type AppServiceHandler interface {
 	// Create creates a new app.
@@ -218,6 +236,8 @@ type AppServiceHandler interface {
 	Watch(context.Context, *connect.Request[app.WatchRequest], *connect.ServerStream[app.WatchResponse]) error
 	// Lease leases apps.
 	Lease(context.Context, *connect.Request[app.LeaseRequest], *connect.ServerStream[app.LeaseResponse]) error
+	// ListAndWatch returns the current list of apps and then streams updates.
+	ListAndWatch(context.Context, *connect.Request[app.ListAndWatchRequest], *connect.ServerStream[app.ListAndWatchResponse]) error
 }
 
 // NewAppServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -277,6 +297,13 @@ func NewAppServiceHandler(svc AppServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(appServiceLeaseMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	appServiceListAndWatchHandler := connect.NewServerStreamHandler(
+		AppServiceListAndWatchProcedure,
+		svc.ListAndWatch,
+		connect.WithSchema(appServiceListAndWatchMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.app.AppService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AppServiceCreateProcedure:
@@ -295,6 +322,8 @@ func NewAppServiceHandler(svc AppServiceHandler, opts ...connect.HandlerOption) 
 			appServiceWatchHandler.ServeHTTP(w, r)
 		case AppServiceLeaseProcedure:
 			appServiceLeaseHandler.ServeHTTP(w, r)
+		case AppServiceListAndWatchProcedure:
+			appServiceListAndWatchHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -334,4 +363,8 @@ func (UnimplementedAppServiceHandler) Watch(context.Context, *connect.Request[ap
 
 func (UnimplementedAppServiceHandler) Lease(context.Context, *connect.Request[app.LeaseRequest], *connect.ServerStream[app.LeaseResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Lease is not implemented"))
+}
+
+func (UnimplementedAppServiceHandler) ListAndWatch(context.Context, *connect.Request[app.ListAndWatchRequest], *connect.ServerStream[app.ListAndWatchResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.ListAndWatch is not implemented"))
 }

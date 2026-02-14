@@ -137,6 +137,32 @@ message WatchResponse {
   }
 }
 
+// Request message for listing and watching apps.
+message ListAndWatchRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof filter_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering apps.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+    // Cluster identifier for filtering apps.
+    common.ClusterIdentifier cluster_id = 3;
+    // Project identifier for filtering apps.
+    common.ProjectIdentifier project = 4;
+  }
+}
+
+// Response message for list and watching apps status.
+message ListAndWatchResponse {
+  // List of apps.
+  repeated App apps = 1;
+
+  // Indicates when the initial List call is complete, and subsequent messages are updates.
+  bool sentinel = 2;
+}
+
 // Request message for updating app status.
 message UpdateStatusRequest {
   // The app with updated status.

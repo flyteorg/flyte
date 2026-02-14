@@ -121,6 +121,26 @@ class WatchResponse(_message.Message):
     delete_event: DeleteEvent
     def __init__(self, create_event: _Optional[_Union[CreateEvent, _Mapping]] = ..., update_event: _Optional[_Union[UpdateEvent, _Mapping]] = ..., delete_event: _Optional[_Union[DeleteEvent, _Mapping]] = ...) -> None: ...
 
+class ListAndWatchRequest(_message.Message):
+    __slots__ = ["request", "org", "cluster_id", "project"]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    request: _list_pb2.ListRequest
+    org: str
+    cluster_id: _identifier_pb2.ClusterIdentifier
+    project: _identifier_pb2.ProjectIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+
+class ListAndWatchResponse(_message.Message):
+    __slots__ = ["apps", "sentinel"]
+    APPS_FIELD_NUMBER: _ClassVar[int]
+    SENTINEL_FIELD_NUMBER: _ClassVar[int]
+    apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    sentinel: bool
+    def __init__(self, apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., sentinel: bool = ...) -> None: ...
+
 class UpdateStatusRequest(_message.Message):
     __slots__ = ["app"]
     APP_FIELD_NUMBER: _ClassVar[int]

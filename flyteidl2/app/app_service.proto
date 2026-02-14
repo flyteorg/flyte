@@ -37,4 +37,9 @@ service AppService {
 
   // Lease leases apps.
   rpc Lease(LeaseRequest) returns (stream LeaseResponse) {}
+
+  // ListAndWatch returns the current list of apps and then streams updates.
+  rpc ListAndWatch(ListAndWatchRequest) returns (stream ListAndWatchResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }

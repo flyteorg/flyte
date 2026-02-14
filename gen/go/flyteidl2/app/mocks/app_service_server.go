@@ -306,6 +306,53 @@ func (_c *AppServiceServer_List_Call) RunAndReturn(run func(context.Context, *ap
 	return _c
 }
 
+// ListAndWatch provides a mock function with given fields: _a0, _a1
+func (_m *AppServiceServer) ListAndWatch(_a0 *app.ListAndWatchRequest, _a1 app.AppService_ListAndWatchServer) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListAndWatch")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*app.ListAndWatchRequest, app.AppService_ListAndWatchServer) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// AppServiceServer_ListAndWatch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListAndWatch'
+type AppServiceServer_ListAndWatch_Call struct {
+	*mock.Call
+}
+
+// ListAndWatch is a helper method to define mock.On call
+//   - _a0 *app.ListAndWatchRequest
+//   - _a1 app.AppService_ListAndWatchServer
+func (_e *AppServiceServer_Expecter) ListAndWatch(_a0 interface{}, _a1 interface{}) *AppServiceServer_ListAndWatch_Call {
+	return &AppServiceServer_ListAndWatch_Call{Call: _e.mock.On("ListAndWatch", _a0, _a1)}
+}
+
+func (_c *AppServiceServer_ListAndWatch_Call) Run(run func(_a0 *app.ListAndWatchRequest, _a1 app.AppService_ListAndWatchServer)) *AppServiceServer_ListAndWatch_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*app.ListAndWatchRequest), args[1].(app.AppService_ListAndWatchServer))
+	})
+	return _c
+}
+
+func (_c *AppServiceServer_ListAndWatch_Call) Return(_a0 error) *AppServiceServer_ListAndWatch_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *AppServiceServer_ListAndWatch_Call) RunAndReturn(run func(*app.ListAndWatchRequest, app.AppService_ListAndWatchServer) error) *AppServiceServer_ListAndWatch_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: _a0, _a1
 func (_m *AppServiceServer) Update(_a0 context.Context, _a1 *app.UpdateRequest) (*app.UpdateResponse, error) {
 	ret := _m.Called(_a0, _a1)
