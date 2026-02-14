@@ -185,9 +185,9 @@ func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, u
 	return _c
 }
 
-// CreateRun provides a mock function with given fields: ctx, req
-func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
-	ret := _m.Called(ctx, req)
+// CreateRun provides a mock function with given fields: ctx, run
+func (_m *ActionRepo) CreateRun(ctx context.Context, run *models.Run) (*models.Run, error) {
+	ret := _m.Called(ctx, run)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRun")
@@ -195,19 +195,19 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 
 	var r0 *models.Run
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest) (*models.Run, error)); ok {
-		return rf(ctx, req)
+	if rf, ok := ret.Get(0).(func(context.Context, *models.Run) (*models.Run, error)); ok {
+		return rf(ctx, run)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest) *models.Run); ok {
-		r0 = rf(ctx, req)
+	if rf, ok := ret.Get(0).(func(context.Context, *models.Run) *models.Run); ok {
+		r0 = rf(ctx, run)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Run)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *workflow.CreateRunRequest) error); ok {
-		r1 = rf(ctx, req)
+	if rf, ok := ret.Get(1).(func(context.Context, *models.Run) error); ok {
+		r1 = rf(ctx, run)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -222,14 +222,14 @@ type ActionRepo_CreateRun_Call struct {
 
 // CreateRun is a helper method to define mock.On call
 //   - ctx context.Context
-//   - req *workflow.CreateRunRequest
-func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}) *ActionRepo_CreateRun_Call {
-	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req)}
+//   - run *models.Run
+func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, run interface{}) *ActionRepo_CreateRun_Call {
+	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, run)}
 }
 
-func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, run *models.Run)) *ActionRepo_CreateRun_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*workflow.CreateRunRequest))
+		run(args[0].(context.Context), args[1].(*models.Run))
 	})
 	return _c
 }
@@ -239,7 +239,7 @@ func (_c *ActionRepo_CreateRun_Call) Return(_a0 *models.Run, _a1 error) *ActionR
 	return _c
 }
 
-func (_c *ActionRepo_CreateRun_Call) RunAndReturn(run func(context.Context, *workflow.CreateRunRequest) (*models.Run, error)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) RunAndReturn(run func(context.Context, *models.Run) (*models.Run, error)) *ActionRepo_CreateRun_Call {
 	_c.Call.Return(run)
 	return _c
 }

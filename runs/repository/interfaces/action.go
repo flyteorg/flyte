@@ -11,7 +11,7 @@ import (
 // ActionRepo defines the interface for actions/runs data access
 type ActionRepo interface {
 	// Run operations
-	CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error)
+	CreateRun(ctx context.Context, run *models.Run) (*models.Run, error)
 	GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error)
 	ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error)
 	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
