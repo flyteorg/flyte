@@ -4,7 +4,10 @@ set -ex
 
 echo "Running go generate"
 go generate ./...
-go mod tidy
+# Only run go mod tidy when explicitly requested (avoids incidental go.sum/go.mod churn from make generate)
+if [ -n "${RUN_GO_TIDY:-}" ]; then
+  go mod tidy
+fi
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)

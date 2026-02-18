@@ -29,3 +29,12 @@ jobs:
           go-version-file: ${{ inputs.component }}/go.mod
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate
+      - name: Verify idempotency (second run must not change anything)
+        run: |
+          make generate
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "FAILED: make generate is not idempotent (second run produced changes)."
+            git diff --name-only
+            exit 1
+          fi
+          echo "SUCCESS: make generate is idempotent."
