@@ -154,13 +154,21 @@ message ListAndWatchRequest {
   }
 }
 
-// Response message for list and watching apps status.
-message ListAndWatchResponse {
+// Apps list message for ListAndWatchResponse
+message AppList {
   // List of apps.
   repeated App apps = 1;
+}
 
-  // Indicates when the initial List call is complete, and subsequent messages are updates.
-  bool sentinel = 2;
+// Response message for list and watching apps status.
+message ListAndWatchResponse {
+  oneof resp {
+    // List of apps.
+    AppList apps = 1;
+
+    // Indicates when the initial List call is complete, and subsequent messages are updates.
+    bool sentinel = 2;
+  }
 }
 
 // Request message for updating app status.

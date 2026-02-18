@@ -2568,6 +2568,138 @@ var _ interface {
 	ErrorName() string
 } = ListAndWatchRequestValidationError{}
 
+// Validate checks the field values on AppList with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppList) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppList with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in AppListMultiError, or nil if none found.
+func (m *AppList) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppList) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetApps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AppListValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AppListValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AppListValidationError{
+					field:  fmt.Sprintf("Apps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return AppListMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppListMultiError is an error wrapping multiple validation errors returned
+// by AppList.ValidateAll() if the designated constraints aren't met.
+type AppListMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppListMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppListMultiError) AllErrors() []error { return m }
+
+// AppListValidationError is the validation error returned by AppList.Validate
+// if the designated constraints aren't met.
+type AppListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppListValidationError) ErrorName() string { return "AppListValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppListValidationError{}
+
 // Validate checks the field values on ListAndWatchResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -2590,15 +2722,25 @@ func (m *ListAndWatchResponse) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetApps() {
-		_, _ = idx, item
+	switch v := m.Resp.(type) {
+	case *ListAndWatchResponse_Apps:
+		if v == nil {
+			err := ListAndWatchResponseValidationError{
+				field:  "Resp",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
-			switch v := interface{}(item).(type) {
+			switch v := interface{}(m.GetApps()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ListAndWatchResponseValidationError{
-						field:  fmt.Sprintf("Apps[%v]", idx),
+						field:  "Apps",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2606,25 +2748,37 @@ func (m *ListAndWatchResponse) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ListAndWatchResponseValidationError{
-						field:  fmt.Sprintf("Apps[%v]", idx),
+						field:  "Apps",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetApps()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListAndWatchResponseValidationError{
-					field:  fmt.Sprintf("Apps[%v]", idx),
+					field:  "Apps",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
+	case *ListAndWatchResponse_Sentinel:
+		if v == nil {
+			err := ListAndWatchResponseValidationError{
+				field:  "Resp",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for Sentinel
+	default:
+		_ = v // ensures v is used
 	}
-
-	// no validation rules for Sentinel
 
 	if len(errors) > 0 {
 		return ListAndWatchResponseMultiError(errors)

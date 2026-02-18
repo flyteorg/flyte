@@ -133,13 +133,19 @@ class ListAndWatchRequest(_message.Message):
     project: _identifier_pb2.ProjectIdentifier
     def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
 
+class AppList(_message.Message):
+    __slots__ = ["apps"]
+    APPS_FIELD_NUMBER: _ClassVar[int]
+    apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    def __init__(self, apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ...) -> None: ...
+
 class ListAndWatchResponse(_message.Message):
     __slots__ = ["apps", "sentinel"]
     APPS_FIELD_NUMBER: _ClassVar[int]
     SENTINEL_FIELD_NUMBER: _ClassVar[int]
-    apps: _containers.RepeatedCompositeFieldContainer[_app_definition_pb2.App]
+    apps: AppList
     sentinel: bool
-    def __init__(self, apps: _Optional[_Iterable[_Union[_app_definition_pb2.App, _Mapping]]] = ..., sentinel: bool = ...) -> None: ...
+    def __init__(self, apps: _Optional[_Union[AppList, _Mapping]] = ..., sentinel: bool = ...) -> None: ...
 
 class UpdateStatusRequest(_message.Message):
     __slots__ = ["app"]
