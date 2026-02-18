@@ -71,8 +71,29 @@ jobs:
       component: ${{ matrix.component }}
       cache_key: ${{ needs.flyteadmin-int-tests-image-build.outputs.cache_key }}
 
+  generate-filter:
+    name: Paths filter for generate
+    runs-on: ubuntu-latest
+    outputs:
+      generate: ${{ steps.filter.outputs.generate }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            generate:
+              - 'datacatalog/**'
+              - 'flyteadmin/**'
+              - 'flytecopilot/**'
+              - 'flytectl/**'
+              - 'flytepropeller/**'
+              - 'boilerplate/flyte/golang_test_targets/**'
+
   generate:
     name: Check Go Generate
+    needs: generate-filter
+    if: needs.generate-filter.outputs.generate == 'true'
     strategy:
       fail-fast: false
       matrix:
