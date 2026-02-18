@@ -775,8 +775,8 @@ impl V2TaskManager {
 
         let running_count = tasks
             .values()
-            .filter(|task_info| {
-                task_info.phase != FAILED && task_info.phase != 8 && task_info.phase != SUCCEEDED
+            .filter(|&task_info| {
+                !is_terminal(task_info.phase)
             })
             .count();
         if running_count >= max_parallelism as usize {
