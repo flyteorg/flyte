@@ -212,6 +212,10 @@ func (k *kResolver) run() {
 			case watch.Bookmark:
 				// The lastResourceVersion is already updated, no further action needed
 			case watch.Error:
+				// Reset lastResourceVersion so wait.Until restarts with a fresh list/watch.
+				// Without this, a 410 Gone (resource version too old) causes an infinite
+				// retry loop with the same stale version. See FAB-110.
+				k.lastResourceVersion = ""
 				status, ok := event.Object.(*metav1.Status)
 				if !ok {
 					logger.Errorf(k.ctx, "k8s resolver: watcher received an error but couldn't parse it")
