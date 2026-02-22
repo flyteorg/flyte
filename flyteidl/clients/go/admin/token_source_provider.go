@@ -209,8 +209,14 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 
 func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	return &customTokenSource{
-		ctx:        ctx,
-		new:        p.ccConfig.TokenSource(ctx),
+		ctx: ctx,
+		// clientcredentials.Config.TokenSource() internally uses an in-memory reuse
+		// source based on oauth2.Token.Expiry. Some providers return mismatched
+		// oauth2 expiry vs JWT exp, so we fetch directly and rely on utils.Valid
+		// + tokenCache for reuse decisions.
+		fetchNewToken: func() (*oauth2.Token, error) {
+			return p.ccConfig.Token(ctx)
+		},
 		mu:         sync.Mutex{},
 		tokenCache: p.tokenCache,
 		cfg:        p.cfg,
@@ -218,11 +224,11 @@ func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context
 }
 
 type customTokenSource struct {
-	ctx        context.Context
-	mu         sync.Mutex // guards everything else
-	new        oauth2.TokenSource
-	tokenCache cache.TokenCache
-	cfg        *Config
+	ctx           context.Context
+	mu            sync.Mutex // guards everything else
+	fetchNewToken func() (*oauth2.Token, error)
+	tokenCache    cache.TokenCache
+	cfg           *Config
 }
 
 func (s *customTokenSource) Token() (*oauth2.Token, error) {
@@ -242,10 +248,14 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 	}
 
 	var token *oauth2.Token
+	if s.fetchNewToken == nil {
+		return nil, fmt.Errorf("failed to get new token: token fetcher is not configured")
+	}
+
 	err := retry.OnError(backoff, func(err error) bool {
 		return err != nil
 	}, func() (err error) {
-		token, err = s.new.Token()
+		token, err = s.fetchNewToken()
 		if err != nil {
 			logger.Debugf(s.ctx, "failed to get new token: %w", err)
 			return err
