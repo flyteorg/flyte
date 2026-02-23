@@ -479,8 +479,9 @@ func (m *MetricsManager) parseNodeExecutions(ctx context.Context, nodeExecutions
 		}
 
 		if node == nil {
-			return fmt.Errorf("failed to discover workflow node '%s' in workflow '%+v'",
+			logger.Warnf(ctx, "failed to discover workflow node '%s' in workflow '%+v'",
 				specNodeID, compiledWorkflowClosure.Primary.Template.Id)
+			continue
 		}
 
 		// parse node execution

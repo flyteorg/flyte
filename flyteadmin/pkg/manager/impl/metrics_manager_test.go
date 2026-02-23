@@ -685,6 +685,155 @@ func TestParseLaunchPlanNodeExecution(t *testing.T) {
 	}
 }
 
+func TestParseNodeExecutions_UnknownNodeSkipped(t *testing.T) {
+	// node executions include a node ("fn0") not present in the compiled workflow template
+	nodeExecutions := map[string]*admin.NodeExecution{
+		"start-node": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "start-node",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: baseTimestamp,
+				UpdatedAt: addTimestamp(baseTimestamp, 5),
+			},
+		},
+		"fn0": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "fn0",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: addTimestamp(baseTimestamp, 10),
+				StartedAt: addTimestamp(baseTimestamp, 15),
+				Duration:  baseDuration,
+				UpdatedAt: addTimestamp(baseTimestamp, 420),
+			},
+		},
+		"end-node": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "end-node",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: addTimestamp(baseTimestamp, 430),
+				UpdatedAt: addTimestamp(baseTimestamp, 435),
+			},
+		},
+	}
+
+	// compiled workflow template has no "fn0" node
+	compiledWorkflowClosure := &core.CompiledWorkflowClosure{
+		Primary: &core.CompiledWorkflow{
+			Connections: &core.ConnectionSet{
+				Upstream: map[string]*core.ConnectionSet_IdList{
+					"end-node": {
+						Ids: []string{"start-node"},
+					},
+				},
+			},
+			Template: &core.WorkflowTemplate{
+				Id:    &core.Identifier{Name: "test-workflow"},
+				Nodes: []*core.Node{},
+			},
+		},
+	}
+
+	mockTaskExecutionManager := getMockTaskExecutionManager([]*admin.TaskExecution{})
+	metricsManager := MetricsManager{
+		taskExecutionManager: mockTaskExecutionManager,
+	}
+
+	spans := make([]*core.Span, 0)
+	err := metricsManager.parseNodeExecutions(context.TODO(), nodeExecutions, compiledWorkflowClosure, &spans, -1)
+	assert.Nil(t, err)
+
+	// fn0 should be skipped, so no reference spans
+	_, referenceCount := parseSpans(spans)
+	assert.Equal(t, 0, referenceCount)
+}
+
+func TestParseNodeExecutions_KnownAndUnknownNodes(t *testing.T) {
+	// node executions include both a known node ("foo") and an unknown node ("fn0")
+	nodeExecutions := map[string]*admin.NodeExecution{
+		"start-node": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "start-node",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: baseTimestamp,
+				UpdatedAt: addTimestamp(baseTimestamp, 5),
+			},
+		},
+		"foo": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "foo",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: addTimestamp(baseTimestamp, 10),
+				StartedAt: addTimestamp(baseTimestamp, 15),
+				Duration:  baseDuration,
+				UpdatedAt: addTimestamp(baseTimestamp, 420),
+			},
+		},
+		"fn0": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "fn0",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: addTimestamp(baseTimestamp, 10),
+				StartedAt: addTimestamp(baseTimestamp, 15),
+				Duration:  baseDuration,
+				UpdatedAt: addTimestamp(baseTimestamp, 420),
+			},
+		},
+		"end-node": {
+			Metadata: &admin.NodeExecutionMetaData{
+				SpecNodeId: "end-node",
+			},
+			Closure: &admin.NodeExecutionClosure{
+				CreatedAt: addTimestamp(baseTimestamp, 430),
+				UpdatedAt: addTimestamp(baseTimestamp, 435),
+			},
+		},
+	}
+
+	// compiled workflow template only has "foo", not "fn0"
+	compiledWorkflowClosure := &core.CompiledWorkflowClosure{
+		Primary: &core.CompiledWorkflow{
+			Connections: &core.ConnectionSet{
+				Upstream: map[string]*core.ConnectionSet_IdList{
+					"foo": {
+						Ids: []string{"start-node"},
+					},
+					"end-node": {
+						Ids: []string{"foo"},
+					},
+				},
+			},
+			Template: &core.WorkflowTemplate{
+				Id: &core.Identifier{Name: "test-workflow"},
+				Nodes: []*core.Node{
+					{
+						Id:     "foo",
+						Target: &core.Node_TaskNode{},
+					},
+				},
+			},
+		},
+	}
+
+	mockTaskExecutionManager := getMockTaskExecutionManager([]*admin.TaskExecution{})
+	metricsManager := MetricsManager{
+		taskExecutionManager: mockTaskExecutionManager,
+	}
+
+	spans := make([]*core.Span, 0)
+	err := metricsManager.parseNodeExecutions(context.TODO(), nodeExecutions, compiledWorkflowClosure, &spans, -1)
+	assert.Nil(t, err)
+
+	// fn0 should be skipped but foo should still produce a reference span
+	_, referenceCount := parseSpans(spans)
+	assert.Equal(t, 1, referenceCount)
+}
+
 func TestParseSubworkflowNodeExecution(t *testing.T) {
 	tests := []struct {
 		name               string
