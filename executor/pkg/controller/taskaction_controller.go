@@ -125,7 +125,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		err = r.Status().Update(ctx, taskAction)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
