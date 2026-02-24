@@ -212,6 +212,8 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	)
 	if err != nil {
 		logger.Error(err, "failed to build context for abort/finalize")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, "FinalizationSkipped",
+			"Could not build task execution context; skipping Abort/Finalize. Underlying resources may need manual cleanup: %v", err)
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
