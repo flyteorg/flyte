@@ -32,10 +32,4 @@ message Domain {
   // Timestamp when the domain was created.
   google.protobuf.Timestamp created_at = 3;
 
-  // Domain-level settings (optional, populated when include_settings=true).
-  //Settings settings = 4;
-
-  // Version hash for settings optimistic locking.
-  // Only populated when settings is populated.
-  //string settings_version = 5;
-}
+ }
