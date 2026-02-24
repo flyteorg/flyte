@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type bufferedEventRecorder struct {
@@ -384,4 +385,108 @@ func TestUpdateExternalResourceSubnodePhases(t *testing.T) {
 			assert.Equal(t, test.expectedUpdatedExternalResources, result)
 		})
 	}
+}
+
+func TestBuildExternalResourceCustomInfoFromTaskEvent(t *testing.T) {
+	t.Run("prefers metadata external resource custom info", func(t *testing.T) {
+		metadataCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "metadata"})
+		assert.NoError(t, err)
+
+		taskCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "task"})
+		assert.NoError(t, err)
+
+		taskExecutionEvent := &event.TaskExecutionEvent{
+			CustomInfo: taskCustomInfo,
+			Metadata: &event.TaskExecutionMetadata{
+				ExternalResources: []*event.ExternalResourceInfo{
+					{CustomInfo: metadataCustomInfo},
+				},
+			},
+		}
+
+		assert.Equal(t, metadataCustomInfo, buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent))
+	})
+
+	t.Run("uses metadata custom info when exactly one metadata custom info exists across multiple resources", func(t *testing.T) {
+		metadataCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "metadata"})
+		assert.NoError(t, err)
+
+		taskCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "task"})
+		assert.NoError(t, err)
+
+		taskExecutionEvent := &event.TaskExecutionEvent{
+			CustomInfo: taskCustomInfo,
+			Metadata: &event.TaskExecutionMetadata{
+				ExternalResources: []*event.ExternalResourceInfo{
+					{},
+					{CustomInfo: metadataCustomInfo},
+				},
+			},
+		}
+
+		assert.Equal(t, metadataCustomInfo, buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent))
+	})
+
+	t.Run("falls back to task custom info when multiple metadata custom infos exist", func(t *testing.T) {
+		firstMetadataCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "metadata-first"})
+		assert.NoError(t, err)
+
+		secondMetadataCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "metadata-second"})
+		assert.NoError(t, err)
+
+		taskCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "task"})
+		assert.NoError(t, err)
+
+		taskExecutionEvent := &event.TaskExecutionEvent{
+			CustomInfo: taskCustomInfo,
+			Metadata: &event.TaskExecutionMetadata{
+				ExternalResources: []*event.ExternalResourceInfo{
+					{CustomInfo: firstMetadataCustomInfo},
+					{CustomInfo: secondMetadataCustomInfo},
+				},
+			},
+		}
+
+		assert.Equal(t, taskCustomInfo, buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent))
+	})
+
+	t.Run("falls back to task custom info", func(t *testing.T) {
+		taskCustomInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{"source": "task"})
+		assert.NoError(t, err)
+
+		taskExecutionEvent := &event.TaskExecutionEvent{
+			CustomInfo: taskCustomInfo,
+		}
+
+		assert.Equal(t, taskCustomInfo, buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent))
+	})
+
+	t.Run("falls back to task error when custom info is missing", func(t *testing.T) {
+		taskExecutionEvent := &event.TaskExecutionEvent{
+			OutputResult: &event.TaskExecutionEvent_Error{
+				Error: &idlcore.ExecutionError{
+					Code:    "OOMKilled",
+					Message: "container terminated with exit code (137)",
+					Kind:    idlcore.ExecutionError_USER,
+				},
+			},
+		}
+
+		customInfo := buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent)
+		if assert.NotNil(t, customInfo) {
+			if assert.Contains(t, customInfo.Fields, "error") {
+				errorInfo := customInfo.Fields["error"].GetStructValue()
+				if assert.NotNil(t, errorInfo) {
+					assert.Equal(t, "OOMKilled", errorInfo.Fields["code"].GetStringValue())
+					assert.Contains(t, errorInfo.Fields["message"].GetStringValue(), "exit code")
+					assert.Equal(t, "USER", errorInfo.Fields["kind"].GetStringValue())
+				}
+			}
+		}
+	})
+
+	t.Run("returns nil when no custom info or task error exists", func(t *testing.T) {
+		taskExecutionEvent := &event.TaskExecutionEvent{}
+		assert.Nil(t, buildExternalResourceCustomInfoFromTaskEvent(context.Background(), taskExecutionEvent))
+	})
 }

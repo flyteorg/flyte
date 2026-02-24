@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
+
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
@@ -18,7 +20,37 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
+
+// buildSubTaskExternalResourceCustomInfo stores subtask failure details in external resource metadata
+// so map-task consumers can inspect per-subtask failure causes (for example OOMKilled).
+func buildSubTaskExternalResourceCustomInfo(ctx context.Context, phaseInfo core.PhaseInfo) *structpb.Struct {
+	customInfo := map[string]interface{}{}
+	if len(phaseInfo.Reason()) > 0 {
+		customInfo["reason"] = phaseInfo.Reason()
+	}
+
+	if phaseInfo.Err() != nil {
+		customInfo["error"] = map[string]interface{}{
+			"code":    phaseInfo.Err().GetCode(),
+			"message": phaseInfo.Err().GetMessage(),
+			"kind":    phaseInfo.Err().GetKind().String(),
+		}
+	}
+
+	if len(customInfo) == 0 {
+		return nil
+	}
+
+	structInfo, err := stdlibUtils.MarshalObjToStruct(customInfo)
+	if err != nil {
+		logger.Warnf(ctx, "failed to marshal subtask external resource custom info: %v", err)
+		return nil
+	}
+
+	return structInfo
+}
 
 // allocateResource attempts to allot resources for the specified parameter with the
 // TaskExecutionContexts ResourceManager.
@@ -282,6 +314,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			LogContext:   logContext,
 			RetryAttempt: uint32(retryAttempt),
 			Phase:        actualPhase,
+			CustomInfo:   buildSubTaskExternalResourceCustomInfo(ctx, phaseInfo),
 		})
 
 		// validate parallelism

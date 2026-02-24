@@ -512,7 +512,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, tCtx.DataStore(), "/prefix/", "/prefix-sand/", currentState)
+		newState, externalResources, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, tCtx.DataStore(), "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -521,6 +521,19 @@ func TestCheckSubTasksState(t *testing.T) {
 		resourceManager.AssertNumberOfCalls(t, "ReleaseResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhaseRetryableFailure, core.Phases[subtaskPhaseIndex])
+		}
+		assert.Len(t, externalResources, subtaskCount)
+		for _, externalResource := range externalResources {
+			if assert.NotNil(t, externalResource.CustomInfo) {
+				if assert.Contains(t, externalResource.CustomInfo.Fields, "error") {
+					errorInfo := externalResource.CustomInfo.Fields["error"].GetStructValue()
+					if assert.NotNil(t, errorInfo) {
+						assert.NotEmpty(t, errorInfo.Fields["code"].GetStringValue())
+						assert.NotEmpty(t, errorInfo.Fields["message"].GetStringValue())
+						assert.Equal(t, "SYSTEM", errorInfo.Fields["kind"].GetStringValue())
+					}
+				}
+			}
 		}
 	})
 
@@ -572,6 +585,22 @@ func TestCheckSubTasksState(t *testing.T) {
 			assert.Equal(t, core.PhasePermanentFailure, core.Phases[subtaskPhaseIndex])
 		}
 	})
+}
+
+func TestBuildSubTaskExternalResourceCustomInfo(t *testing.T) {
+	phaseInfo := core.PhaseInfoRetryableFailure("OOMKilled", "container terminated with exit code 137", nil)
+	customInfo := buildSubTaskExternalResourceCustomInfo(context.Background(), phaseInfo)
+
+	if assert.NotNil(t, customInfo) {
+		if assert.Contains(t, customInfo.Fields, "error") {
+			errorInfo := customInfo.Fields["error"].GetStructValue()
+			if assert.NotNil(t, errorInfo) {
+				assert.Equal(t, "OOMKilled", errorInfo.Fields["code"].GetStringValue())
+				assert.Contains(t, errorInfo.Fields["message"].GetStringValue(), "exit code 137")
+				assert.Equal(t, "USER", errorInfo.Fields["kind"].GetStringValue())
+			}
+		}
+	}
 }
 
 func TestTerminateSubTasksOnAbort(t *testing.T) {

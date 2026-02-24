@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	events "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -23,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type taskExecutionID struct {
@@ -120,6 +122,51 @@ type externalResourcesEventRecorder struct {
 	nodeEvents        []*events.NodeExecutionEvent
 	taskEvents        []*events.TaskExecutionEvent
 	expectTaskEvents  bool
+}
+
+func buildExternalResourceCustomInfoFromTaskEvent(ctx context.Context, taskExecutionEvent *events.TaskExecutionEvent) *structpb.Struct {
+	if taskExecutionEvent.GetMetadata() != nil {
+		// A subnode external resource stores a single custom_info payload. If multiple metadata
+		// resources include custom_info values, it is ambiguous which one should be projected.
+		// In that case, defer to task-level custom_info/error fallback below.
+		var metadataCustomInfo *structpb.Struct
+		metadataCustomInfoCount := 0
+		for _, externalResource := range taskExecutionEvent.GetMetadata().GetExternalResources() {
+			if customInfo := externalResource.GetCustomInfo(); customInfo != nil {
+				metadataCustomInfo = customInfo
+				metadataCustomInfoCount++
+				if metadataCustomInfoCount > 1 {
+					break
+				}
+			}
+		}
+		if metadataCustomInfoCount == 1 {
+			return metadataCustomInfo
+		}
+	}
+
+	if customInfo := taskExecutionEvent.GetCustomInfo(); customInfo != nil {
+		return customInfo
+	}
+
+	taskErr := taskExecutionEvent.GetError()
+	if taskErr == nil {
+		return nil
+	}
+
+	customInfo, err := stdlibUtils.MarshalObjToStruct(map[string]interface{}{
+		"error": map[string]interface{}{
+			"code":    taskErr.GetCode(),
+			"message": taskErr.GetMessage(),
+			"kind":    taskErr.GetKind().String(),
+		},
+	})
+	if err != nil {
+		logger.Warnf(ctx, "failed to marshal external resource custom info from task event error: %v", err)
+		return nil
+	}
+
+	return customInfo
 }
 
 func (e *externalResourcesEventRecorder) RecordNodeEvent(ctx context.Context, event *events.NodeExecutionEvent, eventConfig *config.EventConfig) error {
@@ -224,11 +271,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.Phase,
 			CacheStatus:  cacheStatus,
-			CustomInfo:   taskExecutionEvent.GetCustomInfo(),
-		}
-
-		if taskExecutionEvent.GetMetadata() != nil && len(taskExecutionEvent.GetMetadata().GetExternalResources()) == 1 {
-			externalResourceInfo.CustomInfo = taskExecutionEvent.GetMetadata().GetExternalResources()[0].GetCustomInfo()
+			CustomInfo:   buildExternalResourceCustomInfoFromTaskEvent(ctx, taskExecutionEvent),
 		}
 
 		e.externalResources = append(e.externalResources, &externalResourceInfo)
