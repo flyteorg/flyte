@@ -2607,7 +2607,7 @@ func TestDemystifyPending(t *testing.T) {
 		}
 		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 

@@ -1237,10 +1237,16 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 								), t
 
 							case "CreateContainerConfigError":
+								// This is typically a user error (e.g. missing Secret/ConfigMap),
+								// but can also be a transient system issue (e.g. kubelet secret
+								// cache sync timeout). We classify it as a user-retryable failure
+								// rather than permanent so that transient cases get a chance to
+								// recover on retry, while genuine user errors exhaust the user's
+								// retry budget quickly.
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									t = time.Now() // using current time for `OccurredAt` rather than last transition time
-									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
@@ -1257,6 +1263,11 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 								}), t
 
 							case "ImagePullBackOff":
+								// This is typically a user error (e.g. wrong image name/tag),
+								// but can also be a transient system issue (e.g. registry
+								// unavailability). We classify it as a user-retryable failure
+								// so that transient cases can recover on retry, while genuine
+								// user errors exhaust the user's retry budget quickly.
 								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									t = time.Now() // using current time for `OccurredAt` rather than last transition time
