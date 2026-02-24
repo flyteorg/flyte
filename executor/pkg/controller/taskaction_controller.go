@@ -110,6 +110,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
 		if err := r.Update(ctx, taskAction); err != nil {
+			logger.Error(err, "Failed to update TaskAction with finalizer")
 			return ctrl.Result{}, err
 		}
 	}
