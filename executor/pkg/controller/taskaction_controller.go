@@ -185,11 +185,6 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	// Determine requeue behavior
-	if phaseInfo.Phase().IsTerminal() {
-		return ctrl.Result{}, nil
-	}
-
 	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 }
 
