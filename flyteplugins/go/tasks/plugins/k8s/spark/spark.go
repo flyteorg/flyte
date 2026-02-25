@@ -95,7 +95,7 @@ func getSparkConfig(taskCtx pluginsCore.TaskExecutionContext, sparkJob *plugins.
 		sparkConfig[k] = v
 	}
 
-	if sparkJob.GetExecutorPath() != "" && sparkConfig["spark.pyspark.python"] == "" && sparkConfig["spark.pyspark.driver.python"] == "" {
+	if sparkJob.GetExecutorPath() != "" {
 		sparkConfig["spark.pyspark.python"] = sparkJob.GetExecutorPath()
 		sparkConfig["spark.pyspark.driver.python"] = sparkJob.GetExecutorPath()
 	}
@@ -183,6 +183,7 @@ func createSparkPodSpec(
 		SchedulerName:      &podSpec.SchedulerName,
 		NodeSelector:       podSpec.NodeSelector,
 		HostNetwork:        &podSpec.HostNetwork,
+		ServiceAccount:     strPtr(serviceAccountName(taskCtx.TaskExecutionMetadata())),
 	}
 	return &spec
 }
