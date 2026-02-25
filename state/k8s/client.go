@@ -32,7 +32,8 @@ type StateClient struct {
 
 	// Watch management
 	mu sync.RWMutex
-	// Map parent action name to channel
+	// Map parent action name to subscriber channel
+	// TODO: add a prometheus counter for dropped updates when metrics are wired up for the state service
 	subscribers map[string]chan *ActionUpdate
 	stopCh      chan struct{}
 	watching    bool
@@ -256,11 +257,11 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		ParentActionName: parentActionName,
 	}
 
-	c.notifySubscribers(update)
+	c.notifySubscribers(ctx, update)
 }
 
 // notifySubscribers sends an update to all subscribers
-func (c *StateClient) notifySubscribers(update *ActionUpdate) {
+func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdate) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -268,7 +269,7 @@ func (c *StateClient) notifySubscribers(update *ActionUpdate) {
 		select {
 		case ch <- update:
 		default:
-			// Channel full, skip (non-blocking)
+			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
 	}
 	// No channel for the parent action name in the update, skip it
