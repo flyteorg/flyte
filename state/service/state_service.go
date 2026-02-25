@@ -266,21 +266,6 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 	return update
 }
 
-// isChildOf checks if an action is a child of a parent action
-func isChildOf(actionID *common.ActionIdentifier, parentActionID *common.ActionIdentifier) bool {
-	// Must be same run
-	if actionID.Run.Org != parentActionID.Run.Org ||
-		actionID.Run.Project != parentActionID.Run.Project ||
-		actionID.Run.Domain != parentActionID.Run.Domain ||
-		actionID.Run.Name != parentActionID.Run.Name {
-		return false
-	}
-
-	// For now, include all actions in the same run
-	// A more sophisticated implementation would check the parent-child relationship
-	return true
-}
-
 // getPhaseFromConditions extracts the phase from TaskAction conditions
 func getPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhase {
 	for _, cond := range taskAction.Status.Conditions {
