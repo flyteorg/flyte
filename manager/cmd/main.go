@@ -142,10 +142,10 @@ func serve(ctx context.Context) error {
 	}
 
 	// Create a client.Client from the WithWatch client for services that don't need watch
-	var regularK8sClient client.Client = k8sClient
+	var k8sClientWithoutWatch client.Client = k8sClient
 
 	// Create queue client (for Kubernetes operations)
-	queueK8sClient := queuek8s.NewQueueClient(regularK8sClient, cfg.Kubernetes.Namespace)
+	queueK8sClient := queuek8s.NewQueueClient(k8sClientWithoutWatch, cfg.Kubernetes.Namespace)
 	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
 
 	// Create state client (K8s-based, for watching TaskAction CRs)
