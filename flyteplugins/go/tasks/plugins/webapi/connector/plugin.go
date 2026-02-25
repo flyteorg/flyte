@@ -439,7 +439,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
-		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs, // nolint:protogetter
+		Identity:             taskExecutionMetadata.GetSecurityContext().GetRunAs(),
 	}
 }
 
