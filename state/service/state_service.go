@@ -13,17 +13,20 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
 
 // StateService implements the StateService gRPC API using Kubernetes TaskAction CRs
 type StateService struct {
 	k8sClient StateClientInterface
+	repo      interfaces.Repository
 }
 
 // NewStateService creates a new StateService
-func NewStateService(k8sClient StateClientInterface) *StateService {
+func NewStateService(k8sClient StateClientInterface, repo interfaces.Repository) *StateService {
 	return &StateService{
 		k8sClient: k8sClient,
+		repo: repo,
 	}
 }
 
@@ -162,6 +165,11 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parent_action_id is required"))
 	}
 
+	// Subscribe first to buffer events before listing, avoiding missed updates
+	// between the list snapshot and the start of the watch stream
+	updateCh := s.k8sClient.Subscribe(parentActionID.Name)
+	defer s.k8sClient.Unsubscribe(parentActionID.Name)
+
 	// Get all child actions for the parent and send initial state
 	childActions, err := s.k8sClient.ListChildActions(ctx, parentActionID)
 	if err != nil {
@@ -196,10 +204,6 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 	logger.Infof(ctx, "Sent initial state (%d actions) and sentinel for parent action: %s", len(childActions), parentActionID.Name)
 
-	// Subscribe to updates
-	updateCh := s.k8sClient.Subscribe()
-	defer s.k8sClient.Unsubscribe(updateCh)
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -210,11 +214,6 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 			if !ok {
 				logger.Infof(ctx, "Update channel closed")
 				return nil
-			}
-
-			// Filter for actions that are children of the parent
-			if !isChildOf(update.ActionID, parentActionID) {
-				continue
 			}
 
 			// Convert update to ActionUpdate message
@@ -231,6 +230,17 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 			if err := stream.Send(resp); err != nil {
 				return err
+			}
+
+			// Store action state to DB, return error if failed to update DB
+			if err := s.repo.ActionRepo().UpdateActionState(ctx, update.ActionID, update.StateJSON); err != nil {
+				logger.Warnf(ctx, "Failed to update action state to DB: %v", err)
+				return fmt.Errorf("failed to update action state to DB: %v", err)
+			}
+			// Send the state update notification (with PostgreSQL only)
+			if err := s.repo.ActionRepo().NotifyStateUpdate(ctx, update.ActionID); err != nil {
+				logger.Warnf(ctx, "Failed to send state update notification: %v", err)
+				// Continue anyway - the update was saved
 			}
 
 			logger.Debugf(ctx, "Sent action update for: %s", update.ActionID.Name)
@@ -254,21 +264,6 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 	}
 
 	return update
-}
-
-// isChildOf checks if an action is a child of a parent action
-func isChildOf(actionID *common.ActionIdentifier, parentActionID *common.ActionIdentifier) bool {
-	// Must be same run
-	if actionID.Run.Org != parentActionID.Run.Org ||
-		actionID.Run.Project != parentActionID.Run.Project ||
-		actionID.Run.Domain != parentActionID.Run.Domain ||
-		actionID.Run.Name != parentActionID.Run.Name {
-		return false
-	}
-
-	// For now, include all actions in the same run
-	// A more sophisticated implementation would check the parent-child relationship
-	return true
 }
 
 // getPhaseFromConditions extracts the phase from TaskAction conditions
