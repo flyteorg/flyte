@@ -13,20 +13,17 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
 
 // StateService implements the StateService gRPC API using Kubernetes TaskAction CRs
 type StateService struct {
 	k8sClient StateClientInterface
-	repo      interfaces.Repository
 }
 
 // NewStateService creates a new StateService
-func NewStateService(k8sClient StateClientInterface, repo interfaces.Repository) *StateService {
+func NewStateService(k8sClient StateClientInterface) *StateService {
 	return &StateService{
 		k8sClient: k8sClient,
-		repo: repo,
 	}
 }
 
@@ -230,17 +227,6 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 			if err := stream.Send(resp); err != nil {
 				return err
-			}
-
-			// Store action state to DB, return error if failed to update DB
-			if err := s.repo.ActionRepo().UpdateActionState(ctx, update.ActionID, update.StateJSON); err != nil {
-				logger.Warnf(ctx, "Failed to update action state to DB: %v", err)
-				return fmt.Errorf("failed to update action state to DB: %v", err)
-			}
-			// Send the state update notification (with PostgreSQL only)
-			if err := s.repo.ActionRepo().NotifyStateUpdate(ctx, update.ActionID); err != nil {
-				logger.Warnf(ctx, "Failed to send state update notification: %v", err)
-				// Continue anyway - the update was saved
 			}
 
 			logger.Debugf(ctx, "Sent action update for: %s", update.ActionID.Name)

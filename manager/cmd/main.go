@@ -182,7 +182,7 @@ func serve(ctx context.Context) error {
 
 	// Create all services
 	runsSvc := runsservice.NewRunService(repo, queueClient)
-	stateSvc := stateservice.NewStateService(stateK8sClient, repo) // K8s-based state service
+	stateSvc := stateservice.NewStateService(stateK8sClient) // K8s-based state service
 	queueSvc := queueservice.NewQueueService(queueK8sClient)
 	dataProxyCfg := dataproxyconfig.GetConfig()
 	dataProxySvc := dataproxyservice.NewService(*dataProxyCfg, dataStore)
