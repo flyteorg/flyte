@@ -32,9 +32,10 @@ type StateClient struct {
 
 	// Watch management
 	mu sync.RWMutex
-	// Map parent action name to subscriber channel
+	// Map parent action name to subscriber channels.
+	// Multiple callers may watch the same parent action concurrently.
 	// TODO: add a prometheus counter for dropped updates when metrics are wired up for the state service
-	subscribers map[string]chan *ActionUpdate
+	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
 }
@@ -45,7 +46,7 @@ func NewStateClient(k8sClient client.WithWatch, namespace string, bufferSize int
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
-		subscribers: make(map[string]chan *ActionUpdate),
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 }
 
@@ -151,18 +152,24 @@ func (c *StateClient) Subscribe(parentActionName string) chan *ActionUpdate {
 	defer c.mu.Unlock()
 
 	ch := make(chan *ActionUpdate, c.bufferSize)
-	c.subscribers[parentActionName] = ch
+	if c.subscribers[parentActionName] == nil {
+		c.subscribers[parentActionName] = make(map[chan *ActionUpdate]struct{})
+	}
+	c.subscribers[parentActionName][ch] = struct{}{}
 	return ch
 }
 
-// Unsubscribe removes a subscription channel for a parent action name
-func (c *StateClient) Unsubscribe(parentActionName string) {
+// Unsubscribe removes the given channel from the subscription list for the parent action name
+func (c *StateClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if ch, ok := c.subscribers[parentActionName]; ok {
-		delete(c.subscribers, parentActionName)
+	if channels, ok := c.subscribers[parentActionName]; ok {
+		delete(channels, ch)
 		close(ch)
+		if len(channels) == 0 {
+			delete(c.subscribers, parentActionName)
+		}
 	}
 }
 
@@ -265,14 +272,13 @@ func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdat
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	if ch, ok := c.subscribers[update.ParentActionName]; ok {
+	for ch := range c.subscribers[update.ParentActionName] {
 		select {
 		case ch <- update:
 		default:
 			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
 	}
-	// No channel for the parent action name in the update, skip it
 }
 
 // StopWatching stops the TaskAction watcher
