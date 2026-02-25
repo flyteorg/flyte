@@ -13,14 +13,18 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"gorm.io/gorm"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/migrations"
+	"github.com/flyteorg/flyte/v2/runs/repository"
 	stateconfig "github.com/flyteorg/flyte/v2/state/config"
 	"github.com/flyteorg/flyte/v2/state/k8s"
 	"github.com/flyteorg/flyte/v2/state/service"
@@ -64,6 +68,25 @@ func serve(ctx context.Context) error {
 	// Get configuration
 	cfg := stateconfig.GetConfig()
 
+	// DB config
+	dbCfg := &database.DbConfig{
+		SQLite: database.SQLiteConfig{
+			File: "flyte.db",
+		},
+	}
+	// Initialize database
+	db, err := initDB(ctx, dbCfg)
+	if err != nil {
+		return fmt.Errorf("failed to initialize database: %w", err)
+	}
+	// Run migrations
+	logger.Infof(ctx, "Running database migrations")
+	if err := migrations.RunMigrations(db); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+	// Create repository
+	repo := repository.NewRepository(db)
+
 	// Initialize the executor API scheme
 	if err := k8s.InitScheme(); err != nil {
 		return fmt.Errorf("failed to initialize scheme: %w", err)
@@ -86,7 +109,7 @@ func serve(ctx context.Context) error {
 	defer stateClient.StopWatching()
 
 	// Create service
-	stateSvc := service.NewStateService(stateClient)
+	stateSvc := service.NewStateService(stateClient, repo)
 
 	// Setup HTTP server with Connect handlers
 	mux := http.NewServeMux()
@@ -155,6 +178,18 @@ func initConfig() error {
 	})
 
 	return configAccessor.UpdateConfig(context.Background())
+}
+
+func initDB(ctx context.Context, cfg *database.DbConfig) (*gorm.DB, error) {
+	logCfg := logger.GetConfig()
+
+	db, err := database.GetDB(ctx, cfg, logCfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	logger.Infof(ctx, "Database connection established")
+	return db, nil
 }
 
 func initKubernetesClient(ctx context.Context, cfg *stateconfig.KubernetesConfig) (client.WithWatch, error) {

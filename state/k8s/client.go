@@ -17,10 +17,11 @@ import (
 
 // ActionUpdate represents an update to a TaskAction
 type ActionUpdate struct {
-	ActionID  *common.ActionIdentifier
-	StateJSON string
-	Phase     string
-	IsDeleted bool
+	ActionID         *common.ActionIdentifier
+	StateJSON        string
+	Phase            string
+	IsDeleted        bool
+	ParentActionName string
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -30,8 +31,10 @@ type StateClient struct {
 	bufferSize int
 
 	// Watch management
-	mu          sync.RWMutex
-	subscribers map[chan *ActionUpdate]struct{}
+	mu sync.RWMutex
+	// Map parent action name to subscriber channel
+	// TODO: add a prometheus counter for dropped updates when metrics are wired up for the state service
+	subscribers map[string]chan *ActionUpdate
 	stopCh      chan struct{}
 	watching    bool
 }
@@ -42,7 +45,7 @@ func NewStateClient(k8sClient client.WithWatch, namespace string, bufferSize int
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
-		subscribers: make(map[chan *ActionUpdate]struct{}),
+		subscribers: make(map[string]chan *ActionUpdate),
 	}
 }
 
@@ -72,6 +75,11 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 		Namespace: c.namespace,
 	}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
+	}
+
+	// Skip update if the stateJSON does not change
+	if taskAction.Status.StateJSON == stateJSON {
+		return nil
 	}
 
 	// Update state JSON
@@ -137,23 +145,23 @@ func (c *StateClient) GetTaskAction(ctx context.Context, actionID *common.Action
 	return taskAction, nil
 }
 
-// Subscribe creates a new subscription channel for action updates
-func (c *StateClient) Subscribe() chan *ActionUpdate {
+// Subscribe creates a new subscription channel for action updates for specified parent action name
+func (c *StateClient) Subscribe(parentActionName string) chan *ActionUpdate {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	ch := make(chan *ActionUpdate, c.bufferSize)
-	c.subscribers[ch] = struct{}{}
+	c.subscribers[parentActionName] = ch
 	return ch
 }
 
-// Unsubscribe removes a subscription channel
-func (c *StateClient) Unsubscribe(ch chan *ActionUpdate) {
+// Unsubscribe removes a subscription channel for a parent action name
+func (c *StateClient) Unsubscribe(parentActionName string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if _, ok := c.subscribers[ch]; ok {
-		delete(c.subscribers, ch)
+	if ch, ok := c.subscribers[parentActionName]; ok {
+		delete(c.subscribers, parentActionName)
 		close(ch)
 	}
 }
@@ -228,6 +236,11 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		return
 	}
 
+	parentActionName := ""
+	if taskAction.Spec.ParentActionName != nil {
+		parentActionName = *taskAction.Spec.ParentActionName
+	}
+
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
@@ -238,26 +251,28 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 			},
 			Name: taskAction.Spec.ActionName,
 		},
-		StateJSON: taskAction.Status.StateJSON,
-		Phase:     getPhaseFromConditions(taskAction),
-		IsDeleted: event.Type == watch.Deleted,
+		StateJSON:        taskAction.Status.StateJSON,
+		Phase:            getPhaseFromConditions(taskAction),
+		IsDeleted:        event.Type == watch.Deleted,
+		ParentActionName: parentActionName,
 	}
 
-	c.notifySubscribers(update)
+	c.notifySubscribers(ctx, update)
 }
 
 // notifySubscribers sends an update to all subscribers
-func (c *StateClient) notifySubscribers(update *ActionUpdate) {
+func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdate) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	for ch := range c.subscribers {
+	if ch, ok := c.subscribers[update.ParentActionName]; ok {
 		select {
 		case ch <- update:
 		default:
-			// Channel full, skip (non-blocking)
+			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
 	}
+	// No channel for the parent action name in the update, skip it
 }
 
 // StopWatching stops the TaskAction watcher
