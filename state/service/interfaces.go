@@ -26,8 +26,8 @@ type StateClientInterface interface {
 	// Subscribe creates a new subscription channel for action updates for the given parent action name
 	Subscribe(parentActionName string) chan *k8s.ActionUpdate
 
-	// Unsubscribe removes a subscription channel for the given parent action name
-	Unsubscribe(parentActionName string)
+	// Unsubscribe removes the given channel from the subscription list for the parent action name
+	Unsubscribe(parentActionName string, ch chan *k8s.ActionUpdate)
 
 	// StartWatching starts watching TaskAction resources
 	StartWatching(ctx context.Context) error
