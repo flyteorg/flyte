@@ -74,6 +74,11 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
+	// Skip update if the stateJSON does not change
+	if taskAction.Status.StateJSON == stateJSON {
+		return nil
+	}
+
 	// Update state JSON
 	taskAction.Status.StateJSON = stateJSON
 
