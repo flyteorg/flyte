@@ -162,6 +162,11 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parent_action_id is required"))
 	}
 
+	// Subscribe first to buffer events before listing, avoiding missed updates
+	// between the list snapshot and the start of the watch stream
+	updateCh := s.k8sClient.Subscribe()
+	defer s.k8sClient.Unsubscribe(updateCh)
+
 	// Get all child actions for the parent and send initial state
 	childActions, err := s.k8sClient.ListChildActions(ctx, parentActionID)
 	if err != nil {
@@ -195,10 +200,6 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 	}
 
 	logger.Infof(ctx, "Sent initial state (%d actions) and sentinel for parent action: %s", len(childActions), parentActionID.Name)
-
-	// Subscribe to updates
-	updateCh := s.k8sClient.Subscribe()
-	defer s.k8sClient.Unsubscribe(updateCh)
 
 	for {
 		select {
