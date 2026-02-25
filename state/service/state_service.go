@@ -167,8 +167,8 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 	// Subscribe first to buffer events before listing, avoiding missed updates
 	// between the list snapshot and the start of the watch stream
-	updateCh := s.k8sClient.Subscribe()
-	defer s.k8sClient.Unsubscribe(updateCh)
+	updateCh := s.k8sClient.Subscribe(parentActionID.Name)
+	defer s.k8sClient.Unsubscribe(parentActionID.Name)
 
 	// Get all child actions for the parent and send initial state
 	childActions, err := s.k8sClient.ListChildActions(ctx, parentActionID)
@@ -214,11 +214,6 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 			if !ok {
 				logger.Infof(ctx, "Update channel closed")
 				return nil
-			}
-
-			// Filter for actions that are children of the parent
-			if !isChildOf(update.ActionID, parentActionID) {
-				continue
 			}
 
 			// Convert update to ActionUpdate message
