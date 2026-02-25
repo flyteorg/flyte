@@ -67,11 +67,15 @@ message PythonWheels {
 // UVProject defines a UV project configuration, which includes
 // a pyproject.toml file and a uvlock file.
 message UVProject {
+  // The path to the folder containing the pyproject.toml and uvlock files.
   string pyproject = 1;
+  // The path to the uvlock file.
   string uvlock = 2;
   // Options for pip packages.
   PipOptions options = 3;
   repeated flyteidl2.core.Secret secret_mounts = 4;
+  // The folder that should be mounted into the image.
+  string source_dir = 5;
 }
 
 // Commands defines a list of commands to run in the image.
