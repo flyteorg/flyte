@@ -23,11 +23,11 @@ type StateClientInterface interface {
 	// GetTaskAction retrieves a specific TaskAction
 	GetTaskAction(ctx context.Context, actionID *common.ActionIdentifier) (*executorv1.TaskAction, error)
 
-	// Subscribe creates a new subscription channel for action updates
-	Subscribe() chan *k8s.ActionUpdate
+	// Subscribe creates a new subscription channel for action updates for the given parent action name
+	Subscribe(parentActionName string) chan *k8s.ActionUpdate
 
-	// Unsubscribe removes a subscription channel
-	Unsubscribe(ch chan *k8s.ActionUpdate)
+	// Unsubscribe removes the given channel from the subscription list for the parent action name
+	Unsubscribe(parentActionName string, ch chan *k8s.ActionUpdate)
 
 	// StartWatching starts watching TaskAction resources
 	StartWatching(ctx context.Context) error
