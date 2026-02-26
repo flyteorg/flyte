@@ -11,6 +11,8 @@ import (
 
 	models "github.com/flyteorg/flyte/v2/runs/repository/models"
 
+	time "time"
+
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
@@ -485,6 +487,70 @@ func (_c *ActionRepo_ListActions_Call) Return(_a0 []*models.Action, _a1 string, 
 }
 
 func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(context.Context, *common.RunIdentifier, int, string) ([]*models.Action, string, error)) *ActionRepo_ListActions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListRootActions provides a mock function with given fields: ctx, org, project, domain, startDate, endDate, limit
+func (_m *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
+	ret := _m.Called(ctx, org, project, domain, startDate, endDate, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListRootActions")
+	}
+
+	var r0 []*models.Action
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
+		return rf(ctx, org, project, domain, startDate, endDate, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
+		r0 = rf(ctx, org, project, domain, startDate, endDate, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Action)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, *time.Time, *time.Time, int) error); ok {
+		r1 = rf(ctx, org, project, domain, startDate, endDate, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_ListRootActions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRootActions'
+type ActionRepo_ListRootActions_Call struct {
+	*mock.Call
+}
+
+// ListRootActions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - org string
+//   - project string
+//   - domain string
+//   - startDate *time.Time
+//   - endDate *time.Time
+//   - limit int
+func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, org interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
+	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, org, project, domain, startDate, endDate, limit)}
+}
+
+func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string), args[4].(*time.Time), args[5].(*time.Time), args[6].(int))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListRootActions_Call) Return(_a0 []*models.Action, _a1 error) *ActionRepo_ListRootActions_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Return(run)
 	return _c
 }
