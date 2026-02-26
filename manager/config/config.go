@@ -20,19 +20,36 @@ type Config struct {
 
 // ServerConfig holds HTTP server configuration
 type ServerConfig struct {
+<<<<<<< HEAD
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
+=======
 	Host string `json:"host"`
 	Port int    `json:"port"`
+>>>>>>> enghabu/state-etcd
 }
 
 // ExecutorConfig holds executor-specific configuration
 type ExecutorConfig struct {
+<<<<<<< HEAD
+	HealthProbePort int `json:"healthProbePort" pflag:",Port for executor health probes"`
+=======
 	HealthProbePort int `json:"healthProbePort"`
+>>>>>>> enghabu/state-etcd
 }
 
 // KubernetesConfig holds Kubernetes client configuration
 type KubernetesConfig struct {
+<<<<<<< HEAD
+	Namespace  string `json:"namespace" pflag:",Kubernetes namespace"`
+	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
+	QPS        int    `json:"qps" pflag:",Max sustained queries per second to the API server"`
+	Burst      int    `json:"burst" pflag:",Max burst queries to the API server"`
+	Timeout    string `json:"timeout" pflag:",Default timeout for API server requests (e.g. 30s)"`
+=======
 	Namespace  string `json:"namespace"`
 	KubeConfig string `json:"kubeconfig"` // Optional, defaults to in-cluster or ~/.kube/config
+>>>>>>> enghabu/state-etcd
 }
 
 var defaultConfig = &Config{
@@ -46,6 +63,19 @@ var defaultConfig = &Config{
 	Kubernetes: KubernetesConfig{
 		Namespace:  "flyte",
 		KubeConfig: "",
+<<<<<<< HEAD
+		QPS:        1000,
+		Burst:      2000,
+		Timeout:    "30s",
+	},
+}
+
+var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
+
+// GetConfig retrieves the current config value or default.
+func GetConfig() *Config {
+	return configSection.GetConfig().(*Config)
+=======
 	},
 }
 
@@ -58,4 +88,5 @@ func GetConfig() *Config {
 
 func init() {
 	config.MustRegisterSection(configSectionKey, &cfg)
+>>>>>>> enghabu/state-etcd
 }

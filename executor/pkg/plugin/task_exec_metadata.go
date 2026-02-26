@@ -1,12 +1,20 @@
 package plugin
 
 import (
+<<<<<<< HEAD
+	"google.golang.org/protobuf/proto"
+=======
+>>>>>>> enghabu/state-etcd
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+<<<<<<< HEAD
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+=======
+>>>>>>> enghabu/state-etcd
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -46,10 +54,29 @@ type taskExecutionMetadata struct {
 	labels          map[string]string
 	annotations     map[string]string
 	maxAttempts     uint32
+<<<<<<< HEAD
+	overrides       pluginsCore.TaskOverrides
+	envVars         map[string]string
+=======
+>>>>>>> enghabu/state-etcd
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
 func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecutionMetadata {
+<<<<<<< HEAD
+	// Extract resource requirements from the inline task template
+	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
+
+	// Build environment variables for the task pod
+	envVars := map[string]string{
+		"ACTION_NAME": ta.Spec.ActionName,
+		"RUN_NAME":    ta.Spec.RunName,
+		"_U_ORG_NAME": ta.Spec.Org,
+		"_U_RUN_BASE": ta.Spec.RunOutputBase,
+	}
+
+=======
+>>>>>>> enghabu/state-etcd
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
 			Name:      ta.Name,
@@ -79,9 +106,37 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecuti
 		labels:      ta.Labels,
 		annotations: ta.Annotations,
 		maxAttempts: 1,
+<<<<<<< HEAD
+		overrides:   overrides,
+		envVars:     envVars,
 	}
 }
 
+// buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
+func buildOverridesFromTaskTemplate(data []byte) *taskOverrides {
+	if len(data) == 0 {
+		return &taskOverrides{}
+	}
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return &taskOverrides{}
+	}
+	container := tmpl.GetContainer()
+	if container == nil || container.Resources == nil {
+		return &taskOverrides{}
+	}
+	res, err := flytek8s.ToK8sResourceRequirements(container.Resources)
+	if err != nil {
+		return &taskOverrides{}
+	}
+	return &taskOverrides{resources: res}
+}
+
+=======
+	}
+}
+
+>>>>>>> enghabu/state-etcd
 func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName            { return m.ownerID }
 func (m *taskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecutionID { return m.taskExecutionID }
 func (m *taskExecutionMetadata) GetNamespace() string                         { return m.namespace }
@@ -92,11 +147,19 @@ func (m *taskExecutionMetadata) GetMaxAttempts() uint32                       { 
 func (m *taskExecutionMetadata) GetK8sServiceAccount() string                 { return "" }
 func (m *taskExecutionMetadata) IsInterruptible() bool                        { return false }
 func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32      { return 0 }
+<<<<<<< HEAD
+func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string   { return m.envVars }
+func (m *taskExecutionMetadata) GetConsoleURL() string                        { return "" }
+
+func (m *taskExecutionMetadata) GetOverrides() pluginsCore.TaskOverrides {
+	return m.overrides
+=======
 func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string   { return nil }
 func (m *taskExecutionMetadata) GetConsoleURL() string                        { return "" }
 
 func (m *taskExecutionMetadata) GetOverrides() pluginsCore.TaskOverrides {
 	return &taskOverrides{}
+>>>>>>> enghabu/state-etcd
 }
 
 func (m *taskExecutionMetadata) GetSecurityContext() *core.SecurityContext {
@@ -111,10 +174,19 @@ func (m *taskExecutionMetadata) GetExternalResourceAttributes() pluginsCore.Exte
 	return pluginsCore.ExternalResourceAttributes{}
 }
 
+<<<<<<< HEAD
+// taskOverrides provides resource overrides extracted from the task template.
+type taskOverrides struct {
+	resources *v1.ResourceRequirements
+}
+
+func (t *taskOverrides) GetResources() *v1.ResourceRequirements     { return t.resources }
+=======
 // taskOverrides is a minimal TaskOverrides implementation returning zero values.
 type taskOverrides struct{}
 
 func (t *taskOverrides) GetResources() *v1.ResourceRequirements     { return nil }
+>>>>>>> enghabu/state-etcd
 func (t *taskOverrides) GetExtendedResources() *core.ExtendedResources { return nil }
 func (t *taskOverrides) GetContainerImage() string                   { return "" }
 func (t *taskOverrides) GetConfigMap() *v1.ConfigMap                 { return nil }

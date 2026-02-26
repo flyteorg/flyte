@@ -77,6 +77,12 @@ const (
 
 	// ConditionReasonPluginNotFound indicates no plugin was found for the task type
 	ConditionReasonPluginNotFound TaskActionConditionReason = "PluginNotFound"
+<<<<<<< HEAD
+
+	// ConditionReasonInvalidSpec indicates the TaskAction spec is missing required fields
+	ConditionReasonInvalidSpec TaskActionConditionReason = "InvalidSpec"
+=======
+>>>>>>> enghabu/state-etcd
 )
 
 // TaskActionSpec defines the desired state of TaskAction
@@ -133,10 +139,21 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=63
 	TaskType string `json:"taskType"`
 
+<<<<<<< HEAD
+	// ShortName is the human-readable display name for this task
+	// +optional
+	// +kubebuilder:validation:MaxLength=63
+	ShortName string `json:"shortName,omitempty"`
+
+	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
+	// +kubebuilder:validation:Required
+	TaskTemplate []byte `json:"taskTemplate"`
+=======
 	// TaskTemplateURI is the storage URI where the serialized core.TaskTemplate can be read
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	TaskTemplateURI string `json:"taskTemplateUri"`
+>>>>>>> enghabu/state-etcd
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
@@ -177,6 +194,22 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
+<<<<<<< HEAD
+// PhaseTransition records a phase change with its timestamp.
+type PhaseTransition struct {
+	// Phase is the phase that was entered (e.g. "Queued", "Initializing", "Executing", "Succeeded", "Failed").
+	Phase string `json:"phase"`
+
+	// OccurredAt is when this phase transition happened.
+	OccurredAt metav1.Time `json:"occurredAt"`
+
+	// Message is an optional human-readable message about the transition.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
+=======
+>>>>>>> enghabu/state-etcd
 // TaskActionStatus defines the observed state of TaskAction.
 type TaskActionStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
@@ -218,6 +251,15 @@ type TaskActionStatus struct {
 	// +listMapKey=type
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+<<<<<<< HEAD
+
+	// PhaseHistory is an append-only log of phase transitions. Unlike conditions
+	// (which are updated in-place by type), this preserves the full timeline:
+	// Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+	// +optional
+	PhaseHistory []PhaseTransition `json:"phaseHistory,omitempty"`
+=======
+>>>>>>> enghabu/state-etcd
 }
 
 // +kubebuilder:object:root=true

@@ -98,7 +98,11 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+<<<<<<< HEAD
+	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
+=======
 	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking 
+>>>>>>> enghabu/state-etcd
 	// if the TaskAction instance changes
 	originalTaskActionInstance := taskAction.DeepCopy()
 
@@ -112,6 +116,22 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
+<<<<<<< HEAD
+	// Validate required spec fields before proceeding
+	if err := validateSpec(taskAction); err != nil {
+		logger.Error(err, "TaskAction spec is invalid")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(flyteorgv1.ConditionReasonInvalidSpec),
+			"Invalid spec: %v", err)
+		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
+		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
+		_ = r.Status().Update(ctx, taskAction)
+		return ctrl.Result{}, nil // terminal — do not requeue
+	}
+
+=======
+>>>>>>> enghabu/state-etcd
 	// Ensure finalizer is present
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
@@ -279,6 +299,44 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 	return !reflect.DeepEqual(oldStatus.Conditions, newStatus.Conditions)
 }
 
+<<<<<<< HEAD
+// mapPhaseToConditions maps a plugin PhaseInfo to TaskAction conditions
+// and appends to the PhaseHistory for durable transition tracking.
+func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo) {
+	var phaseName string
+	var msg string
+
+	switch info.Phase() {
+	case pluginsCore.PhaseNotReady, pluginsCore.PhaseQueued, pluginsCore.PhaseWaitingForResources, pluginsCore.PhaseWaitingForCache:
+		phaseName = string(flyteorgv1.ConditionReasonQueued)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonQueued, msg)
+
+	case pluginsCore.PhaseInitializing:
+		phaseName = string(flyteorgv1.ConditionReasonInitializing)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonInitializing, msg)
+
+	case pluginsCore.PhaseRunning:
+		phaseName = string(flyteorgv1.ConditionReasonExecuting)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonExecuting, msg)
+
+	case pluginsCore.PhaseSuccess:
+		phaseName = string(flyteorgv1.ConditionReasonCompleted)
+		msg = "TaskAction completed successfully"
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonCompleted, "TaskAction has completed")
+		setCondition(ta, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonCompleted, msg)
+
+	case pluginsCore.PhasePermanentFailure:
+		phaseName = string(flyteorgv1.ConditionReasonPermanentFailure)
+		msg = info.Reason()
+=======
 // mapPhaseToConditions maps a plugin PhaseInfo to TaskAction conditions.
 func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo) {
 	switch info.Phase() {
@@ -302,6 +360,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 
 	case pluginsCore.PhasePermanentFailure:
 		msg := info.Reason()
+>>>>>>> enghabu/state-etcd
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 		}
@@ -311,7 +370,12 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonPermanentFailure, msg)
 
 	case pluginsCore.PhaseRetryableFailure:
+<<<<<<< HEAD
+		phaseName = string(flyteorgv1.ConditionReasonRetryableFailure)
+		msg = info.Reason()
+=======
 		msg := info.Reason()
+>>>>>>> enghabu/state-etcd
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 		}
@@ -319,10 +383,31 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonRetryableFailure, msg)
 
 	case pluginsCore.PhaseAborted:
+<<<<<<< HEAD
+		phaseName = string(flyteorgv1.ConditionReasonAborted)
+		msg = "TaskAction was aborted"
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonAborted, msg)
+		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonAborted, msg)
+	}
+
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	if phaseName != "" {
+		n := len(ta.Status.PhaseHistory)
+		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
+			ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
+				Phase:      phaseName,
+				OccurredAt: metav1.Now(),
+				Message:    msg,
+			})
+		}
+=======
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonAborted, "TaskAction was aborted")
 		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
 			flyteorgv1.ConditionReasonAborted, "TaskAction was aborted")
+>>>>>>> enghabu/state-etcd
 	}
 }
 
@@ -363,6 +448,30 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+<<<<<<< HEAD
+// validateSpec checks that the TaskAction spec has all required fields populated.
+func validateSpec(taskAction *flyteorgv1.TaskAction) error {
+	var missing []string
+	if taskAction.Spec.TaskType == "" {
+		missing = append(missing, "taskType")
+	}
+	if len(taskAction.Spec.TaskTemplate) == 0 {
+		missing = append(missing, "taskTemplate")
+	}
+	if taskAction.Spec.InputURI == "" {
+		missing = append(missing, "inputUri")
+	}
+	if taskAction.Spec.RunOutputBase == "" {
+		missing = append(missing, "runOutputBase")
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("required spec fields are empty: %v", missing)
+	}
+	return nil
+}
+
+=======
+>>>>>>> enghabu/state-etcd
 // setCondition sets or updates a condition on the TaskAction.
 func setCondition(taskAction *flyteorgv1.TaskAction, conditionType flyteorgv1.TaskActionConditionType, status metav1.ConditionStatus, reason flyteorgv1.TaskActionConditionReason, message string) {
 	condition := metav1.Condition{

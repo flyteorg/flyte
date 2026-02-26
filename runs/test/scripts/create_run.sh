@@ -3,14 +3,22 @@
 # Run from the repo root: bash runs/test/scripts/create_run.sh
 
 ENDPOINT="${ENDPOINT:-http://localhost:8090}"
+<<<<<<< HEAD
+ORG="${ORG:-testorg}"
+=======
 ORG="${ORG:-dogfood-gcp}"
+>>>>>>> enghabu/state-etcd
 PROJECT="${PROJECT:-flytesnacks}"
 DOMAIN="${DOMAIN:-development}"
 
 buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @- <<'EOF'
 {
     "projectId": {
+<<<<<<< HEAD
+        "organization": "testorg",
+=======
         "organization": "dogfood-gcp",
+>>>>>>> enghabu/state-etcd
         "name": "flytesnacks",
         "domain": "development"
     },
@@ -22,7 +30,11 @@ buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @
                 "domain": "development",
                 "name": "hello_world.say_hello",
                 "version": "ae90079690e275d2dd68fadbf4a66641",
+<<<<<<< HEAD
+                "org": "testorg"
+=======
                 "org": "dogfood-gcp"
+>>>>>>> enghabu/state-etcd
             },
             "type": "python",
             "metadata": {
@@ -46,6 +58,50 @@ buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @
             },
             "interface": {
                 "inputs": {
+<<<<<<< HEAD
+                    "variables": [
+                        {"key": "x_list", "value": {"type": {"collectionType": {"simple": "FLOAT"}}}}
+                    ]
+                },
+                "outputs": {
+                    "variables": [
+                        {"key": "o0", "value": {"type": {"simple": "STRING"}}}
+                    ]
+                }
+            },
+            "container": {
+                "image": "ghcr.io/flyteorg/flyte:py3.10-v2.0.0b55",
+                "args": [
+                  "a0",
+                  "--inputs",
+                  "{{.input}}",
+                  "--outputs-path",
+                  "{{.outputPrefix}}",
+                  "--version",
+                  "45b230d2b24b90cb7578333647e619c4",
+                  "--raw-data-path",
+                  "{{.rawOutputDataPrefix}}",
+                  "--checkpoint-path",
+                  "{{.checkpointOutputPrefix}}",
+                  "--prev-checkpoint",
+                  "{{.prevCheckpointPrefix}}",
+                  "--run-name",
+                  "{{.runName}}",
+                  "--name",
+                  "{{.actionName}}",
+                  "--image-cache",
+                  "H4sIAPdEimkC/6tWysxNTE+Nz8nPzy4tULKqVspIzcnJjy/PL8pJUbJSSs9ILtLLzNdPy6ksSc0vSocwrAoqjfUMDXTLjPQM9AySTE2VamsBGQCEuEoAAAA=",
+                  "--tgz",
+                  "s3://flyte-data/fast-registration/fast.tar.gz",
+                  "--dest",
+                  ".",
+                  "--resolver",
+                  "flyte._internal.resolvers.default.DefaultTaskResolver",
+                  "mod",
+                  "hello",
+                  "instance",
+                  "main"
+=======
                     "variables": {
                         "data": {
                             "type": {
@@ -103,6 +159,7 @@ buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @
                     "examples.basics.devbox_one",
                     "instance",
                     "say_hello"
+>>>>>>> enghabu/state-etcd
                 ],
                 "resources": {
                     "requests": [
@@ -118,6 +175,9 @@ buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @
     "inputs": {
         "literals": [
             {
+<<<<<<< HEAD
+                "name": "x_list",
+=======
                 "name": "data",
                 "value": {
                     "scalar": {
@@ -129,11 +189,29 @@ buf curl --schema . "$ENDPOINT/flyteidl2.workflow.RunService/CreateRun" --data @
             },
             {
                 "name": "lt",
+>>>>>>> enghabu/state-etcd
                 "value": {
                     "collection": {
                         "literals": [
                             {"scalar": {"primitive": {"integer": "1"}}},
                             {"scalar": {"primitive": {"integer": "2"}}},
+<<<<<<< HEAD
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+                            {"scalar": {"primitive": {"integer": "1"}}},
+                            {"scalar": {"primitive": {"integer": "2"}}},
+=======
+>>>>>>> enghabu/state-etcd
                             {"scalar": {"primitive": {"integer": "3"}}}
                         ]
                     }

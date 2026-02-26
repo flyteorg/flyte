@@ -2,6 +2,42 @@ package main
 
 import (
 	"context"
+<<<<<<< HEAD
+	"fmt"
+	"os"
+
+	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/state"
+	stateconfig "github.com/flyteorg/flyte/v2/state/config"
+)
+
+func main() {
+	a := &app.App{
+		Name:  "state-service",
+		Short: "State Service for Flyte",
+		Setup: func(ctx context.Context, sc *app.SetupContext) error {
+			cfg := stateconfig.GetConfig()
+			sc.Host = cfg.Server.Host
+			sc.Port = cfg.Server.Port
+
+			k8sClient, _, err := app.InitKubernetesClient(ctx, app.K8sConfig{
+				KubeConfig: cfg.Kubernetes.KubeConfig,
+				Namespace:  cfg.Kubernetes.Namespace,
+			}, nil)
+			if err != nil {
+				return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
+			}
+			sc.K8sClient = k8sClient
+			sc.Namespace = cfg.Kubernetes.Namespace
+
+			return state.Setup(ctx, sc)
+		},
+	}
+	if err := a.Run(); err != nil {
+		os.Exit(1)
+	}
+}
+=======
 	"errors"
 	"fmt"
 	"net/http"
@@ -198,3 +234,4 @@ func initKubernetesClient(ctx context.Context, cfg *stateconfig.KubernetesConfig
 	logger.Infof(ctx, "Kubernetes client initialized successfully")
 	return k8sClient, nil
 }
+>>>>>>> enghabu/state-etcd

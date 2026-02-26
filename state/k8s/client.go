@@ -3,9 +3,17 @@ package k8s
 import (
 	"context"
 	"fmt"
+<<<<<<< HEAD
+	"strings"
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
+=======
+	"sync"
+	"time"
+
+>>>>>>> enghabu/state-etcd
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -13,15 +21,29 @@ import (
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+<<<<<<< HEAD
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+=======
+>>>>>>> enghabu/state-etcd
 )
 
 // ActionUpdate represents an update to a TaskAction
 type ActionUpdate struct {
 	ActionID         *common.ActionIdentifier
+<<<<<<< HEAD
+	ParentActionName string
+	StateJSON        string
+	Phase            string
+	OutputUri        string
+	IsDeleted        bool
+	TaskType         string
+	ShortName        string
+=======
 	StateJSON        string
 	Phase            string
 	IsDeleted        bool
 	ParentActionName string
+>>>>>>> enghabu/state-etcd
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -31,11 +53,16 @@ type StateClient struct {
 	bufferSize int
 
 	// Watch management
+<<<<<<< HEAD
+	mu          sync.RWMutex
+	subscribers map[chan *ActionUpdate]struct{}
+=======
 	mu sync.RWMutex
 	// Map parent action name to subscriber channels.
 	// Multiple callers may watch the same parent action concurrently.
 	// TODO: add a prometheus counter for dropped updates when metrics are wired up for the state service
 	subscribers map[string]map[chan *ActionUpdate]struct{}
+>>>>>>> enghabu/state-etcd
 	stopCh      chan struct{}
 	watching    bool
 }
@@ -46,7 +73,11 @@ func NewStateClient(k8sClient client.WithWatch, namespace string, bufferSize int
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+<<<<<<< HEAD
+		subscribers: make(map[chan *ActionUpdate]struct{}),
+=======
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+>>>>>>> enghabu/state-etcd
 	}
 }
 
@@ -78,11 +109,14 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
+<<<<<<< HEAD
+=======
 	// Skip update if the stateJSON does not change
 	if taskAction.Status.StateJSON == stateJSON {
 		return nil
 	}
 
+>>>>>>> enghabu/state-etcd
 	// Update state JSON
 	taskAction.Status.StateJSON = stateJSON
 
@@ -95,6 +129,33 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 	return nil
 }
 
+<<<<<<< HEAD
+// ListRunActions lists all TaskActions belonging to a run.
+func (c *StateClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
+	taskActionList := &executorv1.TaskActionList{}
+	listOpts := []client.ListOption{
+		client.InNamespace(c.namespace),
+		client.MatchingLabels{
+			"flyte.org/org":     runID.Org,
+			"flyte.org/project": runID.Project,
+			"flyte.org/domain":  runID.Domain,
+			"flyte.org/run":     runID.Name,
+		},
+	}
+
+	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
+		return nil, fmt.Errorf("failed to list TaskActions for run: %w", err)
+	}
+
+	result := make([]*executorv1.TaskAction, len(taskActionList.Items))
+	for i := range taskActionList.Items {
+		result[i] = &taskActionList.Items[i]
+	}
+	return result, nil
+}
+
+=======
+>>>>>>> enghabu/state-etcd
 // ListChildActions lists all TaskActions that are children of the given parent action
 func (c *StateClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
 	// List all TaskActions in the same run
@@ -146,12 +207,31 @@ func (c *StateClient) GetTaskAction(ctx context.Context, actionID *common.Action
 	return taskAction, nil
 }
 
+<<<<<<< HEAD
+// Subscribe creates a new subscription channel for action updates
+func (c *StateClient) Subscribe() chan *ActionUpdate {
+=======
 // Subscribe creates a new subscription channel for action updates for specified parent action name
 func (c *StateClient) Subscribe(parentActionName string) chan *ActionUpdate {
+>>>>>>> enghabu/state-etcd
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	ch := make(chan *ActionUpdate, c.bufferSize)
+<<<<<<< HEAD
+	c.subscribers[ch] = struct{}{}
+	return ch
+}
+
+// Unsubscribe removes a subscription channel
+func (c *StateClient) Unsubscribe(ch chan *ActionUpdate) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if _, ok := c.subscribers[ch]; ok {
+		delete(c.subscribers, ch)
+		close(ch)
+=======
 	if c.subscribers[parentActionName] == nil {
 		c.subscribers[parentActionName] = make(map[chan *ActionUpdate]struct{})
 	}
@@ -170,6 +250,7 @@ func (c *StateClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate
 		if len(channels) == 0 {
 			delete(c.subscribers, parentActionName)
 		}
+>>>>>>> enghabu/state-etcd
 	}
 }
 
@@ -243,9 +324,21 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		return
 	}
 
+<<<<<<< HEAD
+	var parentName string
+	if taskAction.Spec.ParentActionName != nil {
+		parentName = *taskAction.Spec.ParentActionName
+	}
+
+	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	shortName := taskAction.Spec.ShortName
+	if shortName == "" && len(taskAction.Spec.TaskTemplate) > 0 {
+		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
+=======
 	parentActionName := ""
 	if taskAction.Spec.ParentActionName != nil {
 		parentActionName = *taskAction.Spec.ParentActionName
+>>>>>>> enghabu/state-etcd
 	}
 
 	update := &ActionUpdate{
@@ -258,6 +351,30 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 			},
 			Name: taskAction.Spec.ActionName,
 		},
+<<<<<<< HEAD
+		ParentActionName: parentName,
+		StateJSON:        taskAction.Status.StateJSON,
+		Phase:            GetPhaseFromConditions(taskAction),
+		OutputUri:        buildOutputUri(taskAction),
+		IsDeleted:        event.Type == watch.Deleted,
+		TaskType:         taskAction.Spec.TaskType,
+		ShortName:        shortName,
+	}
+
+	c.notifySubscribers(update)
+}
+
+// notifySubscribers sends an update to all subscribers
+func (c *StateClient) notifySubscribers(update *ActionUpdate) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	for ch := range c.subscribers {
+		select {
+		case ch <- update:
+		default:
+			// Channel full, skip (non-blocking)
+=======
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            getPhaseFromConditions(taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
@@ -277,6 +394,7 @@ func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdat
 		case ch <- update:
 		default:
 			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
+>>>>>>> enghabu/state-etcd
 		}
 	}
 }
@@ -292,8 +410,13 @@ func (c *StateClient) StopWatching() {
 	}
 }
 
+<<<<<<< HEAD
+// GetPhaseFromConditions extracts the phase from TaskAction conditions.
+func GetPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+=======
 // getPhaseFromConditions extracts the phase from TaskAction conditions
 func getPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+>>>>>>> enghabu/state-etcd
 	for _, cond := range taskAction.Status.Conditions {
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
@@ -331,7 +454,43 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 	)
 }
 
+<<<<<<< HEAD
+// buildOutputUri computes the action-specific output URI from the TaskAction spec.
+func buildOutputUri(ta *executorv1.TaskAction) string {
+	if ta.Spec.RunOutputBase == "" {
+		return ""
+	}
+	return strings.TrimRight(ta.Spec.RunOutputBase, "/") + "/" + ta.Spec.ActionName
+}
+
+=======
+>>>>>>> enghabu/state-etcd
 // InitScheme adds the executor API types to the scheme
 func InitScheme() error {
 	return executorv1.AddToScheme(scheme.Scheme)
 }
+<<<<<<< HEAD
+
+// extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.
+// It splits on '.' and returns the last part.
+func extractShortNameFromTemplate(templateBytes []byte) string {
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(templateBytes, tmpl); err != nil {
+		return ""
+	}
+	if tmpl.GetId() == nil {
+		return ""
+	}
+	name := tmpl.GetId().GetName()
+	if name == "" {
+		return ""
+	}
+	// Split on '.' and take the last part
+	parts := strings.Split(name, ".")
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return name
+}
+=======
+>>>>>>> enghabu/state-etcd

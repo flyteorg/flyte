@@ -2,6 +2,12 @@ package plugin
 
 import (
 	"context"
+<<<<<<< HEAD
+	"strings"
+
+	"google.golang.org/protobuf/proto"
+=======
+>>>>>>> enghabu/state-etcd
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -40,6 +46,20 @@ func (t *taskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecution
 func (t *taskExecutionContext) OutputWriter() io.OutputWriter                             { return t.outputWriter }
 func (t *taskExecutionContext) Catalog() catalog.AsyncClient                              { return t.catalogClient }
 
+<<<<<<< HEAD
+// inlineTaskReader reads a TaskTemplate from bytes stored inline in the CRD.
+type inlineTaskReader struct {
+	data []byte
+}
+
+func (r *inlineTaskReader) Path(_ context.Context) (storage.DataReference, error) {
+	return "inline://taskTemplate", nil
+}
+
+func (r *inlineTaskReader) Read(_ context.Context) (*core.TaskTemplate, error) {
+	t := &core.TaskTemplate{}
+	if err := proto.Unmarshal(r.data, t); err != nil {
+=======
 // remoteTaskReader reads a TaskTemplate from a storage URI.
 type remoteTaskReader struct {
 	store storage.ProtobufStore
@@ -53,6 +73,7 @@ func (r *remoteTaskReader) Path(_ context.Context) (storage.DataReference, error
 func (r *remoteTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
 	t := &core.TaskTemplate{}
 	if err := r.store.ReadProtobuf(ctx, r.uri, t); err != nil {
+>>>>>>> enghabu/state-etcd
 		return nil, err
 	}
 	return t, nil
@@ -69,6 +90,28 @@ func NewTaskExecutionContext(
 ) (*taskExecutionContext, error) {
 	ctx := context.Background()
 
+<<<<<<< HEAD
+	// Task reader (inline from CRD)
+	taskReader := &inlineTaskReader{
+		data: taskAction.Spec.TaskTemplate,
+	}
+
+	// Input reader — InputURI may be a full path (ending in inputs.pb) or just
+	// the prefix directory.  NewInputFilePaths always appends "inputs.pb", so
+	// strip a trailing suffix to avoid the doubled "inputs.pb/inputs.pb" path.
+	inputPathPrefix := storage.DataReference(
+		strings.TrimSuffix(taskAction.Spec.InputURI, "/"+ioutils.InputsSuffix),
+	)
+	inputPaths := ioutils.NewInputFilePaths(ctx, dataStore, inputPathPrefix)
+	inputReader := ioutils.NewRemoteFileInputReader(ctx, dataStore, inputPaths)
+
+	// Output writer — scope outputs per action so actions don't overwrite each other.
+	// RunOutputBase is run-level (e.g. s3://bucket/org/proj/domain/run/),
+	// append the action name to make it action-specific.
+	outputPrefix := storage.DataReference(
+		strings.TrimRight(taskAction.Spec.RunOutputBase, "/") + "/" + taskAction.Spec.ActionName,
+	)
+=======
 	// Task reader
 	taskTemplateURI := storage.DataReference(taskAction.Spec.TaskTemplateURI)
 	taskReader := &remoteTaskReader{
@@ -83,6 +126,7 @@ func NewTaskExecutionContext(
 
 	// Output writer
 	outputPrefix := storage.DataReference(taskAction.Spec.RunOutputBase)
+>>>>>>> enghabu/state-etcd
 	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, outputPrefix)
 	outputFilePaths := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, outputPrefix, rawOutputPaths, "")
 	outputWriter := ioutils.NewRemoteFileOutputWriter(ctx, dataStore, outputFilePaths)

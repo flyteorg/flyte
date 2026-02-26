@@ -5,6 +5,21 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+<<<<<<< HEAD
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+=======
+>>>>>>> enghabu/state-etcd
   - flyte.org
   resources:
   - taskactions

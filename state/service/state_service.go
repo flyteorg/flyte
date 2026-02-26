@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
+	"strings"
+=======
+>>>>>>> enghabu/state-etcd
 
 	"connectrpc.com/connect"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -162,11 +166,14 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parent_action_id is required"))
 	}
 
+<<<<<<< HEAD
+=======
 	// Subscribe first to buffer events before listing, avoiding missed updates
 	// between the list snapshot and the start of the watch stream
 	updateCh := s.k8sClient.Subscribe(parentActionID.Name)
 	defer s.k8sClient.Unsubscribe(parentActionID.Name, updateCh)
 
+>>>>>>> enghabu/state-etcd
 	// Get all child actions for the parent and send initial state
 	childActions, err := s.k8sClient.ListChildActions(ctx, parentActionID)
 	if err != nil {
@@ -201,6 +208,13 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 	logger.Infof(ctx, "Sent initial state (%d actions) and sentinel for parent action: %s", len(childActions), parentActionID.Name)
 
+<<<<<<< HEAD
+	// Subscribe to updates
+	updateCh := s.k8sClient.Subscribe()
+	defer s.k8sClient.Unsubscribe(updateCh)
+
+=======
+>>>>>>> enghabu/state-etcd
 	for {
 		select {
 		case <-ctx.Done():
@@ -213,10 +227,23 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 				return nil
 			}
 
+<<<<<<< HEAD
+			// Filter for actions that are children of the parent
+			if !isChildOf(update.ActionID, parentActionID) {
+				continue
+			}
+
+			// Convert update to ActionUpdate message
+			actionUpdate := &workflow.ActionUpdate{
+				ActionId:  update.ActionID,
+				Phase:     stringToPhase(update.Phase),
+				OutputUri: update.OutputUri,
+=======
 			// Convert update to ActionUpdate message
 			actionUpdate := &workflow.ActionUpdate{
 				ActionId: update.ActionID,
 				Phase:    stringToPhase(update.Phase),
+>>>>>>> enghabu/state-etcd
 			}
 
 			resp := &workflow.WatchResponse{
@@ -246,12 +273,43 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 			},
 			Name: action.Spec.ActionName,
 		},
+<<<<<<< HEAD
+		Phase:     getPhaseFromConditions(action),
+		OutputUri: actionOutputUri(action.Spec.RunOutputBase, action.Spec.ActionName),
+=======
 		Phase: getPhaseFromConditions(action),
+>>>>>>> enghabu/state-etcd
 	}
 
 	return update
 }
 
+<<<<<<< HEAD
+// actionOutputUri computes the action-scoped output prefix.
+func actionOutputUri(runOutputBase, actionName string) string {
+	if runOutputBase == "" {
+		return ""
+	}
+	return strings.TrimRight(runOutputBase, "/") + "/" + actionName
+}
+
+// isChildOf checks if an action is a child of a parent action
+func isChildOf(actionID *common.ActionIdentifier, parentActionID *common.ActionIdentifier) bool {
+	// Must be same run
+	if actionID.Run.Org != parentActionID.Run.Org ||
+		actionID.Run.Project != parentActionID.Run.Project ||
+		actionID.Run.Domain != parentActionID.Run.Domain ||
+		actionID.Run.Name != parentActionID.Run.Name {
+		return false
+	}
+
+	// For now, include all actions in the same run
+	// A more sophisticated implementation would check the parent-child relationship
+	return true
+}
+
+=======
+>>>>>>> enghabu/state-etcd
 // getPhaseFromConditions extracts the phase from TaskAction conditions
 func getPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhase {
 	for _, cond := range taskAction.Status.Conditions {

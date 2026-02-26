@@ -16,6 +16,10 @@ var defaultConfig = &Config{
 	},
 	WatchBufferSize: 100,
 	QueueServiceURL: "http://localhost:8089",
+<<<<<<< HEAD
+	StoragePrefix:   "file:///tmp/flyte/data",
+=======
+>>>>>>> enghabu/state-etcd
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -33,6 +37,13 @@ type Config struct {
 
 	// Queue service URL for enqueuing actions
 	QueueServiceURL string `json:"queueServiceUrl" pflag:",URL of the queue service"`
+<<<<<<< HEAD
+
+	// StoragePrefix is the base URI for storing run data (inputs, outputs)
+	// e.g. "s3://my-bucket" or "gs://my-bucket" or "file:///tmp/flyte/data"
+	StoragePrefix string `json:"storagePrefix" pflag:",Base URI prefix for storing run inputs and outputs"`
+=======
+>>>>>>> enghabu/state-etcd
 }
 
 // ServerConfig holds HTTP server configuration

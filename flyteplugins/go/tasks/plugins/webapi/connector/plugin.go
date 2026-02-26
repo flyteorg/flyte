@@ -439,7 +439,11 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
+<<<<<<< HEAD
+		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs, // nolint:protogetter
+=======
 		Identity:             taskExecutionMetadata.GetSecurityContext().GetRunAs(),
+>>>>>>> enghabu/state-etcd
 	}
 }
 

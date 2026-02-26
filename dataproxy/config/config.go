@@ -7,6 +7,11 @@ import (
 
 const configSectionKey = "dataproxy"
 
+<<<<<<< HEAD
+//go:generate pflags DataProxyConfig --default-var=defaultConfig
+
+=======
+>>>>>>> enghabu/state-etcd
 var defaultConfig = &DataProxyConfig{
 	Upload: DataProxyUploadConfig{
 		MaxSize:               resource.MustParse("100Mi"),
