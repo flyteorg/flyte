@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "flyteidl2/notification/definition.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -93,4 +95,26 @@ message RunSpec {
 
   // CacheConfig contains configurations that influence the behavior of cache reads and writes
   CacheConfig cache_config = 9;
+
+  oneof notification_settings {
+    flyteidl2.notification.RuleId rule_id = 10; // either refer to a previously stored notification rule
+
+    Rule rule = 11; // either define an inline rule
+  }
+}
+
+message DeliveryConfig {
+  oneof config {
+    option (buf.validate.oneof).required = true;
+
+    flyteidl2.notification.DeliveryConfigId delivery_config_id = 1; // either refer to a previously stored delivery config
+
+    flyteidl2.notification.DeliveryConfig delivery_config = 2; // either define an inline config
+  }
+}
+
+message Rule {
+  string phase_regex = 1;
+
+  repeated DeliveryConfig configs = 2 [(buf.validate.field).repeated.min_items = 1];
 }

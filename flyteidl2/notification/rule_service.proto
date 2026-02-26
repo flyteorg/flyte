@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package flyteidl2.notification;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/notification/definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
+
+// RuleService manages rules that define when to send a notification.
+service RuleService {
+  // Idempotently saves a notification rule.
+  rpc SaveRule(SaveRuleRequest) returns (SaveRuleResponse) {}
+
+  // Get detailed information about a single notification rule.
+  rpc GetRule(GetRuleRequest) returns (GetRuleResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists notification rules per org or project.
+  rpc ListRules(ListRulesRequest) returns (ListRulesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Idempotently deletes a notification rule.
+  rpc DeleteRule(DeleteRuleRequest) returns (DeleteRuleResponse) {}
+}
+
+// Request message for saving a notification rule.
+message SaveRuleRequest {
+  Rule rule = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for saving a rule.
+message SaveRuleResponse {}
+
+// Request message for getting detailed information about a rule.
+message GetRuleRequest {
+  RuleId rule_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting a rule.
+message GetRuleResponse {
+  Rule rule = 1 [(buf.validate.field).required = true];
+}
+
+message ListRulesRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+
+    // Project identifier for filtering.
+    common.ProjectIdentifier project_id = 3;
+  }
+}
+
+message ListRulesResponse {
+  repeated Rule rules = 1;
+
+  // Pagination token for the next page of tasks.
+  string token = 2;
+}
+
+// Request message for deleting a rule.
+message DeleteRuleRequest {
+  RuleId rule_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for deleting a rule.
+message DeleteRuleResponse {}
