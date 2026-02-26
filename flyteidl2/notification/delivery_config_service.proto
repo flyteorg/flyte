@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package flyteidl2.notification;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/notification/definition.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
+
+// DeliveryConfigService manages configs that are used for sending various types of notifications(webhooks, emails, Slack, etc.)
+service DeliveryConfigService {
+  // Idempotently saves a delivery config.
+  rpc SaveDeliveryConfig(SaveDeliveryConfigRequest) returns (SaveDeliveryConfigResponse) {}
+
+  // Get detailed information about a single delivery config.
+  rpc GetDeliveryConfig(GetDeliveryConfigRequest) returns (GetDeliveryConfigResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists delivery configs.
+  rpc ListDeliveryConfigs(ListDeliveryConfigsRequest) returns (ListDeliveryConfigsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Idempotently deletes a delivery config.
+  rpc DeleteDeliveryConfig(DeleteDeliveryConfigRequest) returns (DeleteDeliveryConfigResponse) {}
+
+  // Send a test notification for given delivery config.
+  rpc SendTestNotification(SendTestNotificationRequest) returns (SendTestNotificationResponse) {}
+}
+
+// Request message for saving a delivery config.
+message SaveDeliveryConfigRequest {
+  DeliveryConfig delivery_config = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for saving a delivery config.
+message SaveDeliveryConfigResponse {}
+
+// Request message for getting detailed information about a delivery config.
+message GetDeliveryConfigRequest {
+  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting a delivery config.
+message GetDeliveryConfigResponse {
+  DeliveryConfig delivery_config = 1 [(buf.validate.field).required = true];
+}
+
+message ListDeliveryConfigsRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    // Organization name for filtering.
+    string org = 2 [(buf.validate.field).string.min_len = 1];
+
+    // Project identifier for filtering.
+    common.ProjectIdentifier project_id = 3;
+  }
+}
+
+message ListDeliveryConfigsResponse {
+  repeated DeliveryConfig delivery_configs = 1;
+
+  // Pagination token for the next page of tasks.
+  string token = 2;
+}
+
+// Request message for deleting a delivery config.
+message DeleteDeliveryConfigRequest {
+  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for deleting a delivery config.
+message DeleteDeliveryConfigResponse {}
+
+message SendTestNotificationRequest {
+  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+
+  google.protobuf.Struct template_data = 2; // optional, template metadata required for compiling notification
+}
+
+message SendTestNotificationResponse {}

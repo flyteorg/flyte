@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package flyteidl2.notification;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
+
+message RuleId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+message Rule {
+  // The user provided rule id.
+  RuleId rule_id = 1 [(buf.validate.field).required = true];
+
+  // List of notifications defined by delivery configs that must be sent when a given rule applies.
+  repeated DeliveryConfig delivery_configs = 2 [(buf.validate.field).repeated.min_items = 1];
+
+  // in future, this can extend to rules related to Apps, Usage, Artifacts, etc.
+  oneof condition {
+    option (buf.validate.oneof).required = true;
+
+    ActionRule action_rule = 3;
+  }
+}
+
+message ActionRule {
+  // Regular expression for matching task name.
+  // if not supplied, rule applies to an action of any task
+  string task_name_regex = 1;
+
+  // Regular expression for matching run phase.
+  // if not supplied, rule applies to any terminal phase
+  string phase_regex = 2;
+}
+
+message DeliveryConfigId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// Type of supported notifications.
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSPECIFIED = 0;
+  NOTIFICATION_TYPE_WEBHOOK = 1;
+  NOTIFICATION_TYPE_EMAIL = 2;
+}
+
+message DeliveryConfig {
+  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+
+  NotificationType type = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    WebhookDeliveryConfig webhook_config = 3;
+
+    EmailDeliveryConfig email_config = 4;
+  }
+}
+
+message WebhookDeliveryConfig {
+  string url = 1;
+
+  string method = 2;
+
+  map<string, string> headers = 3;
+
+  string body = 4; // this is a template that may contain placeholders
+}
+
+message EmailDeliveryConfig {
+  string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a template that may contain placeholders
+
+  repeated string to = 2;
+
+  repeated string cc = 3;
+
+  repeated string bcc = 4;
+
+  string html = 5 [(buf.validate.field).string.min_len = 1]; // this is a template that may contain placeholders
+
+  string text = 6; // this is a template that may contain placeholders
+}
