@@ -195,6 +195,12 @@ func (s *RunService) CreateRun(
 		logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
 	}
 
+	// TODO(nary): We should set the phase here to ActionPhase_ACTION_PHASE_QUEUED. As the root action phase
+	// will be returned to the client for display if they use .wait(), returning ActionPhase_ACTION_PHASE_UNSPECIFIED
+	// will cause error.
+	// We should do this after we persist the state to the DB, and when run service fully relies on DB and do not get
+	// status from the state client directly.
+
 	// Build response (simplified - you'd convert the full Run model)
 	resp := &workflow.CreateRunResponse{
 		Run: &workflow.Run{
