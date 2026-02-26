@@ -259,7 +259,16 @@ export type UVProject = Message<"flyteidl2.imagebuilder.UVProject"> & {
   secretMounts: Secret[];
 
   /**
-   * The folder that should be mounted into the image.
+   * The directory to mount into the image.
+   * Use this when [tool.uv.sources] in pyproject.toml references packages outside the pyproject directory.
+   * Set source_dir to the closest common ancestor of pyproject.toml and all referenced source paths,
+   * so that all required directories are available during the build.
+   *
+   * Example:
+   *   - pyproject.toml is at ./packages/projectA/pyproject.toml
+   *   - [tool.uv.sources] references: seeds = { path = "../seeds", editable = true }
+   *   - Set pyproject = "./packages/projectA" and source_dir = "./packages"
+   *     so that both projectA/ and seeds/ are mounted into the image.
    *
    * @generated from field: string source_dir = 5;
    */

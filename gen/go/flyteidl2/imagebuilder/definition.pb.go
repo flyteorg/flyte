@@ -471,7 +471,16 @@ type UVProject struct {
 	// Options for pip packages.
 	Options      *PipOptions    `protobuf:"bytes,3,opt,name=options,proto3" json:"options,omitempty"`
 	SecretMounts []*core.Secret `protobuf:"bytes,4,rep,name=secret_mounts,json=secretMounts,proto3" json:"secret_mounts,omitempty"`
-	// The folder that should be mounted into the image.
+	// The directory to mount into the image.
+	// Use this when [tool.uv.sources] in pyproject.toml references packages outside the pyproject directory.
+	// Set source_dir to the closest common ancestor of pyproject.toml and all referenced source paths,
+	// so that all required directories are available during the build.
+	//
+	// Example:
+	//   - pyproject.toml is at ./packages/projectA/pyproject.toml
+	//   - [tool.uv.sources] references: seeds = { path = "../seeds", editable = true }
+	//   - Set pyproject = "./packages/projectA" and source_dir = "./packages"
+	//     so that both projectA/ and seeds/ are mounted into the image.
 	SourceDir string `protobuf:"bytes,5,opt,name=source_dir,json=sourceDir,proto3" json:"source_dir,omitempty"`
 }
 
