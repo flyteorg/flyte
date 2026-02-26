@@ -565,8 +565,13 @@ func (s *RunService) WatchActionDetails(
 	}
 
 	// Step 2: Subscribe and stream updates
-	updatesCh := s.stateClient.Subscribe()
-	defer s.stateClient.Unsubscribe(updatesCh)
+	// TODO(nary): We should watch DB update rather than state client here
+	parentActionName := ""
+	if ta.Spec.ParentActionName != nil {
+		parentActionName = *ta.Spec.ParentActionName
+	}
+	updatesCh := s.stateClient.Subscribe(parentActionName)
+	defer s.stateClient.Unsubscribe(parentActionName, updatesCh)
 
 	for {
 		select {
@@ -677,8 +682,10 @@ func (s *RunService) WatchActions(
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
 	// Step 1: Subscribe to K8s watch events, filter to this run
-	updatesCh := s.stateClient.Subscribe()
-	defer s.stateClient.Unsubscribe(updatesCh)
+	// Root-level actions have no parent action name, so subscribe with "" to receive their updates.
+	// TODO(nary): This is wrong here, we should watch the DB update, and the watch should depends on the filter
+	updatesCh := s.stateClient.Subscribe("")
+	defer s.stateClient.Unsubscribe("", updatesCh)
 
 	// Step 2: Send existing TaskAction CRs for this run
 	taskActions, err := s.stateClient.ListRunActions(ctx, runID)
@@ -769,8 +776,13 @@ func (s *RunService) WatchClusterEvents(
 	}
 
 	// Step 2: Subscribe and stream new events as conditions change
-	updatesCh := s.stateClient.Subscribe()
-	defer s.stateClient.Unsubscribe(updatesCh)
+	// TODO(nary): This is wrong here, we should watch the DB update, and the watch should depends on the filter
+	parentActionName := ""
+	if ta.Spec.ParentActionName != nil {
+		parentActionName = *ta.Spec.ParentActionName
+	}
+	updatesCh := s.stateClient.Subscribe(parentActionName)
+	defer s.stateClient.Unsubscribe(parentActionName, updatesCh)
 
 	for {
 		select {
