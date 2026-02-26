@@ -107,6 +107,11 @@ spec:
                   write its output
                 minLength: 1
                 type: string
+              shortName:
+                description: ShortName is the human-readable display name for this
+                  task
+                maxLength: 63
+                type: string
               taskTemplate:
                 description: TaskTemplate is the proto-serialized core.TaskTemplate
                   stored inline in etcd
