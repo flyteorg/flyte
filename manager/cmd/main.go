@@ -61,17 +61,13 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
 	}
-
-	// Create a client.Client from the WithWatch client for services that don't need watch
-	var k8sClientWithoutWatch client.Client = k8sClient
-
-	// Initialize labeled metrics (required for storage)
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	sc.K8sClient = k8sClient
 	sc.K8sConfig = k8sConfig
 
-	// Initialize storage
+	// Initialize labeled metrics (required for storage)
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+
+	// Initialize storage
 	storageCfg := storage.GetConfig()
 	dataStore, err := storage.NewDataStore(storageCfg, promutils.NewTestScope())
 	if err != nil {
@@ -79,16 +75,6 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	sc.DataStore = dataStore
 
-	// Create queue client (for Kubernetes operations)
-	queueK8sClient := queuek8s.NewQueueClient(k8sClientWithoutWatch, cfg.Kubernetes.Namespace)
-	logger.Infof(ctx, "Kubernetes client initialized for namespace: %s", cfg.Kubernetes.Namespace)
-
-	// Create state client (K8s-based, for watching TaskAction CRs)
-	stateK8sClient := statek8s.NewStateClient(k8sClient, cfg.Kubernetes.Namespace, 100)
-
-	// Start watching TaskActions for state service
-	if err := stateK8sClient.StartWatching(ctx); err != nil {
-		return fmt.Errorf("failed to start TaskAction watcher: %w", err)
 	// Setup all services
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err

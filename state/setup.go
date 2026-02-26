@@ -28,6 +28,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := stateClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("state: failed to start TaskAction watcher: %w", err)
 	}
+	sc.AddWorker("state-watcher", func(ctx context.Context) error {
+		<-ctx.Done()
+		stateClient.StopWatching()
+		return nil
+	})
 
 	stateSvc := service.NewStateService(stateClient)
 

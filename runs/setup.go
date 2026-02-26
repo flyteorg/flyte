@@ -46,6 +46,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := stateClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("runs: failed to start TaskAction watcher: %w", err)
 	}
+	sc.AddWorker("runs-state-watcher", func(ctx context.Context) error {
+		<-ctx.Done()
+		stateClient.StopWatching()
+		return nil
+	})
 
 	runsSvc := service.NewRunService(repo, queueClient, cfg.StoragePrefix, sc.DataStore, stateClient)
 	taskSvc := service.NewTaskService(repo)
