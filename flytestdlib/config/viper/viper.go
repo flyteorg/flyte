@@ -6,12 +6,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/mitchellh/mapstructure"
+	"github.com/ghodss/yaml"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -182,17 +185,21 @@ func sliceToMapHook(f reflect.Kind, t reflect.Kind, data interface{}) (interface
 	// Only handle slice -> map conversion
 	if f == reflect.Slice && t == reflect.Map {
 		// this will be the target result
-		res := map[interface{}]interface{}{}
+		res := map[string]interface{}{}
 		// It's safe to convert data into a slice since we did the type assertion above.
 		asSlice := data.([]interface{})
 		for _, item := range asSlice {
-			asMap, casted := item.(map[interface{}]interface{})
-			if !casted {
+			// mapstructure v2 uses map[string]interface{} for decoded YAML maps
+			if asMap, ok := item.(map[string]interface{}); ok {
+				for key, value := range asMap {
+					res[key] = value
+				}
+			} else if asMap, ok := item.(map[interface{}]interface{}); ok {
+				for key, value := range asMap {
+					res[fmt.Sprintf("%v", key)] = value
+				}
+			} else {
 				return data, nil
-			}
-
-			for key, value := range asMap {
-				res[key] = value
 			}
 		}
 
@@ -258,10 +265,143 @@ func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, er
 	return data, nil
 }
 
+// containsSlice checks if a data tree contains any slice values.
+func containsSlice(data interface{}) bool {
+	switch d := data.(type) {
+	case map[string]interface{}:
+		for _, v := range d {
+			if containsSlice(v) {
+				return true
+			}
+		}
+	case []interface{}:
+		return true
+	}
+	return false
+}
+
 // Parses RootType config from parsed Viper settings. This should be called after viper has parsed config file/pflags...etc.
 func (v viperAccessor) parseViperConfig(root config.Section) error {
 	// We use AllSettings instead of AllKeys to get the root level keys folded.
-	return v.parseViperConfigRecursive(root, v.viper.AllSettings())
+	settings := v.viper.AllSettings()
+
+	// Viper v1.20 recursively lowercases all map keys, including keys inside
+	// list items. This breaks the "list-of-maps for case-sensitive keys"
+	// workaround. Read the raw YAML to recover original key case for maps
+	// that are elements of slices. Only do this when settings actually contain
+	// slices to avoid unnecessary file I/O.
+	if configFiles := v.viper.ConfigFilesUsed(); len(configFiles) > 0 && containsSlice(settings) {
+		rawSettings := readRawYAMLConfigs(configFiles)
+		if restored, ok := restoreSliceMapKeyCase(settings, rawSettings, false).(map[string]interface{}); ok {
+			settings = restored
+		}
+	}
+
+	return v.parseViperConfigRecursive(root, settings)
+}
+
+// readRawYAMLConfigs reads YAML config files preserving original key case
+// and merges them into a single map. This is used to recover key case
+// that viper v1.20 recursively lowercases.
+func readRawYAMLConfigs(configFiles []string) map[string]interface{} {
+	merged := map[string]interface{}{}
+	for _, f := range configFiles {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		var m map[string]interface{}
+		if err := yaml.Unmarshal(data, &m); err != nil {
+			continue
+		}
+		deepMergeMaps(merged, m)
+	}
+	return merged
+}
+
+// deepMergeMaps merges src into dst, recursing into nested maps.
+func deepMergeMaps(dst, src map[string]interface{}) {
+	for k, srcVal := range src {
+		if dstVal, exists := dst[k]; exists {
+			if dstMap, ok := dstVal.(map[string]interface{}); ok {
+				if srcMap, ok := srcVal.(map[string]interface{}); ok {
+					deepMergeMaps(dstMap, srcMap)
+					continue
+				}
+			}
+		}
+		dst[k] = srcVal
+	}
+}
+
+// restoreSliceMapKeyCase walks viperData and rawData in parallel, restoring
+// original key case for maps that are elements of slices. Maps not inside
+// slices keep viper's lowercased keys (needed for section/struct matching).
+func restoreSliceMapKeyCase(viperData, rawData interface{}, inSlice bool) interface{} {
+	switch vd := viperData.(type) {
+	case map[string]interface{}:
+		rd, ok := rawData.(map[string]interface{})
+		if !ok {
+			return viperData
+		}
+		if inSlice {
+			// Inside a slice: restore original-cased keys from raw data.
+			result := make(map[string]interface{}, len(vd))
+			viperByLower := make(map[string]interface{}, len(vd))
+			for k, v := range vd {
+				viperByLower[strings.ToLower(k)] = v
+			}
+			for rawKey, rawVal := range rd {
+				lowerKey := strings.ToLower(rawKey)
+				if viperVal, found := viperByLower[lowerKey]; found {
+					result[rawKey] = restoreSliceMapKeyCase(viperVal, rawVal, true)
+				} else {
+					result[rawKey] = rawVal
+				}
+			}
+			// Include viper-only keys (from env/pflags, not in YAML).
+			for k, v := range vd {
+				lk := strings.ToLower(k)
+				found := false
+				for rawKey := range rd {
+					if strings.ToLower(rawKey) == lk {
+						found = true
+						break
+					}
+				}
+				if !found {
+					result[k] = v
+				}
+			}
+			return result
+		}
+		// Not in slice: keep viper's lowercased keys, recurse into values.
+		result := make(map[string]interface{}, len(vd))
+		rawByLower := make(map[string]interface{}, len(rd))
+		for k, v := range rd {
+			rawByLower[strings.ToLower(k)] = v
+		}
+		for viperKey, viperVal := range vd {
+			if rawVal, found := rawByLower[viperKey]; found {
+				result[viperKey] = restoreSliceMapKeyCase(viperVal, rawVal, false)
+			} else {
+				result[viperKey] = viperVal
+			}
+		}
+		return result
+	case []interface{}:
+		rd, ok := rawData.([]interface{})
+		if !ok || len(rd) != len(vd) {
+			return viperData
+		}
+		result := make([]interface{}, len(vd))
+		for i := range vd {
+			result[i] = restoreSliceMapKeyCase(vd[i], rd[i], true)
+		}
+		return result
+	default:
+		return viperData
+	}
 }
 
 func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings interface{}) error {
@@ -365,6 +505,14 @@ func decode(input interface{}, config *mapstructure.DecoderConfig) error {
 
 func (v viperAccessor) configChangeHandler() {
 	ctx := context.Background()
+
+	// Brief delay to allow filesystem changes to settle. This handles K8s
+	// ConfigMap-style updates where directory changes (e.g., creating a new data
+	// directory) trigger file watcher events before the symlink swap completes.
+	// Without this, fsnotify may fire a spurious event that reads stale config,
+	// and the subsequent symlink change may not generate a new event.
+	time.Sleep(time.Second)
+
 	err := v.RefreshFromConfig(ctx, v.rootConfig, false)
 	if err != nil {
 		// TODO: Retry? panic?

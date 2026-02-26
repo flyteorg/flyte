@@ -168,13 +168,13 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		if err != nil {
 			errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
 			logger.Errorf(ctx, errString)
-			return nil, nil, status.Errorf(codes.Internal, errString)
+			return nil, nil, status.Errorf(codes.Internal, "%s", errString)
 		}
 		secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
 		if err != nil {
 			errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
 			logger.Errorf(ctx, errString)
-			return nil, nil, status.Errorf(codes.Internal, errString)
+			return nil, nil, status.Errorf(codes.Internal, "%s", errString)
 		}
 		connection.Secrets[k] = secretVal
 	}
