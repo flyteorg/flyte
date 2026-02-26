@@ -17,9 +17,11 @@ limitations under the License.
 package controller
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -96,6 +98,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking 
+	// if the TaskAction instance changes
+	originalTaskActionInstance := taskAction.DeepCopy()
+
 	// Handle deletion
 	if !taskAction.DeletionTimestamp.IsZero() {
 		return r.handleAbortAndFinalize(ctx, taskAction)
@@ -110,8 +116,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
 		if err := r.Update(ctx, taskAction); err != nil {
+			logger.Error(err, "Failed to update TaskAction with finalizer")
 			return ctrl.Result{}, err
 		}
+		return ctrl.Result{}, nil
 	}
 
 	// Resolve plugin from registry
@@ -124,7 +132,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		err = r.Status().Update(ctx, taskAction)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
@@ -176,14 +187,8 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
 	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
 
-	// Update status subresource
-	if err := r.Status().Update(ctx, taskAction); err != nil {
+	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction); err != nil {
 		return ctrl.Result{}, err
-	}
-
-	// Determine requeue behavior
-	if phaseInfo.Phase().IsTerminal() {
-		return ctrl.Result{}, nil
 	}
 
 	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
@@ -213,6 +218,8 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	)
 	if err != nil {
 		logger.Error(err, "failed to build context for abort/finalize")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, "FinalizationSkipped",
+			"Could not build task execution context; skipping Abort/Finalize. Underlying resources may need manual cleanup: %v", err)
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
@@ -235,6 +242,41 @@ func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
+}
+
+// updateTaskActionStatus updates the TaskAction status only when the status has changed,
+// avoiding unnecessary API calls for unchanged state.
+func (r *TaskActionReconciler) updateTaskActionStatus(ctx context.Context, oldTaskAction, newTaskAction *flyteorgv1.TaskAction) error {
+	logger := log.FromContext(ctx)
+
+	if !taskActionStatusChanged(oldTaskAction.Status, newTaskAction.Status) {
+		return nil
+	}
+
+	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
+	err := r.Status().Update(ctx, newTaskAction)
+	if err != nil {
+		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
+	}
+
+	return err
+}
+
+// taskActionStatusChanged reports whether any status field has changed between old and new,
+// covering plugin phase, state, state version, observability JSON, and conditions.
+func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
+	if oldStatus.StateJSON != newStatus.StateJSON ||
+		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+		oldStatus.PluginPhase != newStatus.PluginPhase ||
+		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion {
+		return true
+	}
+
+	if !bytes.Equal(oldStatus.PluginState, newStatus.PluginState) {
+		return true
+	}
+
+	return !reflect.DeepEqual(oldStatus.Conditions, newStatus.Conditions)
 }
 
 // mapPhaseToConditions maps a plugin PhaseInfo to TaskAction conditions.
