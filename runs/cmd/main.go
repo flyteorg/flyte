@@ -99,6 +99,10 @@ func serve(ctx context.Context) error {
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
 	mux.Handle(runsPath, runsHandler)
 
+	// Mount the Internal Run Service
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc)
+	mux.Handle(internalRunsPath, internalRunsHandler)
+
 	// Mount the Task Service
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	mux.Handle(taskPath, taskHandler)

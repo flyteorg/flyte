@@ -2,8 +2,14 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
+	"io"
+	"sync"
 
 	"connectrpc.com/connect"
+	"google.golang.org/genproto/googleapis/rpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -12,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	sharedErr "github.com/flyteorg/flyte/v2/shared_service/error"
 )
 
 // RunService implements the RunServiceHandler interface
@@ -574,6 +581,259 @@ func (s *RunService) WatchClusterEvents(
 
 	<-ctx.Done()
 	return nil
+}
+
+func (s *RunService) recordSingleAction(ctx context.Context, request *workflow.RecordActionRequest) error {
+	m := models.NewActionModel(request.GetActionId())
+
+	var infoBytes []byte
+	var err error
+
+	switch request.GetSpec().(type) {
+	case *workflow.RecordActionRequest_Task:
+		// Validate inputs against task spec interface
+		taskSpec := request.GetTask().GetSpec()
+
+		taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+		if err != nil {
+			logger.Warnf(ctx, "failed to create task spec model: %v", err)
+			return err
+		}
+
+		err = s.db.TaskRepo().CreateTaskSpec(ctx, taskSpecModel)
+		if err != nil && !sharedErr.IsAlreadyExists(err) {
+			logger.Warnf(ctx, "failed to create task spec: %v", err)
+			return err
+		}
+
+		info := &privateWorkflow.RunInfo{
+			TaskSpecDigest: taskSpecModel.Digest,
+			InputsUri:      request.GetInputUri(),
+		}
+		infoBytes, err = proto.Marshal(info)
+		if err != nil {
+			logger.Warnf(ctx, "failed to marshal run info: %v", err)
+			return err
+		}
+
+		taskID := request.GetTask().GetId()
+		if taskID == nil {
+			taskID = taskIdFromTaskSpec(taskSpec)
+		}
+		functionName := transformers.ExtractFunctionName(ctx, taskID.GetName(), taskSpec.GetEnvironment().GetName())
+
+		m.TaskReference = models.ToTask(taskID)
+		m.TaskType = request.GetTask().GetSpec().GetTaskTemplate().GetType()
+		m.ActionType = int32(flyteWorkflow.ActionType_ACTION_TYPE_TASK)
+		m.TaskShortName = sharedModels.NewNullString(taskSpec.GetShortName())
+		m.EnvironmentName = sharedModels.NewNullString(taskSpec.GetEnvironment().GetName())
+		m.FunctionName = functionName
+
+	case *workflow.RecordActionRequest_Trace:
+		m.TaskReference = models.TaskReference{
+			TaskOrg:     sharedModels.NewNullString(request.GetActionId().GetRun().GetOrg()),
+			TaskProject: sharedModels.NewNullString(request.GetActionId().GetRun().GetProject()),
+			TaskDomain:  sharedModels.NewNullString(request.GetActionId().GetRun().GetDomain()),
+			TaskName:    sharedModels.NewNullString(request.GetTrace().GetName()),
+		}
+		m.ActionType = int32(flyteWorkflow.ActionType_ACTION_TYPE_TRACE)
+
+		m.CreatedAt = request.GetTrace().GetStartTime().AsTime()
+		m.EndedAt = sharedModels.NewNullTime(request.GetTrace().GetEndTime())
+		m.FunctionName = transformers.ExtractFunctionName(ctx, request.GetTrace().GetName(), "")
+
+		m.Phase = int32(request.GetTrace().GetPhase())
+
+		// Validate inputs against task spec interface
+		traceSpec := request.GetTrace().GetSpec()
+
+		traceSpecModel, err := models.NewTaskSpecModelFromTraceSpec(ctx, traceSpec)
+		if err != nil {
+			logger.Warnf(ctx, "failed to create trace spec model: %v", err)
+			return err
+		}
+
+		// Required for backcompat for traces with no spec
+		info := &privateWorkflow.RunInfo{}
+		if traceSpecModel != nil {
+			err = s.db.TaskRepo().CreateTaskSpec(ctx, traceSpecModel)
+			if err != nil && !sharedErr.IsAlreadyExists(err) {
+				logger.Warnf(ctx, "failed to create trace spec: %v", err)
+				return err
+			}
+			info.TaskSpecDigest = traceSpecModel.Digest
+		}
+
+		info.OutputsUri = request.GetTrace().GetOutputs().GetOutputUri()
+		info.InputsUri = request.GetInputUri()
+
+		infoBytes, err = proto.Marshal(info)
+		if err != nil {
+			logger.Warnf(ctx, "failed to marshal run info: %v", err)
+			return err
+		}
+
+	default:
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", request.GetSpec()))
+	}
+
+	// TODO: use host from streaming request
+	// host := authz.IdentityContextFromContext(ctx).Host()
+	m.ParentName = sharedModels.NewNullString(request.GetParent())
+	// If the parent is empty, we assume this is a root action
+	if request.GetParent() == "" {
+		m.IsRoot = true
+	}
+	m.ActionGroup = sharedModels.NewNullString(request.GetGroup())
+	m.CreatedBy = sharedModels.NewNullString(request.GetSubject())
+	m.DetailedInfo = infoBytes
+
+	err = s.db.ActionRepo().CreateAction(ctx, m, false)
+	if err != nil && !sharedErr.IsAlreadyExists(err) {
+		logger.Warnf(ctx, "failed to create run: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (s *RunService) recordAction(ctx context.Context, request *workflow.RecordActionRequest) *workflow.RecordActionResponse {
+	err := s.recordSingleAction(ctx, request)
+
+	status := &status.Status{}
+	if err != nil {
+		status.Code = int32(sharedErr.GrpcErrorCode(err))
+		status.Message = err.Error()
+	}
+	return &workflow.RecordActionResponse{
+		ActionId: request.GetActionId(),
+		Status:   status,
+	}
+}
+
+func (s *RunService) RecordActionStream(ctx context.Context, c *connect.BidiStream[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse]) error {
+	return s.recordActionStream(ctx, c)
+}
+
+func (s *RunService) recordActionStream(ctx context.Context, c connect.BidiStream[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse]) error {
+	sendCh := make(chan *workflow.RecordActionStreamResponse, streamedResponseChannelSize)
+	sendDoneCh := make(chan struct{})
+	var wg sync.WaitGroup
+	wg.Add(1)
+	var sendErr error
+	go func() {
+		defer wg.Done()
+		for resp := range sendCh {
+			if err := c.Send(resp); err != nil {
+				sendErr = err
+				break
+			}
+		}
+		close(sendDoneCh)
+	}()
+
+	var finalErr error
+receive:
+	for {
+		select {
+		case <-ctx.Done():
+			finalErr = ctx.Err()
+			break receive
+		case <-sendDoneCh:
+			finalErr = sendErr
+			break receive
+		default:
+			request, err := c.Receive()
+			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					finalErr = err
+				}
+				break receive
+			}
+
+			resp := s.recordAction(ctx, request.GetRequest())
+			sendCh <- &workflow.RecordActionStreamResponse{
+				Response: resp,
+			}
+		}
+
+	}
+	close(sendCh)
+	wg.Wait()
+	return finalErr
+}
+
+func (s *RunService) UpdateActionStatusStream(ctx context.Context, c *connect.BidiStream[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse]) error {
+	return s.updateActionStatusStream(ctx, c)
+}
+
+func (s *RunService) updateActionStatusStream(ctx context.Context, c connect.BidiStream[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse]) error {
+	sendCh := make(chan *workflow.UpdateActionStatusStreamResponse, streamedResponseChannelSize)
+	sendDoneCh := make(chan struct{})
+	var wg sync.WaitGroup
+	wg.Add(1)
+	var sendErr error
+	go func() {
+		defer wg.Done()
+		for resp := range sendCh {
+			if err := c.Send(resp); err != nil {
+				sendErr = err
+				break
+			}
+		}
+		close(sendDoneCh)
+	}()
+
+	var finalErr error
+receive:
+	for {
+		select {
+		case <-ctx.Done():
+			finalErr = ctx.Err()
+			break receive
+		case <-sendDoneCh:
+			finalErr = sendErr
+			break receive
+		default:
+			request, err := c.Receive()
+			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					finalErr = err
+				}
+				break receive
+			}
+
+			resp := s.updateActionStatus(ctx, request.GetRequest())
+			sendCh <- &workflow.UpdateActionStatusStreamResponse{
+				Response: resp,
+				Nonce:    request.GetNonce(),
+			}
+		}
+
+	}
+	close(sendCh)
+	wg.Wait()
+	return finalErr
+}
+
+func (s *RunService) updateActionStatus(ctx context.Context, request *workflow.UpdateActionStatusRequest) *workflow.UpdateActionStatusResponse {
+	err := s.updateSingleActionStatus(ctx, request)
+
+	status := &status.Status{}
+	if err != nil {
+		status.Code = int32(sharedErr.GrpcErrorCode(err))
+		status.Message = err.Error()
+	}
+	return &workflow.UpdateActionStatusResponse{
+		ActionId: request.GetActionId(),
+		Status:   status,
+	}
+}
+
+func (s *RunService) updateSingleActionStatus(ctx context.Context, request *workflow.UpdateActionStatusRequest) error {
+	m := models.NewActionModel(request.GetActionId())
+	m.SetStatus(request.GetStatus())
+
+	return s.db.ActionRepo().UpdateAction(ctx, m)
 }
 
 // Helper functions
