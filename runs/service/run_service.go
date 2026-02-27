@@ -16,11 +16,13 @@ import (
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
@@ -29,7 +31,7 @@ import (
 // RunService implements the RunServiceHandler interface
 type RunService struct {
 	repo          interfaces.Repository
-	queueClient   workflowconnect.QueueServiceClient
+	actionsClient actionsconnect.ActionsServiceClient
 	storagePrefix string
 	dataStore     *storage.DataStore
 	stateClient   *actionsk8s.ActionsClient
@@ -84,10 +86,10 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient, storagePrefix string, dataStore *storage.DataStore, stateClient *actionsk8s.ActionsClient) *RunService {
+func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore, stateClient *actionsk8s.ActionsClient) *RunService {
 	return &RunService{
 		repo:          repo,
-		queueClient:   queueClient,
+		actionsClient: actionsClient,
 		storagePrefix: storagePrefix,
 		dataStore:     dataStore,
 		stateClient:   stateClient,
@@ -149,7 +151,6 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Enqueue the root action to the queue service
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
 			Org:     run.Org,
@@ -160,37 +161,29 @@ func (s *RunService) CreateRun(
 		Name: run.Name, // For root actions, action name = run name
 	}
 
-	// Build EnqueueActionRequest from CreateRunRequest
-	enqueueReq := &workflow.EnqueueActionRequest{
+	// Build the root action for ActionsService.Enqueue
+	rootAction := &actions.Action{
 		ActionId:      actionID,
-		RunSpec:       req.Msg.RunSpec,
 		InputUri:      inputPrefix,
 		RunOutputBase: runOutputBase,
 	}
-
-	// Set the spec based on the task type in CreateRunRequest
 	switch taskSpec := req.Msg.Task.(type) {
 	case *workflow.CreateRunRequest_TaskSpec:
-		enqueueReq.Spec = &workflow.EnqueueActionRequest_Task{
-			Task: &workflow.TaskAction{
-				Spec: taskSpec.TaskSpec,
-			},
+		rootAction.Spec = &actions.Action_Task{
+			Task: &workflow.TaskAction{Spec: taskSpec.TaskSpec},
 		}
 	case *workflow.CreateRunRequest_TaskId:
-		enqueueReq.Spec = &workflow.EnqueueActionRequest_Task{
-			Task: &workflow.TaskAction{
-				Id: taskSpec.TaskId,
-			},
+		rootAction.Spec = &actions.Action_Task{
+			Task: &workflow.TaskAction{Id: taskSpec.TaskId},
 		}
 	}
 
-	// Call queue service to enqueue the root action
-	_, err = s.queueClient.EnqueueAction(ctx, connect.NewRequest(enqueueReq))
+	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
+		Action:  rootAction,
+		RunSpec: req.Msg.RunSpec,
+	}))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
-		// Note: We don't fail the CreateRun if enqueue fails - the run is already created
-		// In production, you might want to mark the run as failed or retry the enqueue
-		logger.Warnf(ctx, "Run %s created but failed to enqueue root action", run.Name)
 	} else {
 		logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
 	}

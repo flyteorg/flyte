@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
@@ -29,13 +30,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	repo := repository.NewRepository(sc.DB)
 
 	// In unified mode, intra-service calls go through the same mux.
-	queueURL := cfg.QueueServiceURL
+	actionsURL := cfg.ActionsServiceURL
 	if sc.BaseURL != "" {
-		queueURL = sc.BaseURL
+		actionsURL = sc.BaseURL
 	}
-	queueClient := workflowconnect.NewQueueServiceClient(
+	actionsClient := actionsconnect.NewActionsServiceClient(
 		http.DefaultClient,
-		queueURL,
+		actionsURL,
 	)
 
 	// Create a state client for watching TaskAction CRs
@@ -52,7 +53,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return nil
 	})
 
-	runsSvc := service.NewRunService(repo, queueClient, cfg.StoragePrefix, sc.DataStore, stateClient)
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, stateClient)
 	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
