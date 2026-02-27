@@ -50,6 +50,7 @@ plugins:
       - FLYTE_AWS_SECRET_ACCESS_KEY: "minioadmin"
       - _U_EP_OVERRIDE: "flyte-host:8090"
       - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
 
 # Storage Configuration
 # For local development, using RustFS (run: bash start-rustfs.sh)
