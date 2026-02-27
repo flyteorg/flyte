@@ -3,9 +3,11 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -13,15 +15,19 @@ import (
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // ActionUpdate represents an update to a TaskAction
 type ActionUpdate struct {
 	ActionID         *common.ActionIdentifier
+	ParentActionName string
 	StateJSON        string
 	Phase            string
+	OutputUri        string
 	IsDeleted        bool
-	ParentActionName string
+	TaskType         string
+	ShortName        string
 }
 
 // StateClient implements state operations using Kubernetes TaskAction CRs
@@ -93,6 +99,30 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 
 	logger.Infof(ctx, "Updated state for TaskAction: %s", taskActionName)
 	return nil
+}
+
+// ListRunActions lists all TaskActions belonging to a run.
+func (c *StateClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
+	taskActionList := &executorv1.TaskActionList{}
+	listOpts := []client.ListOption{
+		client.InNamespace(c.namespace),
+		client.MatchingLabels{
+			"flyte.org/org":     runID.Org,
+			"flyte.org/project": runID.Project,
+			"flyte.org/domain":  runID.Domain,
+			"flyte.org/run":     runID.Name,
+		},
+	}
+
+	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
+		return nil, fmt.Errorf("failed to list TaskActions for run: %w", err)
+	}
+
+	result := make([]*executorv1.TaskAction, len(taskActionList.Items))
+	for i := range taskActionList.Items {
+		result[i] = &taskActionList.Items[i]
+	}
+	return result, nil
 }
 
 // ListChildActions lists all TaskActions that are children of the given parent action
@@ -243,9 +273,15 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 		return
 	}
 
-	parentActionName := ""
+	var parentName string
 	if taskAction.Spec.ParentActionName != nil {
-		parentActionName = *taskAction.Spec.ParentActionName
+		parentName = *taskAction.Spec.ParentActionName
+	}
+
+	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	shortName := taskAction.Spec.ShortName
+	if shortName == "" && len(taskAction.Spec.TaskTemplate) > 0 {
+		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
 	}
 
 	update := &ActionUpdate{
@@ -258,10 +294,13 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 			},
 			Name: taskAction.Spec.ActionName,
 		},
+		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
-		Phase:            getPhaseFromConditions(taskAction),
+		Phase:            GetPhaseFromConditions(taskAction),
+		OutputUri:        buildOutputUri(taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
-		ParentActionName: parentActionName,
+		TaskType:         taskAction.Spec.TaskType,
+		ShortName:        shortName,
 	}
 
 	c.notifySubscribers(ctx, update)
@@ -292,8 +331,8 @@ func (c *StateClient) StopWatching() {
 	}
 }
 
-// getPhaseFromConditions extracts the phase from TaskAction conditions
-func getPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+// GetPhaseFromConditions extracts the phase from TaskAction conditions.
+func GetPhaseFromConditions(taskAction *executorv1.TaskAction) string {
 	for _, cond := range taskAction.Status.Conditions {
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
@@ -331,7 +370,37 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 	)
 }
 
+// buildOutputUri computes the action-specific output URI from the TaskAction spec.
+func buildOutputUri(ta *executorv1.TaskAction) string {
+	if ta.Spec.RunOutputBase == "" {
+		return ""
+	}
+	return strings.TrimRight(ta.Spec.RunOutputBase, "/") + "/" + ta.Spec.ActionName
+}
+
 // InitScheme adds the executor API types to the scheme
 func InitScheme() error {
 	return executorv1.AddToScheme(scheme.Scheme)
+}
+
+// extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.
+// It splits on '.' and returns the last part.
+func extractShortNameFromTemplate(templateBytes []byte) string {
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(templateBytes, tmpl); err != nil {
+		return ""
+	}
+	if tmpl.GetId() == nil {
+		return ""
+	}
+	name := tmpl.GetId().GetName()
+	if name == "" {
+		return ""
+	}
+	// Split on '.' and take the last part
+	parts := strings.Split(name, ".")
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return name
 }
