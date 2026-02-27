@@ -26,6 +26,12 @@ func NewActionsService(client ActionsClientInterface) *ActionsService {
 	return &ActionsService{client: client}
 }
 
+// NewActionsServiceWithClient creates a new ActionsService with a custom client implementation.
+// This is useful for testing.
+func NewActionsServiceWithClient(client ActionsClientInterface) *ActionsService {
+	return &ActionsService{client: client}
+}
+
 // Ensure we implement the interface.
 var _ actionsconnect.ActionsServiceHandler = (*ActionsService)(nil)
 
