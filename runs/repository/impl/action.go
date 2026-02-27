@@ -53,7 +53,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
+func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error) {
 	// Determine run ID
 	var runID *common.RunIdentifier
 	switch id := req.Id.(type) {
@@ -79,8 +79,8 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         "", // TODO: build from inputs
-		RunOutputBase:    "", // TODO: build output path
+		InputUri:         inputUri,
+		RunOutputBase:    runOutputBase,
 	}
 
 	// Set the task spec based on the request
@@ -750,6 +750,38 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 	if err := r.db.WithContext(ctx).Exec(sql).Error; err != nil {
 		logger.Errorf(ctx, "Failed to NOTIFY run_updates: %v", err)
 	}
+}
+
+// ListRootActions lists root actions (runs) matching scope and date filters.
+func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	query := r.db.WithContext(ctx).Model(&models.Action{}).
+		Where("parent_action_name IS NULL")
+
+	if org != "" {
+		query = query.Where("org = ?", org)
+	}
+	if project != "" {
+		query = query.Where("project = ?", project)
+	}
+	if domain != "" {
+		query = query.Where("domain = ?", domain)
+	}
+	if startDate != nil {
+		query = query.Where("created_at >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("created_at <= ?", *endDate)
+	}
+	if limit <= 0 {
+		limit = 1000
+	}
+
+	var actions []*models.Action
+	result := query.Order("created_at DESC").Limit(limit).Find(&actions)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list root actions: %w", result.Error)
+	}
+	return actions, nil
 }
 
 // notifyActionUpdate sends a notification about an action update

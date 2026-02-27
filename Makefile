@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := help
 
+CLUSTER_NAME ?= flytev2
+
 # Docker CI image configuration
 DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
 
@@ -18,6 +20,29 @@ SEPARATOR := \033[1;36m========================================\033[0m
 
 # Include common Go targets
 include go.Makefile
+
+# =============================================================================
+# Local Cluster Commands
+# =============================================================================
+
+.PHONY: cluster-create
+cluster-create: ## Create k3d cluster with host gateway alias for pod-to-host connectivity
+	$(eval HOST_GATEWAY_IP := $(shell docker run --rm --add-host=probe:host-gateway busybox cat /etc/hosts 2>/dev/null | awk '$$1~/^[0-9]/&&$$2=="probe"{print $$1;exit}'))
+	@if [ -z "$(HOST_GATEWAY_IP)" ]; then \
+		echo "ERROR: Failed to detect HOST_GATEWAY_IP. Ensure Docker is running."; \
+		exit 1; \
+	fi
+	@echo "Host gateway IP: $(HOST_GATEWAY_IP)"
+	@if k3d cluster get $(CLUSTER_NAME) --no-headers >/dev/null 2>&1; then \
+		echo "Cluster $(CLUSTER_NAME) already exists, skipping creation"; \
+	else \
+		CLUSTER_NAME=$(CLUSTER_NAME) HOST_GATEWAY_IP=$(HOST_GATEWAY_IP) envsubst < config/k3d/cluster.yaml | k3d cluster create --config -; \
+	fi
+	@echo "Cluster $(CLUSTER_NAME) ready. Pods can reach host services via flyte-host:<port>"
+
+.PHONY: cluster-delete
+cluster-delete: ## Delete k3d cluster
+	@k3d cluster delete $(CLUSTER_NAME)
 
 .PHONY: help
 help: ## Show this help message
