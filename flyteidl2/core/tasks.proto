@@ -192,6 +192,9 @@ message TaskMetadata {
 
   // Log links associated with this task.
   repeated core.TaskLog log_links = 18;
+
+  // URL of the remote image build run that produced the container image for this task.
+  string image_build_url = 19;
 }
 
 // A Task structure that uniquely identifies a task in the system

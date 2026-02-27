@@ -2156,6 +2156,10 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "description": "Log links associated with this task."
+        },
+        "image_build_url": {
+          "type": "string",
+          "description": "URL of the remote image build run that produced the container image for this task."
         }
       },
       "title": "Task Metadata"
