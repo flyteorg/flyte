@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -215,8 +216,9 @@ func (s *StateService) Watch(ctx context.Context, req *connect.Request[workflow.
 
 			// Convert update to ActionUpdate message
 			actionUpdate := &workflow.ActionUpdate{
-				ActionId: update.ActionID,
-				Phase:    stringToPhase(update.Phase),
+				ActionId:  update.ActionID,
+				Phase:     stringToPhase(update.Phase),
+				OutputUri: update.OutputUri,
 			}
 
 			resp := &workflow.WatchResponse{
@@ -246,10 +248,34 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 			},
 			Name: action.Spec.ActionName,
 		},
-		Phase: getPhaseFromConditions(action),
+		Phase:     getPhaseFromConditions(action),
+		OutputUri: actionOutputUri(action.Spec.RunOutputBase, action.Spec.ActionName),
 	}
 
 	return update
+}
+
+// actionOutputUri computes the action-scoped output prefix.
+func actionOutputUri(runOutputBase, actionName string) string {
+	if runOutputBase == "" {
+		return ""
+	}
+	return strings.TrimRight(runOutputBase, "/") + "/" + actionName
+}
+
+// isChildOf checks if an action is a child of a parent action
+func isChildOf(actionID *common.ActionIdentifier, parentActionID *common.ActionIdentifier) bool {
+	// Must be same run
+	if actionID.Run.Org != parentActionID.Run.Org ||
+		actionID.Run.Project != parentActionID.Run.Project ||
+		actionID.Run.Domain != parentActionID.Run.Domain ||
+		actionID.Run.Name != parentActionID.Run.Name {
+		return false
+	}
+
+	// For now, include all actions in the same run
+	// A more sophisticated implementation would check the parent-child relationship
+	return true
 }
 
 // getPhaseFromConditions extracts the phase from TaskAction conditions

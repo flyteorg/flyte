@@ -20,19 +20,22 @@ type Config struct {
 
 // ServerConfig holds HTTP server configuration
 type ServerConfig struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
 }
 
 // ExecutorConfig holds executor-specific configuration
 type ExecutorConfig struct {
-	HealthProbePort int `json:"healthProbePort"`
+	HealthProbePort int `json:"healthProbePort" pflag:",Port for executor health probes"`
 }
 
 // KubernetesConfig holds Kubernetes client configuration
 type KubernetesConfig struct {
-	Namespace  string `json:"namespace"`
-	KubeConfig string `json:"kubeconfig"` // Optional, defaults to in-cluster or ~/.kube/config
+	Namespace  string `json:"namespace" pflag:",Kubernetes namespace"`
+	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
+	QPS        int    `json:"qps" pflag:",Max sustained queries per second to the API server"`
+	Burst      int    `json:"burst" pflag:",Max burst queries to the API server"`
+	Timeout    string `json:"timeout" pflag:",Default timeout for API server requests (e.g. 30s)"`
 }
 
 var defaultConfig = &Config{
@@ -46,16 +49,15 @@ var defaultConfig = &Config{
 	Kubernetes: KubernetesConfig{
 		Namespace:  "flyte",
 		KubeConfig: "",
+		QPS:        1000,
+		Burst:      2000,
+		Timeout:    "30s",
 	},
 }
 
-var cfg Config
+var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 // GetConfig retrieves the current config value or default.
 func GetConfig() *Config {
-	return &cfg
-}
-
-func init() {
-	config.MustRegisterSection(configSectionKey, &cfg)
+	return configSection.GetConfig().(*Config)
 }

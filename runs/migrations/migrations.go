@@ -21,9 +21,9 @@ var AllModels = []interface{}{
 func RunMigrations(db *gorm.DB) error {
 	ctx := context.Background()
 
-	// Drop ALL old tables if they exist (from previous schema)
-	// This includes the old actions table which had different columns
-	oldTables := []string{"runs", "actions", "action_attempts", "cluster_events", "phase_transitions"}
+	// Drop stale tables from previous schema versions that are no longer used.
+	// "actions" is intentionally excluded since it holds live data.
+	oldTables := []string{"runs", "action_attempts", "cluster_events", "phase_transitions"}
 	for _, table := range oldTables {
 		if db.Migrator().HasTable(table) {
 			logger.Infof(ctx, "Dropping old table: %s", table)
@@ -33,11 +33,11 @@ func RunMigrations(db *gorm.DB) error {
 		}
 	}
 
-	// AutoMigrate will create the new actions table with simplified schema
+	// AutoMigrate creates missing tables and adds new columns without dropping existing data.
 	if err := db.AutoMigrate(AllModels...); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	logger.Infof(ctx, "Database migrations completed successfully (recreated actions table)")
+	logger.Infof(ctx, "Database migrations completed successfully")
 	return nil
 }
