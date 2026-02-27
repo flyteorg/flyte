@@ -12,7 +12,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/service"
-	statek8s "github.com/flyteorg/flyte/v2/state/k8s"
+	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -39,10 +39,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	)
 
 	// Create a state client for watching TaskAction CRs
-	if err := statek8s.InitScheme(); err != nil {
+	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("runs: failed to initialize k8s scheme: %w", err)
 	}
-	stateClient := statek8s.NewStateClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize)
+	stateClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize)
 	if err := stateClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("runs: failed to start TaskAction watcher: %w", err)
 	}

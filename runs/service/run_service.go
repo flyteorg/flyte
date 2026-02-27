@@ -23,7 +23,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	statek8s "github.com/flyteorg/flyte/v2/state/k8s"
+	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 )
 
 // RunService implements the RunServiceHandler interface
@@ -32,7 +32,7 @@ type RunService struct {
 	queueClient   workflowconnect.QueueServiceClient
 	storagePrefix string
 	dataStore     *storage.DataStore
-	stateClient   *statek8s.StateClient
+	stateClient   *actionsk8s.ActionsClient
 }
 
 // WatchGroups streams task groups (runs grouped by task) from the database.
@@ -84,7 +84,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient, storagePrefix string, dataStore *storage.DataStore, stateClient *statek8s.StateClient) *RunService {
+func NewRunService(repo interfaces.Repository, queueClient workflowconnect.QueueServiceClient, storagePrefix string, dataStore *storage.DataStore, stateClient *actionsk8s.ActionsClient) *RunService {
 	return &RunService{
 		repo:          repo,
 		queueClient:   queueClient,
@@ -1024,7 +1024,7 @@ func (s *RunService) taskActionToEnrichedProto(ta *executorv1.TaskAction) *workf
 		metadata.Parent = *ta.Spec.ParentActionName
 	}
 
-	phase := actionPhaseFromString(statek8s.GetPhaseFromConditions(ta))
+	phase := actionPhaseFromString(actionsk8s.GetPhaseFromConditions(ta))
 	status := &workflow.ActionStatus{
 		Phase:     phase,
 		StartTime: timestamppb.New(ta.CreationTimestamp.Time),
@@ -1272,7 +1272,7 @@ func (s *RunService) taskActionToActionDetails(ta *executorv1.TaskAction) (*work
 	}
 
 	// Build status from conditions
-	phase := actionPhaseFromString(statek8s.GetPhaseFromConditions(ta))
+	phase := actionPhaseFromString(actionsk8s.GetPhaseFromConditions(ta))
 	status := &workflow.ActionStatus{
 		Phase:     phase,
 		StartTime: timestamppb.New(ta.CreationTimestamp.Time),

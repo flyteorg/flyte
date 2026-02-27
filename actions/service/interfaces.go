@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/state/k8s"
+	"github.com/flyteorg/flyte/v2/actions/k8s"
 )
 
 // ActionsClientInterface defines the interface for actions operations.
