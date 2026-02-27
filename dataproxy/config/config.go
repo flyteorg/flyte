@@ -7,6 +7,8 @@ import (
 
 const configSectionKey = "dataproxy"
 
+//go:generate pflags DataProxyConfig --default-var=defaultConfig
+
 var defaultConfig = &DataProxyConfig{
 	Upload: DataProxyUploadConfig{
 		MaxSize:               resource.MustParse("100Mi"),

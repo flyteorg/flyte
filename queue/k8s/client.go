@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -98,6 +99,11 @@ func (q *QueueClient) EnqueueAction(ctx context.Context, req *workflow.EnqueueAc
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
 
+	// Embed TaskTemplate inline in the CR (stored in etcd)
+	if err := embedTaskTemplate(req, taskAction); err != nil {
+		return fmt.Errorf("failed to embed task template: %w", err)
+	}
+
 	// Create in Kubernetes
 	if err := q.k8sClient.Create(ctx, taskAction); err != nil {
 		return fmt.Errorf("failed to create TaskAction CR: %w", err)
@@ -184,6 +190,28 @@ func (q *QueueClient) AbortQueuedAction(ctx context.Context, actionID *common.Ac
 			taskActionName)
 	}
 
+	return nil
+}
+
+// embedTaskTemplate extracts the TaskTemplate from the request, serializes it,
+// and stores it inline in the TaskAction CR spec (persisted in etcd).
+func embedTaskTemplate(req *workflow.EnqueueActionRequest, taskAction *executorv1.TaskAction) error {
+	taskReq, ok := req.Spec.(*workflow.EnqueueActionRequest_Task)
+	if !ok || taskReq.Task == nil || taskReq.Task.Spec == nil || taskReq.Task.Spec.TaskTemplate == nil {
+		return fmt.Errorf("enqueue request does not contain an inline task template")
+	}
+
+	taskSpec := taskReq.Task.Spec
+	tmpl := taskSpec.TaskTemplate
+	taskAction.Spec.TaskType = tmpl.Type
+	taskAction.Spec.ShortName = taskSpec.ShortName
+
+	data, err := proto.Marshal(tmpl)
+	if err != nil {
+		return fmt.Errorf("failed to marshal task template: %w", err)
+	}
+
+	taskAction.Spec.TaskTemplate = data
 	return nil
 }
 
