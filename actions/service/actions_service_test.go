@@ -47,7 +47,7 @@ var (
 func TestEnqueue(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).Return(nil)
 
@@ -61,7 +61,7 @@ func TestEnqueue(t *testing.T) {
 
 	t.Run("client error returns internal", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).Return(errors.New("k8s error"))
 
@@ -77,7 +77,7 @@ func TestEnqueue(t *testing.T) {
 func TestGetLatestState(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		m.EXPECT().GetState(mock.Anything, testActionID).Return(`{"status":"ok"}`, nil)
 
@@ -92,7 +92,7 @@ func TestGetLatestState(t *testing.T) {
 
 	t.Run("client error returns not found", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		m.EXPECT().GetState(mock.Anything, testActionID).Return("", errors.New("not found"))
 
@@ -108,7 +108,7 @@ func TestGetLatestState(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
 		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(nil)
@@ -126,7 +126,7 @@ func TestUpdate(t *testing.T) {
 
 	t.Run("client error returns internal", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
 		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(errors.New("write failed"))
@@ -145,7 +145,7 @@ func TestUpdate(t *testing.T) {
 func TestAbort(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		reason := "user requested"
 		m.EXPECT().AbortAction(mock.Anything, testActionID, &reason).Return(nil)
@@ -161,7 +161,7 @@ func TestAbort(t *testing.T) {
 
 	t.Run("client error returns internal", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsServiceWithClient(m)
+		svc := NewActionsService(m)
 
 		m.EXPECT().AbortAction(mock.Anything, testActionID, (*string)(nil)).Return(errors.New("delete failed"))
 

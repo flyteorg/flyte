@@ -16,19 +16,12 @@ import (
 )
 
 // ActionsService implements the ActionsService gRPC API.
-// It consolidates the responsibilities of the queue and state services.
 type ActionsService struct {
 	client ActionsClientInterface
 }
 
 // NewActionsService creates a new ActionsService.
 func NewActionsService(client ActionsClientInterface) *ActionsService {
-	return &ActionsService{client: client}
-}
-
-// NewActionsServiceWithClient creates a new ActionsService with a custom client implementation.
-// This is useful for testing.
-func NewActionsServiceWithClient(client ActionsClientInterface) *ActionsService {
 	return &ActionsService{client: client}
 }
 
@@ -211,11 +204,11 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 			Name: action.Spec.ActionName,
 		},
 		Phase:     getPhaseFromConditions(action),
-		OutputUri: actionOutputUri(action.Spec.RunOutputBase, action.Spec.ActionName),
+		OutputUri: actionOutputURI(action.Spec.RunOutputBase, action.Spec.ActionName),
 	}
 }
 
-func actionOutputUri(runOutputBase, actionName string) string {
+func actionOutputURI(runOutputBase, actionName string) string {
 	if runOutputBase == "" {
 		return ""
 	}

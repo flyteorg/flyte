@@ -10,7 +10,7 @@ const configSectionKey = "actions"
 
 var defaultConfig = &Config{
 	Server: ServerConfig{
-		Port: 8090,
+		Port: 8091,
 		Host: "0.0.0.0",
 	},
 	Kubernetes: KubernetesConfig{
