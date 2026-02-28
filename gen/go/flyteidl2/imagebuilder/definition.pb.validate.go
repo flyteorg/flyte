@@ -1083,6 +1083,8 @@ func (m *UVProject) validate(all bool) error {
 
 	}
 
+	// no validation rules for SourceDir
+
 	if len(errors) > 0 {
 		return UVProjectMultiError(errors)
 	}
