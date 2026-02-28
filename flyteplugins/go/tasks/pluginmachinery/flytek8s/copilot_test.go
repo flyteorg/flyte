@@ -474,7 +474,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 	taskMetadata.EXPECT().IsInterruptible().Return(false)
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			Name: "my-task",
 		},

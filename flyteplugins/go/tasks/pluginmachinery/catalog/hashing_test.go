@@ -671,7 +671,7 @@ func TestCacheIgnoreInputVars(t *testing.T) {
 }
 
 func TestHashIdentifierExceptVersion(t *testing.T) {
-	identifier := core.Identifier{
+	identifier := &core.Identifier{
 		Project: "project_1",
 		Domain:  "domain_1",
 		Name:    "name_1",
@@ -679,7 +679,7 @@ func TestHashIdentifierExceptVersion(t *testing.T) {
 		Org:     "org_1",
 	}
 
-	identifierDiffVersion := core.Identifier{
+	identifierDiffVersion := &core.Identifier{
 		Project: "project_1",
 		Domain:  "domain_1",
 		Name:    "name_1",

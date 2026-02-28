@@ -40,7 +40,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	})
 	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",

@@ -119,7 +119,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		}
 
 		if kfTensorflowTaskExtraArgs.GetRunPolicy() != nil {
-			runPolicy = common.ParseRunPolicy(*kfTensorflowTaskExtraArgs.GetRunPolicy())
+			runPolicy = common.ParseRunPolicy(kfTensorflowTaskExtraArgs.GetRunPolicy())
 		}
 
 	} else {

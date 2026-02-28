@@ -117,7 +117,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 
 	tID := &coreMocks.TaskExecutionID{}
 	tID.EXPECT().GetGeneratedName().Return(execID + "-my-task-1")
-	tID.EXPECT().GetID().Return(idlCore.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&idlCore.TaskExecutionIdentifier{
 		TaskId: &idlCore.Identifier{
 			ResourceType: idlCore.ResourceType_TASK,
 			Project:      "a",
@@ -151,7 +151,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 
 	connections := map[string]pluginCore.ConnectionWrapper{
 		"my-openai": {
-			Connection: idlCore.Connection{
+			Connection: &idlCore.Connection{
 				TaskType: "openai",
 				Secrets:  map[string]string{"key": "value"},
 				Configs:  map[string]string{"key": "value"},
@@ -166,7 +166,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.EXPECT().GetK8sServiceAccount().Return("s")
 	tMeta.EXPECT().GetNamespace().Return("fake-development")
 	tMeta.EXPECT().GetMaxAttempts().Return(2)
-	tMeta.EXPECT().GetSecurityContext().Return(idlCore.SecurityContext{
+	tMeta.EXPECT().GetSecurityContext().Return(&idlCore.SecurityContext{
 		RunAs: &idlCore.Identity{
 			K8SServiceAccount: "s",
 		},

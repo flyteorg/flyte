@@ -526,7 +526,7 @@ func TestToK8sContainer(t *testing.T) {
 	mockTaskOverrides.EXPECT().GetExtendedResources().Return(nil)
 	mockTaskExecMetadata.EXPECT().GetOverrides().Return(&mockTaskOverrides)
 	mockTaskExecutionID := mocks.TaskExecutionID{}
-	mockTaskExecutionID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{})
+	mockTaskExecutionID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{})
 	mockTaskExecutionID.EXPECT().GetGeneratedName().Return("gen_name")
 	mockTaskExecMetadata.EXPECT().GetTaskExecutionID().Return(&mockTaskExecutionID)
 	mockTaskExecMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
@@ -583,7 +583,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecutionID := mocks.TaskExecutionID{}
 	mockTaskExecutionID.EXPECT().GetUniqueNodeID().Return("unique_node_id")
 	mockTaskExecutionID.EXPECT().GetGeneratedName().Return("gen_name")
-	mockTaskExecutionID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	mockTaskExecutionID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      "p1",

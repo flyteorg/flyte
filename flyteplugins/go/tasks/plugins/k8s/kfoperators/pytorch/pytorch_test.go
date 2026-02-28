@@ -76,10 +76,10 @@ func dummyPytorchCustomObj(workers int32) *plugins.DistributedPyTorchTrainingTas
 	}
 }
 
-func dummyElasticPytorchCustomObj(workers int32, elasticConfig plugins.ElasticConfig) *plugins.DistributedPyTorchTrainingTask {
+func dummyElasticPytorchCustomObj(workers int32, elasticConfig *plugins.ElasticConfig) *plugins.DistributedPyTorchTrainingTask {
 	return &plugins.DistributedPyTorchTrainingTask{
 		Workers:       workers,
-		ElasticConfig: &elasticConfig,
+		ElasticConfig: elasticConfig,
 	}
 }
 
@@ -147,7 +147,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -213,7 +213,7 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -384,7 +384,7 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 func TestBuildResourcePytorchElastic(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
-	ptObj := dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"})
+	ptObj := dummyElasticPytorchCustomObj(2, &plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"})
 	taskTemplate := dummyPytorchTaskTemplate("job2", ptObj)
 
 	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
@@ -504,7 +504,7 @@ func TestBuildResourcePytorchContainerImage(t *testing.T) {
 		},
 		{
 			"elastic pytorch",
-			dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}),
+			dummyElasticPytorchCustomObj(2, &plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}),
 		},
 	}
 
@@ -656,7 +656,7 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 		},
 		{
 			"elastic pytorch",
-			dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}),
+			dummyElasticPytorchCustomObj(2, &plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}),
 		},
 	}
 

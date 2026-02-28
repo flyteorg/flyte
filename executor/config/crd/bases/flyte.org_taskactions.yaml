@@ -21,6 +21,9 @@ spec:
     - jsonPath: .spec.actionName
       name: Action
       type: string
+    - jsonPath: .spec.taskType
+      name: TaskType
+      type: string
     - jsonPath: .status.conditions[?(@.type=='Progressing')].reason
       name: Status
       type: string
@@ -104,6 +107,22 @@ spec:
                   write its output
                 minLength: 1
                 type: string
+              shortName:
+                description: ShortName is the human-readable display name for this
+                  task
+                maxLength: 63
+                type: string
+              taskTemplate:
+                description: TaskTemplate is the proto-serialized core.TaskTemplate
+                  stored inline in etcd
+                format: byte
+                type: string
+              taskType:
+                description: TaskType identifies which plugin handles this task (e.g.
+                  "container", "spark", "ray")
+                maxLength: 63
+                minLength: 1
+                type: string
             required:
             - actionName
             - domain
@@ -112,6 +131,8 @@ spec:
             - project
             - runName
             - runOutputBase
+            - taskTemplate
+            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
@@ -185,6 +206,49 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              phaseHistory:
+                description: |-
+                  PhaseHistory is an append-only log of phase transitions. Unlike conditions
+                  (which are updated in-place by type), this preserves the full timeline:
+                  Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+                items:
+                  description: PhaseTransition records a phase change with its timestamp.
+                  properties:
+                    message:
+                      description: Message is an optional human-readable message about
+                        the transition.
+                      type: string
+                    occurredAt:
+                      description: OccurredAt is when this phase transition happened.
+                      format: date-time
+                      type: string
+                    phase:
+                      description: Phase is the phase that was entered (e.g. "Queued",
+                        "Initializing", "Executing", "Succeeded", "Failed").
+                      type: string
+                  required:
+                  - occurredAt
+                  - phase
+                  type: object
+                type: array
+              pluginPhase:
+                description: PluginPhase is a human-readable representation of the
+                  plugin's current phase.
+                type: string
+              pluginPhaseVersion:
+                description: PluginPhaseVersion is the version of the current plugin
+                  phase.
+                format: int32
+                type: integer
+              pluginState:
+                description: PluginState is the Gob-encoded plugin state from the
+                  last reconciliation round.
+                format: byte
+                type: string
+              pluginStateVersion:
+                description: PluginStateVersion tracks the version of the plugin state
+                  schema for compatibility.
+                type: integer
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service

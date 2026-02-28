@@ -24,7 +24,7 @@ func TestGetProperties(t *testing.T) {
 
 func TestHandleAlwaysFails(t *testing.T) {
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(idlCore.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&idlCore.TaskExecutionIdentifier{
 		NodeExecutionId: &idlCore.NodeExecutionIdentifier{
 			ExecutionId: &idlCore.WorkflowExecutionIdentifier{
 				Name:    "my_name",

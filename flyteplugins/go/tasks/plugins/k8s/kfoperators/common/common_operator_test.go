@@ -358,7 +358,7 @@ func dummyTaskContext() *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",

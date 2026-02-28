@@ -624,18 +624,20 @@ func (_c *TaskExecutionMetadata_GetPlatformResources_Call) RunAndReturn(run func
 }
 
 // GetSecurityContext provides a mock function with no fields
-func (_m *TaskExecutionMetadata) GetSecurityContext() flyteidl2core.SecurityContext {
+func (_m *TaskExecutionMetadata) GetSecurityContext() *flyteidl2core.SecurityContext {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSecurityContext")
 	}
 
-	var r0 flyteidl2core.SecurityContext
-	if rf, ok := ret.Get(0).(func() flyteidl2core.SecurityContext); ok {
+	var r0 *flyteidl2core.SecurityContext
+	if rf, ok := ret.Get(0).(func() *flyteidl2core.SecurityContext); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(flyteidl2core.SecurityContext)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidl2core.SecurityContext)
+		}
 	}
 
 	return r0
@@ -658,12 +660,12 @@ func (_c *TaskExecutionMetadata_GetSecurityContext_Call) Run(run func()) *TaskEx
 	return _c
 }
 
-func (_c *TaskExecutionMetadata_GetSecurityContext_Call) Return(_a0 flyteidl2core.SecurityContext) *TaskExecutionMetadata_GetSecurityContext_Call {
+func (_c *TaskExecutionMetadata_GetSecurityContext_Call) Return(_a0 *flyteidl2core.SecurityContext) *TaskExecutionMetadata_GetSecurityContext_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *TaskExecutionMetadata_GetSecurityContext_Call) RunAndReturn(run func() flyteidl2core.SecurityContext) *TaskExecutionMetadata_GetSecurityContext_Call {
+func (_c *TaskExecutionMetadata_GetSecurityContext_Call) RunAndReturn(run func() *flyteidl2core.SecurityContext) *TaskExecutionMetadata_GetSecurityContext_Call {
 	_c.Call.Return(run)
 	return _c
 }

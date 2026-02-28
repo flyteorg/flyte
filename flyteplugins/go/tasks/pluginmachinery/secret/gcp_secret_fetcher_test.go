@@ -57,7 +57,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 		}).Return(nil, cause)
 
 		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
-		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, fmt.Sprintf(SecretNotFoundErrorFormat, secretID)), err)
+		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, SecretNotFoundErrorFormat, secretID), err)
 	})
 
 	t.Run("get secret read failure", func(t *testing.T) {
@@ -71,6 +71,6 @@ func TestGetSecretValueGCP(t *testing.T) {
 		}).Return(nil, cause)
 
 		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
-		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, secretID)), err)
+		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, SecretReadFailureErrorFormat, secretID), err)
 	})
 }

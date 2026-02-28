@@ -113,8 +113,8 @@ func TestAsyncClientImpl_Download(t *testing.T) {
 func TestAsyncClientImpl_Upload(t *testing.T) {
 	ctx := context.Background()
 
-	inputHash1 := "{{{} [] [] <nil>} 0 [] UNSPECIFIED     }:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
-	inputHash2 := "{{{} [] [] <nil>} 0 [] UNSPECIFIED     }:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
+	inputHash1 := "<nil>:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
+	inputHash2 := "<nil>:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
 
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}
@@ -143,13 +143,13 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 			[]UploadRequest{
 				{
 					Key: Key{
-						TypedInterface: *exampleInterface,
+						TypedInterface: exampleInterface,
 						InputReader:    inputReader1,
 					},
 				},
 				{
 					Key: Key{
-						TypedInterface: *exampleInterface,
+						TypedInterface: exampleInterface,
 						InputReader:    inputReader2,
 					},
 				},

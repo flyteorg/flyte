@@ -123,18 +123,20 @@ func (_c *TaskExecutionID_GetGeneratedNameWith_Call) RunAndReturn(run func(int, 
 }
 
 // GetID provides a mock function with no fields
-func (_m *TaskExecutionID) GetID() flyteidl2core.TaskExecutionIdentifier {
+func (_m *TaskExecutionID) GetID() *flyteidl2core.TaskExecutionIdentifier {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetID")
 	}
 
-	var r0 flyteidl2core.TaskExecutionIdentifier
-	if rf, ok := ret.Get(0).(func() flyteidl2core.TaskExecutionIdentifier); ok {
+	var r0 *flyteidl2core.TaskExecutionIdentifier
+	if rf, ok := ret.Get(0).(func() *flyteidl2core.TaskExecutionIdentifier); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(flyteidl2core.TaskExecutionIdentifier)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidl2core.TaskExecutionIdentifier)
+		}
 	}
 
 	return r0
@@ -157,12 +159,12 @@ func (_c *TaskExecutionID_GetID_Call) Run(run func()) *TaskExecutionID_GetID_Cal
 	return _c
 }
 
-func (_c *TaskExecutionID_GetID_Call) Return(_a0 flyteidl2core.TaskExecutionIdentifier) *TaskExecutionID_GetID_Call {
+func (_c *TaskExecutionID_GetID_Call) Return(_a0 *flyteidl2core.TaskExecutionIdentifier) *TaskExecutionID_GetID_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *TaskExecutionID_GetID_Call) RunAndReturn(run func() flyteidl2core.TaskExecutionIdentifier) *TaskExecutionID_GetID_Call {
+func (_c *TaskExecutionID_GetID_Call) RunAndReturn(run func() *flyteidl2core.TaskExecutionIdentifier) *TaskExecutionID_GetID_Call {
 	_c.Call.Return(run)
 	return _c
 }
