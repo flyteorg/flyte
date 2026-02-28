@@ -48,6 +48,13 @@ func TestWithNamespace(t *testing.T) {
 	assert.Equal(t, "flyte2", ctx.Value(NamespaceKey))
 }
 
+func TestWithOrganization(t *testing.T) {
+	ctx := context.Background()
+	assert.Nil(t, ctx.Value(OrganizationKey))
+	ctx = WithOrganization(ctx, "org1")
+	assert.Equal(t, "org1", ctx.Value(OrganizationKey))
+}
+
 func TestWithExecutionID(t *testing.T) {
 	ctx := context.Background()
 	assert.Nil(t, ctx.Value(ExecIDKey))
@@ -111,9 +118,10 @@ func TestWithSignalID(t *testing.T) {
 
 func TestGetFields(t *testing.T) {
 	ctx := context.Background()
-	ctx = WithRequestID(WithJobID(WithNamespace(ctx, "ns123"), "job123"), "req123")
+	ctx = WithRequestID(WithJobID(WithOrganization(WithNamespace(ctx, "ns123"), "org1"), "job123"), "req123")
 	m := GetLogFields(ctx)
 	assert.Equal(t, "ns123", m[NamespaceKey.String()])
+	assert.Equal(t, "org1", m[OrganizationKey.String()])
 	assert.Equal(t, "job123", m[JobIDKey.String()])
 	assert.Equal(t, "req123", m[RequestIDKey.String()])
 }

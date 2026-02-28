@@ -12,14 +12,15 @@ import (
 type Key string
 
 const (
-	AppNameKey    Key = "app_name"
-	NamespaceKey  Key = "ns"
-	TaskTypeKey   Key = "tasktype"
-	ProjectKey    Key = "project"
-	DomainKey     Key = "domain"
-	WorkflowIDKey Key = "wf"
-	NodeIDKey     Key = "node"
-	TaskIDKey     Key = "task"
+	AppNameKey      Key = "app_name"
+	NamespaceKey    Key = "ns"
+	OrganizationKey Key = "org"
+	TaskTypeKey     Key = "tasktype"
+	ProjectKey      Key = "project"
+	DomainKey       Key = "domain"
+	WorkflowIDKey   Key = "wf"
+	NodeIDKey       Key = "node"
+	TaskIDKey       Key = "task"
 	// Adding the ExecIDKey label to a metric will cause higher cardinality. Use with caution.
 	ExecIDKey          Key = "exec_id"
 	JobIDKey           Key = "job_id"
@@ -39,6 +40,7 @@ var logKeys = []Key{
 	AppNameKey,
 	JobIDKey,
 	NamespaceKey,
+	OrganizationKey,
 	ExecIDKey,
 	NodeIDKey,
 	WorkflowIDKey,
@@ -69,6 +71,11 @@ func WithResourceVersion(ctx context.Context, resourceVersion string) context.Co
 // WithNamespace gets a new context with namespace set.
 func WithNamespace(ctx context.Context, namespace string) context.Context {
 	return context.WithValue(ctx, NamespaceKey, namespace)
+}
+
+// WithOrganization gets a new context with organization set.
+func WithOrganization(ctx context.Context, organization string) context.Context {
+	return context.WithValue(ctx, OrganizationKey, organization)
 }
 
 // WithJobID gets a new context with JobId set. If the existing context already has a job id, the new context will have
