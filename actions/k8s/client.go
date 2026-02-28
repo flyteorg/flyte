@@ -8,14 +8,18 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/proto"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
 // ActionUpdate represents an update to a TaskAction
@@ -30,8 +34,8 @@ type ActionUpdate struct {
 	ShortName        string
 }
 
-// StateClient implements state operations using Kubernetes TaskAction CRs
-type StateClient struct {
+// ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
+type ActionsClient struct {
 	k8sClient  client.WithWatch
 	namespace  string
 	bufferSize int
@@ -40,15 +44,15 @@ type StateClient struct {
 	mu sync.RWMutex
 	// Map parent action name to subscriber channels.
 	// Multiple callers may watch the same parent action concurrently.
-	// TODO: add a prometheus counter for dropped updates when metrics are wired up for the state service
+	// TODO: add a prometheus counter for dropped updates when metrics are wired up
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
 }
 
-// NewStateClient creates a new Kubernetes-based state client
-func NewStateClient(k8sClient client.WithWatch, namespace string, bufferSize int) *StateClient {
-	return &StateClient{
+// NewActionsClient creates a new Kubernetes-based actions client.
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int) *ActionsClient {
+	return &ActionsClient{
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
@@ -56,8 +60,98 @@ func NewStateClient(k8sClient client.WithWatch, namespace string, bufferSize int
 	}
 }
 
+// Enqueue creates a TaskAction CR in etcd (via the K8s API).
+func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, runSpec *task.RunSpec) error {
+	actionID := action.ActionId
+	logger.Infof(ctx, "Enqueuing action: %s/%s/%s/%s/%s",
+		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+		actionID.Run.Name, actionID.Name)
+
+	isRoot := action.ParentActionName == nil || *action.ParentActionName == ""
+
+	taskActionName := buildTaskActionName(actionID)
+	taskAction := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      taskActionName,
+			Namespace: c.namespace,
+			Labels: map[string]string{
+				"flyte.org/org":         actionID.Run.Org,
+				"flyte.org/project":     actionID.Run.Project,
+				"flyte.org/domain":      actionID.Run.Domain,
+				"flyte.org/run":         actionID.Run.Name,
+				"flyte.org/action":      actionID.Name,
+				"flyte.org/action-type": "task", // TODO: derive from action.Spec
+				"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	// Set OwnerReference to parent so K8s cascades deletion to children.
+	if !isRoot {
+		parentID := &common.ActionIdentifier{
+			Run:  actionID.Run,
+			Name: *action.ParentActionName,
+		}
+		parentName := buildTaskActionName(parentID)
+
+		parent := &executorv1.TaskAction{}
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: c.namespace}, parent); err != nil {
+			return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+		}
+
+		blockOwnerDeletion := true
+		taskAction.OwnerReferences = []metav1.OwnerReference{
+			{
+				APIVersion:         "flyte.org/v1",
+				Kind:               "TaskAction",
+				Name:               parent.Name,
+				UID:                parent.UID,
+				BlockOwnerDeletion: &blockOwnerDeletion,
+			},
+		}
+	}
+
+	// Build and set the ActionSpec for the executor.
+	actionSpec := buildActionSpec(action, runSpec)
+	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
+		return fmt.Errorf("failed to set action spec: %w", err)
+	}
+
+	// Embed the inline TaskTemplate if present.
+	if err := embedTaskTemplate(action, taskAction); err != nil {
+		return fmt.Errorf("failed to embed task template: %w", err)
+	}
+
+	if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+		return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
+	}
+
+	logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
+	return nil
+}
+
+// AbortAction deletes a TaskAction CR from etcd.
+// K8s cascades the deletion to all descendants via OwnerReferences.
+func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason *string) error {
+	taskActionName := buildTaskActionName(actionID)
+	logger.Infof(ctx, "Aborting action %s (reason: %v)", taskActionName, reason)
+
+	taskAction := &executorv1.TaskAction{}
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
+	}
+
+	if err := c.k8sClient.Delete(ctx, taskAction); err != nil {
+		return fmt.Errorf("failed to delete TaskAction %s: %w", taskActionName, err)
+	}
+
+	logger.Infof(ctx, "Deleted TaskAction %s (descendants will be cascade deleted by K8s)", taskActionName)
+	return nil
+}
+
 // GetState retrieves the state JSON for a TaskAction
-func (c *StateClient) GetState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
+func (c *ActionsClient) GetState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
 	taskActionName := buildTaskActionName(actionID)
 
 	taskAction := &executorv1.TaskAction{}
@@ -71,8 +165,9 @@ func (c *StateClient) GetState(ctx context.Context, actionID *common.ActionIdent
 	return taskAction.Status.StateJSON, nil
 }
 
-// PutState updates the state JSON for a TaskAction
-func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdentifier, stateJSON string) error {
+// PutState updates the state JSON for a TaskAction.
+// attempt and status are accepted for future use (e.g. recording to RunService).
+func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, stateJSON string) error {
 	taskActionName := buildTaskActionName(actionID)
 
 	// Get current TaskAction
@@ -102,7 +197,7 @@ func (c *StateClient) PutState(ctx context.Context, actionID *common.ActionIdent
 }
 
 // ListRunActions lists all TaskActions belonging to a run.
-func (c *StateClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
+func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
 		client.InNamespace(c.namespace),
@@ -126,7 +221,7 @@ func (c *StateClient) ListRunActions(ctx context.Context, runID *common.RunIdent
 }
 
 // ListChildActions lists all TaskActions that are children of the given parent action
-func (c *StateClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
+func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
 	// List all TaskActions in the same run
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
@@ -162,7 +257,7 @@ func (c *StateClient) ListChildActions(ctx context.Context, parentActionID *comm
 }
 
 // GetTaskAction retrieves a specific TaskAction
-func (c *StateClient) GetTaskAction(ctx context.Context, actionID *common.ActionIdentifier) (*executorv1.TaskAction, error) {
+func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.ActionIdentifier) (*executorv1.TaskAction, error) {
 	taskActionName := buildTaskActionName(actionID)
 
 	taskAction := &executorv1.TaskAction{}
@@ -177,7 +272,7 @@ func (c *StateClient) GetTaskAction(ctx context.Context, actionID *common.Action
 }
 
 // Subscribe creates a new subscription channel for action updates for specified parent action name
-func (c *StateClient) Subscribe(parentActionName string) chan *ActionUpdate {
+func (c *ActionsClient) Subscribe(parentActionName string) chan *ActionUpdate {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -190,7 +285,7 @@ func (c *StateClient) Subscribe(parentActionName string) chan *ActionUpdate {
 }
 
 // Unsubscribe removes the given channel from the subscription list for the parent action name
-func (c *StateClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate) {
+func (c *ActionsClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -204,7 +299,7 @@ func (c *StateClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate
 }
 
 // StartWatching starts watching TaskAction resources and notifies all subscribers
-func (c *StateClient) StartWatching(ctx context.Context) error {
+func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.mu.Lock()
 	if c.watching {
 		c.mu.Unlock()
@@ -222,7 +317,7 @@ func (c *StateClient) StartWatching(ctx context.Context) error {
 }
 
 // watchLoop continuously watches TaskAction resources
-func (c *StateClient) watchLoop(ctx context.Context) {
+func (c *ActionsClient) watchLoop(ctx context.Context) {
 	for {
 		select {
 		case <-c.stopCh:
@@ -241,7 +336,7 @@ func (c *StateClient) watchLoop(ctx context.Context) {
 }
 
 // doWatch performs a single watch operation
-func (c *StateClient) doWatch(ctx context.Context) error {
+func (c *ActionsClient) doWatch(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 
 	watcher, err := c.k8sClient.Watch(ctx, taskActionList, client.InNamespace(c.namespace))
@@ -266,7 +361,7 @@ func (c *StateClient) doWatch(ctx context.Context) error {
 }
 
 // handleWatchEvent processes a watch event
-func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
+func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 	taskAction, ok := event.Object.(*executorv1.TaskAction)
 	if !ok {
 		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
@@ -307,7 +402,7 @@ func (c *StateClient) handleWatchEvent(ctx context.Context, event watch.Event) {
 }
 
 // notifySubscribers sends an update to all subscribers
-func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdate) {
+func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpdate) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -321,7 +416,7 @@ func (c *StateClient) notifySubscribers(ctx context.Context, update *ActionUpdat
 }
 
 // StopWatching stops the TaskAction watcher
-func (c *StateClient) StopWatching() {
+func (c *ActionsClient) StopWatching() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -381,6 +476,49 @@ func buildOutputUri(ta *executorv1.TaskAction) string {
 // InitScheme adds the executor API types to the scheme
 func InitScheme() error {
 	return executorv1.AddToScheme(scheme.Scheme)
+}
+
+// buildActionSpec converts an actions.Action into the workflow.ActionSpec expected by the executor.
+func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.ActionSpec {
+	actionSpec := &workflow.ActionSpec{
+		ActionId:      action.ActionId,
+		ParentActionName: action.ParentActionName,
+		RunSpec:       runSpec,
+		InputUri:      action.InputUri,
+		RunOutputBase: action.RunOutputBase,
+		Group:         action.Group,
+	}
+
+	switch spec := action.Spec.(type) {
+	case *actions.Action_Task:
+		actionSpec.Spec = &workflow.ActionSpec_Task{Task: spec.Task}
+	case *actions.Action_Trace:
+		actionSpec.Spec = &workflow.ActionSpec_Trace{Trace: spec.Trace}
+	case *actions.Action_Condition:
+		actionSpec.Spec = &workflow.ActionSpec_Condition{Condition: spec.Condition}
+	}
+
+	return actionSpec
+}
+
+// embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
+	taskSpec, ok := action.Spec.(*actions.Action_Task)
+	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
+		// Non-task actions do not carry an inline template.
+		return nil
+	}
+
+	tmpl := taskSpec.Task.Spec.TaskTemplate
+	taskAction.Spec.TaskType = tmpl.Type
+	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
+
+	data, err := proto.Marshal(tmpl)
+	if err != nil {
+		return fmt.Errorf("failed to marshal task template: %w", err)
+	}
+	taskAction.Spec.TaskTemplate = data
+	return nil
 }
 
 // extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.

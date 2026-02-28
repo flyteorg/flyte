@@ -45,11 +45,12 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://flyte-host:9000"
+      - FLYTE_AWS_ENDPOINT: "http://minio.flyte-dataproxy:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: "minioadmin"
       - FLYTE_AWS_SECRET_ACCESS_KEY: "minioadmin"
-      - _U_EP_OVERRIDE: "flyte-host:8090"
+      - _U_EP_OVERRIDE: "host.docker.internal:8090"
       - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
 
 # Storage Configuration
 # For local development, using RustFS (run: bash start-rustfs.sh)

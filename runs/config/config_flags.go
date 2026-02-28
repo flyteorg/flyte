@@ -67,7 +67,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "database.postgres.debug"), defaultConfig.Database.Postgres.Debug, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.sqlite.file"), defaultConfig.Database.SQLite.File, "The path to the file (existing or new) where the DB should be created / stored. If existing,  then this will be reused,  else a new will be created")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchBufferSize"), defaultConfig.WatchBufferSize, "Buffer size for watch streams")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "queueServiceUrl"), defaultConfig.QueueServiceURL, "URL of the queue service")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsServiceUrl"), defaultConfig.ActionsServiceURL, "URL of the actions service")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storagePrefix"), defaultConfig.StoragePrefix, "Base URI prefix for storing run inputs and outputs")
 	return cmdFlags
 }
