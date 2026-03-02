@@ -25,6 +25,21 @@ jobs:
       component: flyteidl
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  generate-filter:
+    name: Paths filter for generate
+    runs-on: ubuntu-latest
+    outputs:
+      generate: ${{ steps.filter.outputs.generate }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            generate:
+              - 'flyteidl/**'
+              - 'boilerplate/flyte/golang_test_targets/**'
+
   generate:
     name: Check Go Generate
     strategy:
