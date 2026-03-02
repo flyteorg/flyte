@@ -60,6 +60,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc)
+	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
+	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
+
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	sc.Mux.Handle(taskPath, taskHandler)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
