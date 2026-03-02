@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flyte/v2/actions"
+	actionsconfig "github.com/flyteorg/flyte/v2/actions/config"
 	"github.com/flyteorg/flyte/v2/app"
-	"github.com/flyteorg/flyte/v2/state"
-	stateconfig "github.com/flyteorg/flyte/v2/state/config"
 )
 
 func main() {
 	a := &app.App{
-		Name:  "state-service",
-		Short: "State Service for Flyte",
+		Name:  "actions-service",
+		Short: "Actions Service for Flyte",
 		Setup: func(ctx context.Context, sc *app.SetupContext) error {
-			cfg := stateconfig.GetConfig()
+			cfg := actionsconfig.GetConfig()
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
 
@@ -29,7 +29,7 @@ func main() {
 			sc.K8sClient = k8sClient
 			sc.Namespace = cfg.Kubernetes.Namespace
 
-			return state.Setup(ctx, sc)
+			return actions.Setup(ctx, sc)
 		},
 	}
 	if err := a.Run(); err != nil {

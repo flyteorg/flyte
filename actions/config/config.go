@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
-const configSectionKey = "state"
+const configSectionKey = "actions"
 
 //go:generate pflags Config --default-var=defaultConfig
 
@@ -21,7 +21,7 @@ var defaultConfig = &Config{
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
-// Config holds the configuration for the State service
+// Config holds the configuration for the Actions service
 type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
@@ -48,7 +48,7 @@ type KubernetesConfig struct {
 	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
 }
 
-// GetConfig returns the parsed state configuration
+// GetConfig returns the parsed actions configuration
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }

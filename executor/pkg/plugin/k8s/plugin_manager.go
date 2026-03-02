@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
@@ -14,8 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
@@ -155,6 +156,31 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		} else {
 			opReader = pCtx.ow.GetReader()
 		}
+		y, err := opReader.IsError(ctx)
+		if err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+		if y {
+			taskErr, err := opReader.ReadError(ctx)
+			if err != nil {
+				return pluginsCore.UnknownTransition, err
+			}
+
+			if taskErr.ExecutionError == nil {
+				taskErr.ExecutionError = &core.ExecutionError{Kind: core.ExecutionError_UNKNOWN, Code: "Unknown", Message: "Unknown"}
+			}
+			var phase pluginsCore.Phase
+			if taskErr.IsRecoverable {
+				phase = pluginsCore.PhaseRetryableFailure
+			} else {
+				phase = pluginsCore.PhasePermanentFailure
+			}
+			return pluginsCore.DoTransitionType(
+				pluginsCore.TransitionTypeEphemeral,
+				pluginsCore.PhaseInfoFailed(phase, taskErr.ExecutionError, p.Info()),
+			), nil
+		}
+
 		if err := tCtx.OutputWriter().Put(ctx, opReader); err != nil {
 			return pluginsCore.UnknownTransition, err
 		}

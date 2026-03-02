@@ -49,6 +49,7 @@ plugins:
       - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
       - _U_EP_OVERRIDE: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
       - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
 
 # Storage Configuration
 # For local development, using RustFS (run: bash start-rustfs.sh)
