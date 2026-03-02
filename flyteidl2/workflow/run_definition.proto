@@ -199,6 +199,9 @@ message ActionStatus {
 
   // Duration of the action in milliseconds.
   optional uint64 duration_ms = 6;
+
+  // GPU resource name resolved by the operator (e.g. "nvidia.com/gpu").
+  string gpu_resource_name = 7;
 }
 
 // Lightweight representation of an action.
