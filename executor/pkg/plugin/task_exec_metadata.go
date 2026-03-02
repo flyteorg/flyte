@@ -109,7 +109,7 @@ func buildOverridesFromTaskTemplate(data []byte) *taskOverrides {
 		return &taskOverrides{}
 	}
 	container := tmpl.GetContainer()
-	if container == nil || container.Resources == nil {
+	if container == nil {
 		return &taskOverrides{}
 	}
 	res, err := flytek8s.ToK8sResourceRequirements(container.Resources)
