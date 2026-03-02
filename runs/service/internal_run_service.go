@@ -11,7 +11,6 @@ import (
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
@@ -137,15 +136,13 @@ func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.Updat
 
 func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
-	phase := common.ActionPhase_name[int32(actionStatus.GetPhase())]
-
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
 		t := actionStatus.GetEndTime().AsTime()
 		endTime = &t
 	}
 
-	if err := s.repo.ActionRepo().UpdateActionPhase(ctx, req.GetActionId(), phase, endTime); err != nil {
+	if err := s.repo.ActionRepo().UpdateActionPhase(ctx, req.GetActionId(), int32(actionStatus.GetPhase()), endTime); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
@@ -194,15 +191,13 @@ func (s *RunService) RecordActionEventStream(
 // recordEvents applies each ActionEvent as a phase update.
 func (s *RunService) recordEvents(ctx context.Context, events []*workflow.ActionEvent) error {
 	for _, event := range events {
-		phase := common.ActionPhase_name[int32(event.GetPhase())]
-
 		var endTime *time.Time
 		if event.GetEndTime() != nil {
 			t := event.GetEndTime().AsTime()
 			endTime = &t
 		}
 
-		if err := s.repo.ActionRepo().UpdateActionPhase(ctx, event.GetId(), phase, endTime); err != nil {
+		if err := s.repo.ActionRepo().UpdateActionPhase(ctx, event.GetId(), int32(event.GetPhase()), endTime); err != nil {
 			logger.Warnf(ctx, "RecordActionEvents: failed to update action %s: %v", event.GetId().GetName(), err)
 			return connect.NewError(connect.CodeInternal, err)
 		}

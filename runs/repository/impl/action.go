@@ -112,7 +112,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Domain:           runID.Domain,
 		Name:             runID.Name,
 		ParentActionName: nil, // NULL for root actions/runs
-		Phase:            "PHASE_QUEUED",
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
@@ -193,7 +193,7 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	// Update the run action to aborted
 	updates := map[string]interface{}{
-		"phase":      "PHASE_ABORTED",
+		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
 		"updated_at": time.Now(),
 	}
 
@@ -234,7 +234,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		Domain:           actionSpec.ActionId.Run.Domain,
 		Name:             actionSpec.ActionId.Name,
 		ParentActionName: parentActionName,
-		Phase:            "PHASE_QUEUED",
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
@@ -307,7 +307,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, endTime *time.Time) error {
+func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase int32, endTime *time.Time) error {
 	updates := map[string]interface{}{
 		"phase":      phase,
 		"updated_at": time.Now(),
@@ -338,7 +338,7 @@ func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.Act
 // AbortAction aborts a specific action
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	updates := map[string]interface{}{
-		"phase":      "PHASE_ABORTED",
+		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
 		"updated_at": time.Now(),
 	}
 

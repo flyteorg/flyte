@@ -27,7 +27,7 @@ type ActionUpdate struct {
 	ActionID         *common.ActionIdentifier
 	ParentActionName string
 	StateJSON        string
-	Phase            string
+	Phase            common.ActionPhase
 	OutputUri        string
 	IsDeleted        bool
 	TaskType         string
@@ -427,31 +427,31 @@ func (c *ActionsClient) StopWatching() {
 }
 
 // GetPhaseFromConditions extracts the phase from TaskAction conditions.
-func GetPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhase {
 	for _, cond := range taskAction.Status.Conditions {
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
 			if cond.Status == "True" {
-				return "PHASE_SUCCEEDED"
+				return common.ActionPhase_ACTION_PHASE_SUCCEEDED
 			}
 		case string(executorv1.ConditionTypeFailed):
 			if cond.Status == "True" {
-				return "PHASE_FAILED"
+				return common.ActionPhase_ACTION_PHASE_FAILED
 			}
 		case string(executorv1.ConditionTypeProgressing):
 			if cond.Status == "True" {
 				switch cond.Reason {
 				case string(executorv1.ConditionReasonQueued):
-					return "PHASE_QUEUED"
+					return common.ActionPhase_ACTION_PHASE_QUEUED
 				case string(executorv1.ConditionReasonInitializing):
-					return "PHASE_INITIALIZING"
+					return common.ActionPhase_ACTION_PHASE_INITIALIZING
 				case string(executorv1.ConditionReasonExecuting):
-					return "PHASE_RUNNING"
+					return common.ActionPhase_ACTION_PHASE_RUNNING
 				}
 			}
 		}
 	}
-	return "PHASE_UNSPECIFIED"
+	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction

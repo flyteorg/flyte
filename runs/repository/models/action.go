@@ -21,8 +21,9 @@ type Action struct {
 	// Parent action (NULL for root actions/runs)
 	ParentActionName *string `gorm:"index:idx_actions_parent" db:"parent_action_name"`
 
-	// High-level status for quick queries/filtering
-	Phase string `gorm:"not null;default:'PHASE_QUEUED';index:idx_actions_phase" db:"phase"`
+	// High-level status for quick queries/filtering.
+	// Stores the proto ActionPhase enum integer value directly (e.g. 1 = QUEUED).
+	Phase int32 `gorm:"not null;default:1;index:idx_actions_phase" db:"phase"`
 
 	// Serialized protobuf messages
 	// ActionSpec contains the full action specification proto

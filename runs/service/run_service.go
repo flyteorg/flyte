@@ -265,7 +265,7 @@ func (s *RunService) GetRunDetails(
 		details.Action = &workflow.ActionDetails{
 			Id: rootActionID,
 			Status: &workflow.ActionStatus{
-				Phase:     actionPhaseFromString(run.Phase),
+				Phase:     common.ActionPhase(run.Phase),
 				StartTime: timestamppb.New(run.CreatedAt),
 			},
 		}
@@ -737,7 +737,7 @@ func (s *RunService) WatchActions(
 					Id:       aid,
 					Metadata: metadata,
 					Status: &workflow.ActionStatus{
-						Phase: actionPhaseFromString(update.Phase),
+						Phase: update.Phase,
 					},
 				},
 				MeetsFilter: !update.IsDeleted,
@@ -939,7 +939,7 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 			// TODO: Extract from ActionSpec JSON if needed
 		},
 		Status: &workflow.ActionStatus{
-			Phase: common.ActionPhase(common.ActionPhase_value[run.Phase]),
+			Phase: common.ActionPhase(run.Phase),
 			// TODO: Extract timestamps, error, etc. from ActionDetails JSON
 		},
 	}
@@ -968,7 +968,7 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 
 	// Build the action status
 	actionStatus := &workflow.ActionStatus{
-		Phase: common.ActionPhase(common.ActionPhase_value[action.Phase]),
+		Phase: common.ActionPhase(action.Phase),
 	}
 
 	// Build the action proto
@@ -1017,7 +1017,7 @@ func (s *RunService) taskActionToEnrichedProto(ta *executorv1.TaskAction) *workf
 		metadata.Parent = *ta.Spec.ParentActionName
 	}
 
-	phase := actionPhaseFromString(actionsk8s.GetPhaseFromConditions(ta))
+	phase := actionsk8s.GetPhaseFromConditions(ta)
 	status := &workflow.ActionStatus{
 		Phase:     phase,
 		StartTime: timestamppb.New(ta.CreationTimestamp.Time),
@@ -1042,16 +1042,6 @@ func (s *RunService) taskActionToEnrichedProto(ta *executorv1.TaskAction) *workf
 	}
 }
 
-// actionPhaseFromString maps state-client phase strings (e.g. "PHASE_QUEUED")
-// to the proto ActionPhase enum.
-func actionPhaseFromString(phase string) common.ActionPhase {
-	// The state client returns "PHASE_*" while the proto enum uses "ACTION_PHASE_*".
-	mapped := "ACTION_" + phase
-	if v, ok := common.ActionPhase_value[mapped]; ok {
-		return common.ActionPhase(v)
-	}
-	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
-}
 
 // buildTaskGroups queries the DB for root actions and groups them by task name in memory.
 func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGroupsRequest) ([]*workflow.TaskGroup, error) {
@@ -1114,7 +1104,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 			g.latestTime = action.CreatedAt
 		}
 
-		phase := common.ActionPhase(common.ActionPhase_value["ACTION_"+action.Phase])
+		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
 		if phase == common.ActionPhase_ACTION_PHASE_FAILED {
 			g.failCount++
@@ -1265,7 +1255,7 @@ func (s *RunService) taskActionToActionDetails(ta *executorv1.TaskAction) (*work
 	}
 
 	// Build status from conditions
-	phase := actionPhaseFromString(actionsk8s.GetPhaseFromConditions(ta))
+	phase := actionsk8s.GetPhaseFromConditions(ta)
 	status := &workflow.ActionStatus{
 		Phase:     phase,
 		StartTime: timestamppb.New(ta.CreationTimestamp.Time),
