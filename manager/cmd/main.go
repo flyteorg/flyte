@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/executor"
@@ -14,9 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
-	"github.com/flyteorg/flyte/v2/queue"
 	"github.com/flyteorg/flyte/v2/runs"
-	"github.com/flyteorg/flyte/v2/state"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 )
@@ -79,10 +78,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err
 	}
-	if err := queue.Setup(ctx, sc); err != nil {
-		return err
-	}
-	if err := state.Setup(ctx, sc); err != nil {
+	if err := actions.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
