@@ -404,7 +404,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
-	go c.notifyRunService(ctx, taskAction, update)
+	go c.notifyRunService(ctx, taskAction, update, event.Type)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -422,10 +422,28 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 }
 
 // notifyRunService forwards a watch event to the internal run service.
-// It calls UpdateActionStatus when the phase is meaningful, and always calls RecordActionEvents.
-func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate) {
+// On ADDED events it calls RecordAction to create the DB record.
+// On all events it calls UpdateActionStatus (when phase is meaningful) and RecordActionEvents.
+func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate, eventType watch.EventType) {
 	if c.runClient == nil {
 		return
+	}
+
+	// On ADDED: create the action record in the DB.
+	if eventType == watch.Added {
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: update.ActionID,
+			Parent:   update.ParentActionName,
+			InputUri: taskAction.Spec.InputURI,
+		}
+		if taskAction.Spec.TaskType != "" {
+			recordReq.Spec = &workflow.RecordActionRequest_Task{
+				Task: &workflow.TaskAction{},
+			}
+		}
+		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		}
 	}
 
 	// Derive UpdatedTime from the last PhaseHistory entry.
