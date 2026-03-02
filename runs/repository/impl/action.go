@@ -305,11 +305,18 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	return actions, nextToken, nil
 }
 
-// UpdateActionPhase updates the phase of an action
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error {
+// UpdateActionPhase updates the phase of an action.
+// endTime should be set when the action reaches a terminal phase.
+func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, endTime *time.Time) error {
 	updates := map[string]interface{}{
 		"phase":      phase,
 		"updated_at": time.Now(),
+	}
+	if endTime != nil {
+		// Clamp ended_at to be at least created_at, matching union cloud behaviour.
+		// K8s timestamps have second-level precision while created_at has microsecond
+		// precision, so for very fast tasks ended_at can appear before created_at.
+		updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
 	}
 
 	result := r.db.WithContext(ctx).

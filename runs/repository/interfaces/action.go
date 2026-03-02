@@ -21,7 +21,7 @@ type ActionRepo interface {
 	CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
-	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error
+	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, endTime *time.Time) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Watch operations (for streaming)

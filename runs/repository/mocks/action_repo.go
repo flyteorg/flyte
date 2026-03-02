@@ -668,17 +668,17 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, startTime, endTime
-func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime *string, endTime *string) error {
-	ret := _m.Called(ctx, actionID, phase, startTime, endTime)
+// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, endTime
+func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, endTime *time.Time) error {
+	ret := _m.Called(ctx, actionID, phase, endTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, string, *string, *string) error); ok {
-		r0 = rf(ctx, actionID, phase, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, string, *time.Time) error); ok {
+		r0 = rf(ctx, actionID, phase, endTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -695,15 +695,14 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - phase string
-//   - startTime *string
-//   - endTime *string
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, startTime interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, startTime, endTime)}
+//   - endTime *time.Time
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, endTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime *string, endTime *string)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase string, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(string), args[3].(*string), args[4].(*string))
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(string), args[3].(*time.Time))
 	})
 	return _c
 }
@@ -713,7 +712,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(_a0 error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, string, *string, *string) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, string, *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }
