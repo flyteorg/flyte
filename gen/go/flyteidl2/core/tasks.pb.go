@@ -883,7 +883,7 @@ type TaskMetadata struct {
 	Debuggable bool `protobuf:"varint,17,opt,name=debuggable,proto3" json:"debuggable,omitempty"`
 	// Log links associated with this task.
 	LogLinks []*TaskLog `protobuf:"bytes,18,rep,name=log_links,json=logLinks,proto3" json:"log_links,omitempty"`
-	// URL of the remote image build run that produced the container image for this task.
+	// RunIdentifier of the remote image build run that produced the container image for this task.
 	ImageBuildRun *common.RunIdentifier `protobuf:"bytes,19,opt,name=image_build_run,json=imageBuildRun,proto3" json:"image_build_run,omitempty"`
 }
 

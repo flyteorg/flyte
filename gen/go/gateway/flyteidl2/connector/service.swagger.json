@@ -2181,7 +2181,7 @@
         },
         "image_build_run": {
           "$ref": "#/definitions/commonRunIdentifier",
-          "description": "URL of the remote image build run that produced the container image for this task."
+          "description": "RunIdentifier of the remote image build run that produced the container image for this task."
         }
       },
       "title": "Task Metadata"

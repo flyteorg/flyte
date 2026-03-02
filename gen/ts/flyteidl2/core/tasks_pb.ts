@@ -493,7 +493,7 @@ export type TaskMetadata = Message<"flyteidl2.core.TaskMetadata"> & {
   logLinks: TaskLog[];
 
   /**
-   * URL of the remote image build run that produced the container image for this task.
+   * RunIdentifier of the remote image build run that produced the container image for this task.
    *
    * @generated from field: flyteidl2.common.RunIdentifier image_build_run = 19;
    */
