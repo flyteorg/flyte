@@ -645,7 +645,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 				// Query actions updated since last check
 				var actions []*models.Action
 				if err := r.db.WithContext(ctx).
-					Where("org = ? AND project = ? AND domain = ? AND updated_at > ? AND parent_action_name IS NOT NULL",
+					Where("org = ? AND project = ? AND domain = ? AND updated_at > ?",
 						runID.Org, runID.Project, runID.Domain, lastCheck).
 					Find(&actions).Error; err != nil {
 					errs <- err
