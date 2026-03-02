@@ -318,7 +318,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase int32, endTime *time.Time) error {
+func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
 	updates := map[string]interface{}{
 		"phase":      phase,
 		"updated_at": time.Now(),

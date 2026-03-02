@@ -143,7 +143,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		endTime = &t
 	}
 
-	if err := s.repo.ActionRepo().UpdateActionPhase(ctx, req.GetActionId(), int32(actionStatus.GetPhase()), endTime); err != nil {
+	if err := s.repo.ActionRepo().UpdateActionPhase(ctx, req.GetActionId(), actionStatus.GetPhase(), endTime); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}

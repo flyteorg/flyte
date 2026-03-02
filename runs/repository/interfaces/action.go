@@ -22,7 +22,7 @@ type ActionRepo interface {
 	InsertEvents(ctx context.Context, events []*models.ActionEvent) error
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
-	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase int32, endTime *time.Time) error
+	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Watch operations (for streaming)
