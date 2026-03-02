@@ -423,6 +423,53 @@ func (_c *ActionRepo_GetRun_Call) RunAndReturn(run func(context.Context, *common
 	return _c
 }
 
+// InsertEvents provides a mock function with given fields: ctx, events
+func (_m *ActionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	ret := _m.Called(ctx, events)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertEvents")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, []*models.ActionEvent) error); ok {
+		r0 = rf(ctx, events)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ActionRepo_InsertEvents_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertEvents'
+type ActionRepo_InsertEvents_Call struct {
+	*mock.Call
+}
+
+// InsertEvents is a helper method to define mock.On call
+//   - ctx context.Context
+//   - events []*models.ActionEvent
+func (_e *ActionRepo_Expecter) InsertEvents(ctx interface{}, events interface{}) *ActionRepo_InsertEvents_Call {
+	return &ActionRepo_InsertEvents_Call{Call: _e.mock.On("InsertEvents", ctx, events)}
+}
+
+func (_c *ActionRepo_InsertEvents_Call) Run(run func(ctx context.Context, events []*models.ActionEvent)) *ActionRepo_InsertEvents_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]*models.ActionEvent))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_InsertEvents_Call) Return(_a0 error) *ActionRepo_InsertEvents_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ActionRepo_InsertEvents_Call) RunAndReturn(run func(context.Context, []*models.ActionEvent) error) *ActionRepo_InsertEvents_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListActions provides a mock function with given fields: ctx, runID, limit, token
 func (_m *ActionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
 	ret := _m.Called(ctx, runID, limit, token)

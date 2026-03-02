@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 // Ensure RunService implements the InternalRunService handler interface.
@@ -188,19 +189,20 @@ func (s *RunService) RecordActionEventStream(
 	}
 }
 
-// recordEvents applies each ActionEvent as a phase update.
+// recordEvents inserts ActionEvents into the dedicated table and updates the action phase.
 func (s *RunService) recordEvents(ctx context.Context, events []*workflow.ActionEvent) error {
+	eventModels := make([]*models.ActionEvent, 0, len(events))
 	for _, event := range events {
-		var endTime *time.Time
-		if event.GetEndTime() != nil {
-			t := event.GetEndTime().AsTime()
-			endTime = &t
-		}
-
-		if err := s.repo.ActionRepo().UpdateActionPhase(ctx, event.GetId(), int32(event.GetPhase()), endTime); err != nil {
-			logger.Warnf(ctx, "RecordActionEvents: failed to update action %s: %v", event.GetId().GetName(), err)
+		m, err := models.NewActionEventModel(event)
+		if err != nil {
+			logger.Warnf(ctx, "RecordActionEvents: failed to build event model for %s: %v", event.GetId().GetName(), err)
 			return connect.NewError(connect.CodeInternal, err)
 		}
+		eventModels = append(eventModels, m)
+	}
+	if err := s.repo.ActionRepo().InsertEvents(ctx, eventModels); err != nil {
+		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
+		return connect.NewError(connect.CodeInternal, err)
 	}
 	return nil
 }

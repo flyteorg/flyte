@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -212,6 +213,16 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 	return nil
+}
+
+// InsertEvents inserts a batch of action events, ignoring duplicates (same PK = idempotent).
+func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	if len(events) == 0 {
+		return nil
+	}
+	return r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(&events).Error
 }
 
 // CreateAction creates a new action
