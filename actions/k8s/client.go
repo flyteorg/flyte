@@ -404,7 +404,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
-	c.notifyRunService(ctx, taskAction, update)
+	go c.notifyRunService(ctx, taskAction, update)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -446,14 +446,15 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// TODO(nary): some ActionEvent fields not populated here:
-	//   - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
-	//   - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
-	//   - LogContext:    not on the CR; same reason as LogInfo.
-	//   - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
-	//   - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
-	//   - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
-	//   - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
+	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want 
+	// to handle the action event persistence
+	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
+	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
+	// - LogContext:    not on the CR; same reason as LogInfo.
+	// - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
+	// - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
+	// - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
+	// - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
 	event := &workflow.ActionEvent{
 		Id:           update.ActionID,
 		Attempt:      1, // TODO(nary): hardcoded until retry support is added
