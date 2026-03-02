@@ -851,6 +851,11 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 				continue
 			}
 
+			// skip containers already applied as magic templates to avoid double-merging
+			if templateContainer.Name == defaultContainerTemplateName || templateContainer.Name == primaryContainerTemplateName {
+				continue
+			}
+
 			if mergedContainer == nil {
 				mergedContainer = &templatePodSpec.Containers[i]
 			} else {
@@ -901,6 +906,11 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 		// Check for any name matching template containers
 		for i, templateInitContainer := range templatePodSpec.InitContainers {
 			if templateInitContainer.Name != initContainer.Name {
+				continue
+			}
+
+			// skip containers already applied as magic templates to avoid double-merging
+			if templateInitContainer.Name == defaultInitContainerTemplateName || templateInitContainer.Name == primaryInitContainerTemplateName {
 				continue
 			}
 
