@@ -1,0 +1,16 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-sandbox
+  releaseName: flyte-sandbox
+  namespace: flyte
+  valuesInline:
+    flyte-binary:
+      enabled: false
+    sandbox:
+      dev: true
+namespace: flyte
+resources:
+- ../namespace.yaml
+- ../../../../charts/flyte-binary/templates/crds/taskaction.yaml
+- ../dashboard-rbac.yaml

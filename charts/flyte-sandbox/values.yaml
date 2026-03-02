@@ -17,8 +17,8 @@ flyte-binary:
       host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
       password: postgres
     storage:
-      metadataContainer: my-s3-bucket
-      userDataContainer: my-s3-bucket
+      metadataContainer: flyte-data
+      userDataContainer: flyte-data
       provider: s3
       providerConfig:
         s3:
@@ -57,8 +57,8 @@ flyte-binary:
             - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-            - FLYTE_PLATFORM_URL: '{{ printf "%s-grpc" .Release.Name }}.{{ .Release.Namespace }}:8089'
-            - FLYTE_PLATFORM_INSECURE: True
+            - _U_EP_OVERRIDE: '{{ printf "%s-http" .Release.Name }}.{{ .Release.Namespace }}:8090'
+            - _U_INSECURE: "true"
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'
@@ -111,7 +111,7 @@ minio:
   auth:
     rootUser: minio
     rootPassword: miniostorage
-  defaultBuckets: my-s3-bucket
+  defaultBuckets: flyte-data
   extraEnvVars:
     - name: MINIO_BROWSER_REDIRECT_URL
       value: http://localhost:30080/minio

@@ -110,7 +110,7 @@ spec:
             {{- tpl ( .Values.deployment.args | toYaml ) . | nindent 12 }}
             {{- else }}
             - --config
-            - /etc/flyte/config.d
+            - /etc/flyte/config.d/*.yaml
             {{- end }}
           env:
             - name: POD_NAME

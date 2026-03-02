@@ -22,6 +22,19 @@ SEPARATOR := \033[1;36m========================================\033[0m
 include go.Makefile
 
 # =============================================================================
+# Sandbox Commands
+# =============================================================================
+
+.PHONY: build-sandbox
+build-sandbox: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+	$(MAKE) -C docker/sandbox-bundled build
+
+# Run in dev mode with extra arg FLYTE_DEV=True
+.PHONY: run-sandbox
+run-sandbox: ## Start the flyte sandbox without rebuilding the image
+	$(MAKE) -C docker/sandbox-bundled start
+
+# =============================================================================
 # Local Cluster Commands
 # =============================================================================
 

@@ -8,6 +8,7 @@ ENV GOOS=linux
 
 WORKDIR /flyteorg/build
 
+COPY app app
 COPY dataproxy dataproxy
 COPY executor executor
 COPY flytecopilot flytecopilot

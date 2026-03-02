@@ -3,6 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -70,8 +73,17 @@ func InitKubernetesClient(ctx context.Context, cfg K8sConfig, scheme *runtime.Sc
 	return k8sClient, restConfig, nil
 }
 
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, path[2:])
+	}
+	return path
+}
+
 func buildRESTConfig(ctx context.Context, kubeconfig string) (*rest.Config, error) {
 	if kubeconfig != "" {
+		kubeconfig = expandPath(kubeconfig)
 		logger.Infof(ctx, "Using kubeconfig from: %s", kubeconfig)
 		cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
