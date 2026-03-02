@@ -7,7 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -20,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 // ActionUpdate represents an update to a TaskAction
@@ -39,6 +42,7 @@ type ActionsClient struct {
 	k8sClient  client.WithWatch
 	namespace  string
 	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 
 	// Watch management
 	mu sync.RWMutex
@@ -51,11 +55,12 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient) *ActionsClient {
 	return &ActionsClient{
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 }
@@ -399,6 +404,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
+	c.notifyRunService(ctx, taskAction, update)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -412,6 +418,55 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 		default:
 			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
+	}
+}
+
+// notifyRunService forwards a watch event to the internal run service.
+// It calls UpdateActionStatus when the phase is meaningful, and always calls RecordActionEvents.
+func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate) {
+	if c.runClient == nil {
+		return
+	}
+
+	// Derive UpdatedTime from the last PhaseHistory entry.
+	var updatedTime *timestamppb.Timestamp
+	if n := len(taskAction.Status.PhaseHistory); n > 0 {
+		updatedTime = timestamppb.New(taskAction.Status.PhaseHistory[n-1].OccurredAt.Time)
+	}
+
+	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+		statusReq := &workflow.UpdateActionStatusRequest{
+			ActionId: update.ActionID,
+			Status: &workflow.ActionStatus{
+				Phase: update.Phase,
+			},
+		}
+		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
+		}
+	}
+
+	// TODO(nary): some ActionEvent fields not populated here:
+	//   - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
+	//   - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
+	//   - LogContext:    not on the CR; same reason as LogInfo.
+	//   - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
+	//   - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
+	//   - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
+	//   - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
+	event := &workflow.ActionEvent{
+		Id:           update.ActionID,
+		Attempt:      1, // TODO(nary): hardcoded until retry support is added
+		Phase:        update.Phase,
+		Version:      taskAction.Status.PluginPhaseVersion,
+		UpdatedTime:  updatedTime,
+		ReportedTime: timestamppb.Now(),
+	}
+	recordReq := &workflow.RecordActionEventsRequest{
+		Events: []*workflow.ActionEvent{event},
+	}
+	if _, err := c.runClient.RecordActionEvents(ctx, connect.NewRequest(recordReq)); err != nil {
+		logger.Warnf(ctx, "Failed to record action event in run service for %s: %v", update.ActionID.Name, err)
 	}
 }
 

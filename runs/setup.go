@@ -43,7 +43,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("runs: failed to initialize k8s scheme: %w", err)
 	}
-	stateClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize)
+	stateClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, nil)
 	if err := stateClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("runs: failed to start TaskAction watcher: %w", err)
 	}

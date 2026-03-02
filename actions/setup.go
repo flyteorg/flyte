@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/flyteorg/flyte/v2/actions/config"
 	"github.com/flyteorg/flyte/v2/actions/k8s"
@@ -10,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 // Setup registers the ActionsService handler on the SetupContext mux.
@@ -21,7 +23,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
 	}
 
-	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize)
+	runServiceURL := cfg.RunServiceURL
+	if sc.BaseURL != "" {
+		runServiceURL = sc.BaseURL
+	}
+	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
+
+	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient)
 	logger.Infof(ctx, "Actions K8s client initialized for namespace: %s", sc.Namespace)
 
 	if err := actionsClient.StartWatching(ctx); err != nil {

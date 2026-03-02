@@ -166,9 +166,6 @@ func (s *ActionsService) Update(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// TODO: forward the update to RunService via an internal stream so it can persist to DB.
-	// e.g. s.runServiceClient.RecordActionEvent(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status)
-
 	return connect.NewResponse(&actions.UpdateResponse{}), nil
 }
 
