@@ -281,6 +281,31 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 	}
 }
 
+func TestBuildResourceRayEntrypointPreservesEmptyArgs(t *testing.T) {
+	// Regression test: empty string args must be preserved when converting
+	// container args (yaml array) to the RayJob entrypoint string.
+	rayJobResourceHandler := rayJobResourceHandler{}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	rayJob := dummyRayCustomObj()
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
+	taskTemplate.GetContainer().Args = []string{
+		"pyflyte-map-execute", "--resolver", "ArrayNodeMapTaskResolver",
+		"--", "vars", "", "resolver", "default_task_resolver",
+		"task-module", "some_module", "task-name", "some_task",
+	}
+
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	assert.NotNil(t, r)
+
+	rayJobObj, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	assert.Contains(t, rayJobObj.Spec.Entrypoint, "vars '' resolver")
+}
+
 func TestBuildPodTemplate(t *testing.T) {
 	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
 	resources := &corev1.ResourceRequirements{

@@ -226,6 +226,17 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		}
 	}
 
+	// We mustn't drop empty string arguments when converting from the yaml
+	// array representation of K8s container args to the single string representation
+	// of RayJobSpec's Entrypoint field.
+	//
+	// Example: ["--resolver", "ArrayNodeMapTaskResolver", "--", "vars", "", "resolver", "DefaultResolver"]
+	for i, arg := range primaryContainer.Args {
+		if arg == "" {
+			primaryContainer.Args[i] = "''"
+		}
+	}
+
 	jobSpec := rayv1.RayJobSpec{
 		RayClusterSpec:           &rayClusterSpec,
 		Entrypoint:               strings.Join(primaryContainer.Args, " "),
