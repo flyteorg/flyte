@@ -851,7 +851,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 				continue
 			}
 
-			// skip containers already applied as magic templates to avoid double-merging
+			// skip "default" and "primary" magic template containers as they are already
+			// merged above. Without this guard, WithAppendSlice causes duplicate
+			// VolumeMounts / EnvVars when the base container name collides with a
+			// magic template name.
 			if templateContainer.Name == defaultContainerTemplateName || templateContainer.Name == primaryContainerTemplateName {
 				continue
 			}
@@ -909,7 +912,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 				continue
 			}
 
-			// skip containers already applied as magic templates to avoid double-merging
+			// skip "default-init" and "primary-init" magic template containers as they
+			// are already merged above. Without this guard, WithAppendSlice causes
+			// duplicate VolumeMounts / EnvVars when the base init container name
+			// collides with a magic template name.
 			if templateInitContainer.Name == defaultInitContainerTemplateName || templateInitContainer.Name == primaryInitContainerTemplateName {
 				continue
 			}
