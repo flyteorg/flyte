@@ -200,12 +200,12 @@ message ActionStatus {
   // Duration of the action in milliseconds.
   optional uint64 duration_ms = 6;
 
-  // Resource details resolved at execution time by the operator.
-  ResourceDetails resource_details = 7;
+  // Runtime details resolved at execution time by the operator.
+  RuntimeDetails runtime_details = 7;
 }
 
-// Resource details resolved at execution time by the operator.
-message ResourceDetails {
+// Runtime details resolved at execution time by the operator.
+message RuntimeDetails {
   // GPU resource name (e.g. "nvidia.com/gpu").
   string gpu_resource_name = 1;
 }

@@ -1684,6 +1684,38 @@ func (m *ActionStatus) validate(all bool) error {
 
 	// no validation rules for CacheStatus
 
+<<<<<<< Updated upstream
+=======
+	if all {
+		switch v := interface{}(m.GetRuntimeDetails()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "RuntimeDetails",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "RuntimeDetails",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRuntimeDetails()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "RuntimeDetails",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+>>>>>>> Stashed changes
 	if m.EndTime != nil {
 
 		if all {
@@ -1798,6 +1830,119 @@ var _ interface {
 	ErrorName() string
 } = ActionStatusValidationError{}
 
+<<<<<<< Updated upstream
+=======
+// Validate checks the field values on RuntimeDetails with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RuntimeDetails) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RuntimeDetails with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RuntimeDetailsMultiError,
+// or nil if none found.
+func (m *RuntimeDetails) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RuntimeDetails) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for GpuResourceName
+
+	// no validation rules for PodName
+
+	// no validation rules for InstanceId
+
+	// no validation rules for SourceCluster
+
+	// no validation rules for SourceCloud
+
+	if len(errors) > 0 {
+		return RuntimeDetailsMultiError(errors)
+	}
+
+	return nil
+}
+
+// RuntimeDetailsMultiError is an error wrapping multiple validation errors
+// returned by RuntimeDetails.ValidateAll() if the designated constraints
+// aren't met.
+type RuntimeDetailsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RuntimeDetailsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RuntimeDetailsMultiError) AllErrors() []error { return m }
+
+// RuntimeDetailsValidationError is the validation error returned by
+// RuntimeDetails.Validate if the designated constraints aren't met.
+type RuntimeDetailsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RuntimeDetailsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RuntimeDetailsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RuntimeDetailsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RuntimeDetailsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RuntimeDetailsValidationError) ErrorName() string { return "RuntimeDetailsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RuntimeDetailsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRuntimeDetails.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RuntimeDetailsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RuntimeDetailsValidationError{}
+
+>>>>>>> Stashed changes
 // Validate checks the field values on Action with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
