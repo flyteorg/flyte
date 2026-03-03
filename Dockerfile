@@ -16,9 +16,8 @@ COPY flyteidl2 flyteidl2
 COPY flyteplugins flyteplugins
 COPY flytestdlib flytestdlib
 COPY gen gen
-COPY queue queue
+COPY actions actions
 COPY runs runs
-COPY state state
 
 COPY go.mod go.sum ./
 RUN go mod download

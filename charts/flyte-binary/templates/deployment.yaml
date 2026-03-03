@@ -172,8 +172,6 @@ spec:
             {{- end }}
             - name: config
               mountPath: /etc/flyte/config.d
-            - name: state
-              mountPath: /var/run/flyte
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
@@ -212,8 +210,6 @@ spec:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
             {{- end }}
           {{- end }}
-        - name: state
-          emptyDir: {}
         {{- if .Values.deployment.extraVolumes }}
         {{- tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
         {{- end }}

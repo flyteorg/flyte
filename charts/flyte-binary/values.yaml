@@ -26,7 +26,6 @@ flyte-core-components:
       host: "0.0.0.0"
       port: 8090
     watchBufferSize: 100
-    queueServiceUrl: "http://localhost:8089"
     storagePrefix: "s3://flyte-data"
     # Right now sandbox use SQLite db, we just leave the postgreSQL setting for potential future usage
     database:
@@ -41,21 +40,13 @@ flyte-core-components:
         password: ""
         options: "sslmode=disable"
         debug: false
-  state:
-    server:
-      host: "0.0.0.0"
-      port: 8091
+
+  actions:
     kubernetes:
       namespace: "flyte"
       kubeconfig: ""
     watchBufferSize: 100
-  queue:
-    server:
-      host: "0.0.0.0"
-      port: 8089
-    kubernetes:
-      namespace: "flyte"
-      kubeconfig: ""
+
   dataproxy:
     upload:
       maxSize: "100Mi"
