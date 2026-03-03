@@ -996,7 +996,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: enNBNGYwZWtYc0J5d3g5cA==
+  haSharedSecret: RjYyYWVaUHR6dDVkcHB5Zw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1042,19 +1042,14 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kubernetes-dashboard-csrf
-  namespace: flyte
----
-apiVersion: v1
-kind: Secret
-metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard-certs
+  name: kubernetes-dashboard-csrf
+  namespace: flyte
 type: Opaque
 ---
 apiVersion: v1
@@ -1066,7 +1061,7 @@ metadata:
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: kubernetes-dashboard-csrf
+  name: flyte-sandbox-kubernetes-dashboard-certs
 type: Opaque
 ---
 apiVersion: v1
@@ -1505,7 +1500,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d5f44fe6a4b582c5a3e77cfb60d26cbdb99f1f8281f4eae042424258c236eae8
+        checksum/secret: 3450cefc6a8d57adfad13324b3ff5b2487db586c67c6f9736aa5e44d008408b7
       labels:
         app: docker-registry
         release: flyte-sandbox

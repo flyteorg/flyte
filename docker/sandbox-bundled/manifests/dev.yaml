@@ -748,7 +748,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: bWdKM29hblN6YkdtaEVMdg==
+  haSharedSecret: NjhlRTJ6TnNrQkhsZlFNeg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -790,12 +790,6 @@ metadata:
   name: flyte-sandbox-postgresql
   namespace: flyte
 type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kubernetes-dashboard-csrf
-  namespace: flyte
 ---
 apiVersion: v1
 kind: Secret
@@ -1182,7 +1176,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 818a08f9bf0778413b78af10fcbad0b369676b9493eee0c5c1c1ad6e61812c00
+        checksum/secret: f606c04570e40842f3deb1a4b93fb7ac05d5c820334e4023f650be10ba943b09
       labels:
         app: docker-registry
         release: flyte-sandbox

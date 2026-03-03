@@ -8,3 +8,11 @@ namespace: flyte
 resources:
 - ../namespace.yaml
 - ../dashboard-rbac.yaml
+patches:
+- target:
+    kind: Secret
+    name: kubernetes-dashboard-csrf
+  patch: |
+    - op: add
+      path: /metadata/namespace
+      value: flyte
