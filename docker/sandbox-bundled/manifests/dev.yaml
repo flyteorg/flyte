@@ -748,7 +748,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MGYyWXZoa3hBT0ZVZkJhOA==
+  haSharedSecret: bWdKM29hblN6YkdtaEVMdg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -873,6 +873,15 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+spec:
+  externalName: flyte-sandbox-kubernetes-dashboard.default.svc.cluster.local
+  type: ExternalName
 ---
 apiVersion: v1
 kind: Service
@@ -1173,7 +1182,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0e5deec3961eae9f54a33529cac6504f134ee2c274c6f67a1ed5c967ce9de624
+        checksum/secret: 818a08f9bf0778413b78af10fcbad0b369676b9493eee0c5c1c1ad6e61812c00
       labels:
         app: docker-registry
         release: flyte-sandbox

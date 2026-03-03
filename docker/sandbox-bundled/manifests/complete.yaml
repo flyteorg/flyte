@@ -654,6 +654,11 @@ data:
       show-source: true
       level: 5
 
+    actions:
+      kubernetes:
+        kubeconfig: ""
+        namespace: flyte
+      watchBufferSize: 100
     dataproxy:
       download:
         maxExpiresIn: 1h
@@ -674,13 +679,6 @@ data:
       server:
         host: 0.0.0.0
         port: 8090
-    queue:
-      kubernetes:
-        kubeconfig: ""
-        namespace: flyte
-      server:
-        host: 0.0.0.0
-        port: 8089
     runs:
       database:
         connMaxLifeTime: 1h
@@ -694,19 +692,10 @@ data:
           password: ""
           port: 5432
           username: postgres
-      queueServiceUrl: http://localhost:8089
       server:
         host: 0.0.0.0
         port: 8090
       storagePrefix: s3://flyte-data
-      watchBufferSize: 100
-    state:
-      kubernetes:
-        kubeconfig: ""
-        namespace: flyte
-      server:
-        host: 0.0.0.0
-        port: 8091
       watchBufferSize: 100
   001-plugins.yaml: |
     tasks:
@@ -1007,7 +996,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZXU1ODMzUlF4TThIa2htYg==
+  haSharedSecret: enNBNGYwZWtYc0J5d3g5cA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1135,6 +1124,15 @@ spec:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+spec:
+  externalName: flyte-sandbox-kubernetes-dashboard.default.svc.cluster.local
+  type: ExternalName
 ---
 apiVersion: v1
 kind: Service
@@ -1359,7 +1357,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 8454c2f4e888a79fe64f7abdc3abdb66cd24c810f26a2d75e640a6f26e776b03
+        checksum/configuration: 2530d6197a4e932119c2b556c8025f30f1fc0cafab92334b8ba68059299954bc
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1398,8 +1396,6 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config.d
           name: config
-        - mountPath: /var/run/flyte
-          name: state
       initContainers:
       - args:
         - |
@@ -1428,8 +1424,6 @@ spec:
               name: flyte-sandbox-config-secret
           - configMap:
               name: flyte-sandbox-extra-config
-      - emptyDir: {}
-        name: state
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1511,7 +1505,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 8c74cf230f2504985733dbfc92ab5a728244fa1ed9abcc754a85b9bdf62d8ef8
+        checksum/secret: d5f44fe6a4b582c5a3e77cfb60d26cbdb99f1f8281f4eae042424258c236eae8
       labels:
         app: docker-registry
         release: flyte-sandbox
