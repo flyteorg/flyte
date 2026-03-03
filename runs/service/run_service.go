@@ -635,21 +635,29 @@ func (s *RunService) WatchActions(
 	errsCh := make(chan error)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
-	// Send existing actions from DB
-	existingActions, _, err := s.repo.ActionRepo().ListActions(ctx, runID, 1000, "")
-	if err != nil {
-		logger.Errorf(ctx, "Failed to list actions: %v", err)
-		// Continue — still watch for new updates
-	} else if len(existingActions) > 0 {
-		enriched := make([]*workflow.EnrichedAction, 0, len(existingActions))
-		for _, a := range existingActions {
-			enriched = append(enriched, s.convertActionToEnrichedProto(a))
+	// Send existing actions from DB (paginate through all pages)
+	token := ""
+	for {
+		batch, nextToken, err := s.repo.ActionRepo().ListActions(ctx, runID, 100, token)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to list actions: %v", err)
+			break
 		}
-		if err := stream.Send(&workflow.WatchActionsResponse{
-			EnrichedActions: enriched,
-		}); err != nil {
-			return err
+		if len(batch) > 0 {
+			enriched := make([]*workflow.EnrichedAction, 0, len(batch))
+			for _, a := range batch {
+				enriched = append(enriched, s.convertActionToEnrichedProto(a))
+			}
+			if err := stream.Send(&workflow.WatchActionsResponse{
+				EnrichedActions: enriched,
+			}); err != nil {
+				return err
+			}
 		}
+		if nextToken == "" {
+			break
+		}
+		token = nextToken
 	}
 
 	for {
