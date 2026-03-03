@@ -630,7 +630,12 @@ func (s *RunService) WatchActions(
 	runID := req.Msg.RunId
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
-	// Step 1: Send existing actions from DB
+	// Start watching for updates from DB first to prevent event miss
+	updatesCh := make(chan *models.Action)
+	errsCh := make(chan error)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
+
+	// Send existing actions from DB
 	existingActions, _, err := s.repo.ActionRepo().ListActions(ctx, runID, 1000, "")
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
@@ -646,11 +651,6 @@ func (s *RunService) WatchActions(
 			return err
 		}
 	}
-
-	// Step 2: Watch for updates from DB
-	updatesCh := make(chan *models.Action)
-	errsCh := make(chan error)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	for {
 		select {
