@@ -346,6 +346,10 @@ type MutableNodeStatus interface {
 	GetArrayNodeStatus() MutableArrayNodeStatus
 	GetOrCreateArrayNodeStatus() MutableArrayNodeStatus
 	ClearArrayNodeStatus()
+
+	// ClearExecutionError clears the execution error stored in the node status.
+	// This is used to reduce etcd state size by removing old errors when new ones occur.
+	ClearExecutionError()
 }
 
 type ExecutionTimeInfo interface {

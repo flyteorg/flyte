@@ -765,3 +765,94 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 }
+
+func TestNodeStatus_ClearExecutionError(t *testing.T) {
+	t.Run("clear-existing-error", func(t *testing.T) {
+		ns := &NodeStatus{
+			Phase: NodePhaseFailed,
+			Error: &ExecutionError{
+				ExecutionError: &core.ExecutionError{
+					Code:    "TestError",
+					Message: "Test error message",
+				},
+			},
+		}
+		// Verify error exists before clearing
+		assert.NotNil(t, ns.Error)
+		assert.NotNil(t, ns.GetExecutionError())
+
+		// Clear the error
+		ns.ClearExecutionError()
+
+		// Verify error is cleared
+		assert.Nil(t, ns.Error)
+		assert.Nil(t, ns.GetExecutionError())
+		// Phase should remain unchanged
+		assert.Equal(t, NodePhaseFailed, ns.Phase)
+		// Should be marked dirty
+		assert.True(t, ns.IsDirty())
+	})
+
+	t.Run("clear-nil-error-is-noop", func(t *testing.T) {
+		ns := &NodeStatus{
+			Phase: NodePhaseFailed,
+			Error: nil,
+		}
+		// Clear should work even when error is already nil
+		ns.ClearExecutionError()
+		assert.Nil(t, ns.Error)
+		// Should be marked dirty
+		assert.True(t, ns.IsDirty())
+	})
+
+	t.Run("determinism-only-last-error-preserved", func(t *testing.T) {
+		// This test verifies the key behavior that ensures determinism:
+		// Once an error is cleared, GetExecutionError() returns nil,
+		// which is used to skip re-processing that node in handleDownstream.
+
+		// Create two nodes with errors
+		n0 := &NodeStatus{
+			Phase: NodePhaseFailed,
+			Error: &ExecutionError{
+				ExecutionError: &core.ExecutionError{Code: "Error0", Message: "First error"},
+			},
+		}
+		n1 := &NodeStatus{
+			Phase: NodePhaseFailed,
+			Error: &ExecutionError{
+				ExecutionError: &core.ExecutionError{Code: "Error1", Message: "Second error"},
+			},
+		}
+
+		// Simulate Round 1: order [n0, n1]
+		// n0 has error, keep it; n1 has error, clear n0's error
+		assert.NotNil(t, n0.GetExecutionError())
+		assert.NotNil(t, n1.GetExecutionError())
+		n0.ClearExecutionError()
+
+		// After Round 1: n0 has no error, n1 has error
+		assert.Nil(t, n0.GetExecutionError())
+		assert.NotNil(t, n1.GetExecutionError())
+
+		// Simulate Round 2: different order [n1, n0]
+		// n1 has error - would be tracked
+		// n0 has NO error (GetExecutionError() == nil) - SKIP
+		// This is the key: n0 is skipped because its error was already cleared
+
+		// The check that enables determinism:
+		if n0.GetExecutionError() != nil {
+			// This block should NOT execute - n0's error was cleared
+			t.Error("n0 should have been skipped because its error was cleared")
+		}
+		if n1.GetExecutionError() != nil {
+			// This block SHOULD execute - n1 still has an error
+			// n1's error remains because there's no "previous" node with error to clear it
+		}
+
+		// Final state: n0 still has no error, n1 still has error
+		// This is stable regardless of iteration order in future rounds
+		assert.Nil(t, n0.GetExecutionError())
+		assert.NotNil(t, n1.GetExecutionError())
+		assert.Equal(t, "Error1", n1.GetExecutionError().Code)
+	})
+}

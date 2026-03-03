@@ -568,6 +568,11 @@ func (in *NodeStatus) ClearArrayNodeStatus() {
 	in.SetDirty()
 }
 
+func (in *NodeStatus) ClearExecutionError() {
+	in.Error = nil
+	in.SetDirty()
+}
+
 func (in *NodeStatus) GetLastUpdatedAt() *metav1.Time {
 	return in.LastUpdatedAt
 }
