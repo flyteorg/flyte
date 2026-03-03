@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-
 // InputFilePaths contains the different ways available for downstream systems to retrieve inputs.
 // If using Files for IO with tasks, then the input will be written to this path. All the files are always created in a
 // sandbox per execution

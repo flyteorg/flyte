@@ -443,7 +443,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -471,7 +471,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(&core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
 	taskExecutionMetadata.EXPECT().IsInterruptible().Return(interruptible)
@@ -519,7 +519,7 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 	pCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -546,7 +546,7 @@ func dummySparkPluginContextWithPods(taskTemplate *core.TaskTemplate, pluginStat
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(&core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
 	})
 	taskExecutionMetadata.EXPECT().IsInterruptible().Return(false)

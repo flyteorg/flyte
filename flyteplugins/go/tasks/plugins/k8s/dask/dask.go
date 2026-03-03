@@ -91,13 +91,13 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetAnnotations(), objectMeta.Annotations)
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetLabels(), objectMeta.Labels)
 
-	workerSpec, err := createWorkerSpec(*daskJob.Workers, podSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
+	workerSpec, err := createWorkerSpec(daskJob.Workers, podSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	schedulerSpec, err := createSchedulerSpec(*daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
+	schedulerSpec, err := createSchedulerSpec(daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return job, nil
 }
 
-func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string,
+func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string,
 	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.WorkerSpec, error) {
 	workerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(workerPodSpec, primaryContainerName)
@@ -183,7 +183,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	}, nil
 }
 
-func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
+func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
 	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)

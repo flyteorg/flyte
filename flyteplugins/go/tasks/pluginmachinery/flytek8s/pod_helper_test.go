@@ -40,7 +40,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	})
 	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -3599,6 +3599,95 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 			},
 			primaryContainerName:     "task-1",
 			primaryInitContainerName: "task-init-1",
+		},
+		{
+			name: "primary container template with volume mounts does not duplicate when base container is also named primary",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "default-task-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "shared-data", MountPath: "/mnt/shared"},
+							{Name: "scratch", MountPath: "/mnt/scratch"},
+						},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "default-init-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "init-data", MountPath: "/mnt/init"},
+						},
+					},
+				},
+				Volumes: []v1.Volume{
+					{Name: "shared-data", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "scratch", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "init-data", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "shared-data1", MountPath: "/mnt/shared1"},
+							{Name: "scratch1", MountPath: "/mnt/scratch1"},
+						},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "init-data1", MountPath: "/mnt/init1"},
+						},
+					},
+				},
+				Volumes: []v1.Volume{
+					{Name: "shared-data1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "scratch1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "init-data1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+				},
+			},
+			primaryContainerName:     "primary",
+			primaryInitContainerName: "primary-init",
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "primary",
+						Image: "task-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "shared-data", MountPath: "/mnt/shared"},
+							{Name: "scratch", MountPath: "/mnt/scratch"},
+							{Name: "shared-data1", MountPath: "/mnt/shared1"},
+							{Name: "scratch1", MountPath: "/mnt/scratch1"},
+						},
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "primary-init",
+						Image: "task-init-image",
+						VolumeMounts: []v1.VolumeMount{
+							{Name: "init-data", MountPath: "/mnt/init"},
+							{Name: "init-data1", MountPath: "/mnt/init1"},
+						},
+					},
+				},
+				Volumes: []v1.Volume{
+					{Name: "shared-data", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "scratch", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "init-data", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "shared-data1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "scratch1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+					{Name: "init-data1", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}},
+				},
+			},
 		},
 	}
 
