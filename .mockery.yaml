@@ -24,6 +24,16 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'gen/go/flyteidl2/workflow/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/actions/mocks'
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect:
+    config:
+      include-auto-generated: true
+      all: true
+      dir: 'gen/go/flyteidl2/actions/actionsconnect/mocks'
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect:
     config:
       include-auto-generated: true
@@ -64,11 +74,6 @@ packages:
       include-auto-generated: true
       all: true
       dir: 'runs/repository/mocks'
-  github.com/flyteorg/flyte/v2/actions/service:
-    config:
-      include-auto-generated: true
-      all: true
-      dir: 'actions/service/mocks'
 
   # flyteplugins
   github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core:
