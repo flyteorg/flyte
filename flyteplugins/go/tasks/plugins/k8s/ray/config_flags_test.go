@@ -155,14 +155,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_disableIngress", func(t *testing.T) {
+	t.Run("Test_enableIngress", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("disableIngress", testValue)
-			if vBool, err := cmdFlags.GetBool("disableIngress"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.DisableIngress)
+			cmdFlags.Set("enableIngress", testValue)
+			if vBool, err := cmdFlags.GetBool("enableIngress"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EnableIngress)
 
 			} else {
 				assert.FailNow(t, err.Error())
