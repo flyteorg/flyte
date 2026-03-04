@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -31,17 +31,27 @@ type taskExecutionContext struct {
 	catalogClient        catalog.AsyncClient
 }
 
-func (t *taskExecutionContext) ResourceManager() pluginsCore.ResourceManager             { return t.resourceManager }
-func (t *taskExecutionContext) SecretManager() pluginsCore.SecretManager                 { return t.secretManager }
-func (t *taskExecutionContext) TaskRefreshIndicator() pluginsCore.SignalAsync             { return t.taskRefreshIndicator }
-func (t *taskExecutionContext) DataStore() *storage.DataStore                            { return t.dataStore }
-func (t *taskExecutionContext) PluginStateReader() pluginsCore.PluginStateReader          { return t.pluginStateReader }
-func (t *taskExecutionContext) PluginStateWriter() pluginsCore.PluginStateWriter          { return t.pluginStateWriter }
-func (t *taskExecutionContext) TaskReader() pluginsCore.TaskReader                        { return t.taskReader }
-func (t *taskExecutionContext) InputReader() io.InputReader                               { return t.inputReader }
-func (t *taskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecutionMetadata  { return t.taskExecMetadata }
-func (t *taskExecutionContext) OutputWriter() io.OutputWriter                             { return t.outputWriter }
-func (t *taskExecutionContext) Catalog() catalog.AsyncClient                              { return t.catalogClient }
+func (t *taskExecutionContext) ResourceManager() pluginsCore.ResourceManager {
+	return t.resourceManager
+}
+func (t *taskExecutionContext) SecretManager() pluginsCore.SecretManager { return t.secretManager }
+func (t *taskExecutionContext) TaskRefreshIndicator() pluginsCore.SignalAsync {
+	return t.taskRefreshIndicator
+}
+func (t *taskExecutionContext) DataStore() *storage.DataStore { return t.dataStore }
+func (t *taskExecutionContext) PluginStateReader() pluginsCore.PluginStateReader {
+	return t.pluginStateReader
+}
+func (t *taskExecutionContext) PluginStateWriter() pluginsCore.PluginStateWriter {
+	return t.pluginStateWriter
+}
+func (t *taskExecutionContext) TaskReader() pluginsCore.TaskReader { return t.taskReader }
+func (t *taskExecutionContext) InputReader() io.InputReader        { return t.inputReader }
+func (t *taskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
+	return t.taskExecMetadata
+}
+func (t *taskExecutionContext) OutputWriter() io.OutputWriter { return t.outputWriter }
+func (t *taskExecutionContext) Catalog() catalog.AsyncClient  { return t.catalogClient }
 
 // inlineTaskReader reads a TaskTemplate from bytes stored inline in the CRD.
 type inlineTaskReader struct {

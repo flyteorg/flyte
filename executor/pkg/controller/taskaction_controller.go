@@ -98,7 +98,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking 
+	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
 	// if the TaskAction instance changes
 	originalTaskActionInstance := taskAction.DeepCopy()
 
