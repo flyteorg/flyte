@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
 )
 
 // Validate checks the field values on RuleId with the rules defined in the
@@ -162,71 +166,10 @@ func (m *Rule) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetRuleId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RuleValidationError{
-					field:  "RuleId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RuleValidationError{
-					field:  "RuleId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRuleId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RuleValidationError{
-				field:  "RuleId",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	for idx, item := range m.GetDeliveryConfigs() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, RuleValidationError{
-						field:  fmt.Sprintf("DeliveryConfigs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, RuleValidationError{
-						field:  fmt.Sprintf("DeliveryConfigs[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RuleValidationError{
-					field:  fmt.Sprintf("DeliveryConfigs[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
+	// no validation rules for EventType
 
 	switch v := m.Condition.(type) {
-	case *Rule_ActionRule:
+	case *Rule_RunRule:
 		if v == nil {
 			err := RuleValidationError{
 				field:  "Condition",
@@ -239,11 +182,11 @@ func (m *Rule) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetActionRule()).(type) {
+			switch v := interface{}(m.GetRunRule()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, RuleValidationError{
-						field:  "ActionRule",
+						field:  "RunRule",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -251,16 +194,16 @@ func (m *Rule) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, RuleValidationError{
-						field:  "ActionRule",
+						field:  "RunRule",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetActionRule()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRunRule()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RuleValidationError{
-					field:  "ActionRule",
+					field:  "RunRule",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -348,45 +291,134 @@ var _ interface {
 	ErrorName() string
 } = RuleValidationError{}
 
-// Validate checks the field values on ActionRule with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *ActionRule) Validate() error {
+// Validate checks the field values on RunCompletedRule with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RunCompletedRule) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ActionRule with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in ActionRuleMultiError, or
-// nil if none found.
-func (m *ActionRule) ValidateAll() error {
+// ValidateAll checks the field values on RunCompletedRule with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RunCompletedRuleMultiError, or nil if none found.
+func (m *RunCompletedRule) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ActionRule) validate(all bool) error {
+func (m *RunCompletedRule) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for TaskNameRegex
+	if all {
+		switch v := interface{}(m.GetRuleId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RunCompletedRuleValidationError{
+					field:  "RuleId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RunCompletedRuleValidationError{
+					field:  "RuleId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRuleId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RunCompletedRuleValidationError{
+				field:  "RuleId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for PhaseRegex
+	for idx, item := range m.GetDeliveryConfigIds() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RunCompletedRuleValidationError{
+						field:  fmt.Sprintf("DeliveryConfigIds[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RunCompletedRuleValidationError{
+						field:  fmt.Sprintf("DeliveryConfigIds[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RunCompletedRuleValidationError{
+					field:  fmt.Sprintf("DeliveryConfigIds[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetChecks()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RunCompletedRuleValidationError{
+					field:  "Checks",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RunCompletedRuleValidationError{
+					field:  "Checks",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetChecks()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RunCompletedRuleValidationError{
+				field:  "Checks",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
-		return ActionRuleMultiError(errors)
+		return RunCompletedRuleMultiError(errors)
 	}
 
 	return nil
 }
 
-// ActionRuleMultiError is an error wrapping multiple validation errors
-// returned by ActionRule.ValidateAll() if the designated constraints aren't met.
-type ActionRuleMultiError []error
+// RunCompletedRuleMultiError is an error wrapping multiple validation errors
+// returned by RunCompletedRule.ValidateAll() if the designated constraints
+// aren't met.
+type RunCompletedRuleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ActionRuleMultiError) Error() string {
+func (m RunCompletedRuleMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -395,11 +427,11 @@ func (m ActionRuleMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ActionRuleMultiError) AllErrors() []error { return m }
+func (m RunCompletedRuleMultiError) AllErrors() []error { return m }
 
-// ActionRuleValidationError is the validation error returned by
-// ActionRule.Validate if the designated constraints aren't met.
-type ActionRuleValidationError struct {
+// RunCompletedRuleValidationError is the validation error returned by
+// RunCompletedRule.Validate if the designated constraints aren't met.
+type RunCompletedRuleValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -407,22 +439,22 @@ type ActionRuleValidationError struct {
 }
 
 // Field function returns field value.
-func (e ActionRuleValidationError) Field() string { return e.field }
+func (e RunCompletedRuleValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ActionRuleValidationError) Reason() string { return e.reason }
+func (e RunCompletedRuleValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ActionRuleValidationError) Cause() error { return e.cause }
+func (e RunCompletedRuleValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ActionRuleValidationError) Key() bool { return e.key }
+func (e RunCompletedRuleValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ActionRuleValidationError) ErrorName() string { return "ActionRuleValidationError" }
+func (e RunCompletedRuleValidationError) ErrorName() string { return "RunCompletedRuleValidationError" }
 
 // Error satisfies the builtin error interface
-func (e ActionRuleValidationError) Error() string {
+func (e RunCompletedRuleValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -434,14 +466,14 @@ func (e ActionRuleValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sActionRule.%s: %s%s",
+		"invalid %sRunCompletedRule.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ActionRuleValidationError{}
+var _ error = RunCompletedRuleValidationError{}
 
 var _ interface {
 	Field() string
@@ -449,7 +481,304 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ActionRuleValidationError{}
+} = RunCompletedRuleValidationError{}
+
+// Validate checks the field values on RunCompletedRuleChecks with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RunCompletedRuleChecks) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RunCompletedRuleChecks with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RunCompletedRuleChecksMultiError, or nil if none found.
+func (m *RunCompletedRuleChecks) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RunCompletedRuleChecks) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ProjectRegex
+
+	// no validation rules for DomainRegex
+
+	// no validation rules for TaskNameRegex
+
+	// no validation rules for PhaseRegex
+
+	if len(errors) > 0 {
+		return RunCompletedRuleChecksMultiError(errors)
+	}
+
+	return nil
+}
+
+// RunCompletedRuleChecksMultiError is an error wrapping multiple validation
+// errors returned by RunCompletedRuleChecks.ValidateAll() if the designated
+// constraints aren't met.
+type RunCompletedRuleChecksMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RunCompletedRuleChecksMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RunCompletedRuleChecksMultiError) AllErrors() []error { return m }
+
+// RunCompletedRuleChecksValidationError is the validation error returned by
+// RunCompletedRuleChecks.Validate if the designated constraints aren't met.
+type RunCompletedRuleChecksValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RunCompletedRuleChecksValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RunCompletedRuleChecksValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RunCompletedRuleChecksValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RunCompletedRuleChecksValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RunCompletedRuleChecksValidationError) ErrorName() string {
+	return "RunCompletedRuleChecksValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RunCompletedRuleChecksValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRunCompletedRuleChecks.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RunCompletedRuleChecksValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RunCompletedRuleChecksValidationError{}
+
+// Validate checks the field values on DeliveryOption with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *DeliveryOption) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeliveryOption with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeliveryOptionMultiError,
+// or nil if none found.
+func (m *DeliveryOption) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeliveryOption) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Option.(type) {
+	case *DeliveryOption_ConfigId:
+		if v == nil {
+			err := DeliveryOptionValidationError{
+				field:  "Option",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetConfigId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DeliveryOptionValidationError{
+						field:  "ConfigId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DeliveryOptionValidationError{
+						field:  "ConfigId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetConfigId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DeliveryOptionValidationError{
+					field:  "ConfigId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DeliveryOption_Config:
+		if v == nil {
+			err := DeliveryOptionValidationError{
+				field:  "Option",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetConfig()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DeliveryOptionValidationError{
+						field:  "Config",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DeliveryOptionValidationError{
+						field:  "Config",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DeliveryOptionValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return DeliveryOptionMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeliveryOptionMultiError is an error wrapping multiple validation errors
+// returned by DeliveryOption.ValidateAll() if the designated constraints
+// aren't met.
+type DeliveryOptionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeliveryOptionMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeliveryOptionMultiError) AllErrors() []error { return m }
+
+// DeliveryOptionValidationError is the validation error returned by
+// DeliveryOption.Validate if the designated constraints aren't met.
+type DeliveryOptionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeliveryOptionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeliveryOptionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeliveryOptionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeliveryOptionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeliveryOptionValidationError) ErrorName() string { return "DeliveryOptionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DeliveryOptionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeliveryOption.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeliveryOptionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeliveryOptionValidationError{}
 
 // Validate checks the field values on DeliveryConfigId with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -559,6 +888,333 @@ var _ interface {
 	ErrorName() string
 } = DeliveryConfigIdValidationError{}
 
+// Validate checks the field values on DeliveryConfigTemplate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeliveryConfigTemplate) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeliveryConfigTemplate with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeliveryConfigTemplateMultiError, or nil if none found.
+func (m *DeliveryConfigTemplate) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeliveryConfigTemplate) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Config.(type) {
+	case *DeliveryConfigTemplate_Webhook:
+		if v == nil {
+			err := DeliveryConfigTemplateValidationError{
+				field:  "Config",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetWebhook()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DeliveryConfigTemplateValidationError{
+						field:  "Webhook",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DeliveryConfigTemplateValidationError{
+						field:  "Webhook",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetWebhook()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DeliveryConfigTemplateValidationError{
+					field:  "Webhook",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DeliveryConfigTemplate_Email:
+		if v == nil {
+			err := DeliveryConfigTemplateValidationError{
+				field:  "Config",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetEmail()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DeliveryConfigTemplateValidationError{
+						field:  "Email",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DeliveryConfigTemplateValidationError{
+						field:  "Email",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetEmail()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DeliveryConfigTemplateValidationError{
+					field:  "Email",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return DeliveryConfigTemplateMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeliveryConfigTemplateMultiError is an error wrapping multiple validation
+// errors returned by DeliveryConfigTemplate.ValidateAll() if the designated
+// constraints aren't met.
+type DeliveryConfigTemplateMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeliveryConfigTemplateMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeliveryConfigTemplateMultiError) AllErrors() []error { return m }
+
+// DeliveryConfigTemplateValidationError is the validation error returned by
+// DeliveryConfigTemplate.Validate if the designated constraints aren't met.
+type DeliveryConfigTemplateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeliveryConfigTemplateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeliveryConfigTemplateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeliveryConfigTemplateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeliveryConfigTemplateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeliveryConfigTemplateValidationError) ErrorName() string {
+	return "DeliveryConfigTemplateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeliveryConfigTemplateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeliveryConfigTemplate.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeliveryConfigTemplateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeliveryConfigTemplateValidationError{}
+
+// Validate checks the field values on RunCompletedNotificationTemplateData
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *RunCompletedNotificationTemplateData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RunCompletedNotificationTemplateData
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RunCompletedNotificationTemplateDataMultiError, or nil if none found.
+func (m *RunCompletedNotificationTemplateData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RunCompletedNotificationTemplateData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRun()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RunCompletedNotificationTemplateDataValidationError{
+					field:  "Run",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RunCompletedNotificationTemplateDataValidationError{
+					field:  "Run",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRun()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RunCompletedNotificationTemplateDataValidationError{
+				field:  "Run",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Phase
+
+	// no validation rules for Error
+
+	if len(errors) > 0 {
+		return RunCompletedNotificationTemplateDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// RunCompletedNotificationTemplateDataMultiError is an error wrapping multiple
+// validation errors returned by
+// RunCompletedNotificationTemplateData.ValidateAll() if the designated
+// constraints aren't met.
+type RunCompletedNotificationTemplateDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RunCompletedNotificationTemplateDataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RunCompletedNotificationTemplateDataMultiError) AllErrors() []error { return m }
+
+// RunCompletedNotificationTemplateDataValidationError is the validation error
+// returned by RunCompletedNotificationTemplateData.Validate if the designated
+// constraints aren't met.
+type RunCompletedNotificationTemplateDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RunCompletedNotificationTemplateDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RunCompletedNotificationTemplateDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RunCompletedNotificationTemplateDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RunCompletedNotificationTemplateDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RunCompletedNotificationTemplateDataValidationError) ErrorName() string {
+	return "RunCompletedNotificationTemplateDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RunCompletedNotificationTemplateDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRunCompletedNotificationTemplateData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RunCompletedNotificationTemplateDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RunCompletedNotificationTemplateDataValidationError{}
+
 // Validate checks the field values on DeliveryConfig with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -610,93 +1266,35 @@ func (m *DeliveryConfig) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Type
+	// no validation rules for EventType
 
-	switch v := m.ScopeBy.(type) {
-	case *DeliveryConfig_WebhookConfig:
-		if v == nil {
-			err := DeliveryConfigValidationError{
-				field:  "ScopeBy",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetWebhookConfig()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, DeliveryConfigValidationError{
-						field:  "WebhookConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, DeliveryConfigValidationError{
-						field:  "WebhookConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetWebhookConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return DeliveryConfigValidationError{
-					field:  "WebhookConfig",
+	if all {
+		switch v := interface{}(m.GetTemplate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeliveryConfigValidationError{
+					field:  "Template",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
 			}
-		}
-
-	case *DeliveryConfig_EmailConfig:
-		if v == nil {
-			err := DeliveryConfigValidationError{
-				field:  "ScopeBy",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetEmailConfig()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, DeliveryConfigValidationError{
-						field:  "EmailConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, DeliveryConfigValidationError{
-						field:  "EmailConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetEmailConfig()).(interface{ Validate() error }); ok {
+		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				return DeliveryConfigValidationError{
-					field:  "EmailConfig",
+				errors = append(errors, DeliveryConfigValidationError{
+					field:  "Template",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
 			}
 		}
-
-	default:
-		_ = v // ensures v is used
+	} else if v, ok := interface{}(m.GetTemplate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeliveryConfigValidationError{
+				field:  "Template",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {
@@ -777,22 +1375,22 @@ var _ interface {
 	ErrorName() string
 } = DeliveryConfigValidationError{}
 
-// Validate checks the field values on WebhookDeliveryConfig with the rules
+// Validate checks the field values on WebhookDeliveryTemplate with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *WebhookDeliveryConfig) Validate() error {
+func (m *WebhookDeliveryTemplate) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on WebhookDeliveryConfig with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on WebhookDeliveryTemplate with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// WebhookDeliveryConfigMultiError, or nil if none found.
-func (m *WebhookDeliveryConfig) ValidateAll() error {
+// WebhookDeliveryTemplateMultiError, or nil if none found.
+func (m *WebhookDeliveryTemplate) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *WebhookDeliveryConfig) validate(all bool) error {
+func (m *WebhookDeliveryTemplate) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -805,22 +1403,22 @@ func (m *WebhookDeliveryConfig) validate(all bool) error {
 
 	// no validation rules for Headers
 
-	// no validation rules for Body
+	// no validation rules for BodyTemplate
 
 	if len(errors) > 0 {
-		return WebhookDeliveryConfigMultiError(errors)
+		return WebhookDeliveryTemplateMultiError(errors)
 	}
 
 	return nil
 }
 
-// WebhookDeliveryConfigMultiError is an error wrapping multiple validation
-// errors returned by WebhookDeliveryConfig.ValidateAll() if the designated
+// WebhookDeliveryTemplateMultiError is an error wrapping multiple validation
+// errors returned by WebhookDeliveryTemplate.ValidateAll() if the designated
 // constraints aren't met.
-type WebhookDeliveryConfigMultiError []error
+type WebhookDeliveryTemplateMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m WebhookDeliveryConfigMultiError) Error() string {
+func (m WebhookDeliveryTemplateMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -829,11 +1427,11 @@ func (m WebhookDeliveryConfigMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m WebhookDeliveryConfigMultiError) AllErrors() []error { return m }
+func (m WebhookDeliveryTemplateMultiError) AllErrors() []error { return m }
 
-// WebhookDeliveryConfigValidationError is the validation error returned by
-// WebhookDeliveryConfig.Validate if the designated constraints aren't met.
-type WebhookDeliveryConfigValidationError struct {
+// WebhookDeliveryTemplateValidationError is the validation error returned by
+// WebhookDeliveryTemplate.Validate if the designated constraints aren't met.
+type WebhookDeliveryTemplateValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -841,24 +1439,24 @@ type WebhookDeliveryConfigValidationError struct {
 }
 
 // Field function returns field value.
-func (e WebhookDeliveryConfigValidationError) Field() string { return e.field }
+func (e WebhookDeliveryTemplateValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e WebhookDeliveryConfigValidationError) Reason() string { return e.reason }
+func (e WebhookDeliveryTemplateValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e WebhookDeliveryConfigValidationError) Cause() error { return e.cause }
+func (e WebhookDeliveryTemplateValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e WebhookDeliveryConfigValidationError) Key() bool { return e.key }
+func (e WebhookDeliveryTemplateValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e WebhookDeliveryConfigValidationError) ErrorName() string {
-	return "WebhookDeliveryConfigValidationError"
+func (e WebhookDeliveryTemplateValidationError) ErrorName() string {
+	return "WebhookDeliveryTemplateValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e WebhookDeliveryConfigValidationError) Error() string {
+func (e WebhookDeliveryTemplateValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -870,14 +1468,14 @@ func (e WebhookDeliveryConfigValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sWebhookDeliveryConfig.%s: %s%s",
+		"invalid %sWebhookDeliveryTemplate.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = WebhookDeliveryConfigValidationError{}
+var _ error = WebhookDeliveryTemplateValidationError{}
 
 var _ interface {
 	Field() string
@@ -885,24 +1483,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = WebhookDeliveryConfigValidationError{}
+} = WebhookDeliveryTemplateValidationError{}
 
-// Validate checks the field values on EmailDeliveryConfig with the rules
+// Validate checks the field values on EmailDeliveryTemplate with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *EmailDeliveryConfig) Validate() error {
+func (m *EmailDeliveryTemplate) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on EmailDeliveryConfig with the rules
+// ValidateAll checks the field values on EmailDeliveryTemplate with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// EmailDeliveryConfigMultiError, or nil if none found.
-func (m *EmailDeliveryConfig) ValidateAll() error {
+// EmailDeliveryTemplateMultiError, or nil if none found.
+func (m *EmailDeliveryTemplate) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *EmailDeliveryConfig) validate(all bool) error {
+func (m *EmailDeliveryTemplate) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -911,24 +1509,24 @@ func (m *EmailDeliveryConfig) validate(all bool) error {
 
 	// no validation rules for Subject
 
-	// no validation rules for Html
+	// no validation rules for HtmlTemplate
 
-	// no validation rules for Text
+	// no validation rules for TextTemplate
 
 	if len(errors) > 0 {
-		return EmailDeliveryConfigMultiError(errors)
+		return EmailDeliveryTemplateMultiError(errors)
 	}
 
 	return nil
 }
 
-// EmailDeliveryConfigMultiError is an error wrapping multiple validation
-// errors returned by EmailDeliveryConfig.ValidateAll() if the designated
+// EmailDeliveryTemplateMultiError is an error wrapping multiple validation
+// errors returned by EmailDeliveryTemplate.ValidateAll() if the designated
 // constraints aren't met.
-type EmailDeliveryConfigMultiError []error
+type EmailDeliveryTemplateMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m EmailDeliveryConfigMultiError) Error() string {
+func (m EmailDeliveryTemplateMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -937,11 +1535,11 @@ func (m EmailDeliveryConfigMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m EmailDeliveryConfigMultiError) AllErrors() []error { return m }
+func (m EmailDeliveryTemplateMultiError) AllErrors() []error { return m }
 
-// EmailDeliveryConfigValidationError is the validation error returned by
-// EmailDeliveryConfig.Validate if the designated constraints aren't met.
-type EmailDeliveryConfigValidationError struct {
+// EmailDeliveryTemplateValidationError is the validation error returned by
+// EmailDeliveryTemplate.Validate if the designated constraints aren't met.
+type EmailDeliveryTemplateValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -949,24 +1547,24 @@ type EmailDeliveryConfigValidationError struct {
 }
 
 // Field function returns field value.
-func (e EmailDeliveryConfigValidationError) Field() string { return e.field }
+func (e EmailDeliveryTemplateValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e EmailDeliveryConfigValidationError) Reason() string { return e.reason }
+func (e EmailDeliveryTemplateValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e EmailDeliveryConfigValidationError) Cause() error { return e.cause }
+func (e EmailDeliveryTemplateValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e EmailDeliveryConfigValidationError) Key() bool { return e.key }
+func (e EmailDeliveryTemplateValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e EmailDeliveryConfigValidationError) ErrorName() string {
-	return "EmailDeliveryConfigValidationError"
+func (e EmailDeliveryTemplateValidationError) ErrorName() string {
+	return "EmailDeliveryTemplateValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e EmailDeliveryConfigValidationError) Error() string {
+func (e EmailDeliveryTemplateValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -978,14 +1576,14 @@ func (e EmailDeliveryConfigValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEmailDeliveryConfig.%s: %s%s",
+		"invalid %sEmailDeliveryTemplate.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = EmailDeliveryConfigValidationError{}
+var _ error = EmailDeliveryTemplateValidationError{}
 
 var _ interface {
 	Field() string
@@ -993,4 +1591,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = EmailDeliveryConfigValidationError{}
+} = EmailDeliveryTemplateValidationError{}

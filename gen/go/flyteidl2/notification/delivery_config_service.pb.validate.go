@@ -1116,35 +1116,6 @@ func (m *SendTestNotificationRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetDeliveryConfigId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "DeliveryConfigId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "DeliveryConfigId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDeliveryConfigId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SendTestNotificationRequestValidationError{
-				field:  "DeliveryConfigId",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
 		switch v := interface{}(m.GetTemplateData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -1167,6 +1138,35 @@ func (m *SendTestNotificationRequest) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return SendTestNotificationRequestValidationError{
 				field:  "TemplateData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDeliveryOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SendTestNotificationRequestValidationError{
+					field:  "DeliveryOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SendTestNotificationRequestValidationError{
+					field:  "DeliveryOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDeliveryOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SendTestNotificationRequestValidationError{
+				field:  "DeliveryOption",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

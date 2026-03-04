@@ -61,12 +61,12 @@ class DeleteDeliveryConfigResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class SendTestNotificationRequest(_message.Message):
-    __slots__ = ["delivery_config_id", "template_data"]
-    DELIVERY_CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["template_data", "delivery_option"]
     TEMPLATE_DATA_FIELD_NUMBER: _ClassVar[int]
-    delivery_config_id: _definition_pb2.DeliveryConfigId
+    DELIVERY_OPTION_FIELD_NUMBER: _ClassVar[int]
     template_data: _struct_pb2.Struct
-    def __init__(self, delivery_config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template_data: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    delivery_option: _definition_pb2.DeliveryOption
+    def __init__(self, template_data: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., delivery_option: _Optional[_Union[_definition_pb2.DeliveryOption, _Mapping]] = ...) -> None: ...
 
 class SendTestNotificationResponse(_message.Message):
     __slots__ = []

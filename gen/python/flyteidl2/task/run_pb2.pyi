@@ -89,21 +89,27 @@ class RunSpec(_message.Message):
     security_context: _security_pb2.SecurityContext
     cache_config: CacheConfig
     rule_id: _definition_pb2.RuleId
-    rule: Rule
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., rule_id: _Optional[_Union[_definition_pb2.RuleId, _Mapping]] = ..., rule: _Optional[_Union[Rule, _Mapping]] = ...) -> None: ...
+    rule: InlineRule
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., rule_id: _Optional[_Union[_definition_pb2.RuleId, _Mapping]] = ..., rule: _Optional[_Union[InlineRule, _Mapping]] = ...) -> None: ...
 
-class DeliveryConfig(_message.Message):
-    __slots__ = ["delivery_config_id", "delivery_config"]
-    DELIVERY_CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
-    DELIVERY_CONFIG_FIELD_NUMBER: _ClassVar[int]
-    delivery_config_id: _definition_pb2.DeliveryConfigId
-    delivery_config: _definition_pb2.DeliveryConfig
-    def __init__(self, delivery_config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., delivery_config: _Optional[_Union[_definition_pb2.DeliveryConfig, _Mapping]] = ...) -> None: ...
+class InlineRule(_message.Message):
+    __slots__ = ["delivery_options", "checks"]
+    DELIVERY_OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    CHECKS_FIELD_NUMBER: _ClassVar[int]
+    delivery_options: _containers.RepeatedCompositeFieldContainer[DeliveryOption]
+    checks: InlineRuleChecks
+    def __init__(self, delivery_options: _Optional[_Iterable[_Union[DeliveryOption, _Mapping]]] = ..., checks: _Optional[_Union[InlineRuleChecks, _Mapping]] = ...) -> None: ...
 
-class Rule(_message.Message):
-    __slots__ = ["phase_regex", "configs"]
+class DeliveryOption(_message.Message):
+    __slots__ = ["config_id", "template"]
+    CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    config_id: _definition_pb2.DeliveryConfigId
+    template: _definition_pb2.DeliveryConfigTemplate
+    def __init__(self, config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template: _Optional[_Union[_definition_pb2.DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...
+
+class InlineRuleChecks(_message.Message):
+    __slots__ = ["phase_regex"]
     PHASE_REGEX_FIELD_NUMBER: _ClassVar[int]
-    CONFIGS_FIELD_NUMBER: _ClassVar[int]
     phase_regex: str
-    configs: _containers.RepeatedCompositeFieldContainer[DeliveryConfig]
-    def __init__(self, phase_regex: _Optional[str] = ..., configs: _Optional[_Iterable[_Union[DeliveryConfig, _Mapping]]] = ...) -> None: ...
+    def __init__(self, phase_regex: _Optional[str] = ...) -> None: ...
