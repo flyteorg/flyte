@@ -18,7 +18,7 @@ from flyteidl2.notification import definition_pb2 as flyteidl2_dot_notification_
 from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x66lyteidl2/task/run.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1d\x66lyteidl2/core/security.proto\x1a\'flyteidl2/notification/definition.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x7f\n\x06Labels\x12:\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl2.task.Labels.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x89\x01\n\x0b\x41nnotations\x12?\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl2.task.Annotations.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"<\n\x04\x45nvs\x12\x34\n\x06values\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x06values\"8\n\x0eRawDataStorage\x12&\n\x0fraw_data_prefix\x18\x01 \x01(\tR\rrawDataPrefix\"\x86\x01\n\x0b\x43\x61\x63heConfig\x12\'\n\x0foverwrite_cache\x18\x01 \x01(\x08R\x0eoverwriteCache\x12N\n\x12\x63\x61\x63he_lookup_scope\x18\x02 \x01(\x0e\x32 .flyteidl2.task.CacheLookupScopeR\x10\x63\x61\x63heLookupScope\"\x81\x05\n\x07RunSpec\x12.\n\x06labels\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.LabelsR\x06labels\x12=\n\x0b\x61nnotations\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.task.AnnotationsR\x0b\x61nnotations\x12(\n\x04\x65nvs\x18\x03 \x01(\x0b\x32\x14.flyteidl2.task.EnvsR\x04\x65nvs\x12@\n\rinterruptible\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.BoolValueR\rinterruptible\x12+\n\x0foverwrite_cache\x18\x05 \x01(\x08\x42\x02\x18\x01R\x0eoverwriteCache\x12\x18\n\x07\x63luster\x18\x06 \x01(\tR\x07\x63luster\x12H\n\x10raw_data_storage\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.task.RawDataStorageR\x0erawDataStorage\x12J\n\x10security_context\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.core.SecurityContextR\x0fsecurityContext\x12>\n\x0c\x63\x61\x63he_config\x18\t \x01(\x0b\x32\x1b.flyteidl2.task.CacheConfigR\x0b\x63\x61\x63heConfig\x12\x39\n\x07rule_id\x18\n \x01(\x0b\x32\x1e.flyteidl2.notification.RuleIdH\x00R\x06ruleId\x12*\n\x04rule\x18\x0b \x01(\x0b\x32\x14.flyteidl2.task.RuleH\x00R\x04ruleB\x17\n\x15notification_settings\"\xce\x01\n\x0e\x44\x65liveryConfig\x12X\n\x12\x64\x65livery_config_id\x18\x01 \x01(\x0b\x32(.flyteidl2.notification.DeliveryConfigIdH\x00R\x10\x64\x65liveryConfigId\x12Q\n\x0f\x64\x65livery_config\x18\x02 \x01(\x0b\x32&.flyteidl2.notification.DeliveryConfigH\x00R\x0e\x64\x65liveryConfigB\x0f\n\x06\x63onfig\x12\x05\xbaH\x02\x08\x01\"k\n\x04Rule\x12\x1f\n\x0bphase_regex\x18\x01 \x01(\tR\nphaseRegex\x12\x42\n\x07\x63onfigs\x18\x02 \x03(\x0b\x32\x1e.flyteidl2.task.DeliveryConfigB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x07\x63onfigs*|\n\x10\x43\x61\x63heLookupScope\x12\"\n\x1e\x43\x41\x43HE_LOOKUP_SCOPE_UNSPECIFIED\x10\x00\x12\x1d\n\x19\x43\x41\x43HE_LOOKUP_SCOPE_GLOBAL\x10\x01\x12%\n!CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN\x10\x02\x42\xad\x01\n\x12\x63om.flyteidl2.taskB\x08RunProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18\x66lyteidl2/task/run.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1d\x66lyteidl2/core/security.proto\x1a\'flyteidl2/notification/definition.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x7f\n\x06Labels\x12:\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl2.task.Labels.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x89\x01\n\x0b\x41nnotations\x12?\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl2.task.Annotations.ValuesEntryR\x06values\x1a\x39\n\x0bValuesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"<\n\x04\x45nvs\x12\x34\n\x06values\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x06values\"8\n\x0eRawDataStorage\x12&\n\x0fraw_data_prefix\x18\x01 \x01(\tR\rrawDataPrefix\"\x86\x01\n\x0b\x43\x61\x63heConfig\x12\'\n\x0foverwrite_cache\x18\x01 \x01(\x08R\x0eoverwriteCache\x12N\n\x12\x63\x61\x63he_lookup_scope\x18\x02 \x01(\x0e\x32 .flyteidl2.task.CacheLookupScopeR\x10\x63\x61\x63heLookupScope\"\x87\x05\n\x07RunSpec\x12.\n\x06labels\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.LabelsR\x06labels\x12=\n\x0b\x61nnotations\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.task.AnnotationsR\x0b\x61nnotations\x12(\n\x04\x65nvs\x18\x03 \x01(\x0b\x32\x14.flyteidl2.task.EnvsR\x04\x65nvs\x12@\n\rinterruptible\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.BoolValueR\rinterruptible\x12+\n\x0foverwrite_cache\x18\x05 \x01(\x08\x42\x02\x18\x01R\x0eoverwriteCache\x12\x18\n\x07\x63luster\x18\x06 \x01(\tR\x07\x63luster\x12H\n\x10raw_data_storage\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.task.RawDataStorageR\x0erawDataStorage\x12J\n\x10security_context\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.core.SecurityContextR\x0fsecurityContext\x12>\n\x0c\x63\x61\x63he_config\x18\t \x01(\x0b\x32\x1b.flyteidl2.task.CacheConfigR\x0b\x63\x61\x63heConfig\x12\x39\n\x07rule_id\x18\n \x01(\x0b\x32\x1e.flyteidl2.notification.RuleIdH\x00R\x06ruleId\x12\x30\n\x04rule\x18\x0b \x01(\x0b\x32\x1a.flyteidl2.task.InlineRuleH\x00R\x04ruleB\x17\n\x15notification_settings\"\x9b\x01\n\nInlineRule\x12S\n\x10\x64\x65livery_options\x18\x01 \x03(\x0b\x32\x1e.flyteidl2.task.DeliveryOptionB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x0f\x64\x65liveryOptions\x12\x38\n\x06\x63hecks\x18\x02 \x01(\x0b\x32 .flyteidl2.task.InlineRuleChecksR\x06\x63hecks\"\xb8\x01\n\x0e\x44\x65liveryOption\x12G\n\tconfig_id\x18\x01 \x01(\x0b\x32(.flyteidl2.notification.DeliveryConfigIdH\x00R\x08\x63onfigId\x12L\n\x08template\x18\x02 \x01(\x0b\x32..flyteidl2.notification.DeliveryConfigTemplateH\x00R\x08templateB\x0f\n\x06option\x12\x05\xbaH\x02\x08\x01\"3\n\x10InlineRuleChecks\x12\x1f\n\x0bphase_regex\x18\x01 \x01(\tR\nphaseRegex*|\n\x10\x43\x61\x63heLookupScope\x12\"\n\x1e\x43\x41\x43HE_LOOKUP_SCOPE_UNSPECIFIED\x10\x00\x12\x1d\n\x19\x43\x41\x43HE_LOOKUP_SCOPE_GLOBAL\x10\x01\x12%\n!CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN\x10\x02\x42\xad\x01\n\x12\x63om.flyteidl2.taskB\x08RunProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,12 +32,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ANNOTATIONS_VALUESENTRY._serialized_options = b'8\001'
   _RUNSPEC.fields_by_name['overwrite_cache']._options = None
   _RUNSPEC.fields_by_name['overwrite_cache']._serialized_options = b'\030\001'
-  _DELIVERYCONFIG.oneofs_by_name['config']._options = None
-  _DELIVERYCONFIG.oneofs_by_name['config']._serialized_options = b'\272H\002\010\001'
-  _RULE.fields_by_name['configs']._options = None
-  _RULE.fields_by_name['configs']._serialized_options = b'\272H\005\222\001\002\010\001'
-  _globals['_CACHELOOKUPSCOPE']._serialized_start=1696
-  _globals['_CACHELOOKUPSCOPE']._serialized_end=1820
+  _INLINERULE.fields_by_name['delivery_options']._options = None
+  _INLINERULE.fields_by_name['delivery_options']._serialized_options = b'\272H\005\222\001\002\010\001'
+  _DELIVERYOPTION.oneofs_by_name['option']._options = None
+  _DELIVERYOPTION.oneofs_by_name['option']._serialized_options = b'\272H\002\010\001'
+  _globals['_CACHELOOKUPSCOPE']._serialized_start=1782
+  _globals['_CACHELOOKUPSCOPE']._serialized_end=1906
   _globals['_LABELS']._serialized_start=208
   _globals['_LABELS']._serialized_end=335
   _globals['_LABELS_VALUESENTRY']._serialized_start=278
@@ -53,9 +53,11 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CACHECONFIG']._serialized_start=598
   _globals['_CACHECONFIG']._serialized_end=732
   _globals['_RUNSPEC']._serialized_start=735
-  _globals['_RUNSPEC']._serialized_end=1376
-  _globals['_DELIVERYCONFIG']._serialized_start=1379
-  _globals['_DELIVERYCONFIG']._serialized_end=1585
-  _globals['_RULE']._serialized_start=1587
-  _globals['_RULE']._serialized_end=1694
+  _globals['_RUNSPEC']._serialized_end=1382
+  _globals['_INLINERULE']._serialized_start=1385
+  _globals['_INLINERULE']._serialized_end=1540
+  _globals['_DELIVERYOPTION']._serialized_start=1543
+  _globals['_DELIVERYOPTION']._serialized_end=1727
+  _globals['_INLINERULECHECKS']._serialized_start=1729
+  _globals['_INLINERULECHECKS']._serialized_end=1780
 # @@protoc_insertion_point(module_scope)

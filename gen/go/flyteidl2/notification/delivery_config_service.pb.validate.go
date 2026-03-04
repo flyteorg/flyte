@@ -1116,11 +1116,11 @@ func (m *SendTestNotificationRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetDeliveryConfigId()).(type) {
+		switch v := interface{}(m.GetDeliveryOption()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "DeliveryConfigId",
+					field:  "DeliveryOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -1128,49 +1128,66 @@ func (m *SendTestNotificationRequest) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "DeliveryConfigId",
+					field:  "DeliveryOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetDeliveryConfigId()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDeliveryOption()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SendTestNotificationRequestValidationError{
-				field:  "DeliveryConfigId",
+				field:  "DeliveryOption",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetTemplateData()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "TemplateData",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SendTestNotificationRequestValidationError{
-					field:  "TemplateData",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetTemplateData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SendTestNotificationRequestValidationError{
+	switch v := m.TemplateData.(type) {
+	case *SendTestNotificationRequest_RunCompletedData:
+		if v == nil {
+			err := SendTestNotificationRequestValidationError{
 				field:  "TemplateData",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRunCompletedData()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SendTestNotificationRequestValidationError{
+						field:  "RunCompletedData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SendTestNotificationRequestValidationError{
+						field:  "RunCompletedData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRunCompletedData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SendTestNotificationRequestValidationError{
+					field:  "RunCompletedData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {

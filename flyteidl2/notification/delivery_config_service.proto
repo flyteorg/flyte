@@ -6,7 +6,6 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/notification/definition.proto";
-import "google/protobuf/struct.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
 
@@ -81,9 +80,13 @@ message DeleteDeliveryConfigRequest {
 message DeleteDeliveryConfigResponse {}
 
 message SendTestNotificationRequest {
-  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+  DeliveryOption delivery_option = 1 [(buf.validate.field).required = true];
 
-  google.protobuf.Struct template_data = 2; // optional, template metadata required for compiling notification
+  oneof template_data {
+    option (buf.validate.oneof).required = true;
+
+    RunCompletedNotificationTemplateData run_completed_data = 2;
+  }
 }
 
 message SendTestNotificationResponse {}

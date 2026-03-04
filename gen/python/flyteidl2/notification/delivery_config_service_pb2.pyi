@@ -2,7 +2,6 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.notification import definition_pb2 as _definition_pb2
-from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -61,12 +60,12 @@ class DeleteDeliveryConfigResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class SendTestNotificationRequest(_message.Message):
-    __slots__ = ["delivery_config_id", "template_data"]
-    DELIVERY_CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
-    TEMPLATE_DATA_FIELD_NUMBER: _ClassVar[int]
-    delivery_config_id: _definition_pb2.DeliveryConfigId
-    template_data: _struct_pb2.Struct
-    def __init__(self, delivery_config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template_data: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    __slots__ = ["delivery_option", "run_completed_data"]
+    DELIVERY_OPTION_FIELD_NUMBER: _ClassVar[int]
+    RUN_COMPLETED_DATA_FIELD_NUMBER: _ClassVar[int]
+    delivery_option: _definition_pb2.DeliveryOption
+    run_completed_data: _definition_pb2.RunCompletedNotificationTemplateData
+    def __init__(self, delivery_option: _Optional[_Union[_definition_pb2.DeliveryOption, _Mapping]] = ..., run_completed_data: _Optional[_Union[_definition_pb2.RunCompletedNotificationTemplateData, _Mapping]] = ...) -> None: ...
 
 class SendTestNotificationResponse(_message.Message):
     __slots__ = []
