@@ -2211,6 +2211,63 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 			)
 		})
 	}
+
+	t.Run("partition slices label is set on objectMeta", func(t *testing.T) {
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.ExtendedResources = &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		}
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				ResourceNvidiaGPU: resource.MustParse("1"),
+			},
+		}, nil, "", nil)
+		_, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, "1", m.Labels[GpuPartitionSlicesLabel])
+	})
+
+	t.Run("partition slices label is not set without partition", func(t *testing.T) {
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.ExtendedResources = &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-t4",
+			},
+		}
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				ResourceNvidiaGPU: resource.MustParse("1"),
+			},
+		}, nil, "", nil)
+		_, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Empty(t, m.Labels[GpuPartitionSlicesLabel])
+	})
+
+	t.Run("partition slices label not set for invalid format", func(t *testing.T) {
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.ExtendedResources = &core.ExtendedResources{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "invalid",
+				},
+			},
+		}
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				ResourceNvidiaGPU: resource.MustParse("1"),
+			},
+		}, nil, "", nil)
+		_, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Empty(t, m.Labels[GpuPartitionSlicesLabel])
+	})
 }
 
 // TestToK8sPodDeviceClass validates the complete three-way merge order through ToK8sPodSpec:

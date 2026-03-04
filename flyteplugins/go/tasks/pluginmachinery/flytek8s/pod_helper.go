@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -45,6 +46,25 @@ const primaryContainerTemplateName = "primary"
 const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
 const FlyteEnableVscode = "_F_E_VS"
+
+// GpuPartitionSlicesLabel is applied to pods that request a MIG GPU partition.
+// The value is the number of compute slices consumed (out of 7 total), parsed from
+// the "Xg.Ygb" partition size format. Downstream consumers (e.g. billing) use this
+// to compute fractional GPU usage as slices/7.
+const GpuPartitionSlicesLabel = "platform.union.ai/gpu-partition-slices"
+
+var migPartitionRegexp = regexp.MustCompile(`^(\d+)g\.\d+gb$`)
+
+// parseMigSlices extracts the compute slice count from a MIG partition size string
+// (e.g. "1g.5gb" → "1", "3g.20gb" → "3"). Returns the slice count as a string,
+// or empty string if the format doesn't match.
+func parseMigSlices(partitionSize string) string {
+	matches := migPartitionRegexp.FindStringSubmatch(partitionSize)
+	if matches == nil {
+		return ""
+	}
+	return matches[1]
+}
 
 var retryableStatusReasons = sets.NewString(
 	// Reasons that indicate the node was preempted aggressively.
@@ -594,6 +614,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
+			if slices := parseMigSlices(ps.PartitionSize); slices != "" {
+				if objectMeta.Labels == nil {
+					objectMeta.Labels = make(map[string]string)
+				}
+				objectMeta.Labels[GpuPartitionSlicesLabel] = slices
+			}
+		}
 	}
 
 	// Shared memory volume
