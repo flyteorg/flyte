@@ -53,11 +53,7 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/flyteidl2.workflow.QueueService"
-                                              route:
-                                                  cluster: flyte
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.StateService"
+                                                  prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
                                             - match:

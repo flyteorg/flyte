@@ -754,6 +754,7 @@ data:
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
         - _U_INSECURE: "true"
+        - _U_USE_ACTIONS: "1"
     storage:
       signedURL:
         stowConfigOverride:
@@ -874,11 +875,7 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/flyteidl2.workflow.QueueService"
-                                              route:
-                                                  cluster: flyte
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.StateService"
+                                                  prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -996,7 +993,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RjYyYWVaUHR6dDVkcHB5Zw==
+  haSharedSecret: MENSdEdwSjZXWFBjQ3h4Wg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1352,7 +1349,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 2530d6197a4e932119c2b556c8025f30f1fc0cafab92334b8ba68059299954bc
+        checksum/configuration: d0b053f1cc026d274a989e73d311b7c20c9d9833b3d768e6758421a614ef69cd
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1500,7 +1497,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 3450cefc6a8d57adfad13324b3ff5b2487db586c67c6f9736aa5e44d008408b7
+        checksum/secret: 389e7257f01431fcff55a98adb27f45c5293e9797177dd63060742719b309d30
       labels:
         app: docker-registry
         release: flyte-sandbox

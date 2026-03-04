@@ -59,6 +59,7 @@ flyte-binary:
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
             - _U_EP_OVERRIDE: '{{ printf "%s-http" .Release.Name }}.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
+            - _U_USE_ACTIONS: "1"
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'

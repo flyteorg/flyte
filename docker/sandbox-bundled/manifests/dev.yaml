@@ -649,11 +649,7 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/flyteidl2.workflow.QueueService"
-                                              route:
-                                                  cluster: flyte
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.StateService"
+                                                  prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -748,7 +744,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: NjhlRTJ6TnNrQkhsZlFNeg==
+  haSharedSecret: Wld6ZFpCRURXNGJFNnVkcg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1176,7 +1172,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: f606c04570e40842f3deb1a4b93fb7ac05d5c820334e4023f650be10ba943b09
+        checksum/secret: 584c24f9bdff5744ca4e361c6fafb46377c4d446b12eef79c5a262fd84b71511
       labels:
         app: docker-registry
         release: flyte-sandbox
