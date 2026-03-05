@@ -17,6 +17,7 @@ var defaultConfig = &Config{
 		Namespace: "flyte",
 	},
 	WatchBufferSize: 100,
+	RunServiceURL:   "http://localhost:8090",
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -31,6 +32,9 @@ type Config struct {
 
 	// WatchBufferSize is the buffer size for watch channels
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch channels"`
+
+	// RunServiceURL is the base URL for the internal run service.
+	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
 }
 
 // ServerConfig holds HTTP server configuration

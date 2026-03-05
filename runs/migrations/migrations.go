@@ -13,6 +13,7 @@ import (
 // AllModels contains all GORM models used in the runs service
 var AllModels = []interface{}{
 	&models.Action{},
+	&models.ActionEvent{},
 	&models.Task{},
 	&models.TaskSpec{},
 }

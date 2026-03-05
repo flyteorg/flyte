@@ -1,6 +1,16 @@
 # Flyte 2
 
-Flyte 2 is a next-generation IDL (Interface Definition Language) repository that defines the protocol buffer schemas for Flyte's APIs. This repository generates client libraries and type definitions for Go, TypeScript, Python, and Rust.
+[Flyte 2](https://github.com/flyteorg/flyte-sdk) is a Python framework that lets you reliably orchestrate ML pipelines, models, and agents at scale — in pure Python. It provides type-safe, async-first orchestration with built-in support for distributed execution, real-time serving, and local development.
+
+**If you're looking to use Flyte on a single machine**, you don't need this repository — just install the [flyte-sdk](https://github.com/flyteorg/flyte-sdk). It's incredibly useful on its own for orchestrating workflows, running ML pipelines, and serving models locally.
+
+**This repository** is the backend infrastructure for deploying a distributed, multi-node version of Flyte 2. The backend is **Kubernetes-native** — it orchestrates workflow execution using Kubernetes primitives, scheduling tasks as pods across clusters with built-in support for multi-cluster routing, service account–based identity, and pod-level log tracking. The core architecture consists of gRPC services (QueueService, RunService, StateService) backed by PostgreSQL, using async processing and real-time streaming via PostgreSQL LISTEN/NOTIFY. See the full [Implementation Spec](https://github.com/flyteorg/flyte/blob/v2/IMPLEMENTATION_SPEC.md) for details.
+
+This repo also defines the protocol buffer schemas for Flyte's APIs and generates client libraries for Go, TypeScript, Python, and Rust. Deploy this when you need Flyte running as a scalable, distributed service across your organization.
+
+**⚠️ This backend is a work in progress and not yet ready for production use.** If you need an enterprise-ready, highly scalable, production-grade backend for Flyte 2, it is available today on [Union.ai](https://www.union.ai/try-flyte-2). You can also try the [in-browser demo](https://flyte2intro.apps.demo.hosted.unionai.cloud/) of Flyte's local TUI to get a feel for the experience.
+
+**Want to contribute?** Join us on [slack.flyte.org](https://slack.flyte.org) to get involved.
 
 ## Repository Structure
 
