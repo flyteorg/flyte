@@ -75,6 +75,9 @@ configuration:
     dbname: flyte
     # options Additional client options for connecting to database
     options: sslmode=disable
+    # sqlite.file Path to SQLite database file. If set, SQLite is used instead of PostgreSQL.
+    sqlite:
+      file: "/var/lib/flyte/flyte.db"
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata
