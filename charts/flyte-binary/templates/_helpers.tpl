@@ -135,19 +135,31 @@ Get the Flyte service HTTP port.
 {{- end -}}
 
 {{/*
+Get the Flyte gRPC service name
+*/}}
+{{- define "flyte-binary.service.grpc.name" -}}
+{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Flyte service gRPC port.
+*/}}
+{{- define "flyte-binary.service.grpc.port" -}}
+{{- default 8090 .Values.service.ports.grpc -}}
+{{- end -}}
+
+{{/*
 Get the Flyte API paths for ingress.
 */}}
-{{- define "flyte-binary.ingress.apiPaths" -}}
+{{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
 - /flyteidl2.task.TaskService
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
 - /flyteidl2.workflow.TranslatorService/*
-- /flyteidl2.workflow.QueueService
-- /flyteidl2.workflow.QueueService/*
-- /flyteidl2.workflow.StateService
-- /flyteidl2.workflow.StateService/*
+- /flyteidl2.actions.ActionsService
+- /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
 {{- end -}}
