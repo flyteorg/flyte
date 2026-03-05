@@ -7,7 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -20,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 // ActionUpdate represents an update to a TaskAction
@@ -27,7 +30,7 @@ type ActionUpdate struct {
 	ActionID         *common.ActionIdentifier
 	ParentActionName string
 	StateJSON        string
-	Phase            string
+	Phase            common.ActionPhase
 	OutputUri        string
 	IsDeleted        bool
 	TaskType         string
@@ -39,6 +42,7 @@ type ActionsClient struct {
 	k8sClient  client.WithWatch
 	namespace  string
 	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 
 	// Watch management
 	mu sync.RWMutex
@@ -51,11 +55,12 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient) *ActionsClient {
 	return &ActionsClient{
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 }
@@ -399,6 +404,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
+	go c.notifyRunService(ctx, taskAction, update, event.Type)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -415,6 +421,74 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 	}
 }
 
+// notifyRunService forwards a watch event to the internal run service.
+// On ADDED events it calls RecordAction to create the DB record.
+// On all events it calls UpdateActionStatus (when phase is meaningful) and RecordActionEvents.
+func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate, eventType watch.EventType) {
+	if c.runClient == nil {
+		return
+	}
+
+	// On ADDED: create the action record in the DB.
+	if eventType == watch.Added {
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: update.ActionID,
+			Parent:   update.ParentActionName,
+			InputUri: taskAction.Spec.InputURI,
+		}
+		if taskAction.Spec.TaskType != "" {
+			recordReq.Spec = &workflow.RecordActionRequest_Task{
+				Task: &workflow.TaskAction{},
+			}
+		}
+		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		}
+	}
+
+	// Derive UpdatedTime from the last PhaseHistory entry.
+	var updatedTime *timestamppb.Timestamp
+	if n := len(taskAction.Status.PhaseHistory); n > 0 {
+		updatedTime = timestamppb.New(taskAction.Status.PhaseHistory[n-1].OccurredAt.Time)
+	}
+
+	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+		statusReq := &workflow.UpdateActionStatusRequest{
+			ActionId: update.ActionID,
+			Status: &workflow.ActionStatus{
+				Phase: update.Phase,
+			},
+		}
+		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
+		}
+	}
+
+	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want 
+	// to handle the action event persistence
+	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
+	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
+	// - LogContext:    not on the CR; same reason as LogInfo.
+	// - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
+	// - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
+	// - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
+	// - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
+	event := &workflow.ActionEvent{
+		Id:           update.ActionID,
+		Attempt:      1, // TODO(nary): hardcoded until retry support is added
+		Phase:        update.Phase,
+		Version:      taskAction.Status.PluginPhaseVersion,
+		UpdatedTime:  updatedTime,
+		ReportedTime: timestamppb.Now(),
+	}
+	recordReq := &workflow.RecordActionEventsRequest{
+		Events: []*workflow.ActionEvent{event},
+	}
+	if _, err := c.runClient.RecordActionEvents(ctx, connect.NewRequest(recordReq)); err != nil {
+		logger.Warnf(ctx, "Failed to record action event in run service for %s: %v", update.ActionID.Name, err)
+	}
+}
+
 // StopWatching stops the TaskAction watcher
 func (c *ActionsClient) StopWatching() {
 	c.mu.Lock()
@@ -427,31 +501,31 @@ func (c *ActionsClient) StopWatching() {
 }
 
 // GetPhaseFromConditions extracts the phase from TaskAction conditions.
-func GetPhaseFromConditions(taskAction *executorv1.TaskAction) string {
+func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhase {
 	for _, cond := range taskAction.Status.Conditions {
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
 			if cond.Status == "True" {
-				return "PHASE_SUCCEEDED"
+				return common.ActionPhase_ACTION_PHASE_SUCCEEDED
 			}
 		case string(executorv1.ConditionTypeFailed):
 			if cond.Status == "True" {
-				return "PHASE_FAILED"
+				return common.ActionPhase_ACTION_PHASE_FAILED
 			}
 		case string(executorv1.ConditionTypeProgressing):
 			if cond.Status == "True" {
 				switch cond.Reason {
 				case string(executorv1.ConditionReasonQueued):
-					return "PHASE_QUEUED"
+					return common.ActionPhase_ACTION_PHASE_QUEUED
 				case string(executorv1.ConditionReasonInitializing):
-					return "PHASE_INITIALIZING"
+					return common.ActionPhase_ACTION_PHASE_INITIALIZING
 				case string(executorv1.ConditionReasonExecuting):
-					return "PHASE_RUNNING"
+					return common.ActionPhase_ACTION_PHASE_RUNNING
 				}
 			}
 		}
 	}
-	return "PHASE_UNSPECIFIED"
+	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction

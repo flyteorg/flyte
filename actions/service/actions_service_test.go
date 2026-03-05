@@ -71,7 +71,6 @@ func TestEnqueue(t *testing.T) {
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
-
 }
 
 func TestGetLatestState(t *testing.T) {

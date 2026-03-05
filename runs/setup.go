@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/service"
-	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -39,26 +38,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
-	// Create a state client for watching TaskAction CRs
-	if err := actionsk8s.InitScheme(); err != nil {
-		return fmt.Errorf("runs: failed to initialize k8s scheme: %w", err)
-	}
-	stateClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize)
-	if err := stateClient.StartWatching(ctx); err != nil {
-		return fmt.Errorf("runs: failed to start TaskAction watcher: %w", err)
-	}
-	sc.AddWorker("runs-state-watcher", func(ctx context.Context) error {
-		<-ctx.Done()
-		stateClient.StopWatching()
-		return nil
-	})
-
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, stateClient)
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore)
 	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
+
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc)
+	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
+	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	sc.Mux.Handle(taskPath, taskHandler)
