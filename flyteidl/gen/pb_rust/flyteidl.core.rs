@@ -105,6 +105,17 @@ pub struct BlobType {
     pub format: ::prost::alloc::string::String,
     #[prost(enumeration="blob_type::BlobDimensionality", tag="2")]
     pub dimensionality: i32,
+    /// Optional file extension (without leading dot) to use when materializing
+    /// the blob to local disk during copilot download, e.g. "csv", "parquet".
+    /// When empty, no extension is appended.
+    #[prost(string, tag="3")]
+    pub file_extension: ::prost::alloc::string::String,
+    /// When true and file_extension is non-empty, the copilot download phase
+    /// writes the blob to both the extended path (with extension) and the
+    /// base path (without extension), preserving backward compatibility for
+    /// tasks that read from the extensionless path. Default is false.
+    #[prost(bool, tag="4")]
+    pub enable_legacy_filename: bool,
 }
 /// Nested message and enum types in `BlobType`.
 pub mod blob_type {

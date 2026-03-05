@@ -231,7 +231,7 @@ func TestRecursiveDownload(t *testing.T) {
 			}
 		}()
 
-		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, true)
+		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, map[string][]string{}, true)
 		assert.NoError(t, err)
 		assert.NotNil(t, varMap)
 		assert.NotNil(t, lMap)
@@ -309,7 +309,7 @@ func TestRecursiveDownload(t *testing.T) {
 			}
 		}()
 
-		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, true)
+		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, map[string][]string{}, true)
 		assert.NoError(t, err)
 		assert.NotNil(t, varMap)
 		assert.NotNil(t, lMap)

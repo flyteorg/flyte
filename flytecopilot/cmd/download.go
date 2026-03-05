@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
 
 	"github.com/flyteorg/flyte/flytecopilot/data"
@@ -49,6 +50,11 @@ func GetUploadModeVals() []string {
 }
 
 func (d *DownloadOptions) Download(ctx context.Context) error {
+	inputInterface := &core.VariableMap{}
+	if err := proto.Unmarshal(d.inputInterface, inputInterface); err != nil {
+		logger.Warnf(ctx, "Bad input interface passed, failed to unmarshal err: %s", err)
+	}
+
 	if d.remoteOutputsPrefix == "" {
 		return fmt.Errorf("to-output-prefix is required")
 	}
@@ -77,7 +83,7 @@ func (d *DownloadOptions) Download(ctx context.Context) error {
 			childCtx, cancelFn = context.WithTimeout(ctx, d.timeout)
 		}
 		defer cancelFn()
-		err := dl.DownloadInputs(childCtx, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath)
+		err := dl.DownloadInputs(childCtx, inputInterface, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath)
 		if err != nil {
 			logger.Errorf(ctx, "Downloading failed, err %s", err)
 			return err
@@ -116,6 +122,6 @@ func NewDownloadCommand(opts *RootOptions) *cobra.Command {
 	downloadCmd.Flags().StringVarP(&downloadOpts.metadataFormat, "format", "m", core.DataLoadingConfig_JSON.String(), fmt.Sprintf("What should be the output format for the primitive and structured types. Options [%v]", GetFormatVals()))
 	downloadCmd.Flags().StringVarP(&downloadOpts.downloadMode, "download-mode", "d", core.IOStrategy_DOWNLOAD_EAGER.String(), fmt.Sprintf("Download mode to use. Options [%v]", GetDownloadModeVals()))
 	downloadCmd.Flags().DurationVarP(&downloadOpts.timeout, "timeout", "t", time.Hour*1, "Max time to allow for downloads to complete, default is 1H")
-	downloadCmd.Flags().BytesBase64VarP(&downloadOpts.inputInterface, "input-interface", "i", nil, "Input interface proto message - core.VariableMap, base64 encoced string")
+	downloadCmd.Flags().BytesBase64VarP(&downloadOpts.inputInterface, "input-interface", "i", nil, "Input interface proto message - core.VariableMap, base64 encoded string")
 	return downloadCmd
 }

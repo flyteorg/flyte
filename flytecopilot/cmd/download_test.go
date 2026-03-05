@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -135,6 +136,83 @@ func TestDownloadOptions_Download(t *testing.T) {
 		}))
 		assert.NoError(t, dopts.Download(ctx), "Download Operation failed")
 		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob"}, collectFile(tmpDir))
+	})
+
+	t.Run("primitiveAndBlobInputsWithFileExtension", func(t *testing.T) {
+		tmpDir, err := ioutil.TempDir(tmpFolderLocation, tmpPrefix)
+		assert.NoError(t, err)
+		defer func() {
+			assert.NoError(t, os.RemoveAll(tmpDir))
+		}()
+		dopts.localDirectoryPath = tmpDir
+
+		s := promutils.NewTestScope()
+		store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, s.NewSubScope("storage"))
+		assert.NoError(t, err)
+		dopts.RootOptions = &RootOptions{
+			Scope: s,
+			Store: store,
+		}
+
+		iface := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"blob": {
+					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "xyz", EnableLegacyFilename: false}}},
+				},
+				"legacy_blob": {
+					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "xyz", EnableLegacyFilename: true}}},
+				},
+			},
+		}
+		d, err := proto.Marshal(iface)
+		assert.NoError(t, err)
+		dopts.inputInterface = d
+
+		blobLoc := storage.DataReference("blob-loc")
+		br := bytes.NewBuffer([]byte("Hello World!"))
+		assert.NoError(t, store.WriteRaw(ctx, blobLoc, int64(br.Len()), storage.Options{}, br))
+		assert.NoError(t, store.WriteProtobuf(ctx, storage.DataReference(inputPath), storage.Options{}, &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+				"y": coreutils.MustMakePrimitiveLiteral("hello"),
+				"blob": {Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{
+							Blob: &core.Blob{
+								Uri: blobLoc.String(),
+								Metadata: &core.BlobMetadata{
+									Type: &core.BlobType{
+										Dimensionality:       core.BlobType_SINGLE,
+										Format:               "xyz",
+										FileExtension:        "xyz",
+										EnableLegacyFilename: false,
+									},
+								},
+							},
+						},
+					},
+				}},
+				"legacy_blob": {Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{
+							Blob: &core.Blob{
+								Uri: blobLoc.String(),
+								Metadata: &core.BlobMetadata{
+									Type: &core.BlobType{
+										Dimensionality:       core.BlobType_SINGLE,
+										Format:               "xyz",
+										FileExtension:        "xyz",
+										EnableLegacyFilename: true,
+									},
+								},
+							},
+						},
+					},
+				}},
+			},
+		}))
+		assert.NoError(t, dopts.Download(ctx), "Download Operation failed")
+		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob.xyz", "legacy_blob", "legacy_blob.xyz"}, collectFile(tmpDir))
 	})
 
 	t.Run("primitiveAndMissingBlobInputs", func(t *testing.T) {

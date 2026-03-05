@@ -107,11 +107,11 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 			}
 		}
 
-		return coreutils.MakeLiteralForBlob(toPath, false, ""), nil
+		return coreutils.MakeLiteralForBlob(toPath, false, "", "", false), nil
 	}
 	size := info.Size()
 	// Should we make this a go routine as well, so that we can introduce timeouts
-	return coreutils.MakeLiteralForBlob(toPath, false, ""), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
+	return coreutils.MakeLiteralForBlob(toPath, false, "", "", false), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
 }
 
 func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, fromPath string, metaOutputPath, dataRawPath storage.DataReference) error {

@@ -6857,6 +6857,10 @@
         },
         "dimensionality": {
           "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        },
+        "file_extension": {
+          "type": "string",
+          "description": "Optional file extension (without leading dot) to use when materializing\nthe blob to local disk during copilot download, e.g. \"csv\", \"parquet\".\nWhen empty, no extension is appended."
         }
       },
       "title": "Defines type behavior for blob objects"
