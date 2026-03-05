@@ -14,9 +14,6 @@ metadata:
     {{- if .Values.commonAnnotations }}
     {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.service.annotations }}
-    {{- tpl ( .Values.service.annotations | toYaml ) . | nindent 4 }}
-    {{- end }}
     {{- if .Values.service.commonAnnotations }}
     {{- tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
