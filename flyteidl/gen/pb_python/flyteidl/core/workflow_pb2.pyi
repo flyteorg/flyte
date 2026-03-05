@@ -91,7 +91,7 @@ class GateNode(_message.Message):
     def __init__(self, approve: _Optional[_Union[ApproveCondition, _Mapping]] = ..., signal: _Optional[_Union[SignalCondition, _Mapping]] = ..., sleep: _Optional[_Union[SleepCondition, _Mapping]] = ...) -> None: ...
 
 class ArrayNode(_message.Message):
-    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode", "is_original_sub_node_interface", "data_mode", "bound_inputs"]
+    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode", "is_original_sub_node_interface", "data_mode", "bound_inputs", "run_all_sub_nodes"]
     class ExecutionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         MINIMAL_STATE: _ClassVar[ArrayNode.ExecutionMode]
@@ -112,6 +112,7 @@ class ArrayNode(_message.Message):
     IS_ORIGINAL_SUB_NODE_INTERFACE_FIELD_NUMBER: _ClassVar[int]
     DATA_MODE_FIELD_NUMBER: _ClassVar[int]
     BOUND_INPUTS_FIELD_NUMBER: _ClassVar[int]
+    RUN_ALL_SUB_NODES_FIELD_NUMBER: _ClassVar[int]
     node: Node
     parallelism: int
     min_successes: int
@@ -120,7 +121,8 @@ class ArrayNode(_message.Message):
     is_original_sub_node_interface: _wrappers_pb2.BoolValue
     data_mode: ArrayNode.DataMode
     bound_inputs: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., data_mode: _Optional[_Union[ArrayNode.DataMode, str]] = ..., bound_inputs: _Optional[_Iterable[str]] = ...) -> None: ...
+    run_all_sub_nodes: bool
+    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., data_mode: _Optional[_Union[ArrayNode.DataMode, str]] = ..., bound_inputs: _Optional[_Iterable[str]] = ..., run_all_sub_nodes: bool = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
     __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable", "config"]

@@ -4601,6 +4601,9 @@ export namespace flyteidl {
 
             /** ArrayNode boundInputs */
             boundInputs?: (string[]|null);
+
+            /** ArrayNode runAllSubNodes */
+            runAllSubNodes?: (boolean|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4635,6 +4638,9 @@ export namespace flyteidl {
 
             /** ArrayNode boundInputs. */
             public boundInputs: string[];
+
+            /** ArrayNode runAllSubNodes. */
+            public runAllSubNodes: boolean;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
