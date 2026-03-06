@@ -5,7 +5,7 @@ docker buildx build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--builder flyte-sandbox \
 	--platform linux/$(1) \
-	--tag flyte-binary:sandbox \
+	--tag flyte-binary-v2:sandbox \
 	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
 	../..
 
@@ -44,7 +44,7 @@ manifests: dep_update
 .PHONY: build
 build: flyte dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
-		--tag flyte-sandbox:latest .
+		--tag flyte-sandbox-v2:latest .
 
 # Port map
 # 6443 - k8s API server
@@ -54,7 +54,7 @@ build: flyte dep_update manifests
 # 30003 - Buildkit
 # 30080 - Flyte Proxy
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
+start: FLYTE_SANDBOX_IMAGE := flyte-sandbox-v2:latest
 start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
