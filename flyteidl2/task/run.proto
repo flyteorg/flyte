@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "flyteidl2/notification/definition.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -93,4 +95,33 @@ message RunSpec {
 
   // CacheConfig contains configurations that influence the behavior of cache reads and writes
   CacheConfig cache_config = 9;
+
+  // Optionally, you can send a notification when your run completes.
+  oneof notification_settings {
+    flyteidl2.notification.RuleId rule_id = 10; // either refer to a previously stored notification rule
+
+    InlineRule rule = 11; // either define an inline one-off rule
+  }
+}
+
+message InlineRule {
+  repeated DeliveryOption delivery_options = 1 [(buf.validate.field).repeated.min_items = 1];
+
+  InlineRuleChecks checks = 2;
+}
+
+message DeliveryOption {
+  oneof option {
+    option (buf.validate.oneof).required = true;
+
+    flyteidl2.notification.DeliveryConfigId config_id = 1;
+
+    flyteidl2.notification.DeliveryConfigTemplate template = 2;
+  }
+}
+
+message InlineRuleChecks {
+  // Regex for matching completed run phase.
+  // if not supplied, rule applies to any terminal phase.
+  string phase_regex = 1;
 }

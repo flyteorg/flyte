@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package flyteidl2.notification;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/phase.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
+
+message RuleId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_RUN_COMPLETED = 1;
+}
+
+message Rule {
+  EventType event_type = 1 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+
+  // in future, this can extend to rules related to Apps, Usage, Artifacts, etc.
+  oneof condition {
+    option (buf.validate.oneof).required = true;
+
+    RunCompletedRule run_rule = 2;
+  }
+}
+
+// RunCompletedRule applies to events when a certain run(its root a0 action) reaches terminal phase
+message RunCompletedRule {
+  // The user provided rule id.
+  RuleId rule_id = 1 [(buf.validate.field).required = true];
+
+  // List of ids to config objects that define what notifications must be compiled and sent.
+  // this must/will only point to delivery configs of type "EVENT_TYPE_RUN_COMPLETED".
+  repeated DeliveryConfigId delivery_config_ids = 2 [(buf.validate.field).repeated.min_items = 1];
+
+  RunCompletedRuleChecks checks = 3;
+}
+
+// RunCompletedRuleChecks defines additional filtering on "run_completed" events
+message RunCompletedRuleChecks {
+  // Regex for matching completed run project.
+  // if not supplied, rules applies to all projects.
+  string project_regex = 1;
+
+  // Regex for matching completed run domain.
+  // if not supplied, rule applies to all domains.
+  string domain_regex = 2;
+
+  // Regex for matching completed run task name.
+  // if not supplied, rule applies to a run of any task.
+  string task_name_regex = 3;
+
+  // Regex for matching completed run phase.
+  // if not supplied, rule applies to any terminal phase.
+  string phase_regex = 4;
+}
+
+// DeliveryOption allows you to send a notification using either existing stored config, either define an inline config
+message DeliveryOption {
+  oneof option {
+    option (buf.validate.oneof).required = true;
+
+    DeliveryConfigId config_id = 1;
+
+    DeliveryConfig config = 2;
+  }
+}
+
+message DeliveryConfigId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+message DeliveryConfigTemplate {
+  oneof config {
+    option (buf.validate.oneof).required = true;
+
+    WebhookDeliveryTemplate webhook = 1;
+
+    EmailDeliveryTemplate email = 2;
+  }
+}
+
+message RunCompletedNotificationTemplateData {
+  common.RunIdentifier run = 1 [(buf.validate.field).required = true];
+
+  common.ActionPhase phase = 2;
+
+  string error = 3;
+}
+
+// DeliveryConfig contains a configuration and template that must be used for compiling and sending a notification
+// when an event of a certain type occurs.
+message DeliveryConfig {
+  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
+
+  EventType event_type = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+
+  // For EVENT_TYPE_RUN_COMPLETED, template must use field names like in RunCompletedNotificationTemplateData struct.
+  DeliveryConfigTemplate template = 3 [(buf.validate.field).required = true];
+}
+
+message WebhookDeliveryTemplate {
+  string url = 1;
+
+  string method = 2;
+
+  map<string, string> headers = 3;
+
+  string body_template = 4; // this is a Go template that may contain placeholders
+}
+
+message EmailDeliveryTemplate {
+  string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+
+  repeated string to = 2;
+
+  repeated string cc = 3;
+
+  repeated string bcc = 4;
+
+  string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+
+  string text_template = 6; // this is a Go template that may contain placeholders
+}
