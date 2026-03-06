@@ -17,8 +17,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      # check the PR is from fork repo or same repo, if PR is from same repo, check will use Docker container, otherwise will use runner to check.
+      - name: Check if PR is from fork
+        id: fork-check
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.fork }}" == 'true' ]; then
+            echo "is_fork=true" >> $GITHUB_OUTPUT
+            echo "🍴 PR is from a fork repo - will use local tools"
+          else
+            echo "is_fork=false" >> $GITHUB_OUTPUT
+            echo "📦 PR is from the same repo - will use Docker image"
+          fi
+
       - name: Determine Docker image
         id: docker-image
+        if: steps.fork-check.outputs.is_fork != 'true'
         run: |
           # Check if gen.Dockerfile or build workflow was modified
           git fetch origin ${{ github.base_ref }}
@@ -33,7 +46,7 @@ jobs:
           fi
 
       - name: Wait for Docker image build workflow
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.fork-check.outputs.is_fork != 'true' && steps.docker-image.outputs.modified == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -82,17 +95,18 @@ jobs:
             core.setFailed('❌ Timeout waiting for Docker image build to complete');
 
       - name: Login to GHCR
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.fork-check.outpus.is_fork == 'true' && steps.docker-image.outputs.modified == 'true'
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.fork-check.outpus.is_fork == 'true' && steps.docker-image.outputs.modified == 'true'
         run: |
           IMAGE="${{ steps.docker-image.outputs.image }}"
           echo "📦 Pulling image: $IMAGE"
           docker pull "$IMAGE"
 
       - name: Run checks in container
+        if: steps.fork-check.outputs.is_fork != 'true'
         run: |
           IMAGE="${{ steps.docker-image.outputs.image }}"
           echo "Using image: $IMAGE"
@@ -111,4 +125,70 @@ jobs:
               make build-crate
             "
 
+      # for fork PR - get the version of tools from gen.Dockerfile
+      - name: Extract tool versions from gen.Dockerfile
+        if: steps.fork-check.outputs.is_fork == 'true'
+        id: versions
+        run: |
+          extract() { grep "^ARG ${1}=" gen.Dockerfile | cut -d'=' -f2; }
+          echo "go=$(extract GO_VERSION)" >> $GITHUB_OUTPUT
+          echo "python=$(extract PYTHON_VERSION)" >> $GITHUB_OUTPUT
+          echo "node=$(extract NODE_VERSION)" >> $GITHUB_OUTPUT
+          echo "rust=$(extract RUST_VERSION)" >> $GITHUB_OUTPUT
+          echo "uv=$(extract UV_VERSION)" >> $GITHUB_OUTPUT
+          echo "buf=$(extract BUF_VERSION)" >> $GITHUB_OUTPUT
+          echo "mockery=$(extract MOCKERY_VERSION)" >> $GITHUB_OUTPUT
 
+      # for fork PR - install tools in runner
+      - name: Setup Go
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.versions.outputs.go }}
+
+      - name: Setup Python
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ steps.versions.outputs.python }}
+
+      - name: Setup Node.js
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.versions.outputs.node }}
+
+      - name: Setup Rust
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ steps.versions.outputs.rust }}
+
+      - name: Setup uv
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ steps.versions.outputs.uv }}
+
+      - name: Install Buf and Mockery
+        if: steps.fork-check.outputs.is_fork == 'true'
+        run: |
+          BUF_VERSION="${{ steps.versions.outputs.buf }}"
+          curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-x86_64.tar.gz" | tar -xzC /tmp
+          sudo mv /tmp/buf/bin/buf /usr/local/bin/buf
+          sudo mv /tmp/buf/bin/protoc-gen-buf-breaking /usr/local/bin/
+          sudo mv /tmp/buf/bin/protoc-gen-buf-lint /usr/local/bin/
+          npm install -g pnpm
+          go install "github.com/vektra/mockery/v2@v${{ steps.versions.outputs.mockery }}"
+
+      # for fork PR - Check make gen locally
+      - name: Run check locally (fork PR)
+        if: steps.fork-check.outputs.is_fork == 'true'
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
+          UV_PROJECT_ENVIRONMENT: /tmp/flyte-venv
+        run: |
+          cd gen/python && uv sync --all-groups --frozen && cd ../..
+          make gen-local
+          git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1)
+          make build-crate
