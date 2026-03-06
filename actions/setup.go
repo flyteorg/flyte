@@ -6,9 +6,10 @@ import (
 	"net/http"
 
 	"github.com/flyteorg/flyte/v2/actions/config"
-	"github.com/flyteorg/flyte/v2/actions/k8s"
+	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -29,7 +30,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
 
-	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient, cfg.RecordFilterSize, sc.Scope)
+	actionsClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient, cfg.RecordFilterSize, sc.Scope)
 	logger.Infof(ctx, "Actions K8s client initialized for namespace: %s", sc.Namespace)
 
 	if err := actionsClient.StartWatching(ctx); err != nil {
