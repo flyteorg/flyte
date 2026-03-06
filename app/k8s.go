@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
@@ -72,6 +73,7 @@ func InitKubernetesClient(ctx context.Context, cfg K8sConfig, scheme *runtime.Sc
 
 func buildRESTConfig(ctx context.Context, kubeconfig string) (*rest.Config, error) {
 	if kubeconfig != "" {
+		kubeconfig = config.NormalizePath(kubeconfig)
 		logger.Infof(ctx, "Using kubeconfig from: %s", kubeconfig)
 		cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
