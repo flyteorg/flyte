@@ -444,27 +444,25 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 }
 
 func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
-	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-
-	clientSet := getConnectorClientSets(ctx)
-	connectorRegistry := getConnectorRegistry(ctx, clientSet)
-	supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
-	connectorService.SetSupportedTaskType(supportedTaskTypes)
-
-	plugin := &Plugin{
-		metricScope: promutils.NewScope("connector_plugin"),
-		cfg:         GetConfig(),
-		cs:          clientSet,
-		registry:    connectorRegistry,
-	}
-	plugin.watchConnectors(ctx, connectorService)
+	cfg := GetConfig()
 
 	return webapi.PluginEntry{
 		ID:                 ID,
-		SupportedTaskTypes: supportedTaskTypes,
+		SupportedTaskTypes: cfg.SupportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			clientSet := getConnectorClientSets(ctx)
+			connectorRegistry := getConnectorRegistry(ctx, clientSet)
+			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
+			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			plugin := &Plugin{
+				metricScope: promutils.NewScope("connector_plugin"),
+				cfg:         cfg,
+				cs:          clientSet,
+				registry:    connectorRegistry,
+			}
+			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil
 		},
 	}
