@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
@@ -62,7 +59,7 @@ func InitKubernetesClient(ctx context.Context, cfg K8sConfig, scheme *runtime.Sc
 	logger.Infof(ctx, "Kubernetes client initialized (QPS=%.0f, Burst=%d)", restConfig.QPS, restConfig.Burst)
 
 	if cfg.Namespace != "" {
-		if err := ensureNamespaceExists(ctx, k8sClient, cfg.Namespace); err != nil {
+		if err := k8s.EnsureNamespaceExists(ctx, k8sClient, cfg.Namespace); err != nil {
 			return nil, nil, fmt.Errorf("failed to ensure namespace exists: %w", err)
 		}
 	}
@@ -100,26 +97,3 @@ func buildRESTConfig(ctx context.Context, kubeconfig string) (*rest.Config, erro
 	return cfg, nil
 }
 
-func ensureNamespaceExists(ctx context.Context, k8sClient client.Client, name string) error {
-	ns := &corev1.Namespace{}
-	err := k8sClient.Get(ctx, types.NamespacedName{Name: name}, ns)
-	if err == nil {
-		logger.Infof(ctx, "Namespace '%s' already exists", name)
-		return nil
-	}
-
-	if !apierrors.IsNotFound(err) {
-		return fmt.Errorf("failed to check namespace: %w", err)
-	}
-
-	logger.Infof(ctx, "Creating namespace '%s'", name)
-	ns = &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{Name: name},
-	}
-	if err := k8sClient.Create(ctx, ns); err != nil {
-		return fmt.Errorf("failed to create namespace: %w", err)
-	}
-
-	logger.Infof(ctx, "Created namespace '%s'", name)
-	return nil
-}

@@ -39,10 +39,11 @@ type ActionUpdate struct {
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient  client.WithWatch
-	namespace  string
-	bufferSize int
-	runClient  workflowconnect.InternalRunServiceClient
+	k8sClient       client.WithWatch
+	namespace       string
+	bufferSize      int
+	runClient       workflowconnect.InternalRunServiceClient
+	ensureNamespace func(ctx context.Context, namespace string) error
 
 	// Watch management
 	mu sync.RWMutex
@@ -55,13 +56,14 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient, ensureNamespace func(ctx context.Context, namespace string) error) *ActionsClient {
 	return &ActionsClient{
-		k8sClient:   k8sClient,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		k8sClient:       k8sClient,
+		namespace:       namespace,
+		bufferSize:      bufferSize,
+		runClient:       runClient,
+		subscribers:     make(map[string]map[chan *ActionUpdate]struct{}),
+		ensureNamespace: ensureNamespace,
 	}
 }
 
@@ -75,10 +77,16 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	isRoot := action.ParentActionName == nil || *action.ParentActionName == ""
 
 	taskActionName := buildTaskActionName(actionID)
+	namespace := buildNamespace(actionID.Run)
+	if c.ensureNamespace != nil {
+		if err := c.ensureNamespace(ctx, namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
+		}
+	}
 	taskAction := &executorv1.TaskAction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      taskActionName,
-			Namespace: c.namespace,
+			Namespace: namespace,
 			Labels: map[string]string{
 				"flyte.org/org":         actionID.Run.Org,
 				"flyte.org/project":     actionID.Run.Project,
@@ -101,7 +109,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		parentName := buildTaskActionName(parentID)
 
 		parent := &executorv1.TaskAction{}
-		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: c.namespace}, parent); err != nil {
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
 			return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
 		}
 
@@ -143,7 +151,7 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	logger.Infof(ctx, "Aborting action %s (reason: %v)", taskActionName, reason)
 
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: buildNamespace(actionID.Run)}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -162,7 +170,7 @@ func (c *ActionsClient) GetState(ctx context.Context, actionID *common.ActionIde
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: c.namespace,
+		Namespace: buildNamespace(actionID.Run),
 	}, taskAction); err != nil {
 		return "", fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -179,7 +187,7 @@ func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIde
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: c.namespace,
+		Namespace: buildNamespace(actionID.Run),
 	}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -205,7 +213,7 @@ func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIde
 func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
+		client.InNamespace(buildNamespace(runID)),
 		client.MatchingLabels{
 			"flyte.org/org":     runID.Org,
 			"flyte.org/project": runID.Project,
@@ -230,7 +238,7 @@ func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *co
 	// List all TaskActions in the same run
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
+		client.InNamespace(buildNamespace(parentActionID.Run)),
 		client.MatchingLabels{
 			"flyte.org/org":     parentActionID.Run.Org,
 			"flyte.org/project": parentActionID.Run.Project,
@@ -268,7 +276,7 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: c.namespace,
+		Namespace: buildNamespace(actionID.Run),
 	}, taskAction); err != nil {
 		return nil, fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -344,7 +352,7 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 func (c *ActionsClient) doWatch(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 
-	watcher, err := c.k8sClient.Watch(ctx, taskActionList, client.InNamespace(c.namespace))
+	watcher, err := c.k8sClient.Watch(ctx, taskActionList)
 	if err != nil {
 		return fmt.Errorf("failed to start watch: %w", err)
 	}
@@ -464,7 +472,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want 
+	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want
 	// to handle the action event persistence
 	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
 	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
@@ -528,15 +536,21 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
-// buildTaskActionName generates a Kubernetes-compliant name for the TaskAction
+// buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.
+// For root actions (where action name == run name), the name is <run-id>-a0-0.
+// For child actions, the name is <run-id>-<action-id>-0.
+// The trailing "0" is the attempt number (0-indexed; hardcoded until retry support is added).
 func buildTaskActionName(actionID *common.ActionIdentifier) string {
-	return fmt.Sprintf("%s-%s-%s-%s-%s",
-		actionID.Run.Org,
-		actionID.Run.Project,
-		actionID.Run.Domain,
-		actionID.Run.Name,
-		actionID.Name,
-	)
+	isRoot := actionID.Name == actionID.Run.Name
+	if isRoot {
+		return fmt.Sprintf("%s-a0-0", actionID.Run.Name)
+	}
+	return fmt.Sprintf("%s-%s-0", actionID.Run.Name, actionID.Name)
+}
+
+// buildNamespace returns the Kubernetes namespace for a run: "<project>-<domain>".
+func buildNamespace(runID *common.RunIdentifier) string {
+	return fmt.Sprintf("%s-%s", runID.Project, runID.Domain)
 }
 
 // buildOutputUri computes the action-specific output URI from the TaskAction spec.
@@ -555,12 +569,12 @@ func InitScheme() error {
 // buildActionSpec converts an actions.Action into the workflow.ActionSpec expected by the executor.
 func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.ActionSpec {
 	actionSpec := &workflow.ActionSpec{
-		ActionId:      action.ActionId,
+		ActionId:         action.ActionId,
 		ParentActionName: action.ParentActionName,
-		RunSpec:       runSpec,
-		InputUri:      action.InputUri,
-		RunOutputBase: action.RunOutputBase,
-		Group:         action.Group,
+		RunSpec:          runSpec,
+		InputUri:         action.InputUri,
+		RunOutputBase:    action.RunOutputBase,
+		Group:            action.Group,
 	}
 
 	switch spec := action.Spec.(type) {
