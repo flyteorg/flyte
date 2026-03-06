@@ -31,8 +31,7 @@ kubectl port-forward -n flyte-dataproxy svc/minio 9000:9000 9001:9001
 5. Start the manager
 
 ```sh
-cd manager/
-make run
+make -C manager run
 ```
 
 6. Run `python example/basics/hello.py` in flyte-sdk with following config:
