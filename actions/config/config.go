@@ -18,7 +18,8 @@ var defaultConfig = &Config{
 	},
 	WatchBufferSize:  100,
 	RunServiceURL:    "http://localhost:8090",
-	RecordFilterSize: 1 << 23, // 8M
+	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
+	RecordFilterSize: 1 << 23,
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -38,7 +39,7 @@ type Config struct {
 	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
 
 	// RecordFilterSize is the size of the bloom filter used to deduplicate RecordAction calls.
-	RecordFilterSize int `json:"recordFilterSize" pflag:",Size of the bloom filter for deduplicating RecordAction calls"`
+	RecordFilterSize int `json:"recordFilterSize" pflag:",Size of the oppo bloom filter for deduplicating RecordAction calls"`
 }
 
 // ServerConfig holds HTTP server configuration

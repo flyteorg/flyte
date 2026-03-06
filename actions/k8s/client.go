@@ -447,7 +447,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 
 	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
 	if eventType == watch.Added {
-		actionKey := []byte(update.ActionID.Name)
+		actionKey := []byte(buildTaskActionName(update.ActionID))
 		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
 			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 		} else {
