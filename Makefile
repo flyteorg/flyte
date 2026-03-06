@@ -36,16 +36,16 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: sandbox-build
-build-sandbox: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
 	$(MAKE) -C docker/sandbox-bundled build
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: sandbox-run
-run-sandbox: ## Start the flyte sandbox without rebuilding the image
+sandbox-run: ## Start the flyte sandbox without rebuilding the image
 	$(MAKE) -C docker/sandbox-bundled start
 
 .PHONY: sandbox-stop
-stop-sandbox: ## Stop the flyte sandbox
+sandbox-stop: ## Stop the flyte sandbox
 	$(MAKE) -C docker/sandbox-bundled stop
 
 # =============================================================================

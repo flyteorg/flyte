@@ -23,7 +23,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY manager manager
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
-    go build -v -o dist/flyte manager/cmd/main.go
+    go build -v -o dist/flyte ./manager/cmd/
 
 
 FROM debian:bookworm-slim
