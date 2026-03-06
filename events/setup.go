@@ -2,7 +2,6 @@ package events
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/flyteorg/flyte/v2/app"
@@ -12,7 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
-// Setup registers the EventsService handler and starts background workers.
+// Setup registers the EventsService handler.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
@@ -22,22 +21,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
 
-	// Create and start events worker.
-	eventWorker, err := service.NewEventsWorker(runClient, cfg.QueueSize, cfg.WorkerCount)
-	if err != nil {
-		return fmt.Errorf("events: failed to create worker: %w", err)
-	}
-	if err := eventWorker.Start(ctx); err != nil {
-		return fmt.Errorf("events: failed to start worker: %w", err)
-	}
-	sc.AddWorker("events-worker", func(ctx context.Context) error {
-		<-ctx.Done()
-		eventWorker.End()
-		return nil
-	})
-	logger.Infof(ctx, "Events worker started with queue size %d and %d workers", cfg.QueueSize, cfg.WorkerCount)
-
-	eventsSvc := service.NewEventService(eventWorker)
+	eventsSvc := service.NewEventService(runClient)
 	path, handler := workflowconnect.NewEventsServiceHandler(eventsSvc)
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted EventsService at %s", path)

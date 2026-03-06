@@ -11,8 +11,6 @@ var defaultConfig = &Config{
 		Port: 8092,
 		Host: "0.0.0.0",
 	},
-	QueueSize:     1000,
-	WorkerCount:   4,
 	RunServiceURL: "http://localhost:8090",
 }
 
@@ -22,12 +20,6 @@ var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 type Config struct {
 	// HTTP server configuration.
 	Server ServerConfig `json:"server"`
-
-	// QueueSize is the number of events that can be buffered in memory.
-	QueueSize int `json:"queueSize" pflag:",Buffer size for in-memory events queue"`
-
-	// WorkerCount is the number of background workers forwarding events.
-	WorkerCount int `json:"workerCount" pflag:",Number of background workers"`
 
 	// RunServiceURL is the base URL for the internal run service.
 	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
