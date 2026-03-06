@@ -92,8 +92,7 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 
 	telemetryResource, err := resource.Merge(
 		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
+		resource.NewSchemaless(
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.ServiceVersionKey.String(version.Version),
 		),
