@@ -1,0 +1,15 @@
+apiVersion: flyte.org/v1
+kind: TaskAction
+metadata:
+  labels:
+    app.kubernetes.io/name: executor
+    app.kubernetes.io/managed-by: kustomize
+  name: taskaction-sample
+spec:
+  runName: "sample-run"
+  org: "demo"
+  project: "default"
+  domain: "dev"
+  actionName: "sample-task"
+  inputUri: "/tmp/input"
+  runOutputBase: "/tmp/output"

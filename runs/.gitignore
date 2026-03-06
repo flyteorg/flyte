@@ -1,0 +1,30 @@
+# Binaries
+bin/
+runs-service
+runs-client
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+# Test artifacts
+coverage.txt
+coverage.html
+*.test
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config overrides
+config-local.yaml
+
+runs.db
