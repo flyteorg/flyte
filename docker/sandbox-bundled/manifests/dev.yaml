@@ -643,22 +643,27 @@ data:
                                                   prefix: "/flyteidl2.workflow.RunService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.task.TaskService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.workflow.TranslatorService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.dataproxy.DataProxyService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -748,7 +753,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Rzhrd2NvYWNENXo4RmpaTQ==
+  haSharedSecret: QWI2Qk5SbUJxWVpJUkNLbA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1171,7 +1176,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 7a1273efacf8b0f7aaf32e4b71d6c886688a75a4cffc3f58f0bd86aece4f0a94
+        checksum/secret: d517886f1b557a6486c75c051197ba3435382771e9baa9811fdd249b05d07c6e
       labels:
         app: docker-registry
         release: flyte-sandbox

@@ -44,22 +44,27 @@ data:
                                                   prefix: "/flyteidl2.workflow.RunService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.task.TaskService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.workflow.TranslatorService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.dataproxy.DataProxyService"
                                               route:
                                                   cluster: flyte
+                                                  timeout: 0s
                                             {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
