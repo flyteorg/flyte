@@ -250,8 +250,20 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
 
-	if err := r.db.WithContext(ctx).Create(action).Error; err != nil {
-		return nil, fmt.Errorf("failed to create action: %w", err)
+	result := r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(action)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to create action: %w", result.Error)
+	}
+
+	// If no rows were affected, the action already exists — fetch and return it.
+	if result.RowsAffected == 0 {
+		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get existing action: %w", err)
+		}
+		return existing, nil
 	}
 
 	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
