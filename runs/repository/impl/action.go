@@ -802,6 +802,37 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 	return actions, nil
 }
 
+// GetChildrenPhaseCounts returns, for each parent action name in the given run,
+// a map of phase -> count of children in that phase.
+func (r *actionRepo) GetChildrenPhaseCounts(ctx context.Context, runID *common.RunIdentifier) (map[string]map[int32]int32, error) {
+	type phaseCountRow struct {
+		ParentActionName string
+		Phase            int32
+		Count            int32
+	}
+
+	var rows []phaseCountRow
+	result := r.db.WithContext(ctx).Model(&models.Action{}).
+		Select("parent_action_name, phase, COUNT(*) as count").
+		Where("org = ? AND project = ? AND domain = ? AND parent_action_name IS NOT NULL",
+			runID.Org, runID.Project, runID.Domain).
+		Group("parent_action_name, phase").
+		Find(&rows)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to get children phase counts: %w", result.Error)
+	}
+
+	counts := make(map[string]map[int32]int32)
+	for _, row := range rows {
+		if _, ok := counts[row.ParentActionName]; !ok {
+			counts[row.ParentActionName] = make(map[int32]int32)
+		}
+		counts[row.ParentActionName][row.Phase] = row.Count
+	}
+	return counts, nil
+}
+
 // notifyActionUpdate sends a notification about an action update
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
 	if !r.isPostgres {

@@ -40,4 +40,5 @@ type ActionRepo interface {
 
 	// Aggregation operations
 	ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error)
+	GetChildrenPhaseCounts(ctx context.Context, runID *common.RunIdentifier) (map[string]map[int32]int32, error)
 }

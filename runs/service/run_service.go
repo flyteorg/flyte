@@ -635,6 +635,13 @@ func (s *RunService) WatchActions(
 	errsCh := make(chan error)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
+	// Fetch children phase counts for the initial snapshot
+	childrenPhaseCounts, err := s.repo.ActionRepo().GetChildrenPhaseCounts(ctx, runID)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to get children phase counts: %v", err)
+		childrenPhaseCounts = make(map[string]map[int32]int32)
+	}
+
 	// Send existing actions from DB (paginate through all pages)
 	token := ""
 	for {
@@ -646,7 +653,11 @@ func (s *RunService) WatchActions(
 		if len(batch) > 0 {
 			enriched := make([]*workflow.EnrichedAction, 0, len(batch))
 			for _, a := range batch {
-				enriched = append(enriched, s.convertActionToEnrichedProto(a))
+				ea := s.convertActionToEnrichedProto(a)
+				if counts, ok := childrenPhaseCounts[a.Name]; ok {
+					ea.ChildrenPhaseCounts = counts
+				}
+				enriched = append(enriched, ea)
 			}
 			if err := stream.Send(&workflow.WatchActionsResponse{
 				EnrichedActions: enriched,
@@ -670,8 +681,16 @@ func (s *RunService) WatchActions(
 			if !ok {
 				return nil
 			}
+			ea := s.convertActionToEnrichedProto(updated)
+			// Refresh children phase counts for updated actions
+			refreshedCounts, err := s.repo.ActionRepo().GetChildrenPhaseCounts(ctx, runID)
+			if err == nil {
+				if counts, ok := refreshedCounts[updated.Name]; ok {
+					ea.ChildrenPhaseCounts = counts
+				}
+			}
 			if err := stream.Send(&workflow.WatchActionsResponse{
-				EnrichedActions: []*workflow.EnrichedAction{s.convertActionToEnrichedProto(updated)},
+				EnrichedActions: []*workflow.EnrichedAction{ea},
 			}); err != nil {
 				return err
 			}
@@ -896,8 +915,18 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 	}
 
 	actionStatus := &workflow.ActionStatus{
-		Phase: common.ActionPhase(action.Phase),
+		Phase:     common.ActionPhase(action.Phase),
+		StartTime: timestamppb.New(action.CreatedAt),
+		Attempts:  1,
 	}
+
+	if action.EndedAt.Valid {
+		actionStatus.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(action.EndedAt.Time.Sub(action.CreatedAt).Milliseconds())
+		actionStatus.DurationMs = &durationMs
+	}
+
+	actionStatus.CacheStatus = extractCacheStatus(action.ActionDetails)
 
 	var metadata *workflow.ActionMetadata
 	if action.ParentActionName != nil {
@@ -914,6 +943,20 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		},
 		MeetsFilter: true,
 	}
+}
+
+// extractCacheStatus extracts the cache status from the ActionDetails JSON blob.
+func extractCacheStatus(detailsJSON []byte) core.CatalogCacheStatus {
+	if len(detailsJSON) == 0 {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	var details struct {
+		CacheStatus int32 `json:"cache_status"`
+	}
+	if err := json.Unmarshal(detailsJSON, &details); err != nil {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	return core.CatalogCacheStatus(details.CacheStatus)
 }
 
 // buildTaskGroups queries the DB for root actions and groups them by task name in memory.

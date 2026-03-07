@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"gorm.io/datatypes"
@@ -46,18 +47,28 @@ type Action struct {
 // TableName specifies the table name
 func (Action) TableName() string { return "actions" }
 
-// GetRunName extracts the run name from the action
-// For root actions (runs), returns the action's own name
-// For child actions, extracts from ActionSpec JSON
+// GetRunName extracts the run name from the action.
+// For root actions (runs), returns the action's own name.
+// For child actions, extracts from the ActionSpec JSON's action_id.run.name field.
 func (a *Action) GetRunName() string {
 	if a.ParentActionName == nil {
-		// Root action - the run name is the action name
 		return a.Name
 	}
 
-	// TODO: Extract run name from ActionSpec JSON
-	// For now, return empty string as placeholder
-	return ""
+	if len(a.ActionSpec) == 0 {
+		return ""
+	}
+	var spec struct {
+		ActionID struct {
+			Run struct {
+				Name string `json:"name"`
+			} `json:"run"`
+		} `json:"action_id"`
+	}
+	if err := json.Unmarshal(a.ActionSpec, &spec); err != nil {
+		return ""
+	}
+	return spec.ActionID.Run.Name
 }
 
 // Run is a type alias for Action (runs are just actions with ParentActionName == nil)
