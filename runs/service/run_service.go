@@ -150,10 +150,9 @@ func (s *RunService) CreateRun(
 	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
 
 	// Persist inputs to storage
-	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
-		literalMap := inputsToLiteralMap(req.Msg.Inputs)
+	if req.Msg.Inputs != nil && (len(req.Msg.Inputs.Literals) > 0 || len(req.Msg.Inputs.Context) > 0) {
 		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, req.Msg.Inputs); err != nil {
 			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 		}
@@ -348,18 +347,16 @@ func (s *RunService) GetActionData(
 
 	// Read inputs from storage
 	if inputURI != "" {
-		inputRef := storage.DataReference(inputURI)
+		inputRef := storage.DataReference(inputURI + "/inputs.pb")
 		logger.Debugf(ctx, "Reading inputs from: %s", inputRef)
-		inputMap := &core.LiteralMap{}
-		if err := s.dataStore.ReadProtobuf(ctx, inputRef, inputMap); err != nil {
+		if err := s.dataStore.ReadProtobuf(ctx, inputRef, resp.Inputs); err != nil {
 			if !storage.IsNotFound(err) {
 				logger.Errorf(ctx, "Failed to read inputs from %s: %v", inputRef, err)
 				return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
 			}
 			logger.Debugf(ctx, "Inputs not found at %s", inputRef)
 		} else {
-			resp.Inputs = literalMapToInputs(inputMap)
-			logger.Debugf(ctx, "Read %d input literals", len(resp.Inputs.Literals))
+			logger.Debugf(ctx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 		}
 	} else {
 		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
