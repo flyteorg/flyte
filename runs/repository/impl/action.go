@@ -60,14 +60,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	switch id := req.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
 		runID = id.RunId
-	case *workflow.CreateRunRequest_ProjectId:
-		// Generate a run name (simplified - in production, use a better generator)
-		runID = &common.RunIdentifier{
-			Org:     id.ProjectId.Organization,
-			Project: id.ProjectId.Name,
-			Domain:  id.ProjectId.Domain,
-			Name:    fmt.Sprintf("run-%d", time.Now().Unix()),
-		}
 	default:
 		return nil, fmt.Errorf("invalid run ID type")
 	}
