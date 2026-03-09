@@ -109,7 +109,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 		eventsServiceURL := sc.BaseURL
 		if eventsServiceURL == "" {
-			eventsServiceURL = cfg.StateServiceURL
+			eventsServiceURL = cfg.EventsServiceURL
 		}
 		eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
 
