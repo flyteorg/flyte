@@ -364,7 +364,10 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 func (c *ActionsClient) doWatch(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 
-	watcher, err := c.k8sClient.Watch(ctx, taskActionList)
+	timeout := int64(300) // 5 minutes
+	watcher, err := c.k8sClient.Watch(ctx, taskActionList, &client.ListOptions{
+		Raw: &metav1.ListOptions{TimeoutSeconds: &timeout},
+	})
 	if err != nil {
 		return fmt.Errorf("failed to start watch: %w", err)
 	}
