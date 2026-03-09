@@ -297,8 +297,16 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{actionEvent},
 	})); err != nil {
-		// Best effort: status update succeeded, do not fail reconciliation on event publish errors.
-		logger.Error(err, "failed to publish action event", "action", actionEvent.GetId().GetName())
+		r.Recorder.Eventf(
+			newTaskAction,
+			corev1.EventTypeWarning,
+			"ActionEventPublishFailed",
+			"Failed to persist action event %q: %v",
+			actionEvent.GetId().GetName(),
+			err,
+		)
+		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		return err
 	}
 
 	return nil
