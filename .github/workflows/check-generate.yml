@@ -35,7 +35,7 @@ jobs:
           fi
 
       - name: Wait for Docker image build workflow
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.docker-image.outputs.modified == true
         uses: actions/github-script@v7
         with:
           script: |
@@ -84,11 +84,11 @@ jobs:
             core.setFailed('❌ Timeout waiting for Docker image build to complete');
 
       - name: Login to GHCR
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.docker-image.outputs.modified == true
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        if: steps.docker-image.outputs.modified == 'true'
+        if: steps.docker-image.outputs.modified == true
         run: |
           IMAGE="${{ steps.docker-image.outputs.image }}"
           echo "📦 Pulling image: $IMAGE"
