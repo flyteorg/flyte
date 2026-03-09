@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -53,7 +54,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
+func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error) {
 	// Determine run ID
 	var runID *common.RunIdentifier
 	switch id := req.Id.(type) {
@@ -79,8 +80,8 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         "", // TODO: build from inputs
-		RunOutputBase:    "", // TODO: build output path
+		InputUri:         inputUri,
+		RunOutputBase:    runOutputBase,
 	}
 
 	// Set the task spec based on the request
@@ -112,7 +113,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Domain:           runID.Domain,
 		Name:             runID.Name,
 		ParentActionName: nil, // NULL for root actions/runs
-		Phase:            "PHASE_QUEUED",
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
@@ -193,7 +194,7 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	// Update the run action to aborted
 	updates := map[string]interface{}{
-		"phase":      "PHASE_ABORTED",
+		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
 		"updated_at": time.Now(),
 	}
 
@@ -212,6 +213,16 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 	return nil
+}
+
+// InsertEvents inserts a batch of action events, ignoring duplicates (same PK = idempotent).
+func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	if len(events) == 0 {
+		return nil
+	}
+	return r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(&events).Error
 }
 
 // CreateAction creates a new action
@@ -234,13 +245,25 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		Domain:           actionSpec.ActionId.Run.Domain,
 		Name:             actionSpec.ActionId.Name,
 		ParentActionName: parentActionName,
-		Phase:            "PHASE_QUEUED",
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionSpec:       datatypes.JSON(actionSpecBytes),
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
 
-	if err := r.db.WithContext(ctx).Create(action).Error; err != nil {
-		return nil, fmt.Errorf("failed to create action: %w", err)
+	result := r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(action)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to create action: %w", result.Error)
+	}
+
+	// If no rows were affected, the action already exists — fetch and return it.
+	if result.RowsAffected == 0 {
+		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get existing action: %w", err)
+		}
+		return existing, nil
 	}
 
 	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
@@ -305,11 +328,18 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	return actions, nextToken, nil
 }
 
-// UpdateActionPhase updates the phase of an action
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error {
+// UpdateActionPhase updates the phase of an action.
+// endTime should be set when the action reaches a terminal phase.
+func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
 	updates := map[string]interface{}{
 		"phase":      phase,
 		"updated_at": time.Now(),
+	}
+	if endTime != nil {
+		// Clamp ended_at to be at least created_at, matching union cloud behaviour.
+		// K8s timestamps have second-level precision while created_at has microsecond
+		// precision, so for very fast tasks ended_at can appear before created_at.
+		updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
 	}
 
 	result := r.db.WithContext(ctx).
@@ -331,7 +361,7 @@ func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.Act
 // AbortAction aborts a specific action
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	updates := map[string]interface{}{
-		"phase":      "PHASE_ABORTED",
+		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
 		"updated_at": time.Now(),
 	}
 
@@ -627,7 +657,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 				// Query actions updated since last check
 				var actions []*models.Action
 				if err := r.db.WithContext(ctx).
-					Where("org = ? AND project = ? AND domain = ? AND updated_at > ? AND parent_action_name IS NOT NULL",
+					Where("org = ? AND project = ? AND domain = ? AND updated_at > ?",
 						runID.Org, runID.Project, runID.Domain, lastCheck).
 					Find(&actions).Error; err != nil {
 					errs <- err
@@ -750,6 +780,38 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 	if err := r.db.WithContext(ctx).Exec(sql).Error; err != nil {
 		logger.Errorf(ctx, "Failed to NOTIFY run_updates: %v", err)
 	}
+}
+
+// ListRootActions lists root actions (runs) matching scope and date filters.
+func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	query := r.db.WithContext(ctx).Model(&models.Action{}).
+		Where("parent_action_name IS NULL")
+
+	if org != "" {
+		query = query.Where("org = ?", org)
+	}
+	if project != "" {
+		query = query.Where("project = ?", project)
+	}
+	if domain != "" {
+		query = query.Where("domain = ?", domain)
+	}
+	if startDate != nil {
+		query = query.Where("created_at >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("created_at <= ?", *endDate)
+	}
+	if limit <= 0 {
+		limit = 1000
+	}
+
+	var actions []*models.Action
+	result := query.Order("created_at DESC").Limit(limit).Find(&actions)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list root actions: %w", result.Error)
+	}
+	return actions, nil
 }
 
 // notifyActionUpdate sends a notification about an action update

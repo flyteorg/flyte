@@ -41,10 +41,10 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 
 	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, projectSecretID),
-	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, fmt.Sprintf(SecretNotFoundErrorFormat, projectSecretID)))
+	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, SecretNotFoundErrorFormat, projectSecretID))
 	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, domainSecretID),
-	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, fmt.Sprintf(SecretNotFoundErrorFormat, projectSecretID)))
+	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, SecretNotFoundErrorFormat, projectSecretID))
 	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, orgSecretID),
 	}).Return(&secretmanagerpb.AccessSecretVersionResponse{
@@ -84,7 +84,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			},
 			expectedK8sSecretName: "",
 			expectedInjected:      false,
-			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, OrganizationLabel)),
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, OrganizationLabel),
 		},
 		{
 			name: "empty project",
@@ -110,7 +110,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			},
 			expectedK8sSecretName: "",
 			expectedInjected:      false,
-			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, ProjectLabel)),
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, ProjectLabel),
 		},
 		{
 			name: "empty domain",
@@ -138,7 +138,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			},
 			expectedK8sSecretName: "",
 			expectedInjected:      false,
-			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, DomainLabel)),
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, DomainLabel),
 		},
 		{
 			name: "all labels",

@@ -29,16 +29,16 @@ func (g GCPSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (
 	})
 	if err != nil {
 		if s, ok := status.FromError(err); ok && s.Code() == codes.NotFound {
-			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, fmt.Sprintf(SecretNotFoundErrorFormat, secretID))
+			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, SecretNotFoundErrorFormat, secretID)
 			logger.Warn(ctx, wrappedErr)
 			return nil, wrappedErr
 		}
-		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, SecretReadFailureErrorFormat, secretID)
 		logger.Error(ctx, wrappedErr)
 		return nil, wrappedErr
 	}
 	if resp.GetPayload() == nil {
-		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, err, fmt.Sprintf(SecretNilErrorFormat, secretID))
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, err, SecretNilErrorFormat, secretID)
 		logger.Error(ctx, wrappedErr)
 		return nil, wrappedErr
 	}

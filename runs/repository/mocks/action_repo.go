@@ -11,6 +11,8 @@ import (
 
 	models "github.com/flyteorg/flyte/v2/runs/repository/models"
 
+	time "time"
+
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
@@ -185,9 +187,9 @@ func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, u
 	return _c
 }
 
-// CreateRun provides a mock function with given fields: ctx, req
-func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error) {
-	ret := _m.Called(ctx, req)
+// CreateRun provides a mock function with given fields: ctx, req, inputUri, runOutputBase
+func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string) (*models.Run, error) {
+	ret := _m.Called(ctx, req, inputUri, runOutputBase)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRun")
@@ -195,19 +197,19 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 
 	var r0 *models.Run
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest) (*models.Run, error)); ok {
-		return rf(ctx, req)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) (*models.Run, error)); ok {
+		return rf(ctx, req, inputUri, runOutputBase)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest) *models.Run); ok {
-		r0 = rf(ctx, req)
+	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) *models.Run); ok {
+		r0 = rf(ctx, req, inputUri, runOutputBase)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Run)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *workflow.CreateRunRequest) error); ok {
-		r1 = rf(ctx, req)
+	if rf, ok := ret.Get(1).(func(context.Context, *workflow.CreateRunRequest, string, string) error); ok {
+		r1 = rf(ctx, req, inputUri, runOutputBase)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -223,13 +225,15 @@ type ActionRepo_CreateRun_Call struct {
 // CreateRun is a helper method to define mock.On call
 //   - ctx context.Context
 //   - req *workflow.CreateRunRequest
-func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}) *ActionRepo_CreateRun_Call {
-	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req)}
+//   - inputUri string
+//   - runOutputBase string
+func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}, inputUri interface{}, runOutputBase interface{}) *ActionRepo_CreateRun_Call {
+	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req, inputUri, runOutputBase)}
 }
 
-func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string)) *ActionRepo_CreateRun_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*workflow.CreateRunRequest))
+		run(args[0].(context.Context), args[1].(*workflow.CreateRunRequest), args[2].(string), args[3].(string))
 	})
 	return _c
 }
@@ -239,7 +243,7 @@ func (_c *ActionRepo_CreateRun_Call) Return(_a0 *models.Run, _a1 error) *ActionR
 	return _c
 }
 
-func (_c *ActionRepo_CreateRun_Call) RunAndReturn(run func(context.Context, *workflow.CreateRunRequest) (*models.Run, error)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) RunAndReturn(run func(context.Context, *workflow.CreateRunRequest, string, string) (*models.Run, error)) *ActionRepo_CreateRun_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -419,6 +423,53 @@ func (_c *ActionRepo_GetRun_Call) RunAndReturn(run func(context.Context, *common
 	return _c
 }
 
+// InsertEvents provides a mock function with given fields: ctx, events
+func (_m *ActionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	ret := _m.Called(ctx, events)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertEvents")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, []*models.ActionEvent) error); ok {
+		r0 = rf(ctx, events)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ActionRepo_InsertEvents_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertEvents'
+type ActionRepo_InsertEvents_Call struct {
+	*mock.Call
+}
+
+// InsertEvents is a helper method to define mock.On call
+//   - ctx context.Context
+//   - events []*models.ActionEvent
+func (_e *ActionRepo_Expecter) InsertEvents(ctx interface{}, events interface{}) *ActionRepo_InsertEvents_Call {
+	return &ActionRepo_InsertEvents_Call{Call: _e.mock.On("InsertEvents", ctx, events)}
+}
+
+func (_c *ActionRepo_InsertEvents_Call) Run(run func(ctx context.Context, events []*models.ActionEvent)) *ActionRepo_InsertEvents_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]*models.ActionEvent))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_InsertEvents_Call) Return(_a0 error) *ActionRepo_InsertEvents_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ActionRepo_InsertEvents_Call) RunAndReturn(run func(context.Context, []*models.ActionEvent) error) *ActionRepo_InsertEvents_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListActions provides a mock function with given fields: ctx, runID, limit, token
 func (_m *ActionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
 	ret := _m.Called(ctx, runID, limit, token)
@@ -483,6 +534,70 @@ func (_c *ActionRepo_ListActions_Call) Return(_a0 []*models.Action, _a1 string, 
 }
 
 func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(context.Context, *common.RunIdentifier, int, string) ([]*models.Action, string, error)) *ActionRepo_ListActions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListRootActions provides a mock function with given fields: ctx, org, project, domain, startDate, endDate, limit
+func (_m *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
+	ret := _m.Called(ctx, org, project, domain, startDate, endDate, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListRootActions")
+	}
+
+	var r0 []*models.Action
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
+		return rf(ctx, org, project, domain, startDate, endDate, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
+		r0 = rf(ctx, org, project, domain, startDate, endDate, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Action)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, *time.Time, *time.Time, int) error); ok {
+		r1 = rf(ctx, org, project, domain, startDate, endDate, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_ListRootActions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRootActions'
+type ActionRepo_ListRootActions_Call struct {
+	*mock.Call
+}
+
+// ListRootActions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - org string
+//   - project string
+//   - domain string
+//   - startDate *time.Time
+//   - endDate *time.Time
+//   - limit int
+func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, org interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
+	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, org, project, domain, startDate, endDate, limit)}
+}
+
+func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string), args[4].(*time.Time), args[5].(*time.Time), args[6].(int))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListRootActions_Call) Return(_a0 []*models.Action, _a1 error) *ActionRepo_ListRootActions_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -600,17 +715,17 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, startTime, endTime
-func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime *string, endTime *string) error {
-	ret := _m.Called(ctx, actionID, phase, startTime, endTime)
+// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, endTime
+func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
+	ret := _m.Called(ctx, actionID, phase, endTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, string, *string, *string) error); ok {
-		r0 = rf(ctx, actionID, phase, startTime, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, *time.Time) error); ok {
+		r0 = rf(ctx, actionID, phase, endTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -626,16 +741,15 @@ type ActionRepo_UpdateActionPhase_Call struct {
 // UpdateActionPhase is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-//   - phase string
-//   - startTime *string
-//   - endTime *string
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, startTime interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, startTime, endTime)}
+//   - phase common.ActionPhase
+//   - endTime *time.Time
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, endTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime *string, endTime *string)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(string), args[3].(*string), args[4].(*string))
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(common.ActionPhase), args[3].(*time.Time))
 	})
 	return _c
 }
@@ -645,7 +759,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(_a0 error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, string, *string, *string) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, common.ActionPhase, *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }

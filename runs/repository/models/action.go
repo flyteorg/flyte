@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"gorm.io/datatypes"
@@ -20,8 +21,9 @@ type Action struct {
 	// Parent action (NULL for root actions/runs)
 	ParentActionName *string `gorm:"index:idx_actions_parent" db:"parent_action_name"`
 
-	// High-level status for quick queries/filtering
-	Phase string `gorm:"not null;default:'PHASE_QUEUED';index:idx_actions_phase" db:"phase"`
+	// High-level status for quick queries/filtering.
+	// Stores the proto ActionPhase enum integer value directly (e.g. 1 = QUEUED).
+	Phase int32 `gorm:"not null;default:1;index:idx_actions_phase" db:"phase"`
 
 	// Serialized protobuf messages
 	// ActionSpec contains the full action specification proto
@@ -34,8 +36,11 @@ type Action struct {
 	ActionDetails datatypes.JSON `gorm:"type:jsonb" db:"action_details"`
 
 	// Timestamps
-	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
-	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
+	CreatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
+	UpdatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	// EndedAt is set when the action reaches a terminal phase.
+	EndedAt   sql.NullTime `gorm:"index:idx_actions_ended" db:"ended_at"`
 }
 
 // TableName specifies the table name

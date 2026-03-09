@@ -105,7 +105,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		}
 
 		if kfPytorchTaskExtraArgs.GetRunPolicy() != nil {
-			runPolicy = common.ParseRunPolicy(*kfPytorchTaskExtraArgs.GetRunPolicy())
+			runPolicy = common.ParseRunPolicy(kfPytorchTaskExtraArgs.GetRunPolicy())
 		}
 		// Set elastic config
 		elasticConfig := kfPytorchTaskExtraArgs.GetElasticConfig()
