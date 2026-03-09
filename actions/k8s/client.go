@@ -17,6 +17,7 @@ import (
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
+	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
@@ -91,10 +92,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 	taskActionName := buildTaskActionName(actionID)
 	namespace := buildNamespace(actionID.Run)
-	if c.ensureNamespace != nil {
-		if err := c.ensureNamespace(ctx, namespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
-		}
+	if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
+		return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
 	}
 	taskAction := &executorv1.TaskAction{
 		ObjectMeta: metav1.ObjectMeta{
@@ -492,7 +491,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want 
+	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want
 	// to handle the action event persistence
 	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
 	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.

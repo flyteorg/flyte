@@ -9,7 +9,6 @@ import (
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/app"
-	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -20,7 +19,7 @@ import (
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
-	if err := k8s.InitScheme(); err != nil {
+	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
 	}
 
