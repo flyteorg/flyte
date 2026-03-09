@@ -241,11 +241,14 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 // ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
 // This is idempotent — if the labels are already set, it's a no-op.
+// Uses a MergeFrom patch instead of a full Update to reduce conflict surface with concurrent reconciles.
 func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAction *flyteorgv1.TaskAction) error {
 	labels := taskAction.GetLabels()
 	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated {
 		return nil // already labeled
 	}
+
+	patch := client.MergeFrom(taskAction.DeepCopy())
 
 	if labels == nil {
 		labels = make(map[string]string)
@@ -254,7 +257,7 @@ func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAct
 	labels[LabelCompletedTime] = time.Now().UTC().Format(labelHourTimeFormat)
 	taskAction.SetLabels(labels)
 
-	if err := r.Update(ctx, taskAction); err != nil {
+	if err := r.Patch(ctx, taskAction, patch); err != nil {
 		log.FromContext(ctx).Error(err, "failed to set terminal labels on TaskAction")
 		return err
 	}

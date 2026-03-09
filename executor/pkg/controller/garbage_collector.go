@@ -49,44 +49,59 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 	}
 }
 
-// collect lists all terminated TaskActions and deletes those whose completed-time has expired.
+const gcPageSize = 500
+
+// collect lists all terminated TaskActions (paginated) and deletes those whose completed-time has expired.
 func (gc *GarbageCollector) collect(ctx context.Context) error {
 	logger := log.FromContext(ctx).WithName("gc")
 
-	var taskActions flyteorgv1.TaskActionList
-	if err := gc.client.List(ctx, &taskActions, client.MatchingLabels{
-		LabelTerminationStatus: LabelValueTerminated,
-	}); err != nil {
-		return err
-	}
-
-	if len(taskActions.Items) == 0 {
-		return nil
-	}
-
 	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelHourTimeFormat)
 	deleted := 0
+	total := 0
+	continueToken := ""
 
-	for i := range taskActions.Items {
-		ta := &taskActions.Items[i]
-		completedTime := ta.GetLabels()[LabelCompletedTime]
-		if completedTime == "" {
-			continue
+	for {
+		var taskActions flyteorgv1.TaskActionList
+		listOpts := []client.ListOption{
+			client.MatchingLabels{LabelTerminationStatus: LabelValueTerminated},
+			client.Limit(gcPageSize),
+		}
+		if continueToken != "" {
+			listOpts = append(listOpts, client.Continue(continueToken))
 		}
 
-		// The hour format is lexicographically ordered, so string comparison works
-		if completedTime <= cutoff {
-			if err := gc.client.Delete(ctx, ta); err != nil {
-				logger.Error(err, "failed to delete expired TaskAction",
-					"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
+		if err := gc.client.List(ctx, &taskActions, listOpts...); err != nil {
+			return err
+		}
+
+		total += len(taskActions.Items)
+
+		for i := range taskActions.Items {
+			ta := &taskActions.Items[i]
+			completedTime := ta.GetLabels()[LabelCompletedTime]
+			if completedTime == "" {
 				continue
 			}
-			deleted++
+
+			// The hour format is lexicographically ordered, so string comparison works
+			if completedTime <= cutoff {
+				if err := gc.client.Delete(ctx, ta); err != nil {
+					logger.Error(err, "failed to delete expired TaskAction",
+						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
+					continue
+				}
+				deleted++
+			}
+		}
+
+		continueToken = taskActions.GetContinue()
+		if continueToken == "" {
+			break
 		}
 	}
 
 	if deleted > 0 {
-		logger.Info("garbage collection completed", "deleted", deleted, "total", len(taskActions.Items))
+		logger.Info("garbage collection completed", "deleted", deleted, "total", total)
 	}
 
 	return nil
