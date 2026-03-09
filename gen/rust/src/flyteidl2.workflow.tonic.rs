@@ -424,15 +424,15 @@ pub mod state_service_server {
     }
 }
 /// Generated client implementations.
-pub mod events_service_client {
+pub mod events_proxy_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct EventsServiceClient<T> {
+    pub struct EventsProxyServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl EventsServiceClient<tonic::transport::Channel> {
+    impl EventsProxyServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -443,7 +443,7 @@ pub mod events_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> EventsServiceClient<T>
+    impl<T> EventsProxyServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -461,7 +461,7 @@ pub mod events_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> EventsServiceClient<InterceptedService<T, F>>
+        ) -> EventsProxyServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -475,7 +475,7 @@ pub mod events_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            EventsServiceClient::new(InterceptedService::new(inner, interceptor))
+            EventsProxyServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -523,36 +523,38 @@ pub mod events_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.EventsService/Record",
+                "/flyteidl2.workflow.EventsProxyService/Record",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.workflow.EventsService", "Record"));
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.EventsProxyService", "Record"),
+                );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod events_service_server {
+pub mod events_proxy_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with EventsServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with EventsProxyServiceServer.
     #[async_trait]
-    pub trait EventsService: Send + Sync + 'static {
+    pub trait EventsProxyService: Send + Sync + 'static {
         async fn record(
             &self,
             request: tonic::Request<super::RecordRequest>,
         ) -> std::result::Result<tonic::Response<super::RecordResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct EventsServiceServer<T: EventsService> {
+    pub struct EventsProxyServiceServer<T: EventsProxyService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: EventsService> EventsServiceServer<T> {
+    impl<T: EventsProxyService> EventsProxyServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -603,9 +605,9 @@ pub mod events_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for EventsServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for EventsProxyServiceServer<T>
     where
-        T: EventsService,
+        T: EventsProxyService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -620,11 +622,11 @@ pub mod events_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.EventsService/Record" => {
+                "/flyteidl2.workflow.EventsProxyService/Record" => {
                     #[allow(non_camel_case_types)]
-                    struct RecordSvc<T: EventsService>(pub Arc<T>);
+                    struct RecordSvc<T: EventsProxyService>(pub Arc<T>);
                     impl<
-                        T: EventsService,
+                        T: EventsProxyService,
                     > tonic::server::UnaryService<super::RecordRequest>
                     for RecordSvc<T> {
                         type Response = super::RecordResponse;
@@ -638,7 +640,7 @@ pub mod events_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as EventsService>::record(&inner, request).await
+                                <T as EventsProxyService>::record(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -683,7 +685,7 @@ pub mod events_service_server {
             }
         }
     }
-    impl<T: EventsService> Clone for EventsServiceServer<T> {
+    impl<T: EventsProxyService> Clone for EventsProxyServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -695,8 +697,9 @@ pub mod events_service_server {
             }
         }
     }
-    impl<T: EventsService> tonic::server::NamedService for EventsServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.EventsService";
+    impl<T: EventsProxyService> tonic::server::NamedService
+    for EventsProxyServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.workflow.EventsProxyService";
     }
 }
 /// Generated client implementations.

@@ -7,8 +7,8 @@ import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
-// EventsService provides an interface for forwarding the events to Run Service or Redis stream.
-service EventsService {
+// EventsProxyService provides an interface for forwarding the events to Run Service or Redis stream.
+service EventsProxyService {
   // record the events for an action.
   rpc Record(RecordRequest) returns (RecordResponse) {}
 }
