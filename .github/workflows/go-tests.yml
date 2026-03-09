@@ -25,9 +25,8 @@ jobs:
             # Exclude runs/test/ which contains integration tests
             test-args: $(go list ./runs/... | grep -v /test)
           - component: executor
+            # Controller tests require envtest binaries (etcd + kube-apiserver)
             needs-envtest: true
-            # Exclude executor e2e tests; controller tests require envtest binaries
-            test-args: $(go list ./executor/... | grep -v /e2e)
           - component: flytecopilot
           - component: dataproxy
           - component: flyteidl2
