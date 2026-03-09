@@ -52,6 +52,15 @@ import (
 const (
 	TaskActionDefaultRequeueDuration = 5 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
+
+	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
+	LabelTerminationStatus = "flyte.org/termination-status"
+	// LabelCompletedTime records the UTC hour when the TaskAction became terminal.
+	LabelCompletedTime = "flyte.org/completed-time"
+	// LabelValueTerminated is the value for LabelTerminationStatus.
+	LabelValueTerminated = "terminated"
+	// labelHourTimeFormat is the time format used for the completed-time label (lexicographically ordered).
+	labelHourTimeFormat = "2006-01-02.15"
 )
 
 type K8sEventType string
@@ -122,6 +131,9 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Check terminal conditions -- short-circuit
 	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
@@ -217,7 +229,36 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
+	// If the TaskAction just became terminal, stamp GC labels
+	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
 	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+}
+
+// ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
+// This is idempotent — if the labels are already set, it's a no-op.
+func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAction *flyteorgv1.TaskAction) error {
+	labels := taskAction.GetLabels()
+	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated {
+		return nil // already labeled
+	}
+
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	labels[LabelTerminationStatus] = LabelValueTerminated
+	labels[LabelCompletedTime] = time.Now().UTC().Format(labelHourTimeFormat)
+	taskAction.SetLabels(labels)
+
+	if err := r.Update(ctx, taskAction); err != nil {
+		log.FromContext(ctx).Error(err, "failed to set terminal labels on TaskAction")
+		return err
+	}
+	return nil
 }
 
 // handleAbortAndFinalize handles the deletion of a TaskAction by aborting and finalizing the plugin.

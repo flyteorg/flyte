@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
@@ -21,6 +23,10 @@ var (
 		EnableHTTP2:            false,
 		EventsServiceURL:        "http://localhost:8090",
 		Cluster:                "",
+		GC: GCConfig{
+			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
+			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
+		},
 	}
 
 	configSection = stdconfig.MustRegisterSection(configSectionKey, defaultConfig)
@@ -67,6 +73,18 @@ type Config struct {
 
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
+
+	// GC configures the garbage collector for terminal TaskActions.
+	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
+}
+
+// GCConfig holds the configuration for the TaskAction garbage collector.
+type GCConfig struct {
+	// Interval is how often the garbage collector runs. 0 disables GC.
+	Interval stdconfig.Duration `json:"interval" pflag:",How often the garbage collector runs. 0 disables GC."`
+
+	// MaxTTL is the time-to-live for terminal TaskActions before deletion.
+	MaxTTL stdconfig.Duration `json:"maxTTL" pflag:",Time-to-live for terminal TaskActions before deletion."`
 }
 
 // GetConfig returns the parsed executor configuration

@@ -258,9 +258,51 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("eventsServiceURL", testValue)
-			if vString, err := cmdFlags.GetString("eventsServiceURL"); err == nil {
+			cmdFlags.Set("stateServiceURL", testValue)
+			if vString, err := cmdFlags.GetString("stateServiceURL"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EventsServiceURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_cluster", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cluster", testValue)
+			if vString, err := cmdFlags.GetString("cluster"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Cluster)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_gc.interval", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.GC.Interval.String()
+
+			cmdFlags.Set("gc.interval", testValue)
+			if vString, err := cmdFlags.GetString("gc.interval"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GC.Interval)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_gc.maxTTL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.GC.MaxTTL.String()
+
+			cmdFlags.Set("gc.maxTTL", testValue)
+			if vString, err := cmdFlags.GetString("gc.maxTTL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GC.MaxTTL)
 
 			} else {
 				assert.FailNow(t, err.Error())
