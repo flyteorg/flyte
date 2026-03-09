@@ -29,7 +29,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
 
-	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient)
+	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient, cfg.RecordFilterSize, sc.Scope)
 	logger.Infof(ctx, "Actions K8s client initialized for namespace: %s", sc.Namespace)
 
 	if err := actionsClient.StartWatching(ctx); err != nil {

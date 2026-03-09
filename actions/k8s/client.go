@@ -16,7 +16,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -44,6 +46,9 @@ type ActionsClient struct {
 	bufferSize int
 	runClient  workflowconnect.InternalRunServiceClient
 
+	// recordedFilter deduplicates RecordAction calls across watch reconnects.
+	recordedFilter fastcheck.Filter
+
 	// Watch management
 	mu sync.RWMutex
 	// Map parent action name to subscriber channels.
@@ -55,14 +60,25 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient) *ActionsClient {
-	return &ActionsClient{
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
 		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
+
+	if recordFilterSize > 0 {
+		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
+		if err != nil {
+			logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
+		} else {
+			c.recordedFilter = filter
+		}
+	}
+
+	return c
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
@@ -429,20 +445,27 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// On ADDED: create the action record in the DB.
+	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
 	if eventType == watch.Added {
-		recordReq := &workflow.RecordActionRequest{
-			ActionId: update.ActionID,
-			Parent:   update.ParentActionName,
-			InputUri: taskAction.Spec.InputURI,
-		}
-		if taskAction.Spec.TaskType != "" {
-			recordReq.Spec = &workflow.RecordActionRequest_Task{
-				Task: &workflow.TaskAction{},
+		actionKey := []byte(buildTaskActionName(update.ActionID))
+		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
+			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
+		} else {
+			recordReq := &workflow.RecordActionRequest{
+				ActionId: update.ActionID,
+				Parent:   update.ParentActionName,
+				InputUri: taskAction.Spec.InputURI,
 			}
-		}
-		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
-			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+			if taskAction.Spec.TaskType != "" {
+				recordReq.Spec = &workflow.RecordActionRequest_Task{
+					Task: &workflow.TaskAction{},
+				}
+			}
+			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+				logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+			} else if c.recordedFilter != nil {
+				c.recordedFilter.Add(ctx, actionKey)
+			}
 		}
 	}
 
