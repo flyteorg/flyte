@@ -441,7 +441,7 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 			continue
 		}
 		// Return the first explicit cache status signal.
-		if resource.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED || len(resources) == 1 {
+		if resource.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED {
 			return resource.CacheStatus
 		}
 	}
