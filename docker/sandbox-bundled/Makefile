@@ -66,7 +66,7 @@ start:
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
-			--volume $(HOME)/.flyte/sandbox:/var/lib/flyte/config \
+			--volume $(HOME)/.flyte/sandboxv2:/var/lib/flyte/config \
 			--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
 			--publish "30000:30000" \

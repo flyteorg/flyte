@@ -12,14 +12,16 @@ import (
 )
 
 type LoaderOpts struct {
-	ConfigurationConfigMapName string
-	DeploymentName             string
-	Namespace                  string
-	DirPath                    string
+	ConfigurationConfigMapName            string
+	ClusterResourceTemplatesConfigMapName string
+	DeploymentName                        string
+	Namespace                             string
+	DirPath                               string
 }
 
 type Loader struct {
-	configuration *Configuration
+	configuration            *Configuration
+	clusterResourceTemplates *ClusterResourceTemplates
 }
 
 func NewLoader(opts *LoaderOpts) (*Loader, error) {
@@ -31,7 +33,6 @@ func NewLoader(opts *LoaderOpts) (*Loader, error) {
 		return nil, err
 	}
 
-	// Auto-detect and instantiate configuration
 	loader.configuration, err = NewConfiguration(
 		opts.ConfigurationConfigMapName,
 		opts.DeploymentName,
@@ -43,40 +44,50 @@ func NewLoader(opts *LoaderOpts) (*Loader, error) {
 		return nil, err
 	}
 
+	loader.clusterResourceTemplates, err = NewClusterResourceTemplates(
+		opts.ClusterResourceTemplatesConfigMapName,
+		opts.DeploymentName,
+		opts.Namespace,
+		filepath.Join(absDirPath, "cluster-resource-templates"),
+	)
+	var clusterResourceTemplatesNotFound *ClusterResourceTemplatesNotFound
+	if err != nil && !errors.As(err, &clusterResourceTemplatesNotFound) {
+		return nil, err
+	}
+
 	return &loader, nil
 }
 
 func (cl *Loader) Transform(data []byte) ([]byte, error) {
-	// Nothing to do, short circuit,
-	if cl.configuration == nil {
+	if cl.configuration == nil && cl.clusterResourceTemplates == nil {
 		return data, nil
 	}
 
-	// Create a temporary directory to serve as the root of the ephemeral kustomize
-	// module
 	workDir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return nil, err
 	}
 	defer os.RemoveAll(workDir)
 
-	// Write base resource module
 	baseManifestPath := filepath.Join(workDir, "base.yaml")
 	if err := os.WriteFile(baseManifestPath, data, 0644); err != nil {
 		return nil, err
 	}
 
-	// Initialize a kustomization configuration
 	k := types.Kustomization{Resources: []string{baseManifestPath}}
 
-	// Load configuration is applicable
+	if cl.clusterResourceTemplates != nil {
+		if err := cl.clusterResourceTemplates.Update(&k); err != nil {
+			return nil, err
+		}
+	}
+
 	if cl.configuration != nil {
 		if err := cl.configuration.Update(&k); err != nil {
 			return nil, err
 		}
 	}
 
-	// Write the updated kustomization configuration to module
 	kyaml, err := yaml.Marshal(k)
 	if err != nil {
 		return nil, err
@@ -85,7 +96,6 @@ func (cl *Loader) Transform(data []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	// Build module
 	opts := krusty.MakeDefaultOptions()
 	opts.DoLegacyResourceSort = true
 	opts.LoadRestrictions = types.LoadRestrictionsNone

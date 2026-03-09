@@ -2,17 +2,16 @@ package config
 
 import (
 	"encoding/hex"
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoaderHappy(t *testing.T) {
-	// Initialize config loader
 	cOpts := LoaderOpts{
 		ConfigurationConfigMapName:            "test-config",
 		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
@@ -21,95 +20,68 @@ func TestLoaderHappy(t *testing.T) {
 		DirPath:                               filepath.Join("testdata", "happy"),
 	}
 	c, err := NewLoader(&cOpts)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	// Read in base manifest
 	base, err := os.ReadFile(filepath.Join("testdata", "base.yaml"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	// Apply transform
 	rendered, err := c.Transform(base)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	// Expected values
-	configurationAbsPath, err := filepath.Abs(filepath.Join(cOpts.DirPath, "config.yaml"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	configurationChecksum, err := utils.FileChecksum(configurationAbsPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	clusterResourceTemplatesAbsPath, err := filepath.Abs(filepath.Join(
-		cOpts.DirPath,
-		"cluster-resource-templates",
-		"resource.yaml",
-	))
-	if err != nil {
-		t.Fatal(err)
-	}
-	clusterResourceTemplatesChecksum, err := utils.FileCollectionChecksum(
-		[]string{clusterResourceTemplatesAbsPath},
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
+	configAbsPath, err := filepath.Abs(filepath.Join("testdata", "happy", "config.yaml"))
+	require.NoError(t, err)
+	configChecksum, err := utils.FileChecksum(configAbsPath)
+	require.NoError(t, err)
 
-	assert.Equal(
-		t,
-		string(rendered),
-		fmt.Sprintf(`apiVersion: v1
-data:
-  resource.yaml: |
-    foo: bar
-kind: ConfigMap
-metadata:
-  name: test-cluster-resource-templates
-  namespace: test
----
-apiVersion: v1
-data:
-  999-extra-config.yaml: |
-    ham: spam
-kind: ConfigMap
-metadata:
-  name: test-config
-  namespace: test
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test-deployment
-  namespace: test
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: test
-  template:
-    metadata:
-      annotations:
-        checksum/extra-cluster-resource-templates: %s
-        checksum/extra-configuration: %s
-      labels:
-        app: test
-    spec:
-      containers:
-      - image: test:test
-        name: test
-`, hex.EncodeToString(clusterResourceTemplatesChecksum), hex.EncodeToString(configurationChecksum)),
-		"YAML strings should match",
-	)
+	crtAbsPath, err := filepath.Abs(filepath.Join("testdata", "happy", "cluster-resource-templates", "resource.yaml"))
+	require.NoError(t, err)
+	crtChecksum, err := utils.FileCollectionChecksum([]string{crtAbsPath})
+	require.NoError(t, err)
+
+	expected := "apiVersion: v1\n" +
+		"data:\n" +
+		"  resource.yaml: |\n" +
+		"    foo: bar\n" +
+		"kind: ConfigMap\n" +
+		"metadata:\n" +
+		"  name: test-cluster-resource-templates\n" +
+		"  namespace: test\n" +
+		"---\n" +
+		"apiVersion: v1\n" +
+		"data:\n" +
+		"  999-extra-config.yaml: |\n" +
+		"    ham: spam\n" +
+		"kind: ConfigMap\n" +
+		"metadata:\n" +
+		"  name: test-config\n" +
+		"  namespace: test\n" +
+		"---\n" +
+		"apiVersion: apps/v1\n" +
+		"kind: Deployment\n" +
+		"metadata:\n" +
+		"  name: test-deployment\n" +
+		"  namespace: test\n" +
+		"spec:\n" +
+		"  replicas: 1\n" +
+		"  selector:\n" +
+		"    matchLabels:\n" +
+		"      app: test\n" +
+		"  template:\n" +
+		"    metadata:\n" +
+		"      annotations:\n" +
+		"        checksum/extra-cluster-resource-templates: " + hex.EncodeToString(crtChecksum) + "\n" +
+		"        checksum/extra-configuration: " + hex.EncodeToString(configChecksum) + "\n" +
+		"      labels:\n" +
+		"        app: test\n" +
+		"    spec:\n" +
+		"      containers:\n" +
+		"      - image: test:test\n" +
+		"        name: test\n"
+
+	assert.Equal(t, expected, string(rendered))
 }
 
 func TestLoaderEmptyDir(t *testing.T) {
-	// Initialize config loader
 	cOpts := LoaderOpts{
 		ConfigurationConfigMapName:            "test-config",
 		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
@@ -118,28 +90,19 @@ func TestLoaderEmptyDir(t *testing.T) {
 		DirPath:                               filepath.Join("testdata", "emptydir"),
 	}
 	c, err := NewLoader(&cOpts)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	assert.Nil(t, c.configuration)
 	assert.Nil(t, c.clusterResourceTemplates)
 
-	// Read in base manifest
 	base, err := os.ReadFile(filepath.Join("testdata", "base.yaml"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	// Apply transform
 	rendered, err := c.Transform(base)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, base, rendered, "YAML strings should match")
+	require.NoError(t, err)
+	assert.Equal(t, base, rendered)
 }
 
 func TestLoaderEmptyFiles(t *testing.T) {
-	// Initialize config loader
 	cOpts := LoaderOpts{
 		ConfigurationConfigMapName:            "test-config",
 		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
@@ -148,22 +111,14 @@ func TestLoaderEmptyFiles(t *testing.T) {
 		DirPath:                               filepath.Join("testdata", "emptyfile"),
 	}
 	c, err := NewLoader(&cOpts)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	assert.Nil(t, c.configuration)
 	assert.Nil(t, c.clusterResourceTemplates)
 
-	// Read in base manifest
 	base, err := os.ReadFile(filepath.Join("testdata", "base.yaml"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	// Apply transform
 	rendered, err := c.Transform(base)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, base, rendered, "YAML strings should match")
+	require.NoError(t, err)
+	assert.Equal(t, base, rendered)
 }
