@@ -10,22 +10,22 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
-// EventsService implements the EventsService gRPC API.
-type EventsService struct {
+// EventsProxyService implements the EventsProxyService gRPC API.
+type EventsProxyService struct {
 	runClient workflowconnect.InternalRunServiceClient
 }
 
-func NewEventService(runClient workflowconnect.InternalRunServiceClient) *EventsService {
-	return &EventsService{runClient: runClient}
+func NewEventsProxyService(runClient workflowconnect.InternalRunServiceClient) *EventsProxyService {
+	return &EventsProxyService{runClient: runClient}
 }
 
 // Record accepts action events and forwards them synchronously to the run service.
-func (s *EventsService) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (s *EventsProxyService) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
 	if s.runClient == nil {
 		return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("run client is not initialized"))
 	}
 	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "invalid EventsService.Record request: %v", err)
+		logger.Errorf(ctx, "invalid EventsProxyService.Record request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	if len(req.Msg.GetEvents()) == 0 {

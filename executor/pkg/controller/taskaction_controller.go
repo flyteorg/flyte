@@ -72,7 +72,7 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
-	eventsClient    workflowconnect.EventsServiceClient
+	eventsClient    workflowconnect.EventsProxyServiceClient
 	cluster         string
 }
 
@@ -82,7 +82,7 @@ func NewTaskActionReconciler(
 	scheme *runtime.Scheme,
 	registry *plugin.Registry,
 	dataStore *storage.DataStore,
-	eventsClient workflowconnect.EventsServiceClient,
+	eventsClient workflowconnect.EventsProxyServiceClient,
 	cluster string,
 ) *TaskActionReconciler {
 	return &TaskActionReconciler{

@@ -11,7 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
-// Setup registers the EventsService handler.
+// Setup registers the EventsProxyService handler.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
@@ -21,10 +21,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
 
-	eventsSvc := service.NewEventService(runClient)
-	path, handler := workflowconnect.NewEventsServiceHandler(eventsSvc)
+	eventsSvc := service.NewEventsProxyService(runClient)
+	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc)
 	sc.Mux.Handle(path, handler)
-	logger.Infof(ctx, "Mounted EventsService at %s", path)
+	logger.Infof(ctx, "Mounted EventsProxyService at %s", path)
 
 	return nil
 }

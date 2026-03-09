@@ -111,7 +111,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		if eventsServiceURL == "" {
 			eventsServiceURL = cfg.StateServiceURL
 		}
-		eventsClient := workflowconnect.NewEventsServiceClient(http.DefaultClient, eventsServiceURL)
+		eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
 
 		reconciler := controller.NewTaskActionReconciler(
 			mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
