@@ -98,14 +98,3 @@ console:
 .venv:
 	python -m venv .venv
 	. .venv/bin/activate && pip install flytekit
-
-.PHONY: test
-test: export FLYTECTL_CONFIG := test/config.yaml
-test: .venv
-	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
-	. .venv/bin/activate && pyflyte run --remote test/raw_container_wf.py wf
-	kubectl create secret generic user-info \
-		--namespace flytesnacks-development \
-		--from-literal=user_secret=sosecret \
-		--dry-run=client --output yaml | kubectl apply --filename -
-	. .venv/bin/activate && pyflyte run --remote test/secrets_wf.py wf
