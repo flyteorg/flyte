@@ -224,6 +224,50 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
 }
 
+func TestBuildResourceRayEnableIngress(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	testCases := []struct {
+		name          string
+		enableIngress bool
+	}{
+		{
+			name:          "ingress enabled",
+			enableIngress: true,
+		},
+		{
+			name:          "ingress disabled",
+			enableIngress: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			origConfig := *GetConfig()
+			t.Cleanup(func() { assert.NoError(t, SetConfig(&origConfig)) })
+
+			assert.NoError(t, SetConfig(&Config{
+				EnableIngress: tc.enableIngress,
+			}))
+
+			rayJobInput := dummyRayCustomObj()
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
+			taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1.RayJob)
+			assert.True(t, ok)
+
+			// Verify that EnableIngress is set correctly on the HeadGroupSpec
+			assert.NotNil(t, rayJob.Spec.RayClusterSpec.HeadGroupSpec.EnableIngress)
+			assert.Equal(t, tc.enableIngress, *rayJob.Spec.RayClusterSpec.HeadGroupSpec.EnableIngress)
+		})
+	}
+}
+
 func TestBuildResourceRayContainerImage(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
@@ -279,6 +323,31 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 			assert.Equal(t, expectedContainerImage, workerNodeSpec.Containers[0].Image)
 		})
 	}
+}
+
+func TestBuildResourceRayEntrypointPreservesEmptyArgs(t *testing.T) {
+	// Regression test: empty string args must be preserved when converting
+	// container args (yaml array) to the RayJob entrypoint string.
+	rayJobResourceHandler := rayJobResourceHandler{}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	rayJob := dummyRayCustomObj()
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
+	taskTemplate.GetContainer().Args = []string{
+		"pyflyte-map-execute", "--resolver", "ArrayNodeMapTaskResolver",
+		"--", "vars", "", "resolver", "default_task_resolver",
+		"task-module", "some_module", "task-name", "some_task",
+	}
+
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	assert.NotNil(t, r)
+
+	rayJobObj, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	assert.Contains(t, rayJobObj.Spec.Entrypoint, "vars '' resolver")
 }
 
 func TestBuildPodTemplate(t *testing.T) {
