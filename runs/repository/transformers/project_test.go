@@ -29,9 +29,10 @@ func TestProjectModelRoundTrip(t *testing.T) {
 	model, err := NewProjectModel(p)
 	require.NoError(t, err)
 	require.NotNil(t, model)
-	assert.Equal(t, "org1", model.Org)
-	assert.Equal(t, "p1", model.ID)
+	assert.Equal(t, "p1", model.Identifier)
 	assert.NotEmpty(t, model.Labels)
+	require.NotNil(t, model.State)
+	assert.Equal(t, int32(project.ProjectState_PROJECT_STATE_ACTIVE), *model.State)
 
 	domains := []*project.Domain{{Id: "production", Name: "Production"}}
 	restored, err := ProjectModelToProject(model, domains)
@@ -40,7 +41,6 @@ func TestProjectModelRoundTrip(t *testing.T) {
 	assert.Equal(t, p.Name, restored.Name)
 	assert.Equal(t, p.Description, restored.Description)
 	assert.Equal(t, p.State, restored.State)
-	assert.Equal(t, p.Org, restored.Org)
 	require.NotNil(t, restored.GetLabels())
 	assert.Equal(t, "infra", restored.GetLabels().GetValues()["team"])
 	require.Len(t, restored.Domains, 1)

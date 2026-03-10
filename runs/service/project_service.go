@@ -69,11 +69,7 @@ func (s *ProjectService) UpdateProject(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("project.id is required"))
 	}
 
-	key := models.ProjectKey{
-		Org: projectProto.GetOrg(),
-		ID:  projectProto.GetId(),
-	}
-	if _, err := s.projectRepo.GetProject(ctx, key); err != nil {
+	if _, err := s.projectRepo.GetProject(ctx, projectProto.GetId()); err != nil {
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
@@ -106,10 +102,7 @@ func (s *ProjectService) GetProject(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id is required"))
 	}
 
-	model, err := s.projectRepo.GetProject(ctx, models.ProjectKey{
-		Org: req.Msg.GetOrg(),
-		ID:  req.Msg.GetId(),
-	})
+	model, err := s.projectRepo.GetProject(ctx, req.Msg.GetId())
 	if err != nil {
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -140,11 +133,7 @@ func (s *ProjectService) ListProjects(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	if req.Msg.GetOrg() != "" {
-		listInput.ScopeByFilter = impl.NewOrgFilter(req.Msg.GetOrg())
-	}
-
-	// Match flyteadmin behavior: if no filters are supplied, hide archived projects.
+	// If no filters are supplied, hide archived (deleted) projects.
 	if req.Msg.GetFilters() == "" {
 		listInput.Filter = impl.NewNotEqualFilter("state", int32(project.ProjectState_PROJECT_STATE_ARCHIVED))
 	}
@@ -193,8 +182,7 @@ func listResourceInputFromProjectListRequest(req *project.ListProjectsRequest) (
 		Offset: offset,
 	}
 
-	if req.GetSortBy() != nil && req.GetSortBy().GetKey() != "" {
-		sortField := req.GetSortBy().GetKey()
+	if sortField := req.GetSortBy().GetKey(); sortField != "" {
 		if !models.ProjectColumns.Has(sortField) {
 			return interfaces.ListResourceInput{}, fmt.Errorf("invalid sort field: %s", sortField)
 		}

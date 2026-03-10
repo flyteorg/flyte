@@ -21,15 +21,14 @@ func NewProjectModel(p *project.Project) (*models.Project, error) {
 		}
 	}
 
+	stateInt := int32(p.GetState())
+
 	return &models.Project{
-		ProjectKey: models.ProjectKey{
-			Org: p.GetOrg(),
-			ID:  p.GetId(),
-		},
+		Identifier:  p.GetId(),
 		Name:        p.GetName(),
 		Description: p.GetDescription(),
 		Labels:      labelsBytes,
-		State:       int32(p.GetState()),
+		State:       &stateInt,
 	}, nil
 }
 
@@ -43,13 +42,17 @@ func ProjectModelToProject(model *models.Project, domains []*project.Domain) (*p
 		}
 	}
 
+	state := project.ProjectState_PROJECT_STATE_ACTIVE
+	if model.State != nil {
+		state = project.ProjectState(*model.State)
+	}
+
 	return &project.Project{
-		Id:          model.ID,
+		Id:          model.Identifier,
 		Name:        model.Name,
 		Domains:     domains,
 		Description: model.Description,
 		Labels:      labels,
-		State:       project.ProjectState(model.State),
-		Org:         model.Org,
+		State:       state,
 	}, nil
 }

@@ -14,7 +14,7 @@ var (
 
 type ProjectRepo interface {
 	CreateProject(ctx context.Context, project *models.Project) error
-	GetProject(ctx context.Context, key models.ProjectKey) (*models.Project, error)
+	GetProject(ctx context.Context, identifier string) (*models.Project, error)
 	UpdateProject(ctx context.Context, project *models.Project) error
 	ListProjects(ctx context.Context, input ListResourceInput) ([]*models.Project, error)
 }

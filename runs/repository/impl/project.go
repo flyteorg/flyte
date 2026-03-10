@@ -29,24 +29,24 @@ func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project
 
 	result := r.db.WithContext(ctx).Create(project)
 	if result.Error != nil {
-		logger.Errorf(ctx, "failed to create project %s/%s: %v", project.Org, project.ID, result.Error)
+		logger.Errorf(ctx, "failed to create project %s: %v", project.Identifier, result.Error)
 		return fmt.Errorf("%w: %v", interfaces.ErrProjectAlreadyExists, result.Error)
 	}
 
 	return nil
 }
 
-func (r *projectRepo) GetProject(ctx context.Context, key models.ProjectKey) (*models.Project, error) {
+func (r *projectRepo) GetProject(ctx context.Context, identifier string) (*models.Project, error) {
 	var project models.Project
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND id = ?", key.Org, key.ID).
+		Where("identifier = ?", identifier).
 		First(&project)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("%w: %s/%s", interfaces.ErrProjectNotFound, key.Org, key.ID)
+			return nil, fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, identifier)
 		}
-		logger.Errorf(ctx, "failed to get project %s/%s: %v", key.Org, key.ID, result.Error)
-		return nil, fmt.Errorf("failed to get project %s/%s: %w", key.Org, key.ID, result.Error)
+		logger.Errorf(ctx, "failed to get project %s: %v", identifier, result.Error)
+		return nil, fmt.Errorf("failed to get project %s: %w", identifier, result.Error)
 	}
 
 	return &project, nil
@@ -63,14 +63,14 @@ func (r *projectRepo) UpdateProject(ctx context.Context, project *models.Project
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Project{}).
-		Where("org = ? AND id = ?", project.Org, project.ID).
+		Where("identifier = ?", project.Identifier).
 		Updates(updates)
 	if result.Error != nil {
-		logger.Errorf(ctx, "failed to update project %s/%s: %v", project.Org, project.ID, result.Error)
-		return fmt.Errorf("failed to update project %s/%s: %w", project.Org, project.ID, result.Error)
+		logger.Errorf(ctx, "failed to update project %s: %v", project.Identifier, result.Error)
+		return fmt.Errorf("failed to update project %s: %w", project.Identifier, result.Error)
 	}
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("%w: %s/%s", interfaces.ErrProjectNotFound, project.Org, project.ID)
+		return fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, project.Identifier)
 	}
 
 	return nil
@@ -88,20 +88,10 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 		query = query.Where(expr.Query, expr.Args...)
 	}
 
-	if input.ScopeByFilter != nil {
-		expr, err := input.ScopeByFilter.GormQueryExpression("")
-		if err != nil {
-			return nil, fmt.Errorf("failed to build scope filter: %w", err)
-		}
-		query = query.Where(expr.Query, expr.Args...)
-	}
-
 	if len(input.SortParameters) > 0 {
 		for _, sp := range input.SortParameters {
 			query = query.Order(sp.GetGormOrderExpr())
 		}
-	} else {
-		query = query.Order("id DESC")
 	}
 
 	query = query.Offset(input.Offset)
