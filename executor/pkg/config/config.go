@@ -19,7 +19,8 @@ var (
 		MetricsCertName:        "tls.crt",
 		MetricsCertKey:         "tls.key",
 		EnableHTTP2:            false,
-		StateServiceURL:        "http://localhost:8090",
+		EventsServiceURL:        "http://localhost:8090",
+		Cluster:                "",
 	}
 
 	configSection = stdconfig.MustRegisterSection(configSectionKey, defaultConfig)
@@ -61,8 +62,11 @@ type Config struct {
 	// EnableHTTP2 enables HTTP/2 for the metrics and webhook servers.
 	EnableHTTP2 bool `json:"enableHTTP2" pflag:",Enable HTTP/2 for metrics and webhook servers"`
 
-	// StateServiceURL is the URL of the State Service for reporting action state updates.
-	StateServiceURL string `json:"stateServiceURL" pflag:",URL of the State Service for action state updates"`
+	// EventsServiceURL is the URL of the State Service for reporting action state updates.
+	EventsServiceURL string `json:"stateServiceURL" pflag:",URL of the State Service for action state updates"`
+
+	// Cluster is the cluster identifier attached to action events.
+	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
 }
 
 // GetConfig returns the parsed executor configuration

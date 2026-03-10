@@ -61,6 +61,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsCertName"), defaultConfig.MetricsCertName, "Name of the metrics server certificate file")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsCertKey"), defaultConfig.MetricsCertKey, "Name of the metrics server key file")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableHTTP2"), defaultConfig.EnableHTTP2, "Enable HTTP/2 for metrics and webhook servers")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stateServiceURL"), defaultConfig.StateServiceURL, "URL of the State Service for action state updates")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "eventsServiceURL"), defaultConfig.EventsServiceURL, "URL of the Events Proxy Service for action state updates")
 	return cmdFlags
 }

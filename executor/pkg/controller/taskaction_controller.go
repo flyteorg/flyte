@@ -22,8 +22,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
+	"connectrpc.com/connect"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,7 +41,12 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	task "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -65,6 +72,8 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
+	eventsClient    workflowconnect.EventsProxyServiceClient
+	cluster         string
 }
 
 // NewTaskActionReconciler creates a new TaskActionReconciler
@@ -73,12 +82,16 @@ func NewTaskActionReconciler(
 	scheme *runtime.Scheme,
 	registry *plugin.Registry,
 	dataStore *storage.DataStore,
+	eventsClient workflowconnect.EventsProxyServiceClient,
+	cluster string,
 ) *TaskActionReconciler {
 	return &TaskActionReconciler{
 		Client:         c,
 		Scheme:         scheme,
 		PluginRegistry: registry,
 		DataStore:      dataStore,
+		eventsClient:   eventsClient,
+		cluster:        cluster,
 	}
 }
 
@@ -200,7 +213,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
 	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
 
-	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction); err != nil {
+	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -259,20 +272,180 @@ func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *
 
 // updateTaskActionStatus updates the TaskAction status only when the status has changed,
 // avoiding unnecessary API calls for unchanged state.
-func (r *TaskActionReconciler) updateTaskActionStatus(ctx context.Context, oldTaskAction, newTaskAction *flyteorgv1.TaskAction) error {
+func (r *TaskActionReconciler) updateTaskActionStatus(
+	ctx context.Context,
+	oldTaskAction, newTaskAction *flyteorgv1.TaskAction,
+	phaseInfo pluginsCore.PhaseInfo,
+) error {
 	logger := log.FromContext(ctx)
 
 	if !taskActionStatusChanged(oldTaskAction.Status, newTaskAction.Status) {
 		return nil
 	}
 
-	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
-	err := r.Status().Update(ctx, newTaskAction)
-	if err != nil {
-		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
+	if r.eventsClient == nil {
+		return nil
 	}
 
-	return err
+	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
+	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{actionEvent},
+	})); err != nil {
+		r.Recorder.Eventf(
+			newTaskAction,
+			corev1.EventTypeWarning,
+			"ActionEventPublishFailed",
+			"Failed to persist action event %q: %v",
+			actionEvent.GetId().GetName(),
+			err,
+		)
+		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		return err
+	}
+
+	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
+	if err := r.Status().Update(ctx, newTaskAction); err != nil {
+		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
+		return err
+	}
+
+	return nil
+}
+
+func (r *TaskActionReconciler) buildActionEvent(
+	taskAction *flyteorgv1.TaskAction,
+	phaseInfo pluginsCore.PhaseInfo,
+) *workflow.ActionEvent {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     taskAction.Spec.Org,
+			Project: taskAction.Spec.Project,
+			Domain:  taskAction.Spec.Domain,
+			Name:    taskAction.Spec.RunName,
+		},
+		Name: taskAction.Spec.ActionName,
+	}
+
+	info := phaseInfo.Info()
+	updatedTime := updatedTimestamp(info, taskAction.Status.PhaseHistory)
+	reportedTime := reportedTimestamp(info)
+
+	event := &workflow.ActionEvent{
+		Id:            actionID,
+		Attempt:       1, // TODO(nary): wire retry attempt once retry state is available in executor status.
+		Phase:         phaseToActionPhase(phaseInfo.Phase()),
+		Version:       phaseInfo.Version(),
+		UpdatedTime:   updatedTime,
+		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
+		Cluster:       r.cluster,
+		Outputs:       outputRefs(taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName),
+		ClusterEvents: toClusterEvents(info, updatedTime),
+		ReportedTime:  reportedTime,
+	}
+
+	if info != nil {
+		event.LogInfo = info.Logs
+		event.LogContext = info.LogContext
+		event.CacheStatus = cacheStatusFromExternalResources(info.ExternalResources)
+	}
+
+	return event
+}
+
+func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
+	if info != nil && info.OccurredAt != nil {
+		return timestamppb.New(*info.OccurredAt)
+	}
+	if n := len(history); n > 0 {
+		return timestamppb.New(history[n-1].OccurredAt.Time)
+	}
+	return nil
+}
+
+func reportedTimestamp(info *pluginsCore.TaskInfo) *timestamppb.Timestamp {
+	if info != nil && info.ReportedAt != nil {
+		return timestamppb.New(*info.ReportedAt)
+	}
+	return timestamppb.Now()
+}
+
+func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
+	if runOutputBase == "" {
+		return nil
+	}
+	return &task.OutputReferences{
+		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName,
+	}
+}
+
+func phaseToActionPhase(phase pluginsCore.Phase) common.ActionPhase {
+	switch phase {
+	case pluginsCore.PhaseNotReady, pluginsCore.PhaseQueued:
+		return common.ActionPhase_ACTION_PHASE_QUEUED
+	case pluginsCore.PhaseWaitingForResources, pluginsCore.PhaseWaitingForCache:
+		return common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES
+	case pluginsCore.PhaseInitializing:
+		return common.ActionPhase_ACTION_PHASE_INITIALIZING
+	case pluginsCore.PhaseRunning:
+		return common.ActionPhase_ACTION_PHASE_RUNNING
+	case pluginsCore.PhaseSuccess:
+		return common.ActionPhase_ACTION_PHASE_SUCCEEDED
+	case pluginsCore.PhaseRetryableFailure, pluginsCore.PhasePermanentFailure:
+		return common.ActionPhase_ACTION_PHASE_FAILED
+	case pluginsCore.PhaseAborted:
+		return common.ActionPhase_ACTION_PHASE_ABORTED
+	default:
+		return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+	}
+}
+
+func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
+	if err == nil {
+		return nil
+	}
+	out := &workflow.ErrorInfo{
+		Message: err.GetMessage(),
+		Kind:    workflow.ErrorInfo_KIND_UNSPECIFIED,
+	}
+	switch err.GetKind() {
+	case core.ExecutionError_USER:
+		out.Kind = workflow.ErrorInfo_KIND_USER
+	case core.ExecutionError_SYSTEM:
+		out.Kind = workflow.ErrorInfo_KIND_SYSTEM
+	}
+	return out
+}
+
+func toClusterEvents(info *pluginsCore.TaskInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
+	if info == nil || len(info.AdditionalReasons) == 0 {
+		return nil
+	}
+	out := make([]*workflow.ClusterEvent, 0, len(info.AdditionalReasons))
+	for _, reason := range info.AdditionalReasons {
+		e := &workflow.ClusterEvent{
+			Message: reason.Reason,
+		}
+		if reason.OccurredAt != nil {
+			e.OccurredAt = timestamppb.New(*reason.OccurredAt)
+		} else {
+			e.OccurredAt = fallbackTime
+		}
+		out = append(out, e)
+	}
+	return out
+}
+
+func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource) core.CatalogCacheStatus {
+	for _, resource := range resources {
+		if resource == nil {
+			continue
+		}
+		// Return the first explicit cache status signal.
+		if resource.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED {
+			return resource.CacheStatus
+		}
+	}
+	return core.CatalogCacheStatus_CACHE_DISABLED
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
