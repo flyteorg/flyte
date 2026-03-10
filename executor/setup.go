@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net/http"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -23,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
 	// Plugin registrations — blank imports trigger init() which registers
 	// plugins with the global registry.
@@ -105,8 +107,14 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			return fmt.Errorf("executor: failed to initialize plugin registry: %w", err)
 		}
 
+		eventsServiceURL := sc.BaseURL
+		if eventsServiceURL == "" {
+			eventsServiceURL = cfg.EventsServiceURL
+		}
+		eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
+
 		reconciler := controller.NewTaskActionReconciler(
-			mgr.GetClient(), mgr.GetScheme(), registry, dataStore,
+			mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
 		)
 		reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
 		if err := reconciler.SetupWithManager(mgr); err != nil {

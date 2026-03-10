@@ -260,7 +260,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("stateServiceURL", testValue)
 			if vString, err := cmdFlags.GetString("stateServiceURL"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.StateServiceURL)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EventsServiceURL)
 
 			} else {
 				assert.FailNow(t, err.Error())
