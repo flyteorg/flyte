@@ -1,5 +1,7 @@
 # Development Guide
 
+> Note: this development guide is stale, should use `make sandbox-run` command
+
 Use following method to setup the whole system and run:
 
 1. Create k3d cluster with
@@ -31,8 +33,7 @@ kubectl port-forward -n flyte-dataproxy svc/minio 9000:9000 9001:9001
 5. Start the manager
 
 ```sh
-cd manager/
-make run
+make -C manager run
 ```
 
 6. Run `python example/basics/hello.py` in flyte-sdk with following config:
