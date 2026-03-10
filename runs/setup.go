@@ -8,11 +8,14 @@ import (
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -63,6 +66,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+
+	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
+	for _, d := range cfg.Domains {
+		domains = append(domains, &projectpb.Domain{
+			Id:   d.ID,
+			Name: d.Name,
+		})
+	}
+	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
+	sc.Mux.Handle(projectPath, projectHandler)
+	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
 	sc.AddReadyCheck(func(r *http.Request) error {
 		sqlDB, err := sc.DB.DB()
