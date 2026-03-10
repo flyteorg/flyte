@@ -145,3 +145,36 @@ func TestListProjects_WithFiltersIncludesArchived(t *testing.T) {
 	require.NotNil(t, resp.Msg.GetProjects())
 	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 2)
 }
+
+func TestListProjects_ZeroLimitDoesNotApplyLimit(t *testing.T) {
+	ctx := context.Background()
+	svc := setupProjectService(t)
+
+	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+		Project: &project.Project{
+			Id:    "one",
+			Name:  "One",
+			State: project.ProjectState_PROJECT_STATE_ACTIVE,
+			Org:   "org1",
+		},
+	}))
+	require.NoError(t, err)
+
+	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+		Project: &project.Project{
+			Id:    "two",
+			Name:  "Two",
+			State: project.ProjectState_PROJECT_STATE_ACTIVE,
+			Org:   "org1",
+		},
+	}))
+	require.NoError(t, err)
+
+	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+		Org: "org1",
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.GetProjects())
+	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 2)
+	assert.Equal(t, "", resp.Msg.GetProjects().GetToken())
+}

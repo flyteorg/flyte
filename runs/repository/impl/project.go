@@ -104,7 +104,10 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 		query = query.Order("id DESC")
 	}
 
-	query = query.Limit(input.Limit).Offset(input.Offset)
+	query = query.Offset(input.Offset)
+	if input.Limit > 0 {
+		query = query.Limit(input.Limit)
+	}
 	if err := query.Find(&projects).Error; err != nil {
 		logger.Errorf(ctx, "failed to list projects: %v", err)
 		return nil, fmt.Errorf("failed to list projects: %w", err)

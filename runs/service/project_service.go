@@ -16,11 +16,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
 
-const (
-	defaultProjectListLimit = 50
-	maxProjectListLimit     = 200
-)
-
 type ProjectService struct {
 	projectRepo interfaces.ProjectRepo
 	domains     []*project.Domain
@@ -169,7 +164,7 @@ func (s *ProjectService) ListProjects(
 	}
 
 	var token string
-	if len(projectProtos) > 0 && len(projectProtos) == listInput.Limit {
+	if listInput.Limit > 0 && len(projectProtos) == listInput.Limit {
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
 
@@ -183,16 +178,6 @@ func (s *ProjectService) ListProjects(
 
 func listResourceInputFromProjectListRequest(req *project.ListProjectsRequest) (interfaces.ListResourceInput, error) {
 	limit := int(req.GetLimit())
-	if limit == 0 {
-		limit = defaultProjectListLimit
-	}
-	if limit < 0 {
-		return interfaces.ListResourceInput{}, fmt.Errorf("invalid limit: %d (must be non-negative)", limit)
-	}
-	if limit > maxProjectListLimit {
-		return interfaces.ListResourceInput{}, fmt.Errorf("invalid limit: %d (exceeds maximum of %d)", limit, maxProjectListLimit)
-	}
-
 	var offset int
 	if req.GetToken() != "" {
 		if _, err := fmt.Sscanf(req.GetToken(), "%d", &offset); err != nil {
