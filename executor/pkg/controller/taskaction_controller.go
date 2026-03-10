@@ -283,22 +283,20 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	if r.eventsClient != nil {
-		actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
-		if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-			Events: []*workflow.ActionEvent{actionEvent},
-		})); err != nil {
-			r.Recorder.Eventf(
-				newTaskAction,
-				corev1.EventTypeWarning,
-				"ActionEventPublishFailed",
-				"Failed to persist action event %q: %v",
-				actionEvent.GetId().GetName(),
-				err,
-			)
-			logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
-			return err
-		}
+	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
+	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{actionEvent},
+	})); err != nil {
+		r.Recorder.Eventf(
+			newTaskAction,
+			corev1.EventTypeWarning,
+			"ActionEventPublishFailed",
+			"Failed to persist action event %q: %v",
+			actionEvent.GetId().GetName(),
+			err,
+		)
+		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		return err
 	}
 
 	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)

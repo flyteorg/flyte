@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
@@ -30,7 +31,15 @@ import (
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
+
+// fakeEventsClient is a no-op implementation of EventsProxyServiceClient for tests.
+type fakeEventsClient struct{}
+
+func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
 
 // buildTaskTemplateBytes creates a minimal protobuf-serialized TaskTemplate
 // with a container spec that the pod plugin can use to build a Pod.
@@ -111,6 +120,7 @@ var _ = Describe("TaskAction Controller", func() {
 				Recorder:       record.NewFakeRecorder(10),
 				PluginRegistry: pluginRegistry,
 				DataStore:      dataStore,
+				eventsClient:   &fakeEventsClient{},
 			}
 
 			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
