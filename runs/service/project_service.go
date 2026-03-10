@@ -196,6 +196,14 @@ func listResourceInputFromProjectListRequest(req *project.ListProjectsRequest) (
 		}
 	}
 
+	if req.GetFilters() != "" {
+		filter, err := impl.ParseStringFilters(req.GetFilters(), models.ProjectColumns)
+		if err != nil {
+			return interfaces.ListResourceInput{}, err
+		}
+		listInput.Filter = filter
+	}
+
 	return listInput, nil
 }
 

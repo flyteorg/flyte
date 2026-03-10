@@ -138,7 +138,40 @@ func TestListProjects_WithFiltersIncludesArchived(t *testing.T) {
 	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
 		Org:     "org1",
 		Limit:   10,
-		Filters: "state == archived",
+		Filters: "eq(state,1)",
+	}))
+	require.NoError(t, err)
+
+	require.NotNil(t, resp.Msg.GetProjects())
+	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 1)
+	assert.Equal(t, "archived", resp.Msg.GetProjects().GetProjects()[0].GetId())
+}
+
+func TestListProjects_ValueInState(t *testing.T) {
+	ctx := context.Background()
+	svc := setupProjectService(t)
+
+	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+		Project: &project.Project{
+			Id:    "active",
+			Name:  "Active",
+			State: project.ProjectState_PROJECT_STATE_ACTIVE,
+		},
+	}))
+	require.NoError(t, err)
+
+	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+		Project: &project.Project{
+			Id:    "archived",
+			Name:  "Archived",
+			State: project.ProjectState_PROJECT_STATE_ARCHIVED,
+		},
+	}))
+	require.NoError(t, err)
+
+	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+		Limit:   10,
+		Filters: "value_in(state,0;1;2)",
 	}))
 	require.NoError(t, err)
 
