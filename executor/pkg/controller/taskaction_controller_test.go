@@ -27,7 +27,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"k8s.io/client-go/tools/record"
 )
+
+// emptyPluginRegistry satisfies plugin.PluginRegistryIface with no registered plugins.
+type emptyPluginRegistry struct{}
+
+func (emptyPluginRegistry) GetCorePlugins() []pluginsCore.PluginEntry { return nil }
+func (emptyPluginRegistry) GetK8sPlugins() []k8sPlugin.PluginEntry   { return nil }
 
 var _ = Describe("TaskAction Controller", func() {
 	Context("When reconciling a resource", func() {
@@ -37,7 +47,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 		typeNamespacedName := types.NamespacedName{
 			Name:      resourceName,
-			Namespace: "default", // TODO(user):Modify as needed
+			Namespace: "default",
 		}
 		taskaction := &flyteorgv1.TaskAction{}
 
@@ -56,6 +66,8 @@ var _ = Describe("TaskAction Controller", func() {
 						Project:       "test-project",
 						Domain:        "test-domain",
 						ActionName:    "test-action",
+						TaskType:      "container",
+						TaskTemplate:  []byte(`{}`),
 						InputURI:      "/tmp/input",
 						RunOutputBase: "/tmp/output",
 					},
@@ -65,7 +77,6 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 
 		AfterEach(func() {
-			// TODO(user): Cleanup logic after each test, like removing the resource instance.
 			resource := &flyteorgv1.TaskAction{}
 			err := k8sClient.Get(ctx, typeNamespacedName, resource)
 			Expect(err).NotTo(HaveOccurred())
@@ -73,12 +84,15 @@ var _ = Describe("TaskAction Controller", func() {
 			By("Cleanup the specific resource instance TaskAction")
 			Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
 		})
+
 		It("should successfully reconcile the resource", func() {
 			By("Reconciling the created resource")
 
 			controllerReconciler := &TaskActionReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				PluginRegistry: plugin.NewRegistry(nil, emptyPluginRegistry{}),
+				Recorder:       record.NewFakeRecorder(10),
 			}
 
 			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{

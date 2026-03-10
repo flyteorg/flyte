@@ -50,9 +50,9 @@ const (
 type K8sEventType string
 
 const (
-	FailedUnmarshal     K8sEventType = "FailedUnmarshal"
-	FailedPluginResolve K8sEventType = "FailedPluginResolve"
-	FailedPluginHandle  K8sEventType = "FailedPluginHandle"
+	FailedUnmarshal    K8sEventType = "FailedUnmarshal"
+	FailedValidation   K8sEventType = "FailedValidation"
+	FailedPluginHandle K8sEventType = "FailedPluginHandle"
 )
 
 // TaskActionReconciler reconciles a TaskAction object
@@ -98,7 +98,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking 
+	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
 	// if the TaskAction instance changes
 	originalTaskActionInstance := taskAction.DeepCopy()
 
@@ -112,41 +112,23 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
-	// Validate required spec fields before proceeding
-	if err := validateSpec(taskAction); err != nil {
-		logger.Error(err, "TaskAction spec is invalid")
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(flyteorgv1.ConditionReasonInvalidSpec),
-			"Invalid spec: %v", err)
-		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
-		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-			flyteorgv1.ConditionReasonInvalidSpec, err.Error())
+	// Validate spec fields and resolve plugin before adding the finalizer
+	// If either fails, the resource is marked terminal and not requeued — no finalizer to clean up
+	p, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
+	if err != nil {
+		logger.Error(err, "TaskAction validation failed")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedValidation), "%v", err)
+		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
+		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
 		_ = r.Status().Update(ctx, taskAction)
 		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
-	// Ensure finalizer is present
+	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
 		if err := r.Update(ctx, taskAction); err != nil {
 			logger.Error(err, "Failed to update TaskAction with finalizer")
-			return ctrl.Result{}, err
-		}
-		return ctrl.Result{}, nil
-	}
-
-	// Resolve plugin from registry
-	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
-	if err != nil {
-		logger.Error(err, "failed to resolve plugin", "taskType", taskAction.Spec.TaskType)
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginResolve),
-			"No plugin found for task type %q: %v", taskAction.Spec.TaskType, err)
-		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
-		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-			flyteorgv1.ConditionReasonPluginNotFound, err.Error())
-		err = r.Status().Update(ctx, taskAction)
-		if err != nil {
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, nil
@@ -403,9 +385,31 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-// validateSpec checks that the TaskAction spec has all required fields populated.
-func validateSpec(taskAction *flyteorgv1.TaskAction) error {
+// pluginResolver is satisfied by *plugin.Registry and allows mocking in tests.
+type pluginResolver interface {
+	ResolvePlugin(taskType string) (pluginsCore.Plugin, error)
+}
+
+// validateTaskAction checks that all required spec fields are populated and that a plugin
+// is registered for the given task type. Both checks happen before the finalizer is added,
+// so a failure here leaves the resource finalizer-free and trivially deletable.
+func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolver) (pluginsCore.Plugin, flyteorgv1.TaskActionConditionReason, error) {
 	var missing []string
+	if taskAction.Spec.RunName == "" {
+		missing = append(missing, "runName")
+	}
+	if taskAction.Spec.Org == "" {
+		missing = append(missing, "org")
+	}
+	if taskAction.Spec.Project == "" {
+		missing = append(missing, "project")
+	}
+	if taskAction.Spec.Domain == "" {
+		missing = append(missing, "domain")
+	}
+	if taskAction.Spec.ActionName == "" {
+		missing = append(missing, "actionName")
+	}
 	if taskAction.Spec.TaskType == "" {
 		missing = append(missing, "taskType")
 	}
@@ -419,9 +423,17 @@ func validateSpec(taskAction *flyteorgv1.TaskAction) error {
 		missing = append(missing, "runOutputBase")
 	}
 	if len(missing) > 0 {
-		return fmt.Errorf("required spec fields are empty: %v", missing)
+		return nil, flyteorgv1.ConditionReasonInvalidSpec,
+			fmt.Errorf("required spec fields are empty: %v", missing)
 	}
-	return nil
+
+	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		return nil, flyteorgv1.ConditionReasonPluginNotFound,
+			fmt.Errorf("no plugin found for task type %q: %w", taskAction.Spec.TaskType, err)
+	}
+
+	return p, "", nil
 }
 
 // setCondition sets or updates a condition on the TaskAction.
