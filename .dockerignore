@@ -16,6 +16,7 @@ target/
 **/Cargo.lock
 *.pyc
 __pycache__/
+.kube/
 
 # IDE
 .vscode/

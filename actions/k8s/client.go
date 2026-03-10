@@ -591,12 +591,12 @@ func InitScheme() error {
 // buildActionSpec converts an actions.Action into the workflow.ActionSpec expected by the executor.
 func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.ActionSpec {
 	actionSpec := &workflow.ActionSpec{
-		ActionId:      action.ActionId,
+		ActionId:         action.ActionId,
 		ParentActionName: action.ParentActionName,
-		RunSpec:       runSpec,
-		InputUri:      action.InputUri,
-		RunOutputBase: action.RunOutputBase,
-		Group:         action.Group,
+		RunSpec:          runSpec,
+		InputUri:         action.InputUri,
+		RunOutputBase:    action.RunOutputBase,
+		Group:            action.Group,
 	}
 
 	switch spec := action.Spec.(type) {
