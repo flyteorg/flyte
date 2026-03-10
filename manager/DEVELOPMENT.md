@@ -1,5 +1,7 @@
 # Development Guide
 
+> Note: this development guide is stale, should use `make sandbox-run` command
+
 Use following method to setup the whole system and run:
 
 1. Create k3d cluster with

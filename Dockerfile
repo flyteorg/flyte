@@ -17,6 +17,7 @@ COPY flyteplugins flyteplugins
 COPY flytestdlib flytestdlib
 COPY gen gen
 COPY actions actions
+COPY events events
 COPY runs runs
 
 COPY go.mod go.sum ./
