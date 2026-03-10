@@ -283,12 +283,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
-	if err := r.Status().Update(ctx, newTaskAction); err != nil {
-		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
-		return err
-	}
-
 	if r.eventsClient == nil {
 		return nil
 	}
@@ -306,6 +300,12 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 			err,
 		)
 		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		return err
+	}
+
+	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
+	if err := r.Status().Update(ctx, newTaskAction); err != nil {
+		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
 
