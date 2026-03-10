@@ -57,9 +57,10 @@ const (
 type K8sEventType string
 
 const (
-	FailedUnmarshal    K8sEventType = "FailedUnmarshal"
-	FailedValidation   K8sEventType = "FailedValidation"
-	FailedPluginHandle K8sEventType = "FailedPluginHandle"
+	FailedUnmarshal     K8sEventType = "FailedUnmarshal"
+	FailedValidation    K8sEventType = "FailedValidation"
+	FailedPluginResolve K8sEventType = "FailedPluginResolve"
+	FailedPluginHandle  K8sEventType = "FailedPluginHandle"
 )
 
 // TaskActionReconciler reconciles a TaskAction object
@@ -130,7 +131,11 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	p, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
 	if err != nil {
 		logger.Error(err, "TaskAction validation failed")
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedValidation), "%v", err)
+		eventType := FailedValidation
+		if reason == flyteorgv1.ConditionReasonPluginNotFound {
+			eventType = FailedPluginResolve
+		}
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
 		_ = r.Status().Update(ctx, taskAction)
