@@ -58,6 +58,8 @@ var _ = Describe("TaskAction Controller", func() {
 						ActionName:    "test-action",
 						InputURI:      "/tmp/input",
 						RunOutputBase: "/tmp/output",
+						TaskType:      "container",
+						TaskTemplate:  []byte("{}"),
 					},
 				}
 				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
