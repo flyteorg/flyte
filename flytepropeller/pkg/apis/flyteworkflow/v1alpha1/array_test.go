@@ -47,3 +47,15 @@ func TestArrayNodeSpec_GetMinSuccessRatio(t *testing.T) {
 		t.Errorf("Expected %f, but got %f", minSuccessRatio, *arrayNodeSpec.GetMinSuccessRatio())
 	}
 }
+
+func TestArrayNodeSpec_GetRunAllSubNodes(t *testing.T) {
+	arrayNodeSpec := ArrayNodeSpec{}
+	if arrayNodeSpec.GetRunAllSubNodes() {
+		t.Errorf("Expected false, but got true")
+	}
+
+	arrayNodeSpec = ArrayNodeSpec{RunAllSubNodes: true}
+	if !arrayNodeSpec.GetRunAllSubNodes() {
+		t.Errorf("Expected true, but got false")
+	}
+}

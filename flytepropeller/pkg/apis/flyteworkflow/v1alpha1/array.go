@@ -10,6 +10,7 @@ type ArrayNodeSpec struct {
 	ExecutionMode   core.ArrayNode_ExecutionMode
 	DataMode        core.ArrayNode_DataMode
 	BoundInputs     []string
+	RunAllSubNodes  bool
 }
 
 func (a *ArrayNodeSpec) GetSubNodeSpec() *NodeSpec {
@@ -38,4 +39,8 @@ func (a *ArrayNodeSpec) GetDataMode() core.ArrayNode_DataMode {
 
 func (a *ArrayNodeSpec) GetBoundInputs() []string {
 	return a.BoundInputs
+}
+
+func (a *ArrayNodeSpec) GetRunAllSubNodes() bool {
+	return a.RunAllSubNodes
 }

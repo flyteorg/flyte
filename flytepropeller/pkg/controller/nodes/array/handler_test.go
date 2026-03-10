@@ -713,6 +713,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 		expectedTaskPhaseVersion                uint32
 		expectHandleError                       bool
 		expectedEventingCalls                   int
+		runAllSubNodes                          bool
 	}{
 		{
 			name:        "StartAllSubNodes",
@@ -936,6 +937,59 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
 		},
 		{
+			name:           "OneSubNodeFailedRunAllSubNodesStillRunning",
+			parallelism:    uint32Ptr(0),
+			runAllSubNodes: true,
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			// should remain executing because run_all_sub_nodes=true and one sub-node is still running
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseRunning,
+			},
+			expectedTaskPhaseVersion:       1,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_RUNNING},
+			incrementParallelismCount:      1,
+		},
+		{
+			name:           "OneSubNodeFailedRunAllSubNodesAllTerminal",
+			parallelism:    uint32Ptr(0),
+			runAllSubNodes: true,
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
+			},
+			// should transition to failing because run_all_sub_nodes=true and all sub-nodes are terminal
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseFailing,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseSucceeded,
+			},
+			expectedTaskPhaseVersion:       0,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
+		},
+		{
 			name:        "EventingFails",
 			parallelism: uint32Ptr(0),
 			subNodePhases: []v1alpha1.NodePhase{
@@ -1036,6 +1090,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				nodeSpec := arrayNodeSpec
 				nodeSpec.ArrayNode.Parallelism = test.parallelism
 				nodeSpec.ArrayNode.MinSuccessRatio = test.minSuccessRatio
+				nodeSpec.ArrayNode.RunAllSubNodes = test.runAllSubNodes
 
 				subNodeStatus := make(map[v1alpha1.NodeID]*v1alpha1.NodeStatus)
 				if arrayNodeSpec.ArrayNode.GetExecutionMode() == idlcore.ArrayNode_FULL_STATE {

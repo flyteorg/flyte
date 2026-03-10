@@ -214,6 +214,38 @@ func (_m *ExecutableArrayNode) GetParallelism() *uint32 {
 	return r0
 }
 
+type ExecutableArrayNode_GetRunAllSubNodes struct {
+	*mock.Call
+}
+
+func (_m ExecutableArrayNode_GetRunAllSubNodes) Return(_a0 bool) *ExecutableArrayNode_GetRunAllSubNodes {
+	return &ExecutableArrayNode_GetRunAllSubNodes{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableArrayNode) OnGetRunAllSubNodes() *ExecutableArrayNode_GetRunAllSubNodes {
+	c_call := _m.On("GetRunAllSubNodes")
+	return &ExecutableArrayNode_GetRunAllSubNodes{Call: c_call}
+}
+
+func (_m *ExecutableArrayNode) OnGetRunAllSubNodesMatch(matchers ...interface{}) *ExecutableArrayNode_GetRunAllSubNodes {
+	c_call := _m.On("GetRunAllSubNodes", matchers...)
+	return &ExecutableArrayNode_GetRunAllSubNodes{Call: c_call}
+}
+
+// GetRunAllSubNodes provides a mock function with given fields:
+func (_m *ExecutableArrayNode) GetRunAllSubNodes() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type ExecutableArrayNode_GetSubNodeSpec struct {
 	*mock.Call
 }

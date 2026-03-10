@@ -261,6 +261,7 @@ type ExecutableArrayNode interface {
 	GetExecutionMode() core.ArrayNode_ExecutionMode
 	GetDataMode() core.ArrayNode_DataMode
 	GetBoundInputs() []string
+	GetRunAllSubNodes() bool
 }
 
 type ExecutableWorkflowNodeStatus interface {

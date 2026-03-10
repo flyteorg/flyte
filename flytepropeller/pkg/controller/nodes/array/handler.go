@@ -486,7 +486,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		if len(arrayNodeState.SubNodePhases.GetItems())-failedCount < minSuccesses {
 			// no chance to reach the minimum number of successes
-			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseFailing
+			if !arrayNode.GetRunAllSubNodes() {
+				arrayNodeState.Phase = v1alpha1.ArrayNodePhaseFailing
+			} else if successCount+failedCount == len(arrayNodeState.SubNodePhases.GetItems()) {
+				// all sub-nodes are terminal, now we can fail
+				arrayNodeState.Phase = v1alpha1.ArrayNodePhaseFailing
+			}
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding

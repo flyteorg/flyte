@@ -11028,6 +11028,7 @@
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
                  * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
                  * @property {Array.<string>|null} [boundInputs] ArrayNode boundInputs
+                 * @property {boolean|null} [runAllSubNodes] ArrayNode runAllSubNodes
                  */
     
                 /**
@@ -11110,6 +11111,14 @@
                  */
                 ArrayNode.prototype.boundInputs = $util.emptyArray;
     
+                /**
+                 * ArrayNode runAllSubNodes.
+                 * @member {boolean} runAllSubNodes
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.runAllSubNodes = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -11176,6 +11185,8 @@
                     if (message.boundInputs != null && message.boundInputs.length)
                         for (var i = 0; i < message.boundInputs.length; ++i)
                             writer.uint32(/* id 8, wireType 2 =*/66).string(message.boundInputs[i]);
+                    if (message.runAllSubNodes != null && message.hasOwnProperty("runAllSubNodes"))
+                        writer.uint32(/* id 9, wireType 0 =*/72).bool(message.runAllSubNodes);
                     return writer;
                 };
     
@@ -11222,6 +11233,9 @@
                             if (!(message.boundInputs && message.boundInputs.length))
                                 message.boundInputs = [];
                             message.boundInputs.push(reader.string());
+                            break;
+                        case 9:
+                            message.runAllSubNodes = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11293,6 +11307,9 @@
                             if (!$util.isString(message.boundInputs[i]))
                                 return "boundInputs: string[] expected";
                     }
+                    if (message.runAllSubNodes != null && message.hasOwnProperty("runAllSubNodes"))
+                        if (typeof message.runAllSubNodes !== "boolean")
+                            return "runAllSubNodes: boolean expected";
                     return null;
                 };
     

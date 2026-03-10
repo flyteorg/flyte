@@ -8,7 +8,7 @@ rm -rf $DIR/gen
 export LC_ALL=C.UTF-8
 
 # Buf migration
-docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
+docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" -e "BUF_TOKEN=${BUF_TOKEN}" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
 
 # Unfortunately the python protoc plugin does not add __init__.py files to the generated code
 # (as described in https://github.com/protocolbuffers/protobuf/issues/881). One of the

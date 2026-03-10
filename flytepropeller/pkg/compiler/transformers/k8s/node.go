@@ -224,6 +224,7 @@ func BuildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		nodeSpec.ArrayNode.ExecutionMode = arrayNode.GetExecutionMode()
 		nodeSpec.ArrayNode.DataMode = arrayNode.GetDataMode()
 		nodeSpec.ArrayNode.BoundInputs = arrayNode.GetBoundInputs()
+		nodeSpec.ArrayNode.RunAllSubNodes = arrayNode.GetRunAllSubNodes()
 	default:
 		if n.GetId() == v1alpha1.StartNodeID {
 			nodeSpec.Kind = v1alpha1.NodeKindStart
