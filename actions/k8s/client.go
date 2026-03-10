@@ -486,30 +486,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
 	}
-
-	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want
-	// to handle the action event persistence
-	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
-	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
-	// - LogContext:    not on the CR; same reason as LogInfo.
-	// - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
-	// - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
-	// - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
-	// - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
-	event := &workflow.ActionEvent{
-		Id:           update.ActionID,
-		Attempt:      1, // TODO(nary): hardcoded until retry support is added
-		Phase:        update.Phase,
-		Version:      taskAction.Status.PluginPhaseVersion,
-		UpdatedTime:  updatedTime,
-		ReportedTime: timestamppb.Now(),
-	}
-	recordReq := &workflow.RecordActionEventsRequest{
-		Events: []*workflow.ActionEvent{event},
-	}
-	if _, err := c.runClient.RecordActionEvents(ctx, connect.NewRequest(recordReq)); err != nil {
-		logger.Warnf(ctx, "Failed to record action event in run service for %s: %v", update.ActionID.Name, err)
-	}
 }
 
 // StopWatching stops the TaskAction watcher
