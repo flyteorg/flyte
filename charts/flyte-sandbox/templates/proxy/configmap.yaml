@@ -30,6 +30,13 @@ data:
                                       - name: backend
                                         domains:
                                             - "*"
+                                        cors:
+                                            allow_origin_string_match:
+                                                - exact: "http://localhost:8080"
+                                            allow_methods: "GET, POST, OPTIONS"
+                                            allow_headers: "content-type, x-grpc-web, x-user-agent, grpc-timeout, authorization, connect-protocol-version, connect-timeout-ms"
+                                            expose_headers: "grpc-status, grpc-message, grpc-status-details-bin"
+                                            allow_credentials: true
                                         routes:
                                             {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
                                             - match:
@@ -65,6 +72,11 @@ data:
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2."
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
                                             {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
@@ -89,6 +101,9 @@ data:
                                                   prefix_rewrite: /
                                             {{- end }}
                               http_filters:
+                                  - name: envoy.filters.http.cors
+                                    typed_config:
+                                        "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                                   - name: envoy.filters.http.router
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router

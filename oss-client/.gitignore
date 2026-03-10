@@ -1,0 +1,27 @@
+
+
+# security concerns
+.env
+
+# git
+!.vscode/
+
+# npm related
+node_modules
+
+# build
+.next
+next-env.d.ts
+*storybook.log
+storybook-static
+tsconfig.typecheck.tsbuildinfo
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright-artifacts/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+/e2e/scripts/fixtures.json

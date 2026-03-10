@@ -1,0 +1,73 @@
+{
+  "explorer.autoReveal": true,
+  "explorer.enableUndo": true,
+  "explorer.excludeGitIgnore": false,
+  "problems.autoReveal": true,
+  "editor.renderWhitespace": "all",
+  "prettier.trailingComma": "es5",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  /**
+   ** Javascript general Settings **
+   */
+  "javascript.validate.enable": false, // Disable VS Code's built-in JavaScript validation to avoid conflicts with TypeScript
+  "javascript.format.enable": false, // Disable JavaScript formatting to avoid conflicts with TypeScript
+  "javascript.preferences.quoteStyle": "single", // Use single quotes for string literals in JavaScript files
+  "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+  "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
+
+  /**
+   ** TypeScript general Settings **
+   */
+  "typescript.validate.enable": true, // Enable TypeScript validation
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+  "typescript.format.placeOpenBraceOnNewLineForFunctions": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true, // Automatically format TypeScript code on save (requires Prettier or other formatter extensions)
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // Set the default code formatter
+  "editor.wordWrap": "on", // Enable word wrapping
+  "editor.minimap.enabled": false, // Disable the minimap
+  "files.autoSave": "afterDelay", // Autosave files when switching focus away from VS Code
+  "typescript.format.enable": false, // Disable TypeScript formatting to rely on your chosen formatter
+  "editor.suggestSelection": "first", // Show suggestions as you type
+  "editor.codeLens": true, // Show code lenses (e.g., references and implementations)
+  "typescript.updateImportsOnFileMove.enabled": "always", // Automatically update import paths when moving files
+  "typescript.preferences.quoteStyle": "single", // Use single quotes for string literals
+  "editor.autoClosingBrackets": "always", // Automatically close brackets and quotes
+  /**
+   ** React-specific Settings **
+   */
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": "always",
+    "source.fixAll.eslint": "always"
+  },
+  "eslint.format.enable": true,
+
+  /**
+   ** JSON Settings **
+   */
+  "[json][jsonc]": {
+    "editor.insertSpaces": true
+  },
+  /**
+   ** HTML Settings **
+   */
+  "html.autoClosingTags": true,
+  "html.format.enable": true,
+  "[html]": {
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  /**
+   ** DOCKERFILE Settings **
+   */
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

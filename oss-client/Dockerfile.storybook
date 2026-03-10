@@ -1,0 +1,62 @@
+# syntax=docker/dockerfile:1
+
+# Base image setup
+FROM node:23-alpine AS base
+RUN apk add --no-cache libc6-compat rsync git
+
+LABEL org.opencontainers.image.source=https://github.com/unionai/consolev2
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# -------------------------------
+# Build stage
+FROM base AS deps
+ARG BUILDKITE_COMMIT
+
+# Enable and pin pnpm
+RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+
+WORKDIR /app
+
+# Copy only files needed to install dependencies first (better cache)
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies (cached if lockfile unchanged)
+RUN \
+  --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile
+
+# Now copy the full app code
+COPY . .
+
+
+# Build the app
+RUN pnpm build-storybook
+
+
+# -------------------------------
+# Runtime stage
+FROM base AS runner
+ARG BUILDKITE_COMMIT
+
+ENV PORT=8080
+
+WORKDIR /app
+
+# Enable pnpm in runtime (required if using pnpm start)
+RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+  adduser -S nextjs -u 1001
+
+# Copy built app and deps from build stage
+COPY --from=deps --chown=nextjs:nodejs /app /app
+
+USER nextjs
+
+EXPOSE 8080 8081
+
+CMD ["pnpm", "serve", "storybook-static", "-l", "8080"]
