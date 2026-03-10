@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
@@ -57,6 +58,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc)
 	sc.Mux.Handle(translatorPath, translatorHandler)
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
+
+	identitySvc := service.NewIdentityService()
+	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
+	sc.Mux.Handle(identityPath, identityHandler)
+	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
 	sc.AddReadyCheck(func(r *http.Request) error {
 		sqlDB, err := sc.DB.DB()
