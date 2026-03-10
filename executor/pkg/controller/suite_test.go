@@ -36,7 +36,9 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 
 	// Register the pod plugin so the registry can resolve container/python task types.
@@ -120,6 +122,9 @@ var _ = BeforeSuite(func() {
 	)
 	pluginRegistry = plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
 	Expect(pluginRegistry.Initialize(ctx)).To(Succeed())
+
+	By("initializing labeled metrics keys")
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey)
 
 	By("creating in-memory data store")
 	dataStore, err = storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewScope("test:storage"))
