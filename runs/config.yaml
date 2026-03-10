@@ -7,6 +7,11 @@ runs:
   watchBufferSize: 100
   queueServiceUrl: "http://localhost:8089"
   storagePrefix: "s3://flyte-data"
+  domains:
+    - id: "development"
+      name: "Development"
+    - id: "production"
+      name: "Production"
 
 database:
   # Option 1: Use SQLite (easier for testing, no setup required)

@@ -17,6 +17,10 @@ var defaultConfig = &Config{
 	WatchBufferSize:   100,
 	ActionsServiceURL: "http://localhost:8090",
 	StoragePrefix:     "file:///tmp/flyte/data",
+	Domains: []DomainConfig{
+		{ID: "development", Name: "Development"},
+		{ID: "production", Name: "Production"},
+	},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -38,12 +42,21 @@ type Config struct {
 	// StoragePrefix is the base URI for storing run data (inputs, outputs)
 	// e.g. "s3://my-bucket" or "gs://my-bucket" or "file:///tmp/flyte/data"
 	StoragePrefix string `json:"storagePrefix" pflag:",Base URI prefix for storing run inputs and outputs"`
+
+	// Domains are injected into project responses (not stored per project row).
+	Domains []DomainConfig `json:"domains"`
 }
 
 // ServerConfig holds HTTP server configuration
 type ServerConfig struct {
 	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
 	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+}
+
+// DomainConfig defines a system domain to inject into project responses.
+type DomainConfig struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // GetConfig returns the parsed runs configuration
