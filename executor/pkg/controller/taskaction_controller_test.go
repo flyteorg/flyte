@@ -24,9 +24,11 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 )
 
 var _ = Describe("TaskAction Controller", func() {
@@ -58,7 +60,7 @@ var _ = Describe("TaskAction Controller", func() {
 						ActionName:    "test-action",
 						InputURI:      "/tmp/input",
 						RunOutputBase: "/tmp/output",
-						TaskType:      "container",
+						TaskType:      "python",
 						TaskTemplate:  []byte("{}"),
 					},
 				}
@@ -79,10 +81,14 @@ var _ = Describe("TaskAction Controller", func() {
 			By("Reconciling the created resource")
 
 			controllerReconciler := &TaskActionReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       record.NewFakeRecorder(10),
+				PluginRegistry: &plugin.Registry{},
 			}
 
+			// Reconcile sets a Failed condition because no plugin is
+			// registered for the task type in this test environment.
 			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
 				NamespacedName: typeNamespacedName,
 			})
