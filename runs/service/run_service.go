@@ -10,6 +10,7 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -30,6 +31,16 @@ type RunService struct {
 	actionsClient actionsconnect.ActionsServiceClient
 	storagePrefix string
 	dataStore     *storage.DataStore
+}
+
+const (
+	runIDLength     = 20
+	runStringFormat = "r%s"
+)
+
+func generateRunName(seed int64) string {
+	rand.Seed(seed)
+	return fmt.Sprintf(runStringFormat, rand.String(runIDLength-1))
 }
 
 // WatchGroups streams task groups (runs grouped by task) from the database.
@@ -106,7 +117,10 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Resolve run identity from request (mirrors repo logic for name generation)
+	// Resolve run identity from request. When only a ProjectId is given, generate
+	// the run name here and normalise the request to a RunId so that the repo
+	// receives a single, pre-formed identifier — avoiding a second independent
+	// name generation inside the repo layer.
 	var org, project, domain, name string
 	switch id := req.Msg.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
@@ -118,7 +132,15 @@ func (s *RunService) CreateRun(
 		org = id.ProjectId.Organization
 		project = id.ProjectId.Name
 		domain = id.ProjectId.Domain
-		name = fmt.Sprintf("run-%d", time.Now().Unix())
+		name = generateRunName(time.Now().UnixNano())
+		req.Msg.Id = &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     org,
+				Project: project,
+				Domain:  domain,
+				Name:    name,
+			},
+		}
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
 	}

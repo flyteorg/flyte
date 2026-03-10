@@ -64,6 +64,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.K8sClient = k8sClient
 	sc.K8sConfig = k8sConfig
 
+	// Initialize metrics scope
+	sc.Scope = promutils.NewScope("flyte")
+
 	// Initialize labeled metrics (required for storage)
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 

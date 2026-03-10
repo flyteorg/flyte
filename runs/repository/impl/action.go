@@ -60,14 +60,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	switch id := req.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
 		runID = id.RunId
-	case *workflow.CreateRunRequest_ProjectId:
-		// Generate a run name (simplified - in production, use a better generator)
-		runID = &common.RunIdentifier{
-			Org:     id.ProjectId.Organization,
-			Project: id.ProjectId.Name,
-			Domain:  id.ProjectId.Domain,
-			Name:    fmt.Sprintf("run-%d", time.Now().Unix()),
-		}
 	default:
 		return nil, fmt.Errorf("invalid run ID type")
 	}
@@ -250,8 +242,20 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
 	}
 
-	if err := r.db.WithContext(ctx).Create(action).Error; err != nil {
-		return nil, fmt.Errorf("failed to create action: %w", err)
+	result := r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(action)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to create action: %w", result.Error)
+	}
+
+	// If no rows were affected, the action already exists — fetch and return it.
+	if result.RowsAffected == 0 {
+		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get existing action: %w", err)
+		}
+		return existing, nil
 	}
 
 	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
