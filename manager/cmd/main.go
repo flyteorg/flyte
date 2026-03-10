@@ -72,7 +72,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Initialize storage
 	storageCfg := storage.GetConfig()
-	dataStore, err := storage.NewDataStore(storageCfg, promutils.NewTestScope())
+	dataStore, err := storage.NewDataStore(storageCfg, sc.Scope.NewSubScope("storage"))
 	if err != nil {
 		return fmt.Errorf("failed to initialize storage: %w", err)
 	}

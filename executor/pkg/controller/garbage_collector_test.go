@@ -111,6 +111,22 @@ var _ = Describe("ensureTerminalLabels", func() {
 		deleteTaskAction(ctx, "terminal-labels-test")
 	})
 
+	It("should patch completed-time when termination-status is set but completed-time is missing", func() {
+		ta := createTaskAction(ctx, "terminal-missing-time", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+		})
+		defer deleteTaskAction(ctx, "terminal-missing-time")
+
+		reconciler := &TaskActionReconciler{
+			Client: k8sClient,
+			Scheme: k8sClient.Scheme(),
+		}
+
+		Expect(reconciler.ensureTerminalLabels(ctx, ta)).To(Succeed())
+		Expect(ta.GetLabels()[LabelTerminationStatus]).To(Equal(LabelValueTerminated))
+		Expect(ta.GetLabels()[LabelCompletedTime]).NotTo(BeEmpty())
+	})
+
 	It("should be idempotent", func() {
 		ta := createTaskAction(ctx, "terminal-labels-test", nil)
 

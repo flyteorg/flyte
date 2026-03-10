@@ -244,7 +244,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 // Uses a MergeFrom patch instead of a full Update to reduce conflict surface with concurrent reconciles.
 func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAction *flyteorgv1.TaskAction) error {
 	labels := taskAction.GetLabels()
-	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated {
+	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated && labels[LabelCompletedTime] != "" {
 		return nil // already labeled
 	}
 
@@ -254,7 +254,7 @@ func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAct
 		labels = make(map[string]string)
 	}
 	labels[LabelTerminationStatus] = LabelValueTerminated
-	labels[LabelCompletedTime] = time.Now().UTC().Format(labelHourTimeFormat)
+	labels[LabelCompletedTime] = terminalTransitionTime(taskAction).Format(labelHourTimeFormat)
 	taskAction.SetLabels(labels)
 
 	if err := r.Patch(ctx, taskAction, patch); err != nil {
@@ -590,6 +590,23 @@ func isTerminal(ta *flyteorgv1.TaskAction) bool {
 		}
 	}
 	return false
+}
+
+// terminalTransitionTime returns the LastTransitionTime from the terminal condition
+// (Succeeded or Failed). Falls back to time.Now().UTC() if no transition time is found.
+func terminalTransitionTime(ta *flyteorgv1.TaskAction) time.Time {
+	for _, cond := range ta.Status.Conditions {
+		if cond.Status != metav1.ConditionTrue {
+			continue
+		}
+		if cond.Type == string(flyteorgv1.ConditionTypeSucceeded) || cond.Type == string(flyteorgv1.ConditionTypeFailed) {
+			if !cond.LastTransitionTime.IsZero() {
+				return cond.LastTransitionTime.UTC()
+			}
+			break
+		}
+	}
+	return time.Now().UTC()
 }
 
 // createStateJSON creates a simplified state JSON for observability.

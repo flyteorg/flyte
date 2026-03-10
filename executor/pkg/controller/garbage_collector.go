@@ -64,6 +64,7 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 		var taskActions flyteorgv1.TaskActionList
 		listOpts := []client.ListOption{
 			client.MatchingLabels{LabelTerminationStatus: LabelValueTerminated},
+			client.HasLabels{LabelCompletedTime},
 			client.Limit(gcPageSize),
 		}
 		if continueToken != "" {
@@ -83,8 +84,9 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 				continue
 			}
 
-			// The hour format is lexicographically ordered, so string comparison works
-			if completedTime <= cutoff {
+			// The hour format is lexicographically ordered, so string comparison works.
+			// Use strict < to avoid deleting up to ~59 min early due to hour granularity.
+			if completedTime < cutoff {
 				if err := gc.client.Delete(ctx, ta); err != nil {
 					logger.Error(err, "failed to delete expired TaskAction",
 						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
