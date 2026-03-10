@@ -1,0 +1,14 @@
+.git
+node_modules
+pnpm-lock.yaml.snap
+Dockerfile
+.dockerignore
+*.log
+*.swp
+.vscode
+.env
+coverage
+dist
+.next
+deploy
+charts

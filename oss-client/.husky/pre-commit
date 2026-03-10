@@ -1,0 +1,5 @@
+# this file should not run. we run all husky scripts from the root because a git config can
+# only support a single hooksPath (which is set with git config core.hooksPath <path>)
+# see https://git-scm.com/docs/githooks
+
+echo "precommit running from clientsv2. something might be wrong"

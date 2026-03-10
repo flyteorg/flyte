@@ -630,6 +630,13 @@ data:
                                       - name: backend
                                         domains:
                                             - "*"
+                                        cors:
+                                            allow_origin_string_match:
+                                                - exact: "http://localhost:8080"
+                                            allow_methods: "GET, POST, OPTIONS"
+                                            allow_headers: "content-type, x-grpc-web, x-user-agent, grpc-timeout, authorization, connect-protocol-version, connect-timeout-ms"
+                                            expose_headers: "grpc-status, grpc-message, grpc-status-details-bin"
+                                            allow_credentials: true
                                         routes:
                                             - match:
                                                   prefix: "/healthz"
@@ -665,6 +672,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2."
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -683,6 +695,9 @@ data:
                                                   cluster: minio
                                                   prefix_rewrite: /
                               http_filters:
+                                  - name: envoy.filters.http.cors
+                                    typed_config:
+                                        "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                                   - name: envoy.filters.http.router
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -753,7 +768,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UDdKalpERlpmUFRPMWN2cA==
+  haSharedSecret: TXNLYkZDRzlvVExocmZQcw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1176,7 +1191,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e90925f49c0854c653f906294f449a8ab941da6f58504a4f515f223cf45f9f7e
+        checksum/secret: a687340b079d95647d6452641de2af438a154ef36afaf8689b567b5ff616b7c6
       labels:
         app: docker-registry
         release: flyte-sandbox

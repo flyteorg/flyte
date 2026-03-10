@@ -1,0 +1,89 @@
+.rdp-root {
+  --rdp-day-height: 30px;
+  --rdp-day-width: 32px;
+  --rdp-day_button-height: 28px;
+  --rdp-day_button-width: 32px;
+  --rdp-accent-color: var(--system-gray-1);
+  --rdp-accent-background-color: var(--system-gray-2);
+  --rdp-range_middle-background-color: var(--system-gray-3);
+  --rdp-range_middle-color: var(--system-gray-6);
+  --rdp-range_start-date-background-color: var(--system-gray-3);
+  --rdp-range_start-color: var(--system-white);
+  --rdp-range_end-date-background-color: var(--system-gray-3);
+  --rdp-range_end-color: var(--system-black);
+  .rdp-month_caption {
+    align-items: center;
+  }
+
+  .rdp-selected {
+    color: var(--system-gray-3);
+  }
+
+  .rdp-day {
+    font-size: medium;
+    font-weight: 500;
+  }
+
+  .rdp-range_start {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 3%,
+      black 3,
+      black 97%,
+      transparent 97%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 3%,
+      black 3%,
+      black 97%,
+      transparent 97%
+    );
+  }
+
+  .rdp-range_middle {
+    background: linear-gradient(
+      to bottom,
+      transparent 3%,
+      var(--rdp-range_middle-background-color) 3%,
+      var(--rdp-range_middle-background-color) 97%,
+      transparent 97%
+    );
+  }
+  .rdp-range_end {
+    background: linear-gradient(
+      to right,
+      var(--rdp-range_middle-background-color) 0%,
+      var(--rdp-range_middle-background-color) 50%,
+      transparent 50%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 3%,
+      black 3%,
+      black 97%,
+      transparent 97%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 3%,
+      black 3%,
+      black 97%,
+      transparent 97%
+    );
+  }
+  .rdp-range_start.rdp-range_end {
+    background: revert;
+  }
+  .rdp-range_middle {
+    background: linear-gradient(
+      to bottom,
+      transparent 3%,
+      var(--rdp-range_middle-background-color) 3%,
+      var(--rdp-range_middle-background-color) 97%,
+      transparent 97%
+    );
+  }
+}
+
