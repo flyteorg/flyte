@@ -41,10 +41,10 @@ type ActionUpdate struct {
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient       client.WithWatch
-	namespace       string
-	bufferSize      int
-	runClient       workflowconnect.InternalRunServiceClient
+	k8sClient  client.WithWatch
+	namespace  string
+	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
