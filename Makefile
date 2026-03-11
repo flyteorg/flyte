@@ -21,6 +21,29 @@ SEPARATOR := \033[1;36m========================================\033[0m
 # Include common Go targets
 include go.Makefile
 
+.PHONY: build
+build: verify ## Build all Go service binaries
+	$(MAKE) -C manager build
+	$(MAKE) -C runs build
+	$(MAKE) -C executor build
+
+# =============================================================================
+# Sandbox Commands
+# =============================================================================
+
+.PHONY: sandbox-build
+sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+	$(MAKE) -C docker/sandbox-bundled build
+
+# Run in dev mode with extra arg FLYTE_DEV=True
+.PHONY: sandbox-run
+sandbox-run: ## Start the flyte sandbox without rebuilding the image
+	$(MAKE) -C docker/sandbox-bundled start
+
+.PHONY: sandbox-stop
+sandbox-stop: ## Stop the flyte sandbox
+	$(MAKE) -C docker/sandbox-bundled stop
+
 # =============================================================================
 # Local Cluster Commands
 # =============================================================================
