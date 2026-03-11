@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy"
+	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -71,7 +72,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Initialize storage
 	storageCfg := storage.GetConfig()
-	dataStore, err := storage.NewDataStore(storageCfg, promutils.NewTestScope())
+	dataStore, err := storage.NewDataStore(storageCfg, sc.Scope.NewSubScope("storage"))
 	if err != nil {
 		return fmt.Errorf("failed to initialize storage: %w", err)
 	}
@@ -85,6 +86,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := events.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {

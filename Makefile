@@ -22,27 +22,31 @@ SEPARATOR := \033[1;36m========================================\033[0m
 include go.Makefile
 
 # =============================================================================
-# Local Cluster Commands
+# Go Services Build
 # =============================================================================
 
-.PHONY: cluster-create
-cluster-create: ## Create k3d cluster with host gateway alias for pod-to-host connectivity
-	$(eval HOST_GATEWAY_IP := $(shell docker run --rm --add-host=probe:host-gateway busybox cat /etc/hosts 2>/dev/null | awk '$$1~/^[0-9]/&&$$2=="probe"{print $$1;exit}'))
-	@if [ -z "$(HOST_GATEWAY_IP)" ]; then \
-		echo "ERROR: Failed to detect HOST_GATEWAY_IP. Ensure Docker is running."; \
-		exit 1; \
-	fi
-	@echo "Host gateway IP: $(HOST_GATEWAY_IP)"
-	@if k3d cluster get $(CLUSTER_NAME) --no-headers >/dev/null 2>&1; then \
-		echo "Cluster $(CLUSTER_NAME) already exists, skipping creation"; \
-	else \
-		CLUSTER_NAME=$(CLUSTER_NAME) HOST_GATEWAY_IP=$(HOST_GATEWAY_IP) envsubst < config/k3d/cluster.yaml | k3d cluster create --config -; \
-	fi
-	@echo "Cluster $(CLUSTER_NAME) ready. Pods can reach host services via flyte-host:<port>"
+.PHONY: build
+build: verify ## Build all Go service binaries
+	$(MAKE) -C manager build
+	$(MAKE) -C runs build
+	$(MAKE) -C executor build
 
-.PHONY: cluster-delete
-cluster-delete: ## Delete k3d cluster
-	@k3d cluster delete $(CLUSTER_NAME)
+# =============================================================================
+# Sandbox Commands
+# =============================================================================
+
+.PHONY: sandbox-build
+sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+	$(MAKE) -C docker/sandbox-bundled build
+
+# Run in dev mode with extra arg FLYTE_DEV=True
+.PHONY: sandbox-run
+sandbox-run: ## Start the flyte sandbox without rebuilding the image
+	$(MAKE) -C docker/sandbox-bundled start
+
+.PHONY: sandbox-stop
+sandbox-stop: ## Stop the flyte sandbox
+	$(MAKE) -C docker/sandbox-bundled stop
 
 .PHONY: help
 help: ## Show this help message

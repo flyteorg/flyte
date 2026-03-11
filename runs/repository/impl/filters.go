@@ -129,6 +129,15 @@ func NewEqualFilter(field string, value interface{}) interfaces.Filter {
 	}
 }
 
+// NewNotEqualFilter creates a filter for field != value.
+func NewNotEqualFilter(field string, value interface{}) interfaces.Filter {
+	return &basicFilter{
+		field:      field,
+		expression: interfaces.FilterExpressionNotEqual,
+		value:      value,
+	}
+}
+
 // NewOrgFilter creates a filter for org = value
 func NewOrgFilter(org string) interfaces.Filter {
 	return NewEqualFilter("org", org)

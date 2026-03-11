@@ -26,23 +26,36 @@ import (
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+
+	// Register the pod plugin so the registry can resolve container/python task types.
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var (
-	ctx       context.Context
-	cancel    context.CancelFunc
-	testEnv   *envtest.Environment
-	cfg       *rest.Config
-	k8sClient client.Client
+	ctx            context.Context
+	cancel         context.CancelFunc
+	testEnv        *envtest.Environment
+	cfg            *rest.Config
+	k8sClient      client.Client
+	pluginRegistry *plugin.Registry
+	dataStore      *storage.DataStore
 )
 
 func TestControllers(t *testing.T) {
@@ -81,6 +94,41 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	By("setting up controller-runtime manager for plugin registry")
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
+		Scheme: scheme.Scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: "0", // disable metrics server in tests
+		},
+	})
+	Expect(err).NotTo(HaveOccurred())
+
+	// Start manager in background — needed so the cache syncs and
+	// kubeClient.GetClient()/GetCache() work for plugins.
+	go func() {
+		defer GinkgoRecover()
+		Expect(mgr.Start(ctx)).To(Succeed())
+	}()
+
+	// Wait for the cache to sync before proceeding.
+	Expect(mgr.GetCache().WaitForCacheSync(ctx)).To(BeTrue())
+
+	By("initializing plugin registry with pod plugin")
+	setupCtx := plugin.NewSetupContext(
+		mgr, nil, nil, nil, nil,
+		"TaskAction",
+		promutils.NewScope("test"),
+	)
+	pluginRegistry = plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
+	Expect(pluginRegistry.Initialize(ctx)).To(Succeed())
+
+	By("initializing labeled metrics keys")
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey)
+
+	By("creating in-memory data store")
+	dataStore, err = storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewScope("test:storage"))
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {

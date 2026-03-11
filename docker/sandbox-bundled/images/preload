@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -ex
+
+__save_image() {
+  local dest="$1"
+  local tar="$(echo ${dest} | cut -d: -f1 | tr / -).tar"
+  local src="$( [ -n "$2" ] && echo "$2" || echo ${dest} )"
+  podman pull --arch ${TARGETARCH} ${src}
+  podman tag ${src} ${dest}
+  podman save -o ${tar} ${dest}
+}
+
+MANIFEST="$(realpath "$1")"
+mkdir -p images
+cd images
+while read line; do
+  __save_image $(echo ${line} | tr = ' ')
+done < ${MANIFEST}
