@@ -1,9 +1,0 @@
-# generated
-gen/
-
-# pnpm
-node_modules/
-
-# Ignore the build output
-.next/
-out/
