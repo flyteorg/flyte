@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 func TestNewEqualFilter(t *testing.T) {
@@ -123,4 +124,24 @@ func TestConvertProtoFilters_EmptyList(t *testing.T) {
 	filter, err := ConvertProtoFiltersToGormFilters([]*common.Filter{})
 	require.NoError(t, err)
 	assert.Nil(t, filter)
+}
+
+func TestParseStringFilters_StateNumericString(t *testing.T) {
+	filter, err := ParseStringFilters("eq(state,1)", models.ProjectColumns)
+	require.NoError(t, err)
+
+	expr, err := filter.GormQueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "state = ?", expr.Query)
+	assert.Equal(t, []interface{}{"1"}, expr.Args)
+}
+
+func TestParseStringFilters_ValueInState(t *testing.T) {
+	filter, err := ParseStringFilters("value_in(state,0;1;2)", models.ProjectColumns)
+	require.NoError(t, err)
+
+	expr, err := filter.GormQueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "state IN ?", expr.Query)
+	assert.Equal(t, []interface{}{[]string{"0", "1", "2"}}, expr.Args)
 }
