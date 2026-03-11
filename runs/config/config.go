@@ -20,6 +20,7 @@ var defaultConfig = &Config{
 	Domains: []DomainConfig{
 		{ID: "development", Name: "Development"},
 		{ID: "production", Name: "Production"},
+		{ID: "staging", Name: "Staging"},
 	},
 }
 

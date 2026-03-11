@@ -12,6 +12,8 @@ runs:
       name: "Development"
     - id: "production"
       name: "Production"
+    - id: "staging"
+      name: "Staging"
 
 database:
   # Option 1: Use SQLite (easier for testing, no setup required)
