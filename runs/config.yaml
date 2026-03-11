@@ -7,6 +7,8 @@ runs:
   watchBufferSize: 100
   queueServiceUrl: "http://localhost:8089"
   storagePrefix: "s3://flyte-data"
+  seedProjects:
+    - "flytesnacks"
   domains:
     - id: "development"
       name: "Development"

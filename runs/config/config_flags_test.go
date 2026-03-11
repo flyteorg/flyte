@@ -365,4 +365,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_seedProjects", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := []string{"flytesnacks", "demo"}
+
+			cmdFlags.Set("seedProjects", join_Config(testValue, ","))
+			if vStringSlice, err := cmdFlags.GetStringSlice("seedProjects"); err == nil {
+				testDecodeRaw_Config(t, vStringSlice, &actual.SeedProjects)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

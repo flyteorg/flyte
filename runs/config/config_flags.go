@@ -69,5 +69,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchBufferSize"), defaultConfig.WatchBufferSize, "Buffer size for watch streams")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsServiceUrl"), defaultConfig.ActionsServiceURL, "URL of the actions service")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storagePrefix"), defaultConfig.StoragePrefix, "Base URI prefix for storing run inputs and outputs")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "seedProjects"), defaultConfig.SeedProjects, "Projects to create by default at startup")
 	return cmdFlags
 }
