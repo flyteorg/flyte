@@ -1,10 +1,8 @@
 # Todo(alex): We should add UI into the image when UI is done
 
-FROM --platform=${BUILDPLATFORM} golang:1.24-bookworm AS flytebuilder
+FROM golang:1.24-bookworm AS flytebuilder
 
-ARG TARGETARCH
-ENV GOARCH="${TARGETARCH}"
-ENV GOOS=linux
+ENV CGO_ENABLED=1
 
 WORKDIR /flyteorg/build
 
@@ -15,7 +13,7 @@ COPY flytecopilot flytecopilot
 COPY flyteidl2 flyteidl2
 COPY flyteplugins flyteplugins
 COPY flytestdlib flytestdlib
-COPY gen gen
+COPY gen/go gen/go
 COPY actions actions
 COPY events events
 COPY runs runs
