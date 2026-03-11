@@ -8,7 +8,7 @@ const configSectionKey = "prof"
 
 var (
 	configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
-	defaultConfig = Config{}
+	defaultConfig = &Config{}
 )
 
 type Config struct {
