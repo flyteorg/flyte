@@ -26,6 +26,7 @@ func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error {
 	// Use GORM's Create or Updates based on conflict
 	// ON CONFLICT (org, project, domain, name, version) DO UPDATE
+	now := time.Now()
 	result := r.db.WithContext(ctx).
 		Exec(`INSERT INTO tasks (
 			org, project, domain, name, version,
@@ -64,8 +65,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			newTask.TaskSpec,
 			newTask.EnvDescription,
 			newTask.ShortDescription,
-			time.Now(),
-			time.Now(),
+			now,
+			now,
 		)
 
 	if result.Error != nil {

@@ -62,10 +62,6 @@ func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 	// Expect RecordAction called exactly once
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
-	// UpdateActionStatus won't be called because phase is UNSPECIFIED
-	// RecordActionEvents will be called twice (once per event)
-	mockClient.On("RecordActionEvents", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionEventsResponse]{}, nil)
 
 	// First Added event — should call RecordAction
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -99,9 +95,6 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 
-	mockClient.On("RecordActionEvents", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionEventsResponse]{}, nil)
-
 	// First event — RecordAction fails, should NOT add to filter
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
@@ -130,8 +123,6 @@ func TestNotifyRunService_NilFilter(t *testing.T) {
 
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.RecordActionResponse]{}, nil)
-	mockClient.On("RecordActionEvents", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionEventsResponse]{}, nil)
 
 	c.notifyRunService(ctx, ta, update, watch.Added)
 	c.notifyRunService(ctx, ta, update, watch.Added)

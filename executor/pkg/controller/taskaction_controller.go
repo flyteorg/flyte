@@ -283,10 +283,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	if r.eventsClient == nil {
-		return nil
-	}
-
 	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
 	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{actionEvent},
