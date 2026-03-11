@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy"
+	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -63,12 +64,15 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.K8sClient = k8sClient
 	sc.K8sConfig = k8sConfig
 
+	// Initialize metrics scope
+	sc.Scope = promutils.NewScope("flyte")
+
 	// Initialize labeled metrics (required for storage)
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 
 	// Initialize storage
 	storageCfg := storage.GetConfig()
-	dataStore, err := storage.NewDataStore(storageCfg, promutils.NewTestScope())
+	dataStore, err := storage.NewDataStore(storageCfg, sc.Scope.NewSubScope("storage"))
 	if err != nil {
 		return fmt.Errorf("failed to initialize storage: %w", err)
 	}
@@ -82,6 +86,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := events.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {

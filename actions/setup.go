@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/flyteorg/flyte/v2/actions/config"
-	"github.com/flyteorg/flyte/v2/actions/k8s"
+	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -19,7 +19,7 @@ import (
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
-	if err := k8s.InitScheme(); err != nil {
+	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
 	}
 
@@ -29,7 +29,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
 
-	actionsClient := k8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient)
+	actionsClient := actionsk8s.NewActionsClient(sc.K8sClient, sc.Namespace, cfg.WatchBufferSize, runClient, cfg.RecordFilterSize, sc.Scope)
 	logger.Infof(ctx, "Actions K8s client initialized for namespace: %s", sc.Namespace)
 
 	if err := actionsClient.StartWatching(ctx); err != nil {

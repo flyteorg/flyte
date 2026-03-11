@@ -2,16 +2,23 @@ package runs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -58,6 +65,27 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(translatorPath, translatorHandler)
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
 
+	identitySvc := service.NewIdentityService()
+	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
+	sc.Mux.Handle(identityPath, identityHandler)
+	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+
+	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
+	for _, d := range cfg.Domains {
+		domains = append(domains, &projectpb.Domain{
+			Id:   d.ID,
+			Name: d.Name,
+		})
+	}
+	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
+	sc.Mux.Handle(projectPath, projectHandler)
+	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
+
+	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
+		return fmt.Errorf("runs: failed to seed projects: %w", err)
+	}
+
 	sc.AddReadyCheck(func(r *http.Request) error {
 		sqlDB, err := sc.DB.DB()
 		if err != nil {
@@ -68,6 +96,32 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		}
 		return nil
 	})
+
+	return nil
+}
+
+func seedProjects(ctx context.Context, projectRepo interfaces.ProjectRepo, projects []string) error {
+	for _, projectID := range projects {
+		if projectID == "" {
+			continue
+		}
+
+		state := int32(projectpb.ProjectState_PROJECT_STATE_ACTIVE)
+		projectModel := &models.Project{
+			Identifier: projectID,
+			Name:       projectID,
+			State:      &state,
+		}
+
+		if err := projectRepo.CreateProject(ctx, projectModel); err != nil {
+			if errors.Is(err, interfaces.ErrProjectAlreadyExists) {
+				continue
+			}
+			return err
+		}
+
+		logger.Infof(ctx, "Seeded project %s", projectID)
+	}
 
 	return nil
 }

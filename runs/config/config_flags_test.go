@@ -337,14 +337,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_queueServiceUrl", func(t *testing.T) {
+	t.Run("Test_actionsServiceUrl", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("queueServiceUrl", testValue)
-			if vString, err := cmdFlags.GetString("queueServiceUrl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.QueueServiceURL)
+			cmdFlags.Set("actionsServiceUrl", testValue)
+			if vString, err := cmdFlags.GetString("actionsServiceUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ActionsServiceURL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -359,6 +359,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("storagePrefix", testValue)
 			if vString, err := cmdFlags.GetString("storagePrefix"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.StoragePrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_seedProjects", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := []string{"flytesnacks", "demo"}
+
+			cmdFlags.Set("seedProjects", join_Config(testValue, ","))
+			if vStringSlice, err := cmdFlags.GetStringSlice("seedProjects"); err == nil {
+				testDecodeRaw_Config(t, vStringSlice, &actual.SeedProjects)
 
 			} else {
 				assert.FailNow(t, err.Error())
