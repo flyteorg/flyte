@@ -51,44 +51,6 @@ class RuleId(_message.Message):
     name: str
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
-class Rule(_message.Message):
-    __slots__ = ["event_type", "run_rule"]
-    EVENT_TYPE_FIELD_NUMBER: _ClassVar[int]
-    RUN_RULE_FIELD_NUMBER: _ClassVar[int]
-    event_type: EventType
-    run_rule: RunCompletedRule
-    def __init__(self, event_type: _Optional[_Union[EventType, str]] = ..., run_rule: _Optional[_Union[RunCompletedRule, _Mapping]] = ...) -> None: ...
-
-class RunCompletedRule(_message.Message):
-    __slots__ = ["rule_id", "delivery_config_ids", "checks"]
-    RULE_ID_FIELD_NUMBER: _ClassVar[int]
-    DELIVERY_CONFIG_IDS_FIELD_NUMBER: _ClassVar[int]
-    CHECKS_FIELD_NUMBER: _ClassVar[int]
-    rule_id: RuleId
-    delivery_config_ids: _containers.RepeatedCompositeFieldContainer[DeliveryConfigId]
-    checks: RunCompletedRuleChecks
-    def __init__(self, rule_id: _Optional[_Union[RuleId, _Mapping]] = ..., delivery_config_ids: _Optional[_Iterable[_Union[DeliveryConfigId, _Mapping]]] = ..., checks: _Optional[_Union[RunCompletedRuleChecks, _Mapping]] = ...) -> None: ...
-
-class RunCompletedRuleChecks(_message.Message):
-    __slots__ = ["project_regex", "domain_regex", "task_name_regex", "phase_regex"]
-    PROJECT_REGEX_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_REGEX_FIELD_NUMBER: _ClassVar[int]
-    TASK_NAME_REGEX_FIELD_NUMBER: _ClassVar[int]
-    PHASE_REGEX_FIELD_NUMBER: _ClassVar[int]
-    project_regex: str
-    domain_regex: str
-    task_name_regex: str
-    phase_regex: str
-    def __init__(self, project_regex: _Optional[str] = ..., domain_regex: _Optional[str] = ..., task_name_regex: _Optional[str] = ..., phase_regex: _Optional[str] = ...) -> None: ...
-
-class DeliveryOption(_message.Message):
-    __slots__ = ["config_id", "config"]
-    CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_FIELD_NUMBER: _ClassVar[int]
-    config_id: DeliveryConfigId
-    config: DeliveryConfig
-    def __init__(self, config_id: _Optional[_Union[DeliveryConfigId, _Mapping]] = ..., config: _Optional[_Union[DeliveryConfig, _Mapping]] = ...) -> None: ...
-
 class DeliveryConfigId(_message.Message):
     __slots__ = ["org", "project", "domain", "name"]
     ORG_FIELD_NUMBER: _ClassVar[int]
@@ -118,16 +80,6 @@ class RunCompletedNotificationTemplateData(_message.Message):
     phase: _phase_pb2.ActionPhase
     error: str
     def __init__(self, run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[str] = ...) -> None: ...
-
-class DeliveryConfig(_message.Message):
-    __slots__ = ["delivery_config_id", "event_type", "template"]
-    DELIVERY_CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
-    EVENT_TYPE_FIELD_NUMBER: _ClassVar[int]
-    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
-    delivery_config_id: DeliveryConfigId
-    event_type: EventType
-    template: DeliveryConfigTemplate
-    def __init__(self, delivery_config_id: _Optional[_Union[DeliveryConfigId, _Mapping]] = ..., event_type: _Optional[_Union[EventType, str]] = ..., template: _Optional[_Union[DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...
 
 class WebhookDeliveryTemplate(_message.Message):
     __slots__ = ["url", "method", "headers", "body_template"]

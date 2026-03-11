@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/notification/definition.proto.
  */
 export const file_flyteidl2_notification_definition: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24icQoGUnVsZUlkEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIpkBCgRSdWxlEj8KCmV2ZW50X3R5cGUYASABKA4yIS5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkV2ZW50VHlwZUIIukgFggECIAASPAoIcnVuX3J1bGUYAiABKAsyKC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLlJ1bkNvbXBsZXRlZFJ1bGVIAEISCgljb25kaXRpb24SBbpIAggBItwBChBSdW5Db21wbGV0ZWRSdWxlEjcKB3J1bGVfaWQYASABKAsyHi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLlJ1bGVJZEIGukgDyAEBEk8KE2RlbGl2ZXJ5X2NvbmZpZ19pZHMYAiADKAsyKC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnSWRCCLpIBZIBAggBEj4KBmNoZWNrcxgDIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uUnVuQ29tcGxldGVkUnVsZUNoZWNrcyJzChZSdW5Db21wbGV0ZWRSdWxlQ2hlY2tzEhUKDXByb2plY3RfcmVnZXgYASABKAkSFAoMZG9tYWluX3JlZ2V4GAIgASgJEhcKD3Rhc2tfbmFtZV9yZWdleBgDIAEoCRITCgtwaGFzZV9yZWdleBgEIAEoCSKaAQoORGVsaXZlcnlPcHRpb24SPQoJY29uZmlnX2lkGAEgASgLMiguZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ0lkSAASOAoGY29uZmlnGAIgASgLMiYuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ0gAQg8KBm9wdGlvbhIFukgCCAEiewoQRGVsaXZlcnlDb25maWdJZBIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ASKtAQoWRGVsaXZlcnlDb25maWdUZW1wbGF0ZRJCCgd3ZWJob29rGAEgASgLMi8uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5XZWJob29rRGVsaXZlcnlUZW1wbGF0ZUgAEj4KBWVtYWlsGAIgASgLMi0uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbERlbGl2ZXJ5VGVtcGxhdGVIAEIPCgZjb25maWcSBbpIAggBIpkBCiRSdW5Db21wbGV0ZWROb3RpZmljYXRpb25UZW1wbGF0ZURhdGESNAoDcnVuGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESLAoFcGhhc2UYAiABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEg0KBWVycm9yGAMgASgJIukBCg5EZWxpdmVyeUNvbmZpZxJMChJkZWxpdmVyeV9jb25maWdfaWQYASABKAsyKC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnSWRCBrpIA8gBARI/CgpldmVudF90eXBlGAIgASgOMiEuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FdmVudFR5cGVCCLpIBYIBAiAAEkgKCHRlbXBsYXRlGAMgASgLMi4uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ1RlbXBsYXRlQga6SAPIAQEioAIKF1dlYmhvb2tEZWxpdmVyeVRlbXBsYXRlEhcKA3VybBgBIAEoCUIKukgHcgUQARjQDxI8CgZtZXRob2QYAiABKA4yIi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkh0dHBNZXRob2RCCLpIBYIBAiAAEmcKB2hlYWRlcnMYAyADKAsyPC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLldlYmhvb2tEZWxpdmVyeVRlbXBsYXRlLkhlYWRlcnNFbnRyeUIYukgVmgESEBQiBnIEEAEYFCoGcgQQARgyEhUKDWJvZHlfdGVtcGxhdGUYBCABKAkaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijQEKFUVtYWlsRGVsaXZlcnlUZW1wbGF0ZRIYCgdzdWJqZWN0GAEgASgJQge6SARyAhABEgoKAnRvGAIgAygJEgoKAmNjGAMgAygJEgsKA2JjYxgEIAMoCRIeCg1odG1sX3RlbXBsYXRlGAUgASgJQge6SARyAhABEhUKDXRleHRfdGVtcGxhdGUYBiABKAkqRQoJRXZlbnRUeXBlEhoKFkVWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIcChhFVkVOVF9UWVBFX1JVTl9DT01QTEVURUQQASr3AQoKSHR0cE1ldGhvZBIbChdIVFRQX01FVEhPRF9VTlNQRUNJRklFRBAAEhMKD0hUVFBfTUVUSE9EX0dFVBABEhQKEEhUVFBfTUVUSE9EX0hFQUQQAhIUChBIVFRQX01FVEhPRF9QT1NUEAMSEwoPSFRUUF9NRVRIT0RfUFVUEAQSFgoSSFRUUF9NRVRIT0RfREVMRVRFEAUSFwoTSFRUUF9NRVRIT0RfQ09OTkVDVBAGEhcKE0hUVFBfTUVUSE9EX09QVElPTlMQBxIVChFIVFRQX01FVEhPRF9UUkFDRRAIEhUKEUhUVFBfTUVUSE9EX1BBVENIEAlC5AEKGmNvbS5mbHl0ZWlkbDIubm90aWZpY2F0aW9uQg9EZWZpbml0aW9uUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvbm90aWZpY2F0aW9uogIDRk5YqgIWRmx5dGVpZGwyLk5vdGlmaWNhdGlvbsoCFkZseXRlaWRsMlxOb3RpZmljYXRpb27iAiJGbHl0ZWlkbDJcTm90aWZpY2F0aW9uXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpOb3RpZmljYXRpb25iBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
+  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24icQoGUnVsZUlkEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BInsKEERlbGl2ZXJ5Q29uZmlnSWQSFgoDb3JnGAEgASgJQgm6SAZyBBABGD8SGgoHcHJvamVjdBgCIAEoCUIJukgGcgQQARg/EhkKBmRvbWFpbhgDIAEoCUIJukgGcgQQARg/EhgKBG5hbWUYBCABKAlCCrpIB3IFEAEY/wEirQEKFkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGUSQgoHd2ViaG9vaxgBIAEoCzIvLmZseXRlaWRsMi5ub3RpZmljYXRpb24uV2ViaG9va0RlbGl2ZXJ5VGVtcGxhdGVIABI+CgVlbWFpbBgCIAEoCzItLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRW1haWxEZWxpdmVyeVRlbXBsYXRlSABCDwoGY29uZmlnEgW6SAIIASKZAQokUnVuQ29tcGxldGVkTm90aWZpY2F0aW9uVGVtcGxhdGVEYXRhEjQKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEiwKBXBoYXNlGAIgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRINCgVlcnJvchgDIAEoCSKgAgoXV2ViaG9va0RlbGl2ZXJ5VGVtcGxhdGUSFwoDdXJsGAEgASgJQgq6SAdyBRABGNAPEjwKBm1ldGhvZBgCIAEoDjIiLmZseXRlaWRsMi5ub3RpZmljYXRpb24uSHR0cE1ldGhvZEIIukgFggECIAASZwoHaGVhZGVycxgDIAMoCzI8LmZseXRlaWRsMi5ub3RpZmljYXRpb24uV2ViaG9va0RlbGl2ZXJ5VGVtcGxhdGUuSGVhZGVyc0VudHJ5Qhi6SBWaARIQFCIGcgQQARgUKgZyBBABGDISFQoNYm9keV90ZW1wbGF0ZRgEIAEoCRouCgxIZWFkZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKNAQoVRW1haWxEZWxpdmVyeVRlbXBsYXRlEhgKB3N1YmplY3QYASABKAlCB7pIBHICEAESCgoCdG8YAiADKAkSCgoCY2MYAyADKAkSCwoDYmNjGAQgAygJEh4KDWh0bWxfdGVtcGxhdGUYBSABKAlCB7pIBHICEAESFQoNdGV4dF90ZW1wbGF0ZRgGIAEoCSpFCglFdmVudFR5cGUSGgoWRVZFTlRfVFlQRV9VTlNQRUNJRklFRBAAEhwKGEVWRU5UX1RZUEVfUlVOX0NPTVBMRVRFRBABKvcBCgpIdHRwTWV0aG9kEhsKF0hUVFBfTUVUSE9EX1VOU1BFQ0lGSUVEEAASEwoPSFRUUF9NRVRIT0RfR0VUEAESFAoQSFRUUF9NRVRIT0RfSEVBRBACEhQKEEhUVFBfTUVUSE9EX1BPU1QQAxITCg9IVFRQX01FVEhPRF9QVVQQBBIWChJIVFRQX01FVEhPRF9ERUxFVEUQBRIXChNIVFRQX01FVEhPRF9DT05ORUNUEAYSFwoTSFRUUF9NRVRIT0RfT1BUSU9OUxAHEhUKEUhUVFBfTUVUSE9EX1RSQUNFEAgSFQoRSFRUUF9NRVRIT0RfUEFUQ0gQCULkAQoaY29tLmZseXRlaWRsMi5ub3RpZmljYXRpb25CD0RlZmluaXRpb25Qcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9ub3RpZmljYXRpb26iAgNGTliqAhZGbHl0ZWlkbDIuTm90aWZpY2F0aW9uygIWRmx5dGVpZGwyXE5vdGlmaWNhdGlvbuICIkZseXRlaWRsMlxOb3RpZmljYXRpb25cR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6Ok5vdGlmaWNhdGlvbmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
 
 /**
  * @generated from message flyteidl2.notification.RuleId
@@ -58,147 +58,6 @@ export const RuleIdSchema: GenMessage<RuleId> = /*@__PURE__*/
   messageDesc(file_flyteidl2_notification_definition, 0);
 
 /**
- * @generated from message flyteidl2.notification.Rule
- */
-export type Rule = Message<"flyteidl2.notification.Rule"> & {
-  /**
-   * @generated from field: flyteidl2.notification.EventType event_type = 1;
-   */
-  eventType: EventType;
-
-  /**
-   * in future, this can extend to rules related to Apps, Usage, Artifacts, etc.
-   *
-   * @generated from oneof flyteidl2.notification.Rule.condition
-   */
-  condition: {
-    /**
-     * @generated from field: flyteidl2.notification.RunCompletedRule run_rule = 2;
-     */
-    value: RunCompletedRule;
-    case: "runRule";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.notification.Rule.
- * Use `create(RuleSchema)` to create a new message.
- */
-export const RuleSchema: GenMessage<Rule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 1);
-
-/**
- * RunCompletedRule applies to events when a certain run(its root a0 action) reaches terminal phase
- *
- * @generated from message flyteidl2.notification.RunCompletedRule
- */
-export type RunCompletedRule = Message<"flyteidl2.notification.RunCompletedRule"> & {
-  /**
-   * The user provided rule id.
-   *
-   * @generated from field: flyteidl2.notification.RuleId rule_id = 1;
-   */
-  ruleId?: RuleId;
-
-  /**
-   * List of ids to config objects that define what notifications must be compiled and sent.
-   * this must/will only point to delivery configs of type "EVENT_TYPE_RUN_COMPLETED".
-   *
-   * @generated from field: repeated flyteidl2.notification.DeliveryConfigId delivery_config_ids = 2;
-   */
-  deliveryConfigIds: DeliveryConfigId[];
-
-  /**
-   * @generated from field: flyteidl2.notification.RunCompletedRuleChecks checks = 3;
-   */
-  checks?: RunCompletedRuleChecks;
-};
-
-/**
- * Describes the message flyteidl2.notification.RunCompletedRule.
- * Use `create(RunCompletedRuleSchema)` to create a new message.
- */
-export const RunCompletedRuleSchema: GenMessage<RunCompletedRule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 2);
-
-/**
- * RunCompletedRuleChecks defines additional filtering on "run_completed" events
- *
- * @generated from message flyteidl2.notification.RunCompletedRuleChecks
- */
-export type RunCompletedRuleChecks = Message<"flyteidl2.notification.RunCompletedRuleChecks"> & {
-  /**
-   * Regex for matching completed run project.
-   * if not supplied, rules applies to all projects.
-   *
-   * @generated from field: string project_regex = 1;
-   */
-  projectRegex: string;
-
-  /**
-   * Regex for matching completed run domain.
-   * if not supplied, rule applies to all domains.
-   *
-   * @generated from field: string domain_regex = 2;
-   */
-  domainRegex: string;
-
-  /**
-   * Regex for matching completed run task name.
-   * if not supplied, rule applies to a run of any task.
-   *
-   * @generated from field: string task_name_regex = 3;
-   */
-  taskNameRegex: string;
-
-  /**
-   * Regex for matching completed run phase.
-   * if not supplied, rule applies to any terminal phase.
-   *
-   * @generated from field: string phase_regex = 4;
-   */
-  phaseRegex: string;
-};
-
-/**
- * Describes the message flyteidl2.notification.RunCompletedRuleChecks.
- * Use `create(RunCompletedRuleChecksSchema)` to create a new message.
- */
-export const RunCompletedRuleChecksSchema: GenMessage<RunCompletedRuleChecks> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 3);
-
-/**
- * DeliveryOption allows you to send a notification using either existing stored config, either define an inline config
- *
- * @generated from message flyteidl2.notification.DeliveryOption
- */
-export type DeliveryOption = Message<"flyteidl2.notification.DeliveryOption"> & {
-  /**
-   * @generated from oneof flyteidl2.notification.DeliveryOption.option
-   */
-  option: {
-    /**
-     * @generated from field: flyteidl2.notification.DeliveryConfigId config_id = 1;
-     */
-    value: DeliveryConfigId;
-    case: "configId";
-  } | {
-    /**
-     * @generated from field: flyteidl2.notification.DeliveryConfig config = 2;
-     */
-    value: DeliveryConfig;
-    case: "config";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.notification.DeliveryOption.
- * Use `create(DeliveryOptionSchema)` to create a new message.
- */
-export const DeliveryOptionSchema: GenMessage<DeliveryOption> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 4);
-
-/**
  * @generated from message flyteidl2.notification.DeliveryConfigId
  */
 export type DeliveryConfigId = Message<"flyteidl2.notification.DeliveryConfigId"> & {
@@ -236,7 +95,7 @@ export type DeliveryConfigId = Message<"flyteidl2.notification.DeliveryConfigId"
  * Use `create(DeliveryConfigIdSchema)` to create a new message.
  */
 export const DeliveryConfigIdSchema: GenMessage<DeliveryConfigId> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 5);
+  messageDesc(file_flyteidl2_notification_definition, 1);
 
 /**
  * @generated from message flyteidl2.notification.DeliveryConfigTemplate
@@ -265,7 +124,7 @@ export type DeliveryConfigTemplate = Message<"flyteidl2.notification.DeliveryCon
  * Use `create(DeliveryConfigTemplateSchema)` to create a new message.
  */
 export const DeliveryConfigTemplateSchema: GenMessage<DeliveryConfigTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 6);
+  messageDesc(file_flyteidl2_notification_definition, 2);
 
 /**
  * @generated from message flyteidl2.notification.RunCompletedNotificationTemplateData
@@ -292,39 +151,7 @@ export type RunCompletedNotificationTemplateData = Message<"flyteidl2.notificati
  * Use `create(RunCompletedNotificationTemplateDataSchema)` to create a new message.
  */
 export const RunCompletedNotificationTemplateDataSchema: GenMessage<RunCompletedNotificationTemplateData> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 7);
-
-/**
- * DeliveryConfig contains a configuration and template that must be used for compiling and sending a notification
- * when an event of a certain type occurs.
- *
- * @generated from message flyteidl2.notification.DeliveryConfig
- */
-export type DeliveryConfig = Message<"flyteidl2.notification.DeliveryConfig"> & {
-  /**
-   * @generated from field: flyteidl2.notification.DeliveryConfigId delivery_config_id = 1;
-   */
-  deliveryConfigId?: DeliveryConfigId;
-
-  /**
-   * @generated from field: flyteidl2.notification.EventType event_type = 2;
-   */
-  eventType: EventType;
-
-  /**
-   * For EVENT_TYPE_RUN_COMPLETED, template must use field names like in RunCompletedNotificationTemplateData struct.
-   *
-   * @generated from field: flyteidl2.notification.DeliveryConfigTemplate template = 3;
-   */
-  template?: DeliveryConfigTemplate;
-};
-
-/**
- * Describes the message flyteidl2.notification.DeliveryConfig.
- * Use `create(DeliveryConfigSchema)` to create a new message.
- */
-export const DeliveryConfigSchema: GenMessage<DeliveryConfig> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 8);
+  messageDesc(file_flyteidl2_notification_definition, 3);
 
 /**
  * @generated from message flyteidl2.notification.WebhookDeliveryTemplate
@@ -358,7 +185,7 @@ export type WebhookDeliveryTemplate = Message<"flyteidl2.notification.WebhookDel
  * Use `create(WebhookDeliveryTemplateSchema)` to create a new message.
  */
 export const WebhookDeliveryTemplateSchema: GenMessage<WebhookDeliveryTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 9);
+  messageDesc(file_flyteidl2_notification_definition, 4);
 
 /**
  * @generated from message flyteidl2.notification.EmailDeliveryTemplate
@@ -406,7 +233,7 @@ export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliver
  * Use `create(EmailDeliveryTemplateSchema)` to create a new message.
  */
 export const EmailDeliveryTemplateSchema: GenMessage<EmailDeliveryTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 10);
+  messageDesc(file_flyteidl2_notification_definition, 5);
 
 /**
  * @generated from enum flyteidl2.notification.EventType

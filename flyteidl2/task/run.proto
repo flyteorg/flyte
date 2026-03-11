@@ -116,6 +116,7 @@ message DeliveryOption {
 
     flyteidl2.notification.DeliveryConfigId config_id = 1;
 
+    // template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
     flyteidl2.notification.DeliveryConfigTemplate template = 2;
   }
 }

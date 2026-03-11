@@ -39,61 +39,6 @@ enum EventType {
   EVENT_TYPE_RUN_COMPLETED = 1;
 }
 
-message Rule {
-  EventType event_type = 1 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
-
-  // in future, this can extend to rules related to Apps, Usage, Artifacts, etc.
-  oneof condition {
-    option (buf.validate.oneof).required = true;
-
-    RunCompletedRule run_rule = 2;
-  }
-}
-
-// RunCompletedRule applies to events when a certain run(its root a0 action) reaches terminal phase
-message RunCompletedRule {
-  // The user provided rule id.
-  RuleId rule_id = 1 [(buf.validate.field).required = true];
-
-  // List of ids to config objects that define what notifications must be compiled and sent.
-  // this must/will only point to delivery configs of type "EVENT_TYPE_RUN_COMPLETED".
-  repeated DeliveryConfigId delivery_config_ids = 2 [(buf.validate.field).repeated.min_items = 1];
-
-  RunCompletedRuleChecks checks = 3;
-}
-
-// RunCompletedRuleChecks defines additional filtering on "run_completed" events
-message RunCompletedRuleChecks {
-  // Regex for matching completed run project.
-  // if not supplied, rules applies to all projects.
-  string project_regex = 1;
-
-  // Regex for matching completed run domain.
-  // if not supplied, rule applies to all domains.
-  string domain_regex = 2;
-
-  // Regex for matching completed run task name.
-  // if not supplied, rule applies to a run of any task.
-  string task_name_regex = 3;
-
-  // Regex for matching completed run phase.
-  // if not supplied, rule applies to any terminal phase.
-  string phase_regex = 4;
-}
-
-// DeliveryOption allows you to send a notification using either existing stored config, either define an inline config
-message DeliveryOption {
-  oneof option {
-    option (buf.validate.oneof).required = true;
-
-    DeliveryConfigId config_id = 1;
-
-    DeliveryConfig config = 2;
-  }
-}
-
 message DeliveryConfigId {
   // Org this rule belongs to.
   string org = 1 [
@@ -136,19 +81,6 @@ message RunCompletedNotificationTemplateData {
   common.ActionPhase phase = 2;
 
   string error = 3;
-}
-
-// DeliveryConfig contains a configuration and template that must be used for compiling and sending a notification
-// when an event of a certain type occurs.
-message DeliveryConfig {
-  DeliveryConfigId delivery_config_id = 1 [(buf.validate.field).required = true];
-
-  EventType event_type = 2 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
-
-  // For EVENT_TYPE_RUN_COMPLETED, template must use field names like in RunCompletedNotificationTemplateData struct.
-  DeliveryConfigTemplate template = 3 [(buf.validate.field).required = true];
 }
 
 enum HttpMethod {
