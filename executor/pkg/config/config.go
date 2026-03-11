@@ -21,7 +21,7 @@ var (
 		MetricsCertName:        "tls.crt",
 		MetricsCertKey:         "tls.key",
 		EnableHTTP2:            false,
-		EventsServiceURL:        "http://localhost:8090",
+		EventsServiceURL:       "http://localhost:8090",
 		Cluster:                "",
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
