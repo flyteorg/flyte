@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/console"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
@@ -78,6 +79,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.DataStore = dataStore
 
 	// Setup all services
+	if err := console.Setup(ctx, sc); err != nil {
+		return err
+	}
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err
 	}

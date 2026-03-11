@@ -40,6 +40,10 @@ data:
                                         routes:
                                             {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
                                             - match:
+                                                  prefix: "/v2"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
                                                   prefix: "/healthz"
                                               route:
                                                   cluster: flyte

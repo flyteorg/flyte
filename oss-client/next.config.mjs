@@ -8,8 +8,7 @@ const gitSha =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export',
-  output: 'standalone', // Creates a minimal server for Docker
+  output: process.env.BUILD_STATIC ? 'export' : 'standalone',
   basePath: '/v2',
   deploymentId: gitSha,
 
