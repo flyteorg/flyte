@@ -113,6 +113,14 @@ Name of Envoy proxy configmap
 {{- end }}
 
 {{/*
+Selector labels for Console
+*/}}
+{{- define "flyte-sandbox.consoleSelectorLabels" -}}
+{{ include "flyte-sandbox.selectorLabels" . }}
+app.kubernetes.io/component: console
+{{- end }}
+
+{{/*
 Name of development-mode Flyte headless service
 */}}
 {{- define "flyte-sandbox.localHeadlessService" -}}
