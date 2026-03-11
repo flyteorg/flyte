@@ -55,12 +55,12 @@ const (
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
 	LabelTerminationStatus = "flyte.org/termination-status"
-	// LabelCompletedTime records the UTC hour when the TaskAction became terminal.
+	// LabelCompletedTime records the UTC time (minute precision) when the TaskAction became terminal.
 	LabelCompletedTime = "flyte.org/completed-time"
 	// LabelValueTerminated is the value for LabelTerminationStatus.
 	LabelValueTerminated = "terminated"
-	// labelHourTimeFormat is the time format used for the completed-time label (lexicographically ordered).
-	labelHourTimeFormat = "2006-01-02.15"
+	// labelTimeFormat is the time format used for the completed-time label (lexicographically ordered, minute precision).
+	labelTimeFormat = "2006-01-02.15-04"
 )
 
 type K8sEventType string
@@ -254,7 +254,7 @@ func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAct
 		labels = make(map[string]string)
 	}
 	labels[LabelTerminationStatus] = LabelValueTerminated
-	labels[LabelCompletedTime] = terminalTransitionTime(taskAction).Format(labelHourTimeFormat)
+	labels[LabelCompletedTime] = terminalTransitionTime(taskAction).Format(labelTimeFormat)
 	taskAction.SetLabels(labels)
 
 	if err := r.Patch(ctx, taskAction, patch); err != nil {

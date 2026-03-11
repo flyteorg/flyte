@@ -57,7 +57,7 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should delete TaskActions with expired completed-time label", func() {
-		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelHourTimeFormat)
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
 		createTaskAction(ctx, "gc-expired", map[string]string{
 			LabelTerminationStatus: LabelValueTerminated,
 			LabelCompletedTime:     expiredTime,
@@ -73,7 +73,7 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should retain TaskActions with recent completed-time label", func() {
-		recentTime := time.Now().UTC().Format(labelHourTimeFormat)
+		recentTime := time.Now().UTC().Format(labelTimeFormat)
 		createTaskAction(ctx, "gc-recent", map[string]string{
 			LabelTerminationStatus: LabelValueTerminated,
 			LabelCompletedTime:     recentTime,

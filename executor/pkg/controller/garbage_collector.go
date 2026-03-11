@@ -55,7 +55,7 @@ const gcPageSize = 500
 func (gc *GarbageCollector) collect(ctx context.Context) error {
 	logger := log.FromContext(ctx).WithName("gc")
 
-	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelHourTimeFormat)
+	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelTimeFormat)
 	deleted := 0
 	total := 0
 	continueToken := ""
@@ -84,8 +84,7 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 				continue
 			}
 
-			// The hour format is lexicographically ordered, so string comparison works.
-			// Use strict < to avoid deleting up to ~59 min early due to hour granularity.
+			// The minute-precision format is lexicographically ordered, so string comparison works.
 			if completedTime < cutoff {
 				if err := gc.client.Delete(ctx, ta); err != nil {
 					logger.Error(err, "failed to delete expired TaskAction",
