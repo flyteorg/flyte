@@ -314,7 +314,10 @@ func TestExtractAccessTokenFromCookies(t *testing.T) {
 	if err == nil {
 		t.Logf("Cookie 1 raw decoded (first 50 bytes): %s", string(decoded[:50]))
 	}
+	// Use MaxAge(0) to disable timestamp expiration checks so hardcoded
+	// cookie values don't fail validation as time passes.
 	s := securecookie.New(hashKey, blockKey)
+	s.MaxAge(0)
 	var firstHalf string
 	err = s.Decode("flyte_at_1", cookieValue1, &firstHalf)
 	if err != nil {
