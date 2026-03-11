@@ -69,13 +69,6 @@ func (s *ProjectService) UpdateProject(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("project.id is required"))
 	}
 
-	if _, err := s.projectRepo.GetProject(ctx, projectProto.GetId()); err != nil {
-		if errors.Is(err, interfaces.ErrProjectNotFound) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
-		}
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
 	model, err := transformers.NewProjectModel(projectProto)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
