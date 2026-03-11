@@ -51,106 +51,14 @@ type Config struct {
 	// Domains are injected into project responses (not stored per project row).
 	Domains []DomainConfig `json:"domains"`
 
-	// Auth configuration for the AuthMetadataService
-	Auth AuthConfig `json:"auth"`
+	// Security controls authentication and authorization behavior.
+	Security SecurityConfig `json:"security"`
 }
 
-// AuthorizationServerType defines the type of authorization server.
-type AuthorizationServerType int
-
-const (
-	// AuthorizationServerTypeSelf indicates the service acts as its own authorization server.
-	AuthorizationServerTypeSelf AuthorizationServerType = iota
-	// AuthorizationServerTypeExternal indicates an external authorization server is used.
-	AuthorizationServerTypeExternal
-)
-
-// AuthConfig holds authentication configuration matching flyteadmin's auth config shape.
-type AuthConfig struct {
-	// AuthorizedURIs is the set of URIs clients can access the service on.
-	// The first entry is used as the public URL for building OAuth2 metadata URLs.
-	AuthorizedURIs []config.URL `json:"authorizedUris"`
-
-	// GrpcAuthorizationHeader is the authorization metadata key returned to clients.
-	GrpcAuthorizationHeader string `json:"grpcAuthorizationHeader"`
-
-	// AppAuth defines app-level OAuth2 settings.
-	AppAuth OAuth2Options `json:"appAuth"`
-
-	// HTTPProxyURL allows accessing external OAuth2 servers through an HTTP proxy.
-	HTTPProxyURL config.URL `json:"httpProxyURL"`
-
-	// TokenEndpointProxyConfig proxies token endpoint calls through admin.
-	TokenEndpointProxyConfig TokenEndpointProxyConfig `json:"tokenEndpointProxyConfig"`
-}
-
-// OAuth2Options holds OAuth2 authorization server options.
-type OAuth2Options struct {
-	// AuthServerType determines whether to use a self-hosted or external auth server.
-	AuthServerType AuthorizationServerType `json:"authServerType"`
-
-	// SelfAuthServer configures the self-hosted authorization server.
-	SelfAuthServer AuthorizationServer `json:"selfAuthServer"`
-
-	// ExternalAuthServer configures the external authorization server.
-	ExternalAuthServer ExternalAuthorizationServer `json:"externalAuthServer"`
-
-	// ThirdParty configures third-party (public client) settings.
-	ThirdParty ThirdPartyConfigOptions `json:"thirdParty"`
-}
-
-// AuthorizationServer configures a self-hosted authorization server.
-type AuthorizationServer struct {
-	// Issuer is the issuer URL. If empty, the first AuthorizedURI is used.
-	Issuer string `json:"issuer"`
-}
-
-// ExternalAuthorizationServer configures an external authorization server.
-type ExternalAuthorizationServer struct {
-	// BaseURL is the base URL of the external authorization server.
-	BaseURL config.URL `json:"baseURL"`
-
-	// MetadataEndpointURL overrides the default .well-known/oauth-authorization-server endpoint.
-	MetadataEndpointURL config.URL `json:"metadataEndpointURL"`
-
-	// RetryAttempts is the number of retry attempts for fetching metadata.
-	RetryAttempts int `json:"retryAttempts"`
-
-	// RetryDelay is the delay between retry attempts.
-	RetryDelay config.Duration `json:"retryDelay"`
-}
-
-// ThirdPartyConfigOptions holds third-party OAuth2 client settings.
-type ThirdPartyConfigOptions struct {
-	// FlyteClientConfig holds public client configuration.
-	FlyteClientConfig FlyteClientConfig `json:"flyteClient"`
-}
-
-// FlyteClientConfig holds the public client configuration.
-type FlyteClientConfig struct {
-	// ClientID is the public client ID.
-	ClientID string `json:"clientId"`
-
-	// RedirectURI is the redirect URI for the client.
-	RedirectURI string `json:"redirectUri"`
-
-	// Scopes are the OAuth2 scopes to request.
-	Scopes []string `json:"scopes"`
-
-	// Audience is the intended audience for OAuth2 tokens.
-	Audience string `json:"audience"`
-}
-
-// TokenEndpointProxyConfig configures proxying of token endpoint calls.
-type TokenEndpointProxyConfig struct {
-	// Enabled enables token endpoint proxying.
-	Enabled bool `json:"enabled"`
-
-	// PublicURL is the public URL to use for rewriting the token endpoint.
-	PublicURL config.URL `json:"publicURL"`
-
-	// PathPrefix is appended to the public URL when rewriting.
-	PathPrefix string `json:"pathPrefix"`
+// SecurityConfig controls authentication and authorization behavior.
+type SecurityConfig struct {
+	// UseAuth enables authentication. When true, AuthMetadataService and IdentityService are registered.
+	UseAuth bool `json:"useAuth" pflag:",Enable authentication and identity services"`
 }
 
 // ServerConfig holds HTTP server configuration

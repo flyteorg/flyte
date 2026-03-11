@@ -152,7 +152,7 @@ Get the Flyte service HTTP port.
 Get the Flyte gRPC service name
 */}}
 {{- define "flyte-binary.service.grpc.name" -}}
-{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
+{{- printf "%s-grpc" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*

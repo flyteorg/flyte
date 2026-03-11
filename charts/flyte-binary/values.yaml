@@ -420,7 +420,6 @@ enabled_plugins:
         - container
         - sidecar
         - connector-service
-        - echo
       default-for-task-types:
         container: container
         sidecar: sidecar
