@@ -61,7 +61,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsCertName"), defaultConfig.MetricsCertName, "Name of the metrics server certificate file")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsCertKey"), defaultConfig.MetricsCertKey, "Name of the metrics server key file")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableHTTP2"), defaultConfig.EnableHTTP2, "Enable HTTP/2 for metrics and webhook servers")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stateServiceURL"), defaultConfig.EventsServiceURL, "URL of the State Service for action state updates")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "EventsServiceURL"), defaultConfig.EventsServiceURL, "URL of the Event Service for action event updates")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.interval"), defaultConfig.GC.Interval.String(), "How often the garbage collector runs. 0 disables GC.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.maxTTL"), defaultConfig.GC.MaxTTL.String(), "Time-to-live for terminal TaskActions before deletion.")

@@ -253,13 +253,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_stateServiceURL", func(t *testing.T) {
+	t.Run("Test_EventsServiceURL", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("stateServiceURL", testValue)
-			if vString, err := cmdFlags.GetString("stateServiceURL"); err == nil {
+			cmdFlags.Set("EventsServiceURL", testValue)
+			if vString, err := cmdFlags.GetString("EventsServiceURL"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EventsServiceURL)
 
 			} else {

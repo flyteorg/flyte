@@ -26,8 +26,6 @@ func createTaskAction(ctx context.Context, name string, labels map[string]string
 			Project:       "test-project",
 			Domain:        "test-domain",
 			ActionName:    "test-action",
-			TaskType:      "container",
-			TaskTemplate:  []byte(`{}`),
 			InputURI:      "/tmp/input",
 			RunOutputBase: "/tmp/output",
 			TaskType:      "python-task",
