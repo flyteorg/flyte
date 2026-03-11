@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -29,8 +30,10 @@ func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project
 
 	result := r.db.WithContext(ctx).Create(project)
 	if result.Error != nil {
-		logger.Errorf(ctx, "failed to create project %s: %v", project.Identifier, result.Error)
-		return fmt.Errorf("%w: %v", interfaces.ErrProjectAlreadyExists, result.Error)
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
+			return fmt.Errorf("%w: %v", interfaces.ErrProjectAlreadyExists, result.Error)
+		}
+		return fmt.Errorf("failed to create project %s: %w", project.Identifier, result.Error)
 	}
 
 	return nil
