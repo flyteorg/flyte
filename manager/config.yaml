@@ -13,6 +13,12 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
 
+# Executor configuration
+executor:
+  gc:
+    interval: 1m
+    maxTTL: 1m
+
 # Runs service configuration
 runs:
   storagePrefix: "s3://flyte-data"

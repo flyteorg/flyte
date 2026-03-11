@@ -146,4 +146,78 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(updatedTaskAction.Status.Conditions).NotTo(BeEmpty())
 		})
 	})
+
+	Context("When reconciling a terminal TaskAction", func() {
+		const terminalResourceName = "terminal-test-resource"
+
+		ctx := context.Background()
+
+		typeNamespacedName := types.NamespacedName{
+			Name:      terminalResourceName,
+			Namespace: "default",
+		}
+
+		BeforeEach(func() {
+			By("creating a terminal TaskAction")
+			resource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      terminalResourceName,
+					Namespace: "default",
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "test-run",
+					Org:           "test-org",
+					Project:       "test-project",
+					Domain:        "test-domain",
+					ActionName:    "test-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "python-task",
+					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
+
+			// Set terminal condition on status
+			resource.Status.Conditions = []metav1.Condition{
+				{
+					Type:               string(flyteorgv1.ConditionTypeSucceeded),
+					Status:             metav1.ConditionTrue,
+					Reason:             string(flyteorgv1.ConditionReasonCompleted),
+					Message:            "TaskAction completed successfully",
+					LastTransitionTime: metav1.Now(),
+				},
+			}
+			Expect(k8sClient.Status().Update(ctx, resource)).To(Succeed())
+		})
+
+		AfterEach(func() {
+			resource := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, typeNamespacedName, resource)
+			if err == nil {
+				Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
+			}
+		})
+
+		It("should set GC labels on terminal TaskAction", func() {
+			By("Reconciling the terminal resource")
+
+			controllerReconciler := &TaskActionReconciler{
+				Client: k8sClient,
+				Scheme: k8sClient.Scheme(),
+			}
+
+			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: typeNamespacedName,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			// Verify GC labels are set
+			updatedTaskAction := &flyteorgv1.TaskAction{}
+			err = k8sClient.Get(ctx, typeNamespacedName, updatedTaskAction)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(updatedTaskAction.GetLabels()).To(HaveKeyWithValue(LabelTerminationStatus, LabelValueTerminated))
+			Expect(updatedTaskAction.GetLabels()).To(HaveKey(LabelCompletedTime))
+		})
+	})
 })
