@@ -30,6 +30,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
@@ -64,6 +66,12 @@ func buildTaskTemplateBytes(taskType, image string) []byte {
 	Expect(err).NotTo(HaveOccurred())
 	return data
 }
+
+// emptyPluginRegistry satisfies plugin.PluginRegistryIface with no registered plugins.
+type emptyPluginRegistry struct{}
+
+func (emptyPluginRegistry) GetCorePlugins() []pluginsCore.PluginEntry { return nil }
+func (emptyPluginRegistry) GetK8sPlugins() []k8sPlugin.PluginEntry   { return nil }
 
 var _ = Describe("TaskAction Controller", func() {
 	Context("When reconciling a resource", func() {
@@ -103,6 +111,7 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 
 		AfterEach(func() {
+			// TODO(user): Cleanup logic after each test, like removing the resource instance.
 			resource := &flyteorgv1.TaskAction{}
 			err := k8sClient.Get(ctx, typeNamespacedName, resource)
 			Expect(err).NotTo(HaveOccurred())
