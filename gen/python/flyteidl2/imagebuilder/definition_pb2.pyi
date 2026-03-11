@@ -72,16 +72,18 @@ class PythonWheels(_message.Message):
     def __init__(self, dir: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class UVProject(_message.Message):
-    __slots__ = ["pyproject", "uvlock", "options", "secret_mounts"]
+    __slots__ = ["pyproject", "uvlock", "options", "secret_mounts", "source_dir"]
     PYPROJECT_FIELD_NUMBER: _ClassVar[int]
     UVLOCK_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_DIR_FIELD_NUMBER: _ClassVar[int]
     pyproject: str
     uvlock: str
     options: PipOptions
     secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
-    def __init__(self, pyproject: _Optional[str] = ..., uvlock: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
+    source_dir: str
+    def __init__(self, pyproject: _Optional[str] = ..., uvlock: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ..., source_dir: _Optional[str] = ...) -> None: ...
 
 class Commands(_message.Message):
     __slots__ = ["cmd", "secret_mounts"]

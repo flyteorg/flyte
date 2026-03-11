@@ -1,0 +1,18 @@
+dependencies:
+- name: docker-registry
+  repository: https://twuni.github.io/docker-registry.helm
+  version: 2.2.2
+- name: flyte-binary
+  repository: file://../flyte-binary
+  version: v0.2.0
+- name: kubernetes-dashboard
+  repository: https://kubernetes-retired.github.io/dashboard/
+  version: 6.0.0
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.6.7
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.8.1
+digest: sha256:226294cb2ca0049355056db89e7e0085f407eda14a9cc6737d37fba486eb2c28
+generated: "2026-02-27T22:05:59.483903+08:00"

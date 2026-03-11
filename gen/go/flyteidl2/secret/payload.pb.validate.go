@@ -610,6 +610,8 @@ func (m *GetSecretRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IncludeSystemSecrets
+
 	if len(errors) > 0 {
 		return GetSecretRequestMultiError(errors)
 	}
@@ -870,6 +872,8 @@ func (m *DeleteSecretRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IncludeSystemSecrets
+
 	if len(errors) > 0 {
 		return DeleteSecretRequestMultiError(errors)
 	}
@@ -1085,6 +1089,8 @@ func (m *ListSecretsRequest) validate(all bool) error {
 	// no validation rules for Token
 
 	// no validation rules for PerClusterTokens
+
+	// no validation rules for IncludeSystemSecrets
 
 	if len(errors) > 0 {
 		return ListSecretsRequestMultiError(errors)

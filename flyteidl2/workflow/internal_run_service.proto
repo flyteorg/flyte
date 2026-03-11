@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+service InternalRunService {
+  // Record a new action.
+  rpc RecordAction(RecordActionRequest) returns (RecordActionResponse) {}
+
+  // Record a new action (streaming implementation).
+  rpc RecordActionStream(stream RecordActionStreamRequest) returns (stream RecordActionStreamResponse) {}
+
+  // Update the status of an action.
+  rpc UpdateActionStatus(UpdateActionStatusRequest) returns (UpdateActionStatusResponse) {}
+
+  // Update the status of an action (streaming implementation).
+  rpc UpdateActionStatusStream(stream UpdateActionStatusStreamRequest) returns (stream UpdateActionStatusStreamResponse) {}
+
+  // Record a collection of action events.
+  rpc RecordActionEvents(RecordActionEventsRequest) returns (RecordActionEventsResponse) {}
+
+  // Record a new action event (streaming implementation).
+  rpc RecordActionEventStream(stream RecordActionEventStreamRequest) returns (stream RecordActionEventStreamResponse) {}
+}
+
+// Request message for recording an action.
+message RecordActionRequest {
+  // Action to record.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The parent action. This is used to establish the hierarchy of actions. Empty if this is the root action.
+  string parent = 4;
+
+  // The group this action belongs to, if applicable.
+  string group = 5;
+
+  // The subject that created the action, if known.
+  string subject = 6;
+
+  // The inputs for the action.
+  string input_uri = 7;
+
+  oneof spec {
+    // TODO(haytham): Uncomment when we update all code paths to use this.
+    // option (buf.validate.oneof).required = true;
+    flyteidl2.workflow.TaskAction task = 10;
+    flyteidl2.workflow.TraceAction trace = 11;
+    flyteidl2.workflow.ConditionAction condition = 12;
+  }
+}
+
+// Response message for recording an action.
+message RecordActionResponse {
+  // The action id.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The result.
+  google.rpc.Status status = 2 [(buf.validate.field).required = true];
+}
+
+// Request message for recording an action (streaming implementation).
+message RecordActionStreamRequest {
+  // Request message for recording an action.
+  RecordActionRequest request = 1;
+}
+
+// Response message for recording an action (streaming implementation).
+message RecordActionStreamResponse {
+  // Response message for recording an action.
+  RecordActionResponse response = 1;
+}
+
+// Request message for updating an action.
+message UpdateActionStatusRequest {
+  // Action to update.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Updated status of the action.
+  flyteidl2.workflow.ActionStatus status = 2 [(buf.validate.field).required = true];
+}
+
+// Response message for updating an action.
+message UpdateActionStatusResponse {
+  // The action id.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The result.
+  google.rpc.Status status = 2 [(buf.validate.field).required = true];
+}
+
+// Request message for updating an action (streaming implementation).
+message UpdateActionStatusStreamRequest {
+  // Request message for updating an action.
+  UpdateActionStatusRequest request = 1;
+
+  // The nonce is used to correlate the request with the response.
+  int64 nonce = 2;
+}
+
+// Response message for updating an action (streaming implementation).
+message UpdateActionStatusStreamResponse {
+  // Response message for updating an action.
+  UpdateActionStatusResponse response = 1;
+
+  // The nonce is used to correlate the request with the response.
+  int64 nonce = 2;
+}
+
+// Request message for recording an action event.
+message RecordActionEventRequest {
+  // The event.
+  flyteidl2.workflow.ActionEvent event = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for recording an action event.
+message RecordActionEventResponse {
+  // The action id.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The result.
+  google.rpc.Status status = 2 [(buf.validate.field).required = true];
+}
+
+// Request message for recording a collection of action events.
+message RecordActionEventsRequest {
+  // The events.
+  repeated flyteidl2.workflow.ActionEvent events = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for recording a collection of action events.
+message RecordActionEventsResponse {
+  // The result.
+  google.rpc.Status status = 1 [(buf.validate.field).required = true];
+}
+
+// Request message for recording an action event (streaming implementation).
+// TODO - when this message is removed, also remove the RecordActionEventRequest message above.
+message RecordActionEventStreamRequest {
+  // Request message for recording an action event.
+  RecordActionEventRequest request = 1 [(buf.validate.field).required = true];
+
+  // The nonce is used to correlate the request with the response.
+  int64 nonce = 2;
+}
+
+// Response message for recording an action event (streaming implementation).
+// TODO - when this message is removed, also remove the RecordActionEventResponse message above.
+message RecordActionEventStreamResponse {
+  // Response message for recording an action event.
+  RecordActionEventResponse response = 1 [(buf.validate.field).required = true];
+
+  // The nonce is used to correlate the request with the response.
+  int64 nonce = 2;
+}

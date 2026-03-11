@@ -103,7 +103,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	} else {
 		taskMetadata.EXPECT().GetK8sServiceAccount().Return("")
 	}
-	taskMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
+	taskMetadata.EXPECT().GetSecurityContext().Return(&core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: securityContextServiceAccount},
 	})
 	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
@@ -113,7 +113,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",

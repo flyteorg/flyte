@@ -22,7 +22,7 @@ func Benchmark_initDefaultRegexes(b *testing.B) {
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
 	tID.EXPECT().GetGeneratedName().Return("generated-name")
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",

@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -11,16 +12,17 @@ import (
 // ActionRepo defines the interface for actions/runs data access
 type ActionRepo interface {
 	// Run operations
-	CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*models.Run, error)
+	CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error)
 	GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error)
 	ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error)
 	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Action operations
 	CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error)
+	InsertEvents(ctx context.Context, events []*models.ActionEvent) error
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
-	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase string, startTime, endTime *string) error
+	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Watch operations (for streaming)
@@ -35,4 +37,7 @@ type ActionRepo interface {
 	// Event notification (for state updates)
 	NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error
 	WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error)
+
+	// Aggregation operations
+	ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error)
 }

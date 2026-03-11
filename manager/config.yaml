@@ -11,8 +11,17 @@ manager:
 
   kubernetes:
     namespace: "flyte"
-    # Optional: specify custom kubeconfig path
-    # kubeconfig: "/path/to/kubeconfig"
+    kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
+
+# Executor configuration
+executor:
+  gc:
+    interval: 1m
+    maxTTL: 1m
+
+# Runs service configuration
+runs:
+  storagePrefix: "s3://flyte-data"
 
 # Database configuration (SQLite)
 database:
@@ -35,8 +44,21 @@ dataproxy:
   download:
     maxExpiresIn: 1h
 
+# Default env vars injected into task pods by the executor.
+# flyte-host is injected into the kind node's /etc/hosts by `make cluster-create`,
+# pointing to the host machine's gateway IP so pods can reach host services.
+plugins:
+  k8s:
+    default-env-vars:
+      - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+      - _U_EP_OVERRIDE: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
+      - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
+
 # Storage Configuration
-# For local development, using MinIO (make sure MinIO is running on localhost:9000)
+# For local development, using RustFS (run: bash start-rustfs.sh)
 # You can also use "mem" type for in-memory storage during testing
 storage:
   type: minio
@@ -46,8 +68,8 @@ storage:
     kind: "s3"
     config:
       auth_type: "accesskey"
-      access_key_id: "minioadmin"
-      secret_key: "minioadmin"
+      access_key_id: "minio"
+      secret_key: "miniostorage"
       region: "us-east-1"
-      endpoint: "http://localhost:9000"
+      endpoint: "http://localhost:30002"
       disable_ssl: "true"

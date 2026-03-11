@@ -106,7 +106,6 @@ type SignedURLResponse struct {
 	RequiredRequestHeaders map[string]string
 }
 
-
 // RawStore defines a low level interface for accessing and storing bytes.
 type RawStore interface {
 	// GetBaseContainerFQN returns a FQN DataReference with the configured base init container
@@ -134,7 +133,6 @@ type RawStore interface {
 	Delete(ctx context.Context, reference DataReference) error
 }
 
-
 // ReferenceConstructor defines an interface for building data reference paths.
 type ReferenceConstructor interface {
 	// ConstructReference creates a new dataReference that matches the storage structure.
@@ -152,7 +150,6 @@ type ProtobufStore interface {
 	// WriteProtobuf serializes and stores the protobuf.
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
-
 
 // ComposedProtobufStore interface includes all the necessary data to allow a ProtobufStore to interact with storage
 // through a RawStore.
