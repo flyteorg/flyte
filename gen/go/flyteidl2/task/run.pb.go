@@ -640,6 +640,7 @@ type DeliveryOption_ConfigId struct {
 }
 
 type DeliveryOption_Template struct {
+	// template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
 	Template *notification.DeliveryConfigTemplate `protobuf:"bytes,2,opt,name=template,proto3,oneof"`
 }
 

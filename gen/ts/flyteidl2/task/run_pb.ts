@@ -276,6 +276,8 @@ export type DeliveryOption = Message<"flyteidl2.task.DeliveryOption"> & {
     case: "configId";
   } | {
     /**
+     * template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+     *
      * @generated from field: flyteidl2.notification.DeliveryConfigTemplate template = 2;
      */
     value: DeliveryConfigTemplate;
