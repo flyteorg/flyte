@@ -3,6 +3,7 @@ package mocks
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/eko/gocache/lib/v4/store"
 )

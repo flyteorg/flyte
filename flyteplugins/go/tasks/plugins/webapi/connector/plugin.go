@@ -13,9 +13,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
@@ -23,7 +20,9 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
