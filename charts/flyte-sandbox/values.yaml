@@ -156,6 +156,12 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  console:
+    enabled: true
+    image:
+      repository: unionconsole
+      tag: sandbox
+      pullPolicy: Never
   buildkit:
     enabled: true
     image:

@@ -24,6 +24,19 @@ flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
+CONSOLE_IMAGE := 643379628101.dkr.ecr.us-east-1.amazonaws.com/union-cp/unionconsole
+CONSOLE_TAG := 2026.2.3
+
+.PHONY: console
+console:
+	aws ecr get-login-password --region us-east-1 | \
+		docker login --username AWS --password-stdin 643379628101.dkr.ecr.us-east-1.amazonaws.com
+	mkdir -p images/tar/amd64 images/tar/arm64
+	docker pull --platform linux/amd64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker tag $(CONSOLE_IMAGE):$(CONSOLE_TAG) unionconsole:sandbox
+	docker save unionconsole:sandbox -o images/tar/amd64/unionconsole.tar
+	cp images/tar/amd64/unionconsole.tar images/tar/arm64/unionconsole.tar
+
 .PHONY: dep_update
 dep_update:
 	helm dependency update ../../charts/flyte-binary
@@ -42,7 +55,7 @@ manifests: dep_update
 		kustomize/dev > manifests/dev.yaml
 
 .PHONY: build
-build: flyte dep_update manifests
+build: flyte console dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox-v2:latest .
 
@@ -91,8 +104,8 @@ kubeconfig:
 stop:
 	docker stop flyte-sandbox
 
-.PHONY: console
-console:
+.PHONY: open
+open:
 	open http://localhost:30080/console
 
 .venv:

@@ -1,13 +1,3 @@
-FROM --platform=${BUILDPLATFORM} node:22-bookworm-slim AS console-builder
-
-WORKDIR /oss-client
-COPY oss-client/package.json oss-client/pnpm-lock.yaml ./
-RUN npm install -g pnpm@10.20.0 && pnpm install --frozen-lockfile
-COPY oss-client .
-# Remove server-side route handlers (legacy URL redirects) incompatible with static export
-RUN find src/app -name "route.ts" -delete
-RUN BUILD_STATIC=1 pnpm build
-
 FROM --platform=${BUILDPLATFORM} golang:1.24-bookworm AS flytebuilder
 
 ARG TARGETARCH
@@ -30,9 +20,8 @@ COPY runs runs
 COPY go.mod go.sum ./
 RUN go mod download
 COPY manager manager
-COPY --from=console-builder /oss-client/out console/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
-    go build -tags console -v -o dist/flyte ./manager/cmd/
+    go build -v -o dist/flyte ./manager/cmd/
 
 
 FROM debian:bookworm-slim
