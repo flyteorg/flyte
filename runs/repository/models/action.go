@@ -46,6 +46,31 @@ type Action struct {
 // TableName specifies the table name
 func (Action) TableName() string { return "actions" }
 
+// Clone returns an independent copy of the action, including pointer and JSON fields.
+func (a *Action) Clone() *Action {
+	if a == nil {
+		return nil
+	}
+
+	cloned := *a
+	if a.ParentActionName != nil {
+		parent := *a.ParentActionName
+		cloned.ParentActionName = &parent
+	}
+	if a.ActionSpec != nil {
+		actionSpec := make(datatypes.JSON, len(a.ActionSpec))
+		copy(actionSpec, a.ActionSpec)
+		cloned.ActionSpec = actionSpec
+	}
+	if a.ActionDetails != nil {
+		actionDetails := make(datatypes.JSON, len(a.ActionDetails))
+		copy(actionDetails, a.ActionDetails)
+		cloned.ActionDetails = actionDetails
+	}
+
+	return &cloned
+}
+
 // GetRunName extracts the run name from the action
 // For root actions (runs), returns the action's own name
 // For child actions, extracts from ActionSpec JSON

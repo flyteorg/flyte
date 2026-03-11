@@ -657,29 +657,10 @@ func (s *RunService) WatchActions(
 	errsCh := make(chan error)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
-	// Send existing actions from DB (paginate through all pages)
-	token := ""
-	for {
-		batch, nextToken, err := s.repo.ActionRepo().ListActions(ctx, runID, 100, token)
-		if err != nil {
-			logger.Errorf(ctx, "Failed to list actions: %v", err)
-			break
-		}
-		if len(batch) > 0 {
-			enriched := make([]*workflow.EnrichedAction, 0, len(batch))
-			for _, a := range batch {
-				enriched = append(enriched, s.convertActionToEnrichedProto(a))
-			}
-			if err := stream.Send(&workflow.WatchActionsResponse{
-				EnrichedActions: enriched,
-			}); err != nil {
-				return err
-			}
-		}
-		if nextToken == "" {
-			break
-		}
-		token = nextToken
+	rsm := newRunStateManager()
+
+	if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+		logger.Errorf(ctx, "Failed to list actions: %v", err)
 	}
 
 	for {
@@ -692,13 +673,53 @@ func (s *RunService) WatchActions(
 			if !ok {
 				return nil
 			}
-			if err := stream.Send(&workflow.WatchActionsResponse{
-				EnrichedActions: []*workflow.EnrichedAction{s.convertActionToEnrichedProto(updated)},
-			}); err != nil {
+			if err := s.sendChangedActions(rsm.upsertActions([]*models.Action{updated}), stream); err != nil {
 				return err
 			}
 		}
 	}
+}
+
+func (s *RunService) listAndSendAllActions(
+	ctx context.Context,
+	runID *common.RunIdentifier,
+	rsm *runStateManager,
+	stream *connect.ServerStream[workflow.WatchActionsResponse],
+) error {
+	token := ""
+	for {
+		batch, nextToken, err := s.repo.ActionRepo().ListActions(ctx, runID, 100, token)
+		if err != nil {
+			return err
+		}
+
+		if err := s.sendChangedActions(rsm.upsertActions(batch), stream); err != nil {
+			return err
+		}
+
+		if nextToken == "" {
+			return nil
+		}
+		token = nextToken
+	}
+}
+
+func (s *RunService) sendChangedActions(
+	actions []*models.Action,
+	stream *connect.ServerStream[workflow.WatchActionsResponse],
+) error {
+	if len(actions) == 0 {
+		return nil
+	}
+
+	enriched := make([]*workflow.EnrichedAction, 0, len(actions))
+	for _, action := range actions {
+		enriched = append(enriched, s.convertActionToEnrichedProto(action))
+	}
+
+	return stream.Send(&workflow.WatchActionsResponse{
+		EnrichedActions: enriched,
+	})
 }
 
 // WatchClusterEvents streams cluster events from the DB action updates.
