@@ -34,11 +34,6 @@ message RuleId {
   ];
 }
 
-enum EventType {
-  EVENT_TYPE_UNSPECIFIED = 0;
-  EVENT_TYPE_RUN_COMPLETED = 1;
-}
-
 message DeliveryConfigId {
   // Org this rule belongs to.
   string org = 1 [

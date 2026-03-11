@@ -9,11 +9,6 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class EventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
-    EVENT_TYPE_UNSPECIFIED: _ClassVar[EventType]
-    EVENT_TYPE_RUN_COMPLETED: _ClassVar[EventType]
-
 class HttpMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     HTTP_METHOD_UNSPECIFIED: _ClassVar[HttpMethod]
@@ -26,8 +21,6 @@ class HttpMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     HTTP_METHOD_OPTIONS: _ClassVar[HttpMethod]
     HTTP_METHOD_TRACE: _ClassVar[HttpMethod]
     HTTP_METHOD_PATCH: _ClassVar[HttpMethod]
-EVENT_TYPE_UNSPECIFIED: EventType
-EVENT_TYPE_RUN_COMPLETED: EventType
 HTTP_METHOD_UNSPECIFIED: HttpMethod
 HTTP_METHOD_GET: HttpMethod
 HTTP_METHOD_HEAD: HttpMethod
