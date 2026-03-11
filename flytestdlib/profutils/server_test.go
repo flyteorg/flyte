@@ -77,6 +77,9 @@ func TestConfigHandler(t *testing.T) {
 				"type": "json",
 			},
 		},
+		"prof": map[string]interface{}{
+			"DisableConfigEndpoint": false,
+		},
 	}, m)
 }
 
