@@ -36,7 +36,7 @@ type TestObj struct {
 }
 
 func init() {
-	if err := configureGlobalHTTPHandler(nil); err != nil {
+	if err := configureGlobalHTTPHandler(&Config{}, nil); err != nil {
 		panic(err)
 	}
 }
