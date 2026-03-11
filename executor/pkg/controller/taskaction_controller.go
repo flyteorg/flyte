@@ -52,6 +52,15 @@ import (
 const (
 	TaskActionDefaultRequeueDuration = 5 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
+
+	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
+	LabelTerminationStatus = "flyte.org/termination-status"
+	// LabelCompletedTime records the UTC time (minute precision) when the TaskAction became terminal.
+	LabelCompletedTime = "flyte.org/completed-time"
+	// LabelValueTerminated is the value for LabelTerminationStatus.
+	LabelValueTerminated = "terminated"
+	// labelTimeFormat is the time format used for the completed-time label (lexicographically ordered, minute precision).
+	labelTimeFormat = "2006-01-02.15-04"
 )
 
 type K8sEventType string
@@ -122,6 +131,9 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Check terminal conditions -- short-circuit
 	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
@@ -217,7 +229,39 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
+	// If the TaskAction just became terminal, stamp GC labels
+	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
 	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+}
+
+// ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
+// This is idempotent — if the labels are already set, it's a no-op.
+// Uses a MergeFrom patch instead of a full Update to reduce conflict surface with concurrent reconciles.
+func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAction *flyteorgv1.TaskAction) error {
+	labels := taskAction.GetLabels()
+	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated && labels[LabelCompletedTime] != "" {
+		return nil // already labeled
+	}
+
+	patch := client.MergeFrom(taskAction.DeepCopy())
+
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	labels[LabelTerminationStatus] = LabelValueTerminated
+	labels[LabelCompletedTime] = terminalTransitionTime(taskAction).Format(labelTimeFormat)
+	taskAction.SetLabels(labels)
+
+	if err := r.Patch(ctx, taskAction, patch); err != nil {
+		log.FromContext(ctx).Error(err, "failed to set terminal labels on TaskAction")
+		return err
+	}
+	return nil
 }
 
 // handleAbortAndFinalize handles the deletion of a TaskAction by aborting and finalizing the plugin.
@@ -280,10 +324,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	logger := log.FromContext(ctx)
 
 	if !taskActionStatusChanged(oldTaskAction.Status, newTaskAction.Status) {
-		return nil
-	}
-
-	if r.eventsClient == nil {
 		return nil
 	}
 
@@ -550,6 +590,23 @@ func isTerminal(ta *flyteorgv1.TaskAction) bool {
 		}
 	}
 	return false
+}
+
+// terminalTransitionTime returns the LastTransitionTime from the terminal condition
+// (Succeeded or Failed). Falls back to time.Now().UTC() if no transition time is found.
+func terminalTransitionTime(ta *flyteorgv1.TaskAction) time.Time {
+	for _, cond := range ta.Status.Conditions {
+		if cond.Status != metav1.ConditionTrue {
+			continue
+		}
+		if cond.Type == string(flyteorgv1.ConditionTypeSucceeded) || cond.Type == string(flyteorgv1.ConditionTypeFailed) {
+			if !cond.LastTransitionTime.IsZero() {
+				return cond.LastTransitionTime.UTC()
+			}
+			break
+		}
+	}
+	return time.Now().UTC()
 }
 
 // createStateJSON creates a simplified state JSON for observability.
