@@ -38,6 +38,22 @@ spec:
       {{- if .Values.ingress.httpExtraPaths.prepend }}
       {{- tpl ( .Values.ingress.httpExtraPaths.prepend | toYaml ) . | nindent 6 }}
       {{- end }}
+      {{- if .Values.console.enabled }}
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}-console
+            port:
+              number: {{ .Values.console.service.port | default 80 }}
+        path: /v2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}-console
+            port:
+              number: {{ .Values.console.service.port | default 80 }}
+        path: /v2/*
+        pathType: ImplementationSpecific
+      {{- end }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}

@@ -114,6 +114,14 @@ templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 
 {{/*
+Selector labels for Console
+*/}}
+{{ define "flyte-binary.consoleSelectorLabels" -}}
+{{ include "flyte-binary.selectorLabels" . }}
+app.kubernetes.io/component: console
+{{- end }}
+
+{{/*
 Get the Secret name for Run service authentication secrets.
 */}}
 {{ define "flyte-binary.configuration.auth.runServiceAuthSecretName" -}}
