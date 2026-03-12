@@ -294,8 +294,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
 		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
-			runID.Org, runID.Project, runID.Domain, runID.Name).
-		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
+			runID.Org, runID.Project, runID.Domain, runID.Name)
 
 	// Apply pagination token
 	if token != "" {
