@@ -1,7 +1,10 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -9,40 +12,129 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func TestRunStateManagerUpsertActions(t *testing.T) {
-	t.Run("stores initial batch", func(t *testing.T) {
-		rsm := newRunStateManager()
+func TestRunStateManagerTracksChildPhaseCounts(t *testing.T) {
+	rsm, err := newRunStateManager(nil)
+	require.NoError(t, err)
 
-		actions := []*models.Action{
-			{Name: "a", Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED)},
-			{Name: "b", Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+	updates, err := rsm.upsertActions(context.Background(), []*models.Action{
+		testAction("parent", nil, common.ActionPhase_ACTION_PHASE_RUNNING, 1),
+		testAction("child", stringPtr("parent"), common.ActionPhase_ACTION_PHASE_QUEUED, 2),
+	})
+	require.NoError(t, err)
+	require.Len(t, updates, 2)
+
+	parent := rsm.GetActionTreeNodeByName("parent")
+	require.NotNil(t, parent)
+	require.Equal(t, 1, parent.ChildPhaseCounts[common.ActionPhase_ACTION_PHASE_QUEUED])
+
+	updates, err = rsm.upsertActions(context.Background(), []*models.Action{
+		testAction("child", stringPtr("parent"), common.ActionPhase_ACTION_PHASE_SUCCEEDED, 2),
+	})
+	require.NoError(t, err)
+
+	parent = rsm.GetActionTreeNodeByName("parent")
+	require.Equal(t, 0, parent.ChildPhaseCounts[common.ActionPhase_ACTION_PHASE_QUEUED])
+	require.Equal(t, 1, parent.ChildPhaseCounts[common.ActionPhase_ACTION_PHASE_SUCCEEDED])
+}
+
+func TestRunStateManagerTracksVisibilityFromFilters(t *testing.T) {
+	rsm, err := newRunStateManager([]*common.Filter{
+		{
+			Field:    "PHASE",
+			Function: common.Filter_VALUE_IN,
+			Values:   []string{fmt.Sprintf("%d", common.ActionPhase_ACTION_PHASE_RUNNING)},
+		},
+	})
+	require.NoError(t, err)
+
+	updates, err := rsm.upsertActions(context.Background(), []*models.Action{
+		testAction("parent", nil, common.ActionPhase_ACTION_PHASE_QUEUED, 1),
+		testAction("child", stringPtr("parent"), common.ActionPhase_ACTION_PHASE_RUNNING, 2),
+	})
+	require.NoError(t, err)
+
+	requireNodeUpdate(t, updates, "parent", true)
+	requireNodeUpdate(t, updates, "child", true)
+
+	updates, err = rsm.upsertActions(context.Background(), []*models.Action{
+		testAction("child", stringPtr("parent"), common.ActionPhase_ACTION_PHASE_SUCCEEDED, 2),
+	})
+	require.NoError(t, err)
+
+	requireNodeUpdate(t, updates, "child", false)
+	requireNodeUpdate(t, updates, "parent", false)
+}
+
+func TestRunStateManagerSupportsNameFilter(t *testing.T) {
+	rsm, err := newRunStateManager([]*common.Filter{
+		{
+			Field:    "NAME",
+			Function: common.Filter_CONTAINS_CASE_INSENSITIVE,
+			Values:   []string{"important"},
+		},
+	})
+	require.NoError(t, err)
+
+	updates, err := rsm.upsertActions(context.Background(), []*models.Action{
+		testActionWithTask("a", nil, common.ActionPhase_ACTION_PHASE_QUEUED, 1, "pkg.important_task"),
+		testActionWithTask("b", nil, common.ActionPhase_ACTION_PHASE_QUEUED, 2, "pkg.other_task"),
+	})
+	require.NoError(t, err)
+
+	requireNodeUpdate(t, updates, "a", true)
+	requireNoNodeUpdate(t, updates, "b")
+}
+
+func TestRunStateManagerErrorsWhenParentMissing(t *testing.T) {
+	rsm, err := newRunStateManager(nil)
+	require.NoError(t, err)
+
+	_, err = rsm.upsertActions(context.Background(), []*models.Action{
+		testAction("child", stringPtr("parent"), common.ActionPhase_ACTION_PHASE_QUEUED, 1),
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "parent node [parent] not found")
+	require.Nil(t, rsm.GetActionTreeNodeByName("child"))
+}
+
+func testAction(name string, parent *string, phase common.ActionPhase, createdAtSec int64) *models.Action {
+	return testActionWithTask(name, parent, phase, createdAtSec, "")
+}
+
+func testActionWithTask(name string, parent *string, phase common.ActionPhase, createdAtSec int64, taskName string) *models.Action {
+	action := &models.Action{
+		Org:              "o",
+		Project:          "p",
+		Domain:           "d",
+		Name:             name,
+		ParentActionName: parent,
+		Phase:            int32(phase),
+		CreatedAt:        time.Unix(createdAtSec, 0),
+	}
+	if taskName != "" {
+		action.ActionSpec = []byte(`{"spec":{"task":{"id":{"name":"` + taskName + `"}}}}`)
+	}
+	return action
+}
+
+func stringPtr(s string) *string { return &s }
+
+func requireNodeUpdate(t *testing.T, updates []*nodeUpdate, name string, meetsFilter bool) {
+	t.Helper()
+	for _, update := range updates {
+		if update != nil && update.Node != nil && update.Node.Action != nil && update.Node.Action.Name == name {
+			require.Equal(t, meetsFilter, update.MeetsFilter)
+			return
 		}
+	}
+	t.Fatalf("expected node update for %s", name)
+}
 
-		changed := rsm.upsertActions(actions)
-
-		require.Len(t, changed, 2)
-		require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), rsm.actions["a"].Phase)
-		require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), rsm.actions["b"].Phase)
-	})
-
-	t.Run("dedupes unchanged updates", func(t *testing.T) {
-		rsm := newRunStateManager()
-		action := &models.Action{Name: "a", Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED)}
-
-		require.Len(t, rsm.upsertActions([]*models.Action{action}), 1)
-		require.Empty(t, rsm.upsertActions([]*models.Action{action}))
-	})
-
-	t.Run("keeps only latest update for the same action in one batch", func(t *testing.T) {
-		rsm := newRunStateManager()
-
-		changed := rsm.upsertActions([]*models.Action{
-			{Name: "a", Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED)},
-			{Name: "a", Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED)},
-		})
-
-		require.Len(t, changed, 1)
-		require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), changed[0].Phase)
-		require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), rsm.actions["a"].Phase)
-	})
+func requireNoNodeUpdate(t *testing.T, updates []*nodeUpdate, name string) {
+	t.Helper()
+	for _, update := range updates {
+		if update != nil && update.Node != nil && update.Node.Action != nil && update.Node.Action.Name == name {
+			t.Fatalf("unexpected node update for %s", name)
+		}
+	}
 }

@@ -16,6 +16,7 @@ type Action struct {
 	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org" db:"org"`
 	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project" db:"project"`
 	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain" db:"domain"`
+	RunName string `gorm:"not null;default:'';index:idx_actions_run_name" db:"run_name"`
 	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
@@ -75,13 +76,14 @@ func (a *Action) Clone() *Action {
 // For root actions (runs), returns the action's own name
 // For child actions, extracts from ActionSpec JSON
 func (a *Action) GetRunName() string {
+	if a.RunName != "" {
+		return a.RunName
+	}
+
 	if a.ParentActionName == nil {
 		// Root action - the run name is the action name
 		return a.Name
 	}
-
-	// TODO: Extract run name from ActionSpec JSON
-	// For now, return empty string as placeholder
 	return ""
 }
 

@@ -657,10 +657,14 @@ func (s *RunService) WatchActions(
 	errsCh := make(chan error)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
-	rsm := newRunStateManager()
+	rsm, err := newRunStateManager(req.Msg.GetFilter())
+	if err != nil {
+		return err
+	}
 
 	if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
+		return err
 	}
 
 	for {
@@ -673,7 +677,11 @@ func (s *RunService) WatchActions(
 			if !ok {
 				return nil
 			}
-			if err := s.sendChangedActions(rsm.upsertActions([]*models.Action{updated}), stream); err != nil {
+			updates, err := rsm.upsertActions(ctx, []*models.Action{updated})
+			if err != nil {
+				return err
+			}
+			if err := s.sendChangedActions(runID, updates, stream); err != nil {
 				return err
 			}
 		}
@@ -693,7 +701,12 @@ func (s *RunService) listAndSendAllActions(
 			return err
 		}
 
-		if err := s.sendChangedActions(rsm.upsertActions(batch), stream); err != nil {
+		updates, err := rsm.upsertActions(ctx, batch)
+		if err != nil {
+			return err
+		}
+
+		if err := s.sendChangedActions(runID, updates, stream); err != nil {
 			return err
 		}
 
@@ -705,16 +718,17 @@ func (s *RunService) listAndSendAllActions(
 }
 
 func (s *RunService) sendChangedActions(
-	actions []*models.Action,
+	runID *common.RunIdentifier,
+	updates []*nodeUpdate,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	if len(actions) == 0 {
+	if len(updates) == 0 {
 		return nil
 	}
 
-	enriched := make([]*workflow.EnrichedAction, 0, len(actions))
-	for _, action := range actions {
-		enriched = append(enriched, s.convertActionToEnrichedProto(action))
+	enriched := make([]*workflow.EnrichedAction, 0, len(updates))
+	for _, update := range updates {
+		enriched = append(enriched, s.convertNodeUpdateToEnrichedProto(runID, update))
 	}
 
 	return stream.Send(&workflow.WatchActionsResponse{
@@ -956,6 +970,52 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 			Status:   actionStatus,
 		},
 		MeetsFilter: true,
+	}
+}
+
+func (s *RunService) convertNodeUpdateToEnrichedProto(
+	runID *common.RunIdentifier,
+	update *nodeUpdate,
+) *workflow.EnrichedAction {
+	if update == nil || update.Node == nil || update.Node.Action == nil {
+		return nil
+	}
+
+	action := update.Node.Action
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     runID.Org,
+			Project: runID.Project,
+			Domain:  runID.Domain,
+			Name:    runID.Name,
+		},
+		Name: action.Name,
+	}
+
+	actionStatus := &workflow.ActionStatus{
+		Phase: common.ActionPhase(action.Phase),
+	}
+
+	var metadata *workflow.ActionMetadata
+	if action.ParentActionName != nil {
+		metadata = &workflow.ActionMetadata{
+			Parent: *action.ParentActionName,
+		}
+	}
+
+	childrenPhaseCounts := make(map[int32]int32, len(update.Node.ChildPhaseCounts))
+	for phase, count := range update.Node.ChildPhaseCounts {
+		childrenPhaseCounts[int32(phase)] = int32(count)
+	}
+
+	return &workflow.EnrichedAction{
+		Action: &workflow.Action{
+			Id:       actionID,
+			Metadata: metadata,
+			Status:   actionStatus,
+		},
+		MeetsFilter:         update.MeetsFilter,
+		ChildrenPhaseCounts: childrenPhaseCounts,
 	}
 }
 
