@@ -70,6 +70,11 @@ message DeliveryConfigTemplate {
   }
 }
 
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_RUN_COMPLETED = 1;
+}
+
 message RunCompletedNotificationTemplateData {
   common.RunIdentifier run = 1 [(buf.validate.field).required = true];
 
