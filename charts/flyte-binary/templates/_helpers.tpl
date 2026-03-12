@@ -153,7 +153,7 @@ Get the Flyte HTTP service name
 Get the Flyte service HTTP port.
 */}}
 {{- define "flyte-binary.service.http.port" -}}
-{{- default 8090 .Values.service.ports.http -}}
+{{- default 8080 .Values.service.ports.http -}}
 {{- end -}}
 
 {{/*

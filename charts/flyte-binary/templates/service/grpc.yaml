@@ -38,7 +38,7 @@ spec:
   ports:
     - name: grpc
       port: {{ include "flyte-binary.service.grpc.port" . }}
-      targetPort: grpc
+      targetPort: http
       {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.grpc)) }}
       nodePort: {{ .Values.service.nodePorts.grpc }}
       {{- else if eq .Values.service.type "ClusterIP" }}

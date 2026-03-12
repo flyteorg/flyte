@@ -17,6 +17,10 @@ spec:
       imagePullSecrets:
         {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.deployment.extraPodSpec.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: console
           {{- with .Values.console.image }}
