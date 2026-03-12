@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -22,6 +22,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	gormConfig := &gorm.Config{
 		Logger:                                   GetGormLogger(ctx, logConfig),
 		DisableForeignKeyConstraintWhenMigrating: false,
+		TranslateError:                           true,
 	}
 
 	var gormDb *gorm.DB
@@ -78,6 +79,7 @@ func GetReadOnlyDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Co
 	gormConfig := &gorm.Config{
 		Logger:                                   GetGormLogger(ctx, logConfig),
 		DisableForeignKeyConstraintWhenMigrating: false,
+		TranslateError:                           true,
 	}
 
 	var gormDb *gorm.DB

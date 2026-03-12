@@ -98,4 +98,3 @@ func buildRESTConfig(ctx context.Context, kubeconfig string) (*rest.Config, erro
 	logger.Infof(ctx, "Using default kubeconfig (~/.kube/config)")
 	return cfg, nil
 }
-

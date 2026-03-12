@@ -49,6 +49,10 @@ pub mod flyteidl {
         include!("flyteidl2.core.rs");
     }
 
+    pub mod notification {
+        include!("flyteidl2.notification.rs");
+    }
+
     pub mod task {
         include!("flyteidl2.task.rs");
     }
