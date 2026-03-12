@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/cache_service/config"
+	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	v2connect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2/v2connect"
@@ -15,9 +16,12 @@ import (
 // Setup registers the CacheService handler on the SetupContext mux.
 // Requires sc.DB and sc.DataStore to be set by the standalone binary.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
-	_ = config.GetConfig()
+	cfg := config.GetConfig()
+	if err := migrations.RunMigrations(sc.DB); err != nil {
+		return err
+	}
 
-	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService())
+	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService(cfg, sc.DB))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted CacheService at %s", path)
 

@@ -1,6 +1,10 @@
 package config
 
-import "github.com/flyteorg/flyte/v2/flytestdlib/config"
+import (
+	"time"
+
+	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
+)
 
 const configSectionKey = "cache_service"
 
@@ -11,12 +15,17 @@ var defaultConfig = &Config{
 		Port: 8094,
 		Host: "0.0.0.0",
 	},
+	HeartbeatGracePeriodMultiplier: 3,
+	MaxReservationHeartbeat:        stdconfig.Duration{Duration: 10 * time.Second},
 }
 
-var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
+var configSection = stdconfig.MustRegisterSection(configSectionKey, defaultConfig)
 
 type Config struct {
 	Server ServerConfig `json:"server"`
+
+	HeartbeatGracePeriodMultiplier int                `json:"heartbeatGracePeriodMultiplier" pflag:",Number of heartbeats before a reservation expires without an extension."`
+	MaxReservationHeartbeat        stdconfig.Duration `json:"maxReservationHeartbeat" pflag:",Maximum reservation heartbeat interval."`
 }
 
 type ServerConfig struct {
