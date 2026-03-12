@@ -22,6 +22,7 @@ var (
 		MetricsCertKey:         "tls.key",
 		EnableHTTP2:            false,
 		EventsServiceURL:       "http://localhost:8090",
+		CacheServiceURL:        "http://localhost:8094",
 		Cluster:                "",
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
@@ -70,6 +71,9 @@ type Config struct {
 
 	// EventsServiceURL is the URL of the event Service for reporting action state updates.
 	EventsServiceURL string `json:"EventsServiceURL" pflag:",URL of the Event Service for action event updates"`
+
+	// CacheServiceURL is the URL of the cache service for catalog operations.
+	CacheServiceURL string `json:"cacheServiceURL" pflag:",URL of the cache service for task cache operations"`
 
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`

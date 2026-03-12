@@ -22,6 +22,8 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -112,10 +114,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			eventsServiceURL = cfg.EventsServiceURL
 		}
 		eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
+		cacheClient := cachecatalog.NewHTTPClient(dataStore, cfg.CacheServiceURL)
+		asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalog.GetConfig(), promutils.NewScope("executor:catalog"))
+		if err != nil {
+			return fmt.Errorf("executor: failed to create catalog cache client: %w", err)
+		}
+		if err := asyncCatalogClient.Start(ctx); err != nil {
+			return fmt.Errorf("executor: failed to start catalog cache client: %w", err)
+		}
 
 		reconciler := controller.NewTaskActionReconciler(
 			mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
 		)
+		reconciler.CatalogClient = asyncCatalogClient
 		reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
 		if err := reconciler.SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("executor: failed to setup controller: %w", err)
