@@ -217,6 +217,21 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		Create(&events).Error
 }
 
+// ListEvents lists action events for a given action identifier.
+func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Order("attempt ASC, phase ASC, version ASC").
+		Limit(limit).
+		Find(&events)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list action events: %w", result.Error)
+	}
+	return events, nil
+}
+
 // CreateAction creates a new action
 func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error) {
 	// Serialize action spec

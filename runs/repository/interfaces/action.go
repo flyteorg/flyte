@@ -20,6 +20,7 @@ type ActionRepo interface {
 	// Action operations
 	CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error)
 	InsertEvents(ctx context.Context, events []*models.ActionEvent) error
+	ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
 	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error

@@ -35,6 +35,14 @@ type Action struct {
 	// - Any other runtime state
 	ActionDetails datatypes.JSON `gorm:"type:jsonb" db:"action_details"`
 
+	// DetailedInfo stores a serialized RunInfo proto containing metadata such as
+	// the task spec digest (for looking up the resolved spec) and storage URIs.
+	DetailedInfo []byte `gorm:"type:bytea" db:"detailed_info"`
+
+	// RunSpec stores a serialized task.RunSpec proto (labels, annotations, envs,
+	// interruptible, cluster, etc.) for this action's run.
+	RunSpec []byte `gorm:"type:bytea" db:"run_spec"`
+
 	// Timestamps
 	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
 	CreatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`

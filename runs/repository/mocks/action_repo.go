@@ -538,6 +538,66 @@ func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(context.Context, *c
 	return _c
 }
 
+// ListEvents provides a mock function with given fields: ctx, actionID, limit
+func (_m *ActionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
+	ret := _m.Called(ctx, actionID, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListEvents")
+	}
+
+	var r0 []*models.ActionEvent
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, int) ([]*models.ActionEvent, error)); ok {
+		return rf(ctx, actionID, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, int) []*models.ActionEvent); ok {
+		r0 = rf(ctx, actionID, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.ActionEvent)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier, int) error); ok {
+		r1 = rf(ctx, actionID, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_ListEvents_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListEvents'
+type ActionRepo_ListEvents_Call struct {
+	*mock.Call
+}
+
+// ListEvents is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - limit int
+func (_e *ActionRepo_Expecter) ListEvents(ctx interface{}, actionID interface{}, limit interface{}) *ActionRepo_ListEvents_Call {
+	return &ActionRepo_ListEvents_Call{Call: _e.mock.On("ListEvents", ctx, actionID, limit)}
+}
+
+func (_c *ActionRepo_ListEvents_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, limit int)) *ActionRepo_ListEvents_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(int))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListEvents_Call) Return(_a0 []*models.ActionEvent, _a1 error) *ActionRepo_ListEvents_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_ListEvents_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, int) ([]*models.ActionEvent, error)) *ActionRepo_ListEvents_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListRootActions provides a mock function with given fields: ctx, org, project, domain, startDate, endDate, limit
 func (_m *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
 	ret := _m.Called(ctx, org, project, domain, startDate, endDate, limit)
