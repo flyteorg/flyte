@@ -31,6 +31,7 @@ lint:
       - flyteidl2/project/project_service.proto
       - flyteidl2/project/common.proto
     ENUM_ZERO_VALUE_SUFFIX:
+      - flyteidl2/org/settings_definition.proto
       - flyteidl2/common/authorization.proto
       - flyteidl2/plugins/common.proto
       - flyteidl2/common/list.proto
