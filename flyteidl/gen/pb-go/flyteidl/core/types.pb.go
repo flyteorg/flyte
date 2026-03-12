@@ -334,14 +334,17 @@ type BlobType struct {
 	// csv, parquet etc
 	Format         string                      `protobuf:"bytes,1,opt,name=format,proto3" json:"format,omitempty"`
 	Dimensionality BlobType_BlobDimensionality `protobuf:"varint,2,opt,name=dimensionality,proto3,enum=flyteidl.core.BlobType_BlobDimensionality" json:"dimensionality,omitempty"`
-	// Optional file extension (without leading dot) to use when materializing
-	// the blob to local disk during copilot download, e.g. "csv", "parquet".
-	// When empty, no extension is appended.
+	// Optional file extension (e.g. "csv", "parquet") to use during copilot download.
+	// Default is "", which means no extension is appended.
+	// Differences from "format":
+	//  1. "format" is used for type validation in flytekit, "file_extension" is not.
+	//  2. "file_extension" controls the file extension of the blob when materializing
+	//     to local disk during copilot download, unlike "format".
 	FileExtension string `protobuf:"bytes,3,opt,name=file_extension,json=fileExtension,proto3" json:"file_extension,omitempty"`
 	// When true and file_extension is non-empty, the copilot download phase
-	// writes the blob to both the extended path (with extension) and the
-	// base path (without extension), preserving backward compatibility for
-	// tasks that read from the extensionless path. Default is false.
+	// writes the blob to both the full path (with extension) and the
+	// old path (without extension), preserving backward compatibility for
+	// workflows with tasks that may read from both. Default is false.
 	EnableLegacyFilename bool `protobuf:"varint,4,opt,name=enable_legacy_filename,json=enableLegacyFilename,proto3" json:"enable_legacy_filename,omitempty"`
 }
 

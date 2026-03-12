@@ -342,9 +342,12 @@ export class BlobType extends Message<BlobType> {
   dimensionality = BlobType_BlobDimensionality.SINGLE;
 
   /**
-   * Optional file extension (without leading dot) to use when materializing
-   * the blob to local disk during copilot download, e.g. "csv", "parquet".
-   * When empty, no extension is appended.
+   * Optional file extension (e.g. "csv", "parquet") to use during copilot download.
+   * Default is "", which means no extension is appended.
+   * Differences from "format":
+   *   1. "format" is used for type validation in flytekit, "file_extension" is not.
+   *   2. "file_extension" controls the file extension of the blob when materializing
+   *    to local disk during copilot download, unlike "format".
    *
    * @generated from field: string file_extension = 3;
    */
@@ -352,9 +355,9 @@ export class BlobType extends Message<BlobType> {
 
   /**
    * When true and file_extension is non-empty, the copilot download phase
-   * writes the blob to both the extended path (with extension) and the
-   * base path (without extension), preserving backward compatibility for
-   * tasks that read from the extensionless path. Default is false.
+   * writes the blob to both the full path (with extension) and the
+   * old path (without extension), preserving backward compatibility for
+   * workflows with tasks that may read from both. Default is false.
    *
    * @generated from field: bool enable_legacy_filename = 4;
    */
