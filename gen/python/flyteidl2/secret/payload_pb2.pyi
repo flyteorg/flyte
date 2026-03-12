@@ -32,10 +32,12 @@ class UpdateSecretResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class GetSecretRequest(_message.Message):
-    __slots__ = ["id"]
+    __slots__ = ["id", "include_system_secrets"]
     ID_FIELD_NUMBER: _ClassVar[int]
+    INCLUDE_SYSTEM_SECRETS_FIELD_NUMBER: _ClassVar[int]
     id: _definition_pb2.SecretIdentifier
-    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ...) -> None: ...
+    include_system_secrets: bool
+    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., include_system_secrets: bool = ...) -> None: ...
 
 class GetSecretResponse(_message.Message):
     __slots__ = ["secret"]
@@ -44,17 +46,19 @@ class GetSecretResponse(_message.Message):
     def __init__(self, secret: _Optional[_Union[_definition_pb2.Secret, _Mapping]] = ...) -> None: ...
 
 class DeleteSecretRequest(_message.Message):
-    __slots__ = ["id"]
+    __slots__ = ["id", "include_system_secrets"]
     ID_FIELD_NUMBER: _ClassVar[int]
+    INCLUDE_SYSTEM_SECRETS_FIELD_NUMBER: _ClassVar[int]
     id: _definition_pb2.SecretIdentifier
-    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ...) -> None: ...
+    include_system_secrets: bool
+    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., include_system_secrets: bool = ...) -> None: ...
 
 class DeleteSecretResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class ListSecretsRequest(_message.Message):
-    __slots__ = ["organization", "domain", "project", "limit", "token", "per_cluster_tokens"]
+    __slots__ = ["organization", "domain", "project", "limit", "token", "per_cluster_tokens", "include_system_secrets"]
     class PerClusterTokensEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -68,13 +72,15 @@ class ListSecretsRequest(_message.Message):
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     PER_CLUSTER_TOKENS_FIELD_NUMBER: _ClassVar[int]
+    INCLUDE_SYSTEM_SECRETS_FIELD_NUMBER: _ClassVar[int]
     organization: str
     domain: str
     project: str
     limit: int
     token: str
     per_cluster_tokens: _containers.ScalarMap[str, str]
-    def __init__(self, organization: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., per_cluster_tokens: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    include_system_secrets: bool
+    def __init__(self, organization: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., per_cluster_tokens: _Optional[_Mapping[str, str]] = ..., include_system_secrets: bool = ...) -> None: ...
 
 class ListSecretsResponse(_message.Message):
     __slots__ = ["secrets", "token", "per_cluster_tokens"]

@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package flyteidl2.notification;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/phase.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
+
+message RuleId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+message DeliveryConfigId {
+  // Org this rule belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this rule belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this rule belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the rule.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+message DeliveryConfigTemplate {
+  oneof config {
+    option (buf.validate.oneof).required = true;
+
+    WebhookDeliveryTemplate webhook = 1;
+
+    EmailDeliveryTemplate email = 2;
+  }
+}
+
+message RunCompletedNotificationTemplateData {
+  common.RunIdentifier run = 1 [(buf.validate.field).required = true];
+
+  common.ActionPhase phase = 2;
+
+  string error = 3;
+}
+
+enum HttpMethod {
+  HTTP_METHOD_UNSPECIFIED = 0;
+  HTTP_METHOD_GET = 1;
+  HTTP_METHOD_HEAD = 2;
+  HTTP_METHOD_POST = 3;
+  HTTP_METHOD_PUT = 4;
+  HTTP_METHOD_DELETE = 5;
+  HTTP_METHOD_CONNECT = 6;
+  HTTP_METHOD_OPTIONS = 7;
+  HTTP_METHOD_TRACE = 8;
+  HTTP_METHOD_PATCH = 9;
+}
+
+message WebhookDeliveryTemplate {
+  string url = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 2000
+  }];
+
+  HttpMethod method = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+
+  map<string, string> headers = 3 [(buf.validate.field).map = {
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 20
+      }
+    }
+    values: {
+      string: {
+        min_len: 1
+        max_len: 50
+      }
+    }
+    max_pairs: 20
+  }];
+
+  string body_template = 4; // this is a Go template that may contain placeholders
+}
+
+message EmailDeliveryTemplate {
+  string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+
+  repeated string to = 2;
+
+  repeated string cc = 3;
+
+  repeated string bcc = 4;
+
+  string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+
+  string text_template = 6; // this is a Go template that may contain placeholders
+}
