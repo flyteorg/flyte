@@ -11,7 +11,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	"github.com/mattn/go-sqlite3"
 )
 
 type projectRepo struct {
@@ -111,18 +110,5 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 }
 
 func isDuplicateProjectError(err error) bool {
-	if errors.Is(err, gorm.ErrDuplicatedKey) {
-		return true
-	}
-
-	// For SQLite
-	var sqlErr sqlite3.Error
-	if errors.As(err, &sqlErr) {
-		return sqlErr.Code == sqlite3.ErrConstraint &&
-			(sqlErr.ExtendedCode == sqlite3.ErrConstraintUnique ||
-				sqlErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey ||
-				sqlErr.ExtendedCode == sqlite3.ErrConstraintRowID)
-	}
-
-	return false
+	return errors.Is(err, gorm.ErrDuplicatedKey)
 }

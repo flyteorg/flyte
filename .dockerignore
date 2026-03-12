@@ -7,8 +7,9 @@
 .github
 
 # Generated files
-gen/
-!gen/go/**
+gen/python/
+gen/rust/
+gen/ts/
 
 # Dependencies
 node_modules/
