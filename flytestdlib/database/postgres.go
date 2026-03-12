@@ -42,6 +42,11 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 	return password
 }
 
+// GetPostgresDSN produces the DSN (data source name) for opening a postgres db connection.
+func GetPostgresDSN(ctx context.Context, pgConfig PostgresConfig) string {
+	return getPostgresDsn(ctx, pgConfig)
+}
+
 // Produces the DSN (data source name) for opening a postgres db connection.
 func getPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
