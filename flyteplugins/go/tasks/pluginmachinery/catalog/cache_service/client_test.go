@@ -87,7 +87,7 @@ func TestGetMapsNotFound(t *testing.T) {
 		getFunc: func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
 			return nil, connect.NewError(connect.CodeNotFound, assert.AnError)
 		},
-	}, store)
+	}, store, 0)
 
 	_, err := client.Get(context.Background(), newCatalogKey(t))
 	require.Error(t, err)
@@ -103,7 +103,7 @@ func TestPutUsesOutputURI(t *testing.T) {
 			got = req.Msg
 			return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
 		},
-	}, store)
+	}, store, 0)
 
 	outputPrefix := mem.DataReference("s3://bucket/prefix")
 	reader := ioutils.NewRemoteFileOutputReader(context.Background(), store, ioutils.NewReadOnlyOutputFilePaths(context.Background(), store, outputPrefix), 0)
@@ -129,7 +129,7 @@ func TestGetOrExtendReservationPassesHeartbeat(t *testing.T) {
 				},
 			}), nil
 		},
-	}, store)
+	}, store, 0)
 
 	reservation, err := client.GetOrExtendReservation(context.Background(), newCatalogKey(t), "owner-1", 5*time.Second)
 	require.NoError(t, err)
@@ -145,6 +145,30 @@ func TestReservationCache(t *testing.T) {
 
 	client.UpdateReservationCache("owner-1", entry)
 	assert.Equal(t, entry, client.GetReservationCache("owner-1"))
+}
+
+func TestGetRespectsMaxCacheAge(t *testing.T) {
+	store := newTestDataStore(t)
+	key := newCatalogKey(t)
+	client := NewWithServiceClient(&stubCacheService{
+		getFunc: func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
+			return connect.NewResponse(&cacheservicepb.GetCacheResponse{
+				Output: &cacheservicepb.CachedOutput{
+					Output: &cacheservicepb.CachedOutput_OutputUri{
+						OutputUri: "s3://bucket/prefix/outputs.pb",
+					},
+					Metadata: &cacheservicepb.Metadata{
+						SourceIdentifier: key.Identifier,
+						LastUpdatedAt:    timestamppb.New(time.Now().Add(-2 * time.Hour)),
+					},
+				},
+			}), nil
+		},
+	}, store, time.Hour)
+
+	_, err := client.Get(context.Background(), key)
+	require.Error(t, err)
+	assert.Equal(t, codes.NotFound, grpcstatus.Code(err))
 }
 
 func newCatalogKey(t *testing.T) catalog.Key {

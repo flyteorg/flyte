@@ -114,8 +114,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			eventsServiceURL = cfg.EventsServiceURL
 		}
 		eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
-		cacheClient := cachecatalog.NewHTTPClient(dataStore, cfg.CacheServiceURL)
-		asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalog.GetConfig(), promutils.NewScope("executor:catalog"))
+		catalogCfg := catalog.GetConfig()
+		cacheClient := cachecatalog.NewHTTPClient(dataStore, cfg.CacheServiceURL, catalogCfg.MaxCacheAge.Duration)
+		asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 		if err != nil {
 			return fmt.Errorf("executor: failed to create catalog cache client: %w", err)
 		}

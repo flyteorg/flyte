@@ -38,26 +38,29 @@ type outputPathReader interface {
 type Client struct {
 	service          v2connect.CacheServiceClient
 	store            *storage.DataStore
+	maxCacheAge      time.Duration
 	reservationCache sync.Map
 }
 
 var _ catalog.Client = (*Client)(nil)
 
-func NewClient(httpClient connect.HTTPClient, store *storage.DataStore, baseURL string) *Client {
+func NewClient(httpClient connect.HTTPClient, store *storage.DataStore, baseURL string, maxCacheAge time.Duration) *Client {
 	return &Client{
-		service: v2connect.NewCacheServiceClient(httpClient, baseURL),
-		store:   store,
+		service:     v2connect.NewCacheServiceClient(httpClient, baseURL),
+		store:       store,
+		maxCacheAge: maxCacheAge,
 	}
 }
 
-func NewHTTPClient(store *storage.DataStore, baseURL string) *Client {
-	return NewClient(http.DefaultClient, store, baseURL)
+func NewHTTPClient(store *storage.DataStore, baseURL string, maxCacheAge time.Duration) *Client {
+	return NewClient(http.DefaultClient, store, baseURL, maxCacheAge)
 }
 
-func NewWithServiceClient(service v2connect.CacheServiceClient, store *storage.DataStore) *Client {
+func NewWithServiceClient(service v2connect.CacheServiceClient, store *storage.DataStore, maxCacheAge time.Duration) *Client {
 	return &Client{
-		service: service,
-		store:   store,
+		service:     service,
+		store:       store,
+		maxCacheAge: maxCacheAge,
 	}
 }
 
@@ -81,6 +84,15 @@ func (c *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error
 	output := resp.Msg.GetOutput()
 	if output == nil || output.GetOutput() == nil || output.GetMetadata() == nil {
 		return catalog.Entry{}, grpcstatus.Error(codes.Internal, "received malformed response from cache service")
+	}
+	if c.maxCacheAge > 0 {
+		lastUpdatedAt := output.GetMetadata().GetLastUpdatedAt()
+		if lastUpdatedAt == nil {
+			return catalog.Entry{}, grpcstatus.Error(codes.Internal, "received cache metadata without last_updated_at")
+		}
+		if time.Since(lastUpdatedAt.AsTime()) > c.maxCacheAge {
+			return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "artifact over age limit")
+		}
 	}
 
 	outputs, err := readCachedOutput(ctx, c.store, output)
