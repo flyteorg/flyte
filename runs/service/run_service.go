@@ -419,6 +419,9 @@ func (s *RunService) ListRuns(
 	// Convert to proto format
 	protoRuns := make([]*workflow.Run, len(runs))
 	for i, run := range runs {
+		// Todo:
+		// safely handle error from json unmarshal should be handled properly.
+		// Add a unit test for convertRunToProto function
 		protoRuns[i] = s.convertRunToProto(run)
 	}
 
@@ -955,6 +958,22 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		Status: &workflow.ActionStatus{
 			Phase: common.ActionPhase(run.Phase),
 		},
+	}
+
+	var actionDetails workflow.ActionDetails
+	if err := json.Unmarshal(run.ActionDetails, &actionDetails); err == nil {
+		action.Status.Attempts = actionDetails.Status.Attempts
+		action.Status.CacheStatus = actionDetails.Status.CacheStatus
+		if actionDetails.Status.StartTime != nil {
+			action.Status.StartTime = actionDetails.Status.StartTime
+		}
+		if actionDetails.Status.EndTime != nil {
+			action.Status.EndTime = actionDetails.Status.EndTime
+		}
+		if action.Status.StartTime != nil && action.Status.EndTime != nil {
+			ms := uint64(action.Status.EndTime.AsTime().Sub(action.Status.StartTime.AsTime()).Milliseconds())
+			action.Status.DurationMs = &ms
+		}
 	}
 
 	return &workflow.Run{
