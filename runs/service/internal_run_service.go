@@ -9,7 +9,6 @@ import (
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -87,7 +86,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 			run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
 			if err == nil && len(run.ActionSpec) > 0 {
 				var parentSpec workflow.ActionSpec
-				if err := protojson.Unmarshal(run.ActionSpec, &parentSpec); err == nil {
+				if err := proto.Unmarshal(run.ActionSpec, &parentSpec); err == nil {
 					if parentTask := parentSpec.GetTask(); parentTask != nil {
 						taskAction = parentTask
 					}

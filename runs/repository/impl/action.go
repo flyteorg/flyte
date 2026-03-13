@@ -13,7 +13,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
@@ -98,8 +97,8 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		}
 	}
 
-	// Serialize the ActionSpec to JSON
-	actionSpecBytes, err := protojson.Marshal(actionSpec)
+	// Serialize the ActionSpec to binary protobuf
+	actionSpecBytes, err := proto.Marshal(actionSpec)
 	logger.Infof(ctx, "Serialized action spec: %s", actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
@@ -108,7 +107,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	// Build RunInfo with storage URIs and task spec digest
 	info := &workflow.RunInfo{
 		InputsUri: inputUri,
-		// TODO: Add taskSpecDigest
 	}
 
 	// Store task spec separately and record its digest
@@ -296,7 +294,7 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec
 	logger.Infof(ctx, "action spec: %s", actionSpec.String())
-	actionSpecBytes, err := protojson.Marshal(actionSpec)
+	actionSpecBytes, err := proto.Marshal(actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
 	}

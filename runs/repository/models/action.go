@@ -84,12 +84,12 @@ func (a *Action) Clone() *Action {
 		cloned.ParentActionName = &parent
 	}
 	if a.ActionSpec != nil {
-		actionSpec := make(datatypes.JSON, len(a.ActionSpec))
+		actionSpec := make([]byte, len(a.ActionSpec))
 		copy(actionSpec, a.ActionSpec)
 		cloned.ActionSpec = actionSpec
 	}
 	if a.ActionDetails != nil {
-		actionDetails := make(datatypes.JSON, len(a.ActionDetails))
+		actionDetails := make([]byte, len(a.ActionDetails))
 		copy(actionDetails, a.ActionDetails)
 		cloned.ActionDetails = actionDetails
 	}
