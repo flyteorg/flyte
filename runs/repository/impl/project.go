@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -28,14 +29,18 @@ func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project
 	project.CreatedAt = now
 	project.UpdatedAt = now
 
-	result := r.db.WithContext(ctx).Create(project)
+	result := r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{DoNothing: true}).
+		Create(project)
 	if result.Error != nil {
 		if isDuplicateProjectError(result.Error) {
-			return fmt.Errorf("%w: %v", interfaces.ErrProjectAlreadyExists, result.Error)
+			return fmt.Errorf("%w: %s", interfaces.ErrProjectAlreadyExists, project.Identifier)
 		}
 		return fmt.Errorf("failed to create project %s: %w", project.Identifier, result.Error)
 	}
-
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("%w: %s", interfaces.ErrProjectAlreadyExists, project.Identifier)
+	}
 	return nil
 }
 
