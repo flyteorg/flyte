@@ -2,13 +2,15 @@ package impl
 
 import (
 	"context"
+	"strings"
 	"testing"
+
+	"github.com/glebarez/sqlite"
+	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	"github.com/stretchr/testify/require"
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
 )
 
 func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
@@ -32,4 +34,5 @@ func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
 		State:      &state,
 	})
 	require.ErrorIs(t, err, interfaces.ErrProjectAlreadyExists)
+	require.False(t, strings.Contains(strings.ToUpper(err.Error()), "UNIQUE"))
 }
