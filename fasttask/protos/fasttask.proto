@@ -44,6 +44,10 @@ message TaskStatus {
 
     // A map of values used to re-enqueue the execution
     map<string, string> enqueue_labels = 8;
+
+    // Indicates that the failure was caused by the system (e.g. worker termination) rather than
+    // user code. Used by the plugin to distinguish system vs user retry budgets.
+    bool system_failure = 9;
 }
 
 // The current execution capacity for a fasttask worker replia.

@@ -61,16 +61,18 @@ type Worker interface {
 	LastAccessedAt() int64
 	SetLastAccessedAt(int64)
 	State() State
-	SetState(State)
+	SetState(state State, reason string)
+	StateReason() string
 	ID() string
 	EnqueueHeartbeatResponse(*pb.HeartbeatResponse)
 	Responses() <-chan *pb.HeartbeatResponse
 }
 
 type TaskStatus struct {
-	Phase        core.Phase
-	Reason       string
-	TaskDuration time.Duration
+	Phase         core.Phase
+	Reason        string
+	TaskDuration  time.Duration
+	SystemFailure bool
 }
 
 type FastTaskService interface {
@@ -110,7 +112,7 @@ type Environment interface {
 	SetState(state State)
 	Recover(envID ExecutionEnvID, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec)
 	FastTaskEnvironmentSpec() *pb.FastTaskEnvironmentSpec
-	// Task tracking for demand-based auto-scaling. Tracks active tasks to determine
+	// RegisterTask tracking for demand-based auto-scaling. Tracks active tasks to determine
 	// when to scale up workers. This reactive approach will be replaced with declarative
 	// reconciliation once the fast task service has persistence.
 	RegisterTask(taskID string)
@@ -125,6 +127,7 @@ type EnvironmentBuilder interface {
 
 	GetWorkerPod(ctx context.Context, executionEnvID, workerID string) (*v1.Pod, error)
 	ValidateWorkerPods(ctx context.Context, executionEnvID string, taskInfo *core.TaskInfo) (string, error)
+	CheckAndSetWorkerError(ctx context.Context, env Environment, workerName string) (string, error)
 }
 
 type EnvironmentStore interface {

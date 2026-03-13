@@ -298,9 +298,10 @@ Loop:
 	}
 
 	return interfaces.TaskStatus{
-		Phase:        phase,
-		Reason:       taskStatus.GetReason(),
-		TaskDuration: taskStatus.GetTaskDuration().AsDuration(),
+		Phase:         phase,
+		Reason:        taskStatus.GetReason(),
+		TaskDuration:  taskStatus.GetTaskDuration().AsDuration(),
+		SystemFailure: taskStatus.GetSystemFailure(),
 	}, nil
 }
 
@@ -339,10 +340,12 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 	}
 
 	if err == io.EOF || heartbeatRequest == nil {
+		// EOF is the error that's returned when the client closes the stream
 		logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
 		return nil
 	} else if err != nil {
 		f.metrics.workerConnectionErrors.WithLabelValues("initial_connection").Inc()
+		// probably never seen this.
 		return err
 	}
 
@@ -352,7 +355,10 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 	// be created from either (1) a new task or (2) orphan detection to ensure the environment
 	// contains necessary metadata to `scaleDown`.
 	var env interfaces.Environment
+	// builder creates environments. builder may not create the environment in the store, before the
+	// replica comes up and starts to heartbeat.
 	for i := 0; i < 600; i++ {
+		// queueid is the actor environment id, proj/domain etc.
 		env = f.store.Get(heartbeatRequest.GetQueueId())
 		if env != nil {
 			break
@@ -367,11 +373,12 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 	}
 
 	if env == nil {
+		// if a replica listens on a queue baz that doesn't exist, then it should get an error.
 		return fmt.Errorf("environment %s not found", heartbeatRequest.GetQueueId())
 	}
 
 	worker := env.GetOrCreateWorker(heartbeatRequest.GetWorkerId())
-	worker.SetState(interfaces.HEALTHY)
+	worker.SetState(interfaces.HEALTHY, "")
 
 	capacity := heartbeatRequest.GetCapacity()
 	worker.SetCapacity(capacity)
@@ -383,7 +390,7 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 	// assigned. if the worker reconnects, we will transition back to `HEALTHY`; otherwise, the
 	// worker will be cleaned up by the `scaleDown` operation.
 	defer func() {
-		worker.SetState(interfaces.ORPHANED)
+		worker.SetState(interfaces.ORPHANED, "")
 	}()
 
 	// start go routine to handle heartbeat responses
@@ -392,14 +399,19 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 			select {
 			case message := <-worker.Responses():
 				if err := stream.Send(message); err != nil {
+					// Errors in sending should surface itself as other problems elsewhere (like grace period timeouts, etc.)
 					f.metrics.workerConnectionErrors.WithLabelValues("send").Inc()
 					logger.Warnf(context.Background(), "failed to send heartbeat response %+v", message)
 				}
 			case <-stream.Context().Done():
+				// this is when the connection is dropped.
 				return
 			}
 		}
 	}()
+
+	// process task statuses from the initial heartbeat (e.g. final heartbeat on SIGTERM)
+	f.processHeartbeatTaskStatuses(heartbeatRequest, env, worker)
 
 	// handle heartbeat requests
 	for {
@@ -420,56 +432,60 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 			f.EnqueuePendingOwners(heartbeatRequest.GetQueueId(), int(executionCapacity))
 		}
 
-		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
-			// register task for demand-based scaling (backup for restart recovery)
-			// tasks remain registered until Cleanup is called, regardless of phase
-			env.RegisterTask(taskStatus.GetTaskId())
-
-			// if the taskContext exists then send the taskStatus to the statusChannel
-			// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
-			// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
-			// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
-			// cleanup would require a separate GC process.
-			if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
-				taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
-				taskStatusChannel <- &workerTaskStatus{
-					workerID:   worker.ID(),
-					taskStatus: taskStatus,
-				}
-			}
-			execID := taskStatus.GetExecId()
-			if taskStatus.GetTaskDuration().AsDuration() > 0 {
-				f.metrics.fastTaskExecutionDuration.add(execID,
-					taskStatus.GetNamespace(),
-					heartbeatRequest.GetWorkerId(),
-					taskStatus.GetTaskDuration().AsDuration())
-			}
-
-			// if taskStatus is complete then enqueueOwner for fast feedback
-			phase := core.Phase(taskStatus.GetPhase())
-			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
-				labels := make(map[string]string)
-
-				// for backwards compatibility, add workflow id
-				namespacedName := types.NamespacedName{
-					Namespace: taskStatus.GetNamespace(),
-					Name:      taskStatus.GetWorkflowId(),
-				}
-				labels[k8s.WorkflowID] = namespacedName.String()
-
-				for label, value := range taskStatus.GetEnqueueLabels() {
-					labels[label] = value
-				}
-
-				if err := f.enqueueOwner(labels); err != nil {
-					f.metrics.enqueueOwnerFailure.Inc()
-					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
-				}
-			}
-		}
+		f.processHeartbeatTaskStatuses(heartbeatRequest, env, worker)
 	}
 
 	return nil
+}
+
+func (f *fastTaskServiceImpl) processHeartbeatTaskStatuses(heartbeatRequest *pb.HeartbeatRequest, env interfaces.Environment, worker interfaces.Worker) {
+	for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
+		// register task for demand-based scaling (backup for restart recovery)
+		// tasks remain registered until Cleanup is called, regardless of phase
+		env.RegisterTask(taskStatus.GetTaskId())
+
+		// if the taskContext exists then send the taskStatus to the statusChannel
+		// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
+		// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
+		// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
+		// cleanup would require a separate GC process.
+		if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
+			taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
+			taskStatusChannel <- &workerTaskStatus{
+				workerID:   worker.ID(),
+				taskStatus: taskStatus,
+			}
+		}
+		execID := taskStatus.GetExecId()
+		if taskStatus.GetTaskDuration().AsDuration() > 0 {
+			f.metrics.fastTaskExecutionDuration.add(execID,
+				taskStatus.GetNamespace(),
+				heartbeatRequest.GetWorkerId(),
+				taskStatus.GetTaskDuration().AsDuration())
+		}
+
+		// if taskStatus is complete then enqueueOwner for fast feedback
+		phase := core.Phase(taskStatus.GetPhase())
+		if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
+			labels := make(map[string]string)
+
+			// for backwards compatibility, add workflow id
+			namespacedName := types.NamespacedName{
+				Namespace: taskStatus.GetNamespace(),
+				Name:      taskStatus.GetWorkflowId(),
+			}
+			labels[k8s.WorkflowID] = namespacedName.String()
+
+			for label, value := range taskStatus.GetEnqueueLabels() {
+				labels[label] = value
+			}
+
+			if err := f.enqueueOwner(labels); err != nil {
+				f.metrics.enqueueOwnerFailure.Inc()
+				logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
+			}
+		}
+	}
 }
 
 func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID *idlCore.WorkflowExecutionIdentifier, environmentID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (interfaces.Worker, error) {

@@ -28,6 +28,64 @@ func (_m *EnvironmentBuilder) EXPECT() *EnvironmentBuilder_Expecter {
 	return &EnvironmentBuilder_Expecter{mock: &_m.Mock}
 }
 
+// CheckAndSetWorkerError provides a mock function with given fields: ctx, env, workerName
+func (_m *EnvironmentBuilder) CheckAndSetWorkerError(ctx context.Context, env interfaces.Environment, workerName string) (string, error) {
+	ret := _m.Called(ctx, env, workerName)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CheckAndSetWorkerError")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.Environment, string) (string, error)); ok {
+		return rf(ctx, env, workerName)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.Environment, string) string); ok {
+		r0 = rf(ctx, env, workerName)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, interfaces.Environment, string) error); ok {
+		r1 = rf(ctx, env, workerName)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EnvironmentBuilder_CheckAndSetWorkerError_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckAndSetWorkerError'
+type EnvironmentBuilder_CheckAndSetWorkerError_Call struct {
+	*mock.Call
+}
+
+// CheckAndSetWorkerError is a helper method to define mock.On call
+//   - ctx context.Context
+//   - env interfaces.Environment
+//   - workerName string
+func (_e *EnvironmentBuilder_Expecter) CheckAndSetWorkerError(ctx interface{}, env interface{}, workerName interface{}) *EnvironmentBuilder_CheckAndSetWorkerError_Call {
+	return &EnvironmentBuilder_CheckAndSetWorkerError_Call{Call: _e.mock.On("CheckAndSetWorkerError", ctx, env, workerName)}
+}
+
+func (_c *EnvironmentBuilder_CheckAndSetWorkerError_Call) Run(run func(ctx context.Context, env interfaces.Environment, workerName string)) *EnvironmentBuilder_CheckAndSetWorkerError_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(interfaces.Environment), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *EnvironmentBuilder_CheckAndSetWorkerError_Call) Return(_a0 string, _a1 error) *EnvironmentBuilder_CheckAndSetWorkerError_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *EnvironmentBuilder_CheckAndSetWorkerError_Call) RunAndReturn(run func(context.Context, interfaces.Environment, string) (string, error)) *EnvironmentBuilder_CheckAndSetWorkerError_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrCreateEnvironment provides a mock function with given fields: ctx, tCtx, envID, executionEnv
 func (_m *EnvironmentBuilder) GetOrCreateEnvironment(ctx context.Context, tCtx core.TaskExecutionContext, envID interfaces.ExecutionEnvID, executionEnv *flyteidlcore.ExecutionEnv) (interfaces.Environment, error) {
 	ret := _m.Called(ctx, tCtx, envID, executionEnv)

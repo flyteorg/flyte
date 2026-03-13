@@ -305,9 +305,9 @@ func (_c *Worker_SetLastAccessedAt_Call) RunAndReturn(run func(int64)) *Worker_S
 	return _c
 }
 
-// SetState provides a mock function with given fields: _a0
-func (_m *Worker) SetState(_a0 interfaces.State) {
-	_m.Called(_a0)
+// SetState provides a mock function with given fields: state, reason
+func (_m *Worker) SetState(state interfaces.State, reason string) {
+	_m.Called(state, reason)
 }
 
 // Worker_SetState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetState'
@@ -316,14 +316,15 @@ type Worker_SetState_Call struct {
 }
 
 // SetState is a helper method to define mock.On call
-//   - _a0 interfaces.State
-func (_e *Worker_Expecter) SetState(_a0 interface{}) *Worker_SetState_Call {
-	return &Worker_SetState_Call{Call: _e.mock.On("SetState", _a0)}
+//   - state interfaces.State
+//   - reason string
+func (_e *Worker_Expecter) SetState(state interface{}, reason interface{}) *Worker_SetState_Call {
+	return &Worker_SetState_Call{Call: _e.mock.On("SetState", state, reason)}
 }
 
-func (_c *Worker_SetState_Call) Run(run func(_a0 interfaces.State)) *Worker_SetState_Call {
+func (_c *Worker_SetState_Call) Run(run func(state interfaces.State, reason string)) *Worker_SetState_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(interfaces.State))
+		run(args[0].(interfaces.State), args[1].(string))
 	})
 	return _c
 }
@@ -333,7 +334,7 @@ func (_c *Worker_SetState_Call) Return() *Worker_SetState_Call {
 	return _c
 }
 
-func (_c *Worker_SetState_Call) RunAndReturn(run func(interfaces.State)) *Worker_SetState_Call {
+func (_c *Worker_SetState_Call) RunAndReturn(run func(interfaces.State, string)) *Worker_SetState_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -379,6 +380,51 @@ func (_c *Worker_State_Call) Return(_a0 interfaces.State) *Worker_State_Call {
 }
 
 func (_c *Worker_State_Call) RunAndReturn(run func() interfaces.State) *Worker_State_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// StateReason provides a mock function with given fields:
+func (_m *Worker) StateReason() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for StateReason")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// Worker_StateReason_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StateReason'
+type Worker_StateReason_Call struct {
+	*mock.Call
+}
+
+// StateReason is a helper method to define mock.On call
+func (_e *Worker_Expecter) StateReason() *Worker_StateReason_Call {
+	return &Worker_StateReason_Call{Call: _e.mock.On("StateReason")}
+}
+
+func (_c *Worker_StateReason_Call) Run(run func()) *Worker_StateReason_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Worker_StateReason_Call) Return(_a0 string) *Worker_StateReason_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Worker_StateReason_Call) RunAndReturn(run func() string) *Worker_StateReason_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -146,6 +146,7 @@ type workerImpl struct {
 	lock           sync.RWMutex
 	responseChan   chan *pb.HeartbeatResponse
 	state          interfaces.State
+	stateReason    string
 }
 
 var _ interfaces.Worker = (*workerImpl)(nil)
@@ -180,10 +181,17 @@ func (w *workerImpl) State() interfaces.State {
 	return w.state
 }
 
-func (w *workerImpl) SetState(state interfaces.State) {
+func (w *workerImpl) SetState(state interfaces.State, reason string) {
 	w.lock.Lock()
 	defer w.lock.Unlock()
 	w.state = state
+	w.stateReason = reason
+}
+
+func (w *workerImpl) StateReason() string {
+	w.lock.RLock()
+	defer w.lock.RUnlock()
+	return w.stateReason
 }
 
 func (w *workerImpl) ID() string {

@@ -52,6 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ = sigterm.recv() => {
             warn!("Received SIGTERM, initiating graceful shutdown");
             cancellation_token.cancel();
+            manager.mark_unfinished_tasks_failed("task failed because the worker was terminated (SIGTERM)").await;
             manager.send_final_heartbeat(args.fasttask_url.clone()).await;
         }
 
@@ -59,6 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ = sigint.recv() => {
             warn!("Received SIGINT, initiating graceful shutdown");
             cancellation_token.cancel();
+            manager.mark_unfinished_tasks_failed("task failed because the worker was interrupted (SIGINT)").await;
             manager.send_final_heartbeat(args.fasttask_url.clone()).await;
         }
     }

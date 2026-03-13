@@ -42,6 +42,10 @@ pub struct TaskStatus {
     #[prost(map = "string, string", tag = "8")]
     pub enqueue_labels:
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Indicates that the failure was caused by the system (e.g. worker termination) rather than
+    /// user code. Used by the plugin to distinguish system vs user retry budgets.
+    #[prost(bool, tag = "9")]
+    pub system_failure: bool,
 }
 /// The current execution capacity for a fasttask worker replia.
 #[allow(clippy::derive_partial_eq_without_eq)]

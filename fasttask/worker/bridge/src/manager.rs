@@ -111,6 +111,7 @@ impl ExecutionStrategy {
                         task_duration: None,
                         enqueue_labels: task_assignment.enqueue_labels,
                         workflow_id: None,
+                        system_failure: false,
                     })
                     .await?;
 
@@ -566,6 +567,7 @@ impl TaskManagerRuntime for SuccessRuntime {
                 enqueue_labels: HashMap::new(),
                 task_duration: None,
                 workflow_id: None,
+                system_failure: false,
             };
 
             let send_result = task_status_tx.send(task_status).await;

@@ -173,6 +173,9 @@ type TaskStatus struct {
 	TaskDuration *durationpb.Duration `protobuf:"bytes,7,opt,name=task_duration,json=taskDuration,proto3" json:"task_duration,omitempty"`
 	// A map of values used to re-enqueue the execution
 	EnqueueLabels map[string]string `protobuf:"bytes,8,rep,name=enqueue_labels,json=enqueueLabels,proto3" json:"enqueue_labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Indicates that the failure was caused by the system (e.g. worker termination) rather than
+	// user code. Used by the plugin to distinguish system vs user retry budgets.
+	SystemFailure bool `protobuf:"varint,9,opt,name=system_failure,json=systemFailure,proto3" json:"system_failure,omitempty"`
 }
 
 func (x *TaskStatus) Reset() {
@@ -262,6 +265,13 @@ func (x *TaskStatus) GetEnqueueLabels() map[string]string {
 		return x.EnqueueLabels
 	}
 	return nil
+}
+
+func (x *TaskStatus) GetSystemFailure() bool {
+	if x != nil {
+		return x.SystemFailure
+	}
+	return false
 }
 
 // The current execution capacity for a fasttask worker replia.

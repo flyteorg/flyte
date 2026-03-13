@@ -47,6 +47,8 @@ const (
 	PROJECT_LABEL         = "project"
 	DOMAIN_LABEL          = "domain"
 	ORGANIZATION_LABEL    = "organization"
+
+	fasttaskFinalizer = "flyte/fasttask"
 )
 
 // builderMetrics is a collection of metrics for the InMemoryEnvBuilder.
@@ -119,8 +121,8 @@ func addObjectMetadata(ctx context.Context, tCtx core.TaskExecutionContext, spec
 	// don't set owner references for fast tasks, as they are intended to outlive a single task execution
 	spec.SetOwnerReferences([]metav1.OwnerReference{})
 
-	if cfg.InjectFinalizer { // nolint: staticcheck
-		// TODO: add finalizer
+	if cfg.InjectFinalizer {
+		spec.SetFinalizers(append(spec.GetFinalizers(), fasttaskFinalizer))
 	}
 
 	return nil
@@ -458,9 +460,35 @@ func (e *environmentBuilderImpl) GetOrCreateEnvironment(ctx context.Context, tCt
 	return env, nil
 }
 
+// clearFinalizers removes all finalizers from the pod using a merge patch to
+// avoid conflicts with stale informer cache.
+func (e *environmentBuilderImpl) clearFinalizers(ctx context.Context, name types.NamespacedName) error {
+	pod := &v1.Pod{}
+	pod.SetName(name.Name)
+	pod.SetNamespace(name.Namespace)
+
+	patch := client.RawPatch(
+		types.MergePatchType,
+		[]byte(`{"metadata":{"finalizers":[]}}`),
+	)
+
+	err := e.kubeClient.GetClient().Patch(ctx, pod, patch)
+	if err != nil && !k8serrors.IsNotFound(err) {
+		logger.Warnf(ctx, "failed to clear finalizers for pod '%s' [%v]", name.Name, err)
+		return err
+	}
+
+	return nil
+}
+
 // deletePod deletes the pod with the given name and namespace.
 func (e *environmentBuilderImpl) deletePod(ctx context.Context, env interfaces.Environment, name types.NamespacedName, reason string) error {
 	logger.Debugf(ctx, "deleting pod '%s' for environment '%s' (reason: %s)", name.Name, env.EnvID(), reason)
+
+	// clear finalizers before deleting to ensure the pod can be removed
+	if err := e.clearFinalizers(ctx, name); err != nil {
+		return err
+	}
 
 	objectMeta := metav1.ObjectMeta{
 		Name:      name.Name,
@@ -481,6 +509,43 @@ func (e *environmentBuilderImpl) deletePod(ctx context.Context, env interfaces.E
 
 	e.metrics.podsDeleted.WithLabelValues(metricLabels...).Inc()
 	return nil
+}
+
+// CheckAndSetWorkerError returns the worker reason if worker has a reason, and is in orphaned state.
+// If not, this will attempt to check the Pod. If it's oomed, this will set the worker to the orphaned state, and
+// set and return the OOM message
+func (e *environmentBuilderImpl) CheckAndSetWorkerError(ctx context.Context, env interfaces.Environment, workerName string) (string, error) {
+	worker := env.GetWorker(workerName)
+	if worker == nil {
+		return "", nil
+	}
+	if worker.State() == interfaces.ORPHANED && len(worker.StateReason()) > 0 {
+		return worker.StateReason(), nil
+	}
+
+	namespace, err := envNamespace(env)
+	if err != nil {
+		return "", err
+	}
+
+	currentPod := &v1.Pod{}
+	if err := e.kubeClient.GetClient().Get(ctx, types.NamespacedName{
+		Name:      workerName,
+		Namespace: namespace,
+	}, currentPod); err != nil {
+		logger.Warnf(ctx, "failed to read pod status, will skip failure check for worker %s", worker.ID())
+		return "", nil
+	}
+
+	switch currentPod.Status.Phase {
+	case v1.PodFailed:
+		if failed, reason := workerFailureReason(ctx, currentPod, workerName); failed {
+			worker.SetState(interfaces.ORPHANED, reason)
+			return reason, nil
+		}
+	}
+
+	return "", nil
 }
 
 func (e *environmentBuilderImpl) getPodName(envName string) string {
@@ -547,6 +612,7 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 	// identify latest accessed timestamp
 	lastAccessedAt := int64(0)
 	workerCount := 0
+
 	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
 		workerLastAccessedAt := worker.LastAccessedAt()
 		if workerLastAccessedAt > lastAccessedAt {
@@ -636,16 +702,50 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 		}
 	}
 
+	// After worker GC, re-check whether current demand or min-replica requirements
+	// require scaling back up. This is a temporary workaround for demand-based scaling
+	// until we move to a dedicated reconciliation loop. Expired environments are
+	// already handled above.
+	if needed, _, _ := needsScaleUp(env); needed {
+		select {
+		case e.scaleUpChan <- env.EnvID().String():
+		default:
+		}
+	}
+
 	return nil
 }
 
-func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Environment) error {
-
-	if env.State() != interfaces.HEALTHY {
-		return nil
+// workerFailureReason iff pod is in a failed status, and demystify was able to extract an oom error code
+func workerFailureReason(ctx context.Context, pod *v1.Pod, workerName string) (bool, string) {
+	if pod == nil || pod.Status.Phase != v1.PodFailed {
+		return false, ""
+	}
+	dummyTaskInfo := core.TaskInfo{}
+	failurePhaseInfo, err := flytek8s.DemystifyFailure(ctx, pod.Status, dummyTaskInfo, workerName)
+	if err != nil {
+		logger.Debugf(ctx, "failed to demystify failure phase for pod '%s': %v", pod.Name, err)
+		return false, ""
 	}
 
-	// verify we should perform scale up operation
+	if len(failurePhaseInfo.Err().GetCode()) > 0 {
+		msg := fmt.Sprintf("worker '%s' failed with %s", workerName, failurePhaseInfo.Err().GetCode())
+		if len(failurePhaseInfo.Err().GetMessage()) > 0 {
+			msg = failurePhaseInfo.Err().GetMessage()
+		}
+		return true, msg
+	}
+
+	return false, ""
+}
+
+// needsScaleUp is the shared capacity-reconciliation predicate used by both
+// the direct scale-up path and the periodic scale-down pass (as a temporary
+// workaround until a dedicated reconciliation loop is introduced). It returns
+// true if the environment needs more workers — either below the minimum replica
+// count or demand exceeds available capacity. It also returns the current worker
+// and usable (non-orphaned) worker counts.
+func needsScaleUp(env interfaces.Environment) (bool, int, int) {
 	workerCount := 0
 	usableWorkerCount := 0
 	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
@@ -657,6 +757,27 @@ func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Env
 	})
 
 	if workerCount >= int(env.FastTaskEnvironmentSpec().GetReplicaCount()) {
+		return false, workerCount, usableWorkerCount
+	}
+
+	minReplicaCount := getMinReplicaCount(env.FastTaskEnvironmentSpec())
+	if workerCount < minReplicaCount {
+		return true, workerCount, usableWorkerCount
+	}
+
+	demand := int32(env.GetActiveTaskCount())
+	parallelism := env.FastTaskEnvironmentSpec().GetParallelism()
+	availableCapacity := int32(usableWorkerCount) * parallelism
+	return demand > availableCapacity, workerCount, usableWorkerCount
+}
+
+func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Environment) error {
+	if env.State() != interfaces.HEALTHY {
+		return nil
+	}
+
+	needed, workerCount, usableWorkerCount := needsScaleUp(env)
+	if !needed {
 		return nil
 	}
 
@@ -676,15 +797,10 @@ func (e *environmentBuilderImpl) scaleUp(ctx context.Context, env interfaces.Env
 		return nil
 	}
 
-	demand := int32(env.GetActiveTaskCount())
-	parallelism := env.FastTaskEnvironmentSpec().GetParallelism()
-	availableCapacity := int32(usableWorkerCount) * parallelism
-	if demand <= availableCapacity {
-		logger.Debugf(ctx, "skipping scale up for environment '%s': demand [%d] <= availableCapacity [%d]", env.EnvID().String(), demand, availableCapacity)
-		return nil
-	}
+	// demand exceeds available capacity, scale up by 1 replica
+	logger.Debugf(ctx, "scaling up environment '%s': demand [%d] > availableCapacity [%d]",
+		env.EnvID().String(), env.GetActiveTaskCount(), int32(usableWorkerCount)*env.FastTaskEnvironmentSpec().GetParallelism())
 
-	// scale up by 1 replica
 	podName := e.getPodName(env.EnvID().Name)
 	env.GetOrCreateWorker(podName)
 	e.metrics.scaleUpWorkerEvents.WithLabelValues(env.EnvID().String()).Inc()
@@ -766,6 +882,17 @@ func (e *environmentBuilderImpl) start(ctx context.Context, store interfaces.Env
 	}()
 }
 
+// envNamespace unmarshals the PodTemplateSpec from the environment to extract the namespace.
+func envNamespace(env interfaces.Environment) (string, error) {
+	podTemplateSpec := &v1.PodTemplateSpec{}
+	if err := json.Unmarshal(env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), podTemplateSpec); err != nil {
+		return "", flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
+			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), err.Error())
+	}
+
+	return podTemplateSpec.Namespace, nil
+}
+
 func (e *environmentBuilderImpl) GetWorkerPod(ctx context.Context, executionEnvID, workerID string) (*v1.Pod, error) {
 	// retrieve worker
 	env := e.store.Get(executionEnvID)
@@ -778,20 +905,16 @@ func (e *environmentBuilderImpl) GetWorkerPod(ctx context.Context, executionEnvI
 		return nil, fmt.Errorf("worker '%s' not found in environment '%s'", workerID, executionEnvID)
 	}
 
-	podTemplateSpec := &v1.PodTemplateSpec{}
-	if err := json.Unmarshal(env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), podTemplateSpec); err != nil {
-		return nil, flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), err.Error())
-	}
-
-	// retrieve pod
-	namespacedName := types.NamespacedName{
-		Name:      workerID,
-		Namespace: podTemplateSpec.Namespace,
+	namespace, err := envNamespace(env)
+	if err != nil {
+		return nil, err
 	}
 
 	pod := &v1.Pod{}
-	if err := e.kubeClient.GetClient().Get(ctx, namespacedName, pod); err != nil {
+	if err := e.kubeClient.GetClient().Get(ctx, types.NamespacedName{
+		Name:      workerID,
+		Namespace: namespace,
+	}, pod); err != nil {
 		return nil, err
 	}
 
@@ -799,10 +922,14 @@ func (e *environmentBuilderImpl) GetWorkerPod(ctx context.Context, executionEnvI
 }
 
 func (e *environmentBuilderImpl) ValidateWorkerPods(ctx context.Context, executionEnvID string, taskInfo *core.TaskInfo) (string, error) {
-	// retrieve environment
 	env := e.store.Get(executionEnvID)
 	if env == nil {
 		return "", fmt.Errorf("environment '%s' not found", executionEnvID)
+	}
+
+	namespace, err := envNamespace(env)
+	if err != nil {
+		return "", err
 	}
 
 	// retrieve worker pod names
@@ -812,23 +939,15 @@ func (e *environmentBuilderImpl) ValidateWorkerPods(ctx context.Context, executi
 		return true
 	})
 
-	podTemplateSpec := &v1.PodTemplateSpec{}
-	if err := json.Unmarshal(env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), podTemplateSpec); err != nil {
-		return "", flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", env.FastTaskEnvironmentSpec().GetPodTemplateSpec(), err.Error())
-	}
-
 	// validate that all worker pads are not in a failure state
 	allReplicasFailed := true
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	for i, podName := range podNames {
-		namespacedName := types.NamespacedName{
-			Name:      podName,
-			Namespace: podTemplateSpec.Namespace,
-		}
-
 		pod := &v1.Pod{}
-		if err := e.kubeClient.GetCache().Get(ctx, namespacedName, pod); err != nil {
+		if err := e.kubeClient.GetCache().Get(ctx, types.NamespacedName{
+			Name:      podName,
+			Namespace: namespace,
+		}, pod); err != nil {
 			if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err) {
 				// pod does not exist because it has not yet been populated in the kubeclient
 				// cache or was deleted. to be safe, we treat both as a non-failure state.

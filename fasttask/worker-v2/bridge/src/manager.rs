@@ -35,6 +35,7 @@ struct TaskInfo {
     env_vars: HashMap<String, String>,
     enqueue_labels: HashMap<String, String>,
     last_ack_time: Option<SystemTime>,
+    system_failure: bool,
 }
 
 impl From<&TaskInfo> for TaskStatus {
@@ -51,6 +52,7 @@ impl From<&TaskInfo> for TaskStatus {
                     .map_or(None, |d| Some(d.to_prost()))
             }),
             enqueue_labels: task_info.enqueue_labels.clone(),
+            system_failure: task_info.system_failure,
         }
     }
 }
@@ -799,6 +801,7 @@ impl V2TaskManager {
             env_vars: operation.env_vars.clone(),
             enqueue_labels: operation.enqueue_labels.clone(),
             last_ack_time: None,
+            system_failure: false,
         };
 
         // Create the initial task to send to the executor
@@ -834,7 +837,7 @@ impl V2TaskManager {
         Ok(())
     }
 
-    async fn mark_unfinished_tasks_failed(&mut self, reason: &str) {
+    pub async fn mark_unfinished_tasks_failed(&mut self, reason: &str) {
         let mut tasks = self.tasks_in_progress.lock().unwrap();
         let task_count = tasks.len();
         info!(task_count, reason, "Marking all tasks as failed");
@@ -847,6 +850,8 @@ impl V2TaskManager {
             }
             trace!(task.id = %k, old_phase = t_info.phase, "Marking task as failed");
             t_info.phase = FAILED;
+            t_info.reason = Some(reason.to_string());
+            t_info.system_failure = true;
         }
     }
 
@@ -935,6 +940,7 @@ mod tests {
             env_vars: HashMap::new(),
             enqueue_labels: HashMap::new(),
             last_ack_time: None,
+            system_failure: false,
         }
     }
 

@@ -57,6 +57,10 @@ func (k *kubeClient) Delete(ctx context.Context, obj client.Object, opts ...clie
 	return nil
 }
 
+func (k *kubeClient) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
+	return nil
+}
+
 type kubeCache struct {
 	cache.Cache
 
@@ -621,6 +625,7 @@ func TestScaleDown(t *testing.T) {
 		expectedDeletedWorkers []string
 		expectedEnvDeleted     bool
 		expectedDeletePodCalls int
+		expectedScaleUp        bool
 	}{
 		{
 			name: "Delete expired environment based on lastAccessedAt",
@@ -720,6 +725,7 @@ func TestScaleDown(t *testing.T) {
 			expectedDeletedWorkers: []string{"orphaned-1"},
 			expectedEnvDeleted:     false,
 			expectedDeletePodCalls: 1,
+			expectedScaleUp:        true,
 		},
 		{
 			name: "Delete initializing workers beyond TTL",
@@ -779,6 +785,7 @@ func TestScaleDown(t *testing.T) {
 			expectedDeletedWorkers: []string{"orphaned-1"},
 			expectedEnvDeleted:     false,
 			expectedDeletePodCalls: 1,
+			expectedScaleUp:        true,
 		},
 		{
 			name: "Delete expired workers but maintain minimum replicas",
@@ -833,9 +840,194 @@ func TestScaleDown(t *testing.T) {
 
 				return env
 			},
-			expectedDeletedWorkers: []string{"worker-1"},
+			expectedDeletedWorkers: []string{}, // non-deterministic which expired worker gets deleted due to sync.Map iteration order
 			expectedEnvDeleted:     false,
 			expectedDeletePodCalls: 1,
+		},
+		{
+			name: "Trigger scale up after cleaning up unhealthy workers drops below min replicas",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().InitializingWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    3,
+						MinReplicaCount: wrapperspb.Int32(3),
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// 2 orphaned workers (expired) + 1 healthy worker = 3 total
+				// After cleaning up orphaned, workerCount drops to 1, which is below minReplicaCount of 3
+				orphaned1 := &workerImpl{
+					id:             "orphaned-1",
+					lastAccessedAt: time.Now().Unix() - 60,
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				orphaned2 := &workerImpl{
+					id:             "orphaned-2",
+					lastAccessedAt: time.Now().Unix() - 60,
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				healthy1 := &workerImpl{
+					id:             "healthy-1",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("orphaned-1", orphaned1)
+				env.workers.Store("orphaned-2", orphaned2)
+				env.workers.Store("healthy-1", healthy1)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"orphaned-1", "orphaned-2"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 2,
+			expectedScaleUp:        true,
+		},
+		{
+			name: "Trigger scale up after cleanup when demand exceeds capacity",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(1),
+						Parallelism:     1,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// 1 orphaned worker (expired) + 2 healthy workers = 3 total
+				// After cleanup: 2 healthy workers remain with capacity=2, but demand=3
+				orphaned := &workerImpl{
+					id:             "orphaned-1",
+					lastAccessedAt: time.Now().Unix() - 60,
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				healthy1 := &workerImpl{
+					id:             "healthy-1",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+				healthy2 := &workerImpl{
+					id:             "healthy-2",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("orphaned-1", orphaned)
+				env.workers.Store("healthy-1", healthy1)
+				env.workers.Store("healthy-2", healthy2)
+				env.activeTaskCount.Store(3) // demand=3 > capacity=2 after cleanup
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"orphaned-1"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 1,
+			expectedScaleUp:        true,
+		},
+		{
+			name: "No scale up after cleanup when demand within capacity",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(1),
+						Parallelism:     2,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// 1 orphaned worker (expired) + 2 healthy workers = 3 total
+				// After cleanup: 2 healthy workers remain with capacity=4, demand=3
+				orphaned := &workerImpl{
+					id:             "orphaned-1",
+					lastAccessedAt: time.Now().Unix() - 60,
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				healthy1 := &workerImpl{
+					id:             "healthy-1",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+				healthy2 := &workerImpl{
+					id:             "healthy-2",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("orphaned-1", orphaned)
+				env.workers.Store("healthy-1", healthy1)
+				env.workers.Store("healthy-2", healthy2)
+				env.activeTaskCount.Store(3) // demand=3 <= capacity=4 after cleanup
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"orphaned-1"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 1,
+			expectedScaleUp:        false,
 		},
 		{
 			name: "Environment with only orphaned workers uses lastAccessedAt for TTL check",
@@ -924,10 +1116,12 @@ func TestScaleDown(t *testing.T) {
 			store.GetOrCreate(env.EnvID().String(), env)
 
 			scope := promutils.NewTestScope()
+			scaleUpChan := make(chan string, 1)
 			builder := &environmentBuilderImpl{
-				kubeClient: mockKubeClient,
-				store:      store,
-				metrics:    newBuilderMetrics(scope),
+				kubeClient:  mockKubeClient,
+				store:       store,
+				metrics:     newBuilderMetrics(scope),
+				scaleUpChan: scaleUpChan,
 			}
 
 			err := builder.scaleDown(ctx, env)
@@ -944,6 +1138,12 @@ func TestScaleDown(t *testing.T) {
 					_, exists := env.workers.Load(workerID)
 					assert.False(t, exists, "Worker %s should be deleted", workerID)
 				}
+			}
+
+			if tt.expectedScaleUp {
+				assert.Equal(t, 1, len(scaleUpChan), "Expected scale up to be triggered")
+			} else {
+				assert.Equal(t, 0, len(scaleUpChan), "Expected no scale up to be triggered")
 			}
 		})
 	}
@@ -1187,6 +1387,136 @@ func TestScaleUp(t *testing.T) {
 				return true
 			})
 			assert.Equal(t, tt.expectedWorkerCount, workerCount)
+		})
+	}
+}
+
+func TestNeedsScaleUp(t *testing.T) {
+	podTemplateSpec := &v1.PodTemplateSpec{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "test-namespace",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{{Name: "test"}},
+		},
+	}
+	podTemplateSpecBytes, _ := json.Marshal(podTemplateSpec)
+
+	tests := []struct {
+		name                      string
+		setupEnv                  func() *environmentImpl
+		expectedNeedsScaleUp      bool
+		expectedWorkerCount       int
+		expectedUsableWorkerCount int
+	}{
+		{
+			name: "AtMaxReplicas_ReturnsFalse",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    2,
+						Parallelism:     1,
+					},
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.workers.Store("worker-2", &workerImpl{id: "worker-2", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				return env
+			},
+			expectedNeedsScaleUp:      false,
+			expectedWorkerCount:       2,
+			expectedUsableWorkerCount: 2,
+		},
+		{
+			name: "BelowMinReplicas_ReturnsTrue",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(3),
+						Parallelism:     1,
+					},
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				return env
+			},
+			expectedNeedsScaleUp:      true,
+			expectedWorkerCount:       1,
+			expectedUsableWorkerCount: 1,
+		},
+		{
+			name: "DemandExceedsCapacity_ReturnsTrue",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(1),
+						Parallelism:     2,
+					},
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(3) // demand=3 > capacity=2
+				return env
+			},
+			expectedNeedsScaleUp:      true,
+			expectedWorkerCount:       1,
+			expectedUsableWorkerCount: 1,
+		},
+		{
+			name: "DemandWithinCapacity_ReturnsFalse",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(1),
+						Parallelism:     2,
+					},
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(2) // demand=2 <= capacity=2
+				return env
+			},
+			expectedNeedsScaleUp:      false,
+			expectedWorkerCount:       1,
+			expectedUsableWorkerCount: 1,
+		},
+		{
+			name: "OrphanedWorkersExcludedFromUsableCount",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,
+						MinReplicaCount: wrapperspb.Int32(1),
+						Parallelism:     2,
+					},
+					workers: &sync.Map{},
+				}
+				env.workers.Store("worker-1", &workerImpl{id: "worker-1", state: interfaces.HEALTHY, lock: sync.RWMutex{}})
+				env.workers.Store("worker-2", &workerImpl{id: "worker-2", state: interfaces.ORPHANED, lock: sync.RWMutex{}})
+				env.activeTaskCount.Store(3) // demand=3 > usable capacity=2 (only worker-1)
+				return env
+			},
+			expectedNeedsScaleUp:      true,
+			expectedWorkerCount:       2,
+			expectedUsableWorkerCount: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			env := tt.setupEnv()
+			needed, workerCount, usableWorkerCount := needsScaleUp(env)
+			assert.Equal(t, tt.expectedNeedsScaleUp, needed)
+			assert.Equal(t, tt.expectedWorkerCount, workerCount)
+			assert.Equal(t, tt.expectedUsableWorkerCount, usableWorkerCount)
 		})
 	}
 }

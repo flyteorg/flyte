@@ -321,13 +321,13 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 	if env == nil {
 		p.metrics.unexpectedEnvironmentDeletion.Inc()
 		logger.Errorf(ctx, "environment %s not found in store for running task", executionEnvID.String())
-		return &pluginState, core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("Environment %s not found in store for running task", executionEnvID.String()), nil), nil
+		return &pluginState, core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("Reusable environment '%s' was unexpectedly disconnected", executionEnvID.String()), nil), nil
 	}
 	workerID := initialState.WorkerID
 	if worker := env.GetWorker(workerID); worker == nil {
 		p.metrics.unexpectedWorkerDeletion.Inc()
 		logger.Errorf(ctx, "worker %s not found in store for running task", workerID)
-		return &pluginState, core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("Worker %s not found in store for running task", workerID), nil), nil
+		return &pluginState, core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("Reusable worker '%s' was unexpectedly disconnected", workerID), nil), nil
 	}
 
 	taskID, err := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(0, 50)
@@ -345,13 +345,27 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 	var phaseInfo core.PhaseInfo
 	taskStatus, err := p.fastTaskService.CheckStatus(ctx, taskID, executionEnvID.String(), workerID)
 	if err != nil {
-		if errors.Is(err, statusUpdateNotFoundError) && time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
-			// if task has not been updated within the grace period we should abort
-			logger.Warnf(ctx, "task status update not reported within grace period for queue %s and worker %s", executionEnvID.String(), workerID)
-			p.metrics.statusUpdateNotFoundTimeout.Inc()
-			phaseInfo = core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("task status update not reported within grace period for queue %s and worker %s", executionEnvID.String(), pluginState.WorkerID), taskInfo)
-			return &pluginState, phaseInfo, nil
-		} else if errors.Is(err, statusUpdateNotFoundError) || errors.Is(err, taskContextNotFoundError) {
+		if errors.Is(err, statusUpdateNotFoundError) {
+			// no status update — check if worker is orphaned with a pod-level failure
+			if worker := env.GetWorker(workerID); worker != nil && worker.State() == interfaces.ORPHANED {
+				logger.Errorf(ctx, "worker %s is orphaned", workerID)
+				reason, checkErr := p.builder.CheckAndSetWorkerError(ctx, env, workerID)
+				if checkErr != nil {
+					logger.Errorf(ctx, "Error when checking worker for errors")
+				} else if len(reason) > 0 {
+					return &pluginState, core.PhaseInfoSystemRetryableFailure("unknown", reason, taskInfo), nil
+				}
+			}
+
+			if time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
+				logger.Warnf(ctx, "task status update not reported within grace period for queue %s and worker %s", executionEnvID.String(), workerID)
+				p.metrics.statusUpdateNotFoundTimeout.Inc()
+				phaseInfo = core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("Reusable worker '%s' stopped reporting status updates", pluginState.WorkerID), taskInfo)
+				return &pluginState, phaseInfo, nil
+			}
+
+			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
+		} else if errors.Is(err, taskContextNotFoundError) {
 			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
 		} else {
 			return nil, core.PhaseInfoUndefined, err
@@ -369,7 +383,13 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 
 			phaseInfo = core.PhaseInfoSuccess(taskInfo)
 		case core.PhaseRetryableFailure:
-			phaseInfo = core.PhaseInfoRetryableFailure("unknown", taskStatus.Reason, taskInfo)
+			if taskStatus.SystemFailure {
+				phaseInfo = core.PhaseInfoSystemRetryableFailure("unknown", taskStatus.Reason, taskInfo)
+			} else {
+				phaseInfo = core.PhaseInfoRetryableFailure("unknown", taskStatus.Reason, taskInfo)
+			}
+		case core.PhasePermanentFailure:
+			phaseInfo = core.PhaseInfoFailure("unknown", taskStatus.Reason, taskInfo)
 		default:
 			pluginState.PhaseVersion++
 			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)

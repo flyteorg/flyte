@@ -479,6 +479,7 @@ func TestHandleRunning(t *testing.T) {
 		expectedLastUpdatedInc bool
 		expectedLogs           bool
 		envState               interfaces.State
+		workerState            interfaces.State
 	}{
 		{
 			name:             "PodNotFoundRunning",
@@ -701,10 +702,13 @@ func TestHandleRunning(t *testing.T) {
 			// Create mock worker
 			mockWorker := &interfaceMocks.Worker{}
 			mockWorker.EXPECT().ID().Return("w0")
+			if test.checkStatusError == statusUpdateNotFoundError {
+				mockWorker.EXPECT().State().Return(test.workerState)
+			}
 
 			// Create mock environment and worker for the store
 			mockEnv := &interfaceMocks.Environment{}
-			mockEnv.EXPECT().GetWorker("w0").Return(mockWorker)
+			mockEnv.EXPECT().GetWorker("w0").Return(mockWorker).Maybe()
 			mockEnv.EXPECT().State().Return(test.envState)
 
 			// Add environment to store using the correct executionEnvID string

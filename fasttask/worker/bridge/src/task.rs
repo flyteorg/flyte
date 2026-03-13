@@ -205,6 +205,7 @@ async fn report_terminal_status(
                     reason: reason.clone(),
                     task_duration: task_duration.map(|d|d.to_prost()),
                     workflow_id: None,
+                    system_failure: false,
                 }).await;
 
                 if error.is_err() {
@@ -335,6 +336,7 @@ async fn run_command(
                     reason: reason.clone(),
                     task_duration: Some(current_duration.to_prost()),
                     workflow_id: None,
+                    system_failure: false,
                 }).await;
 
                 if error.is_err() {
@@ -418,6 +420,7 @@ async fn wait_in_backlog<T>(
                     reason: reason.clone(),
                     task_duration: None,
                     workflow_id: None,
+                    system_failure: false,
                 }).await;
 
                 if error.is_err() {

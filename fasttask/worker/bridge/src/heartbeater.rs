@@ -247,6 +247,7 @@ mod tests {
             task_duration: None,
             enqueue_labels: HashMap::new(),
             workflow_id: None,
+            system_failure: false,
         };
 
         let succeeded_now = Instant::now();
