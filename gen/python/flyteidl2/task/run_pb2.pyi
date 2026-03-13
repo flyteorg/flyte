@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from flyteidl2.notification import definition_pb2 as _definition_pb2
@@ -93,23 +94,17 @@ class RunSpec(_message.Message):
     def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., rule_id: _Optional[_Union[_definition_pb2.RuleId, _Mapping]] = ..., rule: _Optional[_Union[InlineRule, _Mapping]] = ...) -> None: ...
 
 class InlineRule(_message.Message):
-    __slots__ = ["delivery_options", "checks"]
-    DELIVERY_OPTIONS_FIELD_NUMBER: _ClassVar[int]
-    CHECKS_FIELD_NUMBER: _ClassVar[int]
-    delivery_options: _containers.RepeatedCompositeFieldContainer[DeliveryOption]
-    checks: InlineRuleChecks
-    def __init__(self, delivery_options: _Optional[_Iterable[_Union[DeliveryOption, _Mapping]]] = ..., checks: _Optional[_Union[InlineRuleChecks, _Mapping]] = ...) -> None: ...
+    __slots__ = ["matchers"]
+    MATCHERS_FIELD_NUMBER: _ClassVar[int]
+    matchers: _containers.RepeatedCompositeFieldContainer[InlineRuleMatcher]
+    def __init__(self, matchers: _Optional[_Iterable[_Union[InlineRuleMatcher, _Mapping]]] = ...) -> None: ...
 
-class DeliveryOption(_message.Message):
-    __slots__ = ["config_id", "template"]
+class InlineRuleMatcher(_message.Message):
+    __slots__ = ["on_phases", "config_id", "template"]
+    ON_PHASES_FIELD_NUMBER: _ClassVar[int]
     CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    on_phases: _containers.RepeatedScalarFieldContainer[_phase_pb2.ActionPhase]
     config_id: _definition_pb2.DeliveryConfigId
     template: _definition_pb2.DeliveryConfigTemplate
-    def __init__(self, config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template: _Optional[_Union[_definition_pb2.DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...
-
-class InlineRuleChecks(_message.Message):
-    __slots__ = ["phase_regex"]
-    PHASE_REGEX_FIELD_NUMBER: _ClassVar[int]
-    phase_regex: str
-    def __init__(self, phase_regex: _Optional[str] = ...) -> None: ...
+    def __init__(self, on_phases: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template: _Optional[_Union[_definition_pb2.DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...

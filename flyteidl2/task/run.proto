@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/notification/definition.proto";
@@ -105,24 +106,31 @@ message RunSpec {
 }
 
 message InlineRule {
-  repeated DeliveryOption delivery_options = 1 [(buf.validate.field).repeated.min_items = 1];
-
-  InlineRuleChecks checks = 2;
+  repeated InlineRuleMatcher matchers = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message DeliveryOption {
-  oneof option {
+message InlineRuleMatcher {
+  repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+    items: {
+      enum: {
+        in: [ // terminal phases only
+          5, // ACTION_PHASE_SUCCEEDED
+          6, // ACTION_PHASE_FAILED
+          7, // ACTION_PHASE_ABORTED
+          8 // ACTION_PHASE_TIMED_OUT
+        ]
+      }
+    }
+  }];
+
+  oneof delivery {
     option (buf.validate.oneof).required = true;
 
-    flyteidl2.notification.DeliveryConfigId config_id = 1;
+    flyteidl2.notification.DeliveryConfigId config_id = 2;
 
     // template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
-    flyteidl2.notification.DeliveryConfigTemplate template = 2;
+    flyteidl2.notification.DeliveryConfigTemplate template = 3;
   }
-}
-
-message InlineRuleChecks {
-  // Regex for matching completed run phase.
-  // if not supplied, rule applies to any terminal phase.
-  string phase_regex = 1;
 }

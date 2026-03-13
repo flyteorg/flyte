@@ -275,91 +275,62 @@ func (m *DeliveryConfigTemplate) validate(all bool) error {
 
 	var errors []error
 
-	switch v := m.Config.(type) {
-	case *DeliveryConfigTemplate_Webhook:
-		if v == nil {
-			err := DeliveryConfigTemplateValidationError{
-				field:  "Config",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetWebhook()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, DeliveryConfigTemplateValidationError{
-						field:  "Webhook",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, DeliveryConfigTemplateValidationError{
-						field:  "Webhook",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetWebhook()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return DeliveryConfigTemplateValidationError{
+	if all {
+		switch v := interface{}(m.GetWebhook()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeliveryConfigTemplateValidationError{
 					field:  "Webhook",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
 			}
-		}
-
-	case *DeliveryConfigTemplate_Email:
-		if v == nil {
-			err := DeliveryConfigTemplateValidationError{
-				field:  "Config",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetEmail()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, DeliveryConfigTemplateValidationError{
-						field:  "Email",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, DeliveryConfigTemplateValidationError{
-						field:  "Email",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetEmail()).(interface{ Validate() error }); ok {
+		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				return DeliveryConfigTemplateValidationError{
+				errors = append(errors, DeliveryConfigTemplateValidationError{
+					field:  "Webhook",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWebhook()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeliveryConfigTemplateValidationError{
+				field:  "Webhook",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetEmail()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeliveryConfigTemplateValidationError{
 					field:  "Email",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeliveryConfigTemplateValidationError{
+					field:  "Email",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
 		}
-
-	default:
-		_ = v // ensures v is used
+	} else if v, ok := interface{}(m.GetEmail()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeliveryConfigTemplateValidationError{
+				field:  "Email",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {

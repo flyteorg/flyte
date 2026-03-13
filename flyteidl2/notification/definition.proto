@@ -61,13 +61,15 @@ message DeliveryConfigId {
 }
 
 message DeliveryConfigTemplate {
-  oneof config {
-    option (buf.validate.oneof).required = true;
+  option (buf.validate.message).cel = {
+    id: "at_least_one_required"
+    message: "at least one of the delivery options must be set"
+    expression: "has(this.webhook) || has(this.email)"
+  };
 
-    WebhookDeliveryTemplate webhook = 1;
+  WebhookDeliveryTemplate webhook = 1;
 
-    EmailDeliveryTemplate email = 2;
-  }
+  EmailDeliveryTemplate email = 2;
 }
 
 enum EventType {
