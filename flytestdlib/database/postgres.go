@@ -42,13 +42,8 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 	return password
 }
 
-// GetPostgresDSN produces the DSN (data source name) for opening a postgres db connection.
-func GetPostgresDSN(ctx context.Context, pgConfig PostgresConfig) string {
-	return getPostgresDsn(ctx, pgConfig)
-}
-
 // Produces the DSN (data source name) for opening a postgres db connection.
-func getPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
+func GetPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
@@ -73,7 +68,7 @@ func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
-	dialector := postgres.Open(getPostgresDsn(ctx, pgConfig))
+	dialector := postgres.Open(GetPostgresDsn(ctx, pgConfig))
 	gormDb, err := gorm.Open(dialector, gormConfig)
 	if err == nil {
 		return gormDb, nil
@@ -88,7 +83,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	// initialize the user-specified database.
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
-	defaultDBDialector := postgres.Open(getPostgresDsn(ctx, defaultDbPgConfig))
+	defaultDBDialector := postgres.Open(GetPostgresDsn(ctx, defaultDbPgConfig))
 	gormDb, err = gorm.Open(defaultDBDialector, gormConfig)
 	if err != nil {
 		return nil, err

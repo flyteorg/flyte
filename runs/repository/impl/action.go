@@ -690,7 +690,7 @@ func (r *actionRepo) startPostgresListener() {
 	// Build connection string from the database config
 	pgCfg := r.pgConfig
 	pgCfg.DbName = dbName
-	connStr = database.GetPostgresDSN(context.Background(), pgCfg)
+	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
