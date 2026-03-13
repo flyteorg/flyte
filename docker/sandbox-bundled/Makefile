@@ -26,8 +26,7 @@ flyte: create_builder
 
 .PHONY: dep_update
 dep_update:
-	helm dependency update ../../charts/flyte-binary
-	helm dependency update ../../charts/flyte-sandbox
+	cd ../../charts/flyte-sandbox/charts && for f in *.tgz; do tar xzf "$$f"; done
 
 .PHONY: manifests
 manifests: dep_update
