@@ -35,19 +35,19 @@ func TestGetPostgresDsn(t *testing.T) {
 		ExtraOptions: "sslmode=disable",
 	}
 	t.Run("no password", func(t *testing.T) {
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		dsn := GetPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=disable", dsn)
 	})
 	t.Run("with password", func(t *testing.T) {
 		pgConfig.Password = "pass"
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		dsn := GetPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass sslmode=disable", dsn)
 
 	})
 	t.Run("with password, no extra", func(t *testing.T) {
 		pgConfig.Password = "pass"
 		pgConfig.ExtraOptions = ""
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		dsn := GetPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass ", dsn)
 	})
 	t.Run("with password path", func(t *testing.T) {
@@ -61,7 +61,7 @@ func TestGetPostgresDsn(t *testing.T) {
 			t.Errorf("Couldn't write to temp file: %v", err)
 		}
 		pgConfig.PasswordPath = tmpFile.Name()
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
+		dsn := GetPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=123abc ", dsn)
 	})
 }

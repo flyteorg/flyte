@@ -60,6 +60,14 @@ flyte-binary:
             - _U_EP_OVERRIDE: '{{ printf "%s-http" .Release.Name }}.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
             - _U_USE_ACTIONS: "1"
+      runs:
+        database:
+          postgres:
+            host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}'
+            port: 5432
+            dbName: runs
+            user: postgres
+            password: postgres
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'

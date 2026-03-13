@@ -17,8 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	"github.com/flyteorg/flyte/v2/runs"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 )
 
 func main() {
@@ -41,9 +40,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.BaseURL = fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 
 	// Initialize database
-	dbCfg := &database.DbConfig{
-		SQLite: database.SQLiteConfig{File: "flyte.db"},
-	}
+	dbCfg := &runsconfig.GetConfig().Database
 	db, err := app.InitDB(ctx, dbCfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
