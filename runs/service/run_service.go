@@ -246,6 +246,19 @@ func (s *RunService) AbortRun(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	// Abort via actions service
+	rootActionID := &common.ActionIdentifier{
+		Run:  req.Msg.RunId,
+		Name: req.Msg.RunId.Name,
+	}
+	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+		ActionId: rootActionID,
+		Reason:   &reason,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to abort run via actions service: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
 }
 
@@ -478,6 +491,15 @@ func (s *RunService) AbortAction(
 	// Abort in database
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Abort via actions service
+	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+		ActionId: req.Msg.ActionId,
+		Reason:   &reason,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to abort action via actions service: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -1042,7 +1064,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 		endDate = &t
 	}
 
-	actions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
+	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
@@ -1065,7 +1087,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 	}
 	groups := make(map[string]*groupAccum)
 
-	for _, action := range actions {
+	for _, action := range rootActions {
 		taskName := extractTaskName(action.ActionSpec)
 		if taskName == "" {
 			taskName = action.Name // fallback to action name
