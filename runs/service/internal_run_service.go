@@ -77,6 +77,9 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		InputsUri: req.GetInputUri(),
 	}
 
+	logger.Infof(ctx, "RecordAction: action=%s parent=%s taskId=%v taskSpec=%v",
+		actionID.GetName(), req.GetParent(), req.GetTask().GetId(), req.GetTask().GetSpec() != nil)
+
 	switch v := req.GetSpec().(type) {
 	case *workflow.RecordActionRequest_Task:
 		taskAction := v.Task
