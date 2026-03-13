@@ -154,17 +154,18 @@ func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.Po
 	sparkEnv = append(sparkEnv, v1.EnvVar{Name: "FLYTE_MAX_ATTEMPTS", Value: strconv.Itoa(int(taskCtx.TaskExecutionMetadata().GetMaxAttempts()))})
 
 	spec := sparkOp.SparkPodSpec{
-		Affinity:         podSpec.Affinity,
-		Annotations:      annotations,
-		Labels:           labels,
-		Env:              sparkEnv,
-		Image:            &container.Image,
+		Affinity:           podSpec.Affinity,
+		Annotations:        annotations,
+		Labels:             labels,
+		Env:                sparkEnv,
+		Image:              &container.Image,
 		PodSecurityContext: podSpec.SecurityContext.DeepCopy(),
-		DNSConfig:        podSpec.DNSConfig.DeepCopy(),
-		Tolerations:      podSpec.Tolerations,
-		SchedulerName:    &podSpec.SchedulerName,
-		NodeSelector:     podSpec.NodeSelector,
-		HostNetwork:      &podSpec.HostNetwork,
+		DNSConfig:          podSpec.DNSConfig.DeepCopy(),
+		Tolerations:        podSpec.Tolerations,
+		SchedulerName:      &podSpec.SchedulerName,
+		NodeSelector:       podSpec.NodeSelector,
+		HostNetwork:        &podSpec.HostNetwork,
+		Template:           &v1.PodTemplateSpec{Spec: *podSpec},
 	}
 	return &spec
 }
@@ -290,13 +291,13 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 			APIVersion: sparkOp.SchemeGroupVersion.String(),
 		},
 		Spec: sparkOp.SparkApplicationSpec{
-			Type: getApplicationType(sparkJob.GetApplicationType()),
-			Image:          &executorSpec.container.Image,
-			Arguments:      executorSpec.container.Args,
-			Driver:         *driverSpec.sparkSpec,
-			Executor:       *executorSpec.sparkSpec,
-			SparkConf:      sparkConfig,
-			HadoopConf:     sparkJob.GetHadoopConf(),
+			Type:       getApplicationType(sparkJob.GetApplicationType()),
+			Image:      &executorSpec.container.Image,
+			Arguments:  executorSpec.container.Args,
+			Driver:     *driverSpec.sparkSpec,
+			Executor:   *executorSpec.sparkSpec,
+			SparkConf:  sparkConfig,
+			HadoopConf: sparkJob.GetHadoopConf(),
 			// SubmissionFailures handled here. Task Failures handled at Propeller/Job level.
 			RestartPolicy: sparkOp.RestartPolicy{
 				Type:                       sparkOp.RestartPolicyOnFailure,
