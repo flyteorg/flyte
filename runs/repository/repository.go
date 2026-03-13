@@ -3,6 +3,7 @@ package repository
 import (
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
@@ -14,9 +15,9 @@ type repository struct {
 }
 
 // NewRepository creates a new Repository instance
-func NewRepository(db *gorm.DB) interfaces.Repository {
+func NewRepository(db *gorm.DB, dbConfig database.DbConfig) interfaces.Repository {
 	return &repository{
-		actionRepo: impl.NewActionRepo(db),
+		actionRepo: impl.NewActionRepo(db, dbConfig),
 		taskRepo:   impl.NewTaskRepo(db),
 	}
 }

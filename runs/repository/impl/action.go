@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -24,6 +25,7 @@ import (
 type actionRepo struct {
 	db         *gorm.DB
 	isPostgres bool
+	pgConfig   database.PostgresConfig
 	listener   *pq.Listener
 
 	// Subscriber management for LISTEN/NOTIFY
@@ -33,7 +35,7 @@ type actionRepo struct {
 }
 
 // NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
+func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
@@ -41,6 +43,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 	repo := &actionRepo{
 		db:                db,
 		isPostgres:        isPostgres,
+		pgConfig:          dbConfig.Postgres,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
@@ -684,15 +687,10 @@ func (r *actionRepo) startPostgresListener() {
 		return
 	}
 
-	// Build connection string from the existing connection
-	// This is a simplified approach - in production, get from config
-	row = sqlDB.QueryRow("SHOW server_version")
-	var version string
-	_ = row.Scan(&version) // Ignore error, just need a connection
-
-	// Create listener with a simple connection string
-	// In production, get this from the database config
-	connStr = "user=postgres password=mysecretpassword host=localhost port=5432 dbname=" + dbName + " sslmode=disable"
+	// Build connection string from the database config
+	pgCfg := r.pgConfig
+	pgCfg.DbName = dbName
+	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {

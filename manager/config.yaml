@@ -22,12 +22,13 @@ executor:
 # Runs service configuration
 runs:
   storagePrefix: "s3://flyte-data"
-
-# Database configuration (SQLite)
-database:
-  type: "sqlite"
-  sqlite:
-    file: "flyte.db"
+  database:
+    postgres:
+      host: "localhost"
+      port: 30001
+      dbName: "runs"
+      user: "postgres"
+      password: "postgres"
 
 # Logger configuration
 logger:
