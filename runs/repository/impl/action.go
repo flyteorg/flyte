@@ -16,6 +16,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -27,6 +28,7 @@ import (
 type actionRepo struct {
 	db         *gorm.DB
 	isPostgres bool
+	pgConfig   database.PostgresConfig
 	listener   *pq.Listener
 
 	// Subscriber management for LISTEN/NOTIFY
@@ -36,7 +38,7 @@ type actionRepo struct {
 }
 
 // NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
+func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
@@ -44,6 +46,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 	repo := &actionRepo{
 		db:                db,
 		isPostgres:        isPostgres,
+		pgConfig:          dbConfig.Postgres,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
@@ -147,6 +150,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
+		RunName:          runID.Name,
 		Name:             runID.Name,
 		ParentActionName: nil, // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
@@ -310,6 +314,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		Org:              actionSpec.ActionId.Run.Org,
 		Project:          actionSpec.ActionId.Run.Project,
 		Domain:           actionSpec.ActionId.Run.Domain,
+		RunName:          actionSpec.ActionId.Run.Name,
 		Name:             actionSpec.ActionId.Name,
 		ParentActionName: parentActionName,
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
@@ -378,9 +383,8 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	}
 
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ?",
-			runID.Org, runID.Project, runID.Domain).
-		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
+			runID.Org, runID.Project, runID.Domain, runID.Name)
 
 	// Apply pagination token
 	if token != "" {
@@ -778,15 +782,10 @@ func (r *actionRepo) startPostgresListener() {
 		return
 	}
 
-	// Build connection string from the existing connection
-	// This is a simplified approach - in production, get from config
-	row = sqlDB.QueryRow("SHOW server_version")
-	var version string
-	_ = row.Scan(&version) // Ignore error, just need a connection
-
-	// Create listener with a simple connection string
-	// In production, get this from the database config
-	connStr = "user=postgres password=mysecretpassword host=localhost port=5432 dbname=" + dbName + " sslmode=disable"
+	// Build connection string from the database config
+	pgCfg := r.pgConfig
+	pgCfg.DbName = dbName
+	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {

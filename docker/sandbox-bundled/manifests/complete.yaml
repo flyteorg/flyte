@@ -754,6 +754,14 @@ data:
         - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
         - _U_INSECURE: "true"
         - _U_USE_ACTIONS: "1"
+    runs:
+      database:
+        postgres:
+          dbName: runs
+          host: 'flyte-sandbox-postgresql.flyte'
+          password: postgres
+          port: 5432
+          user: postgres
     storage:
       signedURL:
         stowConfigOverride:
@@ -998,7 +1006,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aVdtdG5zSVVBS05tWHdYbA==
+  haSharedSecret: emM2QnVqZHg2bDRmNU5SRg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1348,7 +1356,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: fbf5054950812545471a284b62acc548a3d375b8a4fe4082922f2531287e771a
+        checksum/configuration: 3b0d6da5b288489c1f1dd02d5cfa086b29ef51328f9f6b729836a22a7a8cd4e1
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1496,7 +1504,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: f12bb394f0db3ad82ee183411cce5147db3b5149739b981f9bef2a7190f8c8f5
+        checksum/secret: 796feb18367c04449fe1a0f869fa44179d659d4357a7f83833c3e905b7df3072
       labels:
         app: docker-registry
         release: flyte-sandbox
