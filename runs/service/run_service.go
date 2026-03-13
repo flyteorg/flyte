@@ -728,7 +728,11 @@ func (s *RunService) sendChangedActions(
 
 	enriched := make([]*workflow.EnrichedAction, 0, len(updates))
 	for _, update := range updates {
-		enriched = append(enriched, s.convertNodeUpdateToEnrichedProto(runID, update))
+		enrichedAction := s.convertNodeUpdateToEnrichedProto(runID, update)
+		if enrichedAction == nil {
+			continue
+		}
+		enriched = append(enriched, enrichedAction)
 	}
 
 	return stream.Send(&workflow.WatchActionsResponse{
