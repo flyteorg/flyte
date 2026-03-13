@@ -52,16 +52,12 @@ class RuleId(_message.Message):
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class DeliveryConfigId(_message.Message):
-    __slots__ = ["org", "project", "domain", "name"]
+    __slots__ = ["org", "name"]
     ORG_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     org: str
-    project: str
-    domain: str
     name: str
-    def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+    def __init__(self, org: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class DeliveryConfigTemplate(_message.Message):
     __slots__ = ["webhook", "email"]

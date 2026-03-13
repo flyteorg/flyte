@@ -169,10 +169,6 @@ func (m *DeliveryConfigId) validate(all bool) error {
 
 	// no validation rules for Org
 
-	// no validation rules for Project
-
-	// no validation rules for Domain
-
 	// no validation rules for Name
 
 	if len(errors) > 0 {

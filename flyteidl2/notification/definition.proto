@@ -35,26 +35,14 @@ message RuleId {
 }
 
 message DeliveryConfigId {
-  // Org this rule belongs to.
+  // Org this config belongs to.
   string org = 1 [
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).string.max_len = 63
   ];
 
-  // Project this rule belongs to.
-  string project = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Domain this rule belongs to.
-  string domain = 3 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
   // Unique name of the rule.
-  string name = 4 [
+  string name = 2 [
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).string.max_len = 255
   ];
