@@ -106,6 +106,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
+		RunName:          runID.Name,
 		Name:             runID.Name,
 		ParentActionName: nil, // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
@@ -238,6 +239,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *w
 		Org:              actionSpec.ActionId.Run.Org,
 		Project:          actionSpec.ActionId.Run.Project,
 		Domain:           actionSpec.ActionId.Run.Domain,
+		RunName:          actionSpec.ActionId.Run.Name,
 		Name:             actionSpec.ActionId.Name,
 		ParentActionName: parentActionName,
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
@@ -294,9 +296,8 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	}
 
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ?",
-							runID.Org, runID.Project, runID.Domain).
-		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
+			runID.Org, runID.Project, runID.Domain, runID.Name)
 
 	// Apply pagination token
 	if token != "" {
