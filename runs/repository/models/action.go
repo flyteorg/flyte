@@ -3,8 +3,6 @@ package models
 import (
 	"database/sql"
 	"time"
-
-	"gorm.io/datatypes"
 )
 
 // Action represents a workflow action in the database
@@ -25,15 +23,33 @@ type Action struct {
 	// Stores the proto ActionPhase enum integer value directly (e.g. 1 = QUEUED).
 	Phase int32 `gorm:"not null;default:1;index:idx_actions_phase" db:"phase"`
 
+	// Action type (task, trace, condition). Stores workflow.ActionType enum value.
+	ActionType int32 `db:"action_type"`
+	// Group this action belongs to, if applicable.
+	ActionGroup sql.NullString `db:"action_group"`
+
+	// Task reference columns
+	TaskOrg     sql.NullString `db:"task_org"`
+	TaskProject sql.NullString `db:"task_project"`
+	TaskDomain  sql.NullString `db:"task_domain"`
+	TaskName    sql.NullString `db:"task_name"`
+	TaskVersion sql.NullString `db:"task_version"`
+
+	// Task metadata columns
+	TaskType        string         `db:"task_type"`
+	TaskShortName   sql.NullString `db:"task_short_name"`
+	FunctionName    string         `db:"function_name"`
+	EnvironmentName sql.NullString `db:"environment_name"`
+
 	// Serialized protobuf messages
 	// ActionSpec contains the full action specification proto
-	ActionSpec datatypes.JSON `gorm:"type:jsonb" db:"action_spec"`
+	ActionSpec []byte `gorm:"type:bytea" db:"action_spec"`
 
 	// ActionDetails contains the full action details proto:
 	// - ActionStatus (phase, timestamps, error, cache status, etc.)
 	// - ActionAttempts array (all attempts with their phase transitions, cluster events, logs, etc.)
 	// - Any other runtime state
-	ActionDetails datatypes.JSON `gorm:"type:jsonb" db:"action_details"`
+	ActionDetails []byte `gorm:"type:bytea" db:"action_details"`
 
 	// DetailedInfo stores a serialized RunInfo proto containing metadata such as
 	// the task spec digest (for looking up the resolved spec) and storage URIs.
@@ -45,10 +61,11 @@ type Action struct {
 
 	// Timestamps
 	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
-	CreatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
-	UpdatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
+	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt   sql.NullTime `gorm:"index:idx_actions_ended" db:"ended_at"`
+	EndedAt    sql.NullTime  `gorm:"index:idx_actions_ended" db:"ended_at"`
+	DurationMs sql.NullInt64 `db:"duration_ms"`
 }
 
 // TableName specifies the table name

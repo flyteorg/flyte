@@ -10,6 +10,7 @@ import (
 
 	"connectrpc.com/connect"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/rand"
 
@@ -313,9 +314,9 @@ func (s *RunService) getActionDetails(ctx context.Context, actionId *common.Acti
 		}
 
 		var info *workflow.RunInfo
-		if model.DetailedInfo != nil {
-			info, err = models.UnmarshalRunInfo(model.DetailedInfo)
-			if err != nil {
+		if len(model.DetailedInfo) > 0 {
+			info = &workflow.RunInfo{}
+			if err := proto.Unmarshal(model.DetailedInfo, info); err != nil {
 				return err
 			}
 		}
@@ -1022,6 +1023,10 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
 	}
+	if action.DurationMs.Valid {
+		durationMs := uint64(action.DurationMs.Int64)
+		status.DurationMs = &durationMs
+	}
 
 	phase := common.ActionPhase(action.Phase)
 	attempt := &workflow.ActionAttempt{
@@ -1038,11 +1043,58 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		EndTime:   status.EndTime,
 	}}
 
+	metadata := actionMetadataFromModel(action)
+
 	return &workflow.ActionDetails{
 		Id:       actionID,
+		Metadata: metadata,
 		Status:   status,
 		Attempts: []*workflow.ActionAttempt{attempt},
 	}
+}
+
+// actionMetadataFromModel builds an ActionMetadata proto from DB model columns.
+func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
+	metadata := &workflow.ActionMetadata{
+		ActionType:   workflow.ActionType(action.ActionType),
+		FuntionName:  action.FunctionName,
+	}
+	if action.ParentActionName != nil {
+		metadata.Parent = *action.ParentActionName
+	}
+	if action.ActionGroup.Valid {
+		metadata.Group = action.ActionGroup.String
+	}
+	if action.EnvironmentName.Valid {
+		metadata.EnvironmentName = action.EnvironmentName.String
+	}
+
+	switch workflow.ActionType(action.ActionType) {
+	case workflow.ActionType_ACTION_TYPE_TASK:
+		taskMeta := &workflow.TaskActionMetadata{
+			TaskType: action.TaskType,
+		}
+		if action.TaskName.Valid {
+			taskMeta.Id = &task.TaskIdentifier{
+				Org:     action.TaskOrg.String,
+				Project: action.TaskProject.String,
+				Domain:  action.TaskDomain.String,
+				Name:    action.TaskName.String,
+				Version: action.TaskVersion.String,
+			}
+		}
+		if action.TaskShortName.Valid {
+			taskMeta.ShortName = action.TaskShortName.String
+		}
+		metadata.Spec = &workflow.ActionMetadata_Task{Task: taskMeta}
+	case workflow.ActionType_ACTION_TYPE_TRACE:
+		traceMeta := &workflow.TraceActionMetadata{
+			Name: action.FunctionName,
+		}
+		metadata.Spec = &workflow.ActionMetadata_Trace{Trace: traceMeta}
+	}
+
+	return metadata
 }
 
 // extractStorageURIs parses ActionSpec JSON to extract InputUri and RunOutputBase.

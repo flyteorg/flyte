@@ -127,9 +127,9 @@ func (_c *ActionRepo_AbortRun_Call) RunAndReturn(run func(context.Context, *comm
 	return _c
 }
 
-// CreateAction provides a mock function with given fields: ctx, runID, actionSpec
-func (_m *ActionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error) {
-	ret := _m.Called(ctx, runID, actionSpec)
+// CreateAction provides a mock function with given fields: ctx, runID, actionSpec, detailedInfo
+func (_m *ActionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
+	ret := _m.Called(ctx, runID, actionSpec, detailedInfo)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateAction")
@@ -137,19 +137,19 @@ func (_m *ActionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *
 
 	var r0 *models.Action
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uint, *workflow.ActionSpec) (*models.Action, error)); ok {
-		return rf(ctx, runID, actionSpec)
+	if rf, ok := ret.Get(0).(func(context.Context, uint, *workflow.ActionSpec, []byte) (*models.Action, error)); ok {
+		return rf(ctx, runID, actionSpec, detailedInfo)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uint, *workflow.ActionSpec) *models.Action); ok {
-		r0 = rf(ctx, runID, actionSpec)
+	if rf, ok := ret.Get(0).(func(context.Context, uint, *workflow.ActionSpec, []byte) *models.Action); ok {
+		r0 = rf(ctx, runID, actionSpec, detailedInfo)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Action)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uint, *workflow.ActionSpec) error); ok {
-		r1 = rf(ctx, runID, actionSpec)
+	if rf, ok := ret.Get(1).(func(context.Context, uint, *workflow.ActionSpec, []byte) error); ok {
+		r1 = rf(ctx, runID, actionSpec, detailedInfo)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -166,13 +166,14 @@ type ActionRepo_CreateAction_Call struct {
 //   - ctx context.Context
 //   - runID uint
 //   - actionSpec *workflow.ActionSpec
-func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, runID interface{}, actionSpec interface{}) *ActionRepo_CreateAction_Call {
-	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, runID, actionSpec)}
+//   - detailedInfo []byte
+func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, runID interface{}, actionSpec interface{}, detailedInfo interface{}) *ActionRepo_CreateAction_Call {
+	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, runID, actionSpec, detailedInfo)}
 }
 
-func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec, detailedInfo []byte)) *ActionRepo_CreateAction_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uint), args[2].(*workflow.ActionSpec))
+		run(args[0].(context.Context), args[1].(uint), args[2].(*workflow.ActionSpec), args[3].([]byte))
 	})
 	return _c
 }
@@ -182,7 +183,7 @@ func (_c *ActionRepo_CreateAction_Call) Return(_a0 *models.Action, _a1 error) *A
 	return _c
 }
 
-func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, uint, *workflow.ActionSpec) (*models.Action, error)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, uint, *workflow.ActionSpec, []byte) (*models.Action, error)) *ActionRepo_CreateAction_Call {
 	_c.Call.Return(run)
 	return _c
 }

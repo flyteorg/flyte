@@ -31,9 +31,8 @@ type ActionEvent struct {
 	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP" db:"updated_at"`
 }
 
-func (ActionEvent) TableName() string { return "action_events" }
+func (m *ActionEvent) TableName() string { return "action_events" }
 
-// NewActionEventModel builds an ActionEvent model from a proto ActionEvent.
 // ToActionEvent unmarshals the Info bytes into a workflow.ActionEvent proto.
 func (m *ActionEvent) ToActionEvent() (*workflow.ActionEvent, error) {
 	event := &workflow.ActionEvent{}
@@ -43,6 +42,7 @@ func (m *ActionEvent) ToActionEvent() (*workflow.ActionEvent, error) {
 	return event, nil
 }
 
+// NewActionEventModel builds an ActionEvent model from a proto ActionEvent.
 func NewActionEventModel(event *workflow.ActionEvent) (*ActionEvent, error) {
 	m := &ActionEvent{
 		Org:     event.GetId().GetRun().GetOrg(),

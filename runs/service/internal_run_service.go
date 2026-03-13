@@ -9,6 +9,8 @@ import (
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -62,23 +64,83 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 
 	// Build an ActionSpec from the RecordActionRequest to persist via CreateAction.
 	spec := &workflow.ActionSpec{
-		ActionId:  actionID,
-		InputUri:  req.GetInputUri(),
-		Group:     req.GetGroup(),
+		ActionId: actionID,
+		InputUri: req.GetInputUri(),
+		Group:    req.GetGroup(),
 	}
 	if req.GetParent() != "" {
 		parent := req.GetParent()
 		spec.ParentActionName = &parent
 	}
+
+	// Build RunInfo with task spec digest and storage URIs
+	info := &workflow.RunInfo{
+		InputsUri: req.GetInputUri(),
+	}
+
 	switch v := req.GetSpec().(type) {
 	case *workflow.RecordActionRequest_Task:
-		spec.Spec = &workflow.ActionSpec_Task{Task: v.Task}
+		taskAction := v.Task
+
+		// If the sub-action doesn't carry its own id/spec, inherit from the root run.
+		if taskAction.GetId() == nil && taskAction.GetSpec() == nil && req.GetParent() != "" {
+			run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
+			if err == nil && len(run.ActionSpec) > 0 {
+				var parentSpec workflow.ActionSpec
+				if err := protojson.Unmarshal(run.ActionSpec, &parentSpec); err == nil {
+					if parentTask := parentSpec.GetTask(); parentTask != nil {
+						taskAction = parentTask
+					}
+				}
+			}
+		}
+
+		spec.Spec = &workflow.ActionSpec_Task{Task: taskAction}
+
+		// Store task spec separately and record its digest
+		if taskSpec := taskAction.GetSpec(); taskSpec != nil {
+			taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+			if err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to create task spec model: %v", err)
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to store task spec: %v", err)
+				// Non-fatal: continue without digest
+			} else {
+				info.TaskSpecDigest = taskSpecModel.Digest
+			}
+		}
+
 	case *workflow.RecordActionRequest_Trace:
 		spec.Spec = &workflow.ActionSpec_Trace{Trace: v.Trace}
+
+		// Store trace spec separately and record its digest
+		if traceSpec := v.Trace.GetSpec(); traceSpec != nil {
+			traceSpecModel, err := models.NewTaskSpecModelFromTraceSpec(ctx, traceSpec)
+			if err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to create trace spec model: %v", err)
+			} else if traceSpecModel != nil {
+				if err := s.repo.TaskRepo().CreateTaskSpec(ctx, traceSpecModel); err != nil {
+					logger.Warnf(ctx, "RecordAction: failed to store trace spec: %v", err)
+				} else {
+					info.TaskSpecDigest = traceSpecModel.Digest
+				}
+			}
+		}
+		if v.Trace.GetOutputs().GetOutputUri() != "" {
+			info.OutputsUri = v.Trace.GetOutputs().GetOutputUri()
+		}
+
 	default:
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
 	}
 
+	detailedInfo, err := proto.Marshal(info)
+	if err != nil {
+		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
+		return connect.NewError(connect.CodeInternal, err)
+	}
 	// Look up the run to get its DB primary key.
 	run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
 	if err != nil {
@@ -86,7 +148,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
-	_, err = s.repo.ActionRepo().CreateAction(ctx, run.ID, spec)
+	_, err = s.repo.ActionRepo().CreateAction(ctx, run.ID, spec, detailedInfo)
 	if err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -140,6 +202,10 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
 		t := actionStatus.GetEndTime().AsTime()
+		endTime = &t
+	} else if IsTerminalPhase(actionStatus.GetPhase()) {
+		// If no end time is provided but the phase is terminal, use now.
+		t := time.Now()
 		endTime = &t
 	}
 
