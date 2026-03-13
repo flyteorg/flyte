@@ -112,3 +112,15 @@ such as workflow executions. The default values are enough to let you connect an
 
 Now that you have the sandbox cluster running, you can now go to the :ref:`User Guide <cookbook:userguide>` or
 :ref:`Tutorials <cookbook:tutorials>` to run tasks and workflows written in ``flytekit``, the Python SDK for Flyte.
+
+
+Stopping the Sandbox
+====================
+
+After finishing your testing or development work, you can stop the Flyte sandbox by running:
+
+.. prompt:: bash $
+
+   flytectl demo stop
+
+This command stops the running sandbox container on your local machine.
