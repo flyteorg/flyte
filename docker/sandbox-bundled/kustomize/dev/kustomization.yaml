@@ -78,3 +78,4 @@ patches:
     - op: add
       path: /metadata/namespace
       value: flyte
+- path: ../minio-patch.yaml
