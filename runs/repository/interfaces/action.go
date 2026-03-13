@@ -18,7 +18,7 @@ type ActionRepo interface {
 	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Action operations
-	CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error)
+	CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error)
 	InsertEvents(ctx context.Context, events []*models.ActionEvent) error
 	ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)

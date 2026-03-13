@@ -80,20 +80,6 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 	switch v := req.GetSpec().(type) {
 	case *workflow.RecordActionRequest_Task:
 		taskAction := v.Task
-
-		// If the sub-action doesn't carry its own id/spec, inherit from the root run.
-		if taskAction.GetId() == nil && taskAction.GetSpec() == nil && req.GetParent() != "" {
-			run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
-			if err == nil && len(run.ActionSpec) > 0 {
-				var parentSpec workflow.ActionSpec
-				if err := proto.Unmarshal(run.ActionSpec, &parentSpec); err == nil {
-					if parentTask := parentSpec.GetTask(); parentTask != nil {
-						taskAction = parentTask
-					}
-				}
-			}
-		}
-
 		spec.Spec = &workflow.ActionSpec_Task{Task: taskAction}
 
 		// Store task spec separately and record its digest
@@ -140,14 +126,8 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	// Look up the run to get its DB primary key.
-	run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
-	if err != nil {
-		logger.Warnf(ctx, "RecordAction: run not found for action %s: %v", actionID.GetName(), err)
-		return connect.NewError(connect.CodeNotFound, err)
-	}
 
-	_, err = s.repo.ActionRepo().CreateAction(ctx, run.ID, spec, detailedInfo)
+	_, err = s.repo.ActionRepo().CreateAction(ctx, spec, detailedInfo)
 	if err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -214,7 +194,6 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	}
 	return nil
 }
-
 
 // RecordActionEvents records a batch of action events.
 func (s *RunService) RecordActionEvents(

@@ -291,7 +291,7 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 }
 
 // CreateAction creates a new action
-func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
+func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec
 	logger.Infof(ctx, "action spec: %s", actionSpec.String())
 	actionSpecBytes, err := proto.Marshal(actionSpec)
