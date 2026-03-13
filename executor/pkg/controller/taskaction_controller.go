@@ -82,6 +82,7 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
+	Catalog         catalog.Client
 	eventsClient    workflowconnect.EventsProxyServiceClient
 	cluster         string
 }
@@ -184,12 +185,28 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	// Invoke plugin.Handle
-	transition, err := p.Handle(ctx, tCtx)
+	transition, handledByCache, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
 	if err != nil {
-		logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
-			"Plugin %q Handle failed: %v", p.GetID(), err)
+		logger.Error(err, "cache pre-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+	// Even when cache handling short-circuits execution, we still continue through the
+	// shared reconcile tail below so the derived transition updates conditions, status,
+	// and emitted action events in the same way as the normal plugin path.
+
+	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	if !handledByCache {
+		transition, err = p.Handle(ctx, tCtx)
+		if err != nil {
+			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
+			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+				"Plugin %q Handle failed: %v", p.GetID(), err)
+			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		}
+	}
+
+	if transition, err = r.handleCacheAfterExecution(ctx, taskAction, tCtx, transition, handledByCache); err != nil {
+		logger.Error(err, "cache post-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
