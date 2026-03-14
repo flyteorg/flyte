@@ -27,8 +27,9 @@ runs:
       host: "localhost"
       port: 30001
       dbName: "runs"
-      user: "postgres"
+      username: "postgres"
       password: "postgres"
+      options: "sslmode=disable"
 
 # Logger configuration
 logger:
