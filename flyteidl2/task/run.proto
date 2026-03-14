@@ -101,15 +101,15 @@ message RunSpec {
   oneof notification_settings {
     flyteidl2.notification.RuleId rule_id = 10; // either refer to a previously stored notification rule
 
-    InlineRule rule = 11; // either define an inline one-off rule
+    InlineRuleList rules = 11; // either define an inline one-off rule
   }
 }
 
-message InlineRule {
-  repeated InlineRuleMatcher matchers = 1 [(buf.validate.field).repeated.min_items = 1];
+message InlineRuleList {
+  repeated InlineRule rules = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
-message InlineRuleMatcher {
+message InlineRule {
   repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true

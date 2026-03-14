@@ -847,7 +847,7 @@ func (m *RunSpec) validate(all bool) error {
 			}
 		}
 
-	case *RunSpec_Rule:
+	case *RunSpec_Rules:
 		if v == nil {
 			err := RunSpecValidationError{
 				field:  "NotificationSettings",
@@ -860,11 +860,11 @@ func (m *RunSpec) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetRule()).(type) {
+			switch v := interface{}(m.GetRules()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "Rule",
+						field:  "Rules",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -872,16 +872,16 @@ func (m *RunSpec) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "Rule",
+						field:  "Rules",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetRule()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRules()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RunSpecValidationError{
-					field:  "Rule",
+					field:  "Rules",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -969,6 +969,140 @@ var _ interface {
 	ErrorName() string
 } = RunSpecValidationError{}
 
+// Validate checks the field values on InlineRuleList with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *InlineRuleList) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InlineRuleList with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in InlineRuleListMultiError,
+// or nil if none found.
+func (m *InlineRuleList) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InlineRuleList) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetRules() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InlineRuleListValidationError{
+						field:  fmt.Sprintf("Rules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InlineRuleListValidationError{
+						field:  fmt.Sprintf("Rules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InlineRuleListValidationError{
+					field:  fmt.Sprintf("Rules[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return InlineRuleListMultiError(errors)
+	}
+
+	return nil
+}
+
+// InlineRuleListMultiError is an error wrapping multiple validation errors
+// returned by InlineRuleList.ValidateAll() if the designated constraints
+// aren't met.
+type InlineRuleListMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InlineRuleListMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InlineRuleListMultiError) AllErrors() []error { return m }
+
+// InlineRuleListValidationError is the validation error returned by
+// InlineRuleList.Validate if the designated constraints aren't met.
+type InlineRuleListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InlineRuleListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InlineRuleListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InlineRuleListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InlineRuleListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InlineRuleListValidationError) ErrorName() string { return "InlineRuleListValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InlineRuleListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInlineRuleList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InlineRuleListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InlineRuleListValidationError{}
+
 // Validate checks the field values on InlineRule with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -991,15 +1125,25 @@ func (m *InlineRule) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetMatchers() {
-		_, _ = idx, item
+	switch v := m.Delivery.(type) {
+	case *InlineRule_ConfigId:
+		if v == nil {
+			err := InlineRuleValidationError{
+				field:  "Delivery",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
-			switch v := interface{}(item).(type) {
+			switch v := interface{}(m.GetConfigId()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, InlineRuleValidationError{
-						field:  fmt.Sprintf("Matchers[%v]", idx),
+						field:  "ConfigId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1007,22 +1151,65 @@ func (m *InlineRule) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, InlineRuleValidationError{
-						field:  fmt.Sprintf("Matchers[%v]", idx),
+						field:  "ConfigId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetConfigId()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return InlineRuleValidationError{
-					field:  fmt.Sprintf("Matchers[%v]", idx),
+					field:  "ConfigId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
+	case *InlineRule_Template:
+		if v == nil {
+			err := InlineRuleValidationError{
+				field:  "Delivery",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTemplate()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InlineRuleValidationError{
+						field:  "Template",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InlineRuleValidationError{
+						field:  "Template",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTemplate()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InlineRuleValidationError{
+					field:  "Template",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -1101,192 +1288,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = InlineRuleValidationError{}
-
-// Validate checks the field values on InlineRuleMatcher with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *InlineRuleMatcher) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on InlineRuleMatcher with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// InlineRuleMatcherMultiError, or nil if none found.
-func (m *InlineRuleMatcher) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *InlineRuleMatcher) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	switch v := m.Delivery.(type) {
-	case *InlineRuleMatcher_ConfigId:
-		if v == nil {
-			err := InlineRuleMatcherValidationError{
-				field:  "Delivery",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetConfigId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, InlineRuleMatcherValidationError{
-						field:  "ConfigId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, InlineRuleMatcherValidationError{
-						field:  "ConfigId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetConfigId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return InlineRuleMatcherValidationError{
-					field:  "ConfigId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *InlineRuleMatcher_Template:
-		if v == nil {
-			err := InlineRuleMatcherValidationError{
-				field:  "Delivery",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetTemplate()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, InlineRuleMatcherValidationError{
-						field:  "Template",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, InlineRuleMatcherValidationError{
-						field:  "Template",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetTemplate()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return InlineRuleMatcherValidationError{
-					field:  "Template",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
-	if len(errors) > 0 {
-		return InlineRuleMatcherMultiError(errors)
-	}
-
-	return nil
-}
-
-// InlineRuleMatcherMultiError is an error wrapping multiple validation errors
-// returned by InlineRuleMatcher.ValidateAll() if the designated constraints
-// aren't met.
-type InlineRuleMatcherMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m InlineRuleMatcherMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m InlineRuleMatcherMultiError) AllErrors() []error { return m }
-
-// InlineRuleMatcherValidationError is the validation error returned by
-// InlineRuleMatcher.Validate if the designated constraints aren't met.
-type InlineRuleMatcherValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e InlineRuleMatcherValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e InlineRuleMatcherValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e InlineRuleMatcherValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e InlineRuleMatcherValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e InlineRuleMatcherValidationError) ErrorName() string {
-	return "InlineRuleMatcherValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e InlineRuleMatcherValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sInlineRuleMatcher.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = InlineRuleMatcherValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = InlineRuleMatcherValidationError{}

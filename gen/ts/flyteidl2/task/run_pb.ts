@@ -20,7 +20,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSKIBAoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSMQoHcnVsZV9pZBgKIAEoCzIeLmZseXRlaWRsMi5ub3RpZmljYXRpb24uUnVsZUlkSAASKgoEcnVsZRgLIAEoCzIaLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVIAEIXChVub3RpZmljYXRpb25fc2V0dGluZ3MiSwoKSW5saW5lUnVsZRI9CghtYXRjaGVycxgBIAMoCzIhLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVNYXRjaGVyQgi6SAWSAQIIASL0AQoRSW5saW5lUnVsZU1hdGNoZXISSQoJb25fcGhhc2VzGAEgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZUIXukgUkgERCAEYASILggEIGAUYBhgHGAgSPQoJY29uZmlnX2lkGAIgASgLMiguZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ0lkSAASQgoIdGVtcGxhdGUYAyABKAsyLi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGVIAEIRCghkZWxpdmVyeRIFukgCCAEqfAoQQ2FjaGVMb29rdXBTY29wZRIiCh5DQUNIRV9MT09LVVBfU0NPUEVfVU5TUEVDSUZJRUQQABIdChlDQUNIRV9MT09LVVBfU0NPUEVfR0xPQkFMEAESJQohQ0FDSEVfTE9PS1VQX1NDT1BFX1BST0pFQ1RfRE9NQUlOEAJCrQEKEmNvbS5mbHl0ZWlkbDIudGFza0IIUnVuUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSKNBAoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSMQoHcnVsZV9pZBgKIAEoCzIeLmZseXRlaWRsMi5ub3RpZmljYXRpb24uUnVsZUlkSAASLwoFcnVsZXMYCyABKAsyHi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlTGlzdEgAQhcKFW5vdGlmaWNhdGlvbl9zZXR0aW5ncyJFCg5JbmxpbmVSdWxlTGlzdBIzCgVydWxlcxgBIAMoCzIaLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVCCLpIBZIBAggBIu0BCgpJbmxpbmVSdWxlEkkKCW9uX3BoYXNlcxgBIAMoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2VCF7pIFJIBEQgBGAEiC4IBCBgFGAYYBxgIEj0KCWNvbmZpZ19pZBgCIAEoCzIoLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdJZEgAEkIKCHRlbXBsYXRlGAMgASgLMi4uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ1RlbXBsYXRlSABCEQoIZGVsaXZlcnkSBbpIAggBKnwKEENhY2hlTG9va3VwU2NvcGUSIgoeQ0FDSEVfTE9PS1VQX1NDT1BFX1VOU1BFQ0lGSUVEEAASHQoZQ0FDSEVfTE9PS1VQX1NDT1BFX0dMT0JBTBABEiUKIUNBQ0hFX0xPT0tVUF9TQ09QRV9QUk9KRUNUX0RPTUFJThACQq0BChJjb20uZmx5dGVpZGwyLnRhc2tCCFJ1blByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -227,10 +227,10 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
     /**
      * either define an inline one-off rule
      *
-     * @generated from field: flyteidl2.task.InlineRule rule = 11;
+     * @generated from field: flyteidl2.task.InlineRuleList rules = 11;
      */
-    value: InlineRule;
-    case: "rule";
+    value: InlineRuleList;
+    case: "rules";
   } | { case: undefined; value?: undefined };
 };
 
@@ -242,33 +242,33 @@ export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 5);
 
 /**
- * @generated from message flyteidl2.task.InlineRule
+ * @generated from message flyteidl2.task.InlineRuleList
  */
-export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
+export type InlineRuleList = Message<"flyteidl2.task.InlineRuleList"> & {
   /**
-   * @generated from field: repeated flyteidl2.task.InlineRuleMatcher matchers = 1;
+   * @generated from field: repeated flyteidl2.task.InlineRule rules = 1;
    */
-  matchers: InlineRuleMatcher[];
+  rules: InlineRule[];
 };
 
 /**
- * Describes the message flyteidl2.task.InlineRule.
- * Use `create(InlineRuleSchema)` to create a new message.
+ * Describes the message flyteidl2.task.InlineRuleList.
+ * Use `create(InlineRuleListSchema)` to create a new message.
  */
-export const InlineRuleSchema: GenMessage<InlineRule> = /*@__PURE__*/
+export const InlineRuleListSchema: GenMessage<InlineRuleList> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 6);
 
 /**
- * @generated from message flyteidl2.task.InlineRuleMatcher
+ * @generated from message flyteidl2.task.InlineRule
  */
-export type InlineRuleMatcher = Message<"flyteidl2.task.InlineRuleMatcher"> & {
+export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
   /**
    * @generated from field: repeated flyteidl2.common.ActionPhase on_phases = 1;
    */
   onPhases: ActionPhase[];
 
   /**
-   * @generated from oneof flyteidl2.task.InlineRuleMatcher.delivery
+   * @generated from oneof flyteidl2.task.InlineRule.delivery
    */
   delivery: {
     /**
@@ -288,10 +288,10 @@ export type InlineRuleMatcher = Message<"flyteidl2.task.InlineRuleMatcher"> & {
 };
 
 /**
- * Describes the message flyteidl2.task.InlineRuleMatcher.
- * Use `create(InlineRuleMatcherSchema)` to create a new message.
+ * Describes the message flyteidl2.task.InlineRule.
+ * Use `create(InlineRuleSchema)` to create a new message.
  */
-export const InlineRuleMatcherSchema: GenMessage<InlineRuleMatcher> = /*@__PURE__*/
+export const InlineRuleSchema: GenMessage<InlineRule> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 7);
 
 /**

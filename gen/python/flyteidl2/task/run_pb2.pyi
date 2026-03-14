@@ -68,7 +68,7 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
-    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "rule_id", "rule"]
+    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "rule_id", "rules"]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
@@ -79,7 +79,7 @@ class RunSpec(_message.Message):
     SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     CACHE_CONFIG_FIELD_NUMBER: _ClassVar[int]
     RULE_ID_FIELD_NUMBER: _ClassVar[int]
-    RULE_FIELD_NUMBER: _ClassVar[int]
+    RULES_FIELD_NUMBER: _ClassVar[int]
     labels: Labels
     annotations: Annotations
     envs: Envs
@@ -90,16 +90,16 @@ class RunSpec(_message.Message):
     security_context: _security_pb2.SecurityContext
     cache_config: CacheConfig
     rule_id: _definition_pb2.RuleId
-    rule: InlineRule
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., rule_id: _Optional[_Union[_definition_pb2.RuleId, _Mapping]] = ..., rule: _Optional[_Union[InlineRule, _Mapping]] = ...) -> None: ...
+    rules: InlineRuleList
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., rule_id: _Optional[_Union[_definition_pb2.RuleId, _Mapping]] = ..., rules: _Optional[_Union[InlineRuleList, _Mapping]] = ...) -> None: ...
+
+class InlineRuleList(_message.Message):
+    __slots__ = ["rules"]
+    RULES_FIELD_NUMBER: _ClassVar[int]
+    rules: _containers.RepeatedCompositeFieldContainer[InlineRule]
+    def __init__(self, rules: _Optional[_Iterable[_Union[InlineRule, _Mapping]]] = ...) -> None: ...
 
 class InlineRule(_message.Message):
-    __slots__ = ["matchers"]
-    MATCHERS_FIELD_NUMBER: _ClassVar[int]
-    matchers: _containers.RepeatedCompositeFieldContainer[InlineRuleMatcher]
-    def __init__(self, matchers: _Optional[_Iterable[_Union[InlineRuleMatcher, _Mapping]]] = ...) -> None: ...
-
-class InlineRuleMatcher(_message.Message):
     __slots__ = ["on_phases", "config_id", "template"]
     ON_PHASES_FIELD_NUMBER: _ClassVar[int]
     CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
