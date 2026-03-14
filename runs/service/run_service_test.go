@@ -2,13 +2,22 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/datatypes"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -214,4 +223,79 @@ func TestGenerateRunName(t *testing.T) {
 		name2 := generateRunName(12345)
 		assert.Equal(t, name1, name2)
 	})
+}
+
+// Define table-driven tests for the Code constants.
+func TestConvertRunToProto(t *testing.T) {
+	// Define the test cases as a slice of structs.
+	s := &RunService{}
+	name := generateRunName(int64(0))
+	org := "test_org"
+	project := "test_project"
+	domain := "test_domain"
+	startTime := timestamppb.Now()
+	endTime := timestamppb.New(startTime.AsTime().Add(time.Minute))
+	durationMs := uint64(endTime.AsTime().Sub(startTime.AsTime()).Milliseconds())
+	status := &workflow.ActionStatus{
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		StartTime:   startTime,
+		EndTime:     endTime,
+		Attempts:    uint32(1),
+		CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
+		DurationMs:  &durationMs,
+	}
+	detail := &workflow.ActionDetails{
+		Status: status,
+	}
+	detailJson, _ := json.Marshal(detail)
+	testCases := []struct {
+		name   string
+		run    *models.Run
+		expect *workflow.Run
+	}{
+		{"empty run", nil, nil},
+		{"valid run",
+			&models.Run{
+				ID:            uint(0),
+				Org:           org,
+				Project:       project,
+				Domain:        domain,
+				Name:          name,
+				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				ActionDetails: datatypes.JSON(detailJson),
+			},
+			&workflow.Run{
+				Action: &workflow.Action{
+					Id: &common.ActionIdentifier{
+						Run: &common.RunIdentifier{
+							Org:     org,
+							Project: project,
+							Domain:  domain,
+							Name:    name,
+						},
+						Name: name,
+					},
+					Metadata: &workflow.ActionMetadata{},
+					Status:   status,
+				},
+			},
+		},
+	}
+
+	// Iterate over the test cases.
+	for _, tc := range testCases {
+		// Run the test for the current case.
+		t.Run(tc.name, func(t *testing.T) {
+			res := s.convertRunToProto(tc.run)
+			if tc.expect == nil {
+				assert.Nil(t, res)
+				return
+			}
+			fmt.Println(res.Action.Status)
+			fmt.Println(tc.expect.Action.Status)
+			assert.Equal(t, res.Action.Id, tc.expect.Action.Id)
+			assert.Equal(t, res.Action.Metadata, tc.expect.Action.Metadata)
+			assert.Equal(t, res.Action.Status, tc.expect.Action.Status)
+		})
+	}
 }

@@ -419,9 +419,6 @@ func (s *RunService) ListRuns(
 	// Convert to proto format
 	protoRuns := make([]*workflow.Run, len(runs))
 	for i, run := range runs {
-		// Todo:
-		// safely handle error from json unmarshal should be handled properly.
-		// Add a unit test for convertRunToProto function
 		protoRuns[i] = s.convertRunToProto(run)
 	}
 
