@@ -92,7 +92,7 @@ func TestAbortRun(t *testing.T) {
 		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
 		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
 			return req.Msg.ActionId.Run.Name == runID.Name &&
-				req.Msg.ActionId.Name == runID.Name &&
+				req.Msg.ActionId.Name == "a0" &&
 				req.Msg.Reason != nil && *req.Msg.Reason == "User requested abort"
 		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
