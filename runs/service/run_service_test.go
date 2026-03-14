@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -20,8 +19,6 @@ import (
 	"gorm.io/datatypes"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 )
 
@@ -291,8 +288,6 @@ func TestConvertRunToProto(t *testing.T) {
 				assert.Nil(t, res)
 				return
 			}
-			fmt.Println(res.Action.Status)
-			fmt.Println(tc.expect.Action.Status)
 			assert.Equal(t, res.Action.Id, tc.expect.Action.Id)
 			assert.Equal(t, res.Action.Metadata, tc.expect.Action.Metadata)
 			assert.Equal(t, res.Action.Status, tc.expect.Action.Status)
