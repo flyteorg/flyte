@@ -806,7 +806,7 @@ func (m *RunSpec) validate(all bool) error {
 	}
 
 	switch v := m.NotificationSettings.(type) {
-	case *RunSpec_RuleId:
+	case *RunSpec_NotificationRuleId:
 		if v == nil {
 			err := RunSpecValidationError{
 				field:  "NotificationSettings",
@@ -819,11 +819,11 @@ func (m *RunSpec) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetRuleId()).(type) {
+			switch v := interface{}(m.GetNotificationRuleId()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "RuleId",
+						field:  "NotificationRuleId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -831,23 +831,23 @@ func (m *RunSpec) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "RuleId",
+						field:  "NotificationRuleId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetRuleId()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetNotificationRuleId()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RunSpecValidationError{
-					field:  "RuleId",
+					field:  "NotificationRuleId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
-	case *RunSpec_Rules:
+	case *RunSpec_NotificationRules:
 		if v == nil {
 			err := RunSpecValidationError{
 				field:  "NotificationSettings",
@@ -860,11 +860,11 @@ func (m *RunSpec) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetRules()).(type) {
+			switch v := interface{}(m.GetNotificationRules()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "Rules",
+						field:  "NotificationRules",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -872,16 +872,16 @@ func (m *RunSpec) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, RunSpecValidationError{
-						field:  "Rules",
+						field:  "NotificationRules",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetRules()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetNotificationRules()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RunSpecValidationError{
-					field:  "Rules",
+					field:  "NotificationRules",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

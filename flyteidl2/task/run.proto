@@ -99,9 +99,9 @@ message RunSpec {
 
   // Optionally, you can send a notification when your run completes.
   oneof notification_settings {
-    flyteidl2.notification.RuleId rule_id = 10; // either refer to a previously stored notification rule
+    flyteidl2.notification.RuleId notification_rule_id = 10; // either refer to a previously stored notification rule
 
-    InlineRuleList rules = 11; // either define an inline one-off rule
+    InlineRuleList notification_rules = 11; // either define an inline one-off rule
   }
 }
 
