@@ -249,7 +249,7 @@ func (s *RunService) AbortRun(
 	// Abort via actions service
 	rootActionID := &common.ActionIdentifier{
 		Run:  req.Msg.RunId,
-		Name: req.Msg.RunId.Name,
+		Name: "a0",
 	}
 	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
 		ActionId: rootActionID,
