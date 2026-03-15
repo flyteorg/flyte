@@ -100,11 +100,11 @@ class InlineRuleList(_message.Message):
     def __init__(self, rules: _Optional[_Iterable[_Union[InlineRule, _Mapping]]] = ...) -> None: ...
 
 class InlineRule(_message.Message):
-    __slots__ = ["on_phases", "config_id", "template"]
+    __slots__ = ["on_phases", "delivery_config_name", "delivery_template"]
     ON_PHASES_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_ID_FIELD_NUMBER: _ClassVar[int]
-    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_CONFIG_NAME_FIELD_NUMBER: _ClassVar[int]
+    DELIVERY_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     on_phases: _containers.RepeatedScalarFieldContainer[_phase_pb2.ActionPhase]
-    config_id: _definition_pb2.DeliveryConfigId
-    template: _definition_pb2.DeliveryConfigTemplate
-    def __init__(self, on_phases: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., config_id: _Optional[_Union[_definition_pb2.DeliveryConfigId, _Mapping]] = ..., template: _Optional[_Union[_definition_pb2.DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...
+    delivery_config_name: str
+    delivery_template: _definition_pb2.DeliveryConfigTemplate
+    def __init__(self, on_phases: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., delivery_config_name: _Optional[str] = ..., delivery_template: _Optional[_Union[_definition_pb2.DeliveryConfigTemplate, _Mapping]] = ...) -> None: ...

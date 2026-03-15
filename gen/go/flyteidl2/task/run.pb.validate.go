@@ -1126,7 +1126,19 @@ func (m *InlineRule) validate(all bool) error {
 	var errors []error
 
 	switch v := m.Delivery.(type) {
-	case *InlineRule_ConfigId:
+	case *InlineRule_DeliveryConfigName:
+		if v == nil {
+			err := InlineRuleValidationError{
+				field:  "Delivery",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for DeliveryConfigName
+	case *InlineRule_DeliveryTemplate:
 		if v == nil {
 			err := InlineRuleValidationError{
 				field:  "Delivery",
@@ -1139,11 +1151,11 @@ func (m *InlineRule) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetConfigId()).(type) {
+			switch v := interface{}(m.GetDeliveryTemplate()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, InlineRuleValidationError{
-						field:  "ConfigId",
+						field:  "DeliveryTemplate",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1151,57 +1163,16 @@ func (m *InlineRule) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, InlineRuleValidationError{
-						field:  "ConfigId",
+						field:  "DeliveryTemplate",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetConfigId()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetDeliveryTemplate()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return InlineRuleValidationError{
-					field:  "ConfigId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *InlineRule_Template:
-		if v == nil {
-			err := InlineRuleValidationError{
-				field:  "Delivery",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetTemplate()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, InlineRuleValidationError{
-						field:  "Template",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, InlineRuleValidationError{
-						field:  "Template",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetTemplate()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return InlineRuleValidationError{
-					field:  "Template",
+					field:  "DeliveryTemplate",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
