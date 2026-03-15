@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -198,6 +199,78 @@ func TestAbortAction(t *testing.T) {
 	})
 }
 
+func TestListRuns(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	runs := []*workflow.Run{}
+	sqlRes := []*models.Run{}
+	for i := 0; i < 10; i++ {
+		runs = append(runs, &workflow.Run{
+			Action: &workflow.Action{
+				Id: &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org:     "test-org",
+						Project: "test-project",
+						Domain:  "test-domain",
+						Name:    fmt.Sprintf("run-%d", i),
+					},
+					Name: fmt.Sprintf("run-%d", i),
+				},
+				Metadata: &workflow.ActionMetadata{},
+				Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+			},
+		})
+		sqlRes = append(sqlRes, &models.Run{
+			ID:      uint(i),
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    fmt.Sprintf("run-%d", i),
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		})
+	}
+	type mockListRes struct {
+		runs  []*models.Run
+		token string
+		err   error
+	}
+	testCases := []struct {
+		name    string
+		req     *common.ListRequest
+		mockRes mockListRes
+		expect  *workflow.ListRunsResponse
+	}{
+		{
+			"Empty Runs",
+			&common.ListRequest{Limit: 2},
+			mockListRes{runs: []*models.Run{}, err: nil},
+			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
+		},
+		{
+			"list with limit 2 and token",
+			&common.ListRequest{Limit: 2, Token: "5"},
+			mockListRes{runs: sqlRes[5:7], token: "7", err: nil},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
+		},
+		{
+			"list with limit 3 and token",
+			&common.ListRequest{Limit: 3, Token: "8"},
+			mockListRes{runs: sqlRes[8:10], token: "", err: nil},
+			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
+			actionRepo.On("ListRuns", mock.Anything, req.Msg).Return(tc.mockRes.runs, tc.mockRes.token, tc.mockRes.err)
+			got, err := svc.ListRuns(context.Background(), req)
+			assert.NoError(t, err)
+			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
+			assert.Equal(t, tc.expect.Runs, got.Msg.Runs)
+			assert.Equal(t, tc.expect.Token, got.Msg.Token)
+		})
+	}
+}
+
 func TestGenerateRunName(t *testing.T) {
 	t.Run("starts with r prefix", func(t *testing.T) {
 		name := generateRunName(42)
@@ -222,7 +295,6 @@ func TestGenerateRunName(t *testing.T) {
 	})
 }
 
-// Define table-driven tests for the Code constants.
 func TestConvertRunToProto(t *testing.T) {
 	// Define the test cases as a slice of structs.
 	s := &RunService{}
@@ -305,9 +377,7 @@ func TestConvertRunToProto(t *testing.T) {
 		},
 	}
 
-	// Iterate over the test cases.
 	for _, tc := range testCases {
-		// Run the test for the current case.
 		t.Run(tc.name, func(t *testing.T) {
 			res := s.convertRunToProto(tc.run)
 			if tc.expect == nil {
