@@ -51,14 +51,6 @@ class RuleId(_message.Message):
     name: str
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
-class DeliveryConfigId(_message.Message):
-    __slots__ = ["org", "name"]
-    ORG_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    org: str
-    name: str
-    def __init__(self, org: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
-
 class DeliveryConfigTemplate(_message.Message):
     __slots__ = ["webhook", "email"]
     WEBHOOK_FIELD_NUMBER: _ClassVar[int]
