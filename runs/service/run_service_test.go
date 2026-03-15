@@ -277,6 +277,32 @@ func TestConvertRunToProto(t *testing.T) {
 				},
 			},
 		},
+		{
+			"run with missing details",
+			&models.Run{
+				ID:      uint(0),
+				Org:     org,
+				Project: project,
+				Domain:  domain,
+				Name:    name,
+				Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			},
+			&workflow.Run{
+				Action: &workflow.Action{
+					Id: &common.ActionIdentifier{
+						Run: &common.RunIdentifier{
+							Org:     org,
+							Project: project,
+							Domain:  domain,
+							Name:    name,
+						},
+						Name: name,
+					},
+					Metadata: &workflow.ActionMetadata{},
+					Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_QUEUED},
+				},
+			},
+		},
 	}
 
 	// Iterate over the test cases.
