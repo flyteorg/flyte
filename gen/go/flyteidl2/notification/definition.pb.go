@@ -138,81 +138,6 @@ func (HttpMethod) EnumDescriptor() ([]byte, []int) {
 	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{1}
 }
 
-type RuleId struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Org this rule belongs to.
-	Org string `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty"`
-	// Project this rule belongs to.
-	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
-	// Domain this rule belongs to.
-	Domain string `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
-	// Unique name of the rule.
-	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *RuleId) Reset() {
-	*x = RuleId{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *RuleId) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RuleId) ProtoMessage() {}
-
-func (x *RuleId) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RuleId.ProtoReflect.Descriptor instead.
-func (*RuleId) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *RuleId) GetOrg() string {
-	if x != nil {
-		return x.Org
-	}
-	return ""
-}
-
-func (x *RuleId) GetProject() string {
-	if x != nil {
-		return x.Project
-	}
-	return ""
-}
-
-func (x *RuleId) GetDomain() string {
-	if x != nil {
-		return x.Domain
-	}
-	return ""
-}
-
-func (x *RuleId) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
 type DeliveryConfigTemplate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -225,7 +150,7 @@ type DeliveryConfigTemplate struct {
 func (x *DeliveryConfigTemplate) Reset() {
 	*x = DeliveryConfigTemplate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[1]
+		mi := &file_flyteidl2_notification_definition_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -238,7 +163,7 @@ func (x *DeliveryConfigTemplate) String() string {
 func (*DeliveryConfigTemplate) ProtoMessage() {}
 
 func (x *DeliveryConfigTemplate) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[1]
+	mi := &file_flyteidl2_notification_definition_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -251,7 +176,7 @@ func (x *DeliveryConfigTemplate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeliveryConfigTemplate.ProtoReflect.Descriptor instead.
 func (*DeliveryConfigTemplate) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{1}
+	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DeliveryConfigTemplate) GetWebhook() *WebhookDeliveryTemplate {
@@ -281,7 +206,7 @@ type RunCompletedNotificationTemplateData struct {
 func (x *RunCompletedNotificationTemplateData) Reset() {
 	*x = RunCompletedNotificationTemplateData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[2]
+		mi := &file_flyteidl2_notification_definition_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -294,7 +219,7 @@ func (x *RunCompletedNotificationTemplateData) String() string {
 func (*RunCompletedNotificationTemplateData) ProtoMessage() {}
 
 func (x *RunCompletedNotificationTemplateData) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[2]
+	mi := &file_flyteidl2_notification_definition_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +232,7 @@ func (x *RunCompletedNotificationTemplateData) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use RunCompletedNotificationTemplateData.ProtoReflect.Descriptor instead.
 func (*RunCompletedNotificationTemplateData) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{2}
+	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RunCompletedNotificationTemplateData) GetRun() *common.RunIdentifier {
@@ -345,7 +270,7 @@ type WebhookDeliveryTemplate struct {
 func (x *WebhookDeliveryTemplate) Reset() {
 	*x = WebhookDeliveryTemplate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[3]
+		mi := &file_flyteidl2_notification_definition_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -358,7 +283,7 @@ func (x *WebhookDeliveryTemplate) String() string {
 func (*WebhookDeliveryTemplate) ProtoMessage() {}
 
 func (x *WebhookDeliveryTemplate) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[3]
+	mi := &file_flyteidl2_notification_definition_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -371,7 +296,7 @@ func (x *WebhookDeliveryTemplate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebhookDeliveryTemplate.ProtoReflect.Descriptor instead.
 func (*WebhookDeliveryTemplate) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{3}
+	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *WebhookDeliveryTemplate) GetUrl() string {
@@ -414,7 +339,7 @@ type EmailRecipient struct {
 func (x *EmailRecipient) Reset() {
 	*x = EmailRecipient{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[4]
+		mi := &file_flyteidl2_notification_definition_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -427,7 +352,7 @@ func (x *EmailRecipient) String() string {
 func (*EmailRecipient) ProtoMessage() {}
 
 func (x *EmailRecipient) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[4]
+	mi := &file_flyteidl2_notification_definition_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -440,7 +365,7 @@ func (x *EmailRecipient) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailRecipient.ProtoReflect.Descriptor instead.
 func (*EmailRecipient) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{4}
+	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *EmailRecipient) GetName() string {
@@ -473,7 +398,7 @@ type EmailDeliveryTemplate struct {
 func (x *EmailDeliveryTemplate) Reset() {
 	*x = EmailDeliveryTemplate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_notification_definition_proto_msgTypes[5]
+		mi := &file_flyteidl2_notification_definition_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -486,7 +411,7 @@ func (x *EmailDeliveryTemplate) String() string {
 func (*EmailDeliveryTemplate) ProtoMessage() {}
 
 func (x *EmailDeliveryTemplate) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_notification_definition_proto_msgTypes[5]
+	mi := &file_flyteidl2_notification_definition_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +424,7 @@ func (x *EmailDeliveryTemplate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailDeliveryTemplate.ProtoReflect.Descriptor instead.
 func (*EmailDeliveryTemplate) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{5}
+	return file_flyteidl2_notification_definition_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *EmailDeliveryTemplate) GetSubject() string {
@@ -557,15 +482,6 @@ var file_flyteidl2_notification_definition_proto_rawDesc = []byte{
 	0x2f, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x1a, 0x1c, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x63, 0x6f, 0x6d,
 	0x6d, 0x6f, 0x6e, 0x2f, 0x70, 0x68, 0x61, 0x73, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x8d, 0x01, 0x0a, 0x06, 0x52, 0x75, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x03, 0x6f, 0x72,
-	0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48, 0x06, 0x72, 0x04, 0x10, 0x01,
-	0x18, 0x3f, 0x52, 0x03, 0x6f, 0x72, 0x67, 0x12, 0x23, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6a, 0x65,
-	0x63, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48, 0x06, 0x72, 0x04, 0x10,
-	0x01, 0x18, 0x3f, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x21, 0x0a, 0x06,
-	0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48,
-	0x06, 0x72, 0x04, 0x10, 0x01, 0x18, 0x3f, 0x52, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12,
-	0x1e, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0a, 0xba,
-	0x48, 0x07, 0x72, 0x05, 0x10, 0x01, 0x18, 0xff, 0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22,
 	0x9e, 0x02, 0x0a, 0x16, 0x44, 0x65, 0x6c, 0x69, 0x76, 0x65, 0x72, 0x79, 0x43, 0x6f, 0x6e, 0x66,
 	0x69, 0x67, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x49, 0x0a, 0x07, 0x77, 0x65,
 	0x62, 0x68, 0x6f, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x66, 0x6c,
@@ -691,35 +607,34 @@ func file_flyteidl2_notification_definition_proto_rawDescGZIP() []byte {
 }
 
 var file_flyteidl2_notification_definition_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_flyteidl2_notification_definition_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_flyteidl2_notification_definition_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_flyteidl2_notification_definition_proto_goTypes = []interface{}{
-	(EventType)(0),                 // 0: flyteidl2.notification.EventType
-	(HttpMethod)(0),                // 1: flyteidl2.notification.HttpMethod
-	(*RuleId)(nil),                 // 2: flyteidl2.notification.RuleId
-	(*DeliveryConfigTemplate)(nil), // 3: flyteidl2.notification.DeliveryConfigTemplate
-	(*RunCompletedNotificationTemplateData)(nil), // 4: flyteidl2.notification.RunCompletedNotificationTemplateData
-	(*WebhookDeliveryTemplate)(nil),              // 5: flyteidl2.notification.WebhookDeliveryTemplate
-	(*EmailRecipient)(nil),                       // 6: flyteidl2.notification.EmailRecipient
-	(*EmailDeliveryTemplate)(nil),                // 7: flyteidl2.notification.EmailDeliveryTemplate
-	nil,                                          // 8: flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntry
-	(*common.RunIdentifier)(nil),                 // 9: flyteidl2.common.RunIdentifier
-	(common.ActionPhase)(0),                      // 10: flyteidl2.common.ActionPhase
+	(EventType)(0),                               // 0: flyteidl2.notification.EventType
+	(HttpMethod)(0),                              // 1: flyteidl2.notification.HttpMethod
+	(*DeliveryConfigTemplate)(nil),               // 2: flyteidl2.notification.DeliveryConfigTemplate
+	(*RunCompletedNotificationTemplateData)(nil), // 3: flyteidl2.notification.RunCompletedNotificationTemplateData
+	(*WebhookDeliveryTemplate)(nil),              // 4: flyteidl2.notification.WebhookDeliveryTemplate
+	(*EmailRecipient)(nil),                       // 5: flyteidl2.notification.EmailRecipient
+	(*EmailDeliveryTemplate)(nil),                // 6: flyteidl2.notification.EmailDeliveryTemplate
+	nil,                                          // 7: flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntry
+	(*common.RunIdentifier)(nil),                 // 8: flyteidl2.common.RunIdentifier
+	(common.ActionPhase)(0),                      // 9: flyteidl2.common.ActionPhase
 }
 var file_flyteidl2_notification_definition_proto_depIdxs = []int32{
-	5,  // 0: flyteidl2.notification.DeliveryConfigTemplate.webhook:type_name -> flyteidl2.notification.WebhookDeliveryTemplate
-	7,  // 1: flyteidl2.notification.DeliveryConfigTemplate.email:type_name -> flyteidl2.notification.EmailDeliveryTemplate
-	9,  // 2: flyteidl2.notification.RunCompletedNotificationTemplateData.run:type_name -> flyteidl2.common.RunIdentifier
-	10, // 3: flyteidl2.notification.RunCompletedNotificationTemplateData.phase:type_name -> flyteidl2.common.ActionPhase
-	1,  // 4: flyteidl2.notification.WebhookDeliveryTemplate.method:type_name -> flyteidl2.notification.HttpMethod
-	8,  // 5: flyteidl2.notification.WebhookDeliveryTemplate.headers:type_name -> flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntry
-	6,  // 6: flyteidl2.notification.EmailDeliveryTemplate.to:type_name -> flyteidl2.notification.EmailRecipient
-	6,  // 7: flyteidl2.notification.EmailDeliveryTemplate.cc:type_name -> flyteidl2.notification.EmailRecipient
-	6,  // 8: flyteidl2.notification.EmailDeliveryTemplate.bcc:type_name -> flyteidl2.notification.EmailRecipient
-	9,  // [9:9] is the sub-list for method output_type
-	9,  // [9:9] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	4, // 0: flyteidl2.notification.DeliveryConfigTemplate.webhook:type_name -> flyteidl2.notification.WebhookDeliveryTemplate
+	6, // 1: flyteidl2.notification.DeliveryConfigTemplate.email:type_name -> flyteidl2.notification.EmailDeliveryTemplate
+	8, // 2: flyteidl2.notification.RunCompletedNotificationTemplateData.run:type_name -> flyteidl2.common.RunIdentifier
+	9, // 3: flyteidl2.notification.RunCompletedNotificationTemplateData.phase:type_name -> flyteidl2.common.ActionPhase
+	1, // 4: flyteidl2.notification.WebhookDeliveryTemplate.method:type_name -> flyteidl2.notification.HttpMethod
+	7, // 5: flyteidl2.notification.WebhookDeliveryTemplate.headers:type_name -> flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntry
+	5, // 6: flyteidl2.notification.EmailDeliveryTemplate.to:type_name -> flyteidl2.notification.EmailRecipient
+	5, // 7: flyteidl2.notification.EmailDeliveryTemplate.cc:type_name -> flyteidl2.notification.EmailRecipient
+	5, // 8: flyteidl2.notification.EmailDeliveryTemplate.bcc:type_name -> flyteidl2.notification.EmailRecipient
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_notification_definition_proto_init() }
@@ -729,18 +644,6 @@ func file_flyteidl2_notification_definition_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_flyteidl2_notification_definition_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RuleId); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_flyteidl2_notification_definition_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeliveryConfigTemplate); i {
 			case 0:
 				return &v.state
@@ -752,7 +655,7 @@ func file_flyteidl2_notification_definition_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl2_notification_definition_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl2_notification_definition_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RunCompletedNotificationTemplateData); i {
 			case 0:
 				return &v.state
@@ -764,7 +667,7 @@ func file_flyteidl2_notification_definition_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl2_notification_definition_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl2_notification_definition_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*WebhookDeliveryTemplate); i {
 			case 0:
 				return &v.state
@@ -776,7 +679,7 @@ func file_flyteidl2_notification_definition_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl2_notification_definition_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl2_notification_definition_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EmailRecipient); i {
 			case 0:
 				return &v.state
@@ -788,7 +691,7 @@ func file_flyteidl2_notification_definition_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl2_notification_definition_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl2_notification_definition_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EmailDeliveryTemplate); i {
 			case 0:
 				return &v.state
@@ -807,7 +710,7 @@ func file_flyteidl2_notification_definition_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_notification_definition_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   7,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

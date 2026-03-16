@@ -39,18 +39,6 @@ HTTP_METHOD_OPTIONS: HttpMethod
 HTTP_METHOD_TRACE: HttpMethod
 HTTP_METHOD_PATCH: HttpMethod
 
-class RuleId(_message.Message):
-    __slots__ = ["org", "project", "domain", "name"]
-    ORG_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    org: str
-    project: str
-    domain: str
-    name: str
-    def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
-
 class DeliveryConfigTemplate(_message.Message):
     __slots__ = ["webhook", "email"]
     WEBHOOK_FIELD_NUMBER: _ClassVar[int]
