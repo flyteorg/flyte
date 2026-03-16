@@ -38,10 +38,10 @@ type Action struct {
 
 	// Timestamps
 	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
-	CreatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
-	UpdatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
+	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt   sql.NullTime `gorm:"index:idx_actions_ended" db:"ended_at"`
+	EndedAt sql.NullTime `gorm:"index:idx_actions_ended" db:"ended_at"`
 }
 
 // TableName specifies the table name

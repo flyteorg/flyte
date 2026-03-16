@@ -62,9 +62,9 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 
 	// Build an ActionSpec from the RecordActionRequest to persist via CreateAction.
 	spec := &workflow.ActionSpec{
-		ActionId:  actionID,
-		InputUri:  req.GetInputUri(),
-		Group:     req.GetGroup(),
+		ActionId: actionID,
+		InputUri: req.GetInputUri(),
+		Group:    req.GetGroup(),
 	}
 	if req.GetParent() != "" {
 		parent := req.GetParent()
@@ -149,7 +149,6 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	}
 	return nil
 }
-
 
 // RecordActionEvents records a batch of action events.
 func (s *RunService) RecordActionEvents(
