@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	webhookConfig "github.com/flyteorg/flyte/v2/executor/pkg/webhook/config"
+	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
@@ -30,7 +30,10 @@ func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookCon
 		return fmt.Errorf("webhook: failed to initialize certs: %w", err)
 	}
 
-	podMutator := NewPodMutator(cfg, mgr.GetScheme(), scope.NewSubScope("webhook"))
+	podMutator, err := NewPodMutator(ctx, cfg, defaultNamespace, mgr.GetScheme(), scope)
+	if err != nil {
+		return fmt.Errorf("webhook: failed to create pod mutator: %w", err)
+	}
 
 	if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
 		return fmt.Errorf("webhook: failed to create MutatingWebhookConfiguration: %w", err)

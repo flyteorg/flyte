@@ -24,7 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	webhookPkg "github.com/flyteorg/flyte/v2/executor/pkg/webhook"
-	webhookConfig "github.com/flyteorg/flyte/v2/executor/pkg/webhook/config"
+	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"

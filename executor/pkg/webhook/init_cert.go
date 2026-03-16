@@ -20,7 +20,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
-	webhookConfig "github.com/flyteorg/flyte/v2/executor/pkg/webhook/config"
+	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 

@@ -19,8 +19,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
-	"github.com/flyteorg/flyte/v2/executor/pkg/webhook/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -30,19 +31,9 @@ const webhookName = "flyte-pod-webhook.flyte.org"
 
 // PodMutator implements controller-runtime WebHook interface.
 type PodMutator struct {
-	decoder  admission.Decoder
-	cfg      *config.Config
-	Mutators []MutatorConfig
-}
-
-type MutatorConfig struct {
-	Mutator  Mutator
-	Required bool
-}
-
-type Mutator interface {
-	ID() string
-	Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err error)
+	decoder        admission.Decoder
+	cfg            *webhookConfig.Config
+	secretsMutator *secret.SecretsPodMutator
 }
 
 func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admission.Response {
@@ -52,9 +43,9 @@ func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admi
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	newObj, changed, err := pm.Mutate(ctx, obj)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
+	newObj, changed, admissionErr := pm.secretsMutator.Mutate(ctx, obj)
+	if admissionErr != nil {
+		return *admissionErr
 	}
 
 	if changed {
@@ -66,29 +57,6 @@ func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admi
 	}
 
 	return admission.Allowed("No changes")
-}
-
-func (pm PodMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err error) {
-	newP = p
-	for _, m := range pm.Mutators {
-		tempP := newP
-		tempChanged := false
-		tempP, tempChanged, err = m.Mutator.Mutate(ctx, tempP)
-		if err != nil {
-			if m.Required {
-				err = fmt.Errorf("failed to mutate using [%v]. Since it's a required mutator, failing early. Error: %v", m.Mutator.ID(), err)
-				logger.Info(ctx, err)
-				return p, false, err
-			}
-			logger.Infof(ctx, "Failed to mutate using [%v]. Since it's not a required mutator, skipping. Error: %v", m.Mutator.ID(), err)
-			continue
-		}
-		newP = tempP
-		if tempChanged {
-			changed = true
-		}
-	}
-	return newP, changed, nil
 }
 
 func (pm PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
@@ -156,8 +124,8 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 						},
 					},
 				},
-				FailurePolicy: &fail,
-				SideEffects:   &sideEffects,
+				FailurePolicy:           &fail,
+				SideEffects:             &sideEffects,
 				AdmissionReviewVersions: []string{"v1", "v1beta1"},
 				ObjectSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
@@ -171,14 +139,15 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 	return mutateConfig, nil
 }
 
-func NewPodMutator(cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) *PodMutator {
-	return &PodMutator{
-		decoder: *admission.NewDecoder(scheme),
-		cfg:     cfg,
-		Mutators: []MutatorConfig{
-			{
-				Mutator: NewSecretsMutator(cfg, scope.NewSubScope("secrets")),
-			},
-		},
+func NewPodMutator(ctx context.Context, cfg *webhookConfig.Config, podNamespace string, scheme *runtime.Scheme, scope promutils.Scope) (*PodMutator, error) {
+	secretsMutator, err := secret.NewSecretsMutator(ctx, cfg, podNamespace, scope.NewSubScope("secrets"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create secrets mutator: %w", err)
 	}
+
+	return &PodMutator{
+		decoder:        *admission.NewDecoder(scheme),
+		cfg:            cfg,
+		secretsMutator: secretsMutator,
+	}, nil
 }
