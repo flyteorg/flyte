@@ -26,6 +26,9 @@ flyte: create_builder
 
 .PHONY: dep_update
 dep_update:
+	@if [ ! -d ../../charts/flyte-sandbox/charts ] || [ -z "$$(find ../../charts/flyte-sandbox/charts -maxdepth 1 -name '*.tgz' -print -quit)" ]; then \
+		cd ../../charts/flyte-sandbox && helm dependency update; \
+	fi
 	cd ../../charts/flyte-sandbox/charts && for f in *.tgz; do tar xzf "$$f"; done
 
 .PHONY: manifests
@@ -77,6 +80,7 @@ start:
 	fi
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
+	@docker exec flyte-sandbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
 	@mkdir -p $(HOME)/.flyte/sandboxv2
 	@cp $(PWD)/.kube/kubeconfig $(HOME)/.flyte/sandboxv2/kubeconfig
 	@echo "Kubeconfig copied to ~/.flyte/sandboxv2/kubeconfig"
