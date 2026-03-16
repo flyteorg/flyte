@@ -26,9 +26,9 @@ flyte: create_builder
 
 .PHONY: helm-repos
 helm-repos:
-	helm repo add docker-registry https://twuni.github.io/docker-registry.helm || true
-	helm repo add kubernetes-dashboard https://kubernetes-retired.github.io/dashboard/ || true
-	helm repo add bitnami https://charts.bitnami.com/bitnami || true
+	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
+	helm repo add kubernetes-dashboard https://kubernetes-retired.github.io/dashboard/
+	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo update
 
 .PHONY: dep_build
