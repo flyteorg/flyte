@@ -307,6 +307,14 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
+	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to build cache config for finalization cleanup")
+	} else if ok {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
+			logger.Error(err, "failed to release cache reservation during finalization cleanup")
+		}
+	}
+
 	return r.removeFinalizer(ctx, taskAction)
 }
 

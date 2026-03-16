@@ -179,6 +179,29 @@ func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T)
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_POPULATED, transition.Info().Info().ExternalResources[0].CacheStatus)
 }
 
+func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	released := false
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			releaseReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string) error {
+				released = true
+				assert.Equal(t, "default/cacheable-action", ownerID)
+				return nil
+			},
+		},
+	}
+
+	transition := pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("User", "boom", &pluginsCore.TaskInfo{}))
+	_, err := r.handleCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
+	require.NoError(t, err)
+	assert.True(t, released)
+}
+
 func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) (*flyteorgv1.TaskAction, *storage.DataStore) {
 	t.Helper()
 

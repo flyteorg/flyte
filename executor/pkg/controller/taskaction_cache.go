@@ -89,7 +89,7 @@ func (r *TaskActionReconciler) handleCacheAfterExecution(
 	phase := transition.Info().Phase()
 	if phase.IsSuccess() {
 		status := corepb.CatalogCacheStatus_CACHE_POPULATED
-		if err := r.writeTaskOutputsToCache(ctx, taskAction, tCtx, cacheCfg.key); err != nil {
+		if err := r.writeTaskOutputsToCache(ctx, tCtx, cacheCfg.key); err != nil {
 			if grpcstatus.Code(err) == codes.AlreadyExists {
 				status = corepb.CatalogCacheStatus_CACHE_POPULATED
 			} else {
@@ -99,7 +99,7 @@ func (r *TaskActionReconciler) handleCacheAfterExecution(
 		}
 		appendCacheStatus(transition.Info().Info(), status)
 		if cacheCfg.serializable {
-			if err := r.Catalog.ReleaseReservation(ctx, cacheCfg.key, cacheCfg.ownerID); err != nil {
+			if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
 				log.FromContext(ctx).Error(err, "failed to release cache reservation after success")
 			}
 		}
@@ -107,7 +107,7 @@ func (r *TaskActionReconciler) handleCacheAfterExecution(
 	}
 
 	if cacheCfg.serializable && (phase.IsFailure() || phase.IsAborted()) {
-		if err := r.Catalog.ReleaseReservation(ctx, cacheCfg.key, cacheCfg.ownerID); err != nil {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
 			log.FromContext(ctx).Error(err, "failed to release cache reservation after terminal failure")
 		}
 	}
@@ -153,23 +153,22 @@ func cacheReservationOwnerID(taskAction *flyteorgv1.TaskAction) string {
 	return types.NamespacedName{Name: taskAction.Name, Namespace: taskAction.Namespace}.String()
 }
 
-func (r *TaskActionReconciler) writeTaskOutputsToCache(
-	ctx context.Context,
-	taskAction *flyteorgv1.TaskAction,
-	tCtx pluginsCore.TaskExecutionContext,
-	key catalog.Key,
-) error {
+func (r *TaskActionReconciler) writeTaskOutputsToCache(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, key catalog.Key) error {
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, r.DataStore, tCtx.OutputWriter().GetOutputPrefixPath())
 	outputReader := ioutils.NewRemoteFileOutputReader(ctx, r.DataStore, outputPaths, 0)
-	_, err := r.Catalog.Put(ctx, key, outputReader, cacheMetadataForUpload(taskAction, tCtx, key.Identifier))
+	_, err := r.Catalog.Put(ctx, key, outputReader, cacheMetadataForUpload(tCtx, key.Identifier))
 	return err
 }
 
-func cacheMetadataForUpload(
-	taskAction *flyteorgv1.TaskAction,
-	tCtx pluginsCore.TaskExecutionContext,
-	taskID *corepb.Identifier,
-) catalog.Metadata {
+func (r *TaskActionReconciler) releaseCacheReservation(ctx context.Context, cacheCfg *taskCacheConfig) error {
+	if r.Catalog == nil || cacheCfg == nil || !cacheCfg.serializable {
+		return nil
+	}
+
+	return r.Catalog.ReleaseReservation(ctx, cacheCfg.key, cacheCfg.ownerID)
+}
+
+func cacheMetadataForUpload(tCtx pluginsCore.TaskExecutionContext, taskID *corepb.Identifier) catalog.Metadata {
 	taskExecID := proto.Clone(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()).(*corepb.TaskExecutionIdentifier)
 	taskExecID.TaskId = proto.Clone(taskID).(*corepb.Identifier)
 
