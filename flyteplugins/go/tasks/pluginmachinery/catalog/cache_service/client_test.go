@@ -81,6 +81,30 @@ func TestBuildCacheKey(t *testing.T) {
 	assert.Contains(t, cacheKey, "-cache-v1")
 }
 
+func TestBuildCacheKeyIgnoresPrecomputedCacheKeyShortcut(t *testing.T) {
+	reader := ioMocks.NewInputReader(t)
+
+	key := catalog.Key{
+		Identifier: &corepb.Identifier{
+			ResourceType: corepb.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "task",
+			Version:      "ignored",
+			Org:          "org",
+		},
+		CacheVersion:   "cache-v1",
+		CacheKey:       "precomputed-key-should-not-be-used",
+		TypedInterface: &corepb.TypedInterface{},
+		InputReader:    reader,
+	}
+
+	cacheKey, err := buildCacheKey(context.Background(), key)
+	require.NoError(t, err)
+	assert.NotEqual(t, "precomputed-key-should-not-be-used", cacheKey)
+	assert.Contains(t, cacheKey, "-cache-v1")
+}
+
 func TestGetMapsNotFound(t *testing.T) {
 	store := newTestDataStore(t)
 	client := NewWithServiceClient(&stubCacheService{

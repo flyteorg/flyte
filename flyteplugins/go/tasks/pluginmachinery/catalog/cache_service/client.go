@@ -213,10 +213,6 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 }
 
 func buildCacheKey(ctx context.Context, key catalog.Key) (string, error) {
-	if key.CacheKey != "" {
-		return key.CacheKey, nil
-	}
-
 	if key.Identifier == nil {
 		return "", fmt.Errorf("catalog key identifier is required")
 	}

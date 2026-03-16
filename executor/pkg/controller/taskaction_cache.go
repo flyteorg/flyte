@@ -135,11 +135,10 @@ func buildTaskCacheConfig(
 
 	key := catalog.Key{
 		Identifier:           proto.Clone(taskTemplate.GetId()).(*corepb.Identifier),
-		CacheVersion:         metadata.GetDiscoveryVersion(),
+		CacheVersion:         taskAction.Spec.CacheKey,
 		CacheIgnoreInputVars: metadata.GetCacheIgnoreInputVars(),
 		TypedInterface:       taskTemplate.GetInterface(),
 		InputReader:          tCtx.InputReader(),
-		CacheKey:             taskAction.Spec.CacheKey,
 	}
 
 	return &taskCacheConfig{

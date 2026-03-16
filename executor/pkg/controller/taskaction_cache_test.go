@@ -71,8 +71,8 @@ func TestBuildTaskCacheConfig(t *testing.T) {
 	cfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
 	require.NoError(t, err)
 	require.True(t, ok)
-	assert.Equal(t, taskAction.Spec.CacheKey, cfg.key.CacheKey)
-	assert.Equal(t, "discovery-v1", cfg.key.CacheVersion)
+	assert.Empty(t, cfg.key.CacheKey)
+	assert.Equal(t, taskAction.Spec.CacheKey, cfg.key.CacheVersion)
 	assert.Equal(t, []string{"ignored_input"}, cfg.key.CacheIgnoreInputVars)
 	assert.True(t, cfg.serializable)
 	assert.Equal(t, "default/cacheable-action", cfg.ownerID)
@@ -158,7 +158,8 @@ func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T)
 			},
 			putFunc: func(_ context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
 				putCalled = true
-				assert.Equal(t, taskAction.Spec.CacheKey, key.CacheKey)
+				assert.Empty(t, key.CacheKey)
+				assert.Equal(t, taskAction.Spec.CacheKey, key.CacheVersion)
 				assert.Equal(t, "task-name", metadata.TaskExecutionIdentifier.GetTaskId().GetName())
 				return catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_POPULATED, nil), nil
 			},
