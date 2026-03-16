@@ -24,12 +24,21 @@ flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
+.PHONY: helm-repos
+helm-repos:
+	helm repo add docker-registry https://twuni.github.io/docker-registry.helm || true
+	helm repo add kubernetes-dashboard https://kubernetes-retired.github.io/dashboard/ || true
+	helm repo add bitnami https://charts.bitnami.com/bitnami || true
+	helm repo update
+
+.PHONY: dep_build
+dep_build: helm-repos
+	cd $(SANDBOX_CHART_DIR) && helm dependency build
+
 .PHONY: dep_update
-dep_update:
-	@if [ ! -d ../../charts/flyte-sandbox/charts ] || [ -z "$$(find ../../charts/flyte-sandbox/charts -maxdepth 1 -name '*.tgz' -print -quit)" ]; then \
-		cd ../../charts/flyte-sandbox && helm dependency update; \
-	fi
-	cd ../../charts/flyte-sandbox/charts && for f in *.tgz; do tar xzf "$$f"; done
+dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-sandbox
+dep_update: dep_build
+	cd $(SANDBOX_CHART_DIR)/charts && for f in *.tgz; do tar xzf "$$f"; done
 
 .PHONY: manifests
 manifests: dep_update
@@ -80,6 +89,7 @@ start:
 	fi
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
+	@# On WSL, the bind-mounted kubeconfig may be root-owned, which makes the host-side cp fail with permission denied.
 	@docker exec flyte-sandbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
 	@mkdir -p $(HOME)/.flyte/sandboxv2
 	@cp $(PWD)/.kube/kubeconfig $(HOME)/.flyte/sandboxv2/kubeconfig
