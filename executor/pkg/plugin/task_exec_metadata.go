@@ -93,8 +93,8 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecuti
 			Name:       ta.Name,
 			UID:        ta.UID,
 		},
-		labels:      ta.Labels,
-		annotations: ta.Annotations,
+		labels:          ta.Labels,
+		annotations:     ta.Annotations,
 		maxAttempts:     1,
 		overrides:       overrides,
 		envVars:         envVars,
@@ -134,7 +134,7 @@ func extractSecurityContextFromTaskTemplate(data []byte) *core.SecurityContext {
 	if tmpl.SecurityContext == nil {
 		return &core.SecurityContext{}
 	}
-	return tmpl.SecurityContext
+	return tmpl.GetSecurityContext()
 }
 
 func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName { return m.ownerID }
