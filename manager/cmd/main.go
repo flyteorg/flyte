@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
@@ -89,6 +90,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := events.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := cache_service.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {
