@@ -39,6 +39,20 @@ type ActionUpdate struct {
 	ShortName        string
 }
 
+// pendingRecord holds a failed RecordAction request for retry.
+type pendingRecord struct {
+	req       *workflow.RecordActionRequest
+	actionKey []byte
+	attempts  int
+	nextRetry time.Time
+}
+
+// maxRecordRetries is the maximum number of retry attempts for failed RecordAction calls.
+const maxRecordRetries = 5
+
+// recordRetryInterval is the base interval between retries (doubled each attempt).
+const recordRetryInterval = 2 * time.Second
+
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
 	k8sClient  client.WithWatch
@@ -47,6 +61,10 @@ type ActionsClient struct {
 	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
+
+	// Retry queue for failed RecordAction calls.
+	retryMu        sync.Mutex
+	pendingRecords []*pendingRecord
 
 	// Watch management
 	mu sync.RWMutex
@@ -336,6 +354,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s", c.namespace)
 
 	go c.watchLoop(ctx)
+	go c.startRetryLoop(ctx, c.stopCh)
 
 	return nil
 }
@@ -388,7 +407,7 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 }
 
 // handleWatchEvent processes a watch event
-func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
+func (c *ActionsClient) handleWatchEvent(ctx context.Context, even t watch.Event) {
 	taskAction, ok := event.Object.(*executorv1.TaskAction)
 	if !ok {
 		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
@@ -468,7 +487,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				}
 			}
 			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
-				logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+				logger.Warnf(ctx, "Failed to record action in run service for %s: %v, enqueuing for retry", update.ActionID.Name, err)
+				c.enqueueRetry(recordReq, actionKey)
 			} else if c.recordedFilter != nil {
 				c.recordedFilter.Add(ctx, actionKey)
 			}
@@ -485,6 +505,73 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
+	}
+}
+
+// enqueueRetry adds a failed RecordAction request to the retry queue.
+func (c *ActionsClient) enqueueRetry(req *workflow.RecordActionRequest, actionKey []byte) {
+	c.retryMu.Lock()
+	defer c.retryMu.Unlock()
+	c.pendingRecords = append(c.pendingRecords, &pendingRecord{
+		req:       req,
+		actionKey: actionKey,
+		attempts:  0,
+		nextRetry: time.Now().Add(recordRetryInterval),
+	})
+}
+
+// startRetryLoop runs a background goroutine that retries failed RecordAction calls.
+// It stops when stopCh is closed.
+func (c *ActionsClient) startRetryLoop(ctx context.Context, stopCh <-chan struct{}) {
+	ticker := time.NewTicker(recordRetryInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-stopCh:
+			return
+		case <-ticker.C:
+			c.processRetries(ctx)
+		}
+	}
+}
+
+// processRetries attempts to re-send all pending RecordAction requests that are due.
+func (c *ActionsClient) processRetries(ctx context.Context) {
+	c.retryMu.Lock()
+	pending := c.pendingRecords
+	c.pendingRecords = nil
+	c.retryMu.Unlock()
+
+	var remaining []*pendingRecord
+	for _, p := range pending {
+		if time.Now().Before(p.nextRetry) {
+			remaining = append(remaining, p)
+			continue
+		}
+		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(p.req)); err != nil {
+			p.attempts++
+			if p.attempts >= maxRecordRetries {
+				logger.Errorf(ctx, "RecordAction permanently failed after %d attempts for %s: %v",
+					p.attempts, p.req.ActionId.Name, err)
+				continue
+			}
+			backoff := recordRetryInterval * time.Duration(1<<uint(p.attempts))
+			p.nextRetry = time.Now().Add(backoff)
+			logger.Warnf(ctx, "RecordAction retry %d/%d failed for %s: %v, next retry in %v",
+				p.attempts, maxRecordRetries, p.req.ActionId.Name, err, backoff)
+			remaining = append(remaining, p)
+		} else {
+			if c.recordedFilter != nil {
+				c.recordedFilter.Add(ctx, p.actionKey)
+			}
+			logger.Infof(ctx, "RecordAction retry succeeded for %s after %d attempts", p.req.ActionId.Name, p.attempts+1)
+		}
+	}
+
+	if len(remaining) > 0 {
+		c.retryMu.Lock()
+		c.pendingRecords = append(c.pendingRecords, remaining...)
+		c.retryMu.Unlock()
 	}
 }
 

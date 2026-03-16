@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -72,7 +73,7 @@ func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 }
 
-func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
+func TestNotifyRunService_FailedRecordEnqueuesRetry(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -91,14 +92,16 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 	// First call fails
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return((*connect.Response[workflow.RecordActionResponse])(nil), fmt.Errorf("transient error")).Once()
-	// Second call succeeds
-	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 
-	// First event — RecordAction fails, should NOT add to filter
+	// First event — RecordAction fails, should enqueue for retry
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
-	// Second event — should retry RecordAction since first failed
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	assert.Len(t, c.pendingRecords, 1, "failed record should be enqueued for retry")
+
+	// Second Added event — not in bloom filter, so it retries inline too
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
@@ -106,6 +109,143 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 	// Third event — now it's in the filter, should be skipped
 	c.notifyRunService(ctx, ta, update, watch.Added)
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
+}
+
+func TestProcessRetries_SuccessfulRetry(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	assert.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "action-retry-ok",
+	}
+	actionKey := []byte(buildTaskActionName(actionID))
+	req := &workflow.RecordActionRequest{ActionId: actionID}
+
+	// Enqueue a pending record with nextRetry in the past so it's due
+	c.pendingRecords = []*pendingRecord{{
+		req:       req,
+		actionKey: actionKey,
+		attempts:  0,
+		nextRetry: time.Now().Add(-1 * time.Second),
+	}}
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+
+	c.processRetries(ctx)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	assert.Empty(t, c.pendingRecords, "successful retry should clear pending")
+	assert.True(t, c.recordedFilter.Contains(ctx, actionKey), "successful retry should add to bloom filter")
+}
+
+func TestProcessRetries_ExhaustsRetries(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "action-exhaust",
+	}
+	req := &workflow.RecordActionRequest{ActionId: actionID}
+
+	// Enqueue at max retries - 1, so next failure is the last attempt
+	c.pendingRecords = []*pendingRecord{{
+		req:       req,
+		actionKey: []byte(buildTaskActionName(actionID)),
+		attempts:  maxRecordRetries - 1,
+		nextRetry: time.Now().Add(-1 * time.Second),
+	}}
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return((*connect.Response[workflow.RecordActionResponse])(nil), fmt.Errorf("permanent error")).Once()
+
+	c.processRetries(ctx)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	assert.Empty(t, c.pendingRecords, "exhausted retries should drop the record")
+}
+
+func TestProcessRetries_RequeuesOnFailure(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "action-requeue",
+	}
+	req := &workflow.RecordActionRequest{ActionId: actionID}
+
+	c.pendingRecords = []*pendingRecord{{
+		req:       req,
+		actionKey: []byte(buildTaskActionName(actionID)),
+		attempts:  1,
+		nextRetry: time.Now().Add(-1 * time.Second),
+	}}
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return((*connect.Response[workflow.RecordActionResponse])(nil), fmt.Errorf("transient error")).Once()
+
+	c.processRetries(ctx)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	assert.Len(t, c.pendingRecords, 1, "failed retry should re-enqueue")
+	assert.Equal(t, 2, c.pendingRecords[0].attempts, "attempt count should increment")
+	assert.True(t, c.pendingRecords[0].nextRetry.After(time.Now()), "next retry should be in the future")
+}
+
+func TestProcessRetries_SkipsNotYetDue(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "action-not-due",
+	}
+	req := &workflow.RecordActionRequest{ActionId: actionID}
+
+	// nextRetry is far in the future
+	c.pendingRecords = []*pendingRecord{{
+		req:       req,
+		actionKey: []byte(buildTaskActionName(actionID)),
+		attempts:  0,
+		nextRetry: time.Now().Add(1 * time.Hour),
+	}}
+
+	c.processRetries(ctx)
+
+	// Should not have called RecordAction
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 0)
+	assert.Len(t, c.pendingRecords, 1, "not-yet-due record should remain in queue")
 }
 
 func TestNotifyRunService_NilFilter(t *testing.T) {
