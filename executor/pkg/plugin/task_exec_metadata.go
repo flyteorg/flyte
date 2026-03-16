@@ -50,12 +50,14 @@ type taskExecutionMetadata struct {
 	maxAttempts     uint32
 	overrides       pluginsCore.TaskOverrides
 	envVars         map[string]string
+	securityContext *core.SecurityContext
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
 func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecutionMetadata {
 	// Extract resource requirements from the inline task template
 	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
+	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	// Build environment variables for the task pod
 	envVars := map[string]string{
@@ -93,9 +95,10 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecuti
 		},
 		labels:      ta.Labels,
 		annotations: ta.Annotations,
-		maxAttempts: 1,
-		overrides:   overrides,
-		envVars:     envVars,
+		maxAttempts:     1,
+		overrides:       overrides,
+		envVars:         envVars,
+		securityContext: securityContext,
 	}
 }
 
@@ -119,6 +122,21 @@ func buildOverridesFromTaskTemplate(data []byte) *taskOverrides {
 	return &taskOverrides{resources: res}
 }
 
+// extractSecurityContextFromTaskTemplate deserializes the task template and extracts SecurityContext.
+func extractSecurityContextFromTaskTemplate(data []byte) *core.SecurityContext {
+	if len(data) == 0 {
+		return &core.SecurityContext{}
+	}
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return &core.SecurityContext{}
+	}
+	if tmpl.SecurityContext == nil {
+		return &core.SecurityContext{}
+	}
+	return tmpl.SecurityContext
+}
+
 func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName { return m.ownerID }
 func (m *taskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecutionID {
 	return m.taskExecutionID
@@ -139,7 +157,7 @@ func (m *taskExecutionMetadata) GetOverrides() pluginsCore.TaskOverrides {
 }
 
 func (m *taskExecutionMetadata) GetSecurityContext() *core.SecurityContext {
-	return &core.SecurityContext{}
+	return m.securityContext
 }
 
 func (m *taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
