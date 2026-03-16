@@ -553,6 +553,110 @@ var _ interface {
 	ErrorName() string
 } = WebhookDeliveryTemplateValidationError{}
 
+// Validate checks the field values on EmailRecipient with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *EmailRecipient) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EmailRecipient with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in EmailRecipientMultiError,
+// or nil if none found.
+func (m *EmailRecipient) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EmailRecipient) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Address
+
+	if len(errors) > 0 {
+		return EmailRecipientMultiError(errors)
+	}
+
+	return nil
+}
+
+// EmailRecipientMultiError is an error wrapping multiple validation errors
+// returned by EmailRecipient.ValidateAll() if the designated constraints
+// aren't met.
+type EmailRecipientMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EmailRecipientMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EmailRecipientMultiError) AllErrors() []error { return m }
+
+// EmailRecipientValidationError is the validation error returned by
+// EmailRecipient.Validate if the designated constraints aren't met.
+type EmailRecipientValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EmailRecipientValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EmailRecipientValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EmailRecipientValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EmailRecipientValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EmailRecipientValidationError) ErrorName() string { return "EmailRecipientValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EmailRecipientValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEmailRecipient.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EmailRecipientValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EmailRecipientValidationError{}
+
 // Validate checks the field values on EmailDeliveryTemplate with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -576,6 +680,108 @@ func (m *EmailDeliveryTemplate) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for Subject
+
+	for idx, item := range m.GetTo() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("To[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("To[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EmailDeliveryTemplateValidationError{
+					field:  fmt.Sprintf("To[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetCc() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("Cc[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("Cc[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EmailDeliveryTemplateValidationError{
+					field:  fmt.Sprintf("Cc[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetBcc() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("Bcc[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EmailDeliveryTemplateValidationError{
+						field:  fmt.Sprintf("Bcc[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EmailDeliveryTemplateValidationError{
+					field:  fmt.Sprintf("Bcc[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	// no validation rules for HtmlTemplate
 

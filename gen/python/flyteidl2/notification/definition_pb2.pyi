@@ -88,6 +88,14 @@ class WebhookDeliveryTemplate(_message.Message):
     body_template: str
     def __init__(self, url: _Optional[str] = ..., method: _Optional[_Union[HttpMethod, str]] = ..., headers: _Optional[_Mapping[str, str]] = ..., body_template: _Optional[str] = ...) -> None: ...
 
+class EmailRecipient(_message.Message):
+    __slots__ = ["name", "address"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    address: str
+    def __init__(self, name: _Optional[str] = ..., address: _Optional[str] = ...) -> None: ...
+
 class EmailDeliveryTemplate(_message.Message):
     __slots__ = ["subject", "to", "cc", "bcc", "html_template", "text_template"]
     SUBJECT_FIELD_NUMBER: _ClassVar[int]
@@ -97,9 +105,9 @@ class EmailDeliveryTemplate(_message.Message):
     HTML_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     TEXT_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     subject: str
-    to: _containers.RepeatedScalarFieldContainer[str]
-    cc: _containers.RepeatedScalarFieldContainer[str]
-    bcc: _containers.RepeatedScalarFieldContainer[str]
+    to: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
+    cc: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
+    bcc: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
     html_template: str
     text_template: str
-    def __init__(self, subject: _Optional[str] = ..., to: _Optional[_Iterable[str]] = ..., cc: _Optional[_Iterable[str]] = ..., bcc: _Optional[_Iterable[str]] = ..., html_template: _Optional[str] = ..., text_template: _Optional[str] = ...) -> None: ...
+    def __init__(self, subject: _Optional[str] = ..., to: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., cc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., bcc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., html_template: _Optional[str] = ..., text_template: _Optional[str] = ...) -> None: ...

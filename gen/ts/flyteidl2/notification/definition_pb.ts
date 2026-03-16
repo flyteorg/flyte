@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/notification/definition.proto.
  */
 export const file_flyteidl2_notification_definition: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24icQoGUnVsZUlkEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIo4CChZEZWxpdmVyeUNvbmZpZ1RlbXBsYXRlEkAKB3dlYmhvb2sYASABKAsyLy5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLldlYmhvb2tEZWxpdmVyeVRlbXBsYXRlEjwKBWVtYWlsGAIgASgLMi0uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbERlbGl2ZXJ5VGVtcGxhdGU6dLpIcRpvChVhdF9sZWFzdF9vbmVfcmVxdWlyZWQSMGF0IGxlYXN0IG9uZSBvZiB0aGUgZGVsaXZlcnkgb3B0aW9ucyBtdXN0IGJlIHNldBokaGFzKHRoaXMud2ViaG9vaykgfHwgaGFzKHRoaXMuZW1haWwpIpkBCiRSdW5Db21wbGV0ZWROb3RpZmljYXRpb25UZW1wbGF0ZURhdGESNAoDcnVuGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESLAoFcGhhc2UYAiABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEg0KBWVycm9yGAMgASgJIqACChdXZWJob29rRGVsaXZlcnlUZW1wbGF0ZRIXCgN1cmwYASABKAlCCrpIB3IFEAEY0A8SPAoGbWV0aG9kGAIgASgOMiIuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5IdHRwTWV0aG9kQgi6SAWCAQIgABJnCgdoZWFkZXJzGAMgAygLMjwuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5XZWJob29rRGVsaXZlcnlUZW1wbGF0ZS5IZWFkZXJzRW50cnlCGLpIFZoBEhAUIgZyBBABGBQqBnIEEAEYMhIVCg1ib2R5X3RlbXBsYXRlGAQgASgJGi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIo0BChVFbWFpbERlbGl2ZXJ5VGVtcGxhdGUSGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQARIKCgJ0bxgCIAMoCRIKCgJjYxgDIAMoCRILCgNiY2MYBCADKAkSHgoNaHRtbF90ZW1wbGF0ZRgFIAEoCUIHukgEcgIQARIVCg10ZXh0X3RlbXBsYXRlGAYgASgJKkUKCUV2ZW50VHlwZRIaChZFVkVOVF9UWVBFX1VOU1BFQ0lGSUVEEAASHAoYRVZFTlRfVFlQRV9SVU5fQ09NUExFVEVEEAEq9wEKCkh0dHBNZXRob2QSGwoXSFRUUF9NRVRIT0RfVU5TUEVDSUZJRUQQABITCg9IVFRQX01FVEhPRF9HRVQQARIUChBIVFRQX01FVEhPRF9IRUFEEAISFAoQSFRUUF9NRVRIT0RfUE9TVBADEhMKD0hUVFBfTUVUSE9EX1BVVBAEEhYKEkhUVFBfTUVUSE9EX0RFTEVURRAFEhcKE0hUVFBfTUVUSE9EX0NPTk5FQ1QQBhIXChNIVFRQX01FVEhPRF9PUFRJT05TEAcSFQoRSFRUUF9NRVRIT0RfVFJBQ0UQCBIVChFIVFRQX01FVEhPRF9QQVRDSBAJQuQBChpjb20uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbkIPRGVmaW5pdGlvblByb3RvSAJQAVo6Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL25vdGlmaWNhdGlvbqICA0ZOWKoCFkZseXRlaWRsMi5Ob3RpZmljYXRpb27KAhZGbHl0ZWlkbDJcTm90aWZpY2F0aW9u4gIiRmx5dGVpZGwyXE5vdGlmaWNhdGlvblxHUEJNZXRhZGF0YeoCF0ZseXRlaWRsMjo6Tm90aWZpY2F0aW9uYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
+  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24icQoGUnVsZUlkEhYKA29yZxgBIAEoCUIJukgGcgQQARg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYPxIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYPxIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BIo4CChZEZWxpdmVyeUNvbmZpZ1RlbXBsYXRlEkAKB3dlYmhvb2sYASABKAsyLy5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLldlYmhvb2tEZWxpdmVyeVRlbXBsYXRlEjwKBWVtYWlsGAIgASgLMi0uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbERlbGl2ZXJ5VGVtcGxhdGU6dLpIcRpvChVhdF9sZWFzdF9vbmVfcmVxdWlyZWQSMGF0IGxlYXN0IG9uZSBvZiB0aGUgZGVsaXZlcnkgb3B0aW9ucyBtdXN0IGJlIHNldBokaGFzKHRoaXMud2ViaG9vaykgfHwgaGFzKHRoaXMuZW1haWwpIpkBCiRSdW5Db21wbGV0ZWROb3RpZmljYXRpb25UZW1wbGF0ZURhdGESNAoDcnVuGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESLAoFcGhhc2UYAiABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEg0KBWVycm9yGAMgASgJIqACChdXZWJob29rRGVsaXZlcnlUZW1wbGF0ZRIXCgN1cmwYASABKAlCCrpIB3IFEAEY0A8SPAoGbWV0aG9kGAIgASgOMiIuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5IdHRwTWV0aG9kQgi6SAWCAQIgABJnCgdoZWFkZXJzGAMgAygLMjwuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5XZWJob29rRGVsaXZlcnlUZW1wbGF0ZS5IZWFkZXJzRW50cnlCGLpIFZoBEhAUIgZyBBABGBQqBnIEEAEYMhIVCg1ib2R5X3RlbXBsYXRlGAQgASgJGi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIi8KDkVtYWlsUmVjaXBpZW50EgwKBG5hbWUYASABKAkSDwoHYWRkcmVzcxgCIAEoCSKPAgoVRW1haWxEZWxpdmVyeVRlbXBsYXRlEhgKB3N1YmplY3QYASABKAlCB7pIBHICEAESPAoCdG8YAiADKAsyJi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkVtYWlsUmVjaXBpZW50Qgi6SAWSAQIIARIyCgJjYxgDIAMoCzImLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRW1haWxSZWNpcGllbnQSMwoDYmNjGAQgAygLMiYuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbFJlY2lwaWVudBIeCg1odG1sX3RlbXBsYXRlGAUgASgJQge6SARyAhABEhUKDXRleHRfdGVtcGxhdGUYBiABKAkqRQoJRXZlbnRUeXBlEhoKFkVWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIcChhFVkVOVF9UWVBFX1JVTl9DT01QTEVURUQQASr3AQoKSHR0cE1ldGhvZBIbChdIVFRQX01FVEhPRF9VTlNQRUNJRklFRBAAEhMKD0hUVFBfTUVUSE9EX0dFVBABEhQKEEhUVFBfTUVUSE9EX0hFQUQQAhIUChBIVFRQX01FVEhPRF9QT1NUEAMSEwoPSFRUUF9NRVRIT0RfUFVUEAQSFgoSSFRUUF9NRVRIT0RfREVMRVRFEAUSFwoTSFRUUF9NRVRIT0RfQ09OTkVDVBAGEhcKE0hUVFBfTUVUSE9EX09QVElPTlMQBxIVChFIVFRQX01FVEhPRF9UUkFDRRAIEhUKEUhUVFBfTUVUSE9EX1BBVENIEAlC5AEKGmNvbS5mbHl0ZWlkbDIubm90aWZpY2F0aW9uQg9EZWZpbml0aW9uUHJvdG9IAlABWjpnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvbm90aWZpY2F0aW9uogIDRk5YqgIWRmx5dGVpZGwyLk5vdGlmaWNhdGlvbsoCFkZseXRlaWRsMlxOb3RpZmljYXRpb27iAiJGbHl0ZWlkbDJcTm90aWZpY2F0aW9uXEdQQk1ldGFkYXRh6gIXRmx5dGVpZGwyOjpOb3RpZmljYXRpb25iBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
 
 /**
  * @generated from message flyteidl2.notification.RuleId
@@ -141,6 +141,28 @@ export const WebhookDeliveryTemplateSchema: GenMessage<WebhookDeliveryTemplate> 
   messageDesc(file_flyteidl2_notification_definition, 3);
 
 /**
+ * @generated from message flyteidl2.notification.EmailRecipient
+ */
+export type EmailRecipient = Message<"flyteidl2.notification.EmailRecipient"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string address = 2;
+   */
+  address: string;
+};
+
+/**
+ * Describes the message flyteidl2.notification.EmailRecipient.
+ * Use `create(EmailRecipientSchema)` to create a new message.
+ */
+export const EmailRecipientSchema: GenMessage<EmailRecipient> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_notification_definition, 4);
+
+/**
  * @generated from message flyteidl2.notification.EmailDeliveryTemplate
  */
 export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliveryTemplate"> & {
@@ -152,19 +174,19 @@ export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliver
   subject: string;
 
   /**
-   * @generated from field: repeated string to = 2;
+   * @generated from field: repeated flyteidl2.notification.EmailRecipient to = 2;
    */
-  to: string[];
+  to: EmailRecipient[];
 
   /**
-   * @generated from field: repeated string cc = 3;
+   * @generated from field: repeated flyteidl2.notification.EmailRecipient cc = 3;
    */
-  cc: string[];
+  cc: EmailRecipient[];
 
   /**
-   * @generated from field: repeated string bcc = 4;
+   * @generated from field: repeated flyteidl2.notification.EmailRecipient bcc = 4;
    */
-  bcc: string[];
+  bcc: EmailRecipient[];
 
   /**
    * this is a Go template that may contain placeholders
@@ -186,7 +208,7 @@ export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliver
  * Use `create(EmailDeliveryTemplateSchema)` to create a new message.
  */
 export const EmailDeliveryTemplateSchema: GenMessage<EmailDeliveryTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 4);
+  messageDesc(file_flyteidl2_notification_definition, 5);
 
 /**
  * @generated from enum flyteidl2.notification.EventType

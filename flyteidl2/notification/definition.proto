@@ -101,14 +101,20 @@ message WebhookDeliveryTemplate {
   string body_template = 4; // this is a Go template that may contain placeholders
 }
 
+message EmailRecipient {
+  string name = 1;
+
+  string address = 2;
+}
+
 message EmailDeliveryTemplate {
   string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated string to = 2;
+  repeated EmailRecipient to = 2 [(buf.validate.field).repeated.min_items = 1];
 
-  repeated string cc = 3;
+  repeated EmailRecipient cc = 3;
 
-  repeated string bcc = 4;
+  repeated EmailRecipient bcc = 4;
 
   string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
