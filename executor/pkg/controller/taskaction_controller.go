@@ -185,7 +185,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	transition, handledByCache, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
+	// cacheShortCircuited is true when cache handling already decided the outcome,
+	// either via cache hit or waiting on the reservation owner.
+	var cacheShortCircuited bool
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
@@ -195,7 +198,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// and emitted action events in the same way as the normal plugin path.
 
 	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
-	if !handledByCache {
+	if !cacheShortCircuited {
 		transition, err = p.Handle(ctx, tCtx)
 		if err != nil {
 			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
@@ -205,7 +208,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	if transition, err = r.handleCacheAfterExecution(ctx, taskAction, tCtx, transition, handledByCache); err != nil {
+	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}

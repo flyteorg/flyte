@@ -27,7 +27,7 @@ type taskCacheConfig struct {
 	serializable bool
 }
 
-func (r *TaskActionReconciler) handleCacheBeforeExecution(
+func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	tCtx pluginsCore.TaskExecutionContext,
@@ -70,19 +70,19 @@ func (r *TaskActionReconciler) handleCacheBeforeExecution(
 	return pluginsCore.UnknownTransition, false, nil
 }
 
-func (r *TaskActionReconciler) handleCacheAfterExecution(
+func (r *TaskActionReconciler) finalizeCacheAfterExecution(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	tCtx pluginsCore.TaskExecutionContext,
 	transition pluginsCore.Transition,
-	handledByCache bool,
+	cacheShortCircuited bool,
 ) (pluginsCore.Transition, error) {
 	cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
 	if err != nil || !ok || r.Catalog == nil {
 		return transition, err
 	}
 
-	if handledByCache {
+	if cacheShortCircuited {
 		return transition, nil
 	}
 

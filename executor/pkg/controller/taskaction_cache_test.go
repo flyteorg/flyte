@@ -105,7 +105,7 @@ func TestHandleCacheBeforeExecutionHit(t *testing.T) {
 		},
 	}
 
-	transition, handled, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseSuccess, transition.Info().Phase())
@@ -135,7 +135,7 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 		},
 	}
 
-	transition, handled, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseWaitingForCache, transition.Info().Phase())
@@ -160,7 +160,7 @@ func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *te
 		},
 	}
 
-	transition, handled, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	require.NoError(t, err)
 	require.False(t, handled)
 	assert.Equal(t, pluginsCore.UnknownTransition, transition)
@@ -196,7 +196,7 @@ func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T)
 	}
 
 	transition := pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(&pluginsCore.TaskInfo{}))
-	transition, err := r.handleCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
+	transition, err := r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
 	require.NoError(t, err)
 	assert.True(t, putCalled)
 	assert.True(t, released)
@@ -222,7 +222,7 @@ func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
 	}
 
 	transition := pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("User", "boom", &pluginsCore.TaskInfo{}))
-	_, err := r.handleCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
+	_, err := r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
 	require.NoError(t, err)
 	assert.True(t, released)
 }
