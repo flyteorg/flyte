@@ -18,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
-	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -168,23 +167,6 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	pod := flytek8s.BuildIdentityPod()
 	pod.ObjectMeta = *objectMeta
 	pod.Spec = *podSpec
-
-	if secrets := taskCtx.TaskExecutionMetadata().GetSecurityContext().GetSecrets(); len(secrets) > 0 {
-		secretAnnotations, err := secretUtils.MarshalSecretsToMapStrings(secrets)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal secrets to annotations: %w", err)
-		}
-		if pod.Annotations == nil {
-			pod.Annotations = make(map[string]string)
-		}
-		for k, v := range secretAnnotations {
-			pod.Annotations[k] = v
-		}
-		if pod.Labels == nil {
-			pod.Labels = make(map[string]string)
-		}
-		pod.Labels[secretUtils.PodLabel] = secretUtils.PodLabelValue
-	}
 
 	return pod, nil
 }

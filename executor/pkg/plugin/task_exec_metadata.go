@@ -9,6 +9,8 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -54,10 +56,22 @@ type taskExecutionMetadata struct {
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
-func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecutionMetadata {
+func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecutionMetadata, error) {
 	// Extract resource requirements from the inline task template
 	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
+
+	// Handling secrets
+	var err error
 	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
+	secretsMap := make(map[string]string)
+	injectLabels := make(map[string]string)
+	if securityContext != nil && len(securityContext.Secrets) > 0 {
+		secretsMap, err = secrets.MarshalSecretsToMapStrings(securityContext.Secrets)
+		if err != nil {
+			return nil, err
+		}
+		injectLabels[secrets.PodLabel] = secrets.PodLabelValue
+	}
 
 	// Build environment variables for the task pod
 	envVars := map[string]string{
@@ -93,13 +107,13 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecuti
 			Name:       ta.Name,
 			UID:        ta.UID,
 		},
-		labels:          ta.Labels,
-		annotations:     ta.Annotations,
+		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
+		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
 		maxAttempts:     1,
 		overrides:       overrides,
 		envVars:         envVars,
 		securityContext: securityContext,
-	}
+	}, nil
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
