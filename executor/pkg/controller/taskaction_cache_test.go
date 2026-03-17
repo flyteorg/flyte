@@ -17,18 +17,12 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	corepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-func init() {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-}
 
 type stubCatalogClient struct {
 	getFunc                    func(context.Context, catalog.Key) (catalog.Entry, error)
@@ -64,6 +58,7 @@ func (s *stubCatalogClient) GetReservationCache(string) catalog.ReservationCache
 func (s *stubCatalogClient) UpdateReservationCache(string, catalog.ReservationCache) {}
 
 func TestBuildTaskCacheConfig(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
@@ -79,6 +74,7 @@ func TestBuildTaskCacheConfig(t *testing.T) {
 }
 
 func TestHandleCacheBeforeExecutionHit(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, false)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
@@ -117,6 +113,7 @@ func TestHandleCacheBeforeExecutionHit(t *testing.T) {
 }
 
 func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
@@ -143,6 +140,7 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 }
 
 func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, false)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
@@ -167,6 +165,7 @@ func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *te
 }
 
 func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
@@ -205,6 +204,7 @@ func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T)
 }
 
 func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
+	ensureTestMetricKeys()
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
