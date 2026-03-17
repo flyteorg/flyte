@@ -31,7 +31,7 @@ func main() {
 			sc.DB = db
 
 			labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewTestScope())
+			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewScope("cache-service"))
 			if err != nil {
 				return fmt.Errorf("failed to initialize storage: %w", err)
 			}
