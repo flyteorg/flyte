@@ -2,6 +2,7 @@ package cacheservice
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"time"
@@ -312,8 +313,12 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, cfg *prop
 	}
 
 	if cfg.Insecure {
-		logger.Debug(ctx, "Establishing insecure connection to CacheService")
+		logger.Debug(ctx, "Establishing insecure (plaintext) connection to CacheService")
 		opts = append(opts, grpc.WithInsecure())
+	} else if cfg.InsecureSkipVerify {
+		logger.Debug(ctx, "Establishing TLS connection to CacheService with insecureSkipVerify")
+		tlsCreds := credentials.NewTLS(&tls.Config{InsecureSkipVerify: true}) //nolint:gosec
+		opts = append(opts, grpc.WithTransportCredentials(tlsCreds))
 	} else {
 		logger.Debug(ctx, "Establishing secure connection to CacheService")
 		pool, err := x509.SystemCertPool()

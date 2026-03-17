@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_insecure-skip-verify", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("insecure-skip-verify", testValue)
+			if vBool, err := cmdFlags.GetBool("insecure-skip-verify"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.InsecureSkipVerify)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_max-cache-age", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

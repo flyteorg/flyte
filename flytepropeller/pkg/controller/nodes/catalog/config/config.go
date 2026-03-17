@@ -46,7 +46,8 @@ type Config struct {
 	Type                    DiscoveryType   `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
 	Endpoint                string          `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
 	CacheEndpoint           string          `json:"cache-endpoint" pflag:"\"\", Endpoint for cache service"`
-	Insecure                bool            `json:"insecure" pflag:"false, Use insecure grpc connection"`
+	Insecure                bool            `json:"insecure" pflag:"false, Use insecure (plaintext) grpc connection"`
+	InsecureSkipVerify      bool            `json:"insecure-skip-verify" pflag:"false, Use TLS but skip server certificate verification (for self-signed certs)"`
 	MaxCacheAge             config.Duration `json:"max-cache-age" pflag:", Cache entries past this age will incur cache miss. 0 means cache never expires"`
 	UseAdminAuth            bool            `json:"use-admin-auth" pflag:"false, Use the same gRPC credentials option as the flyteadmin client"`
 	MaxRetries              int             `json:"max-retries" pflag:",The max number of retries for event recording."`
