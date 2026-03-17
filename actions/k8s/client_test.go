@@ -8,7 +8,9 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -172,4 +174,143 @@ func TestBuildNamespace(t *testing.T) {
 		}
 		assert.Equal(t, "myproject-production", buildNamespace(runID))
 	})
+}
+
+// mockWatcher implements watch.Interface for testing
+type mockWatcher struct {
+	ch chan watch.Event
+}
+
+func (m *mockWatcher) Stop()                          {}
+func (m *mockWatcher) ResultChan() <-chan watch.Event  { return m.ch }
+
+// mockK8sClient implements a minimal client.WithWatch for testing doWatch
+type mockK8sClient struct {
+	client.WithWatch
+	watchFn func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error)
+}
+
+func (m *mockK8sClient) Watch(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+	return m.watchFn(ctx, obj, opts...)
+}
+
+func TestHandleWatchEvent_UpdatesResourceVersion(t *testing.T) {
+	c := &ActionsClient{
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Org:        "org",
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			ActionName: "action-1",
+		},
+	}
+	ta.ResourceVersion = "500"
+
+	c.handleWatchEvent(context.Background(), watch.Event{
+		Type:   watch.Modified,
+		Object: ta,
+	})
+
+	c.mu.RLock()
+	assert.Equal(t, "500", c.lastResourceVersion)
+	c.mu.RUnlock()
+}
+
+func TestDoWatch_PassesResourceVersionOnReconnect(t *testing.T) {
+	var capturedOpts *client.ListOptions
+
+	eventCh := make(chan watch.Event)
+	close(eventCh)
+
+	mk := &mockK8sClient{
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			capturedOpts = &client.ListOptions{}
+			for _, opt := range opts {
+				opt.ApplyToList(capturedOpts)
+			}
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	c := &ActionsClient{
+		k8sClient:           mk,
+		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	_ = c.doWatch(context.Background())
+
+	assert.NotNil(t, capturedOpts)
+	assert.NotNil(t, capturedOpts.Raw)
+	assert.Equal(t, "100", capturedOpts.Raw.ResourceVersion)
+}
+
+func TestDoWatch_HandlesGoneError(t *testing.T) {
+	eventCh := make(chan watch.Event, 1)
+	eventCh <- watch.Event{
+		Type: watch.Error,
+		Object: &metav1.Status{
+			Code:   410,
+			Reason: metav1.StatusReasonGone,
+		},
+	}
+
+	mk := &mockK8sClient{
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	c := &ActionsClient{
+		k8sClient:           mk,
+		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	err := c.doWatch(context.Background())
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "watch error")
+
+	c.mu.RLock()
+	assert.Equal(t, "", c.lastResourceVersion)
+	c.mu.RUnlock()
+}
+
+func TestDoWatch_PreservesResourceVersionOnOtherErrors(t *testing.T) {
+	eventCh := make(chan watch.Event, 1)
+	eventCh <- watch.Event{
+		Type: watch.Error,
+		Object: &metav1.Status{
+			Code:   500,
+			Reason: metav1.StatusReasonInternalError,
+		},
+	}
+
+	mk := &mockK8sClient{
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	c := &ActionsClient{
+		k8sClient:           mk,
+		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	err := c.doWatch(context.Background())
+
+	assert.Error(t, err)
+
+	c.mu.RLock()
+	assert.Equal(t, "100", c.lastResourceVersion)
+	c.mu.RUnlock()
 }

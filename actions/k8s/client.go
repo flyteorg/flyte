@@ -9,6 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -56,6 +57,9 @@ type ActionsClient struct {
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
+	// lastResourceVersion tracks the most recent ResourceVersion from watch events,
+	// used to resume watches without replaying already-seen events.
+	lastResourceVersion string
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
@@ -363,11 +367,23 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 func (c *ActionsClient) doWatch(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 
+	c.mu.RLock()
+	rv := c.lastResourceVersion
+	c.mu.RUnlock()
+
 	timeout := int64(300) // 5 minutes
 	watcher, err := c.k8sClient.Watch(ctx, taskActionList, &client.ListOptions{
-		Raw: &metav1.ListOptions{TimeoutSeconds: &timeout},
+		Raw: &metav1.ListOptions{
+			TimeoutSeconds:  &timeout,
+			ResourceVersion: rv,
+		},
 	})
 	if err != nil {
+		if apierrors.IsGone(err) {
+			c.mu.Lock()
+			c.lastResourceVersion = ""
+			c.mu.Unlock()
+		}
 		return fmt.Errorf("failed to start watch: %w", err)
 	}
 	defer watcher.Stop()
@@ -382,6 +398,14 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 			if !ok {
 				return fmt.Errorf("watch channel closed")
 			}
+			if event.Type == watch.Error {
+				if status, ok := event.Object.(*metav1.Status); ok && status.Reason == metav1.StatusReasonGone {
+					c.mu.Lock()
+					c.lastResourceVersion = ""
+					c.mu.Unlock()
+				}
+				return fmt.Errorf("watch error: %v", event.Object)
+			}
 			c.handleWatchEvent(ctx, event)
 		}
 	}
@@ -393,6 +417,13 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !ok {
 		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
 		return
+	}
+
+	// Track ResourceVersion for watch resumption
+	if taskAction.ResourceVersion != "" {
+		c.mu.Lock()
+		c.lastResourceVersion = taskAction.ResourceVersion
+		c.mu.Unlock()
 	}
 
 	var parentName string
