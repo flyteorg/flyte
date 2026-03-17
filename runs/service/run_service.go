@@ -283,14 +283,10 @@ func (s *RunService) GetRunDetails(
 		Run:  req.Msg.RunId,
 		Name: run.Name,
 	}
+
 	details := &workflow.RunDetails{
-		Action: &workflow.ActionDetails{
-			Id: rootActionID,
-			Status: &workflow.ActionStatus{
-				Phase:     common.ActionPhase(run.Phase),
-				StartTime: timestamppb.New(run.CreatedAt),
-			},
-		},
+		RunSpec: extractRunSpec(run.ActionSpec),
+		Action:  s.actionModelToDetails(run, rootActionID),
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
@@ -843,6 +839,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(action.EndedAt.Time.Sub(action.CreatedAt).Microseconds())
+		status.DurationMs = &durationMs
 	}
 
 	phase := common.ActionPhase(action.Phase)
@@ -860,11 +858,37 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		EndTime:   status.EndTime,
 	}}
 
-	return &workflow.ActionDetails{
+	var spec workflow.ActionSpec
+	if len(action.ActionSpec) > 0 {
+		if err := json.Unmarshal(action.ActionSpec, &spec); err == nil {
+			switch s := spec.Spec.(type) {
+			case *workflow.ActionSpec_Task:
+				spec.Spec = s
+			}
+		}
+	}
+
+	details := &workflow.ActionDetails{
 		Id:       actionID,
 		Status:   status,
 		Attempts: []*workflow.ActionAttempt{attempt},
 	}
+
+	specMsg := extractActionSpec(action.ActionSpec)
+	if specMsg != nil {
+		switch s := specMsg.Spec.(type) {
+		case *workflow.ActionSpec_Task:
+			details.Spec = &workflow.ActionDetails_Task{
+				Task: s.Task.Spec,
+			}
+		case *workflow.ActionSpec_Trace:
+			details.Spec = &workflow.ActionDetails_Trace{
+				Trace: s.Trace.Spec,
+			}
+		}
+	}
+
+	return details
 }
 
 // extractStorageURIs parses ActionSpec JSON to extract InputUri and RunOutputBase.
@@ -880,6 +904,30 @@ func extractStorageURIs(specJSON []byte) (inputURI, runOutputBase string) {
 		return
 	}
 	return spec.InputUri, spec.RunOutputBase
+}
+
+// extractRunSpec parses ActionSpec JSON to extract the RunSpec
+func extractActionSpec(specJSON []byte) *workflow.ActionSpec {
+	if len(specJSON) == 0 {
+		return nil
+	}
+	var specMsg workflow.ActionSpec
+	if err := json.Unmarshal(specJSON, &specMsg); err != nil {
+		return nil
+	}
+	return &specMsg
+}
+
+// extractRunSpec parses ActionSpec JSON to extract the RunSpec
+func extractRunSpec(specJSON []byte) *task.RunSpec {
+	if len(specJSON) == 0 {
+		return nil
+	}
+	spec := extractActionSpec(specJSON)
+	if spec == nil {
+		return nil
+	}
+	return spec.RunSpec
 }
 
 // Helper functions
