@@ -9,7 +9,6 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -588,15 +587,11 @@ func extractTaskCacheKey(action *actions.Action) string {
 		return ""
 	}
 
-	return getStringValue(taskSpec.Task.CacheKey)
-}
-
-func getStringValue(v *wrapperspb.StringValue) string {
-	if v == nil {
+	if taskSpec.Task.CacheKey == nil {
 		return ""
 	}
 
-	return v.Value
+	return taskSpec.Task.CacheKey.Value
 }
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.
