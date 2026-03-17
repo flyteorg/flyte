@@ -52,22 +52,22 @@ func (r *TaskActionReconciler) handleCacheBeforeExecution(
 		return pluginsCore.UnknownTransition, false, nil
 	}
 
-	if !cacheCfg.serializable {
-		return pluginsCore.UnknownTransition, false, nil
+	if cacheCfg.serializable {
+		reservation, err := r.Catalog.GetOrExtendReservation(ctx, cacheCfg.key, cacheCfg.ownerID, cacheReservationHeartbeatInterval)
+		if err != nil {
+			return pluginsCore.UnknownTransition, false, fmt.Errorf("acquiring cache reservation: %w", err)
+		}
+		if reservation.GetOwnerId() == cacheCfg.ownerID {
+			return pluginsCore.UnknownTransition, false, nil
+		}
+
+		info := cacheTaskInfo(corepb.CatalogCacheStatus_CACHE_MISS, "waiting for serialized cache owner")
+		phaseInfo := pluginsCore.PhaseInfoWaitingForCache(taskAction.Status.PluginPhaseVersion, info)
+		phaseInfo.WithReason(fmt.Sprintf("waiting for cache to be populated by reservation owner %q", reservation.GetOwnerId()))
+		return pluginsCore.DoTransition(phaseInfo), true, nil
 	}
 
-	reservation, err := r.Catalog.GetOrExtendReservation(ctx, cacheCfg.key, cacheCfg.ownerID, cacheReservationHeartbeatInterval)
-	if err != nil {
-		return pluginsCore.UnknownTransition, false, fmt.Errorf("acquiring cache reservation: %w", err)
-	}
-	if reservation.GetOwnerId() == cacheCfg.ownerID {
-		return pluginsCore.UnknownTransition, false, nil
-	}
-
-	info := cacheTaskInfo(corepb.CatalogCacheStatus_CACHE_MISS, "waiting for serialized cache owner")
-	phaseInfo := pluginsCore.PhaseInfoWaitingForCache(taskAction.Status.PluginPhaseVersion, info)
-	phaseInfo.WithReason(fmt.Sprintf("waiting for cache to be populated by reservation owner %q", reservation.GetOwnerId()))
-	return pluginsCore.DoTransition(phaseInfo), true, nil
+	return pluginsCore.UnknownTransition, false, nil
 }
 
 func (r *TaskActionReconciler) handleCacheAfterExecution(

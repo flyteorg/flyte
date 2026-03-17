@@ -142,6 +142,30 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_MISS, transition.Info().Info().ExternalResources[0].CacheStatus)
 }
 
+func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *testing.T) {
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, false)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+			},
+			getOrExtendReservationFunc: func(context.Context, catalog.Key, string, time.Duration) (*cacheservice.Reservation, error) {
+				t.Fatal("reservation should not be requested for non-serializable cache")
+				return nil, nil
+			},
+		},
+	}
+
+	transition, handled, err := r.handleCacheBeforeExecution(ctx, taskAction, tCtx)
+	require.NoError(t, err)
+	require.False(t, handled)
+	assert.Equal(t, pluginsCore.UnknownTransition, transition)
+}
+
 func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T) {
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
