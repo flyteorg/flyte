@@ -98,8 +98,10 @@ func GetDockerClient() (Docker, error) {
 					)
 					if altErr == nil {
 						if _, altPingErr := altCli.Ping(context.Background()); altPingErr == nil {
+							cli.Close()
 							return altCli, nil
 						}
+						altCli.Close()
 					}
 				}
 			}
