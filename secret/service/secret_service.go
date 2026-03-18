@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"connectrpc.com/connect"
@@ -14,6 +13,7 @@ import (
 
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	secretpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret/secretconnect"
 	"github.com/flyteorg/flyte/v2/secret/config"
@@ -37,15 +37,10 @@ func NewSecretService(k8sClient client.Client) *SecretService {
 	return &SecretService{k8sClient: k8sClient}
 }
 
-// getK8sSecretName decodes the base64 URL-encoded secret name from the identifier
-// and returns both the decoded name and the k8s-safe MD5-hashed name.
-func getK8sSecretName(ctx context.Context, id *secretpb.SecretIdentifier) (string, string, error) {
-	decoded, err := base64.URLEncoding.DecodeString(id.GetName())
-	if err != nil {
-		logger.Errorf(ctx, "failed to base64 decode secret name %v: %v", id.GetName(), err)
-		return "", "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid secret name encoding: %w", err))
-	}
-	secretName := string(decoded)
+// getK8sSecretName returns the secret name and its k8s-safe MD5-hashed name.
+func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string, string, error) {
+	secretName := id.GetName()
+	// We need to encode to make sure it is a valid secret name
 	k8sSecretName := flytesecret.EncodeK8sSecretName(secretName)
 	return secretName, k8sSecretName, nil
 }
@@ -152,7 +147,8 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 		Secret: &secretpb.Secret{
 			Id: req.Msg.GetId(),
 			SecretMetadata: &secretpb.SecretMetadata{
-				CreatedTime: timestamppb.New(k8sSecret.GetCreationTimestamp().Time),
+				CreatedTime:  timestamppb.New(k8sSecret.GetCreationTimestamp().Time),
+				SecretStatus: fullyPresentStatus(),
 			},
 		},
 	}), nil
@@ -220,9 +216,15 @@ func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[se
 			break
 		}
 		rawSecrets = append(rawSecrets, &secretpb.Secret{
-			Id: &secretpb.SecretIdentifier{Name: secretName},
+			Id: &secretpb.SecretIdentifier{
+				Organization: req.Msg.GetOrganization(),
+				Project:      req.Msg.GetProject(),
+				Domain:       req.Msg.GetDomain(),
+				Name:         secretName,
+			},
 			SecretMetadata: &secretpb.SecretMetadata{
-				CreatedTime: timestamppb.New(k8sSecret.GetCreationTimestamp().Time),
+				CreatedTime:  timestamppb.New(k8sSecret.GetCreationTimestamp().Time),
+				SecretStatus: fullyPresentStatus(),
 			},
 		})
 	}
@@ -231,6 +233,22 @@ func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[se
 		Secrets: rawSecrets,
 		Token:   k8sSecretList.Continue,
 	}), nil
+}
+
+// fullyPresentStatus returns a SecretStatus indicating the secret is present in this single cluster.
+func fullyPresentStatus() *secretpb.SecretStatus {
+	cfg := config.GetConfig()
+	return &secretpb.SecretStatus{
+		OverallStatus: secretpb.OverallStatus_FULLY_PRESENT,
+		ClusterStatus: []*secretpb.ClusterSecretStatus{
+			{
+				Cluster: &commonpb.ClusterIdentifier{
+					Name: cfg.Kubernetes.ClusterName,
+				},
+				PresenceStatus: secretpb.SecretPresenceStatus_PRESENT,
+			},
+		},
+	}
 }
 
 // buildK8sSecret constructs a Kubernetes Secret object from the decoded secret name and spec.

@@ -162,6 +162,8 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
+- /flyteidl2.secret.SecretService
+- /flyteidl2.secret.SecretService/*
 {{- end -}}
 
 {{/*

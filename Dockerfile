@@ -20,6 +20,7 @@ COPY gen/go gen/go
 COPY actions actions
 COPY events events
 COPY runs runs
+COPY secret secret
 
 COPY go.mod go.sum ./
 RUN go mod download

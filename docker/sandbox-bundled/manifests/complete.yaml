@@ -700,6 +700,13 @@ data:
         port: 8090
       storagePrefix: s3://flyte-data
       watchBufferSize: 100
+    secret:
+      kubernetes:
+        burst: 200
+        kubeconfig: ""
+        namespace: flyte
+        qps: 100
+        timeout: 30s
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -895,6 +902,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.secret.SecretService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -1006,7 +1018,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: emM2QnVqZHg2bDRmNU5SRg==
+  haSharedSecret: c0VTQk43T0k4dDczcVBGWQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1356,7 +1368,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 3b0d6da5b288489c1f1dd02d5cfa086b29ef51328f9f6b729836a22a7a8cd4e1
+        checksum/configuration: 2e45ef54e866487c2143aa05521765fab5d11aac321e1d04f86faa2153e4af32
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1504,7 +1516,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 796feb18367c04449fe1a0f869fa44179d659d4357a7f83833c3e905b7df3072
+        checksum/secret: 19a666fab2b86c744b2ae2bfbf0cd7208da8d31649aebf0c823c2be9f6c4afe2
       labels:
         app: docker-registry
         release: flyte-sandbox

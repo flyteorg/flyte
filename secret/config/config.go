@@ -14,10 +14,11 @@ var defaultConfig = &Config{
 		Host: "0.0.0.0",
 	},
 	Kubernetes: KubernetesConfig{
-		Namespace: "flyte",
-		QPS:       100,
-		Burst:     200,
-		Timeout:   "30s",
+		Namespace:   "flyte",
+		ClusterName: "flyte-sandbox",
+		QPS:         100,
+		Burst:       200,
+		Timeout:     "30s",
 	},
 }
 
@@ -42,6 +43,9 @@ type ServerConfig struct {
 type KubernetesConfig struct {
 	// Namespace where secrets are managed
 	Namespace string `json:"namespace" pflag:",Kubernetes namespace for secret operations"`
+
+	// ClusterName is the logical name of this cluster, used in secret status reporting
+	ClusterName string `json:"clusterName" pflag:",Logical name of the cluster for secret status reporting"`
 
 	// KubeConfig path (optional - if empty, uses in-cluster config)
 	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
