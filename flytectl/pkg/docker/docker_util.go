@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -60,6 +62,24 @@ var (
 	ExtraHosts         = []string{"host.docker.internal:host-gateway"}
 )
 
+// dockerDesktopSocketPaths returns well-known Docker Desktop socket paths
+// for macOS and Linux when the default /var/run/docker.sock is absent.
+func dockerDesktopSocketPaths() []string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+	paths := []string{
+		filepath.Join(home, ".docker", "run", "docker.sock"),
+	}
+	if runtime.GOOS == "darwin" {
+		paths = append(paths,
+			filepath.Join(home, "Library", "Containers", "com.docker.docker", "Data", "docker-cli.sock"),
+		)
+	}
+	return paths
+}
+
 // GetDockerClient will returns the docker client
 func GetDockerClient() (Docker, error) {
 	if Client == nil {
@@ -68,6 +88,23 @@ func GetDockerClient() (Docker, error) {
 			fmt.Printf("%v Please Check your docker client %v \n", emoji.GrimacingFace, emoji.Whale)
 			return nil, err
 		}
+
+		if _, pingErr := cli.Ping(context.Background()); pingErr != nil && os.Getenv("DOCKER_HOST") == "" {
+			for _, sock := range dockerDesktopSocketPaths() {
+				if _, statErr := os.Stat(sock); statErr == nil {
+					altCli, altErr := client.NewClientWithOpts(
+						client.WithHost("unix://"+sock),
+						client.WithAPIVersionNegotiation(),
+					)
+					if altErr == nil {
+						if _, altPingErr := altCli.Ping(context.Background()); altPingErr == nil {
+							return altCli, nil
+						}
+					}
+				}
+			}
+		}
+
 		return cli, nil
 	}
 	return Client, nil
