@@ -35,7 +35,9 @@ compilation is done locally so no flyte cluster is required.
 func compileFromPackage(packagePath string) error {
 	args := []string{packagePath}
 	fileList, tmpDir, err := register.GetSerializeOutputFiles(context.Background(), args, true)
-	defer os.RemoveAll(tmpDir)
+	if tmpDir != "" {
+		defer os.RemoveAll(tmpDir)
+	}
 	if err != nil {
 		fmt.Println("Error found while extracting package..")
 		return err
