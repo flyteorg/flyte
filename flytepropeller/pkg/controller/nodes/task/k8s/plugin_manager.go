@@ -261,7 +261,7 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
-			// return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
 		} else if k8serrors.IsRequestEntityTooLargeError(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
