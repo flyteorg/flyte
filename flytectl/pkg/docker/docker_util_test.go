@@ -335,6 +335,14 @@ func TestWaitForSandbox(t *testing.T) {
 	})
 }
 
+func TestDockerDesktopSocketPaths(t *testing.T) {
+	paths := dockerDesktopSocketPaths()
+	assert.NotEmpty(t, paths)
+	home, err := os.UserHomeDir()
+	assert.NoError(t, err)
+	assert.Contains(t, paths[0], filepath.Join(home, ".docker", "run", "docker.sock"))
+}
+
 func TestDockerClient(t *testing.T) {
 	t.Run("Successfully get docker mock client", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
