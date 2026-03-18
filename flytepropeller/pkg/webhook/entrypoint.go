@@ -59,7 +59,7 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {
+func createMutationConfig(ctx context.Context, kubeClient kubernetes.Interface, webhookObj *PodMutator, defaultNamespace string) error {
 	shouldAddLabels := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {
