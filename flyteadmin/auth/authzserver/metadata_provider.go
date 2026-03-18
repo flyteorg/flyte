@@ -84,6 +84,7 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 		if err != nil {
 			return nil, err
 		}
+		defer response.Body.Close()
 
 		raw, err := ioutil.ReadAll(response.Body)
 		if err != nil {
@@ -137,6 +138,7 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, url strin
 				return err
 			}
 			if response != nil && response.StatusCode >= http.StatusUnauthorized && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
+				response.Body.Close()
 				logger.Errorf(ctx, "Failed to get oauth metadata, going to retry. StatusCode: %v Err: %v", response.StatusCode, err)
 				return retryableOauthMetadataError
 			}

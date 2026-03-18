@@ -50,11 +50,11 @@ func ExtractTar(ss io.Reader, destination string) error {
 				return err
 			}
 			for {
-				// Read one 1MB at a time.
 				if _, err := io.CopyN(outFile, tarReader, 1024*1024); err != nil {
 					if err == io.EOF {
 						break
 					}
+					outFile.Close()
 					return err
 				}
 			}
