@@ -152,6 +152,7 @@ func (c CollectionProxy) MergeAllConfigs() (all Viper, err error) {
 		}
 
 		err = combinedConfig.MergeConfig(reader)
+		reader.Close()
 		if err != nil {
 			return nil, err
 		}

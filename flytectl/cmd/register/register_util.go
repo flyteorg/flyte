@@ -857,6 +857,7 @@ func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader) err
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		raw, err := ioutil.ReadAll(res.Body)
