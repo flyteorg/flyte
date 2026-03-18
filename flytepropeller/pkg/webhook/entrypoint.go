@@ -59,16 +59,16 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {
-	shouldAddOwnerRef := true
+func createMutationConfig(ctx context.Context, kubeClient kubernetes.Interface, webhookObj *PodMutator, defaultNamespace string) error {
+	shouldAddLabels := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {
-		shouldAddOwnerRef = false
+		shouldAddLabels = false
 	}
 
 	podNamespace, found := os.LookupEnv(PodNamespaceEnvVar)
 	if !found {
-		shouldAddOwnerRef = false
+		shouldAddLabels = false
 		podNamespace = defaultNamespace
 	}
 
@@ -77,15 +77,13 @@ func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset,
 		return err
 	}
 
-	if shouldAddOwnerRef {
-		// Lookup the pod to retrieve its UID
-		p, err := kubeClient.CoreV1().Pods(podNamespace).Get(ctx, podName, v1.GetOptions{})
-		if err != nil {
-			logger.Infof(ctx, "Failed to get Pod [%v/%v]. Error: %v", podNamespace, podName, err)
-			return fmt.Errorf("failed to get pod. Error: %w", err)
+	if shouldAddLabels {
+		if mutateConfig.Labels == nil {
+			mutateConfig.Labels = make(map[string]string)
 		}
-
-		mutateConfig.OwnerReferences = p.OwnerReferences
+		mutateConfig.Labels["app.kubernetes.io/managed-by"] = "flyte-pod-webhook"
+		mutateConfig.Labels["flyte.org/webhook-pod-name"] = podName
+		mutateConfig.Labels["flyte.org/webhook-pod-namespace"] = podNamespace
 	}
 
 	logger.Infof(ctx, "Creating MutatingWebhookConfiguration [%v/%v]", mutateConfig.GetNamespace(), mutateConfig.GetName())
