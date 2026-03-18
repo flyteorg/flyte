@@ -17,6 +17,7 @@ import (
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
@@ -374,7 +375,7 @@ func TestAssignResource(t *testing.T) {
 }
 
 func TestConvertTaskResourcesToRequirements(t *testing.T) {
-	resourceRequirements := convertTaskResourcesToRequirements(v1alpha1.TaskResources{
+	taskRes := v1alpha1.TaskResources{
 		Requests: v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("1"),
 			Memory:           resource.MustParse("2"),
@@ -387,21 +388,36 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			EphemeralStorage: resource.MustParse("30"),
 			GPU:              resource.MustParse("50"),
 		},
+	}
+
+	t.Run("default nvidia GPU resource name", func(t *testing.T) {
+		resourceRequirements := convertTaskResourcesToRequirements(taskRes)
+		assert.EqualValues(t, &corev1.ResourceRequirements{
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:              resource.MustParse("1"),
+				corev1.ResourceMemory:           resource.MustParse("2"),
+				corev1.ResourceEphemeralStorage: resource.MustParse("3"),
+				utils.ResourceNvidiaGPU:         resource.MustParse("5"),
+			},
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:              resource.MustParse("10"),
+				corev1.ResourceMemory:           resource.MustParse("20"),
+				corev1.ResourceEphemeralStorage: resource.MustParse("30"),
+				utils.ResourceNvidiaGPU:         resource.MustParse("50"),
+			},
+		}, resourceRequirements)
 	})
-	assert.EqualValues(t, &corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:              resource.MustParse("1"),
-			corev1.ResourceMemory:           resource.MustParse("2"),
-			corev1.ResourceEphemeralStorage: resource.MustParse("3"),
-			utils.ResourceNvidiaGPU:         resource.MustParse("5"),
-		},
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:              resource.MustParse("10"),
-			corev1.ResourceMemory:           resource.MustParse("20"),
-			corev1.ResourceEphemeralStorage: resource.MustParse("30"),
-			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
-		},
-	}, resourceRequirements)
+
+	t.Run("custom GPU resource name from config", func(t *testing.T) {
+		cfg := k8sConfig.GetK8sPluginConfig()
+		origName := cfg.GpuResourceName
+		cfg.GpuResourceName = "amd.com/gpu"
+		defer func() { cfg.GpuResourceName = origName }()
+
+		resourceRequirements := convertTaskResourcesToRequirements(taskRes)
+		assert.Equal(t, resource.MustParse("5"), resourceRequirements.Requests[corev1.ResourceName("amd.com/gpu")])
+		assert.Equal(t, resource.MustParse("50"), resourceRequirements.Limits[corev1.ResourceName("amd.com/gpu")])
+	})
 }
 
 func TestComputeRawOutputPrefix(t *testing.T) {

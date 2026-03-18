@@ -13,6 +13,7 @@ import (
 	pluginCatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -21,7 +22,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -192,21 +192,21 @@ func assignResource(resourceName v1.ResourceName, execConfigRequest, execConfigL
 }
 
 func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v1.ResourceRequirements {
+	gpuResourceName := k8sConfig.GetK8sPluginConfig().GpuResourceName
 	return &v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU:              taskResources.Requests.CPU,
 			v1.ResourceMemory:           taskResources.Requests.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Requests.EphemeralStorage,
-			utils.ResourceNvidiaGPU:     taskResources.Requests.GPU,
+			gpuResourceName:             taskResources.Requests.GPU,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceCPU:              taskResources.Limits.CPU,
 			v1.ResourceMemory:           taskResources.Limits.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Limits.EphemeralStorage,
-			utils.ResourceNvidiaGPU:     taskResources.Limits.GPU,
+			gpuResourceName:             taskResources.Limits.GPU,
 		},
 	}
-
 }
 
 // ComputeRawOutputPrefix constructs the output directory, where raw outputs of a task can be stored by the task. FlytePropeller may not have
