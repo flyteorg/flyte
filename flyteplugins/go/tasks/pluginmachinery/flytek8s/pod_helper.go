@@ -1030,7 +1030,8 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 								// allow a grace period for kubelet to resolve
 								// transient issues with the container runtime. If the
 								// error persists beyond this time, the corresponding
-								// task is marked as failed.
+								// task is marked as a system-retryable failure so that
+								// system retries can handle transient infrastructure errors.
 								// NOTE: The current implementation checks for a timeout
 								// by comparing the condition's LastTransitionTime
 								// based on the corresponding kubelet's clock with the
@@ -1042,7 +1043,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
-									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
@@ -1051,7 +1052,7 @@ func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (plu
 							case "CreateContainerConfigError":
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
-									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
