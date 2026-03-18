@@ -21,6 +21,7 @@ import (
 type SecretsInjector interface {
 	Type() config.SecretManagerType
 	Inject(ctx context.Context, secrets *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error)
+	InvalidateCache(ctx context.Context, org, domain, project, secretName string)
 }
 
 func newSecretsInjector(

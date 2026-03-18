@@ -75,6 +75,13 @@ func (s *SecretsPodMutator) LabelSelector() *metav1.LabelSelector {
 	}
 }
 
+// InvalidateCache invalidates the secret cache across all injectors for the given secret.
+func (s *SecretsPodMutator) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	for _, injector := range s.injectors {
+		injector.InvalidateCache(ctx, org, domain, project, secretName)
+	}
+}
+
 func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secret, pod *corev1.Pod) (*corev1.Pod, bool /*injected*/, error) {
 	logger.Debugf(ctx, "Injecting secret [%v].", secret)
 	for _, secretManagerType := range s.enabledSecretManagerTypes {
@@ -96,6 +103,14 @@ func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secre
 
 	err := fmt.Errorf("failed to inject secret [%v] using any of the enabled secret managers: %v. Possible reasons: the secret cannot be found or an internal error occurred", secret, s.enabledSecretManagerTypes)
 	return pod, false, err
+}
+
+// NewSecretsMutatorFromInjectors creates a SecretsPodMutator from pre-built injectors. Useful for testing.
+func NewSecretsMutatorFromInjectors(enabledTypes []config.SecretManagerType, injectors map[config.SecretManagerType]SecretsInjector) *SecretsPodMutator {
+	return &SecretsPodMutator{
+		enabledSecretManagerTypes: enabledTypes,
+		injectors:                 injectors,
+	}
 }
 
 // NewSecretsMutator creates a new SecretsMutator with all available plugins.

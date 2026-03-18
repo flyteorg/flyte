@@ -107,6 +107,9 @@ spec:
         {{- end }}
           ports:
           - containerPort: 9443
+          - containerPort: 9444
+            name: cache-internal
+            protocol: TCP
           {{- if .Values.webhook.prometheus.enabled }}
           - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
             name: debug
@@ -157,6 +160,10 @@ spec:
       protocol: TCP
       port: 443
       targetPort: 9443
+    - name: cache-internal
+      protocol: TCP
+      port: 9444
+      targetPort: 9444
 ---
 # Create a ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/

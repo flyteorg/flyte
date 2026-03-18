@@ -38,6 +38,8 @@ func (a AzureSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeAzure
 }
 
+func (a AzureSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}
+
 func (a AzureSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Group) == 0 { // Group version allowed to be empty to retrieve latest secret
 		return p, false, fmt.Errorf("Azure Secrets Webhook require both group and group version to be set. "+

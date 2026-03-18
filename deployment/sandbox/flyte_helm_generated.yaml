@@ -6371,6 +6371,10 @@ spec:
       protocol: TCP
       port: 443
       targetPort: 9443
+    - name: cache-internal
+      protocol: TCP
+      port: 9444
+      targetPort: 9444
 ---
 # Source: flyte/charts/kubernetes-dashboard/templates/service.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -7562,6 +7566,9 @@ spec:
                   fieldPath: metadata.namespace
           ports:
           - containerPort: 9443
+          - containerPort: 9444
+            name: cache-internal
+            protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

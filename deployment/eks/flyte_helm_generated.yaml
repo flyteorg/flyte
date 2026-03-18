@@ -988,6 +988,10 @@ spec:
       protocol: TCP
       port: 443
       targetPort: 9443
+    - name: cache-internal
+      protocol: TCP
+      port: 9444
+      targetPort: 9444
 ---
 # Source: flyte-core/templates/admin/deployment.yaml
 apiVersion: apps/v1
@@ -1787,6 +1791,9 @@ spec:
                   fieldPath: metadata.namespace
           ports:
           - containerPort: 9443
+          - containerPort: 9444
+            name: cache-internal
+            protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

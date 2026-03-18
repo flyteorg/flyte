@@ -34,6 +34,8 @@ func (i VaultSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeVault
 }
 
+func (i VaultSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}
+
 func (i VaultSecretManagerInjector) Inject(ctx context.Context, secret *coreIdl.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Group) == 0 || len(secret.Key) == 0 {
 		return p, false, fmt.Errorf("Vault Secrets Webhook requires both key and group to be set. "+

@@ -731,3 +731,31 @@ func (f secretFetcherMock) GetSecretValue(ctx context.Context, secretID string) 
 
 	return &v, nil
 }
+
+func TestEmbeddedSecretManagerInjector_InvalidateCache(t *testing.T) {
+	ctx := context.Background()
+	mockCache := cacheMocks.NewMockCache[SecretValue](false)
+
+	org := "test-org"
+	domain := "test-domain"
+	project := "test-project"
+	secretName := "test-secret"
+
+	cacheKey := EncodeSecretName(org, domain, project, secretName)
+	secretValue := SecretValue{StringValue: "test-value"}
+	_ = mockCache.Set(ctx, cacheKey, secretValue)
+
+	// Verify it's in cache
+	_, err := mockCache.Get(ctx, cacheKey)
+	assert.NoError(t, err)
+
+	injector := &EmbeddedSecretManagerInjector{
+		secretCache: mockCache,
+	}
+
+	injector.InvalidateCache(ctx, org, domain, project, secretName)
+
+	// Verify entry is removed
+	_, err = mockCache.Get(ctx, cacheKey)
+	assert.Error(t, err, "cache entry should be removed")
+}

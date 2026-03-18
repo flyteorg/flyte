@@ -78,6 +78,15 @@ func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeEmbedded
 }
 
+func (i *EmbeddedSecretManagerInjector) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	cacheKey := EncodeSecretName(org, domain, project, secretName)
+	if err := i.secretCache.Delete(ctx, cacheKey); err != nil {
+		logger.Debugf(ctx, "Failed to delete cache entry [%s]: %v", cacheKey, err)
+	}
+
+	logger.Infof(ctx, "Invalidated cache entry [%s]", cacheKey)
+}
+
 func GetSecretID(secretKey string, source admin.AttributesSource, labels map[string]string) (string, error) {
 	err := validateRequiredFieldsExist(labels)
 	if err != nil {

@@ -121,8 +121,9 @@ func (h *PodHandler) Handle(ctx context.Context, request admission.Request) admi
 	return admission.Allowed("No changes")
 }
 
-// initializePodHandlers creates all pod-specific webhook handlers
-func initializePodHandlers(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, podNamespace string, scope promutils.Scope) ([]ResourceHandler, error) {
+// initializePodHandlers creates all pod-specific webhook handlers.
+// It also returns the SecretsPodMutator so the caller can use it for cache invalidation.
+func initializePodHandlers(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, podNamespace string, scope promutils.Scope) ([]ResourceHandler, *secret.SecretsPodMutator, error) {
 	var handlers []ResourceHandler
 
 	decoder := admission.NewDecoder(scheme)
@@ -154,7 +155,7 @@ func initializePodHandlers(ctx context.Context, cfg *config.Config, scheme *runt
 	//   - For Vault secrets, it'll inject the right annotations to trigger Vault's own sidecar/webhook to mount the secret.
 	secretsMutator, err := secret.NewSecretsMutator(ctx, cfg, podNamespace, scope.NewSubScope("secrets"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create secrets mutator: %w", err)
+		return nil, nil, fmt.Errorf("failed to create secrets mutator: %w", err)
 	}
 	secretsHandler := NewPodHandler(decoder, secretsMutator)
 	secretsHandler.mutatingWebhookName = secretsWebhookName
@@ -172,14 +173,14 @@ func initializePodHandlers(ctx context.Context, cfg *config.Config, scheme *runt
 		logger.Infof(ctx, "Enabling Managed Image Mutator")
 		mutator, err := NewManagedImageMutator(managedImagesCfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create managed image mutator: %w", err)
+			return nil, nil, fmt.Errorf("failed to create managed image mutator: %w", err)
 		}
 		handlers = append(handlers, NewPodHandler(decoder, mutator))
 	} else {
 		logger.Infof(ctx, "Managed Image Mutator is disabled")
 	}
 
-	return handlers, nil
+	return handlers, secretsMutator, nil
 }
 
 // getPodAdmissionRules returns the admission rules for pod webhooks

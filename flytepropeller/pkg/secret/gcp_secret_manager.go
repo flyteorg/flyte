@@ -57,6 +57,8 @@ func (i GCPSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeGCP
 }
 
+func (i GCPSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}
+
 func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Group) == 0 || len(secret.GroupVersion) == 0 {
 		return p, false, fmt.Errorf("GCP Secrets Webhook require both group and group version to be set. "+

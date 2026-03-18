@@ -37,6 +37,8 @@ func (i K8sSecretInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeK8s
 }
 
+func (i K8sSecretInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}
+
 func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Group) == 0 || len(secret.Key) == 0 {
 		return nil, false, fmt.Errorf("k8s Secrets Webhook require both key and group to be set. "+

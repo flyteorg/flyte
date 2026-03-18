@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -19,10 +20,11 @@ import (
 // It handles the registration and configuration of pod, node, and potentially other
 // Kubernetes resource mutators in a single place.
 type WebhookConfig struct {
-	cfg          *config.Config
-	handlers     []ResourceHandler
-	caBytes      []byte
-	podNamespace string
+	cfg            *config.Config
+	handlers       []ResourceHandler
+	caBytes        []byte
+	podNamespace   string
+	secretsMutator *secret.SecretsPodMutator
 }
 
 // ResourceHandler represents a generic handler for any Kubernetes resource type
@@ -63,7 +65,7 @@ func NewWebhookConfig(ctx context.Context, cfg *config.Config, scheme *runtime.S
 	var handlers []ResourceHandler
 
 	// Initialize pod handlers
-	podHandlers, err := initializePodHandlers(ctx, cfg, scheme, podNamespace, scope)
+	podHandlers, secretsMutator, err := initializePodHandlers(ctx, cfg, scheme, podNamespace, scope)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize pod handlers: %w", err)
 	}
@@ -82,10 +84,11 @@ func NewWebhookConfig(ctx context.Context, cfg *config.Config, scheme *runtime.S
 	}
 
 	return &WebhookConfig{
-		cfg:          cfg,
-		handlers:     handlers,
-		caBytes:      caBytes,
-		podNamespace: podNamespace,
+		cfg:            cfg,
+		handlers:       handlers,
+		caBytes:        caBytes,
+		podNamespace:   podNamespace,
+		secretsMutator: secretsMutator,
 	}, nil
 }
 
@@ -128,4 +131,9 @@ func (wc *WebhookConfig) CreateMutationWebhookConfiguration(namespace string) (*
 // GetHandlers returns all registered handlers for testing purposes
 func (wc *WebhookConfig) GetHandlers() []ResourceHandler {
 	return wc.handlers
+}
+
+// GetSecretsMutator returns the secrets pod mutator for cache invalidation
+func (wc *WebhookConfig) GetSecretsMutator() *secret.SecretsPodMutator {
+	return wc.secretsMutator
 }

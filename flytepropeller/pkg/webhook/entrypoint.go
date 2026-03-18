@@ -107,6 +107,15 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *secretCon
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
 
+	// Start cache invalidation server if a secrets mutator is available
+	if secretsMutator := webhookConfig.GetSecretsMutator(); secretsMutator != nil && cfg.CacheInvalidationPort > 0 {
+		go func() {
+			if err := StartCacheInvalidationServer(ctx, cfg.CacheInvalidationPort, secretsMutator); err != nil {
+				logger.Errorf(ctx, "Cache invalidation server failed: %v", err)
+			}
+		}()
+	}
+
 	logger.Infof(ctx, "Started propeller webhook")
 	<-ctx.Done()
 

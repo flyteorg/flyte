@@ -29,6 +29,8 @@ func (g GlobalSecrets) Type() config.SecretManagerType {
 	return config.SecretManagerTypeGlobal
 }
 
+func (g GlobalSecrets) InvalidateCache(_ context.Context, _, _, _, _ string) {}
+
 func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	v, err := g.envSecretManager.GetForSecret(ctx, secret)
 	if err != nil {

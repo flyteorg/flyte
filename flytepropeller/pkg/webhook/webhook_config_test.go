@@ -186,7 +186,7 @@ func TestVerifyHandlers(t *testing.T) {
 			EmbeddedSecretManagerConfig: secretManagerConfig,
 		}
 
-		podHandlers, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
+		podHandlers, _, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		nodeHandlers, err := initializeNodeHandlers(ctx, cfg, latest.Scheme, promutils.NewTestScope())

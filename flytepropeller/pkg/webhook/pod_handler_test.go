@@ -96,7 +96,7 @@ func TestInitializePodHandlers(t *testing.T) {
 			EmbeddedSecretManagerConfig: secretManagerConfig,
 		}
 
-		handlers, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
+		handlers, _, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(handlers))
 
@@ -112,7 +112,7 @@ func TestInitializePodHandlers(t *testing.T) {
 			ImageBuilderConfig:          testImageBuilderConfig,
 		}
 
-		handlers, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
+		handlers, _, err := initializePodHandlers(ctx, cfg, latest.Scheme, testNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 		assert.Equal(t, 2, len(handlers))
 

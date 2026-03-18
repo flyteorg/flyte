@@ -67,6 +67,11 @@ func (_m *SecretsInjector) Inject(ctx context.Context, secrets *core.Secret, p *
 	return r0, r1, r2
 }
 
+// InvalidateCache provides a mock function with given fields: ctx, org, domain, project, secretName
+func (_m *SecretsInjector) InvalidateCache(ctx context.Context, org string, domain string, project string, secretName string) {
+	_m.Called(ctx, org, domain, project, secretName)
+}
+
 type SecretsInjector_Type struct {
 	*mock.Call
 }
