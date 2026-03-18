@@ -54,6 +54,11 @@ func TestSendRequest(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Nil(t, response)
 	})
+	t.Run("Invalid method returns NewRequest error", func(t *testing.T) {
+		response, err := SendRequest("BAD METHOD", "https://github.com", nil)
+		assert.NotNil(t, err)
+		assert.Nil(t, response)
+	})
 }
 
 func TestIsVersionGreaterThan(t *testing.T) {
