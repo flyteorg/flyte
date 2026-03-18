@@ -34,9 +34,8 @@ In order to use this Webhook:
 1) Keys need to be mounted to the POD that runs this command; tls.crt should be a CA-issued cert (not a self-signed 
    cert), tls.key as the private key for that cert and, optionally, ca.crt in case tls.crt's CA is not a known 
    Certificate Authority (e.g. in case ca.crt is self-issued).
-2) POD_NAME and POD_NAMESPACE environment variables need to be populated because the webhook initialization will lookup
-   this pod to copy OwnerReferences into the new MutatingWebhookConfiguration object it'll create to ensure proper
-   cleanup.
+2) POD_NAME and POD_NAMESPACE environment variables need to be populated because the webhook initialization will add
+   labels to the new MutatingWebhookConfiguration object it creates for tracking and identification.
 
 A sample Container for this webhook might look like this:
 
