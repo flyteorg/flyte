@@ -128,12 +128,16 @@ func PrintSandboxTeardownMessage(flyteConsolePort int, kubeconfigLocation string
 // SendRequest will create request and return the response
 func SendRequest(method, url string, option io.Reader) (*http.Response, error) {
 	client := &http.Client{}
-	req, _ := http.NewRequest(method, url, option)
+	req, err := http.NewRequest(method, url, option)
+	if err != nil {
+		return nil, err
+	}
 	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	if response.StatusCode != 200 {
+		response.Body.Close()
 		return nil, fmt.Errorf("something goes wrong while sending request to %s. Got status code %v", url, response.StatusCode)
 	}
 	return response, nil
