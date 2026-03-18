@@ -64,6 +64,8 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 		ServerCertPrivateKey: certs.PrivateKeyPEM.Bytes(),
 	}
 
+	// TODO(alex): This LocalCert tag is only for flyte running in single binary mode.
+	// In full deployment the webhook should be running in a single pod and an init container will generate and inject the secret data
 	if cfg.LocalCert {
 		certPath := cfg.ExpandCertDir()
 		if _, err := os.Stat(certPath); os.IsNotExist(err) {
@@ -139,13 +141,13 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 
 func createCerts(serviceName string, serviceNamespace string) (certs webhookCerts, err error) {
 	caRequest := &x509.Certificate{
-		SerialNumber: big.NewInt(2021),
-		Subject:      pkix.Name{Organization: []string{"flyte.org"}},
-		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(99, 0, 0),
-		IsCA:         true,
-		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		SerialNumber:          big.NewInt(2021),
+		Subject:               pkix.Name{Organization: []string{"flyte.org"}},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(99, 0, 0),
+		IsCA:                  true,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
 
