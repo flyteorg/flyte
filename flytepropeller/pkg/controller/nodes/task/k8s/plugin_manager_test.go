@@ -408,6 +408,32 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.True(t, k8serrors.IsNotFound(err))
 	})
 
+	t.Run("jobBadRequest", func(t *testing.T) {
+		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+		mockResourceHandler.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		fakeClient := extendedFakeClient{
+			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
+			CreateError: k8serrors.NewBadRequest("admission webhook denied the request"),
+		}
+		mockClientset := k8sfake.NewSimpleClientset()
+
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		}, NewResourceMonitorIndex(), mockClientset)
+		assert.NoError(t, err)
+
+		transition, err := pluginManager.Handle(ctx, tctx)
+		assert.NoError(t, err)
+		assert.NotNil(t, transition)
+		transitionInfo := transition.Info()
+		assert.NotNil(t, transitionInfo)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, transitionInfo.Phase())
+	})
+
 	t.Run("Insufficient resource blocking pod creation for the first time", func(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		var tmpl *core.TaskTemplate
