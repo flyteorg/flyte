@@ -114,6 +114,28 @@ templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 
 {{/*
+Selector labels for Console
+*/}}
+{{ define "flyte-binary.consoleSelectorLabels" -}}
+{{ include "flyte-binary.selectorLabels" . }}
+app.kubernetes.io/component: console
+{{- end }}
+
+{{/*
+Get the Secret name for Run service authentication secrets.
+*/}}
+{{ define "flyte-binary.configuration.auth.runServiceAuthSecretName" -}}
+{{ printf "%s-admin-auth" (include "flyte-binary.fullname" .) }}
+{{ end -}}
+
+{{/*
+Get the Secret name for Flyte authentication client secrets.
+*/}}
+{{ define "flyte-binary.configuration.auth.clientSecretName" -}}
+{{ printf "%s-client-secrets" (include "flyte-binary.fullname" .) }}
+{{ end -}}
+
+{{/*
 Get the Flyte cluster resource templates ConfigMap name.
 */}}
 {{- define "flyte-binary.clusterResourceTemplates.configMapName" -}}
@@ -131,14 +153,14 @@ Get the Flyte HTTP service name
 Get the Flyte service HTTP port.
 */}}
 {{- define "flyte-binary.service.http.port" -}}
-{{- default 8090 .Values.service.ports.http -}}
+{{- default 8080 .Values.service.ports.http -}}
 {{- end -}}
 
 {{/*
 Get the Flyte gRPC service name
 */}}
 {{- define "flyte-binary.service.grpc.name" -}}
-{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
+{{- printf "%s-grpc" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*

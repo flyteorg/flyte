@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -20,6 +21,9 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/service"
+	authservice "github.com/flyteorg/flyte/v2/runs/service/auth"
+	authConfig "github.com/flyteorg/flyte/v2/runs/service/auth/config"
+	"github.com/flyteorg/flyte/v2/runs/service/auth/authzserver"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -65,10 +69,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(translatorPath, translatorHandler)
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
 
-	identitySvc := service.NewIdentityService()
-	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
-	sc.Mux.Handle(identityPath, identityHandler)
-	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+	if cfg.Security.UseAuth {
+		authCfg := authConfig.GetConfig()
+		authSvc := authzserver.NewAuthMetadataService(*authCfg)
+		authPath, authHandler := authconnect.NewAuthMetadataServiceHandler(authSvc)
+		sc.Mux.Handle(authPath, authHandler)
+		logger.Infof(ctx, "Mounted AuthMetadataService at %s", authPath)
+
+		identitySvc := authservice.NewIdentityService()
+		identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
+		sc.Mux.Handle(identityPath, identityHandler)
+		logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+	}
 
 	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
 	for _, d := range cfg.Domains {

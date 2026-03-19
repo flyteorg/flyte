@@ -50,6 +50,15 @@ type Config struct {
 
 	// Domains are injected into project responses (not stored per project row).
 	Domains []DomainConfig `json:"domains"`
+
+	// Security controls authentication and authorization behavior.
+	Security SecurityConfig `json:"security"`
+}
+
+// SecurityConfig controls authentication and authorization behavior.
+type SecurityConfig struct {
+	// UseAuth enables authentication. When true, AuthMetadataService and IdentityService are registered.
+	UseAuth bool `json:"useAuth" pflag:",Enable authentication and identity services"`
 }
 
 // ServerConfig holds HTTP server configuration

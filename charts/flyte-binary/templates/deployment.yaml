@@ -3,42 +3,48 @@ kind: Deployment
 metadata:
   name: {{ include "flyte-binary.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.deployment.labels }}
-    {{- tpl ( .Values.deployment.labels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.deployment.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.deployment.annotations }}
-    {{- tpl ( .Values.deployment.annotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.deployment.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
-    matchLabels: {{- include "flyte-binary.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "flyte-binary.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
+      labels: {{ include "flyte-binary.selectorLabels" . | nindent 8 }}
         {{- if .Values.commonLabels }}
-        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 8 }}
+        {{ tpl ( .Values.commonLabels | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podLabels }}
-        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 8 }}
+        {{ tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 8 }}
         {{- end }}
       annotations:
         {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
         checksum/configuration: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/configuration-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
         {{- end }}
+        {{- if .Values.configuration.auth.enabled }}
+        checksum/runservice-auth-secret: {{ include (print $.Template.BasePath "/runservice-auth-secret.yaml") . | sha256sum }}
+        {{- if not .Values.configuration.auth.clientSecretsExternalSecretRef }}
+        checksum/auth-client-secret: {{ include (print $.Template.BasePath "/auth-client-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- end }}
         {{- if .Values.commonAnnotations }}
-        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
+        {{ tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podAnnotations }}
         {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 8 }}
@@ -86,14 +92,14 @@ spec:
             {{- end }}
             {{- end }}
           {{- if .Values.deployment.resources }}
-          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          resources: {{ toYaml .Values.deployment.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.deployment.waitForDB.securityContext }}
-          securityContext: {{- toYaml .Values.deployment.waitForDB.securityContext | nindent 12 }}
+          securityContext: {{ toYaml .Values.deployment.waitForDB.securityContext | nindent 12 }}
           {{- end }}
         {{- end }}
         {{- if .Values.deployment.initContainers }}
-        {{- tpl ( .Values.deployment.initContainers | toYaml ) . | nindent 8 }}
+        {{ tpl ( .Values.deployment.initContainers | toYaml ) . | nindent 8 }}
         {{- end }}
       {{- end }}
       containers:
@@ -138,6 +144,8 @@ spec:
           ports:
             - name: http
               containerPort: 8090
+            - name: grpc
+              containerPort: 8080
           {{- if .Values.deployment.startupProbe }}
           startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
           {{- end }}
@@ -157,7 +165,7 @@ spec:
             httpGet:
               path: /healthz
               port: http
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
           {{- end }}
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
@@ -182,6 +190,20 @@ spec:
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
+        {{- if .Values.configuration.auth.enabled }}
+        - name: auth
+          projected:
+            sources:
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.runServiceAuthSecretName" . }}
+            {{- if .Values.configuration.auth.clientSecretsExternalSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.auth.clientSecretsExternalSecretRef . }}
+            {{- else }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
+            {{- end }}
+        {{- end }}
         - name: config
           {{- if (include "flyte-binary.configuration.externalConfiguration" .) }}
           projected:
@@ -211,5 +233,5 @@ spec:
             {{- end }}
           {{- end }}
         {{- if .Values.deployment.extraVolumes }}
-        {{- tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
+        {{ tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
         {{- end }}

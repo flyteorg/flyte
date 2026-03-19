@@ -1,24 +1,25 @@
+{{- if .Values.ingress.separateGrpcIngress }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "flyte-binary.service.http.name" . }}
+  name: {{ include "flyte-binary.service.grpc.name" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.service.labels }}
-    {{- tpl ( .Values.service.labels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.service.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.service.commonAnnotations }}
-    {{- tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.service.httpAnnotations }}
-    {{- tpl ( .Values.service.httpAnnotations | toYaml ) . | nindent 4 }}
+    {{- if .Values.service.grpcAnnotations }}
+    {{ tpl ( .Values.service.grpcAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   type: {{ .Values.service.type }}
@@ -35,15 +36,6 @@ spec:
   clusterIP: {{ .Values.service.clusterIP }}
   {{- end }}
   ports:
-    - name: http
-      port: {{ include "flyte-binary.service.http.port" . }}
-      targetPort: http
-      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.http)) }}
-      nodePort: {{ .Values.service.nodePorts.http }}
-      {{- else if eq .Values.service.type "ClusterIP" }}
-      nodePort: null
-      {{- end }}
-    {{- if not .Values.ingress.separateGrpcIngress }}
     - name: grpc
       port: {{ include "flyte-binary.service.grpc.port" . }}
       targetPort: http
@@ -52,8 +44,5 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
-    {{- end }}
-    {{- if .Values.service.extraPorts }}
-    {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}
-    {{- end }}
   selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}
+{{- end }}

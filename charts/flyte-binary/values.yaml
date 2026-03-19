@@ -420,10 +420,24 @@ enabled_plugins:
         - container
         - sidecar
         - connector-service
-        - echo
       default-for-task-types:
         container: container
         sidecar: sidecar
         container_array: k8s-array
         # -- Uncomment to enable task type that uses Flyte Connector
         # bigquery_query_job_task: connector-service
+
+console:
+  enabled: true
+  image:
+    repository: ghcr.io/flyteorg/consolev2
+    tag: 34149492567122a466f885700f1df9da42025e6b
+    pullPolicy: Always
+  imagePullSecrets:
+    - name: ghcr-pull-secret
+  service:
+    type: ClusterIP
+    port: 80
+    annotations:
+      alb.ingress.kubernetes.io/healthcheck-path: /v2
+      alb.ingress.kubernetes.io/healthcheck-port: "8080"
