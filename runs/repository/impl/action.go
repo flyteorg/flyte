@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -214,10 +215,20 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 			scope.ProjectId.Organization, scope.ProjectId.Name, scope.ProjectId.Domain)
 	}
 
-	// Apply pagination
+	// Apply pagination according to token and limit from requests.
 	limit := 50
-	if req.Request != nil && req.Request.Limit > 0 {
-		limit = int(req.Request.Limit)
+	if req.Request != nil {
+		if req.Request.Token != "" {
+			tokenID, err := strconv.ParseUint(req.Request.Token, 10, 64)
+			if err != nil {
+				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
+			}
+			query = query.Where("id < ?", tokenID)
+		}
+
+		if req.Request.Limit > 0 {
+			limit = int(req.Request.Limit)
+		}
 	}
 
 	var runs []*models.Run

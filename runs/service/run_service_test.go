@@ -2,15 +2,19 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
@@ -199,6 +203,78 @@ func TestAbortAction(t *testing.T) {
 	})
 }
 
+func TestListRuns(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	runs := []*workflow.Run{}
+	sqlRes := []*models.Run{}
+	for i := 0; i < 10; i++ {
+		runs = append(runs, &workflow.Run{
+			Action: &workflow.Action{
+				Id: &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org:     "test-org",
+						Project: "test-project",
+						Domain:  "test-domain",
+						Name:    fmt.Sprintf("run-%d", i),
+					},
+					Name: fmt.Sprintf("run-%d", i),
+				},
+				Metadata: &workflow.ActionMetadata{},
+				Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+			},
+		})
+		sqlRes = append(sqlRes, &models.Run{
+			ID:      uint(i),
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    fmt.Sprintf("run-%d", i),
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		})
+	}
+	type mockListRes struct {
+		runs  []*models.Run
+		token string
+		err   error
+	}
+	testCases := []struct {
+		name    string
+		req     *common.ListRequest
+		mockRes mockListRes
+		expect  *workflow.ListRunsResponse
+	}{
+		{
+			"Empty Runs",
+			&common.ListRequest{Limit: 2},
+			mockListRes{runs: []*models.Run{}, err: nil},
+			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
+		},
+		{
+			"list with limit 2 and token",
+			&common.ListRequest{Limit: 2, Token: "5"},
+			mockListRes{runs: sqlRes[5:7], token: "7", err: nil},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
+		},
+		{
+			"list with limit 3 and token",
+			&common.ListRequest{Limit: 3, Token: "8"},
+			mockListRes{runs: sqlRes[8:10], token: "", err: nil},
+			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
+			actionRepo.On("ListRuns", mock.Anything, req.Msg).Return(tc.mockRes.runs, tc.mockRes.token, tc.mockRes.err)
+			got, err := svc.ListRuns(context.Background(), req)
+			assert.NoError(t, err)
+			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
+			assert.Equal(t, tc.expect.Runs, got.Msg.Runs)
+			assert.Equal(t, tc.expect.Token, got.Msg.Token)
+		})
+	}
+}
+
 func TestGenerateRunName(t *testing.T) {
 	t.Run("starts with r prefix", func(t *testing.T) {
 		name := generateRunName(42)
@@ -221,6 +297,102 @@ func TestGenerateRunName(t *testing.T) {
 		name2 := generateRunName(12345)
 		assert.Equal(t, name1, name2)
 	})
+}
+
+func TestConvertRunToProto(t *testing.T) {
+	// Define the test cases as a slice of structs.
+	s := &RunService{}
+	name := generateRunName(int64(0))
+	org := "test_org"
+	project := "test_project"
+	domain := "test_domain"
+	startTime := timestamppb.Now()
+	endTime := timestamppb.New(startTime.AsTime().Add(time.Minute))
+	durationMs := uint64(endTime.AsTime().Sub(startTime.AsTime()).Milliseconds())
+	status := &workflow.ActionStatus{
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		StartTime:   startTime,
+		EndTime:     endTime,
+		Attempts:    uint32(1),
+		CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
+		DurationMs:  &durationMs,
+	}
+	detail := &workflow.ActionDetails{
+		Status: status,
+	}
+	detailJson, _ := json.Marshal(detail)
+	testCases := []struct {
+		name   string
+		run    *models.Run
+		expect *workflow.Run
+	}{
+		{"empty run", nil, nil},
+		{"valid run",
+			&models.Run{
+				ID:            uint(0),
+				Org:           org,
+				Project:       project,
+				Domain:        domain,
+				Name:          name,
+				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				ActionDetails: detailJson,
+			},
+			&workflow.Run{
+				Action: &workflow.Action{
+					Id: &common.ActionIdentifier{
+						Run: &common.RunIdentifier{
+							Org:     org,
+							Project: project,
+							Domain:  domain,
+							Name:    name,
+						},
+						Name: name,
+					},
+					Metadata: &workflow.ActionMetadata{},
+					Status:   status,
+				},
+			},
+		},
+		{
+			"run with missing details",
+			&models.Run{
+				ID:      uint(0),
+				Org:     org,
+				Project: project,
+				Domain:  domain,
+				Name:    name,
+				Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			},
+			&workflow.Run{
+				Action: &workflow.Action{
+					Id: &common.ActionIdentifier{
+						Run: &common.RunIdentifier{
+							Org:     org,
+							Project: project,
+							Domain:  domain,
+							Name:    name,
+						},
+						Name: name,
+					},
+					Metadata: &workflow.ActionMetadata{},
+					Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_QUEUED},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			res := s.convertRunToProto(tc.run)
+			if tc.expect == nil {
+				assert.Nil(t, res)
+				return
+			}
+			assert.Equal(t, res.Action.Id, tc.expect.Action.Id)
+			assert.Equal(t, res.Action.Metadata, tc.expect.Action.Metadata)
+			assert.Equal(t, res.Action.Status, tc.expect.Action.Status)
+		})
+	}
 }
 
 func newStringLiteral(s string) *core.Literal {
