@@ -58,13 +58,7 @@ func New(cfg *cacheconfig.Config, outputs interfaces.CachedOutputRepo, reservati
 	}
 }
 
-// Get looks up an already-materialized cache entry.
-//
-// This answers the question: "Does a usable cached output already exist for
-// this key?" If yes, the caller can short-circuit execution and reuse it.
-//
-// This is intentionally separate from reservation APIs. A cache miss should not
-// imply that the caller is now responsible for populating the cache.
+// Get returns the materialized cache entry for the given key, if one exists.
 func (m *Manager) Get(ctx context.Context, request *cacheservicepb.GetCacheRequest) (*CacheEntry, error) {
 	if request.GetKey() == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
@@ -153,17 +147,13 @@ func (m *Manager) Delete(ctx context.Context, request *cacheservicepb.DeleteCach
 	return nil
 }
 
-// GetOrExtendReservation coordinates serialized cache population.
+// GetOrExtendReservation returns the active reservation for a cache key,
+// creating or refreshing it when the caller is allowed to own it.
 //
-// Why this exists in addition to Get:
-//   - Get answers "is cached output already available?"
-//   - GetOrExtendReservation answers "if not, who is allowed to produce it?"
-//
-// Without reservations, two workers can both observe the same cache miss and
-// both execute the task, racing to write the same cache key. With
-// cache_serializable enabled, callers first try to acquire/extend the
-// reservation. Only the active owner should execute and write back cache;
-// everyone else waits for that cache entry to appear.
+// This is the coordination path for serialized cache population. On a cache
+// miss, only the active owner should execute and publish the result; other
+// callers observe the current reservation and wait for the cache entry to
+// appear.
 func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheservicepb.GetOrExtendReservationRequest, now time.Time) (*cacheservicepb.Reservation, error) {
 	if request.GetKey() == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
