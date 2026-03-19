@@ -149,16 +149,15 @@ func (s *RunService) CreateRun(
 	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
 	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
 
-	// Persist inputs to storage
-	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
-		literalMap := inputsToLiteralMap(req.Msg.Inputs)
-		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
-			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-		}
-		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
+	// even when the task has no user inputs, so we must write an empty LiteralMap.
+	literalMap := inputsToLiteralMap(req.Msg.Inputs)
+	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 	}
+	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
 	// Create run in database with storage URIs
 	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg, inputPrefix, runOutputBase)
@@ -893,6 +892,9 @@ func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
 func inputsToLiteralMap(inputs *task.Inputs) *core.LiteralMap {
+	if inputs == nil || len(inputs.Literals) == 0 {
+		return &core.LiteralMap{Literals: map[string]*core.Literal{}}
+	}
 	m := make(map[string]*core.Literal, len(inputs.Literals))
 	for _, nl := range inputs.Literals {
 		m[nl.Name] = nl.Value
