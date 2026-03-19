@@ -18,11 +18,14 @@ type Action struct {
 	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
-	ParentActionName *string `gorm:"index:idx_actions_parent" db:"parent_action_name"`
+	ParentActionName sql.NullString `gorm:"index:idx_actions_parent" db:"parent_action_name"`
 
 	// High-level status for quick queries/filtering.
 	// Stores the proto ActionPhase enum integer value directly (e.g. 1 = QUEUED).
 	Phase int32 `gorm:"not null;default:1;index:idx_actions_phase" db:"phase"`
+
+	// Who initiated this run(web, CLI, scheduler, etc.)
+	RunSource string `db:"run_source" json:"run_source,omitempty"`
 
 	// Action type (task, trace, condition). Stores workflow.ActionType enum value.
 	ActionType int32 `db:"action_type"`
@@ -79,9 +82,8 @@ func (a *Action) Clone() *Action {
 	}
 
 	cloned := *a
-	if a.ParentActionName != nil {
-		parent := *a.ParentActionName
-		cloned.ParentActionName = &parent
+	if a.ParentActionName.Valid {
+		cloned.ParentActionName = a.ParentActionName
 	}
 	if a.ActionSpec != nil {
 		actionSpec := make([]byte, len(a.ActionSpec))
@@ -105,7 +107,7 @@ func (a *Action) GetRunName() string {
 		return a.RunName
 	}
 
-	if a.ParentActionName == nil {
+	if !a.ParentActionName.Valid {
 		// Root action - the run name is the action name
 		return a.Name
 	}

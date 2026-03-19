@@ -1117,8 +1117,8 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		ActionType:  workflow.ActionType(action.ActionType),
 		FuntionName: action.FunctionName,
 	}
-	if action.ParentActionName != nil {
-		metadata.Parent = *action.ParentActionName
+	if action.ParentActionName.Valid {
+		metadata.Parent = action.ParentActionName.String
 	}
 	if action.ActionGroup.Valid {
 		metadata.Group = action.ActionGroup.String
@@ -1274,9 +1274,9 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 	}
 
 	var metadata *workflow.ActionMetadata
-	if action.ParentActionName != nil {
+	if action.ParentActionName.Valid {
 		metadata = &workflow.ActionMetadata{
-			Parent: *action.ParentActionName,
+			Parent: action.ParentActionName.String,
 		}
 	}
 
@@ -1313,12 +1313,50 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		Phase: common.ActionPhase(action.Phase),
 	}
 
-	var metadata *workflow.ActionMetadata
-	if action.ParentActionName != nil {
-		metadata = &workflow.ActionMetadata{
-			Parent: *action.ParentActionName,
-		}
+	metadata := &workflow.ActionMetadata{
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
+
+	// Pivot on known task types for response types
+	switch workflow.ActionType(action.ActionType) {
+	case workflow.ActionType_ACTION_TYPE_TRACE:
+		metadata.Spec = &workflow.ActionMetadata_Trace{
+			Trace: &workflow.TraceActionMetadata{
+				Name: CoalesceNullString(action.TaskName),
+			},
+		}
+	case workflow.ActionType_ACTION_TYPE_TASK:
+		metadata.Spec = &workflow.ActionMetadata_Task{
+			Task: &workflow.TaskActionMetadata{
+				Id: &task.TaskIdentifier{
+					Org:     CoalesceNullString(action.TaskOrg),
+					Project: CoalesceNullString(action.TaskProject),
+					Domain:  CoalesceNullString(action.TaskDomain),
+					Name:    CoalesceNullString(action.TaskName),
+					Version: CoalesceNullString(action.TaskVersion),
+				},
+				TaskType: action.TaskType,
+			},
+		}
+		// Check if there's a task short name override, if so, use that. Otherwise, fall back to the parsed task name.
+		if action.TaskShortName.Valid {
+			metadata.GetTask().ShortName = action.TaskShortName.String
+		} else {
+			metadata.GetTask().ShortName = transformers.ExtractFunctionName(context.Background(), CoalesceNullString(action.TaskName), "")
+		}
+		metadata.EnvironmentName = action.EnvironmentName.String
+
+	case workflow.ActionType_ACTION_TYPE_CONDITION:
+		// Unhandled for now
+	case workflow.ActionType_ACTION_TYPE_UNSPECIFIED:
+		// No-op, this should never happen.
+	}
+
+	metadata.FuntionName = action.FunctionName
+	// TODO: Add ExecutedBy, TriggerTaskName, TriggerId
+
+	metadata.Source = workflow.RunSource(workflow.RunSource_value[action.RunSource])
 
 	childrenPhaseCounts := make(map[int32]int32, len(update.Node.ChildPhaseCounts))
 	for phase, count := range update.Node.ChildPhaseCounts {
