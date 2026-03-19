@@ -165,6 +165,20 @@ Get the Flyte API paths for ingress.
 {{- end -}}
 
 {{/*
+Get the Flyte webhook service name.
+*/}}
+{{- define "flyte-binary.webhook.serviceName" -}}
+{{- printf "%s-webhook" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Flyte webhook secret name.
+*/}}
+{{- define "flyte-binary.webhook.secretName" -}}
+{{- printf "%s-webhook-secret" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
 Get the Flyte ClusterRole name.
 */}}
 {{- define "flyte-binary.rbac.clusterRoleName" -}}

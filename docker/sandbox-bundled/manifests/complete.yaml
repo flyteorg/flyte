@@ -436,6 +436,25 @@ rules:
   - update
   - watch
 - apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
   - '*'
   resources:
   - '*'
@@ -656,6 +675,12 @@ data:
     logger:
       show-source: true
       level: 5
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
 
     actions:
       kubernetes:
@@ -1006,7 +1031,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: emM2QnVqZHg2bDRmNU5SRg==
+  haSharedSecret: Rkk2Y1ZETzk4SnV2V3JZUA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1255,6 +1280,27 @@ spec:
   type: NodePort
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -1356,7 +1402,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 3b0d6da5b288489c1f1dd02d5cfa086b29ef51328f9f6b729836a22a7a8cd4e1
+        checksum/configuration: 6604a6d84082df7341941081eccb62a8c12d4472cf84b319cccc7f5c1684c63c
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1387,6 +1433,8 @@ spec:
         ports:
         - containerPort: 8090
           name: http
+        - containerPort: 9443
+          name: webhook
         readinessProbe:
           httpGet:
             path: /healthz
@@ -1395,6 +1443,9 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config.d
           name: config
+        - mountPath: /var/run/flyte/certs
+          name: webhook-certs
+          readOnly: false
       initContainers:
       - args:
         - |
@@ -1423,6 +1474,8 @@ spec:
               name: flyte-sandbox-config-secret
           - configMap:
               name: flyte-sandbox-extra-config
+      - emptyDir: {}
+        name: webhook-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1504,7 +1557,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 796feb18367c04449fe1a0f869fa44179d659d4357a7f83833c3e905b7df3072
+        checksum/secret: 89994f7cdb81c298a0f3073a45e5fd8afd4cf154b99d3983ed597946794e2d2a
       labels:
         app: docker-registry
         release: flyte-sandbox
