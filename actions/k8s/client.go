@@ -463,8 +463,29 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				InputUri: taskAction.Spec.InputURI,
 			}
 			if taskAction.Spec.TaskType != "" {
+				ta := &workflow.TaskAction{
+					Id: &task.TaskIdentifier{
+						Org:     taskAction.Spec.Org,
+						Project: taskAction.Spec.Project,
+						Domain:  taskAction.Spec.Domain,
+					},
+				}
+				// Deserialize TaskTemplate to build TaskSpec
+				if len(taskAction.Spec.TaskTemplate) > 0 {
+					var tmpl core.TaskTemplate
+					if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
+						if tmplID := tmpl.GetId(); tmplID != nil {
+							ta.Id.Name = tmplID.GetName()
+							ta.Id.Version = tmplID.GetVersion()
+						}
+						ta.Spec = &task.TaskSpec{
+							TaskTemplate: &tmpl,
+							ShortName:    taskAction.Spec.ShortName,
+						}
+					}
+				}
 				recordReq.Spec = &workflow.RecordActionRequest_Task{
-					Task: &workflow.TaskAction{},
+					Task: ta,
 				}
 			}
 			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {

@@ -10,14 +10,18 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/datatypes"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -331,7 +335,7 @@ func TestConvertRunToProto(t *testing.T) {
 				Domain:        domain,
 				Name:          name,
 				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-				ActionDetails: datatypes.JSON(detailJson),
+				ActionDetails: detailJson,
 			},
 			&workflow.Run{
 				Action: &workflow.Action{
@@ -389,4 +393,149 @@ func TestConvertRunToProto(t *testing.T) {
 			assert.Equal(t, res.Action.Status, tc.expect.Action.Status)
 		})
 	}
+}
+
+func newStringLiteral(s string) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{
+		Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+			Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: s}},
+		}},
+	}}
+}
+
+func newIntLiteral(n int64) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{
+		Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+			Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: n}},
+		}},
+	}}
+}
+
+// TestInputsProtoCompat verifies that task.Inputs and core.LiteralMap are wire-compatible,
+// ensuring components that still read/write inputs.pb as LiteralMap work as expect.
+func TestInputsProtoCompat(t *testing.T) {
+	t.Run("task.Inputs roundtrip preserves literals and context", func(t *testing.T) {
+		inputs := &task.Inputs{
+			Literals: []*task.NamedLiteral{
+				{Name: "x", Value: newStringLiteral("hello")},
+				{Name: "y", Value: newIntLiteral(42)},
+			},
+			Context: []*core.KeyValuePair{
+				{Key: "env", Value: "prod"},
+				{Key: "region", Value: "us-east-1"},
+			},
+		}
+
+		data, err := proto.Marshal(inputs)
+		require.NoError(t, err)
+
+		got := &task.Inputs{}
+		require.NoError(t, proto.Unmarshal(data, got))
+
+		assert.Len(t, got.Literals, 2)
+		assert.Equal(t, "x", got.Literals[0].Name)
+		assert.Equal(t, "y", got.Literals[1].Name)
+		assert.Len(t, got.Context, 2)
+		assert.Equal(t, "env", got.Context[0].Key)
+		assert.Equal(t, "prod", got.Context[0].Value)
+	})
+
+	t.Run("task.Inputs read as core.LiteralMap preserves literals", func(t *testing.T) {
+		inputs := &task.Inputs{
+			Literals: []*task.NamedLiteral{
+				{Name: "x", Value: newStringLiteral("hello")},
+				{Name: "y", Value: newIntLiteral(42)},
+			},
+			Context: []*core.KeyValuePair{
+				{Key: "env", Value: "prod"},
+			},
+		}
+
+		data, err := proto.Marshal(inputs)
+		require.NoError(t, err)
+
+		literalMap := &core.LiteralMap{}
+		require.NoError(t, proto.Unmarshal(data, literalMap))
+
+		assert.Len(t, literalMap.Literals, 2)
+		assert.Contains(t, literalMap.Literals, "x")
+		assert.Contains(t, literalMap.Literals, "y")
+		assert.True(t, proto.Equal(newStringLiteral("hello"), literalMap.Literals["x"]))
+		assert.True(t, proto.Equal(newIntLiteral(42), literalMap.Literals["y"]))
+	})
+
+	t.Run("core.LiteralMap read as task.Inputs preserves literals", func(t *testing.T) {
+		literalMap := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"a": newStringLiteral("old_value"),
+			},
+		}
+
+		data, err := proto.Marshal(literalMap)
+		require.NoError(t, err)
+
+		got := &task.Inputs{}
+		require.NoError(t, proto.Unmarshal(data, got))
+
+		assert.Len(t, got.Literals, 1)
+		assert.Equal(t, "a", got.Literals[0].Name)
+		assert.True(t, proto.Equal(newStringLiteral("old_value"), got.Literals[0].Value))
+		assert.Empty(t, got.Context)
+	})
+}
+
+func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_ProjectId{
+			ProjectId: &common.ProjectIdentifier{
+				Organization: "testorg",
+				Domain:       "development",
+				Name:         "testproject",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	expectedRun := &models.Run{
+		Org:     "testorg",
+		Project: "testproject",
+		Domain:  "development",
+		Name:    "generated-run",
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.AnythingOfType("storage.DataReference"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+		lm, ok := msg.(*core.LiteralMap)
+		return ok && len(lm.Literals) == 0
+	})).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.AnythingOfType("*workflow.CreateRunRequest"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(expectedRun, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	assert.NoError(t, err)
+
+	repo.AssertExpectations(t)
+	actionRepo.AssertExpectations(t)
+	actionsClient.AssertExpectations(t)
+	store.AssertExpectations(t)
 }
