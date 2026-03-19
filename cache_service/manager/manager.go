@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	cacheconfig "github.com/flyteorg/flyte/v2/cache_service/config"
-	"github.com/flyteorg/flyte/v2/cache_service/repository"
+	repositoryerrors "github.com/flyteorg/flyte/v2/cache_service/repository/errors"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/models"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
@@ -66,7 +66,7 @@ func (m *Manager) Get(ctx context.Context, request *cacheservicepb.GetCacheReque
 
 	output, err := m.outputs.Get(ctx, request.GetKey())
 	if err != nil {
-		if repository.IsNotFound(err) {
+		if repositoryerrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -97,7 +97,7 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 
 	now := time.Now().UTC()
 	existing, err := m.outputs.Get(ctx, request.GetKey())
-	if err != nil && !repository.IsNotFound(err) {
+	if err != nil && !repositoryerrors.IsNotFound(err) {
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *Manager) Delete(ctx context.Context, request *cacheservicepb.DeleteCach
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
 	}
 	if err := m.outputs.Delete(ctx, request.GetKey()); err != nil {
-		if repository.IsNotFound(err) {
+		if repositoryerrors.IsNotFound(err) {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
 		}
 		return connect.NewError(connect.CodeInternal, err)
@@ -171,8 +171,8 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 		ExpiresAt:        now.Add(heartbeat * time.Duration(m.heartbeatGracePeriodMultiplier)),
 	}
 
-	existing, err := m.reservations.Get(ctx, reservationKey)
-	if err != nil && !repository.IsNotFound(err) {
+	_, err := m.reservations.Get(ctx, reservationKey)
+	if err != nil && !repositoryerrors.IsNotFound(err) {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -181,8 +181,14 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 	//   - different active owner: keep returning the current holder
 	if err == nil {
 		if err := m.reservations.UpdateIfExpiredOrOwned(ctx, reservation, now); err != nil {
-			if repository.IsAlreadyExists(err) {
-				return reservationFromModel(existing), nil
+			if repositoryerrors.IsReservationNotClaimable(err) {
+				// Another caller still owns the reservation or claimed it before we
+				// could refresh an expired one. Re-read to return the current holder.
+				current, getErr := m.reservations.Get(ctx, reservationKey)
+				if getErr != nil {
+					return nil, connect.NewError(connect.CodeInternal, getErr)
+				}
+				return reservationFromModel(current), nil
 			}
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
@@ -190,7 +196,7 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 	}
 
 	if err := m.reservations.Create(ctx, reservation); err != nil {
-		if repository.IsAlreadyExists(err) {
+		if repositoryerrors.IsAlreadyExists(err) {
 			// Another caller created the reservation after our initial read.
 			current, getErr := m.reservations.Get(ctx, reservationKey)
 			if getErr != nil {
@@ -218,7 +224,7 @@ func (m *Manager) ReleaseReservation(ctx context.Context, request *cacheservicep
 
 	reservationKey := fmt.Sprintf("%s:%s", reservationPrefix, request.GetKey())
 	if err := m.reservations.DeleteByKeyAndOwner(ctx, reservationKey, request.GetOwnerId()); err != nil {
-		if repository.IsNotFound(err) {
+		if repositoryerrors.IsNotFound(err) {
 			return nil
 		}
 		return connect.NewError(connect.CodeInternal, err)

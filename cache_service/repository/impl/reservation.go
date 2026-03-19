@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	repositoryerrors "github.com/flyteorg/flyte/v2/cache_service/repository/errors"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/models"
 )
@@ -54,7 +55,7 @@ func (r *ReservationRepo) UpdateIfExpiredOrOwned(ctx context.Context, reservatio
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return gorm.ErrDuplicatedKey
+		return repositoryerrors.ErrReservationNotClaimable
 	}
 	return nil
 }
