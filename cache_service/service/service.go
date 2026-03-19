@@ -11,7 +11,6 @@ import (
 	"github.com/flyteorg/flyte/v2/cache_service/repository"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	cacheservicev2 "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2"
-	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )
 
@@ -67,9 +66,12 @@ func (s *CacheService) Put(ctx context.Context, req *connect.Request[cacheservic
 	if base.GetOutput() == nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request.output is required"))
 	}
-	copy := proto.Clone(base).(*cacheservicepb.PutCacheRequest)
-	copy.Key = scopedKey(base.GetKey(), req.Msg.GetIdentifier())
-	if err := s.manager.Put(ctx, copy); err != nil {
+	managerReq := &cacheservicepb.PutCacheRequest{
+		Key:       scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		Output:    base.GetOutput(),
+		Overwrite: base.GetOverwrite(),
+	}
+	if err := s.manager.Put(ctx, managerReq); err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
@@ -106,9 +108,12 @@ func (s *CacheService) GetOrExtendReservation(ctx context.Context, req *connect.
 	if err := validateOwnerID(base.GetOwnerId()); err != nil {
 		return nil, err
 	}
-	copy := proto.Clone(base).(*cacheservicepb.GetOrExtendReservationRequest)
-	copy.Key = scopedKey(base.GetKey(), req.Msg.GetIdentifier())
-	reservation, err := s.manager.GetOrExtendReservation(ctx, copy, time.Now().UTC())
+	managerReq := &cacheservicepb.GetOrExtendReservationRequest{
+		Key:               scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		OwnerId:           base.GetOwnerId(),
+		HeartbeatInterval: base.GetHeartbeatInterval(),
+	}
+	reservation, err := s.manager.GetOrExtendReservation(ctx, managerReq, time.Now().UTC())
 	if err != nil {
 		return nil, err
 	}
@@ -131,9 +136,11 @@ func (s *CacheService) ReleaseReservation(ctx context.Context, req *connect.Requ
 	if err := validateOwnerID(base.GetOwnerId()); err != nil {
 		return nil, err
 	}
-	copy := proto.Clone(base).(*cacheservicepb.ReleaseReservationRequest)
-	copy.Key = scopedKey(base.GetKey(), req.Msg.GetIdentifier())
-	if err := s.manager.ReleaseReservation(ctx, copy); err != nil {
+	managerReq := &cacheservicepb.ReleaseReservationRequest{
+		Key:     scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		OwnerId: base.GetOwnerId(),
+	}
+	if err := s.manager.ReleaseReservation(ctx, managerReq); err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&cacheservicepb.ReleaseReservationResponse{}), nil
