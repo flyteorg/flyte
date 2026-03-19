@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/glebarez/sqlite"
+	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"

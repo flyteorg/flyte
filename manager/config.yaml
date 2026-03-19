@@ -29,6 +29,7 @@ runs:
       dbName: "runs"
       username: "postgres"
       password: "postgres"
+      options: "sslmode=disable"
 
 # Logger configuration
 logger:

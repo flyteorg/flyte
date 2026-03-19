@@ -21,6 +21,7 @@ class RoleType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ROLE_TYPE_SERVERLESS_VIEWER: _ClassVar[RoleType]
     ROLE_TYPE_SERVERLESS_CONTRIBUTOR: _ClassVar[RoleType]
     ROLE_TYPE_SUPPORT: _ClassVar[RoleType]
+    ROLE_TYPE_SYSTEM_PROVISIONED_ACCESS: _ClassVar[RoleType]
 ROLE_TYPE_NONE: RoleType
 ROLE_TYPE_ADMIN: RoleType
 ROLE_TYPE_CONTRIBUTOR: RoleType
@@ -31,6 +32,7 @@ ROLE_TYPE_FLYTE_PROJECT_ADMIN: RoleType
 ROLE_TYPE_SERVERLESS_VIEWER: RoleType
 ROLE_TYPE_SERVERLESS_CONTRIBUTOR: RoleType
 ROLE_TYPE_SUPPORT: RoleType
+ROLE_TYPE_SYSTEM_PROVISIONED_ACCESS: RoleType
 
 class Role(_message.Message):
     __slots__ = ["id", "permissions", "role_spec", "role_type", "actions"]

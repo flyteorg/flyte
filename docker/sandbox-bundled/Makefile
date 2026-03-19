@@ -24,10 +24,21 @@ flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
+.PHONY: helm-repos
+helm-repos:
+	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
+	helm repo add kubernetes-dashboard https://kubernetes-retired.github.io/dashboard/
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo update
+
+.PHONY: dep_build
+dep_build: helm-repos
+	cd $(SANDBOX_CHART_DIR) && helm dependency build
+
 .PHONY: dep_update
-dep_update:
-	helm dependency update ../../charts/flyte-binary
-	helm dependency update ../../charts/flyte-sandbox
+dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-sandbox
+dep_update: dep_build
+	cd $(SANDBOX_CHART_DIR)/charts && for f in *.tgz; do tar xzf "$$f"; done
 
 .PHONY: manifests
 manifests: dep_update
@@ -78,6 +89,8 @@ start:
 	fi
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
+	@# On WSL, the bind-mounted kubeconfig may be root-owned, which makes the host-side cp fail with permission denied.
+	@docker exec flyte-sandbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
 	@mkdir -p $(HOME)/.flyte/sandboxv2
 	@cp $(PWD)/.kube/kubeconfig $(HOME)/.flyte/sandboxv2/kubeconfig
 	@echo "Kubeconfig copied to ~/.flyte/sandboxv2/kubeconfig"

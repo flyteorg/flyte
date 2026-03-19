@@ -152,16 +152,15 @@ func (s *RunService) CreateRun(
 	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
 	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
 
-	// Persist inputs to storage
-	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
-		literalMap := inputsToLiteralMap(req.Msg.Inputs)
-		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
-			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-		}
-		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
+	// even when the task has no user inputs, so we must write an empty LiteralMap.
+	literalMap := inputsToLiteralMap(req.Msg.Inputs)
+	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 	}
+	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
 	// Create run in database with storage URIs
 	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg, inputPrefix, runOutputBase)
@@ -246,6 +245,19 @@ func (s *RunService) AbortRun(
 	// Abort in database
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Abort via actions service
+	rootActionID := &common.ActionIdentifier{
+		Run:  req.Msg.RunId,
+		Name: "a0",
+	}
+	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+		ActionId: rootActionID,
+		Reason:   &reason,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to abort run via actions service: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -721,6 +733,15 @@ func (s *RunService) AbortAction(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	// Abort via actions service
+	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+		ActionId: req.Msg.ActionId,
+		Reason:   &reason,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to abort action via actions service: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
 }
 
@@ -1162,6 +1183,9 @@ func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
 func inputsToLiteralMap(inputs *task.Inputs) *core.LiteralMap {
+	if inputs == nil || len(inputs.Literals) == 0 {
+		return &core.LiteralMap{Literals: map[string]*core.Literal{}}
+	}
 	m := make(map[string]*core.Literal, len(inputs.Literals))
 	for _, nl := range inputs.Literals {
 		m[nl.Name] = nl.Value
@@ -1333,7 +1357,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 		endDate = &t
 	}
 
-	actions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
+	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
@@ -1356,7 +1380,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 	}
 	groups := make(map[string]*groupAccum)
 
-	for _, action := range actions {
+	for _, action := range rootActions {
 		taskName := extractTaskName(action.ActionSpec)
 		if taskName == "" {
 			taskName = action.Name // fallback to action name
