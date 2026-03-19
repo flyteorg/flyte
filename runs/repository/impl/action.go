@@ -145,26 +145,27 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 
 	// Create root action (represents the run)
 	run := &models.Run{
-		Org:             runID.Org,
-		Project:         runID.Project,
-		Domain:          runID.Domain,
-		RunName:         runID.Name,
-		Name:            runID.Name,
-		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:      meta.ActionType,
-		TaskOrg:         meta.TaskOrg,
-		TaskProject:     meta.TaskProject,
-		TaskDomain:      meta.TaskDomain,
-		TaskName:        meta.TaskName,
-		TaskVersion:     meta.TaskVersion,
-		TaskType:        meta.TaskType,
-		TaskShortName:   meta.TaskShortName,
-		FunctionName:    meta.FunctionName,
-		EnvironmentName: meta.EnvironmentName,
-		ActionSpec:      actionSpecBytes,
-		ActionDetails:   []byte("{}"), // Empty details initially
-		DetailedInfo:    detailedInfo,
-		RunSpec:         runSpecBytes,
+		Org:              runID.Org,
+		Project:          runID.Project,
+		Domain:           runID.Domain,
+		RunName:          runID.Name,
+		Name:             runID.Name,
+		ParentActionName: newNullString(""), // NULL for root actions/runs
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:       meta.ActionType,
+		TaskOrg:          meta.TaskOrg,
+		TaskProject:      meta.TaskProject,
+		TaskDomain:       meta.TaskDomain,
+		TaskName:         meta.TaskName,
+		TaskVersion:      meta.TaskVersion,
+		TaskType:         meta.TaskType,
+		TaskShortName:    meta.TaskShortName,
+		FunctionName:     meta.FunctionName,
+		EnvironmentName:  meta.EnvironmentName,
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"), // Empty details initially
+		DetailedInfo:     detailedInfo,
+		RunSpec:          runSpecBytes,
 	}
 
 	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
