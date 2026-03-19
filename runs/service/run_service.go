@@ -347,7 +347,7 @@ func (s *RunService) GetActionData(
 
 	// Read inputs from storage
 	if inputURI != "" {
-		inputRef := storage.DataReference(inputURI + "/inputs.pb")
+		inputRef := storage.DataReference(inputURI)
 		logger.Debugf(ctx, "Reading inputs from: %s", inputRef)
 		if err := s.dataStore.ReadProtobuf(ctx, inputRef, resp.Inputs); err != nil {
 			if !storage.IsNotFound(err) {

@@ -20,15 +20,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
-<<<<<<< HEAD
-	proto "github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-||||||| 1ef545024
-=======
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
->>>>>>> c94a9a1d1faf819f297efff0600856909120477b
 )
 
 // mockActionsClient implements actionsconnect.ActionsServiceClient for testing.
@@ -230,7 +222,6 @@ func TestGenerateRunName(t *testing.T) {
 		assert.Equal(t, name1, name2)
 	})
 }
-<<<<<<< HEAD
 
 func newStringLiteral(s string) *core.Literal {
 	return &core.Literal{Value: &core.Literal_Scalar{
@@ -320,8 +311,6 @@ func TestInputsProtoCompat(t *testing.T) {
 		assert.Empty(t, got.Context)
 	})
 }
-||||||| 1ef545024
-=======
 
 func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
@@ -378,4 +367,3 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionsClient.AssertExpectations(t)
 	store.AssertExpectations(t)
 }
->>>>>>> c94a9a1d1faf819f297efff0600856909120477b
