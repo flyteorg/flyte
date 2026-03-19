@@ -55,7 +55,14 @@ const gcPageSize = 500
 func (gc *GarbageCollector) collect(ctx context.Context) error {
 	logger := log.FromContext(ctx).WithName("gc")
 
-	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelTimeFormat)
+	var cutoff string
+	if gc.maxTTL <= 0 {
+		// MaxTTL <= 0 means immediate deletion: use a far-future cutoff so all terminal
+		// TaskActions are eligible regardless of their completed time.
+		cutoff = "9999-12-31.23-59"
+	} else {
+		cutoff = time.Now().UTC().Add(-gc.maxTTL).Format(labelTimeFormat)
+	}
 	deleted := 0
 	total := 0
 	continueToken := ""
