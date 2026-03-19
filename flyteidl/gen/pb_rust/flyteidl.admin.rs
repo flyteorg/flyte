@@ -2268,6 +2268,10 @@ pub struct ActiveLaunchPlanListRequest {
 pub enum LaunchPlanState {
     Inactive = 0,
     Active = 1,
+    /// Archived launch plans are considered old/unused and can be filtered out of list queries.
+    /// Archiving a launch plan also disables any active schedule.
+    /// An archived launch plan can still be used to launch executions.
+    Archived = 2,
 }
 impl LaunchPlanState {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -2278,6 +2282,7 @@ impl LaunchPlanState {
         match self {
             LaunchPlanState::Inactive => "INACTIVE",
             LaunchPlanState::Active => "ACTIVE",
+            LaunchPlanState::Archived => "ARCHIVED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2285,6 +2290,7 @@ impl LaunchPlanState {
         match value {
             "INACTIVE" => Some(Self::Inactive),
             "ACTIVE" => Some(Self::Active),
+            "ARCHIVED" => Some(Self::Archived),
             _ => None,
         }
     }

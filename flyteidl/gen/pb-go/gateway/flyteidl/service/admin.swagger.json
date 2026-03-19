@@ -5413,10 +5413,11 @@
       "type": "string",
       "enum": [
         "INACTIVE",
-        "ACTIVE"
+        "ACTIVE",
+        "ARCHIVED"
       ],
       "default": "INACTIVE",
-      "description": "By default any launch plan regardless of state can be used to launch a workflow execution.\nHowever, at most one version of a launch plan\n(e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be\nactive at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier\ngroup will be observed and trigger executions at a defined cadence."
+      "description": "By default any launch plan regardless of state can be used to launch a workflow execution.\nHowever, at most one version of a launch plan\n(e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be\nactive at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier\ngroup will be observed and trigger executions at a defined cadence.\n\n - ARCHIVED: Archived launch plans are considered old/unused and can be filtered out of list queries.\nArchiving a launch plan also disables any active schedule.\nAn archived launch plan can still be used to launch executions."
     },
     "adminLaunchPlanUpdateResponse": {
       "type": "object",

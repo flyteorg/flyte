@@ -51,7 +51,7 @@ func (UpdateConfig) mustMarshalJSON(v json.Marshaler) string {
 func (cfg UpdateConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("UpdateConfig", pflag.ExitOnError)
 	cmdFlags.BoolVar(&UConfig.Activate, fmt.Sprintf("%v%v", prefix, "activate"), UConfig.Activate, "activate launchplan.")
-	cmdFlags.BoolVar(&UConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), UConfig.Archive, "(Deprecated) disable the launch plan schedule (if it has an active schedule associated with it).")
+	cmdFlags.BoolVar(&UConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), UConfig.Archive, "archive the launch plan version, hiding it from list queries and disabling any schedule.")
 	cmdFlags.BoolVar(&UConfig.Deactivate, fmt.Sprintf("%v%v", prefix, "deactivate"), UConfig.Deactivate, "disable the launch plan schedule (if it has an active schedule associated with it).")
 	cmdFlags.BoolVar(&UConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), UConfig.DryRun, "execute command without making any modifications.")
 	cmdFlags.BoolVar(&UConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), UConfig.Force, "do not ask for an acknowledgement during updates.")
