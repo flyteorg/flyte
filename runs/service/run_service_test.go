@@ -7,18 +7,28 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
+<<<<<<< HEAD
 	proto "github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+||||||| 1ef545024
+=======
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
+>>>>>>> c94a9a1d1faf819f297efff0600856909120477b
 )
 
 // mockActionsClient implements actionsconnect.ActionsServiceClient for testing.
@@ -220,6 +230,7 @@ func TestGenerateRunName(t *testing.T) {
 		assert.Equal(t, name1, name2)
 	})
 }
+<<<<<<< HEAD
 
 func newStringLiteral(s string) *core.Literal {
 	return &core.Literal{Value: &core.Literal_Scalar{
@@ -309,3 +320,62 @@ func TestInputsProtoCompat(t *testing.T) {
 		assert.Empty(t, got.Context)
 	})
 }
+||||||| 1ef545024
+=======
+
+func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_ProjectId{
+			ProjectId: &common.ProjectIdentifier{
+				Organization: "testorg",
+				Domain:       "development",
+				Name:         "testproject",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	expectedRun := &models.Run{
+		Org:     "testorg",
+		Project: "testproject",
+		Domain:  "development",
+		Name:    "generated-run",
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.AnythingOfType("storage.DataReference"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+		lm, ok := msg.(*core.LiteralMap)
+		return ok && len(lm.Literals) == 0
+	})).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.AnythingOfType("*workflow.CreateRunRequest"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(expectedRun, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	assert.NoError(t, err)
+
+	repo.AssertExpectations(t)
+	actionRepo.AssertExpectations(t)
+	actionsClient.AssertExpectations(t)
+	store.AssertExpectations(t)
+}
+>>>>>>> c94a9a1d1faf819f297efff0600856909120477b
