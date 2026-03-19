@@ -459,7 +459,7 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 	logs := map[string]*core.TaskLog{}
 	streamingLogsAvailable := false
 	reportURI := ""
-	lastEvent, found := events[len(events)-1], false
+	lastEvent := events[len(events)-1]
 	var logContext *core.LogContext
 	for i := len(events) - 1; i >= 0; i-- {
 		event := events[i]
@@ -477,10 +477,8 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 			reportURI = event.GetOutputs().GetReportUri()
 		}
 		phase := events[i].GetPhase()
-		if !found && IsTerminalPhase(phase) {
+		if IsTerminalPhase(phase) {
 			lastEvent = events[i]
-		} else {
-			found = true
 		}
 	}
 
@@ -1116,8 +1114,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 // actionMetadataFromModel builds an ActionMetadata proto from DB model columns.
 func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	metadata := &workflow.ActionMetadata{
-		ActionType:   workflow.ActionType(action.ActionType),
-		FuntionName:  action.FunctionName,
+		ActionType:  workflow.ActionType(action.ActionType),
+		FuntionName: action.FunctionName,
 	}
 	if action.ParentActionName != nil {
 		metadata.Parent = *action.ParentActionName
