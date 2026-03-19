@@ -68,10 +68,8 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 	// In full deployment the webhook should be running in a single pod and an init container will generate and inject the secret data
 	if cfg.LocalCert {
 		certPath := cfg.ExpandCertDir()
-		if _, err := os.Stat(certPath); os.IsNotExist(err) {
-			if err := os.Mkdir(certPath, folderPerm); err != nil {
-				return err
-			}
+		if err := os.MkdirAll(certPath, folderPerm); err != nil {
+			return err
 		}
 
 		if err := os.WriteFile(path.Join(certPath, CaCertKey), certs.CaPEM.Bytes(), permission); err != nil {
@@ -102,37 +100,14 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 	}
 
 	if kubeErrors.IsAlreadyExists(err) {
-		logger.Infof(ctx, "A secret already exists with the same name. Validating.")
-		s, err := secretsClient.Get(ctx, cfg.SecretName, metav1.GetOptions{})
-		if err != nil {
+		logger.Infof(ctx, "Secret [%v] already exists, recreating with new certs.", cfg.SecretName)
+		if err := secretsClient.Delete(ctx, cfg.SecretName, metav1.DeleteOptions{}); err != nil {
 			return err
 		}
-
-		requiresUpdate := false
-		for key := range secretData {
-			if key == CaCertKey {
-				continue
-			}
-			if _, exists := s.Data[key]; !exists {
-				requiresUpdate = true
-				break
-			}
-		}
-
-		if requiresUpdate {
-			logger.Infof(ctx, "The existing secret is missing one or more keys.")
-			secret.Annotations = map[string]string{
-				"flyteLastUpdate": "system-updated",
-				"flyteUpdatedAt":  time.Now().String(),
-			}
-			_, err = secretsClient.Update(ctx, secret, metav1.UpdateOptions{})
-			if err != nil && kubeErrors.IsConflict(err) {
-				logger.Infof(ctx, "Another instance updated the same secret. Ignoring.")
-				err = nil
-			}
+		if _, err := secretsClient.Create(ctx, secret, metav1.CreateOptions{}); err != nil {
 			return err
 		}
-
+		logger.Infof(ctx, "Recreated secret [%v]", cfg.SecretName)
 		return nil
 	}
 
