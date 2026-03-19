@@ -35,7 +35,8 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, name)
 	)`).Error
 	require.NoError(t, err)
-	db.Exec(`CREATE INDEX idx_actions_org ON actions(org)`)
+	err = db.Exec(`CREATE INDEX idx_actions_org ON actions(org)`).Error
+	require.NoError(t, err)
 	err = db.Exec(`CREATE INDEX idx_actions_project ON actions(project)`).Error
 	require.NoError(t, err)
 	err = db.Exec(`CREATE INDEX idx_actions_domain ON actions(domain)`).Error

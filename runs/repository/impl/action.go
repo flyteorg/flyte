@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -164,7 +165,11 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 	limit := 50
 	if req.Request != nil {
 		if req.Request.Token != "" {
-			query = query.Where("id > ?", req.Request.Token)
+			tokenID, err := strconv.ParseUint(req.Request.Token, 10, 64)
+			if err != nil {
+				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
+			}
+			query = query.Where("id < ?", tokenID)
 		}
 
 		if req.Request.Limit > 0 {

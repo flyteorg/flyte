@@ -958,7 +958,11 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 	}
 
 	var actionDetails workflow.ActionDetails
-	if err := json.Unmarshal(run.ActionDetails, &actionDetails); err == nil {
+	if err := json.Unmarshal(run.ActionDetails, &actionDetails); err != nil {
+		if len(run.ActionDetails) > 0 {
+			logger.Warningf(context.Background(), "failed to unmarshal action details for run %s: %v", run.Name, err)
+		}
+	} else if actionDetails.Status != nil {
 		action.Status.Attempts = actionDetails.Status.Attempts
 		action.Status.CacheStatus = actionDetails.Status.CacheStatus
 		if actionDetails.Status.StartTime != nil {
