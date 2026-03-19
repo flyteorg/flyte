@@ -36,8 +36,8 @@ export enum LaunchPlanState {
   ACTIVE = 1,
 
   /**
-   * Archived launch plans are considered old/unused and can be filtered out of list queries.
-   * Archiving a launch plan also disables any active schedule.
+   * Archived launch plans are considered old/unused and can be excluded from list queries
+   * using a ne(state,2) filter. Archiving a launch plan also disables any active schedule.
    * An archived launch plan can still be used to launch executions.
    *
    * @generated from enum value: ARCHIVED = 2;

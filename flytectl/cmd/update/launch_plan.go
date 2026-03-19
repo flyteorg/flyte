@@ -28,9 +28,9 @@ Deactivates a ` + "`launch plan <https://docs.flyte.org/en/latest/user_guide/pro
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --deactivate
 
-Archives a launch plan version, marking it as old/unused. Archived launch plans are hidden from list
-queries by default and any active schedule is disabled. Archived launch plans can still be used to
-launch executions:
+Archives a launch plan version, marking it as old/unused. Archived launch plans can be filtered out
+of list queries using ne(state,2) and any active schedule is disabled. Archived launch plans can
+still be used to launch executions:
 ::
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --archive
