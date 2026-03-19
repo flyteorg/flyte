@@ -45,6 +45,11 @@ func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string,
 	return secretName, k8sSecretName, nil
 }
 
+// secretNamespace returns the Kubernetes namespace for a secret based on its project and domain.
+func secretNamespace(project, domain string) string {
+	return fmt.Sprintf("%s-%s", project, domain)
+}
+
 func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[secretpb.CreateSecretRequest]) (*connect.Response[secretpb.CreateSecretResponse], error) {
 	logger.Debugf(ctx, "SecretService.CreateSecret called for %v", req.Msg.GetId().GetName())
 
@@ -58,7 +63,8 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	k8sSecret, err := buildK8sSecret(secretName, k8sSecretName, req.Msg.GetSecretSpec())
+	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	k8sSecret, err := buildK8sSecret(secretName, k8sSecretName, namespace, req.Msg.GetSecretSpec())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -88,7 +94,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
 	// Get the existing secret first to obtain the ResourceVersion required by controller-runtime Update.
-	namespace := config.GetConfig().Kubernetes.Namespace
+	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	existing := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
@@ -133,7 +139,7 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace := config.GetConfig().Kubernetes.Namespace
+	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	k8sSecret := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
@@ -167,7 +173,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace := config.GetConfig().Kubernetes.Namespace
+	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	k8sSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      k8sSecretName,
@@ -190,7 +196,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[secretpb.ListSecretsRequest]) (*connect.Response[secretpb.ListSecretsResponse], error) {
 	logger.Debugf(ctx, "SecretService.ListSecrets called")
 
-	namespace := config.GetConfig().Kubernetes.Namespace
+	namespace := secretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
 	k8sSecretList := &corev1.SecretList{}
 	listOpts := []client.ListOption{
 		client.InNamespace(namespace),
@@ -252,9 +258,7 @@ func fullyPresentStatus() *secretpb.SecretStatus {
 }
 
 // buildK8sSecret constructs a Kubernetes Secret object from the decoded secret name and spec.
-func buildK8sSecret(secretName, k8sSecretName string, spec *secretpb.SecretSpec) (*corev1.Secret, error) {
-	namespace := config.GetConfig().Kubernetes.Namespace
-
+func buildK8sSecret(secretName, k8sSecretName, namespace string, spec *secretpb.SecretSpec) (*corev1.Secret, error) {
 	k8sSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      k8sSecretName,
