@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
@@ -219,6 +220,95 @@ func TestGenerateRunName(t *testing.T) {
 		name1 := generateRunName(12345)
 		name2 := generateRunName(12345)
 		assert.Equal(t, name1, name2)
+	})
+}
+
+func newStringLiteral(s string) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{
+		Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+			Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: s}},
+		}},
+	}}
+}
+
+func newIntLiteral(n int64) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{
+		Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+			Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: n}},
+		}},
+	}}
+}
+
+// TestInputsProtoCompat verifies that task.Inputs and core.LiteralMap are wire-compatible,
+// ensuring components that still read/write inputs.pb as LiteralMap work as expect.
+func TestInputsProtoCompat(t *testing.T) {
+	t.Run("task.Inputs roundtrip preserves literals and context", func(t *testing.T) {
+		inputs := &task.Inputs{
+			Literals: []*task.NamedLiteral{
+				{Name: "x", Value: newStringLiteral("hello")},
+				{Name: "y", Value: newIntLiteral(42)},
+			},
+			Context: []*core.KeyValuePair{
+				{Key: "env", Value: "prod"},
+				{Key: "region", Value: "us-east-1"},
+			},
+		}
+
+		data, err := proto.Marshal(inputs)
+		require.NoError(t, err)
+
+		got := &task.Inputs{}
+		require.NoError(t, proto.Unmarshal(data, got))
+
+		assert.Len(t, got.Literals, 2)
+		assert.Equal(t, "x", got.Literals[0].Name)
+		assert.Equal(t, "y", got.Literals[1].Name)
+		assert.Len(t, got.Context, 2)
+		assert.Equal(t, "env", got.Context[0].Key)
+		assert.Equal(t, "prod", got.Context[0].Value)
+	})
+
+	t.Run("task.Inputs read as core.LiteralMap preserves literals", func(t *testing.T) {
+		inputs := &task.Inputs{
+			Literals: []*task.NamedLiteral{
+				{Name: "x", Value: newStringLiteral("hello")},
+				{Name: "y", Value: newIntLiteral(42)},
+			},
+			Context: []*core.KeyValuePair{
+				{Key: "env", Value: "prod"},
+			},
+		}
+
+		data, err := proto.Marshal(inputs)
+		require.NoError(t, err)
+
+		literalMap := &core.LiteralMap{}
+		require.NoError(t, proto.Unmarshal(data, literalMap))
+
+		assert.Len(t, literalMap.Literals, 2)
+		assert.Contains(t, literalMap.Literals, "x")
+		assert.Contains(t, literalMap.Literals, "y")
+		assert.True(t, proto.Equal(newStringLiteral("hello"), literalMap.Literals["x"]))
+		assert.True(t, proto.Equal(newIntLiteral(42), literalMap.Literals["y"]))
+	})
+
+	t.Run("core.LiteralMap read as task.Inputs preserves literals", func(t *testing.T) {
+		literalMap := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"a": newStringLiteral("old_value"),
+			},
+		}
+
+		data, err := proto.Marshal(literalMap)
+		require.NoError(t, err)
+
+		got := &task.Inputs{}
+		require.NoError(t, proto.Unmarshal(data, got))
+
+		assert.Len(t, got.Literals, 1)
+		assert.Equal(t, "a", got.Literals[0].Name)
+		assert.True(t, proto.Equal(newStringLiteral("old_value"), got.Literals[0].Value))
+		assert.Empty(t, got.Context)
 	})
 }
 

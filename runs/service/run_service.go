@@ -587,16 +587,14 @@ func (s *RunService) GetActionData(
 	if inputURI != "" {
 		inputRef := storage.DataReference(inputURI)
 		logger.Debugf(ctx, "Reading inputs from: %s", inputRef)
-		inputMap := &core.LiteralMap{}
-		if err := s.dataStore.ReadProtobuf(ctx, inputRef, inputMap); err != nil {
+		if err := s.dataStore.ReadProtobuf(ctx, inputRef, resp.Inputs); err != nil {
 			if !storage.IsNotFound(err) {
 				logger.Errorf(ctx, "Failed to read inputs from %s: %v", inputRef, err)
 				return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
 			}
 			logger.Debugf(ctx, "Inputs not found at %s", inputRef)
 		} else {
-			resp.Inputs = literalMapToInputs(inputMap)
-			logger.Debugf(ctx, "Read %d input literals", len(resp.Inputs.Literals))
+			logger.Debugf(ctx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 		}
 	} else {
 		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
