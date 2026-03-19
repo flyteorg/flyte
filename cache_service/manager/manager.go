@@ -30,7 +30,7 @@ const reservationPrefix = "reservation"
 type Manager struct {
 	outputs                         interfaces.CachedOutputRepo
 	reservations                    interfaces.ReservationRepo
-	heartbeatGracePeriodMultiplier  time.Duration
+	heartbeatGracePeriodMultiplier  int
 	maxReservationHeartbeatInterval time.Duration
 }
 
@@ -45,7 +45,7 @@ func New(cfg *cacheconfig.Config, outputs interfaces.CachedOutputRepo, reservati
 		maxHeartbeat = 10 * time.Second
 	}
 
-	graceMultiplier := time.Duration(cfg.HeartbeatGracePeriodMultiplier)
+	graceMultiplier := cfg.HeartbeatGracePeriodMultiplier
 	if graceMultiplier <= 0 {
 		graceMultiplier = 3
 	}
@@ -178,7 +178,7 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 		Key:              reservationKey,
 		OwnerID:          request.GetOwnerId(),
 		HeartbeatSeconds: int64(heartbeat.Seconds()),
-		ExpiresAt:        now.Add(heartbeat * m.heartbeatGracePeriodMultiplier),
+		ExpiresAt:        now.Add(heartbeat * time.Duration(m.heartbeatGracePeriodMultiplier)),
 	}
 
 	existing, err := m.reservations.Get(ctx, reservationKey)
