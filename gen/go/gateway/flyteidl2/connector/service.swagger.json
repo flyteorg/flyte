@@ -2182,6 +2182,10 @@
         "image_build_run": {
           "$ref": "#/definitions/commonRunIdentifier",
           "description": "RunIdentifier of the remote image build run that produced the container image for this task."
+        },
+        "is_entrypoint": {
+          "type": "boolean",
+          "description": "IsEntryPoint indicates whether this task will launch additional actions as it runs."
         }
       },
       "title": "Task Metadata"

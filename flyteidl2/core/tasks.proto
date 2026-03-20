@@ -196,6 +196,9 @@ message TaskMetadata {
 
   // RunIdentifier of the remote image build run that produced the container image for this task.
   common.RunIdentifier image_build_run = 19;
+
+  // IsEntryPoint indicates whether this task will launch additional actions as it runs.
+  bool is_entrypoint = 20;
 }
 
 // A Task structure that uniquely identifies a task in the system
