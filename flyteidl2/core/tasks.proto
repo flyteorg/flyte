@@ -190,7 +190,6 @@ message TaskMetadata {
 
   // Whether the task is able to run the debugger (vscode server) inside the task container.
   bool debuggable = 17;
-
   // Log links associated with this task.
   repeated core.TaskLog log_links = 18;
 
