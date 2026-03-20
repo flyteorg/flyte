@@ -13,6 +13,11 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
 
+# Webhook configuration
+# localCert: true writes the generated TLS cert to disk so the webhook server can read it.
+webhook:
+  localCert: true
+
 # Executor configuration
 executor:
   gc:

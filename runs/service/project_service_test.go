@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"testing"
 	"time"
@@ -102,12 +103,16 @@ func testAction(name string, parent *string, phase common.ActionPhase, createdAt
 }
 
 func testActionWithTask(name string, parent *string, phase common.ActionPhase, createdAtSec int64, taskName string) *models.Action {
+	var parentNullStr sql.NullString
+	if parent != nil {
+		parentNullStr = sql.NullString{String: *parent, Valid: true}
+	}
 	action := &models.Action{
 		Org:              "o",
 		Project:          "p",
 		Domain:           "d",
 		Name:             name,
-		ParentActionName: parent,
+		ParentActionName: parentNullStr,
 		Phase:            int32(phase),
 		CreatedAt:        time.Unix(createdAtSec, 0),
 	}
