@@ -847,9 +847,7 @@ func (s *RunService) WatchRunDetails(
 	}
 
 	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+		Details: s.runModelToDetails(run, req.Msg.RunId),
 	}
 
 	if err := stream.Send(resp); err != nil {
@@ -1185,8 +1183,30 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 	}}
 }
 
+// runModelToDetails converts a DB Run model to a RunDetails proto.
+func (s *RunService) runModelToDetails(run *models.Run, runID *common.RunIdentifier) *workflow.RunDetails {
+	var runSpec *task.RunSpec
+	if len(run.ActionSpec) > 0 {
+		var actionSpec workflow.ActionSpec
+		if err := json.Unmarshal(run.ActionSpec, &actionSpec); err == nil {
+			runSpec = actionSpec.RunSpec
+		}
+	}
+
+	return &workflow.RunDetails{
+		RunSpec: runSpec,
+		Action: s.actionModelToDetails(run, &common.ActionIdentifier{
+			Run:  runID,
+			Name: run.Name,
+		}),
+	}
+}
+
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
+	details := &workflow.ActionDetails{
+		Id: actionID,
+	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
 		StartTime:   timestamppb.New(action.CreatedAt),
@@ -1195,6 +1215,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
