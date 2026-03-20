@@ -655,6 +655,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
@@ -753,7 +758,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: U0VJZnFNeGFTWE9peDFlMw==
+  haSharedSecret: MjhVUzNURkZyRWY2MEVrMw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1176,7 +1181,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 770936f6bf0e6bc5cd48fc176eee8831648fb3c4204aa706e08f88ad9b96441b
+        checksum/secret: 1038ebbe6bba0097bc230f0bda80cda66be52521f8f79206359ed1cb25de4559
       labels:
         app: docker-registry
         release: flyte-sandbox
