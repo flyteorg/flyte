@@ -655,12 +655,22 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.dataproxy.DataProxyService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.secret.SecretService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
@@ -753,7 +763,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: M2lLUkV3NHRyenhmSk45bw==
+  haSharedSecret: Y3VyZnF5TTBFMnVmNXc2NQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -853,9 +863,6 @@ subsets:
   - name: http
     port: 8090
     protocol: TCP
-  - name: webhook
-    port: 9443
-    protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -919,9 +926,6 @@ spec:
   ports:
   - name: http
     port: 8090
-    protocol: TCP
-  - name: webhook
-    port: 9443
     protocol: TCP
 ---
 apiVersion: v1
@@ -1182,7 +1186,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: be351f752525848746fdbfe7aff4b547d3d159aadb2dc926485a0f95b1cc9a88
+        checksum/secret: c919aa59e0cf18f1502defcb218c72452af7982490aa292afa4591ff05e63f06
       labels:
         app: docker-registry
         release: flyte-sandbox
