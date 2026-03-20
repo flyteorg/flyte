@@ -56,6 +56,15 @@ flyte-core-components:
     download:
       maxExpiresIn: 1h
 
+  secret:
+    kubernetes:
+      namespace: "flyte"
+      clusterName: "flyte-sandbox"
+      kubeconfig: ""
+      qps: 100
+      burst: 200
+      timeout: "30s"
+
 # configuration Specify configuration for Flyte
 configuration:
   # database Specify configuration for Flyte's database connection
