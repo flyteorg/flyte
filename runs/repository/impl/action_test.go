@@ -47,7 +47,7 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		ended_at DATETIME,
 		duration_ms INTEGER,
-		attempts INTEGER NOT NULL DEFAULT 0,
+		attempts INTEGER NOT NULL DEFAULT 1,
 		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, name)
 	)`).Error
 	require.NoError(t, err)
