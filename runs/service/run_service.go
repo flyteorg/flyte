@@ -1074,8 +1074,6 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
-		durationMs := uint64(action.EndedAt.Time.Sub(action.CreatedAt).Microseconds())
-		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
@@ -1099,7 +1097,7 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 
 	metadata := actionMetadataFromModel(action)
 
-	return &workflow.ActionDetails{
+	details := &workflow.ActionDetails{
 		Id:       actionID,
 		Metadata: metadata,
 		Status:   status,
