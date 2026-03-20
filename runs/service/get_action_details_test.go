@@ -53,7 +53,6 @@ func TestGetActionDetails_ActionNotFound(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionRepo.On("GetAction", mock.Anything, testActionID).Return(nil, errors.New("action not found"))
-	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
 	_, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
