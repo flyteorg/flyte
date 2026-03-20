@@ -18,7 +18,8 @@ manager:
 webhook:
   localCert: true
   certDir: /tmp/flyte/webhook/certs
-  webhookURL: "https://host.docker.internal:9443"
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
 
 # Executor configuration
 executor:

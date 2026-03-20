@@ -172,10 +172,6 @@ type Config struct {
 	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
 	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
 	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
-	// WebhookURL, if set, uses a URL-based webhook client config instead of a k8s Service reference.
-	// Useful for local development where the webhook server runs outside the cluster
-	// (e.g. "https://host.docker.internal:9443").
-	WebhookURL         string           `json:"webhookURL" pflag:",If set, use this base URL instead of the k8s Service reference for the MutatingWebhookConfiguration (e.g. https://host.docker.internal:9443)"`
 	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
 	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
 }

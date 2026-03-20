@@ -10,7 +10,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
-	"net/url"
 	"os"
 	"path"
 	"time"
@@ -48,13 +47,7 @@ func InitCerts(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhoo
 	}
 
 	logger.Infof(ctx, "Issuing certs")
-	var extraDNSNames []string
-	if cfg.WebhookURL != "" {
-		if u, err := url.Parse(cfg.WebhookURL); err == nil && u.Hostname() != "" {
-			extraDNSNames = append(extraDNSNames, u.Hostname())
-		}
-	}
-	certs, err := createCerts(cfg.ServiceName, podNamespace, extraDNSNames)
+	certs, err := createCerts(cfg.ServiceName, podNamespace)
 	if err != nil {
 		return err
 	}
@@ -121,7 +114,7 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 	return err
 }
 
-func createCerts(serviceName string, serviceNamespace string, extraDNSNames []string) (certs webhookCerts, err error) {
+func createCerts(serviceName string, serviceNamespace string) (certs webhookCerts, err error) {
 	caRequest := &x509.Certificate{
 		SerialNumber:          big.NewInt(2021),
 		Subject:               pkix.Name{Organization: []string{"flyte.org"}},
@@ -148,11 +141,11 @@ func createCerts(serviceName string, serviceNamespace string, extraDNSNames []st
 		return webhookCerts{}, err
 	}
 
-	dnsNames := append([]string{
+	dnsNames := []string{
 		serviceName,
 		serviceName + "." + serviceNamespace,
 		serviceName + "." + serviceNamespace + ".svc",
-	}, extraDNSNames...)
+	}
 	commonName := serviceName + "." + serviceNamespace + ".svc"
 
 	certRequest := &x509.Certificate{

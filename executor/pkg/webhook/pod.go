@@ -81,25 +81,6 @@ func generateMutatePath(gvk schema.GroupVersionKind) string {
 		gvk.Version + "-" + strings.ToLower(gvk.Kind)
 }
 
-func (pm PodMutator) buildWebhookClientConfig(caBytes []byte, namespace, path string) admissionregistrationv1.WebhookClientConfig {
-	if pm.cfg.WebhookURL != "" {
-		url := pm.cfg.WebhookURL + path
-		return admissionregistrationv1.WebhookClientConfig{
-			CABundle: caBytes,
-			URL:      &url,
-		}
-	}
-	return admissionregistrationv1.WebhookClientConfig{
-		CABundle: caBytes,
-		Service: &admissionregistrationv1.ServiceReference{
-			Name:      pm.cfg.ServiceName,
-			Namespace: namespace,
-			Path:      &path,
-			Port:      &pm.cfg.ServicePort,
-		},
-	}
-}
-
 func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
 	caBytes, err := os.ReadFile(filepath.Join(pm.cfg.ExpandCertDir(), "ca.crt"))
 	if err != nil {
@@ -122,7 +103,15 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 		Webhooks: []admissionregistrationv1.MutatingWebhook{
 			{
 				Name:         webhookName,
-				ClientConfig: pm.buildWebhookClientConfig(caBytes, namespace, path),
+				ClientConfig: admissionregistrationv1.WebhookClientConfig{
+					CABundle: caBytes,
+					Service: &admissionregistrationv1.ServiceReference{
+						Name:      pm.cfg.ServiceName,
+						Namespace: namespace,
+						Path:      &path,
+						Port:      &pm.cfg.ServicePort,
+					},
+				},
 				Rules: []admissionregistrationv1.RuleWithOperations{
 					{
 						Operations: []admissionregistrationv1.OperationType{
