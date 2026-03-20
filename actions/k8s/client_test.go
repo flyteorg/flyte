@@ -9,8 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -181,17 +183,24 @@ type mockWatcher struct {
 	ch chan watch.Event
 }
 
-func (m *mockWatcher) Stop()                          {}
-func (m *mockWatcher) ResultChan() <-chan watch.Event  { return m.ch }
+func (m *mockWatcher) Stop()                         {}
+func (m *mockWatcher) ResultChan() <-chan watch.Event { return m.ch }
 
-// mockK8sClient implements a minimal client.WithWatch for testing doWatch
-type mockK8sClient struct {
+// newFakeK8sClient creates a fake client.WithWatch with executorv1 scheme registered.
+func newFakeK8sClient(objs ...client.Object) client.WithWatch {
+	scheme := runtime.NewScheme()
+	_ = executorv1.AddToScheme(scheme)
+	return fake.NewClientBuilder().WithScheme(scheme).WithObjects(objs...).Build()
+}
+
+// watchOverrideClient wraps a fake client but overrides Watch for testing doWatch behavior.
+type watchOverrideClient struct {
 	client.WithWatch
 	watchFn func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error)
 }
 
-func (m *mockK8sClient) Watch(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
-	return m.watchFn(ctx, obj, opts...)
+func (w *watchOverrideClient) Watch(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+	return w.watchFn(ctx, obj, opts...)
 }
 
 func TestHandleWatchEvent_UpdatesResourceVersion(t *testing.T) {
@@ -226,7 +235,8 @@ func TestDoWatch_PassesResourceVersionOnReconnect(t *testing.T) {
 	eventCh := make(chan watch.Event)
 	close(eventCh)
 
-	mk := &mockK8sClient{
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(),
 		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
 			capturedOpts = &client.ListOptions{}
 			for _, opt := range opts {
@@ -237,7 +247,7 @@ func TestDoWatch_PassesResourceVersionOnReconnect(t *testing.T) {
 	}
 
 	c := &ActionsClient{
-		k8sClient:           mk,
+		k8sClient:           woc,
 		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
 		stopCh:              make(chan struct{}),
 		lastResourceVersion: "100",
@@ -260,14 +270,15 @@ func TestDoWatch_HandlesGoneError(t *testing.T) {
 		},
 	}
 
-	mk := &mockK8sClient{
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(),
 		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
 			return &mockWatcher{ch: eventCh}, nil
 		},
 	}
 
 	c := &ActionsClient{
-		k8sClient:           mk,
+		k8sClient:           woc,
 		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
 		stopCh:              make(chan struct{}),
 		lastResourceVersion: "100",
@@ -275,11 +286,11 @@ func TestDoWatch_HandlesGoneError(t *testing.T) {
 
 	err := c.doWatch(context.Background())
 
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "watch error")
+	// syncResourceVersionFromList refreshes from List, doWatch returns nil
+	assert.NoError(t, err)
 
 	c.mu.RLock()
-	assert.Equal(t, "", c.lastResourceVersion)
+	assert.NotEqual(t, "100", c.lastResourceVersion)
 	c.mu.RUnlock()
 }
 
@@ -293,14 +304,15 @@ func TestDoWatch_PreservesResourceVersionOnOtherErrors(t *testing.T) {
 		},
 	}
 
-	mk := &mockK8sClient{
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(),
 		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
 			return &mockWatcher{ch: eventCh}, nil
 		},
 	}
 
 	c := &ActionsClient{
-		k8sClient:           mk,
+		k8sClient:           woc,
 		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
 		stopCh:              make(chan struct{}),
 		lastResourceVersion: "100",

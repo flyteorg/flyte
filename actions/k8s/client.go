@@ -380,9 +380,10 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 	})
 	if err != nil {
 		if apierrors.IsGone(err) {
-			c.mu.Lock()
-			c.lastResourceVersion = ""
-			c.mu.Unlock()
+			if syncErr := c.syncResourceVersionFromList(ctx); syncErr != nil {
+				return fmt.Errorf("failed to refresh resource version after expired watch: %w", syncErr)
+			}
+			return nil
 		}
 		return fmt.Errorf("failed to start watch: %w", err)
 	}
@@ -400,15 +401,30 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 			}
 			if event.Type == watch.Error {
 				if status, ok := event.Object.(*metav1.Status); ok && status.Reason == metav1.StatusReasonGone {
-					c.mu.Lock()
-					c.lastResourceVersion = ""
-					c.mu.Unlock()
+					if syncErr := c.syncResourceVersionFromList(ctx); syncErr != nil {
+						return fmt.Errorf("failed to refresh resource version after expired watch event: %w", syncErr)
+					}
+					return nil
 				}
 				return fmt.Errorf("watch error: %v", event.Object)
 			}
 			c.handleWatchEvent(ctx, event)
 		}
 	}
+}
+
+// syncResourceVersionFromList performs a list operation to get the latest ResourceVersion.
+func (c *ActionsClient) syncResourceVersionFromList(ctx context.Context) error {
+	taskActionList := &executorv1.TaskActionList{}
+	if err := c.k8sClient.List(ctx, taskActionList); err != nil {
+		return fmt.Errorf("failed to list TaskActions: %w", err)
+	}
+
+	c.mu.Lock()
+	c.lastResourceVersion = taskActionList.ResourceVersion
+	c.mu.Unlock()
+
+	return nil
 }
 
 // handleWatchEvent processes a watch event
@@ -420,9 +436,9 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	// Track ResourceVersion for watch resumption
-	if taskAction.ResourceVersion != "" {
+	if taskAction.GetResourceVersion() != "" {
 		c.mu.Lock()
-		c.lastResourceVersion = taskAction.ResourceVersion
+		c.lastResourceVersion = taskAction.GetResourceVersion()
 		c.mu.Unlock()
 	}
 
