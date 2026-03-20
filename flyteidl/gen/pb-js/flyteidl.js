@@ -41052,6 +41052,7 @@
                             return "state: enum value expected";
                         case 0:
                         case 1:
+                        case 2:
                             break;
                         }
                     if (message.expectedInputs != null && message.hasOwnProperty("expectedInputs")) {
@@ -41364,6 +41365,7 @@
                             return "state: enum value expected";
                         case 0:
                         case 1:
+                        case 2:
                             break;
                         }
                     return null;
