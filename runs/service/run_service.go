@@ -636,9 +636,9 @@ func (s *RunService) GetActionData(
 				if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(info.GetOutputsUri()), outputMap); err != nil {
 					if !storage.IsNotFound(err) {
 						logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", info.GetOutputsUri(), err)
-					} else {
-						logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", info.GetOutputsUri())
+						return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
 					}
+					logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", info.GetOutputsUri())
 				} else {
 					resp.Outputs = literalMapToOutputs(outputMap)
 					logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
@@ -651,10 +651,6 @@ func (s *RunService) GetActionData(
 			attempts, err = s.getAttempts(groupCtx, req.Msg.GetActionId())
 			if err != nil {
 				return err
-			}
-
-			if len(attempts) != int(action.Attempts) {
-				return app.NewServerError(codes.NotFound, "attempt info not available")
 			}
 
 			if len(attempts) == 0 {
@@ -671,9 +667,9 @@ func (s *RunService) GetActionData(
 			if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(outputUri), outputMap); err != nil {
 				if !storage.IsNotFound(err) {
 					logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", outputUri, err)
-				} else {
-					logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", outputUri)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
 				}
+				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", outputUri)
 			} else {
 				resp.Outputs = literalMapToOutputs(outputMap)
 				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
