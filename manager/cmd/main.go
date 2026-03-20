@@ -18,6 +18,7 @@ import (
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
+	"github.com/flyteorg/flyte/v2/secret"
 )
 
 func main() {
@@ -89,6 +90,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := secret.Setup(ctx, sc); err != nil {
 		return err
 	}
 
