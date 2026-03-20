@@ -665,11 +665,6 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
-                                                  prefix: "/flyteidl2.secret.SecretService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -758,7 +753,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: a2IwUm9wYU5Sb1ZBdDF1NA==
+  haSharedSecret: U0VJZnFNeGFTWE9peDFlMw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1181,7 +1176,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 2e5ea86bcc0c53f5cc9b5d9402c4581ba33ffc4ee8f534af34ad485ed5e081f8
+        checksum/secret: 770936f6bf0e6bc5cd48fc176eee8831648fb3c4204aa706e08f88ad9b96441b
       labels:
         app: docker-registry
         release: flyte-sandbox

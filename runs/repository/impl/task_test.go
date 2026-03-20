@@ -14,11 +14,16 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func setupTestDB(t *testing.T) *gorm.DB {
+func setupDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	require.NoError(t, err)
+	return db
+}
 
-	err = db.Exec(`CREATE TABLE tasks (
+func setupTestDB(t *testing.T) *gorm.DB {
+	db := setupDB(t)
+
+	err := db.Exec(`CREATE TABLE tasks (
 		org TEXT NOT NULL,
 		project TEXT NOT NULL,
 		domain TEXT NOT NULL,

@@ -1,5 +1,7 @@
 package service
 
+import "database/sql"
+
 // TruncateShortDescription truncates the short description to 255 characters if it exceeds the maximum length.
 func truncateShortDescription(description string) string {
 	if len(description) > 255 {
@@ -14,4 +16,11 @@ func truncateLongDescription(description string) string {
 		return description[:2048]
 	}
 	return description
+}
+
+func CoalesceNullString(s sql.NullString) string {
+	if s.Valid {
+		return s.String
+	}
+	return ""
 }

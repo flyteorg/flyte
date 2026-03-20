@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/rand"
 
@@ -23,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
 
 // RunService implements the RunServiceHandler interface
@@ -149,16 +152,15 @@ func (s *RunService) CreateRun(
 	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
 	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
 
-	// Persist inputs to storage
-	if req.Msg.Inputs != nil && len(req.Msg.Inputs.Literals) > 0 {
-		literalMap := inputsToLiteralMap(req.Msg.Inputs)
-		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
-			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-		}
-		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
+	// even when the task has no user inputs, so we must write an empty LiteralMap.
+	literalMap := inputsToLiteralMap(req.Msg.Inputs)
+	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 	}
+	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
 	// Create run in database with storage URIs
 	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg, inputPrefix, runOutputBase)
@@ -302,22 +304,257 @@ func (s *RunService) GetActionDetails(
 	ctx context.Context,
 	req *connect.Request[workflow.GetActionDetailsRequest],
 ) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	logger.Infof(ctx, "Received GetActionDetails request")
-
 	if err := req.Msg.Validate(); err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
+	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
 	if err != nil {
-		logger.Errorf(ctx, "Failed to get action: %v", err)
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		return nil, err
+	}
+	return connect.NewResponse(&workflow.GetActionDetailsResponse{Details: details}), nil
+}
+
+func (s *RunService) getActionDetails(ctx context.Context, actionId *common.ActionIdentifier) (*workflow.ActionDetails, error) {
+	// Get action and task spec
+	var action *workflow.ActionDetails
+	var eg errgroup.Group
+	eg.Go(func() error {
+		model, err := s.repo.ActionRepo().GetAction(ctx, actionId)
+		if err != nil {
+			return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		}
+
+		var info *workflow.RunInfo
+		if len(model.DetailedInfo) > 0 {
+			info = &workflow.RunInfo{}
+			if err := proto.Unmarshal(model.DetailedInfo, info); err != nil {
+				return err
+			}
+		}
+
+		action = s.actionModelToDetails(model, actionId)
+
+		// Get task spec by digest if available
+		if info.GetTaskSpecDigest() != "" {
+			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
+			if err != nil {
+				logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
+				return err
+			}
+
+			// Fill in the action spec based on the action type
+			switch action.GetMetadata().GetActionType() {
+			case workflow.ActionType_ACTION_TYPE_UNSPECIFIED:
+				logger.Warnf(ctx, "action %v has unspecified action type, defaulting to task", actionId)
+			case workflow.ActionType_ACTION_TYPE_TASK:
+				spec, err := transformers.ToTaskSpec(specModel)
+				if err != nil {
+					logger.Errorf(ctx, "failed to convert task spec model for action %v: %v", actionId, err)
+					return err
+				}
+				action.Spec = &workflow.ActionDetails_Task{Task: spec}
+			case workflow.ActionType_ACTION_TYPE_TRACE:
+				spec, err := transformers.ToTraceSpec(specModel)
+				if err != nil {
+					logger.Errorf(ctx, "failed to convert trace spec model for action %v: %v", actionId, err)
+					return err
+				}
+				action.Spec = &workflow.ActionDetails_Trace{Trace: spec}
+			default:
+				return connect.NewError(connect.CodeInternal,
+					fmt.Errorf("unknown action type %v for action %v", action.GetMetadata().GetActionType(), actionId))
+			}
+		}
+
+		return nil
+	})
+
+	// Get attempts
+	var attempts []*workflow.ActionAttempt
+	eg.Go(func() error {
+		var err error
+		attempts, err = s.getAttempts(ctx, actionId)
+		if err != nil {
+			logger.Warnf(ctx, "failed to get action attempts for action %v: %v", actionId, err)
+			return err
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
 	}
 
-	details := s.actionModelToDetails(action, req.Msg.ActionId)
+	action.Attempts = attempts
 
-	logger.Infof(ctx, "Retrieved action details for: %s", req.Msg.ActionId.Name)
-	return connect.NewResponse(&workflow.GetActionDetailsResponse{Details: details}), nil
+	switch action.GetStatus().GetPhase() {
+	case common.ActionPhase_ACTION_PHASE_FAILED:
+		// Get action error from last attempt. Events are eventually consistent, so we may not have
+		// information from the latest attempt yet.
+		numAttempts := len(action.GetAttempts())
+		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
+			action.Result = &workflow.ActionDetails_ErrorInfo{
+				ErrorInfo: action.GetAttempts()[numAttempts-1].GetErrorInfo(),
+			}
+		}
+	case common.ActionPhase_ACTION_PHASE_ABORTED:
+		// TODO: set AbortInfo
+	}
+
+	return action, nil
+}
+
+// getAttempts looks up all events for this action and builds a list of attempts.
+func (s *RunService) getAttempts(ctx context.Context, actionId *common.ActionIdentifier) ([]*workflow.ActionAttempt, error) {
+	eventModels, err := s.repo.ActionRepo().ListEvents(ctx, actionId, 500)
+	if err != nil {
+		return nil, err
+	}
+
+	events := make([]*workflow.ActionEvent, 0, len(eventModels))
+	for _, m := range eventModels {
+		event, err := m.ToActionEvent()
+		if err != nil {
+			logger.Warnf(ctx, "failed to convert action event model for action %v: %v", actionId, err)
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	// Group events by attempt
+	attemptToEvents := map[uint32][]*workflow.ActionEvent{}
+	for _, event := range events {
+		attemptToEvents[event.GetAttempt()] = append(attemptToEvents[event.GetAttempt()], event)
+	}
+
+	attempts := make([]*workflow.ActionAttempt, 0, len(attemptToEvents))
+	for attempt, evts := range attemptToEvents {
+		attempts = append(attempts, mergeEvents(attempt, evts))
+	}
+	sort.SliceStable(attempts, func(i, j int) bool {
+		return attempts[i].GetAttempt() < attempts[j].GetAttempt()
+	})
+
+	return attempts, nil
+}
+
+// mergeEvents merges a set of events for the same attempt into a single ActionAttempt.
+func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.ActionAttempt {
+	// Order events by reported time, falling back to updated time.
+	sort.SliceStable(events, func(i, j int) bool {
+		reportedTimeI := events[i].GetReportedTime()
+		reportedTimeJ := events[j].GetReportedTime()
+		if reportedTimeI != nil && reportedTimeJ != nil {
+			return reportedTimeI.AsTime().Before(reportedTimeJ.AsTime())
+		}
+		return events[i].GetUpdatedTime().AsTime().Before(events[j].GetUpdatedTime().AsTime())
+	})
+
+	if len(events) == 0 {
+		return &workflow.ActionAttempt{Attempt: attempt}
+	}
+
+	// Merge log info (latest takes precedence).
+	logs := map[string]*core.TaskLog{}
+	streamingLogsAvailable := false
+	reportURI := ""
+	lastEvent := events[len(events)-1]
+	var logContext *core.LogContext
+	for i := len(events) - 1; i >= 0; i-- {
+		event := events[i]
+		if event.GetLogContext() != nil && logContext == nil {
+			logContext = event.GetLogContext()
+			streamingLogsAvailable = true
+		}
+
+		for _, log := range event.GetLogInfo() {
+			if _, ok := logs[log.GetName()]; !ok {
+				logs[log.GetName()] = log
+			}
+		}
+		if reportURI == "" && event.GetOutputs().GetReportUri() != "" {
+			reportURI = event.GetOutputs().GetReportUri()
+		}
+		phase := events[i].GetPhase()
+		if IsTerminalPhase(phase) {
+			lastEvent = events[i]
+		}
+	}
+
+	sortedLogs := make([]*core.TaskLog, 0, len(logs))
+	for _, log := range logs {
+		sortedLogs = append(sortedLogs, log)
+	}
+	sort.SliceStable(sortedLogs, func(i, j int) bool {
+		return sortedLogs[i].GetName() < sortedLogs[j].GetName()
+	})
+
+	if reportURI != "" {
+		if lastEvent.GetOutputs() == nil {
+			lastEvent.Outputs = &task.OutputReferences{}
+		}
+		lastEvent.Outputs.ReportUri = reportURI
+	}
+
+	startTime := events[0].GetUpdatedTime()
+	var endTime *timestamppb.Timestamp
+	if IsTerminalPhase(lastEvent.GetPhase()) {
+		endTime = lastEvent.GetUpdatedTime()
+	}
+	// Ensure endTime is never before startTime due to timestamp granularity differences.
+	if endTime != nil && startTime.AsTime().After(endTime.AsTime()) {
+		endTime = startTime
+	}
+
+	var clusterEvents []*workflow.ClusterEvent
+	for _, event := range events {
+		clusterEvents = append(clusterEvents, event.GetClusterEvents()...)
+	}
+
+	// Build phase transitions
+	phaseTransitions := make([]*workflow.PhaseTransition, 0, len(common.ActionPhase_name))
+	phaseSeen := map[common.ActionPhase]bool{}
+	for _, event := range events {
+		phase := event.GetPhase()
+		if !phaseSeen[phase] {
+			if len(phaseTransitions) > 0 {
+				phaseTransitions[len(phaseTransitions)-1].EndTime = event.GetUpdatedTime()
+			}
+			phaseTransitions = append(phaseTransitions, &workflow.PhaseTransition{
+				Phase:     phase,
+				StartTime: event.GetUpdatedTime(),
+			})
+			if IsTerminalPhase(phase) {
+				phaseTransitions[len(phaseTransitions)-1].EndTime = event.GetUpdatedTime()
+				break
+			}
+			phaseSeen[phase] = true
+		}
+	}
+
+	return &workflow.ActionAttempt{
+		Attempt:          attempt,
+		Phase:            lastEvent.GetPhase(),
+		StartTime:        startTime,
+		EndTime:          endTime,
+		Outputs:          lastEvent.GetOutputs(),
+		ErrorInfo:        lastEvent.GetErrorInfo(),
+		LogsAvailable:    streamingLogsAvailable,
+		LogContext:       logContext,
+		LogInfo:          sortedLogs,
+		CacheStatus:      lastEvent.GetCacheStatus(),
+		ClusterEvents:    clusterEvents,
+		Cluster:          lastEvent.GetCluster(),
+		PhaseTransitions: phaseTransitions,
+	}
+}
+
+func IsTerminalPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT ||
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED
 }
 
 // GetActionData gets input and output data for an action by reading from storage.
@@ -350,16 +587,14 @@ func (s *RunService) GetActionData(
 	if inputURI != "" {
 		inputRef := storage.DataReference(inputURI)
 		logger.Debugf(ctx, "Reading inputs from: %s", inputRef)
-		inputMap := &core.LiteralMap{}
-		if err := s.dataStore.ReadProtobuf(ctx, inputRef, inputMap); err != nil {
+		if err := s.dataStore.ReadProtobuf(ctx, inputRef, resp.Inputs); err != nil {
 			if !storage.IsNotFound(err) {
 				logger.Errorf(ctx, "Failed to read inputs from %s: %v", inputRef, err)
 				return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
 			}
 			logger.Debugf(ctx, "Inputs not found at %s", inputRef)
 		} else {
-			resp.Inputs = literalMapToInputs(inputMap)
-			logger.Debugf(ctx, "Read %d input literals", len(resp.Inputs.Literals))
+			logger.Debugf(ctx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 		}
 	} else {
 		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
@@ -844,6 +1079,10 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
 	}
+	if action.DurationMs.Valid {
+		durationMs := uint64(action.DurationMs.Int64)
+		status.DurationMs = &durationMs
+	}
 
 	phase := common.ActionPhase(action.Phase)
 	attempt := &workflow.ActionAttempt{
@@ -860,11 +1099,58 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		EndTime:   status.EndTime,
 	}}
 
+	metadata := actionMetadataFromModel(action)
+
 	return &workflow.ActionDetails{
 		Id:       actionID,
+		Metadata: metadata,
 		Status:   status,
 		Attempts: []*workflow.ActionAttempt{attempt},
 	}
+}
+
+// actionMetadataFromModel builds an ActionMetadata proto from DB model columns.
+func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
+	metadata := &workflow.ActionMetadata{
+		ActionType:  workflow.ActionType(action.ActionType),
+		FuntionName: action.FunctionName,
+	}
+	if action.ParentActionName.Valid {
+		metadata.Parent = action.ParentActionName.String
+	}
+	if action.ActionGroup.Valid {
+		metadata.Group = action.ActionGroup.String
+	}
+	if action.EnvironmentName.Valid {
+		metadata.EnvironmentName = action.EnvironmentName.String
+	}
+
+	switch workflow.ActionType(action.ActionType) {
+	case workflow.ActionType_ACTION_TYPE_TASK:
+		taskMeta := &workflow.TaskActionMetadata{
+			TaskType: action.TaskType,
+		}
+		if action.TaskName.Valid {
+			taskMeta.Id = &task.TaskIdentifier{
+				Org:     action.TaskOrg.String,
+				Project: action.TaskProject.String,
+				Domain:  action.TaskDomain.String,
+				Name:    action.TaskName.String,
+				Version: action.TaskVersion.String,
+			}
+		}
+		if action.TaskShortName.Valid {
+			taskMeta.ShortName = action.TaskShortName.String
+		}
+		metadata.Spec = &workflow.ActionMetadata_Task{Task: taskMeta}
+	case workflow.ActionType_ACTION_TYPE_TRACE:
+		traceMeta := &workflow.TraceActionMetadata{
+			Name: action.FunctionName,
+		}
+		metadata.Spec = &workflow.ActionMetadata_Trace{Trace: traceMeta}
+	}
+
+	return metadata
 }
 
 // extractStorageURIs parses ActionSpec JSON to extract InputUri and RunOutputBase.
@@ -893,6 +1179,9 @@ func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
 func inputsToLiteralMap(inputs *task.Inputs) *core.LiteralMap {
+	if inputs == nil || len(inputs.Literals) == 0 {
+		return &core.LiteralMap{Literals: map[string]*core.Literal{}}
+	}
 	m := make(map[string]*core.Literal, len(inputs.Literals))
 	for _, nl := range inputs.Literals {
 		m[nl.Name] = nl.Value
@@ -957,6 +1246,26 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		},
 	}
 
+	var actionDetails workflow.ActionDetails
+	if err := json.Unmarshal(run.ActionDetails, &actionDetails); err != nil {
+		if len(run.ActionDetails) > 0 {
+			logger.Warningf(context.Background(), "failed to unmarshal action details for run %s: %v", run.Name, err)
+		}
+	} else if actionDetails.Status != nil {
+		action.Status.Attempts = actionDetails.Status.Attempts
+		action.Status.CacheStatus = actionDetails.Status.CacheStatus
+		if actionDetails.Status.StartTime != nil {
+			action.Status.StartTime = actionDetails.Status.StartTime
+		}
+		if actionDetails.Status.EndTime != nil {
+			action.Status.EndTime = actionDetails.Status.EndTime
+		}
+		if action.Status.StartTime != nil && action.Status.EndTime != nil {
+			ms := uint64(action.Status.EndTime.AsTime().Sub(action.Status.StartTime.AsTime()).Milliseconds())
+			action.Status.DurationMs = &ms
+		}
+	}
+
 	return &workflow.Run{
 		Action: action,
 	}
@@ -983,9 +1292,9 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 	}
 
 	var metadata *workflow.ActionMetadata
-	if action.ParentActionName != nil {
+	if action.ParentActionName.Valid {
 		metadata = &workflow.ActionMetadata{
-			Parent: *action.ParentActionName,
+			Parent: action.ParentActionName.String,
 		}
 	}
 
@@ -1022,12 +1331,50 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		Phase: common.ActionPhase(action.Phase),
 	}
 
-	var metadata *workflow.ActionMetadata
-	if action.ParentActionName != nil {
-		metadata = &workflow.ActionMetadata{
-			Parent: *action.ParentActionName,
-		}
+	metadata := &workflow.ActionMetadata{
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
+
+	// Pivot on known task types for response types
+	switch workflow.ActionType(action.ActionType) {
+	case workflow.ActionType_ACTION_TYPE_TRACE:
+		metadata.Spec = &workflow.ActionMetadata_Trace{
+			Trace: &workflow.TraceActionMetadata{
+				Name: CoalesceNullString(action.TaskName),
+			},
+		}
+	case workflow.ActionType_ACTION_TYPE_TASK:
+		metadata.Spec = &workflow.ActionMetadata_Task{
+			Task: &workflow.TaskActionMetadata{
+				Id: &task.TaskIdentifier{
+					Org:     CoalesceNullString(action.TaskOrg),
+					Project: CoalesceNullString(action.TaskProject),
+					Domain:  CoalesceNullString(action.TaskDomain),
+					Name:    CoalesceNullString(action.TaskName),
+					Version: CoalesceNullString(action.TaskVersion),
+				},
+				TaskType: action.TaskType,
+			},
+		}
+		// Check if there's a task short name override, if so, use that. Otherwise, fall back to the parsed task name.
+		if action.TaskShortName.Valid {
+			metadata.GetTask().ShortName = action.TaskShortName.String
+		} else {
+			metadata.GetTask().ShortName = transformers.ExtractFunctionName(context.Background(), CoalesceNullString(action.TaskName), "")
+		}
+		metadata.EnvironmentName = action.EnvironmentName.String
+
+	case workflow.ActionType_ACTION_TYPE_CONDITION:
+		// Unhandled for now
+	case workflow.ActionType_ACTION_TYPE_UNSPECIFIED:
+		// No-op, this should never happen.
+	}
+
+	metadata.FuntionName = action.FunctionName
+	// TODO: Add ExecutedBy, TriggerTaskName, TriggerId
+
+	metadata.Source = workflow.RunSource(workflow.RunSource_value[action.RunSource])
 
 	childrenPhaseCounts := make(map[int32]int32, len(update.Node.ChildPhaseCounts))
 	for phase, count := range update.Node.ChildPhaseCounts {
