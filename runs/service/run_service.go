@@ -127,7 +127,6 @@ func (s *RunService) CreateRun(
 	// the run name here and normalise the request to a RunId so that the repo
 	// receives a single, pre-formed identifier — avoiding a second independent
 	// name generation inside the repo layer.
-	var org, project, domain, name string
 	var runId *common.RunIdentifier
 	switch id := request.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
@@ -177,13 +176,13 @@ func (s *RunService) CreateRun(
 
 	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
-	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
-	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
+	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
+	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 
 	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
 	// even when the task has no user inputs, so we must write an empty LiteralMap.
-	literalMap := inputsToLiteralMap(req.Msg.Inputs)
+	literalMap := inputsToLiteralMap(inputs)
 	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
 	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
 		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
@@ -221,7 +220,7 @@ func (s *RunService) CreateRun(
 				},
 			},
 		},
-		RunSpec: request.RunSpec,
+		RunSpec: runSpec,
 	}))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
