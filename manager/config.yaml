@@ -17,6 +17,8 @@ manager:
 # localCert: true writes the generated TLS cert to disk so the webhook server can read it.
 webhook:
   localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  webhookURL: "https://host.docker.internal:9443"
 
 # Executor configuration
 executor:
