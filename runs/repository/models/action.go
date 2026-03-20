@@ -70,6 +70,7 @@ type Action struct {
 	// EndedAt is set when the action reaches a terminal phase.
 	EndedAt    sql.NullTime  `gorm:"index:idx_actions_ended" db:"ended_at"`
 	DurationMs sql.NullInt64 `db:"duration_ms"`
+	Attempts   uint32        `db:"attempts" json:"attempts,omitempty"`
 }
 
 // TableName specifies the table name

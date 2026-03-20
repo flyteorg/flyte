@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/app"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -146,7 +148,7 @@ func (s *RunService) CreateRun(
 
 	actionID := &common.ActionIdentifier{
 		Run:  runId,
-		Name: "a0",
+		Name: runId.Name,
 	}
 
 	// Get the task template and taskID
@@ -199,6 +201,13 @@ func (s *RunService) CreateRun(
 		}
 	}
 
+	// Create a run in a database with storage URIs
+	run, err := s.repo.ActionRepo().CreateRun(ctx, request, inputPrefix, runOutputBase)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
 		Action: &actions.Action{
 			ActionId:      actionID,
@@ -218,13 +227,6 @@ func (s *RunService) CreateRun(
 		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
 	} else {
 		logger.Infof(ctx, "Successfully enqueued root action for run %s", runId.Name)
-	}
-
-	// Create a run in a database with storage URIs
-	run, err := s.repo.ActionRepo().CreateRun(ctx, request, inputPrefix, runOutputBase)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to create run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	return connect.NewResponse(&workflow.CreateRunResponse{
@@ -391,6 +393,7 @@ func (s *RunService) getActionDetails(ctx context.Context, actionId *common.Acti
 	})
 
 	if err := eg.Wait(); err != nil {
+		logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
 		return nil, err
 	}
 
@@ -584,7 +587,12 @@ func (s *RunService) GetActionData(
 		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
 
-	inputURI, runOutputBase := extractStorageURIs(action.ActionSpec)
+	inputURI, _ := extractStorageURIs(action.ActionSpec)
+
+	info := &workflow.RunInfo{}
+	if err := proto.Unmarshal(action.DetailedInfo, info); err != nil {
+		return nil, err
+	}
 
 	resp := &workflow.GetActionDataResponse{
 		Inputs:  &task.Inputs{},
@@ -592,47 +600,91 @@ func (s *RunService) GetActionData(
 	}
 
 	// Read inputs from storage
+	group, groupCtx := errgroup.WithContext(ctx)
 	if inputURI != "" {
-		inputRef := storage.DataReference(inputURI)
-		logger.Debugf(ctx, "Reading inputs from: %s", inputRef)
-		if err := s.dataStore.ReadProtobuf(ctx, inputRef, resp.Inputs); err != nil {
-			if !storage.IsNotFound(err) {
-				logger.Errorf(ctx, "Failed to read inputs from %s: %v", inputRef, err)
-				return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
+		group.Go(func() error {
+			inputRef := storage.DataReference(inputURI)
+			logger.Debugf(groupCtx, "Reading inputs from: %s", inputRef)
+			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "Failed to read inputs from %s: %v", inputRef, err)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
+				}
+				logger.Debugf(groupCtx, "Inputs not found at %s", inputRef)
+			} else {
+				logger.Debugf(groupCtx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 			}
-			logger.Debugf(ctx, "Inputs not found at %s", inputRef)
-		} else {
-			logger.Debugf(ctx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
-		}
+			return nil
+		})
 	} else {
 		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
 	}
 
 	// Read outputs from storage (only present if action succeeded)
-	if runOutputBase != "" {
-		// TODO(nary): maybe a better way to parse it
-		outputBase := strings.TrimRight(runOutputBase, "/") + "/" + req.Msg.ActionId.Name
-		outputBaseRef := storage.DataReference(outputBase)
-		outputRef, err := s.dataStore.ConstructReference(ctx, outputBaseRef, "outputs.pb")
-		if err != nil {
-			logger.Errorf(ctx, "Failed to construct output reference from %s: %v", outputBase, err)
-			// Don't fail — outputs are optional
-		} else {
-			logger.Debugf(ctx, "Reading outputs from: %s", outputRef)
-			outputMap := &core.LiteralMap{}
-			if err := s.dataStore.ReadProtobuf(ctx, outputRef, outputMap); err != nil {
-				if !storage.IsNotFound(err) {
-					logger.Errorf(ctx, "Failed to read outputs from %s: %v", outputRef, err)
+	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
+		group.Go(func() error {
+			// There are no attempts for trace actions, so we can skip the attempt validation
+			var attempts []*workflow.ActionAttempt
+			var err error
+			if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
+				if info.GetOutputsUri() == "" {
+					return nil
+				}
+				logger.Debugf(groupCtx, "Reading outputs from: %s", info.GetOutputsUri())
+
+				outputMap := &core.LiteralMap{}
+				if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(info.GetOutputsUri()), outputMap); err != nil {
+					if !storage.IsNotFound(err) {
+						logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", info.GetOutputsUri(), err)
+					} else {
+						logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", info.GetOutputsUri())
+					}
 				} else {
-					logger.Debugf(ctx, "Outputs not found at %s (action may not have finished)", outputRef)
+					resp.Outputs = literalMapToOutputs(outputMap)
+					logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
+				}
+
+				return nil
+			}
+
+			// Default to "task" action types
+			attempts, err = s.getAttempts(groupCtx, req.Msg.GetActionId())
+			if err != nil {
+				return err
+			}
+
+			if len(attempts) != int(action.Attempts) {
+				return app.NewServerError(codes.NotFound, "attempt info not available")
+			}
+
+			if len(attempts) == 0 {
+				return app.NewServerError(codes.NotFound, "outputs not available, no attempts for action")
+			}
+
+			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
+			if outputUri == "" {
+				return app.NewServerError(codes.NotFound, "outputs not available")
+			}
+
+			logger.Debugf(groupCtx, "Reading outputs from: %s", outputUri)
+			outputMap := &core.LiteralMap{}
+			if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(outputUri), outputMap); err != nil {
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", outputUri, err)
+				} else {
+					logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", outputUri)
 				}
 			} else {
 				resp.Outputs = literalMapToOutputs(outputMap)
-				logger.Debugf(ctx, "Read %d output literals", len(resp.Outputs.Literals))
+				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
 			}
-		}
-	} else {
-		logger.Warnf(ctx, "Action %s has empty RunOutputBase", req.Msg.ActionId.Name)
+
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
 	}
 
 	logger.Infof(ctx, "Retrieved action data for: %s (inputs=%d, outputs=%d)",
@@ -812,13 +864,13 @@ func (s *RunService) WatchActionDetails(
 	logger.Infof(ctx, "Received WatchActionDetails request for: %s/%s", actionID.Run.Name, actionID.Name)
 
 	// Step 1: Send initial state from DB
-	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
+	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
 	if err != nil {
-		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		return connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get action details: %w", err))
 	}
 
 	if err := stream.Send(&workflow.WatchActionDetailsResponse{
-		Details: s.actionModelToDetails(action, actionID),
+		Details: details,
 	}); err != nil {
 		return err
 	}
