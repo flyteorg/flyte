@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -113,9 +114,9 @@ func (s *RunService) CreateRun(
 	req *connect.Request[workflow.CreateRunRequest],
 ) (*connect.Response[workflow.CreateRunResponse], error) {
 	logger.Infof(ctx, "Received CreateRun request")
-
+	request := req.Msg
 	// Validate request
-	if err := req.Msg.Validate(); err != nil {
+	if err := request.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid CreateRun request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -125,32 +126,58 @@ func (s *RunService) CreateRun(
 	// receives a single, pre-formed identifier — avoiding a second independent
 	// name generation inside the repo layer.
 	var org, project, domain, name string
-	switch id := req.Msg.Id.(type) {
+	var runId *common.RunIdentifier
+	switch id := request.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
-		org = id.RunId.Org
-		project = id.RunId.Project
-		domain = id.RunId.Domain
-		name = id.RunId.Name
+		runId = request.GetRunId()
 	case *workflow.CreateRunRequest_ProjectId:
-		org = id.ProjectId.Organization
-		project = id.ProjectId.Name
-		domain = id.ProjectId.Domain
-		name = generateRunName(time.Now().UnixNano())
-		req.Msg.Id = &workflow.CreateRunRequest_RunId{
-			RunId: &common.RunIdentifier{
-				Org:     org,
-				Project: project,
-				Domain:  domain,
-				Name:    name,
-			},
+		runId = &common.RunIdentifier{
+			Org:     id.ProjectId.Organization,
+			Project: id.ProjectId.Name,
+			Domain:  id.ProjectId.Domain,
+			Name:    generateRunName(time.Now().UnixNano()),
+		}
+		request.Id = &workflow.CreateRunRequest_RunId{
+			RunId: runId,
 		}
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
 	}
 
+	actionID := &common.ActionIdentifier{
+		Run:  runId,
+		Name: "a0",
+	}
+
+	// Get the task template and taskID
+	var taskID *task.TaskIdentifier
+	var taskSpec *task.TaskSpec
+	var err error
+	inputs := request.GetInputs()
+	runSpec := request.GetRunSpec()
+	// TODO: Add trigger
+	switch request.GetTask().(type) {
+	case *workflow.CreateRunRequest_TaskId:
+		taskID = request.GetTaskId()
+		taskSpec, err = fetchTaskSpecByID(ctx, s.repo.TaskRepo(), taskID)
+
+		if err != nil {
+			return nil, err
+		}
+	case *workflow.CreateRunRequest_TaskSpec:
+		taskSpec = request.GetTaskSpec()
+		taskID = taskIdFromTaskSpec(taskSpec)
+	}
+
+	if runSpec == nil {
+		runSpec = &task.RunSpec{}
+	}
+
+	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, org, project, domain, name)
 	runOutputBase := buildRunOutputBase(s.storagePrefix, org, project, domain, name)
+	runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 
 	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
 	// even when the task has no user inputs, so we must write an empty LiteralMap.
@@ -162,66 +189,47 @@ func (s *RunService) CreateRun(
 	}
 	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
-	// Create run in database with storage URIs
-	run, err := s.repo.ActionRepo().CreateRun(ctx, req.Msg, inputPrefix, runOutputBase)
+	cacheKey := ""
+	// Generate cache key for the root action if its task is discoverable
+	// Executor determines if an action is cacheable on the setting of the cache key
+	if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
+		cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputs)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+		}
+	}
+
+	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
+		Action: &actions.Action{
+			ActionId:      actionID,
+			InputUri:      inputPrefix,
+			RunOutputBase: runOutputBase,
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					Id:       taskID,
+					Spec:     taskSpec,
+					CacheKey: wrapperspb.String(cacheKey),
+				},
+			},
+		},
+		RunSpec: request.RunSpec,
+	}))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
+	} else {
+		logger.Infof(ctx, "Successfully enqueued root action for run %s", runId.Name)
+	}
+
+	// Create a run in a database with storage URIs
+	run, err := s.repo.ActionRepo().CreateRun(ctx, request, inputPrefix, runOutputBase)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     run.Org,
-			Project: run.Project,
-			Domain:  run.Domain,
-			Name:    run.Name,
-		},
-		Name: run.Name, // For root actions, action name = run name
-	}
-
-	// Build the root action for ActionsService.Enqueue
-	rootAction := &actions.Action{
-		ActionId:      actionID,
-		InputUri:      inputPrefix,
-		RunOutputBase: runOutputBase,
-	}
-	switch taskSpec := req.Msg.Task.(type) {
-	case *workflow.CreateRunRequest_TaskSpec:
-		rootAction.Spec = &actions.Action_Task{
-			Task: &workflow.TaskAction{Spec: taskSpec.TaskSpec},
-		}
-	case *workflow.CreateRunRequest_TaskId:
-		rootAction.Spec = &actions.Action_Task{
-			Task: &workflow.TaskAction{Id: taskSpec.TaskId},
-		}
-	}
-
-	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
-		Action:  rootAction,
-		RunSpec: req.Msg.RunSpec,
-	}))
-	if err != nil {
-		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
-	} else {
-		logger.Infof(ctx, "Successfully enqueued root action for run %s", run.Name)
-	}
-
-	// TODO(nary): We should set the phase here to ActionPhase_ACTION_PHASE_QUEUED. As the root action phase
-	// will be returned to the client for display if they use .wait(), returning ActionPhase_ACTION_PHASE_UNSPECIFIED
-	// will cause error.
-	// We should do this after we persist the state to the DB, and when run service fully relies on DB and do not get
-	// status from the state client directly.
-
-	// Build response (simplified - you'd convert the full Run model)
-	resp := &workflow.CreateRunResponse{
-		Run: &workflow.Run{
-			Action: &workflow.Action{
-				Id: actionID,
-			},
-		},
-	}
-
-	return connect.NewResponse(resp), nil
+	return connect.NewResponse(&workflow.CreateRunResponse{
+		Run: s.convertRunToProto(run),
+	}), nil
 }
 
 // AbortRun aborts a run
@@ -1153,19 +1161,16 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	return metadata
 }
 
-// extractStorageURIs parses ActionSpec JSON to extract InputUri and RunOutputBase.
-func extractStorageURIs(specJSON []byte) (inputURI, runOutputBase string) {
-	if len(specJSON) == 0 {
+// extractStorageURIs parses ActionSpec protobuf to extract InputUri and RunOutputBase.
+func extractStorageURIs(specBytes []byte) (inputURI, runOutputBase string) {
+	if len(specBytes) == 0 {
 		return
 	}
-	var spec struct {
-		InputUri      string `json:"input_uri"`
-		RunOutputBase string `json:"run_output_base"`
-	}
-	if err := json.Unmarshal(specJSON, &spec); err != nil {
+	var spec workflow.ActionSpec
+	if err := proto.Unmarshal(specBytes, &spec); err != nil {
 		return
 	}
-	return spec.InputUri, spec.RunOutputBase
+	return spec.GetInputUri(), spec.GetRunOutputBase()
 }
 
 // Helper functions
@@ -1512,32 +1517,21 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 	return result, nil
 }
 
-// extractTaskName attempts to extract the task name from an ActionSpec JSON blob.
-func extractTaskName(specJSON []byte) string {
-	if len(specJSON) == 0 {
+// extractTaskName attempts to extract the task name from an ActionSpec protobuf blob.
+func extractTaskName(specBytes []byte) string {
+	if len(specBytes) == 0 {
 		return ""
 	}
-	var spec struct {
-		Spec *struct {
-			Task *struct {
-				ID *struct {
-					Name string `json:"name"`
-				} `json:"id"`
-				Spec *struct {
-					ShortName string `json:"short_name"`
-				} `json:"spec"`
-			} `json:"task"`
-		} `json:"spec"`
-	}
-	if err := json.Unmarshal(specJSON, &spec); err != nil {
+	var spec workflow.ActionSpec
+	if err := proto.Unmarshal(specBytes, &spec); err != nil {
 		return ""
 	}
-	if spec.Spec != nil && spec.Spec.Task != nil {
-		if spec.Spec.Task.ID != nil && spec.Spec.Task.ID.Name != "" {
-			return spec.Spec.Task.ID.Name
+	if taskAction := spec.GetTask(); taskAction != nil {
+		if id := taskAction.GetId(); id != nil && id.GetName() != "" {
+			return id.GetName()
 		}
-		if spec.Spec.Task.Spec != nil && spec.Spec.Task.Spec.ShortName != "" {
-			return spec.Spec.Task.Spec.ShortName
+		if taskSpec := taskAction.GetSpec(); taskSpec != nil && taskSpec.GetShortName() != "" {
+			return taskSpec.GetShortName()
 		}
 	}
 	return ""
@@ -1553,6 +1547,53 @@ func extractShortName(name string) string {
 		return parts[len(parts)-1]
 	}
 	return name
+}
+
+func fetchTaskSpecByID(ctx context.Context, taskRepo interfaces.TaskRepo, taskID *task.TaskIdentifier) (*task.TaskSpec, error) {
+	taskModel, err := taskRepo.GetTask(ctx, transformers.ToTaskKey(taskID))
+	if err != nil {
+		return nil, err
+	}
+	tasks, err := transformers.TaskModelsToTaskDetailsWithoutIdentity(ctx, []*models.Task{taskModel})
+	if err != nil {
+		return nil, err
+	}
+	return tasks[0].GetSpec(), nil
+}
+
+func fillDefaultInputs(inputs *task.Inputs, defaultInputs []*task.NamedParameter) *task.Inputs {
+	inputMap := make(map[string]struct{}, len(inputs.GetLiterals()))
+	for _, literal := range inputs.GetLiterals() {
+		inputMap[literal.GetName()] = struct{}{}
+	}
+	if inputs == nil {
+		inputs = &task.Inputs{}
+	}
+	for _, param := range defaultInputs {
+		if _, ok := inputMap[param.GetName()]; !ok {
+			defaultValue := param.GetParameter().GetDefault()
+			if defaultValue != nil {
+				inputs.Literals = append(inputs.Literals, &task.NamedLiteral{
+					Name:  param.GetName(),
+					Value: defaultValue,
+				})
+			}
+		}
+	}
+	return inputs
+}
+
+func taskIdFromTaskSpec(taskSpec *task.TaskSpec) *task.TaskIdentifier {
+	if taskSpec == nil {
+		return nil
+	}
+	return &task.TaskIdentifier{
+		Org:     taskSpec.GetTaskTemplate().GetId().GetOrg(),
+		Project: taskSpec.GetTaskTemplate().GetId().GetProject(),
+		Domain:  taskSpec.GetTaskTemplate().GetId().GetDomain(),
+		Name:    taskSpec.GetTaskTemplate().GetId().GetName(),
+		Version: taskSpec.GetTaskTemplate().GetId().GetVersion(),
+	}
 }
 
 // convertWatchRequestToListRequest converts a WatchRunsRequest to a ListRunsRequest
