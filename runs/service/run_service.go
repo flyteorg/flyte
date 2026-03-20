@@ -1185,25 +1185,34 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 
 // runModelToDetails converts a DB Run model to a RunDetails proto.
 func (s *RunService) runModelToDetails(run *models.Run, runID *common.RunIdentifier) *workflow.RunDetails {
+	if run == nil && runID == nil {
+		return nil
+	}
 	var runSpec *task.RunSpec
-	if len(run.ActionSpec) > 0 {
+	if run != nil && len(run.ActionSpec) > 0 {
 		var actionSpec workflow.ActionSpec
 		if err := json.Unmarshal(run.ActionSpec, &actionSpec); err == nil {
 			runSpec = actionSpec.RunSpec
 		}
 	}
 
+	id := &common.ActionIdentifier{
+		Run: runID,
+	}
+	if run != nil {
+		id.Name = run.Name
+	}
 	return &workflow.RunDetails{
 		RunSpec: runSpec,
-		Action: s.actionModelToDetails(run, &common.ActionIdentifier{
-			Run:  runID,
-			Name: run.Name,
-		}),
+		Action:  s.actionModelToDetails(run, id),
 	}
 }
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
+	if action == nil && actionID == nil {
+		return nil
+	}
 	details := &workflow.ActionDetails{
 		Id: actionID,
 	}
