@@ -2186,6 +2186,10 @@
         "is_entrypoint": {
           "type": "boolean",
           "description": "IsEntryPoint indicates whether this task will launch additional actions as it runs."
+        },
+        "code_bundle": {
+          "type": "string",
+          "description": "URI pointing to the code bundle used to build this task."
         }
       },
       "title": "Task Metadata"
