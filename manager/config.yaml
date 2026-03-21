@@ -17,6 +17,9 @@ manager:
 # localCert: true writes the generated TLS cert to disk so the webhook server can read it.
 webhook:
   localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
 
 # Executor configuration
 executor:

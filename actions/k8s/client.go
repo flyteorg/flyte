@@ -352,7 +352,6 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 			return
 		default:
 			if err := c.doWatch(ctx); err != nil {
-				logger.Warnf(ctx, "Watch error, will retry: %v", err)
 				time.Sleep(5 * time.Second)
 			}
 		}

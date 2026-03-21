@@ -539,3 +539,250 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionsClient.AssertExpectations(t)
 	store.AssertExpectations(t)
 }
+
+func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "myorg",
+				Project: "myproj",
+				Domain:  "production",
+				Name:    "rtest99999",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	expectedRun := &models.Run{
+		Org:     "myorg",
+		Project: "myproj",
+		Domain:  "production",
+		Name:    "rtest99999",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+
+	run := resp.Msg.Run
+	assert.Equal(t, "myorg", run.Action.Id.Run.Org)
+	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
+	assert.Equal(t, "production", run.Action.Id.Run.Domain)
+	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
+	assert.Equal(t, "rtest99999", run.Action.Id.Name)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
+}
+
+func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rmy-run-123",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", Name: "rmy-run-123"}, nil).Once()
+
+	// Verify the enqueue request uses the run name as the action name
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.Action.ActionId.Name == "rmy-run-123" &&
+			req.Msg.Action.ActionId.Run.Name == "rmy-run-123"
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	assert.NoError(t, err)
+
+	actionsClient.AssertExpectations(t)
+}
+
+func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		dataStore:     dataStore,
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	// Build action spec with input URI
+	actionSpec := &workflow.ActionSpec{
+		InputUri: "s3://bucket/inputs/inputs.pb",
+	}
+	actionSpecBytes, _ := proto.Marshal(actionSpec)
+
+	runInfo := &workflow.RunInfo{}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	actionModel := &models.Action{
+		Org:          "test-org",
+		Project:      "test-project",
+		Domain:       "test-domain",
+		RunName:      "rtest12345",
+		Name:         "action-1",
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		ActionSpec:   actionSpecBytes,
+		DetailedInfo: runInfoBytes,
+		Attempts:     1,
+	}
+
+	// Build event with output URI
+	successEvent := &workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		Version:     1,
+		UpdatedTime: timestamppb.Now(),
+		Outputs: &task.OutputReferences{
+			OutputUri: "s3://bucket/outputs/action-1/outputs.pb",
+		},
+	}
+	eventModel, _ := models.NewActionEventModel(successEvent)
+
+	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, actionID, 500).Return([]*models.ActionEvent{eventModel}, nil)
+
+	// Mock reading inputs
+	store.On("ReadProtobuf", mock.Anything, storage.DataReference("s3://bucket/inputs/inputs.pb"), mock.AnythingOfType("*task.Inputs")).
+		Return(nil).Once()
+
+	// Mock reading outputs — verify it reads from the attempt's output URI
+	store.On("ReadProtobuf", mock.Anything, storage.DataReference("s3://bucket/outputs/action-1/outputs.pb"), mock.AnythingOfType("*core.LiteralMap")).
+		Run(func(args mock.Arguments) {
+			lm := args.Get(2).(*core.LiteralMap)
+			lm.Literals = map[string]*core.Literal{
+				"result": newStringLiteral("success"),
+			}
+		}).
+		Return(nil).Once()
+
+	resp, err := svc.GetActionData(context.Background(), connect.NewRequest(&workflow.GetActionDataRequest{
+		ActionId: actionID,
+	}))
+	require.NoError(t, err)
+	assert.Len(t, resp.Msg.Outputs.Literals, 1)
+	assert.Equal(t, "result", resp.Msg.Outputs.Literals[0].Name)
+
+	store.AssertExpectations(t)
+}
+
+func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:      repo,
+		dataStore: dataStore,
+	}
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	actionSpec := &workflow.ActionSpec{
+		InputUri: "s3://bucket/inputs/inputs.pb",
+	}
+	actionSpecBytes, _ := proto.Marshal(actionSpec)
+
+	runInfo := &workflow.RunInfo{}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	actionModel := &models.Action{
+		Org:          "test-org",
+		Project:      "test-project",
+		Domain:       "test-domain",
+		RunName:      "rtest12345",
+		Name:         "action-1",
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		ActionSpec:   actionSpecBytes,
+		DetailedInfo: runInfoBytes,
+	}
+
+	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil)
+
+	// Mock reading inputs
+	store.On("ReadProtobuf", mock.Anything, storage.DataReference("s3://bucket/inputs/inputs.pb"), mock.AnythingOfType("*task.Inputs")).
+		Return(nil).Once()
+
+	resp, err := svc.GetActionData(context.Background(), connect.NewRequest(&workflow.GetActionDataRequest{
+		ActionId: actionID,
+	}))
+	require.NoError(t, err)
+	// Outputs should be empty since action is still running
+	assert.Empty(t, resp.Msg.Outputs.Literals)
+
+	store.AssertExpectations(t)
+	// Verify ReadProtobuf was only called once (for inputs, not outputs)
+	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
+}

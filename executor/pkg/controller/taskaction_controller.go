@@ -401,7 +401,7 @@ func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
 		return nil
 	}
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName,
+		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName + "/outputs.pb",
 	}
 }
 

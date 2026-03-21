@@ -78,7 +78,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         inputUri,
+		InputUri:         inputUri + "/inputs.pb",
 		RunOutputBase:    runOutputBase,
 	}
 
@@ -100,7 +100,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 
 	// Serialize the ActionSpec to binary protobuf
 	actionSpecBytes, err := proto.Marshal(actionSpec)
-	logger.Infof(ctx, "Serialized action spec: %s", actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
 	}
@@ -167,6 +166,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		ActionDetails:    []byte("{}"), // Empty details initially
 		DetailedInfo:     detailedInfo,
 		RunSpec:          runSpecBytes,
+		Attempts:         1,
 	}
 
 	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
@@ -304,7 +304,6 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 // CreateAction creates a new action
 func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec
-	logger.Infof(ctx, "action spec: %s", actionSpec.String())
 	actionSpecBytes, err := proto.Marshal(actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
@@ -341,6 +340,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 		ActionSpec:       actionSpecBytes,
 		ActionDetails:    []byte("{}"), // Empty details initially
 		DetailedInfo:     detailedInfo,
+		Attempts:         1,
 	}
 
 	result := r.db.WithContext(ctx).

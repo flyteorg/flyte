@@ -8,8 +8,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -117,7 +120,14 @@ func testActionWithTask(name string, parent *string, phase common.ActionPhase, c
 		CreatedAt:        time.Unix(createdAtSec, 0),
 	}
 	if taskName != "" {
-		action.ActionSpec = []byte(`{"spec":{"task":{"id":{"name":"` + taskName + `"}}}}`)
+		spec := &workflow.ActionSpec{
+			Spec: &workflow.ActionSpec_Task{
+				Task: &workflow.TaskAction{
+					Id: &task.TaskIdentifier{Name: taskName},
+				},
+			},
+		}
+		action.ActionSpec, _ = proto.Marshal(spec)
 	}
 	return action
 }

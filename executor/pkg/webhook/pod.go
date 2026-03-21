@@ -102,7 +102,7 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 		},
 		Webhooks: []admissionregistrationv1.MutatingWebhook{
 			{
-				Name: webhookName,
+				Name:         webhookName,
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					CABundle: caBytes,
 					Service: &admissionregistrationv1.ServiceReference{
