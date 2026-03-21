@@ -82,6 +82,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
+	if sc.K8sConfig != nil {
+		logStreamer, err := service.NewK8sLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("runs: failed to create k8s log streamer: %w", err)
+		}
+		runLogsSvc := service.NewRunLogsService(repo, logStreamer)
+		runLogsPath, runLogsHandler := workflowconnect.NewRunLogsServiceHandler(runLogsSvc)
+		sc.Mux.Handle(runLogsPath, runLogsHandler)
+		logger.Infof(ctx, "Mounted RunLogsService at %s", runLogsPath)
+	}
+
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
