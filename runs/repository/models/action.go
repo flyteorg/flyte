@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"time"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // Action represents a workflow action in the database
@@ -68,8 +70,10 @@ type Action struct {
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt    sql.NullTime  `gorm:"index:idx_actions_ended" db:"ended_at"`
-	DurationMs sql.NullInt64 `db:"duration_ms"`
+	EndedAt     sql.NullTime            `gorm:"index:idx_actions_ended" db:"ended_at"`
+	DurationMs  sql.NullInt64           `db:"duration_ms"`
+	Attempts    uint32                  `db:"attempts" json:"attempts,omitempty"`
+	CacheStatus core.CatalogCacheStatus `db:"cache_status" json:"cache_status,omitempty"`
 }
 
 // TableName specifies the table name

@@ -187,9 +187,9 @@ func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, *
 	return _c
 }
 
-// CreateRun provides a mock function with given fields: ctx, req, inputUri, runOutputBase
-func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string) (*models.Run, error) {
-	ret := _m.Called(ctx, req, inputUri, runOutputBase)
+// CreateRun provides a mock function with given fields: ctx, req, inputPrefix, runOutputBase
+func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputPrefix string, runOutputBase string) (*models.Run, error) {
+	ret := _m.Called(ctx, req, inputPrefix, runOutputBase)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRun")
@@ -198,10 +198,10 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 	var r0 *models.Run
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) (*models.Run, error)); ok {
-		return rf(ctx, req, inputUri, runOutputBase)
+		return rf(ctx, req, inputPrefix, runOutputBase)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) *models.Run); ok {
-		r0 = rf(ctx, req, inputUri, runOutputBase)
+		r0 = rf(ctx, req, inputPrefix, runOutputBase)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Run)
@@ -209,7 +209,7 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *workflow.CreateRunRequest, string, string) error); ok {
-		r1 = rf(ctx, req, inputUri, runOutputBase)
+		r1 = rf(ctx, req, inputPrefix, runOutputBase)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -225,13 +225,13 @@ type ActionRepo_CreateRun_Call struct {
 // CreateRun is a helper method to define mock.On call
 //   - ctx context.Context
 //   - req *workflow.CreateRunRequest
-//   - inputUri string
+//   - inputPrefix string
 //   - runOutputBase string
-func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}, inputUri interface{}, runOutputBase interface{}) *ActionRepo_CreateRun_Call {
-	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req, inputUri, runOutputBase)}
+func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}, inputPrefix interface{}, runOutputBase interface{}) *ActionRepo_CreateRun_Call {
+	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req, inputPrefix, runOutputBase)}
 }
 
-func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest, inputPrefix string, runOutputBase string)) *ActionRepo_CreateRun_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*workflow.CreateRunRequest), args[2].(string), args[3].(string))
 	})
