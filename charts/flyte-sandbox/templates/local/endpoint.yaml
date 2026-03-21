@@ -13,4 +13,7 @@ subsets:
       - name: http
         port: 8090
         protocol: TCP
+      - name: webhook
+        port: 9443
+        protocol: TCP
 {{- end }}

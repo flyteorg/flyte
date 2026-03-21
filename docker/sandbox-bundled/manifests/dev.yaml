@@ -763,7 +763,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Y3VyZnF5TTBFMnVmNXc2NQ==
+  haSharedSecret: TDY5Y2lPS0xUMFBRNUZLMQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -863,6 +863,9 @@ subsets:
   - name: http
     port: 8090
     protocol: TCP
+  - name: webhook
+    port: 9443
+    protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -926,6 +929,9 @@ spec:
   ports:
   - name: http
     port: 8090
+    protocol: TCP
+  - name: webhook
+    port: 9443
     protocol: TCP
 ---
 apiVersion: v1
@@ -1186,7 +1192,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: c919aa59e0cf18f1502defcb218c72452af7982490aa292afa4591ff05e63f06
+        checksum/secret: e5c345361f6169f960277db5c368b1f1c2a7ea280b8e17a066ac1c369806b160
       labels:
         app: docker-registry
         release: flyte-sandbox
