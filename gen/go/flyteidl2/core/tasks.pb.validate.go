@@ -954,7 +954,7 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	// no validation rules for IsEntrypoint
 
-	// no validation rules for CodeBundle
+	// no validation rules for CodeBundleUri
 
 	switch v := m.InterruptibleValue.(type) {
 	case *TaskMetadata_Interruptible:

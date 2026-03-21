@@ -199,8 +199,8 @@ message TaskMetadata {
   // IsEntryPoint indicates whether this task will launch additional actions as it runs.
   bool is_entrypoint = 20;
 
-  // URI pointing to the code bundle used to build this task.
-  string code_bundle = 21;
+  // Remote URI pointing to the code bundle used to build this task.
+  string code_bundle_uri = 21;
 }
 
 // A Task structure that uniquely identifies a task in the system
