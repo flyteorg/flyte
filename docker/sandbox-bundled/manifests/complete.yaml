@@ -725,6 +725,14 @@ data:
         port: 8090
       storagePrefix: s3://flyte-data
       watchBufferSize: 100
+    secret:
+      kubernetes:
+        burst: 200
+        clusterName: flyte-sandbox
+        kubeconfig: ""
+        namespace: flyte
+        qps: 100
+        timeout: 30s
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -910,12 +918,22 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.dataproxy.DataProxyService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.secret.SecretService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
@@ -1031,7 +1049,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Rkk2Y1ZETzk4SnV2V3JZUA==
+  haSharedSecret: RGhWVnFVakdvTU93amsxbA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1402,7 +1420,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 6604a6d84082df7341941081eccb62a8c12d4472cf84b319cccc7f5c1684c63c
+        checksum/configuration: d2d832fb02faa1b1a6c7ad361090cbef8ba1af501bcd0864bf089ced0cdb19a5
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1557,7 +1575,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 89994f7cdb81c298a0f3073a45e5fd8afd4cf154b99d3983ed597946794e2d2a
+        checksum/secret: d75874ebdfdca751387f7a272a14ca6f600f03189ebda404575c1645aa7e399a
       labels:
         app: docker-registry
         release: flyte-sandbox
