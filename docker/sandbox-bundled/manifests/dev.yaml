@@ -662,6 +662,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
@@ -672,7 +677,7 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
-                                                  prefix: "/flyteidl2."
+                                                  prefix: "/flyteidl2.secret.SecretService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
@@ -785,7 +790,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RFpsRDF0dk5obU5nQ0I1Mg==
+  haSharedSecret: TDY5Y2lPS0xUMFBRNUZLMQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -885,22 +890,8 @@ subsets:
   - name: http
     port: 8090
     protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-console
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
+  - name: webhook
+    port: 9443
     protocol: TCP
     targetPort: http
   selector:
@@ -970,6 +961,9 @@ spec:
   ports:
   - name: http
     port: 8090
+    protocol: TCP
+  - name: webhook
+    port: 9443
     protocol: TCP
 ---
 apiVersion: v1
@@ -1276,7 +1270,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d7431316dd29ddf5d40ec75233e3c772128e59c9980091cb9f90ddaf3150f0b5
+        checksum/secret: e5c345361f6169f960277db5c368b1f1c2a7ea280b8e17a066ac1c369806b160
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1446,7 +1440,13 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
-      - env:
+      - command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
+        env:
         - name: BITNAMI_DEBUG
           value: "false"
         - name: MINIO_SCHEME
@@ -1517,6 +1517,8 @@ spec:
         - -ec
         - |
           chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
         image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: volume-permissions

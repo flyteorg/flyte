@@ -49,27 +49,31 @@ sandbox-stop: ## Stop the flyte sandbox
 	$(MAKE) -C docker/sandbox-bundled stop
 
 # =============================================================================
-# Local Cluster Commands
+# Go Services Build
 # =============================================================================
 
-.PHONY: cluster-create
-cluster-create: ## Create k3d cluster with host gateway alias for pod-to-host connectivity
-	$(eval HOST_GATEWAY_IP := $(shell docker run --rm --add-host=probe:host-gateway busybox cat /etc/hosts 2>/dev/null | awk '$$1~/^[0-9]/&&$$2=="probe"{print $$1;exit}'))
-	@if [ -z "$(HOST_GATEWAY_IP)" ]; then \
-		echo "ERROR: Failed to detect HOST_GATEWAY_IP. Ensure Docker is running."; \
-		exit 1; \
-	fi
-	@echo "Host gateway IP: $(HOST_GATEWAY_IP)"
-	@if k3d cluster get $(CLUSTER_NAME) --no-headers >/dev/null 2>&1; then \
-		echo "Cluster $(CLUSTER_NAME) already exists, skipping creation"; \
-	else \
-		CLUSTER_NAME=$(CLUSTER_NAME) HOST_GATEWAY_IP=$(HOST_GATEWAY_IP) envsubst < config/k3d/cluster.yaml | k3d cluster create --config -; \
-	fi
-	@echo "Cluster $(CLUSTER_NAME) ready. Pods can reach host services via flyte-host:<port>"
+.PHONY: build
+build: verify ## Build all Go service binaries
+	$(MAKE) -C manager build
+	$(MAKE) -C runs build
+	$(MAKE) -C executor build
 
-.PHONY: cluster-delete
-cluster-delete: ## Delete k3d cluster
-	@k3d cluster delete $(CLUSTER_NAME)
+# =============================================================================
+# Sandbox Commands
+# =============================================================================
+
+.PHONY: sandbox-build
+sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+	$(MAKE) -C docker/sandbox-bundled build
+
+# Run in dev mode with extra arg FLYTE_DEV=True
+.PHONY: sandbox-run
+sandbox-run: ## Start the flyte sandbox without rebuilding the image
+	$(MAKE) -C docker/sandbox-bundled start
+
+.PHONY: sandbox-stop
+sandbox-stop: ## Stop the flyte sandbox
+	$(MAKE) -C docker/sandbox-bundled stop
 
 .PHONY: help
 help: ## Show this help message
@@ -87,63 +91,71 @@ sep:
 # Local Tool Commands (require buf, go, cargo, uv installed locally)
 # =============================================================================
 
+# Helper to time a step: $(call timed,step_name,command)
+define timed
+	@start=$$(date +%s); \
+	$(2); \
+	elapsed=$$((  $$(date +%s) - $$start )); \
+	echo "⏱  $(1) completed in $${elapsed}s"
+endef
+
 .PHONY: buf-dep
 buf-dep:
 	@echo '📦  Updating buf modules (local)'
-	buf dep update
+	$(call timed,buf-dep,buf dep update)
 	@$(MAKE) sep
 
 .PHONY: buf-format
 buf-format:
 	@echo 'Running buf format (local)'
-	buf format -w
+	$(call timed,buf-format,buf format -w)
 	@$(MAKE) sep
 
 .PHONY: buf-lint
 buf-lint:
 	@echo '🧹  Linting protocol buffer files (local)'
-	buf lint --exclude-path flytestdlib/
+	$(call timed,buf-lint,buf lint --exclude-path flytestdlib/)
 	@$(MAKE) sep
 
 .PHONY: buf-ts
 buf-ts:
 	@echo '🟦  Generating TypeScript protocol buffer files (local)'
-	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
-	@cp -r flyteidl2/gen_utils/ts/* gen/ts/
-	@echo '📦  Installing TypeScript dependencies'
-	@cd gen/ts && npm install --silent
-	@echo '✅  TypeScript generation complete'
+	$(call timed,buf-ts,buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/ && \
+		cp -r flyteidl2/gen_utils/ts/* gen/ts/ && \
+		echo '📦  Installing TypeScript dependencies' && \
+		cd gen/ts && npm install --silent && \
+		echo '✅  TypeScript generation complete')
 	@$(MAKE) sep
 
 .PHONY: buf-ts-check
 buf-ts-check: buf-ts
 	@echo '🔍  Type checking generated TypeScript files'
-	@cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0)
+	$(call timed,buf-ts-check,cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0))
 	@echo '✅  Type checking complete'
 	@$(MAKE) sep
 
 .PHONY: buf-go
 buf-go:
 	@echo '🟩  Generating Go protocol buffer files (local)'
-	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/
+	$(call timed,buf-go,buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/)
 	@$(MAKE) sep
 
 .PHONY: buf-rust
 buf-rust:
 	@echo '🦀  Generating Rust protocol buffer files (local)'
-	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
-	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
-	@cd gen/rust && cargo update
+	$(call timed,buf-rust,buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/ && \
+		cp -R flyteidl2/gen_utils/rust/* gen/rust/ && \
+		cd gen/rust && cargo update)
 	@$(MAKE) sep
 
 export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python:
 	@echo '🐍  Generating Python protocol buffer files (local)'
-	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
-	@cp flyteidl2/gen_utils/python/* gen/python/
-	@find gen/python -type d -exec touch {}/__init__.py \;
-	@cd gen/python && uv lock
+	$(call timed,buf-python,buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/ && \
+		cp flyteidl2/gen_utils/python/* gen/python/ && \
+		find gen/python -type d -exec touch {}/__init__.py \; && \
+		cd gen/python && uv lock)
 	@$(MAKE) sep
 
 .PHONY: buf
@@ -154,13 +166,13 @@ buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
 .PHONY: go-tidy
 go-tidy:
 	@echo '🧹  Running go mod tidy (local)'
-	@go mod tidy $(OUT_REDIRECT)
+	$(call timed,go-tidy,go mod tidy $(OUT_REDIRECT))
 	@$(MAKE) sep
 
 .PHONY: mocks
 mocks:
 	@echo "🧪  Generating go mocks (local)"
-	mockery $(OUT_REDIRECT)
+	$(call timed,mocks,mockery $(OUT_REDIRECT))
 	@$(MAKE) sep
 
 .PHONY: gen-local

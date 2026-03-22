@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo := repository.NewRepository(testDB)
+	repo := repository.NewRepository(testDB, *dbConfig)
 	taskSvc := service.NewTaskService(repo)
 
 	// Setup HTTP server

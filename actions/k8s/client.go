@@ -9,7 +9,6 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -42,10 +41,10 @@ type ActionUpdate struct {
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient       client.WithWatch
-	namespace       string
-	bufferSize      int
-	runClient       workflowconnect.InternalRunServiceClient
+	k8sClient  client.WithWatch
+	namespace  string
+	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -353,7 +352,6 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 			return
 		default:
 			if err := c.doWatch(ctx); err != nil {
-				logger.Warnf(ctx, "Watch error, will retry: %v", err)
 				time.Sleep(5 * time.Second)
 			}
 		}
@@ -464,8 +462,29 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				InputUri: taskAction.Spec.InputURI,
 			}
 			if taskAction.Spec.TaskType != "" {
+				ta := &workflow.TaskAction{
+					Id: &task.TaskIdentifier{
+						Org:     taskAction.Spec.Org,
+						Project: taskAction.Spec.Project,
+						Domain:  taskAction.Spec.Domain,
+					},
+				}
+				// Deserialize TaskTemplate to build TaskSpec
+				if len(taskAction.Spec.TaskTemplate) > 0 {
+					var tmpl core.TaskTemplate
+					if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
+						if tmplID := tmpl.GetId(); tmplID != nil {
+							ta.Id.Name = tmplID.GetName()
+							ta.Id.Version = tmplID.GetVersion()
+						}
+						ta.Spec = &task.TaskSpec{
+							TaskTemplate: &tmpl,
+							ShortName:    taskAction.Spec.ShortName,
+						}
+					}
+				}
 				recordReq.Spec = &workflow.RecordActionRequest_Task{
-					Task: &workflow.TaskAction{},
+					Task: ta,
 				}
 			}
 			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
@@ -474,12 +493,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				c.recordedFilter.Add(ctx, actionKey)
 			}
 		}
-	}
-
-	// Derive UpdatedTime from the last PhaseHistory entry.
-	var updatedTime *timestamppb.Timestamp
-	if n := len(taskAction.Status.PhaseHistory); n > 0 {
-		updatedTime = timestamppb.New(taskAction.Status.PhaseHistory[n-1].OccurredAt.Time)
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
@@ -492,30 +505,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
-	}
-
-	// TODO(nary): some ActionEvent fields not populated here. Need further discussion on where and how we want
-	// to handle the action event persistence
-	// - ErrorInfo:     not on the CR; the executor does not write structured error info to TaskAction status.
-	// - LogInfo:       not on the CR; log references are managed by the plugin, not surfaced to the CR.
-	// - LogContext:    not on the CR; same reason as LogInfo.
-	// - Cluster:       not on the CR; the executor runs inside the cluster and does not self-report cluster identity.
-	// - Outputs:       not on the CR; output references are written to object storage by the plugin, not to the CR.
-	// - CacheStatus:   not on ActionUpdate; the k8s watcher does not carry catalog cache results.
-	// - ClusterEvents: not on the CR; Kubernetes events are not aggregated into TaskAction status.
-	event := &workflow.ActionEvent{
-		Id:           update.ActionID,
-		Attempt:      1, // TODO(nary): hardcoded until retry support is added
-		Phase:        update.Phase,
-		Version:      taskAction.Status.PluginPhaseVersion,
-		UpdatedTime:  updatedTime,
-		ReportedTime: timestamppb.Now(),
-	}
-	recordReq := &workflow.RecordActionEventsRequest{
-		Events: []*workflow.ActionEvent{event},
-	}
-	if _, err := c.runClient.RecordActionEvents(ctx, connect.NewRequest(recordReq)); err != nil {
-		logger.Warnf(ctx, "Failed to record action event in run service for %s: %v", update.ActionID.Name, err)
 	}
 }
 

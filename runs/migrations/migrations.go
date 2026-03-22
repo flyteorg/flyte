@@ -14,6 +14,7 @@ import (
 var AllModels = []interface{}{
 	&models.Action{},
 	&models.ActionEvent{},
+	&models.Project{},
 	&models.Task{},
 	&models.TaskSpec{},
 }

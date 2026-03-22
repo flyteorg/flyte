@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy"
+	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -16,8 +17,8 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	"github.com/flyteorg/flyte/v2/runs"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
+	"github.com/flyteorg/flyte/v2/secret"
 )
 
 func main() {
@@ -40,9 +41,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.BaseURL = fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 
 	// Initialize database
-	dbCfg := &database.DbConfig{
-		SQLite: database.SQLiteConfig{File: "flyte.db"},
-	}
+	dbCfg := &runsconfig.GetConfig().Database
 	db, err := app.InitDB(ctx, dbCfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
@@ -71,7 +70,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Initialize storage
 	storageCfg := storage.GetConfig()
-	dataStore, err := storage.NewDataStore(storageCfg, promutils.NewTestScope())
+	dataStore, err := storage.NewDataStore(storageCfg, sc.Scope.NewSubScope("storage"))
 	if err != nil {
 		return fmt.Errorf("failed to initialize storage: %w", err)
 	}
@@ -87,7 +86,13 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := dataproxy.Setup(ctx, sc); err != nil {
 		return err
 	}
+	if err := events.Setup(ctx, sc); err != nil {
+		return err
+	}
 	if err := executor.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := secret.Setup(ctx, sc); err != nil {
 		return err
 	}
 

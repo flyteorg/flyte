@@ -177,7 +177,7 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	execID := rand.String(3)
 	tID := &pluginCoreMocks.TaskExecutionID{}
 	tID.On("GetGeneratedName").Return(execID + "-my-task-1")
-	tID.On("GetID").Return(flyteIdlCore.TaskExecutionIdentifier{
+	tID.On("GetID").Return(&flyteIdlCore.TaskExecutionIdentifier{
 		TaskId: &flyteIdlCore.Identifier{
 			ResourceType: flyteIdlCore.ResourceType_TASK,
 			Project:      "a",
@@ -203,7 +203,7 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	tMeta.On("GetAnnotations").Return(map[string]string{"foo": "bar"})
 	tMeta.On("GetK8sServiceAccount").Return("k8s-account")
 	tMeta.On("GetEnvironmentVariables").Return(map[string]string{"foo": "bar"})
-	tMeta.On("GetSecurityContext").Return(flyteIdlCore.SecurityContext{
+	tMeta.On("GetSecurityContext").Return(&flyteIdlCore.SecurityContext{
 		RunAs: &flyteIdlCore.Identity{ExecutionIdentity: "execution-identity"},
 	})
 

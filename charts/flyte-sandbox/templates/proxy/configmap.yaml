@@ -30,13 +30,6 @@ data:
                                       - name: backend
                                         domains:
                                             - "*"
-                                        cors:
-                                            allow_origin_string_match:
-                                                - exact: "http://localhost:8080"
-                                            allow_methods: "GET, POST, OPTIONS"
-                                            allow_headers: "content-type, x-grpc-web, x-user-agent, grpc-timeout, authorization, connect-protocol-version, connect-timeout-ms"
-                                            expose_headers: "grpc-status, grpc-message, grpc-status-details-bin"
-                                            allow_credentials: true
                                         routes:
                                             {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
                                             - match:
@@ -73,16 +66,10 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
-                                                  prefix: "/flyteidl2."
+                                                  prefix: "/flyteidl2.secret.SecretService"
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
-                                            {{- end }}
-                                            {{- if .Values.sandbox.console.enabled }}
-                                            - match:
-                                                  prefix: "/v2"
-                                              route:
-                                                  cluster: console
                                             {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
@@ -107,9 +94,6 @@ data:
                                                   prefix_rewrite: /
                                             {{- end }}
                               http_filters:
-                                  - name: envoy.filters.http.cors
-                                    typed_config:
-                                        "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                                   - name: envoy.filters.http.router
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -133,21 +117,6 @@ data:
                                           address: {{ include "flyte-sandbox.localHeadlessService" . }}
                                           {{- end }}
                                           port_value: 8090
-            {{- end }}
-            {{- if .Values.sandbox.console.enabled }}
-            - name: console
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: console
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: {{ include "flyte-sandbox.fullname" . }}-console
-                                          port_value: 80
             {{- end }}
             {{- if index .Values "kubernetes-dashboard" "enabled" }}
             - name: kubernetes-dashboard

@@ -285,7 +285,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 }
 
 func (p *Plugin) getEventInfoForConnectorApp(taskCtx webapi.StatusContext, resource ResourceWrapper) ([]*flyteIdl.TaskLog, error) {
-	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins with error: %v", err)
 	}

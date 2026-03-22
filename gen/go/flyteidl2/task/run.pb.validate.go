@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
 )
 
 // Validate checks the field values on Labels with the rules defined in the
@@ -801,6 +805,64 @@ func (m *RunSpec) validate(all bool) error {
 		}
 	}
 
+	switch v := m.NotificationSettings.(type) {
+	case *RunSpec_NotificationRuleName:
+		if v == nil {
+			err := RunSpecValidationError{
+				field:  "NotificationSettings",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for NotificationRuleName
+	case *RunSpec_NotificationRules:
+		if v == nil {
+			err := RunSpecValidationError{
+				field:  "NotificationSettings",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetNotificationRules()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RunSpecValidationError{
+						field:  "NotificationRules",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RunSpecValidationError{
+						field:  "NotificationRules",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetNotificationRules()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RunSpecValidationError{
+					field:  "NotificationRules",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
 	if len(errors) > 0 {
 		return RunSpecMultiError(errors)
 	}
@@ -877,3 +939,294 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RunSpecValidationError{}
+
+// Validate checks the field values on InlineRuleList with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *InlineRuleList) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InlineRuleList with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in InlineRuleListMultiError,
+// or nil if none found.
+func (m *InlineRuleList) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InlineRuleList) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetRules() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InlineRuleListValidationError{
+						field:  fmt.Sprintf("Rules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InlineRuleListValidationError{
+						field:  fmt.Sprintf("Rules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InlineRuleListValidationError{
+					field:  fmt.Sprintf("Rules[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return InlineRuleListMultiError(errors)
+	}
+
+	return nil
+}
+
+// InlineRuleListMultiError is an error wrapping multiple validation errors
+// returned by InlineRuleList.ValidateAll() if the designated constraints
+// aren't met.
+type InlineRuleListMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InlineRuleListMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InlineRuleListMultiError) AllErrors() []error { return m }
+
+// InlineRuleListValidationError is the validation error returned by
+// InlineRuleList.Validate if the designated constraints aren't met.
+type InlineRuleListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InlineRuleListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InlineRuleListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InlineRuleListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InlineRuleListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InlineRuleListValidationError) ErrorName() string { return "InlineRuleListValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InlineRuleListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInlineRuleList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InlineRuleListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InlineRuleListValidationError{}
+
+// Validate checks the field values on InlineRule with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *InlineRule) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InlineRule with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in InlineRuleMultiError, or
+// nil if none found.
+func (m *InlineRule) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InlineRule) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Delivery.(type) {
+	case *InlineRule_DeliveryConfigName:
+		if v == nil {
+			err := InlineRuleValidationError{
+				field:  "Delivery",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for DeliveryConfigName
+	case *InlineRule_DeliveryTemplate:
+		if v == nil {
+			err := InlineRuleValidationError{
+				field:  "Delivery",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDeliveryTemplate()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, InlineRuleValidationError{
+						field:  "DeliveryTemplate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, InlineRuleValidationError{
+						field:  "DeliveryTemplate",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDeliveryTemplate()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return InlineRuleValidationError{
+					field:  "DeliveryTemplate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return InlineRuleMultiError(errors)
+	}
+
+	return nil
+}
+
+// InlineRuleMultiError is an error wrapping multiple validation errors
+// returned by InlineRule.ValidateAll() if the designated constraints aren't met.
+type InlineRuleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InlineRuleMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InlineRuleMultiError) AllErrors() []error { return m }
+
+// InlineRuleValidationError is the validation error returned by
+// InlineRule.Validate if the designated constraints aren't met.
+type InlineRuleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InlineRuleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InlineRuleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InlineRuleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InlineRuleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InlineRuleValidationError) ErrorName() string { return "InlineRuleValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InlineRuleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInlineRule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InlineRuleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InlineRuleValidationError{}
