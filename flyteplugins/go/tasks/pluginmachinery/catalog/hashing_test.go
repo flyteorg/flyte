@@ -657,17 +657,17 @@ func TestNoInputValues(t *testing.T) {
 func TestHashLiteralMap_MsgpackBinaryDeterministic(t *testing.T) {
 	// Manually constructed msgpack bytes for {a:1, b:2, c:3} with key order a, b, c
 	msgpackABC := []byte{
-		0x83,                   // fixmap, 3 entries
-		0xa1, 0x61, 0x01,      // "a": 1
-		0xa1, 0x62, 0x02,      // "b": 2
-		0xa1, 0x63, 0x03,      // "c": 3
+		0x83,             // fixmap, 3 entries
+		0xa1, 0x61, 0x01, // "a": 1
+		0xa1, 0x62, 0x02, // "b": 2
+		0xa1, 0x63, 0x03, // "c": 3
 	}
 	// Same map {a:1, b:2, c:3} with key order c, a, b
 	msgpackCAB := []byte{
-		0x83,                   // fixmap, 3 entries
-		0xa1, 0x63, 0x03,      // "c": 3
-		0xa1, 0x61, 0x01,      // "a": 1
-		0xa1, 0x62, 0x02,      // "b": 2
+		0x83,             // fixmap, 3 entries
+		0xa1, 0x63, 0x03, // "c": 3
+		0xa1, 0x61, 0x01, // "a": 1
+		0xa1, 0x62, 0x02, // "b": 2
 	}
 
 	litABC := &core.Literal{
@@ -689,16 +689,16 @@ func TestHashLiteralMap_MsgpackBinaryDeterministic(t *testing.T) {
 
 	// Nested: {a: {x:1, y:2}, b:3} with order a(x,y), b
 	msgpackNested1 := []byte{
-		0x82,                         // fixmap, 2 entries
-		0xa1, 0x61,                   // "a"
+		0x82,       // fixmap, 2 entries
+		0xa1, 0x61, // "a"
 		0x82, 0xa1, 0x78, 0x01, 0xa1, 0x79, 0x02, // {x:1, y:2}
-		0xa1, 0x62, 0x03,             // "b": 3
+		0xa1, 0x62, 0x03, // "b": 3
 	}
 	// Same nested map with order b, a(y,x)
 	msgpackNested2 := []byte{
-		0x82,                         // fixmap, 2 entries
-		0xa1, 0x62, 0x03,             // "b": 3
-		0xa1, 0x61,                   // "a"
+		0x82,             // fixmap, 2 entries
+		0xa1, 0x62, 0x03, // "b": 3
+		0xa1, 0x61, // "a"
 		0x82, 0xa1, 0x79, 0x02, 0xa1, 0x78, 0x01, // {y:2, x:1}
 	}
 
