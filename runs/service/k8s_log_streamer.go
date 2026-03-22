@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -24,14 +23,7 @@ import (
 const (
 	logBatchSize        = 100
 	defaultInitialLines = int64(1000)
-	readerBufSize       = 64 * 1024
 )
-
-var readerPool = sync.Pool{
-	New: func() any {
-		return bufio.NewReaderSize(nil, readerBufSize)
-	},
-}
 
 // K8sLogStreamer streams logs directly from Kubernetes pods.
 type K8sLogStreamer struct {
@@ -77,9 +69,7 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	}
 	defer logStream.Close()
 
-	reader := readerPool.Get().(*bufio.Reader)
-	reader.Reset(logStream)
-	defer readerPool.Put(reader)
+	reader := bufio.NewReader(logStream)
 
 	lines := make([]*dataplane.LogLine, 0, logBatchSize)
 
