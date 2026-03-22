@@ -164,6 +164,12 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  console:
+    enabled: true
+    image:
+      repository: ghcr.io/unionai-oss/flyte-client-v2
+      tag: latest
+      pullPolicy: IfNotPresent
   buildkit:
     enabled: true
     image:

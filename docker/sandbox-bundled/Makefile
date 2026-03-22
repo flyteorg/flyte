@@ -52,8 +52,19 @@ manifests: dep_update
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
 
+CONSOLE_IMAGE := ghcr.io/unionai-oss/flyte-client-v2
+CONSOLE_TAG := latest
+
+.PHONY: console
+console:
+	mkdir -p images/tar/amd64 images/tar/arm64
+	docker pull --platform linux/amd64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/amd64/flyte-client-v2.tar
+	docker pull --platform linux/arm64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/arm64/flyte-client-v2.tar
+
 .PHONY: build
-build: flyte dep_update manifests
+build: flyte console dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox-v2:latest .
 
@@ -104,9 +115,9 @@ kubeconfig:
 stop:
 	docker stop flyte-sandbox
 
-.PHONY: console
-console:
-	open http://localhost:30080/console
+.PHONY: open
+open:
+	open http://localhost:30080/v2
 
 .venv:
 	python -m venv .venv
