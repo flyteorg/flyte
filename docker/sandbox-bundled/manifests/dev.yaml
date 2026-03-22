@@ -630,13 +630,6 @@ data:
                                       - name: backend
                                         domains:
                                             - "*"
-                                        cors:
-                                            allow_origin_string_match:
-                                                - exact: "http://localhost:8080"
-                                            allow_methods: "GET, POST, OPTIONS"
-                                            allow_headers: "content-type, x-grpc-web, x-user-agent, grpc-timeout, authorization, connect-protocol-version, connect-timeout-ms"
-                                            expose_headers: "grpc-status, grpc-message, grpc-status-details-bin"
-                                            allow_credentials: true
                                         routes:
                                             - match:
                                                   prefix: "/healthz"
@@ -662,11 +655,6 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
-                                                  prefix: "/flyteidl2.project.ProjectService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
@@ -678,6 +666,11 @@ data:
                                                   timeout: 0s
                                             - match:
                                                   prefix: "/flyteidl2.secret.SecretService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2."
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
@@ -704,9 +697,6 @@ data:
                                                   cluster: minio
                                                   prefix_rewrite: /
                               http_filters:
-                                  - name: envoy.filters.http.cors
-                                    typed_config:
-                                        "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                                   - name: envoy.filters.http.router
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -790,7 +780,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: TDY5Y2lPS0xUMFBRNUZLMQ==
+  haSharedSecret: eHJVQ1lIUlBlQldRRnpmUw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -892,6 +882,23 @@ subsets:
     protocol: TCP
   - name: webhook
     port: 9443
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
     protocol: TCP
     targetPort: http
   selector:
@@ -1270,7 +1277,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e5c345361f6169f960277db5c368b1f1c2a7ea280b8e17a066ac1c369806b160
+        checksum/secret: 6a44c829733531ff07961b0e31995f600b2bc91cc20b2ec5136631569edf3734
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1428,8 +1435,6 @@ spec:
         helm.sh/chart: minio-12.6.7
     spec:
       affinity:
-        nodeAffinity: null
-        podAffinity: null
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - podAffinityTerm:
@@ -1473,7 +1478,6 @@ spec:
           value: "9001"
         - name: MINIO_BROWSER_REDIRECT_URL
           value: http://localhost:30080/minio
-        envFrom: null
         image: docker.io/bitnami/minio:sandbox
         imagePullPolicy: Never
         livenessProbe:
