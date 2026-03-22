@@ -364,6 +364,66 @@ func (_c *ActionRepo_GetActionState_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// GetLatestEventByAttempt provides a mock function with given fields: ctx, actionID, attempt
+func (_m *ActionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	ret := _m.Called(ctx, actionID, attempt)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLatestEventByAttempt")
+	}
+
+	var r0 *models.ActionEvent
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32) (*models.ActionEvent, error)); ok {
+		return rf(ctx, actionID, attempt)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32) *models.ActionEvent); ok {
+		r0 = rf(ctx, actionID, attempt)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.ActionEvent)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier, uint32) error); ok {
+		r1 = rf(ctx, actionID, attempt)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_GetLatestEventByAttempt_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLatestEventByAttempt'
+type ActionRepo_GetLatestEventByAttempt_Call struct {
+	*mock.Call
+}
+
+// GetLatestEventByAttempt is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - attempt uint32
+func (_e *ActionRepo_Expecter) GetLatestEventByAttempt(ctx interface{}, actionID interface{}, attempt interface{}) *ActionRepo_GetLatestEventByAttempt_Call {
+	return &ActionRepo_GetLatestEventByAttempt_Call{Call: _e.mock.On("GetLatestEventByAttempt", ctx, actionID, attempt)}
+}
+
+func (_c *ActionRepo_GetLatestEventByAttempt_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32)) *ActionRepo_GetLatestEventByAttempt_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(uint32))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_GetLatestEventByAttempt_Call) Return(_a0 *models.ActionEvent, _a1 error) *ActionRepo_GetLatestEventByAttempt_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_GetLatestEventByAttempt_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, uint32) (*models.ActionEvent, error)) *ActionRepo_GetLatestEventByAttempt_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRun provides a mock function with given fields: ctx, runID
 func (_m *ActionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	ret := _m.Called(ctx, runID)
@@ -534,66 +594,6 @@ func (_c *ActionRepo_ListActions_Call) Return(_a0 []*models.Action, _a1 string, 
 }
 
 func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(context.Context, *common.RunIdentifier, int, string) ([]*models.Action, string, error)) *ActionRepo_ListActions_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetLatestEventByAttempt provides a mock function with given fields: ctx, actionID, attempt
-func (_m *ActionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
-	ret := _m.Called(ctx, actionID, attempt)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetLatestEventByAttempt")
-	}
-
-	var r0 *models.ActionEvent
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32) (*models.ActionEvent, error)); ok {
-		return rf(ctx, actionID, attempt)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32) *models.ActionEvent); ok {
-		r0 = rf(ctx, actionID, attempt)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.ActionEvent)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier, uint32) error); ok {
-		r1 = rf(ctx, actionID, attempt)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// ActionRepo_GetLatestEventByAttempt_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLatestEventByAttempt'
-type ActionRepo_GetLatestEventByAttempt_Call struct {
-	*mock.Call
-}
-
-// GetLatestEventByAttempt is a helper method to define mock.On call
-//   - ctx context.Context
-//   - actionID *common.ActionIdentifier
-//   - attempt uint32
-func (_e *ActionRepo_Expecter) GetLatestEventByAttempt(ctx interface{}, actionID interface{}, attempt interface{}) *ActionRepo_GetLatestEventByAttempt_Call {
-	return &ActionRepo_GetLatestEventByAttempt_Call{Call: _e.mock.On("GetLatestEventByAttempt", ctx, actionID, attempt)}
-}
-
-func (_c *ActionRepo_GetLatestEventByAttempt_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32)) *ActionRepo_GetLatestEventByAttempt_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(uint32))
-	})
-	return _c
-}
-
-func (_c *ActionRepo_GetLatestEventByAttempt_Call) Return(_a0 *models.ActionEvent, _a1 error) *ActionRepo_GetLatestEventByAttempt_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *ActionRepo_GetLatestEventByAttempt_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, uint32) (*models.ActionEvent, error)) *ActionRepo_GetLatestEventByAttempt_Call {
 	_c.Call.Return(run)
 	return _c
 }
