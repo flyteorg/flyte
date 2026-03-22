@@ -1030,7 +1030,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: bTJ0VUl4VWFhaXJIM2c1Uw==
+  haSharedSecret: UVg5OVh0SXNEZ1p5MFBqdQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1555,8 +1555,8 @@ spec:
         app.kubernetes.io/name: flyte-sandbox
     spec:
       containers:
-      - image: unionconsole:sandbox
-        imagePullPolicy: Never
+      - image: ghcr.io/unionai-oss/flyte-client-v2:latest
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
             path: /v2
@@ -1596,7 +1596,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e102ac2b2a2aa3049af7f4b4bcf6bbbb9568cae064ef9d48677dd879cdb6174b
+        checksum/secret: 2908cb6de1eda3605f0c9294f164935f60f6b63888a8da76b9342acae9b4b931
       labels:
         app: docker-registry
         release: flyte-sandbox

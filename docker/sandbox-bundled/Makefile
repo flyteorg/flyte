@@ -24,18 +24,16 @@ flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
-CONSOLE_IMAGE := 643379628101.dkr.ecr.us-east-1.amazonaws.com/union-cp/unionconsole
-CONSOLE_TAG := 2026.2.3
+CONSOLE_IMAGE := ghcr.io/unionai-oss/flyte-client-v2
+CONSOLE_TAG := latest
 
 .PHONY: console
 console:
-	aws ecr get-login-password --region us-east-1 | \
-		docker login --username AWS --password-stdin 643379628101.dkr.ecr.us-east-1.amazonaws.com
 	mkdir -p images/tar/amd64 images/tar/arm64
 	docker pull --platform linux/amd64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
-	docker tag $(CONSOLE_IMAGE):$(CONSOLE_TAG) unionconsole:sandbox
-	docker save unionconsole:sandbox -o images/tar/amd64/unionconsole.tar
-	cp images/tar/amd64/unionconsole.tar images/tar/arm64/unionconsole.tar
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/amd64/flyte-client-v2.tar
+	docker pull --platform linux/arm64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/arm64/flyte-client-v2.tar
 
 .PHONY: dep_update
 dep_update:
