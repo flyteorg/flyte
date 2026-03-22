@@ -301,6 +301,21 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 	return events, nil
 }
 
+// GetLatestEventByAttempt returns the most recent event for a given attempt,
+// ordered by version descending, without deserializing all events.
+func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	var event models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
+		Order("version DESC").
+		First(&event)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, result.Error)
+	}
+	return &event, nil
+}
+
 // CreateAction creates a new action
 func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec

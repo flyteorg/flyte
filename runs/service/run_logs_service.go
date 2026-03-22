@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"connectrpc.com/connect"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/samber/lo"
 )
+
+const defaultMaxConcurrentStreams = 100
 
 // LogStreamer abstracts log fetching from different backends.
 type LogStreamer interface {
@@ -23,6 +26,7 @@ type LogStreamer interface {
 type RunLogsService struct {
 	repo     interfaces.Repository
 	streamer LogStreamer
+	sem      *semaphore.Weighted
 }
 
 // NewRunLogsService creates a new RunLogsService.
@@ -30,6 +34,7 @@ func NewRunLogsService(repo interfaces.Repository, streamer LogStreamer) *RunLog
 	return &RunLogsService{
 		repo:     repo,
 		streamer: streamer,
+		sem:      semaphore.NewWeighted(defaultMaxConcurrentStreams),
 	}
 }
 
@@ -43,6 +48,11 @@ func (s *RunLogsService) TailLogs(ctx context.Context, req *connect.Request[work
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("attempt must be > 0"))
 	}
 
+	if !s.sem.TryAcquire(1) {
+		return connect.NewError(connect.CodeResourceExhausted, fmt.Errorf("too many concurrent log streams"))
+	}
+	defer s.sem.Release(1)
+
 	logContext, err := getLogContextForAttempt(ctx, s.repo, msg.GetActionId(), msg.GetAttempt())
 	if err != nil {
 		return err
@@ -51,29 +61,24 @@ func (s *RunLogsService) TailLogs(ctx context.Context, req *connect.Request[work
 	return s.streamer.TailLogs(ctx, logContext, stream)
 }
 
-// getLogContextForAttempt finds the LogContext from action events for the given attempt.
+// getLogContextForAttempt fetches the latest event for the given attempt and
+// extracts its LogContext. Uses a targeted DB query instead of scanning all events.
 func getLogContextForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, error) {
-	events, err := repo.ActionRepo().ListEvents(ctx, actionID, 100)
+	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to list events for action %v: %w", actionID, err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
 	}
 
-	// Iterate in reverse to find the latest event with a LogContext for this attempt.
-	for i := len(events) - 1; i >= 0; i-- {
-		m := events[i]
-		if m.Attempt != attempt {
-			continue
-		}
-		event, err := m.ToActionEvent()
-		if err != nil {
-			continue
-		}
-		if event.GetLogContext() != nil {
-			return event.GetLogContext(), nil
-		}
+	event, err := m.ToActionEvent()
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
 	}
 
-	return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	if event.GetLogContext() == nil {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	}
+
+	return event.GetLogContext(), nil
 }
 
 // getPrimaryPodAndContainer finds the primary pod and container from a LogContext.

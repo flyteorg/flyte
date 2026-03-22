@@ -81,7 +81,7 @@ func TestTailLogs_HappyPath(t *testing.T) {
 	}
 
 	eventModel := makeEventWithLogContext(tailLogsActionID, 1, common.ActionPhase_ACTION_PHASE_RUNNING, logCtx)
-	actionRepo.On("ListEvents", mock.Anything, mock.Anything, 100).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(1)).Return(eventModel, nil)
 
 	// The streamer should be called with the logContext and send some response.
 	streamer.On("TailLogs", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
@@ -124,7 +124,7 @@ func TestTailLogs_NoLogContext(t *testing.T) {
 
 	// Event without LogContext.
 	eventModel := makeEventWithLogContext(tailLogsActionID, 1, common.ActionPhase_ACTION_PHASE_RUNNING, nil)
-	actionRepo.On("ListEvents", mock.Anything, mock.Anything, 100).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(1)).Return(eventModel, nil)
 
 	client := newTailLogsTestClient(t, actionRepo, streamer)
 
@@ -141,11 +141,11 @@ func TestTailLogs_NoLogContext(t *testing.T) {
 	actionRepo.AssertExpectations(t)
 }
 
-func TestTailLogs_ListEventsError(t *testing.T) {
+func TestTailLogs_GetLatestEventError(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	streamer := &mockLogStreamer{}
 
-	actionRepo.On("ListEvents", mock.Anything, mock.Anything, 100).Return(nil, assert.AnError)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(1)).Return(nil, assert.AnError)
 
 	client := newTailLogsTestClient(t, actionRepo, streamer)
 
@@ -174,7 +174,7 @@ func TestTailLogs_StreamerError(t *testing.T) {
 	}
 
 	eventModel := makeEventWithLogContext(tailLogsActionID, 1, common.ActionPhase_ACTION_PHASE_RUNNING, logCtx)
-	actionRepo.On("ListEvents", mock.Anything, mock.Anything, 100).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(1)).Return(eventModel, nil)
 
 	streamerErr := connect.NewError(connect.CodeInternal, assert.AnError)
 	streamer.On("TailLogs", mock.Anything, mock.Anything, mock.Anything).Return(streamerErr)
@@ -192,4 +192,54 @@ func TestTailLogs_StreamerError(t *testing.T) {
 
 	actionRepo.AssertExpectations(t)
 	streamer.AssertExpectations(t)
+}
+
+func TestTailLogs_ConcurrencyLimit(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	streamer := &mockLogStreamer{}
+
+	logCtx := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	eventModel := makeEventWithLogContext(tailLogsActionID, 1, common.ActionPhase_ACTION_PHASE_RUNNING, logCtx)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, mock.Anything).Return(eventModel, nil)
+
+	// Block in streamer to hold semaphore slots.
+	blocker := make(chan struct{})
+	streamer.On("TailLogs", mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+		<-blocker
+	}).Return(nil)
+
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := NewRunLogsService(repo, streamer)
+	// Exhaust the semaphore by acquiring all slots.
+	svc.sem.Acquire(context.Background(), defaultMaxConcurrentStreams)
+
+	// The next TailLogs should be rejected.
+	path, handler := workflowconnect.NewRunLogsServiceHandler(svc)
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+
+	client := workflowconnect.NewRunLogsServiceClient(http.DefaultClient, server.URL)
+	stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		ActionId: tailLogsActionID,
+		Attempt:  1,
+	}))
+	assert.NoError(t, err)
+
+	assert.False(t, stream.Receive())
+	assert.Error(t, stream.Err())
+	assert.Equal(t, connect.CodeResourceExhausted, connect.CodeOf(stream.Err()))
+
+	// Release so cleanup doesn't hang.
+	svc.sem.Release(defaultMaxConcurrentStreams)
+	close(blocker)
 }

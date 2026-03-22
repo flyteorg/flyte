@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -20,7 +21,17 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
-const logBatchSize = 100
+const (
+	logBatchSize        = 100
+	defaultInitialLines = int64(1000)
+	readerBufSize       = 64 * 1024
+)
+
+var readerPool = sync.Pool{
+	New: func() any {
+		return bufio.NewReaderSize(nil, readerBufSize)
+	},
+}
 
 // K8sLogStreamer streams logs directly from Kubernetes pods.
 type K8sLogStreamer struct {
@@ -43,16 +54,21 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
+	tailLines := defaultInitialLines
 	opts := &corev1.PodLogOptions{
 		Container:  container.GetContainerName(),
 		Follow:     true,
 		Timestamps: true,
+		TailLines:  &tailLines,
 	}
 
 	// Set SinceTime from container start time if available.
+	// When SinceTime is set, it takes precedence and we clear TailLines
+	// to stream all logs from that point forward.
 	if startTime := container.GetProcess().GetContainerStartTime(); startTime != nil {
 		t := metav1.NewTime(startTime.AsTime())
 		opts.SinceTime = &t
+		opts.TailLines = nil
 	}
 
 	logStream, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetPodName(), opts).Stream(ctx)
@@ -61,23 +77,33 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	}
 	defer logStream.Close()
 
-	scanner := bufio.NewScanner(logStream)
-	var lines []*dataplane.LogLine
+	reader := readerPool.Get().(*bufio.Reader)
+	reader.Reset(logStream)
+	defer readerPool.Put(reader)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		logLine := parseLogLine(line)
-		lines = append(lines, logLine)
+	lines := make([]*dataplane.LogLine, 0, logBatchSize)
 
-		if len(lines) >= logBatchSize {
-			if err := stream.Send(&workflow.TailLogsResponse{
-				Logs: []*workflow.TailLogsResponse_Logs{
-					{Lines: lines},
-				},
-			}); err != nil {
-				return err
+	for {
+		line, err := reader.ReadString('\n')
+		if len(line) > 0 {
+			// Trim trailing newline.
+			line = strings.TrimRight(line, "\n")
+			logLine := parseLogLine(line)
+			lines = append(lines, logLine)
+
+			if len(lines) >= logBatchSize {
+				if sendErr := stream.Send(&workflow.TailLogsResponse{
+					Logs: []*workflow.TailLogsResponse_Logs{
+						{Lines: lines},
+					},
+				}); sendErr != nil {
+					return sendErr
+				}
+				lines = make([]*dataplane.LogLine, 0, logBatchSize)
 			}
-			lines = nil
+		}
+		if err != nil {
+			break
 		}
 	}
 
@@ -92,11 +118,8 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		if ctx.Err() != nil {
-			return nil
-		}
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", err))
+	if ctx.Err() != nil {
+		return nil
 	}
 
 	return nil
@@ -105,20 +128,18 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 // parseLogLine splits a K8s log line into timestamp and message.
 // K8s log lines with timestamps are formatted as: "2006-01-02T15:04:05.999999999Z message"
 func parseLogLine(line string) *dataplane.LogLine {
-	logLine := &dataplane.LogLine{
-		Originator: dataplane.LogLineOriginator_USER,
-	}
-
-	parts := strings.SplitN(line, " ", 2)
-	if len(parts) == 2 {
-		if t, err := time.Parse(time.RFC3339Nano, parts[0]); err == nil {
-			logLine.Timestamp = timestamppb.New(t)
-			logLine.Message = parts[1]
-			return logLine
+	if idx := strings.IndexByte(line, ' '); idx > 0 {
+		if t, err := time.Parse(time.RFC3339Nano, line[:idx]); err == nil {
+			return &dataplane.LogLine{
+				Originator: dataplane.LogLineOriginator_USER,
+				Timestamp:  timestamppb.New(t),
+				Message:    line[idx+1:],
+			}
 		}
 	}
 
-	// Fallback: entire line is the message.
-	logLine.Message = line
-	return logLine
+	return &dataplane.LogLine{
+		Originator: dataplane.LogLineOriginator_USER,
+		Message:    line,
+	}
 }
