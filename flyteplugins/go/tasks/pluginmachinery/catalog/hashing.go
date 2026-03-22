@@ -21,15 +21,16 @@ func toJSONCompatible(v interface{}) interface{} {
 	switch val := v.(type) {
 	case map[interface{}]interface{}:
 		m := make(map[string]interface{}, len(val))
-		for k, v := range val {
-			m[fmt.Sprintf("%v", k)] = toJSONCompatible(v)
+		for k, elem := range val {
+			m[fmt.Sprintf("%v", k)] = toJSONCompatible(elem)
 		}
 		return m
 	case []interface{}:
+		result := make([]interface{}, len(val))
 		for i, item := range val {
-			val[i] = toJSONCompatible(item)
+			result[i] = toJSONCompatible(item)
 		}
-		return val
+		return result
 	default:
 		return v
 	}

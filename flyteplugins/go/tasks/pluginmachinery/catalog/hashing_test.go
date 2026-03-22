@@ -720,6 +720,25 @@ func TestHashLiteralMap_MsgpackBinaryDeterministic(t *testing.T) {
 	assert.Equal(t, hashNested1, hashNested2, "identical nested dicts with different msgpack key orderings must hash equally")
 }
 
+// Ensure normalizeMsgpackBytes returns original bytes on invalid input
+func TestNormalizeMsgpackBytes_InvalidInput(t *testing.T) {
+	invalidBytes := []byte{0xff, 0xfe, 0xfd}
+	result := normalizeMsgpackBytes(invalidBytes)
+	assert.Equal(t, invalidBytes, result, "invalid msgpack should return original bytes unchanged")
+}
+
+// Ensure non-msgpack binary tags pass through hashify unmodified
+func TestHashify_NonMsgpackBinaryTag(t *testing.T) {
+	data := []byte{0x01, 0x02, 0x03}
+	lit := &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Binary{Binary: &core.Binary{Value: data, Tag: "protobuf"}},
+		}},
+	}
+	result := hashify(lit)
+	assert.Equal(t, lit, result, "non-msgpack binary should pass through unmodified")
+}
+
 // Ensure that empty inputs are hashed the same way
 func TestCacheIgnoreInputVars(t *testing.T) {
 	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
