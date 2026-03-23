@@ -290,6 +290,15 @@ func (s *RunService) GetRunDetails(
 		RunSpec: extractRunSpec(run.ActionSpec),
 		Action:  s.actionModelToDetails(run, rootActionID),
 	}
+	cacheStatusStr, err := s.repo.ActionRepo().GetActionState(ctx, rootActionID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get cache status: %v", err)
+		return nil, connect.NewError(connect.CodeNotFound, err)
+	}
+
+	cacheStatusVal := core.CatalogCacheStatus(core.CatalogCacheStatus_value[cacheStatusStr])
+
+	details.Action.Status.CacheStatus = cacheStatusVal
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
 	return connect.NewResponse(&workflow.GetRunDetailsResponse{Details: details}), nil
