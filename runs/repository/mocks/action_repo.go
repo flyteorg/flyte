@@ -129,6 +129,53 @@ func (_c *ActionRepo_AbortRun_Call) RunAndReturn(run func(context.Context, *comm
 	return _c
 }
 
+// ClearAbortRequest provides a mock function with given fields: ctx, actionID
+func (_m *ActionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
+	ret := _m.Called(ctx, actionID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ClearAbortRequest")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) error); ok {
+		r0 = rf(ctx, actionID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ActionRepo_ClearAbortRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearAbortRequest'
+type ActionRepo_ClearAbortRequest_Call struct {
+	*mock.Call
+}
+
+// ClearAbortRequest is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+func (_e *ActionRepo_Expecter) ClearAbortRequest(ctx interface{}, actionID interface{}) *ActionRepo_ClearAbortRequest_Call {
+	return &ActionRepo_ClearAbortRequest_Call{Call: _e.mock.On("ClearAbortRequest", ctx, actionID)}
+}
+
+func (_c *ActionRepo_ClearAbortRequest_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier)) *ActionRepo_ClearAbortRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ClearAbortRequest_Call) Return(_a0 error) *ActionRepo_ClearAbortRequest_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier) error) *ActionRepo_ClearAbortRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAction provides a mock function with given fields: ctx, actionSpec, detailedInfo
 func (_m *ActionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	ret := _m.Called(ctx, actionSpec, detailedInfo)
@@ -660,6 +707,64 @@ func (_c *ActionRepo_ListEvents_Call) RunAndReturn(run func(context.Context, *co
 	return _c
 }
 
+// ListPendingAborts provides a mock function with given fields: ctx
+func (_m *ActionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListPendingAborts")
+	}
+
+	var r0 []*models.Action
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*models.Action, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []*models.Action); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Action)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_ListPendingAborts_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPendingAborts'
+type ActionRepo_ListPendingAborts_Call struct {
+	*mock.Call
+}
+
+// ListPendingAborts is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *ActionRepo_Expecter) ListPendingAborts(ctx interface{}) *ActionRepo_ListPendingAborts_Call {
+	return &ActionRepo_ListPendingAborts_Call{Call: _e.mock.On("ListPendingAborts", ctx)}
+}
+
+func (_c *ActionRepo_ListPendingAborts_Call) Run(run func(ctx context.Context)) *ActionRepo_ListPendingAborts_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListPendingAborts_Call) Return(_a0 []*models.Action, _a1 error) *ActionRepo_ListPendingAborts_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_ListPendingAborts_Call) RunAndReturn(run func(context.Context) ([]*models.Action, error)) *ActionRepo_ListPendingAborts_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListRootActions provides a mock function with given fields: ctx, org, project, domain, startDate, endDate, limit
 func (_m *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
 	ret := _m.Called(ctx, org, project, domain, startDate, endDate, limit)
@@ -786,6 +891,63 @@ func (_c *ActionRepo_ListRuns_Call) Return(_a0 []*models.Run, _a1 string, _a2 er
 }
 
 func (_c *ActionRepo_ListRuns_Call) RunAndReturn(run func(context.Context, *workflow.ListRunsRequest) ([]*models.Run, string, error)) *ActionRepo_ListRuns_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MarkAbortAttempt provides a mock function with given fields: ctx, actionID
+func (_m *ActionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	ret := _m.Called(ctx, actionID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MarkAbortAttempt")
+	}
+
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) (int, error)); ok {
+		return rf(ctx, actionID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) int); ok {
+		r0 = rf(ctx, actionID)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier) error); ok {
+		r1 = rf(ctx, actionID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_MarkAbortAttempt_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MarkAbortAttempt'
+type ActionRepo_MarkAbortAttempt_Call struct {
+	*mock.Call
+}
+
+// MarkAbortAttempt is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+func (_e *ActionRepo_Expecter) MarkAbortAttempt(ctx interface{}, actionID interface{}) *ActionRepo_MarkAbortAttempt_Call {
+	return &ActionRepo_MarkAbortAttempt_Call{Call: _e.mock.On("MarkAbortAttempt", ctx, actionID)}
+}
+
+func (_c *ActionRepo_MarkAbortAttempt_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier)) *ActionRepo_MarkAbortAttempt_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_MarkAbortAttempt_Call) Return(attemptCount int, err error) *ActionRepo_MarkAbortAttempt_Call {
+	_c.Call.Return(attemptCount, err)
+	return _c
+}
+
+func (_c *ActionRepo_MarkAbortAttempt_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier) (int, error)) *ActionRepo_MarkAbortAttempt_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -936,6 +1098,41 @@ func (_c *ActionRepo_UpdateActionState_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// WatchAbortRequests provides a mock function with given fields: ctx, payloads, errs
+func (_m *ActionRepo) WatchAbortRequests(ctx context.Context, payloads chan<- string, errs chan<- error) {
+	_m.Called(ctx, payloads, errs)
+}
+
+// ActionRepo_WatchAbortRequests_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchAbortRequests'
+type ActionRepo_WatchAbortRequests_Call struct {
+	*mock.Call
+}
+
+// WatchAbortRequests is a helper method to define mock.On call
+//   - ctx context.Context
+//   - payloads chan<- string
+//   - errs chan<- error
+func (_e *ActionRepo_Expecter) WatchAbortRequests(ctx interface{}, payloads interface{}, errs interface{}) *ActionRepo_WatchAbortRequests_Call {
+	return &ActionRepo_WatchAbortRequests_Call{Call: _e.mock.On("WatchAbortRequests", ctx, payloads, errs)}
+}
+
+func (_c *ActionRepo_WatchAbortRequests_Call) Run(run func(ctx context.Context, payloads chan<- string, errs chan<- error)) *ActionRepo_WatchAbortRequests_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(chan<- string), args[2].(chan<- error))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_WatchAbortRequests_Call) Return() *ActionRepo_WatchAbortRequests_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *ActionRepo_WatchAbortRequests_Call) RunAndReturn(run func(context.Context, chan<- string, chan<- error)) *ActionRepo_WatchAbortRequests_Call {
+	_c.Run(run)
+	return _c
+}
+
 // WatchActionUpdates provides a mock function with given fields: ctx, runID, updates, errs
 func (_m *ActionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	_m.Called(ctx, runID, updates, errs)
@@ -1075,181 +1272,6 @@ func (_c *ActionRepo_WatchStateUpdates_Call) Return() *ActionRepo_WatchStateUpda
 
 func (_c *ActionRepo_WatchStateUpdates_Call) RunAndReturn(run func(context.Context, chan<- *common.ActionIdentifier, chan<- error)) *ActionRepo_WatchStateUpdates_Call {
 	_c.Run(run)
-	return _c
-}
-
-// ListPendingAborts provides a mock function with given fields: ctx
-func (_m *ActionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
-	ret := _m.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListPendingAborts")
-	}
-
-	var r0 []*models.Action
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*models.Action, error)); ok {
-		return rf(ctx)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*models.Action); ok {
-		r0 = rf(ctx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*models.Action)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type ActionRepo_ListPendingAborts_Call struct {
-	*mock.Call
-}
-
-func (_e *ActionRepo_Expecter) ListPendingAborts(ctx interface{}) *ActionRepo_ListPendingAborts_Call {
-	return &ActionRepo_ListPendingAborts_Call{Call: _e.mock.On("ListPendingAborts", ctx)}
-}
-
-func (_c *ActionRepo_ListPendingAborts_Call) Run(run func(ctx context.Context)) *ActionRepo_ListPendingAborts_Call {
-	_c.Call.Run(func(args mock.Arguments) { run(args[0].(context.Context)) })
-	return _c
-}
-
-func (_c *ActionRepo_ListPendingAborts_Call) Return(_a0 []*models.Action, _a1 error) *ActionRepo_ListPendingAborts_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *ActionRepo_ListPendingAborts_Call) RunAndReturn(run func(context.Context) ([]*models.Action, error)) *ActionRepo_ListPendingAborts_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// MarkAbortAttempt provides a mock function with given fields: ctx, actionID
-func (_m *ActionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
-	ret := _m.Called(ctx, actionID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for MarkAbortAttempt")
-	}
-
-	var r0 int
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) (int, error)); ok {
-		return rf(ctx, actionID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) int); ok {
-		r0 = rf(ctx, actionID)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier) error); ok {
-		r1 = rf(ctx, actionID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type ActionRepo_MarkAbortAttempt_Call struct {
-	*mock.Call
-}
-
-func (_e *ActionRepo_Expecter) MarkAbortAttempt(ctx interface{}, actionID interface{}) *ActionRepo_MarkAbortAttempt_Call {
-	return &ActionRepo_MarkAbortAttempt_Call{Call: _e.mock.On("MarkAbortAttempt", ctx, actionID)}
-}
-
-func (_c *ActionRepo_MarkAbortAttempt_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier)) *ActionRepo_MarkAbortAttempt_Call {
-	_c.Call.Run(func(args mock.Arguments) { run(args[0].(context.Context), args[1].(*common.ActionIdentifier)) })
-	return _c
-}
-
-func (_c *ActionRepo_MarkAbortAttempt_Call) Return(_a0 int, _a1 error) *ActionRepo_MarkAbortAttempt_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *ActionRepo_MarkAbortAttempt_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier) (int, error)) *ActionRepo_MarkAbortAttempt_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ClearAbortRequest provides a mock function with given fields: ctx, actionID
-func (_m *ActionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
-	ret := _m.Called(ctx, actionID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ClearAbortRequest")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier) error); ok {
-		r0 = rf(ctx, actionID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-type ActionRepo_ClearAbortRequest_Call struct {
-	*mock.Call
-}
-
-func (_e *ActionRepo_Expecter) ClearAbortRequest(ctx interface{}, actionID interface{}) *ActionRepo_ClearAbortRequest_Call {
-	return &ActionRepo_ClearAbortRequest_Call{Call: _e.mock.On("ClearAbortRequest", ctx, actionID)}
-}
-
-func (_c *ActionRepo_ClearAbortRequest_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier)) *ActionRepo_ClearAbortRequest_Call {
-	_c.Call.Run(func(args mock.Arguments) { run(args[0].(context.Context), args[1].(*common.ActionIdentifier)) })
-	return _c
-}
-
-func (_c *ActionRepo_ClearAbortRequest_Call) Return(_a0 error) *ActionRepo_ClearAbortRequest_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier) error) *ActionRepo_ClearAbortRequest_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// WatchAbortRequests provides a mock function with given fields: ctx, payloads, errs
-func (_m *ActionRepo) WatchAbortRequests(ctx context.Context, payloads chan<- string, errs chan<- error) {
-	_m.Called(ctx, payloads, errs)
-}
-
-type ActionRepo_WatchAbortRequests_Call struct {
-	*mock.Call
-}
-
-func (_e *ActionRepo_Expecter) WatchAbortRequests(ctx interface{}, payloads interface{}, errs interface{}) *ActionRepo_WatchAbortRequests_Call {
-	return &ActionRepo_WatchAbortRequests_Call{Call: _e.mock.On("WatchAbortRequests", ctx, payloads, errs)}
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) Run(run func(ctx context.Context, payloads chan<- string, errs chan<- error)) *ActionRepo_WatchAbortRequests_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(chan<- string), args[2].(chan<- error))
-	})
-	return _c
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) Return() *ActionRepo_WatchAbortRequests_Call {
-	_c.Call.Return()
-	return _c
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) RunAndReturn(run func(context.Context, chan<- string, chan<- error)) *ActionRepo_WatchAbortRequests_Call {
-	_c.Call.Return(run)
 	return _c
 }
 
