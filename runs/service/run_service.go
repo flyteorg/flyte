@@ -252,22 +252,9 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database and enqueue for background pod termination.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
-	// Abort via actions service
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: "a0",
-	}
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: rootActionID,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort run via actions service: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -796,18 +783,9 @@ func (s *RunService) AbortAction(
 		reason = req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database and enqueue for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
-	// Abort via actions service
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: req.Msg.ActionId,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort action via actions service: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
