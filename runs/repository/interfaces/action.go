@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -23,7 +24,7 @@ type ActionRepo interface {
 	ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
-	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error
+	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Watch operations (for streaming)

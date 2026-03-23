@@ -141,6 +141,14 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                type: integer
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.
@@ -1049,7 +1057,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RGhWVnFVakdvTU93amsxbA==
+  haSharedSecret: bHZNNWFFbjVJYzlZSHJaQg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1575,7 +1583,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d75874ebdfdca751387f7a272a14ca6f600f03189ebda404575c1645aa7e399a
+        checksum/secret: db8101eb87292a64110c1efe3ac20b104e11ec74eeecdadd0641e90529028080
       labels:
         app: docker-registry
         release: flyte-sandbox
