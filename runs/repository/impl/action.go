@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -422,10 +423,19 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
+func (r *actionRepo) UpdateActionPhase(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	phase common.ActionPhase,
+	attempts uint32,
+	cacheStatus core.CatalogCacheStatus,
+	endTime *time.Time,
+) error {
 	updates := map[string]interface{}{
-		"phase":      phase,
-		"updated_at": time.Now(),
+		"phase":        phase,
+		"attempts":     attempts,
+		"cache_status": cacheStatus,
+		"updated_at":   time.Now(),
 	}
 	if endTime != nil {
 		if r.isPostgres {
