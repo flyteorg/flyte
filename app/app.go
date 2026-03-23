@@ -167,11 +167,13 @@ func (a *App) serve(ctx context.Context) error {
 	}()
 
 	workerCancel()
+	var shutdownErr error
 	if server != nil {
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 		if err := server.Shutdown(shutdownCtx); err != nil {
 			logger.Errorf(ctx, "Server shutdown error: %v", err)
+			shutdownErr = err
 		}
 	}
 
@@ -187,7 +189,7 @@ func (a *App) serve(ctx context.Context) error {
 	case <-time.After(shutdownTimeout):
 		logger.Warnf(ctx, "%s: graceful shutdown timed out after %v, forcing exit", a.Name, shutdownTimeout)
 	}
-	return nil
+	return shutdownErr
 }
 
 func initConfig(cmd *cobra.Command) error {
