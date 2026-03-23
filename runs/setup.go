@@ -25,7 +25,8 @@ import (
 )
 
 // Setup registers Run and Task service handlers on the SetupContext mux.
-// Requires sc.DB, sc.DataStore, and sc.K8sClient to be set.
+// Requires sc.DB and sc.DataStore to be set. When sc.K8sConfig is provided,
+// RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 

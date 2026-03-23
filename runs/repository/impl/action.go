@@ -311,6 +311,9 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 		Order("version DESC").
 		First(&event)
 	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("event not found for attempt %d: %w", attempt, gorm.ErrRecordNotFound)
+		}
 		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, result.Error)
 	}
 	return &event, nil

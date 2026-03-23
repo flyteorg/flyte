@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -72,12 +73,13 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	reader := bufio.NewReader(logStream)
 
 	lines := make([]*dataplane.LogLine, 0, logBatchSize)
+	var readErr error
 
 	for {
 		line, err := reader.ReadString('\n')
 		if len(line) > 0 {
-			// Trim trailing newline.
-			line = strings.TrimRight(line, "\n")
+			// Trim trailing newline(s) including possible CRLF.
+			line = strings.TrimRight(line, "\r\n")
 			logLine := parseLogLine(line)
 			lines = append(lines, logLine)
 
@@ -93,6 +95,9 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 			}
 		}
 		if err != nil {
+			if err != io.EOF {
+				readErr = err
+			}
 			break
 		}
 	}
@@ -108,8 +113,9 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		}
 	}
 
-	if ctx.Err() != nil {
-		return nil
+	// Return error for non-EOF read failures (unless context was canceled).
+	if readErr != nil && ctx.Err() == nil {
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", readErr))
 	}
 
 	return nil

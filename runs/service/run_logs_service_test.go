@@ -6,10 +6,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"fmt"
+
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -242,4 +245,73 @@ func TestTailLogs_ConcurrencyLimit(t *testing.T) {
 	// Release so cleanup doesn't hang.
 	svc.sem.Release(defaultMaxConcurrentStreams)
 	close(blocker)
+}
+
+func TestTailLogs_AttemptZero(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	streamer := &mockLogStreamer{}
+
+	logCtx := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	eventModel := makeEventWithLogContext(tailLogsActionID, 0, common.ActionPhase_ACTION_PHASE_RUNNING, logCtx)
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(0)).Return(eventModel, nil)
+
+	streamer.On("TailLogs", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		stream := args.Get(2).(*connect.ServerStream[workflow.TailLogsResponse])
+		_ = stream.Send(&workflow.TailLogsResponse{
+			Logs: []*workflow.TailLogsResponse_Logs{
+				{
+					Lines: []*dataplane.LogLine{
+						{Message: "attempt zero log", Originator: dataplane.LogLineOriginator_USER},
+					},
+				},
+			},
+		})
+	}).Return(nil)
+
+	client := newTailLogsTestClient(t, actionRepo, streamer)
+
+	stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		ActionId: tailLogsActionID,
+		Attempt:  0,
+	}))
+	assert.NoError(t, err)
+
+	assert.True(t, stream.Receive())
+	resp := stream.Msg()
+	assert.Len(t, resp.Logs, 1)
+	assert.Equal(t, "attempt zero log", resp.Logs[0].Lines[0].Message)
+
+	assert.False(t, stream.Receive())
+	assert.NoError(t, stream.Err())
+
+	actionRepo.AssertExpectations(t)
+	streamer.AssertExpectations(t)
+}
+
+func TestTailLogs_EventNotFound(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	streamer := &mockLogStreamer{}
+
+	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(5)).
+		Return(nil, fmt.Errorf("event not found for attempt 5: %w", gorm.ErrRecordNotFound))
+
+	client := newTailLogsTestClient(t, actionRepo, streamer)
+
+	stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		ActionId: tailLogsActionID,
+		Attempt:  5,
+	}))
+	assert.NoError(t, err)
+
+	assert.False(t, stream.Receive())
+	assert.Error(t, stream.Err())
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(stream.Err()))
+
+	actionRepo.AssertExpectations(t)
 }
