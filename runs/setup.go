@@ -8,10 +8,12 @@ import (
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
@@ -70,6 +72,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+
+	appSvc := service.NewAppService()
+	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
+	sc.Mux.Handle(appPath, appHandler)
+	logger.Infof(ctx, "Mounted AppService at %s", appPath)
+
+	triggerSvc := service.NewTriggerService()
+	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
+	sc.Mux.Handle(triggerPath, triggerHandler)
+	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
 	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
 	for _, d := range cfg.Domains {

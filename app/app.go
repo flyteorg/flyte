@@ -155,18 +155,41 @@ func (a *App) serve(ctx context.Context) error {
 		return err
 	}
 
-	// 7. Graceful shutdown
+	// 7. Graceful shutdown with overall deadline.
+	// A second SIGINT/SIGTERM forces immediate exit.
+	const shutdownTimeout = 30 * time.Second
+	forceCh := make(chan os.Signal, 1)
+	signal.Notify(forceCh, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-forceCh
+		logger.Warnf(ctx, "Received second signal, forcing immediate exit")
+		os.Exit(1)
+	}()
+
 	workerCancel()
+	var shutdownErr error
 	if server != nil {
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 		defer cancel()
 		if err := server.Shutdown(shutdownCtx); err != nil {
-			return fmt.Errorf("server shutdown failed: %w", err)
+			logger.Errorf(ctx, "Server shutdown error: %v", err)
+			shutdownErr = err
 		}
 	}
 
-	logger.Infof(ctx, "%s stopped", a.Name)
-	return nil
+	// Wait for all workers to finish, but enforce a deadline so we don't hang.
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+		logger.Infof(ctx, "%s stopped", a.Name)
+	case <-time.After(shutdownTimeout):
+		logger.Warnf(ctx, "%s: graceful shutdown timed out after %v, forcing exit", a.Name, shutdownTimeout)
+	}
+	return shutdownErr
 }
 
 func initConfig(cmd *cobra.Command) error {
