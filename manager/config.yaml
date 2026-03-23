@@ -11,18 +11,33 @@ manager:
 
   kubernetes:
     namespace: "flyte"
-    # Optional: specify custom kubeconfig path
-    # kubeconfig: "/path/to/kubeconfig"
+    kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
+
+# Webhook configuration
+# localCert: true writes the generated TLS cert to disk so the webhook server can read it.
+webhook:
+  localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
+
+# Executor configuration
+executor:
+  gc:
+    interval: 1m
+    maxTTL: 1m
 
 # Runs service configuration
 runs:
   storagePrefix: "s3://flyte-data"
-
-# Database configuration (SQLite)
-database:
-  type: "sqlite"
-  sqlite:
-    file: "flyte.db"
+  database:
+    postgres:
+      host: "localhost"
+      port: 30001
+      dbName: "runs"
+      username: "postgres"
+      password: "postgres"
+      options: "sslmode=disable"
 
 # Logger configuration
 logger:
@@ -45,10 +60,10 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://minio.flyte-dataproxy:9000"
-      - FLYTE_AWS_ACCESS_KEY_ID: "minioadmin"
-      - FLYTE_AWS_SECRET_ACCESS_KEY: "minioadmin"
-      - _U_EP_OVERRIDE: "host.docker.internal:8090"
+      - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+      - _U_EP_OVERRIDE: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
       - _U_INSECURE: "true"
       - _U_USE_ACTIONS: "1"
 
@@ -63,8 +78,8 @@ storage:
     kind: "s3"
     config:
       auth_type: "accesskey"
-      access_key_id: "minioadmin"
-      secret_key: "minioadmin"
+      access_key_id: "minio"
+      secret_key: "miniostorage"
       region: "us-east-1"
-      endpoint: "http://localhost:9000"
+      endpoint: "http://localhost:30002"
       disable_ssl: "true"

@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/secret/payload.proto.
  */
 export const file_flyteidl2_secret_payload: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvc2VjcmV0L3BheWxvYWQucHJvdG8SEGZseXRlaWRsMi5zZWNyZXQigAEKE0NyZWF0ZVNlY3JldFJlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldElkZW50aWZpZXJCBrpIA8gBARIxCgtzZWNyZXRfc3BlYxgCIAEoCzIcLmZseXRlaWRsMi5zZWNyZXQuU2VjcmV0U3BlYyIWChRDcmVhdGVTZWNyZXRSZXNwb25zZSKAAQoTVXBkYXRlU2VjcmV0UmVxdWVzdBI2CgJpZBgBIAEoCzIiLmZseXRlaWRsMi5zZWNyZXQuU2VjcmV0SWRlbnRpZmllckIGukgDyAEBEjEKC3NlY3JldF9zcGVjGAIgASgLMhwuZmx5dGVpZGwyLnNlY3JldC5TZWNyZXRTcGVjIhYKFFVwZGF0ZVNlY3JldFJlc3BvbnNlIkoKEEdldFNlY3JldFJlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldElkZW50aWZpZXJCBrpIA8gBASI9ChFHZXRTZWNyZXRSZXNwb25zZRIoCgZzZWNyZXQYASABKAsyGC5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldCJNChNEZWxldGVTZWNyZXRSZXF1ZXN0EjYKAmlkGAEgASgLMiIuZmx5dGVpZGwyLnNlY3JldC5TZWNyZXRJZGVudGlmaWVyQga6SAPIAQEiFgoURGVsZXRlU2VjcmV0UmVzcG9uc2Ui+gEKEkxpc3RTZWNyZXRzUmVxdWVzdBIUCgxvcmdhbml6YXRpb24YASABKAkSDgoGZG9tYWluGAIgASgJEg8KB3Byb2plY3QYAyABKAkSDQoFbGltaXQYBCABKAUSDQoFdG9rZW4YBSABKAkSVgoScGVyX2NsdXN0ZXJfdG9rZW5zGAYgAygLMjouZmx5dGVpZGwyLnNlY3JldC5MaXN0U2VjcmV0c1JlcXVlc3QuUGVyQ2x1c3RlclRva2Vuc0VudHJ5GjcKFVBlckNsdXN0ZXJUb2tlbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIuEBChNMaXN0U2VjcmV0c1Jlc3BvbnNlEikKB3NlY3JldHMYASADKAsyGC5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldBINCgV0b2tlbhgCIAEoCRJXChJwZXJfY2x1c3Rlcl90b2tlbnMYAyADKAsyOy5mbHl0ZWlkbDIuc2VjcmV0Lkxpc3RTZWNyZXRzUmVzcG9uc2UuUGVyQ2x1c3RlclRva2Vuc0VudHJ5GjcKFVBlckNsdXN0ZXJUb2tlbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQr0BChRjb20uZmx5dGVpZGwyLnNlY3JldEIMUGF5bG9hZFByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3NlY3JldKICA0ZTWKoCEEZseXRlaWRsMi5TZWNyZXTKAhBGbHl0ZWlkbDJcU2VjcmV04gIcRmx5dGVpZGwyXFNlY3JldFxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6U2VjcmV0YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_secret_definition]);
+  fileDesc("Ch5mbHl0ZWlkbDIvc2VjcmV0L3BheWxvYWQucHJvdG8SEGZseXRlaWRsMi5zZWNyZXQigAEKE0NyZWF0ZVNlY3JldFJlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldElkZW50aWZpZXJCBrpIA8gBARIxCgtzZWNyZXRfc3BlYxgCIAEoCzIcLmZseXRlaWRsMi5zZWNyZXQuU2VjcmV0U3BlYyIWChRDcmVhdGVTZWNyZXRSZXNwb25zZSKAAQoTVXBkYXRlU2VjcmV0UmVxdWVzdBI2CgJpZBgBIAEoCzIiLmZseXRlaWRsMi5zZWNyZXQuU2VjcmV0SWRlbnRpZmllckIGukgDyAEBEjEKC3NlY3JldF9zcGVjGAIgASgLMhwuZmx5dGVpZGwyLnNlY3JldC5TZWNyZXRTcGVjIhYKFFVwZGF0ZVNlY3JldFJlc3BvbnNlImoKEEdldFNlY3JldFJlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldElkZW50aWZpZXJCBrpIA8gBARIeChZpbmNsdWRlX3N5c3RlbV9zZWNyZXRzGAIgASgIIj0KEUdldFNlY3JldFJlc3BvbnNlEigKBnNlY3JldBgBIAEoCzIYLmZseXRlaWRsMi5zZWNyZXQuU2VjcmV0Im0KE0RlbGV0ZVNlY3JldFJlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldElkZW50aWZpZXJCBrpIA8gBARIeChZpbmNsdWRlX3N5c3RlbV9zZWNyZXRzGAIgASgIIhYKFERlbGV0ZVNlY3JldFJlc3BvbnNlIpoCChJMaXN0U2VjcmV0c1JlcXVlc3QSFAoMb3JnYW5pemF0aW9uGAEgASgJEg4KBmRvbWFpbhgCIAEoCRIPCgdwcm9qZWN0GAMgASgJEg0KBWxpbWl0GAQgASgFEg0KBXRva2VuGAUgASgJElYKEnBlcl9jbHVzdGVyX3Rva2VucxgGIAMoCzI6LmZseXRlaWRsMi5zZWNyZXQuTGlzdFNlY3JldHNSZXF1ZXN0LlBlckNsdXN0ZXJUb2tlbnNFbnRyeRIeChZpbmNsdWRlX3N5c3RlbV9zZWNyZXRzGAcgASgIGjcKFVBlckNsdXN0ZXJUb2tlbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIuEBChNMaXN0U2VjcmV0c1Jlc3BvbnNlEikKB3NlY3JldHMYASADKAsyGC5mbHl0ZWlkbDIuc2VjcmV0LlNlY3JldBINCgV0b2tlbhgCIAEoCRJXChJwZXJfY2x1c3Rlcl90b2tlbnMYAyADKAsyOy5mbHl0ZWlkbDIuc2VjcmV0Lkxpc3RTZWNyZXRzUmVzcG9uc2UuUGVyQ2x1c3RlclRva2Vuc0VudHJ5GjcKFVBlckNsdXN0ZXJUb2tlbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQr0BChRjb20uZmx5dGVpZGwyLnNlY3JldEIMUGF5bG9hZFByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3NlY3JldKICA0ZTWKoCEEZseXRlaWRsMi5TZWNyZXTKAhBGbHl0ZWlkbDJcU2VjcmV04gIcRmx5dGVpZGwyXFNlY3JldFxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6U2VjcmV0YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_secret_definition]);
 
 /**
  * CreateSecretProxyRequest contains the spec and identifier used for secret creation
@@ -103,6 +103,14 @@ export type GetSecretRequest = Message<"flyteidl2.secret.GetSecretRequest"> & {
    * @generated from field: flyteidl2.secret.SecretIdentifier id = 1;
    */
   id?: SecretIdentifier;
+
+  /**
+   * If true, system-provisioned secrets (e.g. EAGER_API_KEY, SERVING_API_KEY) will be included.
+   * If false (default), system secrets will be hidden and return NotFound.
+   *
+   * @generated from field: bool include_system_secrets = 2;
+   */
+  includeSystemSecrets: boolean;
 };
 
 /**
@@ -143,6 +151,14 @@ export type DeleteSecretRequest = Message<"flyteidl2.secret.DeleteSecretRequest"
    * @generated from field: flyteidl2.secret.SecretIdentifier id = 1;
    */
   id?: SecretIdentifier;
+
+  /**
+   * If true, system-provisioned secrets (e.g. EAGER_API_KEY, SERVING_API_KEY) can be deleted.
+   * If false (default), attempting to delete a system secret will return NotFound.
+   *
+   * @generated from field: bool include_system_secrets = 2;
+   */
+  includeSystemSecrets: boolean;
 };
 
 /**
@@ -219,6 +235,14 @@ export type ListSecretsRequest = Message<"flyteidl2.secret.ListSecretsRequest"> 
    * @generated from field: map<string, string> per_cluster_tokens = 6;
    */
   perClusterTokens: { [key: string]: string };
+
+  /**
+   * If true, system-provisioned secrets (e.g. EAGER_API_KEY, SERVING_API_KEY) will be included in results.
+   * If false (default), system secrets will be filtered out.
+   *
+   * @generated from field: bool include_system_secrets = 7;
+   */
+  includeSystemSecrets: boolean;
 };
 
 /**

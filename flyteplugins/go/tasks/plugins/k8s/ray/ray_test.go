@@ -896,6 +896,10 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 
 	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 
+	taskReader := &mocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{}, nil)
+	plg.EXPECT().TaskReader().Return(taskReader)
+
 	return plg
 }
 

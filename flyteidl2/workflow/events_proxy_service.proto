@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/workflow/run_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// EventsProxyService provides an interface for forwarding the events to Run Service or Redis stream.
+service EventsProxyService {
+  // record the events for an action.
+  rpc Record(RecordRequest) returns (RecordResponse) {}
+}
+
+// ============================================================================
+// Record
+// ============================================================================
+
+// RecordRequest is the request message for recording the events for the actions.
+message RecordRequest {
+  // The events to record.
+  repeated flyteidl2.workflow.ActionEvent events = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// RecordResponse is the response message recording an event for an action.
+message RecordResponse {}

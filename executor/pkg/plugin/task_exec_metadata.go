@@ -9,6 +9,8 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -50,12 +52,26 @@ type taskExecutionMetadata struct {
 	maxAttempts     uint32
 	overrides       pluginsCore.TaskOverrides
 	envVars         map[string]string
+	securityContext *core.SecurityContext
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
-func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecutionMetadata {
+func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecutionMetadata, error) {
 	// Extract resource requirements from the inline task template
 	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
+
+	// Handling secrets
+	var err error
+	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
+	secretsMap := make(map[string]string)
+	injectLabels := make(map[string]string)
+	if securityContext != nil && len(securityContext.Secrets) > 0 {
+		secretsMap, err = secrets.MarshalSecretsToMapStrings(securityContext.Secrets)
+		if err != nil {
+			return nil, err
+		}
+		injectLabels[secrets.PodLabel] = secrets.PodLabelValue
+	}
 
 	// Build environment variables for the task pod
 	envVars := map[string]string{
@@ -91,12 +107,13 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) pluginsCore.TaskExecuti
 			Name:       ta.Name,
 			UID:        ta.UID,
 		},
-		labels:      ta.Labels,
-		annotations: ta.Annotations,
-		maxAttempts: 1,
-		overrides:   overrides,
-		envVars:     envVars,
-	}
+		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
+		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
+		maxAttempts:     1,
+		overrides:       overrides,
+		envVars:         envVars,
+		securityContext: securityContext,
+	}, nil
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
@@ -119,25 +136,42 @@ func buildOverridesFromTaskTemplate(data []byte) *taskOverrides {
 	return &taskOverrides{resources: res}
 }
 
-func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName            { return m.ownerID }
-func (m *taskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecutionID { return m.taskExecutionID }
-func (m *taskExecutionMetadata) GetNamespace() string                         { return m.namespace }
-func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference     { return m.ownerReference }
-func (m *taskExecutionMetadata) GetLabels() map[string]string                 { return m.labels }
-func (m *taskExecutionMetadata) GetAnnotations() map[string]string            { return m.annotations }
-func (m *taskExecutionMetadata) GetMaxAttempts() uint32                       { return m.maxAttempts }
-func (m *taskExecutionMetadata) GetK8sServiceAccount() string                 { return "" }
-func (m *taskExecutionMetadata) IsInterruptible() bool                        { return false }
-func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32      { return 0 }
-func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string   { return m.envVars }
-func (m *taskExecutionMetadata) GetConsoleURL() string                        { return "" }
+// extractSecurityContextFromTaskTemplate deserializes the task template and extracts SecurityContext.
+func extractSecurityContextFromTaskTemplate(data []byte) *core.SecurityContext {
+	if len(data) == 0 {
+		return &core.SecurityContext{}
+	}
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return &core.SecurityContext{}
+	}
+	if tmpl.SecurityContext == nil {
+		return &core.SecurityContext{}
+	}
+	return tmpl.GetSecurityContext()
+}
+
+func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName { return m.ownerID }
+func (m *taskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecutionID {
+	return m.taskExecutionID
+}
+func (m *taskExecutionMetadata) GetNamespace() string                       { return m.namespace }
+func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference   { return m.ownerReference }
+func (m *taskExecutionMetadata) GetLabels() map[string]string               { return m.labels }
+func (m *taskExecutionMetadata) GetAnnotations() map[string]string          { return m.annotations }
+func (m *taskExecutionMetadata) GetMaxAttempts() uint32                     { return m.maxAttempts }
+func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return "" }
+func (m *taskExecutionMetadata) IsInterruptible() bool                      { return false }
+func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32    { return 0 }
+func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string { return m.envVars }
+func (m *taskExecutionMetadata) GetConsoleURL() string                      { return "" }
 
 func (m *taskExecutionMetadata) GetOverrides() pluginsCore.TaskOverrides {
 	return m.overrides
 }
 
 func (m *taskExecutionMetadata) GetSecurityContext() *core.SecurityContext {
-	return &core.SecurityContext{}
+	return m.securityContext
 }
 
 func (m *taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
@@ -153,9 +187,9 @@ type taskOverrides struct {
 	resources *v1.ResourceRequirements
 }
 
-func (t *taskOverrides) GetResources() *v1.ResourceRequirements     { return t.resources }
+func (t *taskOverrides) GetResources() *v1.ResourceRequirements        { return t.resources }
 func (t *taskOverrides) GetExtendedResources() *core.ExtendedResources { return nil }
-func (t *taskOverrides) GetContainerImage() string                   { return "" }
-func (t *taskOverrides) GetConfigMap() *v1.ConfigMap                 { return nil }
-func (t *taskOverrides) GetPodTemplate() *core.K8SPod               { return nil }
-func (t *taskOverrides) GetConfig() map[string]string                { return nil }
+func (t *taskOverrides) GetContainerImage() string                     { return "" }
+func (t *taskOverrides) GetConfigMap() *v1.ConfigMap                   { return nil }
+func (t *taskOverrides) GetPodTemplate() *core.K8SPod                  { return nil }
+func (t *taskOverrides) GetConfig() map[string]string                  { return nil }

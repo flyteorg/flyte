@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
@@ -19,7 +21,12 @@ var (
 		MetricsCertName:        "tls.crt",
 		MetricsCertKey:         "tls.key",
 		EnableHTTP2:            false,
-		StateServiceURL:        "http://localhost:8090",
+		EventsServiceURL:       "http://localhost:8090",
+		Cluster:                "",
+		GC: GCConfig{
+			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
+			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
+		},
 	}
 
 	configSection = stdconfig.MustRegisterSection(configSectionKey, defaultConfig)
@@ -61,8 +68,23 @@ type Config struct {
 	// EnableHTTP2 enables HTTP/2 for the metrics and webhook servers.
 	EnableHTTP2 bool `json:"enableHTTP2" pflag:",Enable HTTP/2 for metrics and webhook servers"`
 
-	// StateServiceURL is the URL of the State Service for reporting action state updates.
-	StateServiceURL string `json:"stateServiceURL" pflag:",URL of the State Service for action state updates"`
+	// EventsServiceURL is the URL of the event Service for reporting action state updates.
+	EventsServiceURL string `json:"EventsServiceURL" pflag:",URL of the Event Service for action event updates"`
+
+	// Cluster is the cluster identifier attached to action events.
+	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
+
+	// GC configures the garbage collector for terminal TaskActions.
+	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
+}
+
+// GCConfig holds the configuration for the TaskAction garbage collector.
+type GCConfig struct {
+	// Interval is how often the garbage collector runs. 0 disables GC.
+	Interval stdconfig.Duration `json:"interval" pflag:",How often the garbage collector runs. 0 disables GC."`
+
+	// MaxTTL is the time-to-live for terminal TaskActions before deletion.
+	MaxTTL stdconfig.Duration `json:"maxTTL" pflag:",Time-to-live for terminal TaskActions before deletion."`
 }
 
 // GetConfig returns the parsed executor configuration
