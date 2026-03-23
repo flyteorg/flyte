@@ -46,6 +46,8 @@ type cacheMetrics struct {
 	releaseReservationSuccessCounter labeled.Counter
 	notFoundCounter                  labeled.Counter
 	alreadyExistsCount               labeled.Counter
+	cacheHitCounter                  labeled.Counter
+	reservationContentionCounter     labeled.Counter
 }
 
 type cacheManager struct {
@@ -90,6 +92,8 @@ func (m *cacheManager) Get(ctx context.Context, request *cacheservice.GetCacheRe
 	}
 
 	m.systemMetrics.getSuccessCounter.Inc(ctx)
+	m.systemMetrics.cacheHitCounter.Inc(ctx)
+	logger.Debugf(ctx, "cache hit for key %s", request.Key)
 	return &cacheservice.GetCacheResponse{Output: output}, nil
 }
 
@@ -244,7 +248,8 @@ func (m *cacheManager) GetOrExtendReservation(ctx context.Context, request *cach
 		if reservationModel.ExpiresAt.Before(now) || reservationModel.OwnerID == request.OwnerId {
 			storeError = m.reservationStore.Update(ctx, newReservation, now)
 		} else {
-			logger.Debugf(ctx, "CacheReservation: %+v is held by %s", reservationModel.Key, reservationModel.OwnerID)
+			m.systemMetrics.reservationContentionCounter.Inc(ctx)
+			logger.Infof(ctx, "cache reservation contention: key %s held by %s, requested by %s", reservationModel.Key, reservationModel.OwnerID, request.OwnerId)
 			reservation := transformers.FromReservationModel(ctx, reservationModel)
 			return &cacheservice.GetOrExtendReservationResponse{Reservation: reservation}, nil
 		}
@@ -330,6 +335,8 @@ func NewCacheManager(outputStore interfaces.CacheOutputBlobStore, dataStore repo
 		releaseReservationFailureCounter: labeled.NewCounter("release_reservation_failure", "The number of release reservation failures.", cacheScope, labeled.EmitUnlabeledMetric),
 		notFoundCounter:                  labeled.NewCounter("not_found", "The number of cache keys not found.", cacheScope, labeled.EmitUnlabeledMetric),
 		alreadyExistsCount:               labeled.NewCounter("already_exists", "The number of cache keys already exists.", cacheScope, labeled.EmitUnlabeledMetric),
+		cacheHitCounter:                  labeled.NewCounter("cache_hit", "The number of cache hits (successful Get returning a value).", cacheScope, labeled.EmitUnlabeledMetric),
+		reservationContentionCounter:     labeled.NewCounter("reservation_contention", "The number of times a reservation was held by another owner.", cacheScope, labeled.EmitUnlabeledMetric),
 	}
 
 	return &cacheManager{
