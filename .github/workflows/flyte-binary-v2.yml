@@ -119,7 +119,6 @@ jobs:
           push: true
 
   build-and-push-sandbox-bundled-image:
-    # if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     needs: [build-and-push-single-binary-image]
     steps:
@@ -150,12 +149,14 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push multi-arch image
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/sandbox-bundled
