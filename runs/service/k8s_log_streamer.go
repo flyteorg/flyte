@@ -64,6 +64,14 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		opts.TailLines = nil
 	}
 
+	// Only follow logs when the pod is actively running. For pending or
+	// terminated pods, disable follow so existing logs are returned immediately.
+	podObj, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).Get(ctx, pod.GetPodName(), metav1.GetOptions{})
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get pod: %w", err))
+	}
+	opts.Follow = podObj.Status.Phase == corev1.PodRunning
+
 	logStream, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetPodName(), opts).Stream(ctx)
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
