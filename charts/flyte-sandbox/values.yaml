@@ -167,7 +167,7 @@ sandbox:
   console:
     enabled: true
     image:
-      repository: ghcr.io/unionai-oss/flyte-client-v2
+      repository: ghcr.io/flyteorg/flyte-client-v2
       tag: latest
       pullPolicy: IfNotPresent
   buildkit:

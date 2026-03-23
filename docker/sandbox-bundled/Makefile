@@ -52,7 +52,7 @@ manifests: dep_update
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
 
-CONSOLE_IMAGE := ghcr.io/unionai-oss/flyte-client-v2
+CONSOLE_IMAGE := ghcr.io/flyteorg/flyte-client-v2
 CONSOLE_TAG := latest
 
 .PHONY: console
