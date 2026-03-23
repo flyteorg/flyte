@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
@@ -70,6 +71,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+
+	appSvc := service.NewAppService()
+	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
+	sc.Mux.Handle(appPath, appHandler)
+	logger.Infof(ctx, "Mounted AppService at %s", appPath)
 
 	triggerSvc := service.NewTriggerService()
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
