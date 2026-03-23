@@ -84,6 +84,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	}
 	generatedName := buildGeneratedName(ta)
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
+	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
@@ -114,7 +115,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		},
 		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
 		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
-		maxAttempts:     1,
+		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
 		securityContext: securityContext,
@@ -131,6 +132,25 @@ func attemptToRetry(attempt uint32) uint32 {
 		return 0
 	}
 	return attempt - 1
+}
+
+// maxAttemptsFromTaskTemplate give the max attempts (retries + 1) from the task template.
+func maxAttemptsFromTaskTemplate(data []byte) uint32 {
+	if len(data) == 0 {
+		return 1
+	}
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return 1
+	}
+
+	md := tmpl.GetMetadata()
+	if md == nil || md.GetRetries() == nil {
+		return 1
+	}
+
+	return md.GetRetries().GetRetries() + 1
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
