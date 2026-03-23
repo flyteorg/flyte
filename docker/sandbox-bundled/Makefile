@@ -115,10 +115,6 @@ kubeconfig:
 stop:
 	docker stop flyte-sandbox
 
-.PHONY: open
-open:
-	open http://localhost:30080/v2
-
 .venv:
 	python -m venv .venv
 	. .venv/bin/activate && pip install flytekit
