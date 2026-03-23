@@ -330,7 +330,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
 	if err := r.Status().Update(ctx, newTaskAction); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
