@@ -7,6 +7,8 @@ import (
 
 	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -187,9 +189,9 @@ func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(context.Context, *
 	return _c
 }
 
-// CreateRun provides a mock function with given fields: ctx, req, inputUri, runOutputBase
-func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string) (*models.Run, error) {
-	ret := _m.Called(ctx, req, inputUri, runOutputBase)
+// CreateRun provides a mock function with given fields: ctx, req, inputPrefix, runOutputBase
+func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputPrefix string, runOutputBase string) (*models.Run, error) {
+	ret := _m.Called(ctx, req, inputPrefix, runOutputBase)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRun")
@@ -198,10 +200,10 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 	var r0 *models.Run
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) (*models.Run, error)); ok {
-		return rf(ctx, req, inputUri, runOutputBase)
+		return rf(ctx, req, inputPrefix, runOutputBase)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *workflow.CreateRunRequest, string, string) *models.Run); ok {
-		r0 = rf(ctx, req, inputUri, runOutputBase)
+		r0 = rf(ctx, req, inputPrefix, runOutputBase)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Run)
@@ -209,7 +211,7 @@ func (_m *ActionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequ
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *workflow.CreateRunRequest, string, string) error); ok {
-		r1 = rf(ctx, req, inputUri, runOutputBase)
+		r1 = rf(ctx, req, inputPrefix, runOutputBase)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -225,13 +227,13 @@ type ActionRepo_CreateRun_Call struct {
 // CreateRun is a helper method to define mock.On call
 //   - ctx context.Context
 //   - req *workflow.CreateRunRequest
-//   - inputUri string
+//   - inputPrefix string
 //   - runOutputBase string
-func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}, inputUri interface{}, runOutputBase interface{}) *ActionRepo_CreateRun_Call {
-	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req, inputUri, runOutputBase)}
+func (_e *ActionRepo_Expecter) CreateRun(ctx interface{}, req interface{}, inputPrefix interface{}, runOutputBase interface{}) *ActionRepo_CreateRun_Call {
+	return &ActionRepo_CreateRun_Call{Call: _e.mock.On("CreateRun", ctx, req, inputPrefix, runOutputBase)}
 }
 
-func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest, inputUri string, runOutputBase string)) *ActionRepo_CreateRun_Call {
+func (_c *ActionRepo_CreateRun_Call) Run(run func(ctx context.Context, req *workflow.CreateRunRequest, inputPrefix string, runOutputBase string)) *ActionRepo_CreateRun_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*workflow.CreateRunRequest), args[2].(string), args[3].(string))
 	})
@@ -775,17 +777,17 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, endTime
-func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
-	ret := _m.Called(ctx, actionID, phase, endTime)
+// UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, attempts, cacheStatus, endTime
+func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error {
+	ret := _m.Called(ctx, actionID, phase, attempts, cacheStatus, endTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, *time.Time) error); ok {
-		r0 = rf(ctx, actionID, phase, endTime)
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time) error); ok {
+		r0 = rf(ctx, actionID, phase, attempts, cacheStatus, endTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -802,14 +804,16 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - phase common.ActionPhase
+//   - attempts uint32
+//   - cacheStatus core.CatalogCacheStatus
 //   - endTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, endTime)}
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(common.ActionPhase), args[3].(*time.Time))
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(common.ActionPhase), args[3].(uint32), args[4].(core.CatalogCacheStatus), args[5].(*time.Time))
 	})
 	return _c
 }
@@ -819,7 +823,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(_a0 error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, common.ActionPhase, *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }

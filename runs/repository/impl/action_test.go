@@ -3,9 +3,11 @@ package impl
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -47,6 +49,8 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		ended_at DATETIME,
 		duration_ms INTEGER,
+		attempts INTEGER NOT NULL DEFAULT 1,
+		cache_status INTEGER NOT NULL DEFAULT 0,
 		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, name)
 	)`).Error
 	require.NoError(t, err)
@@ -105,6 +109,47 @@ func TestCreateRun(t *testing.T) {
 	// Attempt duplicate run create with same run name should fail unique constraint
 	_, err = actionRepo.CreateRun(ctx, req, "s3://input2", "s3://output2")
 	require.Error(t, err)
+}
+
+func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo := NewActionRepo(db, database.DbConfig{})
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+		ActionId: actionID,
+		InputUri: "s3://bucket/input",
+	}, nil)
+	require.NoError(t, err)
+
+	endTime := time.Now()
+	err = actionRepo.UpdateActionPhase(
+		ctx,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		3,
+		core.CatalogCacheStatus_CACHE_HIT,
+		&endTime,
+	)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), action.Phase)
+	assert.Equal(t, uint32(3), action.Attempts)
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, action.CacheStatus)
+	assert.True(t, action.EndedAt.Valid)
 }
 
 func TestListRuns(t *testing.T) {

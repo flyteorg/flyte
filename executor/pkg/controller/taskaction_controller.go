@@ -211,6 +211,8 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
 	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	taskAction.Status.Attempts = observedAttempts(taskAction)
+	taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
@@ -359,7 +361,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 
 	event := &workflow.ActionEvent{
 		Id:            actionID,
-		Attempt:       1, // TODO(nary): wire retry attempt once retry state is available in executor status.
+		Attempt:       observedAttempts(taskAction),
 		Phase:         phaseToActionPhase(phaseInfo.Phase()),
 		Version:       phaseInfo.Version(),
 		UpdatedTime:   updatedTime,
@@ -373,10 +375,25 @@ func (r *TaskActionReconciler) buildActionEvent(
 	if info != nil {
 		event.LogInfo = info.Logs
 		event.LogContext = info.LogContext
-		event.CacheStatus = cacheStatusFromExternalResources(info.ExternalResources)
 	}
+	event.CacheStatus = observedCacheStatus(info)
 
 	return event
+}
+
+func observedAttempts(taskAction *flyteorgv1.TaskAction) uint32 {
+	if taskAction.Status.Attempts > 0 {
+		return taskAction.Status.Attempts
+	}
+	// if attempts is not set, default to 1
+	return 1
+}
+
+func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
+	if info == nil {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	return cacheStatusFromExternalResources(info.ExternalResources)
 }
 
 func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
@@ -401,7 +418,7 @@ func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
 		return nil
 	}
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName,
+		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName + "/outputs.pb",
 	}
 }
 
@@ -481,7 +498,9 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 	if oldStatus.StateJSON != newStatus.StateJSON ||
 		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
-		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion {
+		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
+		oldStatus.Attempts != newStatus.Attempts ||
+		oldStatus.CacheStatus != newStatus.CacheStatus {
 		return true
 	}
 

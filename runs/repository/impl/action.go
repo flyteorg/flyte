@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -78,7 +79,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         inputUri,
+		InputUri:         inputUri + "/inputs.pb",
 		RunOutputBase:    runOutputBase,
 	}
 
@@ -100,7 +101,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 
 	// Serialize the ActionSpec to binary protobuf
 	actionSpecBytes, err := proto.Marshal(actionSpec)
-	logger.Infof(ctx, "Serialized action spec: %s", actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
 	}
@@ -167,6 +167,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		ActionDetails:    []byte("{}"), // Empty details initially
 		DetailedInfo:     detailedInfo,
 		RunSpec:          runSpecBytes,
+		Attempts:         1,
 	}
 
 	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
@@ -304,7 +305,6 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 // CreateAction creates a new action
 func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec
-	logger.Infof(ctx, "action spec: %s", actionSpec.String())
 	actionSpecBytes, err := proto.Marshal(actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
@@ -341,6 +341,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 		ActionSpec:       actionSpecBytes,
 		ActionDetails:    []byte("{}"), // Empty details initially
 		DetailedInfo:     detailedInfo,
+		Attempts:         1,
 	}
 
 	result := r.db.WithContext(ctx).
@@ -422,10 +423,19 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
+func (r *actionRepo) UpdateActionPhase(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	phase common.ActionPhase,
+	attempts uint32,
+	cacheStatus core.CatalogCacheStatus,
+	endTime *time.Time,
+) error {
 	updates := map[string]interface{}{
-		"phase":      phase,
-		"updated_at": time.Now(),
+		"phase":        phase,
+		"attempts":     attempts,
+		"cache_status": cacheStatus,
+		"updated_at":   time.Now(),
 	}
 	if endTime != nil {
 		if r.isPostgres {

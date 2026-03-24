@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package flyteidl2.org;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
+
+// SettingState controls how a setting at a given scope behaves when no value
+// is set. The VALUE state is implicit: it is inferred from which value field
+// inside the SettingValue oneof is populated.
+enum SettingState {
+  // Delegate to the parent scope. This is the default.
+  SETTING_STATE_INHERIT = 0;
+
+  // Explicitly no value at this scope. Stops the inheritance chain.
+  SETTING_STATE_UNSET = 1;
+}
+
+// SettingScopeLevel identifies which scope level a resolved setting came from.
+enum ScopeLevel {
+  SCOPE_LEVEL_ORG = 0;
+  SCOPE_LEVEL_DOMAIN = 1;
+  SCOPE_LEVEL_PROJECT = 2;
+}
+
+// StringValues is a wrapper for a list of strings.
+// Required because proto3 does not allow repeated fields directly in a oneof.
+message StringValues {
+  repeated string values = 1;
+}
+
+// StringMap is a wrapper for a string-to-string map.
+// Required because proto3 does not allow map fields directly in a oneof.
+message StringMap {
+  map<string, string> entries = 1;
+}
+
+// SettingValue is a single configurable value supporting inheritance across scopes.
+// The oneof encodes both control state and the typed value:
+//   - state field set to INHERIT (default) or UNSET: no associated data
+//   - string_value / int_value / list_value / map_value set: implies VALUE state
+message SettingValue {
+  oneof value {
+    // INHERIT (default) or UNSET — no data value associated.
+    SettingState state = 1;
+
+    // A plain string value.
+    string string_value = 2;
+
+    // An integer value.
+    int64 int_value = 3;
+
+    // A boolean value
+    bool bool_value = 4;
+
+    // A list-of-strings value. Additive across scopes on GetSettings:
+    // parent values are concatenated before child values.
+    StringValues list_value = 5;
+
+    // A string-to-string map value. Merged across scopes on GetSettings:
+    // child scope entries override parent entries on key conflict.
+    StringMap map_value = 6;
+  }
+
+  // Human-readable description of what this setting controls.
+  // Populated in GetSettingsForEdit responses only (for user guidance) ignored on writes.
+  // This value is not stored in the database, but added from hardcoded values in the code.
+  string description = 7;
+
+  // The scope level at which this setting's value originates.
+  // Populated in GetSettings responses only; ignored on writes.
+  ScopeLevel scope_level = 8;
+}
+
+// SettingsKey is the storage key for a settings record.
+// domain and project are empty for org-scope and org/domain-scope records
+// respectively.
+message SettingsKey {
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+  string domain = 2;
+  string project = 3;
+}
+
+// RunSettings controls workflow execution behavior.
+message RunSettings {
+  // Default queue for workflow runs.
+  SettingValue default_queue = 1;
+
+  // Maximum number of concurrent workflow runs.
+  SettingValue run_concurrency = 2;
+
+  // Maximum number of concurrent actions within a workflow run.
+  SettingValue action_concurrency = 3;
+}
+
+// SecuritySettings controls security-related configuration.
+message SecuritySettings {
+  // Kubernetes service account to use for workflow pods.
+  SettingValue service_account = 1;
+}
+
+// StorageSettings controls data storage configuration.
+message StorageSettings {
+  // URI prefix for raw output data.
+  SettingValue raw_data_path = 1;
+}
+
+// TaskResourceDefaults defines default and limit resource requests for tasks.
+message TaskResourceDefaults {
+  SettingValue min_cpu = 1;
+  SettingValue min_gpu = 2;
+  SettingValue min_memory = 3;
+  SettingValue min_storage = 4;
+  SettingValue max_cpu = 5;
+  SettingValue max_gpu = 6;
+  SettingValue max_memory = 7;
+  SettingValue max_storage = 8;
+}
+
+// TaskResourceSettings controls task resource configuration.
+message TaskResourceSettings {
+  TaskResourceDefaults defaults = 1;
+
+  // Whether resource limits should mirror requests.
+  SettingValue mirror_limits_request = 2;
+}
+
+// Settings holds all configurable settings for a scope.
+message Settings {
+  RunSettings run = 1;
+  SecuritySettings security = 2;
+  StorageSettings storage = 3;
+  TaskResourceSettings task_resource = 4;
+  SettingValue labels = 5;
+  SettingValue annotations = 6;
+  SettingValue environment_variables = 7;
+}

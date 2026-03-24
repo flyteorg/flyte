@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"fmt"
+
 	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -80,6 +82,9 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		"_U_ORG_NAME": ta.Spec.Org,
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
 	}
+	generatedName := buildGeneratedName(ta)
+	retryAttempt := attemptToRetry(ta.Status.Attempts)
+	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
@@ -87,7 +92,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 			Namespace: ta.Namespace,
 		},
 		taskExecutionID: &taskExecutionID{
-			generatedName: ta.Name,
+			generatedName: generatedName,
 			id: core.TaskExecutionIdentifier{
 				NodeExecutionId: &core.NodeExecutionIdentifier{
 					ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -98,6 +103,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 					},
 					NodeId: ta.Spec.ActionName,
 				},
+				RetryAttempt: retryAttempt,
 			},
 		},
 		namespace: ta.Namespace,
@@ -109,11 +115,42 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		},
 		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
 		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
-		maxAttempts:     1,
+		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
 		securityContext: securityContext,
 	}, nil
+}
+
+func buildGeneratedName(ta *flyteorgv1.TaskAction) string {
+	return fmt.Sprintf("%s-%d", ta.Name, attemptToRetry(ta.Status.Attempts))
+}
+
+// attemptToRetry convert attempt to retry count
+func attemptToRetry(attempt uint32) uint32 {
+	if attempt <= 1 {
+		return 0
+	}
+	return attempt - 1
+}
+
+// maxAttemptsFromTaskTemplate give the max attempts (retries + 1) from the task template.
+func maxAttemptsFromTaskTemplate(data []byte) uint32 {
+	if len(data) == 0 {
+		return 1
+	}
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return 1
+	}
+
+	md := tmpl.GetMetadata()
+	if md == nil || md.GetRetries() == nil {
+		return 1
+	}
+
+	return md.GetRetries().GetRetries() + 1
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
