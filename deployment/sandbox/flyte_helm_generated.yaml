@@ -6376,6 +6376,24 @@ spec:
       port: 9444
       targetPort: 9444
 ---
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
+# Headless Service for cache invalidation — resolves to all pod IPs so that
+# we can fan out invalidation requests to every webhook replica.
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook-headless
+  namespace: flyte
+spec:
+  clusterIP: None
+  selector:
+    app: flyte-pod-webhook
+  ports:
+    - name: cache-internal
+      protocol: TCP
+      port: 9444
+      targetPort: 9444
+---
 # Source: flyte/charts/kubernetes-dashboard/templates/service.yaml
 # Copyright 2017 The Kubernetes Authors.
 #

@@ -165,6 +165,23 @@ spec:
       port: 9444
       targetPort: 9444
 ---
+# Headless Service for cache invalidation — resolves to all pod IPs so that
+# we can fan out invalidation requests to every webhook replica.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}-headless
+  namespace: {{ template "flyte.namespace" . }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ template "flyte-pod-webhook.name" . }}
+  ports:
+    - name: cache-internal
+      protocol: TCP
+      port: 9444
+      targetPort: 9444
+---
 # Create a ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
