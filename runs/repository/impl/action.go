@@ -580,7 +580,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -642,7 +642,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -720,7 +720,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -740,16 +740,31 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 			case <-ctx.Done():
 				return
 			case notifPayload := <-notifCh:
-				// Check if this notification is for an action in the run we're watching
-				// Payload format: org/project/domain/run/action
+				// Collect this notification plus any others already queued,
+				// deduplicating by action name so we only query the DB once
+				// per action during a burst of updates.
+				pending := make(map[string]bool)
 				if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
-					// Extract action name from payload
-					actionName := notifPayload[len(runPrefix):]
+					pending[notifPayload[len(runPrefix):]] = true
+				}
+				// Drain buffered notifications without blocking.
+			drain:
+				for {
+					select {
+					case extra := <-notifCh:
+						if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
+							pending[extra[len(runPrefix):]] = true
+						}
+					default:
+						break drain
+					}
+				}
+
+				for actionName := range pending {
 					actionID := &common.ActionIdentifier{
 						Run:  runID,
 						Name: actionName,
 					}
-
 					action, err := r.GetAction(ctx, actionID)
 					if err != nil {
 						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
