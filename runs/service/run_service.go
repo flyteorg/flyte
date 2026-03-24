@@ -173,18 +173,19 @@ func (s *RunService) CreateRun(
 	if runSpec == nil {
 		runSpec = &task.RunSpec{}
 	}
+	request.RunSpec = runSpec
 
 	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
-	runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
+	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
+		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
+	}
 
-	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
-	// even when the task has no user inputs, so we must write an empty LiteralMap.
-	literalMap := inputsToLiteralMap(inputs)
+	// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
 	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
 		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 	}

@@ -556,7 +556,7 @@ func TestConvertRunToProto(t *testing.T) {
 					Metadata: &workflow.ActionMetadata{
 						EnvironmentName: "prod",
 					},
-					Status:   status,
+					Status: status,
 				},
 			},
 		},
@@ -742,8 +742,8 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	}
 
 	store.On("WriteProtobuf", mock.Anything, mock.AnythingOfType("storage.DataReference"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
-		lm, ok := msg.(*core.LiteralMap)
-		return ok && len(lm.Literals) == 0
+		inputs, ok := msg.(*task.Inputs)
+		return ok && len(inputs.Literals) == 0 && len(inputs.Context) == 0
 	})).Return(nil).Once()
 
 	actionRepo.On("CreateRun", mock.Anything, mock.AnythingOfType("*workflow.CreateRunRequest"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
@@ -859,6 +859,69 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	assert.NoError(t, err)
 
 	actionsClient.AssertExpectations(t)
+}
+
+func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rctx-123",
+			},
+		},
+		Inputs: &task.Inputs{
+			Context: []*core.KeyValuePair{
+				{Key: "trace_id", Value: "root-abc"},
+			},
+		},
+		RunSpec: &task.RunSpec{
+			RawDataStorage: &task.RawDataStorage{RawDataPrefix: "s3://custom-raw"},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/org/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+		inputs, ok := msg.(*task.Inputs)
+		return ok &&
+			len(inputs.Context) == 1 &&
+			inputs.Context[0].GetKey() == "trace_id" &&
+			inputs.Context[0].GetValue() == "root-abc"
+	})).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.MatchedBy(func(actual *workflow.CreateRunRequest) bool {
+		return actual.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	}), "s3://flyte-data/org/proj/dev/rctx-123/inputs", "s3://flyte-data/org/proj/dev/rctx-123/").Return(&models.Run{
+		Org:     "org",
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "rctx-123",
+	}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
 }
 
 func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
