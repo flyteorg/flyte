@@ -169,7 +169,7 @@ sandbox:
     image:
       repository: ghcr.io/flyteorg/flyte-client-v2
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Never
   buildkit:
     enabled: true
     image:
