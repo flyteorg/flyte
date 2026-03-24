@@ -951,6 +951,21 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.app.AppService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.trigger.TriggerService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/v2"
                                               route:
                                                   cluster: console
@@ -1079,7 +1094,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: NVZyWGNEVmF4bWVQdHBDdg==
+  haSharedSecret: emtodUxNeVhKRUVTNTZoNQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1633,7 +1648,7 @@ spec:
     spec:
       containers:
       - image: ghcr.io/flyteorg/flyte-client-v2:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Never
         livenessProbe:
           httpGet:
             path: /v2
@@ -1673,7 +1688,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e22c198f351c3d8839045679f8e43efffa7a9c73f0d6890fc82de596f10fd2a7
+        checksum/secret: 01b429904895eccc2dadaa4a021db5273d63aac821b6d8c959e1e29e9edfaab4
       labels:
         app: docker-registry
         release: flyte-sandbox

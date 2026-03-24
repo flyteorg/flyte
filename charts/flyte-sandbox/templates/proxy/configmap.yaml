@@ -80,6 +80,21 @@ data:
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.app.AppService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.trigger.TriggerService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
                                             {{- end }}
                                             {{- if .Values.sandbox.console.enabled }}
                                             - match:

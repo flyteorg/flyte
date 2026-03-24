@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -74,19 +75,199 @@ func (m *mockActionsClient) Abort(ctx context.Context, req *connect.Request[acti
 
 func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
 
 	svc := &RunService{repo: repo, actionsClient: actionsClient}
 
 	t.Cleanup(func() {
 		repo.AssertExpectations(t)
 		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
 		actionsClient.AssertExpectations(t)
 	})
 
 	return actionRepo, actionsClient, svc
+}
+
+func matchActionID(expected *common.ActionIdentifier) interface{} {
+	return mock.MatchedBy(func(actual *common.ActionIdentifier) bool {
+		return proto.Equal(actual, expected)
+	})
+}
+
+func TestGetRunDetails_WithTaskSpec(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	runInfo := &workflow.RunInfo{
+		TaskSpecDigest: "abc123",
+		InputsUri:      "s3://bucket/inputs.pb",
+	}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	runModel := &models.Run{
+		Org:          runID.Org,
+		Project:      runID.Project,
+		Domain:       runID.Domain,
+		RunName:      runID.Name,
+		Name:         runID.Name,
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	taskSpecProto := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Type: "python",
+		},
+	}
+	taskSpecBytes, _ := proto.Marshal(taskSpecProto)
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	taskRepo.On("GetTaskSpec", mock.Anything, "abc123").Return(&models.TaskSpec{
+		Digest: "abc123",
+		Spec:   taskSpecBytes,
+	}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+
+	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Details)
+	require.NotNil(t, resp.Msg.Details.Action)
+	require.NotNil(t, resp.Msg.Details.Action.GetTask())
+	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+}
+
+func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	runModel := &models.Run{
+		Org:         runID.Org,
+		Project:     runID.Project,
+		Domain:      runID.Domain,
+		RunName:     runID.Name,
+		Name:        runID.Name,
+		Phase:       int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType:  int32(workflow.ActionType_ACTION_TYPE_TASK),
+		Attempts:    1,
+		CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
+	}
+
+	now := time.Now()
+	event := &workflow.ActionEvent{
+		Id:          rootActionID,
+		Attempt:     1,
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		Version:     1,
+		UpdatedTime: timestamppb.New(now),
+	}
+	eventModel, _ := models.NewActionEventModel(event)
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
+
+	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Details)
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Msg.Details.Action.Status.GetCacheStatus())
+}
+
+func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	runInfo := &workflow.RunInfo{TaskSpecDigest: "bad-digest"}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	runModel := &models.Run{
+		Org:          runID.Org,
+		Project:      runID.Project,
+		Domain:       runID.Domain,
+		RunName:      runID.Name,
+		Name:         runID.Name,
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(&common.ActionIdentifier{Run: runID, Name: runID.Name}), 500).Return([]*models.ActionEvent{}, nil)
+
+	_, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	assert.Error(t, err)
 }
 
 func TestAbortRun(t *testing.T) {
@@ -207,7 +388,12 @@ func TestListRuns(t *testing.T) {
 	actionRepo, _, svc := newTestService(t)
 	runs := []*workflow.Run{}
 	sqlRes := []*models.Run{}
+	baseTime := time.Date(2026, time.March, 24, 10, 0, 0, 0, time.UTC)
 	for i := 0; i < 10; i++ {
+		startTime := timestamppb.New(baseTime.Add(time.Duration(i) * time.Minute))
+		endTime := timestamppb.New(startTime.AsTime().Add(2 * time.Minute))
+		durationMs := uint64(2 * time.Minute / time.Millisecond)
+		envName := fmt.Sprintf("env-%d", i)
 		runs = append(runs, &workflow.Run{
 			Action: &workflow.Action{
 				Id: &common.ActionIdentifier{
@@ -219,17 +405,31 @@ func TestListRuns(t *testing.T) {
 					},
 					Name: fmt.Sprintf("run-%d", i),
 				},
-				Metadata: &workflow.ActionMetadata{},
-				Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+				Metadata: &workflow.ActionMetadata{
+					EnvironmentName: envName,
+				},
+				Status: &workflow.ActionStatus{
+					Phase:      common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+					StartTime:  startTime,
+					EndTime:    endTime,
+					DurationMs: &durationMs,
+				},
 			},
 		})
 		sqlRes = append(sqlRes, &models.Run{
-			ID:      uint(i),
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    fmt.Sprintf("run-%d", i),
-			Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ID:         uint(i),
+			Org:        "test-org",
+			Project:    "test-project",
+			Domain:     "test-domain",
+			Name:       fmt.Sprintf("run-%d", i),
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			CreatedAt:  startTime.AsTime(),
+			EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
+			DurationMs: sql.NullInt64{Int64: int64(durationMs), Valid: true},
+			EnvironmentName: sql.NullString{
+				String: envName,
+				Valid:  true,
+			},
 		})
 	}
 	type mockListRes struct {
@@ -306,7 +506,7 @@ func TestConvertRunToProto(t *testing.T) {
 	org := "test_org"
 	project := "test_project"
 	domain := "test_domain"
-	startTime := timestamppb.Now()
+	startTime := timestamppb.New(time.Date(2026, time.March, 24, 9, 0, 0, 0, time.UTC))
 	endTime := timestamppb.New(startTime.AsTime().Add(time.Minute))
 	durationMs := uint64(endTime.AsTime().Sub(startTime.AsTime()).Milliseconds())
 	status := &workflow.ActionStatus{
@@ -335,7 +535,12 @@ func TestConvertRunToProto(t *testing.T) {
 				Domain:        domain,
 				Name:          name,
 				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				CreatedAt:     startTime.AsTime(),
 				ActionDetails: detailJson,
+				EnvironmentName: sql.NullString{
+					String: "prod",
+					Valid:  true,
+				},
 			},
 			&workflow.Run{
 				Action: &workflow.Action{
@@ -348,7 +553,9 @@ func TestConvertRunToProto(t *testing.T) {
 						},
 						Name: name,
 					},
-					Metadata: &workflow.ActionMetadata{},
+					Metadata: &workflow.ActionMetadata{
+						EnvironmentName: "prod",
+					},
 					Status:   status,
 				},
 			},
@@ -356,12 +563,19 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"run with missing details",
 			&models.Run{
-				ID:      uint(0),
-				Org:     org,
-				Project: project,
-				Domain:  domain,
-				Name:    name,
-				Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				ID:         uint(0),
+				Org:        org,
+				Project:    project,
+				Domain:     domain,
+				Name:       name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				CreatedAt:  startTime.AsTime(),
+				EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
+				DurationMs: sql.NullInt64{Int64: int64(durationMs), Valid: true},
+				EnvironmentName: sql.NullString{
+					String: "staging",
+					Valid:  true,
+				},
 			},
 			&workflow.Run{
 				Action: &workflow.Action{
@@ -374,8 +588,15 @@ func TestConvertRunToProto(t *testing.T) {
 						},
 						Name: name,
 					},
-					Metadata: &workflow.ActionMetadata{},
-					Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_QUEUED},
+					Metadata: &workflow.ActionMetadata{
+						EnvironmentName: "staging",
+					},
+					Status: &workflow.ActionStatus{
+						Phase:      common.ActionPhase_ACTION_PHASE_QUEUED,
+						StartTime:  startTime,
+						EndTime:    endTime,
+						DurationMs: &durationMs,
+					},
 				},
 			},
 		},
@@ -701,7 +922,7 @@ func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	eventModel, _ := models.NewActionEventModel(successEvent)
 
 	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil)
-	actionRepo.On("ListEvents", mock.Anything, actionID, 500).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
 
 	// Mock reading inputs
 	store.On("ReadProtobuf", mock.Anything, storage.DataReference("s3://bucket/inputs/inputs.pb"), mock.AnythingOfType("*task.Inputs")).
