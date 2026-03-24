@@ -99,12 +99,7 @@ func getPrimaryPodAndContainer(logContext *core.LogContext) (*core.PodLogContext
 		return c.GetContainerName() == pod.GetPrimaryContainerName()
 	})
 	if !found {
-		// Container status may not be populated yet (e.g., pod is still pending).
-		// Fall back to a minimal ContainerContext with just the name so log
-		// streaming can still proceed.
-		container = &core.ContainerContext{
-			ContainerName: pod.GetPrimaryContainerName(),
-		}
+		return nil, nil, fmt.Errorf("primary container %s not found in pod %s", pod.GetPrimaryContainerName(), pod.GetPodName())
 	}
 
 	return pod, container, nil
