@@ -331,7 +331,7 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	result := r.db.WithContext(ctx).
 		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
-		Order("version DESC, phase DESC").
+		Order("phase DESC, version DESC").
 		First(&event)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
