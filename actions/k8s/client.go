@@ -141,6 +141,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
+	applyRunSpecToTaskAction(taskAction, runSpec)
 	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 	// Embed the inline TaskTemplate if present.
@@ -603,6 +604,52 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	}
 
 	return actionSpec
+}
+
+func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) {
+	if runSpec == nil {
+		taskAction.Spec.EnvVars = nil
+		taskAction.Spec.Interruptible = nil
+		return
+	}
+
+	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
+	if runSpec.GetInterruptible() != nil {
+		value := runSpec.GetInterruptible().GetValue()
+		taskAction.Spec.Interruptible = &value
+	} else {
+		taskAction.Spec.Interruptible = nil
+	}
+
+	for key, value := range runSpec.GetLabels().GetValues() {
+		if _, exists := taskAction.Labels[key]; !exists {
+			taskAction.Labels[key] = value
+		}
+	}
+
+	if len(runSpec.GetAnnotations().GetValues()) > 0 {
+		if taskAction.Annotations == nil {
+			taskAction.Annotations = make(map[string]string, len(runSpec.GetAnnotations().GetValues()))
+		}
+		for key, value := range runSpec.GetAnnotations().GetValues() {
+			taskAction.Annotations[key] = value
+		}
+	}
+}
+
+func keyValuePairsToMap(values []*core.KeyValuePair) map[string]string {
+	if len(values) == 0 {
+		return nil
+	}
+
+	cloned := make(map[string]string, len(values))
+	for _, kv := range values {
+		if kv == nil {
+			continue
+		}
+		cloned[kv.GetKey()] = kv.GetValue()
+	}
+	return cloned
 }
 
 func extractTaskCacheKey(action *actions.Action) string {
