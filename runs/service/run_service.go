@@ -1102,6 +1102,11 @@ func (s *RunService) WatchClusterEvents(
 		}
 	}
 
+	// If the action is already in a terminal phase, no further events are expected.
+	if IsTerminalPhase(common.ActionPhase(action.Phase)) {
+		return nil
+	}
+
 	// Step 2: Watch for updates from DB
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
@@ -1130,11 +1135,14 @@ func (s *RunService) WatchClusterEvents(
 			lastPhase = updated.Phase
 
 			newEvents := actionModelToClusterEvents(updated)
-			if len(newEvents) == 0 {
-				continue
+			if len(newEvents) > 0 {
+				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
+					return err
+				}
 			}
-			if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
-				return err
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(common.ActionPhase(updated.Phase)) {
+				return nil
 			}
 		}
 	}
