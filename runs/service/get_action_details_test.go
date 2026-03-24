@@ -476,6 +476,58 @@ func TestMergeEvents_ReportURI(t *testing.T) {
 	assert.Equal(t, "s3://reports/report.html", result.GetOutputs().GetReportUri())
 }
 
+func TestBuildActionDetails_CanceledContextSuppressesErrors(t *testing.T) {
+	actionRepo, taskRepo, svc := newTestServiceWithTaskRepo(t)
+
+	runInfo := &workflow.RunInfo{TaskSpecDigest: "some-digest"}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	actionModel := &models.Action{
+		Org:          "test-org",
+		Project:      "test-project",
+		Domain:       "test-domain",
+		RunName:      "rtest12345",
+		Name:         "action-1",
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	// Cancel context before calling buildActionDetails
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	// Both task spec and events queries will fail due to canceled context
+	taskRepo.On("GetTaskSpec", mock.Anything, "some-digest").Return(nil, context.Canceled)
+	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return(nil, context.Canceled)
+
+	_, err := svc.buildActionDetails(ctx, actionModel, testActionID)
+	// Should return an error but not panic or log excessively
+	assert.Error(t, err)
+}
+
+func TestGetActionDetails_SplitIntoGetAndBuild(t *testing.T) {
+	// Verify that getActionDetails calls GetAction then buildActionDetails
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	actionModel := &models.Action{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		RunName: "rtest12345",
+		Name:    "action-1",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}
+
+	actionRepo.On("GetAction", mock.Anything, testActionID).Return(actionModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
+
+	details, err := svc.getActionDetails(context.Background(), testActionID)
+	assert.NoError(t, err)
+	assert.NotNil(t, details)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, details.Status.Phase)
+}
+
 func TestMergeEvents_EndTimeNeverBeforeStartTime(t *testing.T) {
 	earlyTime := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 	lateTime := time.Date(2026, 1, 1, 0, 0, 10, 0, time.UTC)

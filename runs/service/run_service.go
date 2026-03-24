@@ -355,7 +355,9 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		if info.GetTaskSpecDigest() != "" {
 			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
 			if err != nil {
-				logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
+				if ctx.Err() == nil {
+					logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
+				}
 				return err
 			}
 
@@ -397,14 +399,18 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		var err error
 		attempts, err = s.getAttempts(ctx, actionId)
 		if err != nil {
-			logger.Warnf(ctx, "failed to get action attempts for action %v: %v", actionId, err)
+			if ctx.Err() == nil {
+				logger.Warnf(ctx, "failed to get action attempts for action %v: %v", actionId, err)
+			}
 			return err
 		}
 		return nil
 	})
 
 	if err := eg.Wait(); err != nil {
-		logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
+		if ctx.Err() == nil {
+			logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
+		}
 		return nil, err
 	}
 
@@ -836,8 +842,8 @@ func (s *RunService) WatchRunDetails(
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
 	// Keep connection open and send updates (simplified)
-	updates := make(chan *models.Run)
-	errs := make(chan error)
+	updates := make(chan *models.Run, 50)
+	errs := make(chan error, 1)
 
 	go s.repo.ActionRepo().WatchRunUpdates(ctx, req.Msg.RunId, updates, errs)
 
@@ -882,9 +888,14 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
+	// If the action is already in a terminal phase, no further updates are expected.
+	if IsTerminalPhase(details.GetStatus().GetPhase()) {
+		return nil
+	}
+
 	// Step 2: Watch DB for updates
-	updates := make(chan *models.Action)
-	errs := make(chan error)
+	updates := make(chan *models.Action, 50)
+	errs := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updates, errs)
 
 	for {
@@ -904,6 +915,9 @@ func (s *RunService) WatchActionDetails(
 			// Reuse the already-fetched action model from WatchActionUpdates
 			details, err := s.buildActionDetails(ctx, updated, actionID)
 			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
 				logger.Errorf(ctx, "failed to get action details for action %s: %v", actionID.Name, err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
@@ -911,6 +925,10 @@ func (s *RunService) WatchActionDetails(
 				Details: details,
 			}); err != nil {
 				return err
+			}
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(details.GetStatus().GetPhase()) {
+				return nil
 			}
 		}
 	}
@@ -945,8 +963,8 @@ func (s *RunService) WatchRuns(
 	}
 
 	// Step 2: Watch for run updates from DB
-	updatesCh := make(chan *models.Run)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Run, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	for {
@@ -983,8 +1001,8 @@ func (s *RunService) WatchActions(
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
 	// Start watching for updates from DB first to prevent event miss
-	updatesCh := make(chan *models.Action)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
@@ -1092,9 +1110,14 @@ func (s *RunService) WatchClusterEvents(
 		}
 	}
 
+	// If the action is already in a terminal phase, no further events are expected.
+	if IsTerminalPhase(common.ActionPhase(action.Phase)) {
+		return nil
+	}
+
 	// Step 2: Watch for updates from DB
-	updatesCh := make(chan *models.Action)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
 
 	lastPhase := action.Phase
@@ -1120,11 +1143,14 @@ func (s *RunService) WatchClusterEvents(
 			lastPhase = updated.Phase
 
 			newEvents := actionModelToClusterEvents(updated)
-			if len(newEvents) == 0 {
-				continue
+			if len(newEvents) > 0 {
+				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
+					return err
+				}
 			}
-			if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
-				return err
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(common.ActionPhase(updated.Phase)) {
+				return nil
 			}
 		}
 	}

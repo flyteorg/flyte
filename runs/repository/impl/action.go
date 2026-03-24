@@ -282,9 +282,31 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	if len(events) == 0 {
 		return nil
 	}
-	return r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(&events).Error
+		Create(&events).Error; err != nil {
+		return err
+	}
+
+	// Notify subscribers so watchers see new events (e.g. log context becoming available).
+	notified := make(map[string]bool)
+	for _, e := range events {
+		actionID := &common.ActionIdentifier{
+			Run: &common.RunIdentifier{
+				Org:     e.Org,
+				Project: e.Project,
+				Domain:  e.Domain,
+				Name:    e.RunName,
+			},
+			Name: e.Name,
+		}
+		key := e.Org + "/" + e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
+		if !notified[key] {
+			r.notifyActionUpdate(ctx, actionID)
+			notified[key] = true
+		}
+	}
+	return nil
 }
 
 // ListEvents lists action events for a given action identifier.
@@ -300,6 +322,24 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 		return nil, fmt.Errorf("failed to list action events: %w", result.Error)
 	}
 	return events, nil
+}
+
+// GetLatestEventByAttempt returns the most recent event for a given attempt,
+// ordered by version descending, without deserializing all events.
+func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	var event models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
+		Order("phase DESC, version DESC").
+		First(&event)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("event not found for attempt %d: %w", attempt, gorm.ErrRecordNotFound)
+		}
+		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, result.Error)
+	}
+	return &event, nil
 }
 
 // CreateAction creates a new action
@@ -572,7 +612,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -596,10 +636,17 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 				if notifPayload == runKey {
 					run, err := r.GetRun(ctx, runID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						errs <- err
 						return
 					}
-					updates <- run
+					select {
+					case updates <- run:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -634,7 +681,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -668,12 +715,22 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 					Name:    parts[3],
 				}
 
+				if ctx.Err() != nil {
+					return
+				}
 				run, err := r.GetRun(ctx, runID)
 				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
 					logger.Errorf(ctx, "Failed to get run from notification: %v", err)
 					continue
 				}
-				updates <- run
+				select {
+				case updates <- run:
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	} else {
@@ -712,7 +769,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -732,22 +789,47 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 			case <-ctx.Done():
 				return
 			case notifPayload := <-notifCh:
-				// Check if this notification is for an action in the run we're watching
-				// Payload format: org/project/domain/run/action
+				// Collect this notification plus any others already queued,
+				// deduplicating by action name so we only query the DB once
+				// per action during a burst of updates.
+				pending := make(map[string]bool)
 				if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
-					// Extract action name from payload
-					actionName := notifPayload[len(runPrefix):]
+					pending[notifPayload[len(runPrefix):]] = true
+				}
+				// Drain buffered notifications without blocking.
+			drain:
+				for {
+					select {
+					case extra := <-notifCh:
+						if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
+							pending[extra[len(runPrefix):]] = true
+						}
+					default:
+						break drain
+					}
+				}
+
+				for actionName := range pending {
 					actionID := &common.ActionIdentifier{
 						Run:  runID,
 						Name: actionName,
 					}
-
+					if ctx.Err() != nil {
+						return
+					}
 					action, err := r.GetAction(ctx, actionID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
 						continue
 					}
-					updates <- action
+					select {
+					case updates <- action:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
