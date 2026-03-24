@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ENDPOINT="${ENDPOINT:-http://localhost:8090}"
-ORG="${ORG:-testorg}"
+ORG="${ORG:-localhost}"
 PROJECT="${PROJECT:-testproject}"
 DOMAIN="${DOMAIN:-development}"
 RUN_NAME="${RUN_NAME:?Error: RUN_NAME environment variable is required}"
