@@ -8,7 +8,9 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -17,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
@@ -219,4 +222,43 @@ func TestExtractTaskCacheKey(t *testing.T) {
 	t.Run("returns empty for non-task action", func(t *testing.T) {
 		assert.Empty(t, extractTaskCacheKey(&actions.Action{}))
 	})
+}
+
+func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
+	taskAction := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	applyRunSpecToTaskAction(taskAction, &task.RunSpec{
+		Envs: &task.Envs{
+			Values: []*core.KeyValuePair{
+				{Key: "TRACE_ID", Value: "abc123"},
+			},
+		},
+		Interruptible: wrapperspb.Bool(true),
+		Labels: &task.Labels{
+			Values: map[string]string{
+				"flyte.org/run": "should-not-override",
+				"team":          "platform",
+			},
+		},
+		Annotations: &task.Annotations{
+			Values: map[string]string{
+				"owner": "sdk",
+			},
+		},
+	})
+
+	require.NotNil(t, taskAction.Spec.Interruptible)
+	assert.True(t, *taskAction.Spec.Interruptible)
+	assert.Len(t, taskAction.Spec.EnvVars, 1)
+	assert.Equal(t, "abc123", taskAction.Spec.EnvVars["TRACE_ID"])
+	assert.Equal(t, "run1", taskAction.Labels["flyte.org/run"])
+	assert.Equal(t, "platform", taskAction.Labels["team"])
+	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 }
