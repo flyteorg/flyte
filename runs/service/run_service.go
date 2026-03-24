@@ -305,15 +305,6 @@ func (s *RunService) GetRunDetails(
 		RunSpec: extractRunSpec(run.ActionSpec),
 		Action:  actionDetails,
 	}
-	cacheStatusStr, err := s.repo.ActionRepo().GetActionState(ctx, rootActionID)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get cache status: %v", err)
-		return nil, connect.NewError(connect.CodeNotFound, err)
-	}
-
-	cacheStatusVal := core.CatalogCacheStatus(core.CatalogCacheStatus_value[cacheStatusStr])
-
-	details.Action.Status.CacheStatus = cacheStatusVal
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
 	return connect.NewResponse(&workflow.GetRunDetailsResponse{Details: details}), nil
@@ -1153,9 +1144,10 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
 	status := &workflow.ActionStatus{
-		Phase:     common.ActionPhase(action.Phase),
-		StartTime: timestamppb.New(action.CreatedAt),
-		Attempts:  action.Attempts,
+		Phase:       common.ActionPhase(action.Phase),
+		StartTime:   timestamppb.New(action.CreatedAt),
+		Attempts:    action.Attempts,
+		CacheStatus: action.CacheStatus,
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)

@@ -147,7 +147,6 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 		Spec:   taskSpecBytes,
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, rootActionID, 500).Return([]*models.ActionEvent{}, nil)
-	actionRepo.On("GetActionState", mock.Anything, rootActionID).Return("CACHE_DISABLED", nil)
 
 	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
 		RunId: runID,
@@ -157,6 +156,64 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	require.NotNil(t, resp.Msg.Details.Action)
 	require.NotNil(t, resp.Msg.Details.Action.GetTask())
 	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+}
+
+func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	runModel := &models.Run{
+		Org:         runID.Org,
+		Project:     runID.Project,
+		Domain:      runID.Domain,
+		RunName:     runID.Name,
+		Name:        runID.Name,
+		Phase:       int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType:  int32(workflow.ActionType_ACTION_TYPE_TASK),
+		Attempts:    1,
+		CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
+	}
+
+	now := time.Now()
+	event := &workflow.ActionEvent{
+		Id:          rootActionID,
+		Attempt:     1,
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		Version:     1,
+		UpdatedTime: timestamppb.New(now),
+	}
+	eventModel, _ := models.NewActionEventModel(event)
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, rootActionID, 500).Return([]*models.ActionEvent{eventModel}, nil)
+
+	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Details)
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Msg.Details.Action.Status.GetCacheStatus())
 }
 
 func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
