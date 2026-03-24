@@ -119,7 +119,6 @@ jobs:
           push: true
 
   build-and-push-sandbox-bundled-image:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     needs: [build-and-push-single-binary-image]
     steps:
@@ -163,6 +162,7 @@ jobs:
           docker pull --platform linux/arm64 ghcr.io/flyteorg/flyte-client-v2:latest
           docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/sandbox-bundled/images/tar/arm64/flyte-client-v2.tar
       - name: Build and push multi-arch image
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/sandbox-bundled
