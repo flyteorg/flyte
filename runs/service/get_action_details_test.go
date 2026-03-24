@@ -196,12 +196,13 @@ func TestGetActionDetails_FailedActionSetsErrorInfo(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionModel := &models.Action{
-		Org:     "test-org",
-		Project: "test-project",
-		Domain:  "test-domain",
-		RunName: "rtest12345",
-		Name:    "action-1",
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		Org:      "test-org",
+		Project:  "test-project",
+		Domain:   "test-domain",
+		RunName:  "rtest12345",
+		Name:     "action-1",
+		Phase:    int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		Attempts: 1,
 	}
 
 	now := time.Now()

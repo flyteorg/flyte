@@ -294,14 +294,16 @@ func (s *RunService) GetRunDetails(
 		Run:  req.Msg.RunId,
 		Name: run.Name,
 	}
+
+	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to build run action details: %v", err)
+		return nil, err
+	}
+
 	details := &workflow.RunDetails{
-		Action: &workflow.ActionDetails{
-			Id: rootActionID,
-			Status: &workflow.ActionStatus{
-				Phase:     common.ActionPhase(run.Phase),
-				StartTime: timestamppb.New(run.CreatedAt),
-			},
-		},
+		RunSpec: extractRunSpec(run.ActionSpec),
+		Action:  actionDetails,
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
@@ -378,6 +380,11 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 				return connect.NewError(connect.CodeInternal,
 					fmt.Errorf("unknown action type %v for action %v", action.GetMetadata().GetActionType(), actionId))
 			}
+		}
+
+		if action.Spec == nil {
+			// Fall back to the embedded ActionSpec when no spec was loaded from task table.
+			setActionDetailsSpecFromActionSpec(action, model.ActionSpec)
 		}
 
 		return nil
@@ -1137,9 +1144,10 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
 	status := &workflow.ActionStatus{
-		Phase:     common.ActionPhase(action.Phase),
-		StartTime: timestamppb.New(action.CreatedAt),
-		Attempts:  1,
+		Phase:       common.ActionPhase(action.Phase),
+		StartTime:   timestamppb.New(action.CreatedAt),
+		Attempts:    action.Attempts,
+		CacheStatus: action.CacheStatus,
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
@@ -1149,28 +1157,30 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		status.DurationMs = &durationMs
 	}
 
-	phase := common.ActionPhase(action.Phase)
-	attempt := &workflow.ActionAttempt{
-		Attempt:   1,
-		Phase:     phase,
-		StartTime: timestamppb.New(action.CreatedAt),
-	}
-	if status.EndTime != nil {
-		attempt.EndTime = status.EndTime
-	}
-	attempt.PhaseTransitions = []*workflow.PhaseTransition{{
-		Phase:     phase,
-		StartTime: timestamppb.New(action.CreatedAt),
-		EndTime:   status.EndTime,
-	}}
-
 	metadata := actionMetadataFromModel(action)
 
 	return &workflow.ActionDetails{
 		Id:       actionID,
 		Metadata: metadata,
 		Status:   status,
-		Attempts: []*workflow.ActionAttempt{attempt},
+	}
+}
+
+func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionSpecBytes []byte) {
+	specMsg := extractActionSpec(actionSpecBytes)
+	if specMsg == nil {
+		return
+	}
+
+	switch s := specMsg.Spec.(type) {
+	case *workflow.ActionSpec_Task:
+		if s.Task.GetSpec() != nil {
+			details.Spec = &workflow.ActionDetails_Task{Task: s.Task.GetSpec()}
+		}
+	case *workflow.ActionSpec_Trace:
+		if s.Trace.GetSpec() != nil {
+			details.Spec = &workflow.ActionDetails_Trace{Trace: s.Trace.GetSpec()}
+		}
 	}
 }
 
@@ -1228,6 +1238,30 @@ func extractStorageURIs(specBytes []byte) (inputURI, runOutputBase string) {
 		return
 	}
 	return spec.GetInputUri(), spec.GetRunOutputBase()
+}
+
+// extractRunSpec parses ActionSpec JSON to extract the RunSpec
+func extractActionSpec(specProto []byte) *workflow.ActionSpec {
+	if len(specProto) == 0 {
+		return nil
+	}
+	var specMsg workflow.ActionSpec
+	if err := json.Unmarshal(specProto, &specMsg); err != nil {
+		return nil
+	}
+	return &specMsg
+}
+
+// extractRunSpec parses ActionSpec JSON to extract the RunSpec
+func extractRunSpec(specProto []byte) *task.RunSpec {
+	if len(specProto) == 0 {
+		return nil
+	}
+	spec := extractActionSpec(specProto)
+	if spec == nil {
+		return nil
+	}
+	return spec.RunSpec
 }
 
 // Helper functions
