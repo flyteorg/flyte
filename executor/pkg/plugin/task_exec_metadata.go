@@ -54,6 +54,7 @@ type taskExecutionMetadata struct {
 	maxAttempts     uint32
 	overrides       pluginsCore.TaskOverrides
 	envVars         map[string]string
+	interruptible   bool
 	securityContext *core.SecurityContext
 }
 
@@ -81,6 +82,11 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		"RUN_NAME":    ta.Spec.RunName,
 		"_U_ORG_NAME": ta.Spec.Org,
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
+	}
+	for key, value := range ta.Spec.EnvVars {
+		if _, exists := envVars[key]; !exists {
+			envVars[key] = value
+		}
 	}
 	generatedName := buildGeneratedName(ta)
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
@@ -118,6 +124,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
+		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
 		securityContext: securityContext,
 	}, nil
 }
@@ -198,7 +205,7 @@ func (m *taskExecutionMetadata) GetLabels() map[string]string               { re
 func (m *taskExecutionMetadata) GetAnnotations() map[string]string          { return m.annotations }
 func (m *taskExecutionMetadata) GetMaxAttempts() uint32                     { return m.maxAttempts }
 func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return "" }
-func (m *taskExecutionMetadata) IsInterruptible() bool                      { return false }
+func (m *taskExecutionMetadata) IsInterruptible() bool                      { return m.interruptible }
 func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32    { return 0 }
 func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string { return m.envVars }
 func (m *taskExecutionMetadata) GetConsoleURL() string                      { return "" }
