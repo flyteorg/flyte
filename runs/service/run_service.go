@@ -1336,10 +1336,20 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 			Run:  runID,
 			Name: run.Name,
 		},
-		Metadata: &workflow.ActionMetadata{},
+		Metadata: actionMetadataFromModel(run),
 		Status: &workflow.ActionStatus{
-			Phase: common.ActionPhase(run.Phase),
+			Phase:       common.ActionPhase(run.Phase),
+			StartTime:   timestamppb.New(run.CreatedAt),
+			Attempts:    run.Attempts,
+			CacheStatus: run.CacheStatus,
 		},
+	}
+	if run.EndedAt.Valid {
+		action.Status.EndTime = timestamppb.New(run.EndedAt.Time)
+	}
+	if run.DurationMs.Valid && run.DurationMs.Int64 >= 0 {
+		ms := uint64(run.DurationMs.Int64)
+		action.Status.DurationMs = &ms
 	}
 
 	var actionDetails workflow.ActionDetails
@@ -1356,7 +1366,9 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		if actionDetails.Status.EndTime != nil {
 			action.Status.EndTime = actionDetails.Status.EndTime
 		}
-		if action.Status.StartTime != nil && action.Status.EndTime != nil {
+		if actionDetails.Status.DurationMs != nil {
+			action.Status.DurationMs = actionDetails.Status.DurationMs
+		} else if action.Status.StartTime != nil && action.Status.EndTime != nil {
 			ms := uint64(action.Status.EndTime.AsTime().Sub(action.Status.StartTime.AsTime()).Milliseconds())
 			action.Status.DurationMs = &ms
 		}
