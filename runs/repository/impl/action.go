@@ -2,19 +2,24 @@ package impl
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/lib/pq"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"google.golang.org/protobuf/proto"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -24,6 +29,7 @@ import (
 type actionRepo struct {
 	db         *gorm.DB
 	isPostgres bool
+	pgConfig   database.PostgresConfig
 	listener   *pq.Listener
 
 	// Subscriber management for LISTEN/NOTIFY
@@ -33,7 +39,7 @@ type actionRepo struct {
 }
 
 // NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
+func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
@@ -41,6 +47,7 @@ func NewActionRepo(db *gorm.DB) interfaces.ActionRepo {
 	repo := &actionRepo{
 		db:                db,
 		isPostgres:        isPostgres,
+		pgConfig:          dbConfig.Postgres,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
@@ -72,7 +79,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
-		InputUri:         inputUri,
+		InputUri:         inputUri + "/inputs.pb",
 		RunOutputBase:    runOutputBase,
 	}
 
@@ -92,22 +99,75 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		}
 	}
 
-	// Serialize the ActionSpec to JSON
-	actionSpecBytes, err := json.Marshal(actionSpec)
+	// Serialize the ActionSpec to binary protobuf
+	actionSpecBytes, err := proto.Marshal(actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
 	}
+
+	// Build RunInfo with storage URIs and task spec digest
+	info := &workflow.RunInfo{
+		InputsUri: inputUri,
+	}
+
+	// Store task spec separately and record its digest
+	if taskSpec := actionSpec.GetTask().GetSpec(); taskSpec != nil {
+		taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create task spec model: %w", err)
+		}
+		if taskSpecModel != nil {
+			if err := r.db.WithContext(ctx).
+				Clauses(clause.OnConflict{DoNothing: true}).
+				Create(taskSpecModel).Error; err != nil {
+				logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", err)
+			} else {
+				info.TaskSpecDigest = taskSpecModel.Digest
+			}
+		}
+	}
+
+	detailedInfo, err := proto.Marshal(info)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal run info: %w", err)
+	}
+
+	// Marshal RunSpec if present
+	var runSpecBytes []byte
+	if req.RunSpec != nil {
+		runSpecBytes, err = proto.Marshal(req.RunSpec)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal run spec: %w", err)
+		}
+	}
+
+	// Extract metadata columns from action spec
+	meta := extractActionMetadata(actionSpec)
 
 	// Create root action (represents the run)
 	run := &models.Run{
 		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
+		RunName:          runID.Name,
 		Name:             runID.Name,
-		ParentActionName: nil, // NULL for root actions/runs
+		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionSpec:       datatypes.JSON(actionSpecBytes),
-		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
+		ActionType:       meta.ActionType,
+		TaskOrg:          meta.TaskOrg,
+		TaskProject:      meta.TaskProject,
+		TaskDomain:       meta.TaskDomain,
+		TaskName:         meta.TaskName,
+		TaskVersion:      meta.TaskVersion,
+		TaskType:         meta.TaskType,
+		TaskShortName:    meta.TaskShortName,
+		FunctionName:     meta.FunctionName,
+		EnvironmentName:  meta.EnvironmentName,
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"), // Empty details initially
+		DetailedInfo:     detailedInfo,
+		RunSpec:          runSpecBytes,
+		Attempts:         1,
 	}
 
 	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
@@ -156,10 +216,20 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 			scope.ProjectId.Organization, scope.ProjectId.Name, scope.ProjectId.Domain)
 	}
 
-	// Apply pagination
+	// Apply pagination according to token and limit from requests.
 	limit := 50
-	if req.Request != nil && req.Request.Limit > 0 {
-		limit = int(req.Request.Limit)
+	if req.Request != nil {
+		if req.Request.Token != "" {
+			tokenID, err := strconv.ParseUint(req.Request.Token, 10, 64)
+			if err != nil {
+				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
+			}
+			query = query.Where("id < ?", tokenID)
+		}
+
+		if req.Request.Limit > 0 {
+			limit = int(req.Request.Limit)
+		}
 	}
 
 	var runs []*models.Run
@@ -217,29 +287,61 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		Create(&events).Error
 }
 
+// ListEvents lists action events for a given action identifier.
+func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Order("attempt ASC, phase ASC, version ASC").
+		Limit(limit).
+		Find(&events)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list action events: %w", result.Error)
+	}
+	return events, nil
+}
+
 // CreateAction creates a new action
-func (r *actionRepo) CreateAction(ctx context.Context, runID uint, actionSpec *workflow.ActionSpec) (*models.Action, error) {
+func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
 	// Serialize action spec
-	actionSpecBytes, err := json.Marshal(actionSpec)
+	actionSpecBytes, err := proto.Marshal(actionSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
 	}
 
 	// Determine parent action name
-	var parentActionName *string
+	var parentActionName string
 	if actionSpec.ParentActionName != nil {
-		parentActionName = actionSpec.ParentActionName
+		parentActionName = *actionSpec.ParentActionName
 	}
+
+	// Extract metadata columns from action spec
+	meta := extractActionMetadata(actionSpec)
 
 	action := &models.Action{
 		Org:              actionSpec.ActionId.Run.Org,
 		Project:          actionSpec.ActionId.Run.Project,
 		Domain:           actionSpec.ActionId.Run.Domain,
+		RunName:          actionSpec.ActionId.Run.Name,
 		Name:             actionSpec.ActionId.Name,
-		ParentActionName: parentActionName,
+		ParentActionName: newNullString(parentActionName),
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionSpec:       datatypes.JSON(actionSpecBytes),
-		ActionDetails:    datatypes.JSON([]byte("{}")), // Empty details initially
+		ActionType:       meta.ActionType,
+		ActionGroup:      newNullString(actionSpec.GetGroup()),
+		TaskOrg:          meta.TaskOrg,
+		TaskProject:      meta.TaskProject,
+		TaskDomain:       meta.TaskDomain,
+		TaskName:         meta.TaskName,
+		TaskVersion:      meta.TaskVersion,
+		TaskType:         meta.TaskType,
+		TaskShortName:    meta.TaskShortName,
+		FunctionName:     meta.FunctionName,
+		EnvironmentName:  meta.EnvironmentName,
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"), // Empty details initially
+		DetailedInfo:     detailedInfo,
+		Attempts:         1,
 	}
 
 	result := r.db.WithContext(ctx).
@@ -291,9 +393,8 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	}
 
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ?",
-							runID.Org, runID.Project, runID.Domain).
-		Where("parent_action_name IS NOT NULL") // Exclude the root action/run itself
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
+			runID.Org, runID.Project, runID.Domain, runID.Name)
 
 	// Apply pagination token
 	if token != "" {
@@ -322,16 +423,32 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
-func (r *actionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, endTime *time.Time) error {
+func (r *actionRepo) UpdateActionPhase(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	phase common.ActionPhase,
+	attempts uint32,
+	cacheStatus core.CatalogCacheStatus,
+	endTime *time.Time,
+) error {
 	updates := map[string]interface{}{
-		"phase":      phase,
-		"updated_at": time.Now(),
+		"phase":        phase,
+		"attempts":     attempts,
+		"cache_status": cacheStatus,
+		"updated_at":   time.Now(),
 	}
 	if endTime != nil {
-		// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-		// K8s timestamps have second-level precision while created_at has microsecond
-		// precision, so for very fast tasks ended_at can appear before created_at.
-		updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+		if r.isPostgres {
+			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
+			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			updates["duration_ms"] = gorm.Expr(
+				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+		} else {
+			// SQLite: use MAX() and compute duration via strftime
+			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			updates["duration_ms"] = gorm.Expr(
+				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+		}
 	}
 
 	result := r.db.WithContext(ctx).
@@ -395,7 +512,7 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 	// Store state in ActionDetails JSON
 	// For now, we'll replace the entire ActionDetails with the state
 	// In a full implementation, we'd merge it with existing ActionDetails
-	updates["action_details"] = datatypes.JSON([]byte(state))
+	updates["action_details"] = []byte(state)
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
@@ -684,15 +801,10 @@ func (r *actionRepo) startPostgresListener() {
 		return
 	}
 
-	// Build connection string from the existing connection
-	// This is a simplified approach - in production, get from config
-	row = sqlDB.QueryRow("SHOW server_version")
-	var version string
-	_ = row.Scan(&version) // Ignore error, just need a connection
-
-	// Create listener with a simple connection string
-	// In production, get this from the database config
-	connStr = "user=postgres password=mysecretpassword host=localhost port=5432 dbname=" + dbName + " sslmode=disable"
+	// Build connection string from the database config
+	pgCfg := r.pgConfig
+	pgCfg.DbName = dbName
+	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
@@ -768,8 +880,8 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 	payload := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 
 	// Execute NOTIFY
-	sql := fmt.Sprintf("NOTIFY run_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(sql).Error; err != nil {
+	notifySQL := fmt.Sprintf("NOTIFY run_updates, '%s'", payload)
+	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
 		logger.Errorf(ctx, "Failed to NOTIFY run_updates: %v", err)
 	}
 }
@@ -816,8 +928,69 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
 	// Execute NOTIFY
-	sql := fmt.Sprintf("NOTIFY action_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(sql).Error; err != nil {
+	notifySQL := fmt.Sprintf("NOTIFY action_updates, '%s'", payload)
+	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
 		logger.Errorf(ctx, "Failed to NOTIFY action_updates: %v", err)
 	}
+}
+
+// actionMeta holds metadata columns extracted from an ActionSpec.
+type actionMeta struct {
+	ActionType      int32
+	TaskOrg         sql.NullString
+	TaskProject     sql.NullString
+	TaskDomain      sql.NullString
+	TaskName        sql.NullString
+	TaskVersion     sql.NullString
+	TaskType        string
+	TaskShortName   sql.NullString
+	FunctionName    string
+	EnvironmentName sql.NullString
+}
+
+func newNullString(s string) sql.NullString {
+	if s == "" {
+		return sql.NullString{}
+	}
+	return sql.NullString{String: s, Valid: true}
+}
+
+// extractActionMetadata extracts metadata columns from an ActionSpec proto.
+func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
+	var m actionMeta
+	switch s := spec.GetSpec().(type) {
+	case *workflow.ActionSpec_Task:
+		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
+		// TaskAction.Id takes precedence; fall back to TaskTemplate.Id
+		if id := s.Task.GetId(); id != nil {
+			m.TaskOrg = newNullString(id.GetOrg())
+			m.TaskProject = newNullString(id.GetProject())
+			m.TaskDomain = newNullString(id.GetDomain())
+			m.TaskName = newNullString(id.GetName())
+			m.TaskVersion = newNullString(id.GetVersion())
+			m.FunctionName = id.GetName()
+			m.TaskShortName = newNullString(id.GetName())
+		} else if tmplID := s.Task.GetSpec().GetTaskTemplate().GetId(); tmplID != nil {
+			m.TaskOrg = newNullString(tmplID.GetOrg())
+			m.TaskProject = newNullString(tmplID.GetProject())
+			m.TaskDomain = newNullString(tmplID.GetDomain())
+			m.TaskName = newNullString(tmplID.GetName())
+			m.TaskVersion = newNullString(tmplID.GetVersion())
+			m.FunctionName = tmplID.GetName()
+			m.TaskShortName = newNullString(tmplID.GetName())
+		}
+		if taskSpec := s.Task.GetSpec(); taskSpec != nil {
+			m.TaskType = taskSpec.GetTaskTemplate().GetType()
+			if taskSpec.GetShortName() != "" {
+				m.TaskShortName = newNullString(taskSpec.GetShortName())
+			}
+			if env := taskSpec.GetEnvironment(); env != nil && env.GetName() != "" {
+				m.EnvironmentName = newNullString(env.GetName())
+			}
+		}
+	case *workflow.ActionSpec_Trace:
+		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
+		m.FunctionName = s.Trace.GetName()
+	}
+	return m
 }

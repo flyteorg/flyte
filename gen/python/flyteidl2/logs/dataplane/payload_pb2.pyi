@@ -79,18 +79,20 @@ class ContainerIdentifier(_message.Message):
     def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ...) -> None: ...
 
 class ContainerSelector(_message.Message):
-    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name_prefix", "kubernetes_container_name", "kubernetes_pod_label_selector"]
+    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name_prefix", "kubernetes_container_name", "kubernetes_pod_label_selector", "node_name"]
     CLUSTER_NAME_FIELD_NUMBER: _ClassVar[int]
     KUBERNETES_NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     KUBERNETES_POD_NAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
     KUBERNETES_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
     KUBERNETES_POD_LABEL_SELECTOR_FIELD_NUMBER: _ClassVar[int]
+    NODE_NAME_FIELD_NUMBER: _ClassVar[int]
     cluster_name: str
     kubernetes_namespace: str
     kubernetes_pod_name_prefix: str
     kubernetes_container_name: str
     kubernetes_pod_label_selector: str
-    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name_prefix: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., kubernetes_pod_label_selector: _Optional[str] = ...) -> None: ...
+    node_name: str
+    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name_prefix: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., kubernetes_pod_label_selector: _Optional[str] = ..., node_name: _Optional[str] = ...) -> None: ...
 
 class LiveLogsOptions(_message.Message):
     __slots__ = ["log_pod_status", "log_timestamps"]

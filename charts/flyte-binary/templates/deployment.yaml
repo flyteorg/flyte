@@ -138,6 +138,8 @@ spec:
           ports:
             - name: http
               containerPort: 8090
+            - name: webhook
+              containerPort: 9443
           {{- if .Values.deployment.startupProbe }}
           startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
           {{- end }}
@@ -172,6 +174,9 @@ spec:
             {{- end }}
             - name: config
               mountPath: /etc/flyte/config.d
+            - name: webhook-certs
+              mountPath: /var/run/flyte/certs
+              readOnly: false
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
@@ -210,6 +215,8 @@ spec:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
             {{- end }}
           {{- end }}
+        - name: webhook-certs
+          emptyDir: {}
         {{- if .Values.deployment.extraVolumes }}
         {{- tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
         {{- end }}

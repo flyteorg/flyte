@@ -64,63 +64,71 @@ sep:
 # Local Tool Commands (require buf, go, cargo, uv installed locally)
 # =============================================================================
 
+# Helper to time a step: $(call timed,step_name,command)
+define timed
+	@start=$$(date +%s); \
+	$(2); \
+	elapsed=$$((  $$(date +%s) - $$start )); \
+	echo "⏱  $(1) completed in $${elapsed}s"
+endef
+
 .PHONY: buf-dep
 buf-dep:
 	@echo '📦  Updating buf modules (local)'
-	buf dep update
+	$(call timed,buf-dep,buf dep update)
 	@$(MAKE) sep
 
 .PHONY: buf-format
 buf-format:
 	@echo 'Running buf format (local)'
-	buf format -w
+	$(call timed,buf-format,buf format -w)
 	@$(MAKE) sep
 
 .PHONY: buf-lint
 buf-lint:
 	@echo '🧹  Linting protocol buffer files (local)'
-	buf lint --exclude-path flytestdlib/
+	$(call timed,buf-lint,buf lint --exclude-path flytestdlib/)
 	@$(MAKE) sep
 
 .PHONY: buf-ts
 buf-ts:
 	@echo '🟦  Generating TypeScript protocol buffer files (local)'
-	buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/
-	@cp -r flyteidl2/gen_utils/ts/* gen/ts/
-	@echo '📦  Installing TypeScript dependencies'
-	@cd gen/ts && npm install --silent
-	@echo '✅  TypeScript generation complete'
+	$(call timed,buf-ts,buf generate --clean --template buf.gen.ts.yaml --exclude-path flytestdlib/ && \
+		cp -r flyteidl2/gen_utils/ts/* gen/ts/ && \
+		echo '📦  Installing TypeScript dependencies' && \
+		cd gen/ts && npm install --silent && \
+		echo '✅  TypeScript generation complete')
 	@$(MAKE) sep
 
 .PHONY: buf-ts-check
 buf-ts-check: buf-ts
 	@echo '🔍  Type checking generated TypeScript files'
-	@cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0)
+	$(call timed,buf-ts-check,cd gen/ts && npx tsc --noEmit || (echo '⚠️  Type checking found issues (non-fatal)' && exit 0))
 	@echo '✅  Type checking complete'
 	@$(MAKE) sep
 
 .PHONY: buf-go
 buf-go:
 	@echo '🟩  Generating Go protocol buffer files (local)'
-	buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/
+	$(call timed,buf-go,buf generate --clean --template buf.gen.go.yaml --exclude-path flytestdlib/)
 	@$(MAKE) sep
 
 .PHONY: buf-rust
 buf-rust:
 	@echo '🦀  Generating Rust protocol buffer files (local)'
-	buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/
-	@cp -R flyteidl2/gen_utils/rust/* gen/rust/
-	@cd gen/rust && cargo update
+	$(call timed,buf-rust,buf generate --clean --template buf.gen.rust.yaml --exclude-path flytestdlib/ && \
+		cp -R flyteidl2/gen_utils/rust/* gen/rust/ && \
+		cd gen/rust && cargo update)
 	@$(MAKE) sep
 
 export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python:
 	@echo '🐍  Generating Python protocol buffer files (local)'
-	buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/
-	@cp flyteidl2/gen_utils/python/* gen/python/
-	@find gen/python -type d -exec touch {}/__init__.py \;
-	@cd gen/python && uv lock
+	$(call timed,buf-python,buf generate --clean --template buf.gen.python.yaml --exclude-path flytestdlib/ && \
+		cp flyteidl2/gen_utils/python/* gen/python/ && \
+		find gen/python -type d -exec touch {}/__init__.py \; && \
+		cd gen/python && uv lock)
 	@$(MAKE) sep
 
 .PHONY: buf
@@ -131,13 +139,13 @@ buf: buf-dep buf-format buf-lint buf-rust buf-python buf-go buf-ts buf-ts-check
 .PHONY: go-tidy
 go-tidy:
 	@echo '🧹  Running go mod tidy (local)'
-	@go mod tidy $(OUT_REDIRECT)
+	$(call timed,go-tidy,go mod tidy $(OUT_REDIRECT))
 	@$(MAKE) sep
 
 .PHONY: mocks
 mocks:
 	@echo "🧪  Generating go mocks (local)"
-	mockery $(OUT_REDIRECT)
+	$(call timed,mocks,mockery $(OUT_REDIRECT))
 	@$(MAKE) sep
 
 .PHONY: gen-local

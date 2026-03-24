@@ -5,9 +5,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -21,6 +23,8 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/config"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	webhookPkg "github.com/flyteorg/flyte/v2/executor/pkg/webhook"
+	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
@@ -61,12 +65,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			})
 		}
 
+		wCfg := webhookConfig.GetConfig()
 		webhookServerOptions := webhook.Options{TLSOpts: tlsOpts}
-		if len(cfg.WebhookCertPath) > 0 {
-			webhookServerOptions.CertDir = cfg.WebhookCertPath
-			webhookServerOptions.CertName = cfg.WebhookCertName
-			webhookServerOptions.KeyName = cfg.WebhookCertKey
-		}
+		webhookServerOptions.CertDir = wCfg.ExpandCertDir()
+		webhookServerOptions.CertName = webhookPkg.ServerCertKey
+		webhookServerOptions.KeyName = webhookPkg.ServerCertPrivateKey
+		webhookServerOptions.Port = wCfg.ListenPort
 
 		metricsServerOptions := metricsserver.Options{
 			BindAddress:   cfg.MetricsBindAddress,
@@ -92,6 +96,20 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 		if err != nil {
 			return fmt.Errorf("executor: failed to create controller manager: %w", err)
+		}
+
+		kubeClient, err := kubernetes.NewForConfig(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("executor: failed to create kubernetes client for webhook: %w", err)
+		}
+
+		podNamespace := os.Getenv(webhookPkg.PodNamespaceEnvVar)
+		if podNamespace == "" {
+			podNamespace = sc.Namespace
+		}
+
+		if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, promutils.NewScope("executor"), mgr); err != nil {
+			return fmt.Errorf("executor: webhook setup failed: %w", err)
 		}
 
 		dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewScope("executor:storage"))

@@ -21,6 +21,7 @@ COPY actions actions
 COPY events events
 COPY runs runs
 COPY cache_service cache_service
+COPY secret secret
 
 COPY go.mod go.sum ./
 RUN go mod download

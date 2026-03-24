@@ -8,66 +8,21 @@ import "flyteidl2/common/phase.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
 
-message RuleId {
-  // Org this rule belongs to.
-  string org = 1 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Project this rule belongs to.
-  string project = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Domain this rule belongs to.
-  string domain = 3 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Unique name of the rule.
-  string name = 4 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
-}
-
-message DeliveryConfigId {
-  // Org this rule belongs to.
-  string org = 1 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Project this rule belongs to.
-  string project = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Domain this rule belongs to.
-  string domain = 3 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Unique name of the rule.
-  string name = 4 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
-}
-
 message DeliveryConfigTemplate {
-  oneof config {
-    option (buf.validate.oneof).required = true;
+  option (buf.validate.message).cel = {
+    id: "at_least_one_required"
+    message: "at least one of the delivery options must be set"
+    expression: "has(this.webhook) || has(this.email)"
+  };
 
-    WebhookDeliveryTemplate webhook = 1;
+  WebhookDeliveryTemplate webhook = 1;
 
-    EmailDeliveryTemplate email = 2;
-  }
+  EmailDeliveryTemplate email = 2;
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_RUN_COMPLETED = 1;
 }
 
 message RunCompletedNotificationTemplateData {
@@ -120,14 +75,20 @@ message WebhookDeliveryTemplate {
   string body_template = 4; // this is a Go template that may contain placeholders
 }
 
+message EmailRecipient {
+  string name = 1;
+
+  string address = 2;
+}
+
 message EmailDeliveryTemplate {
   string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated string to = 2;
+  repeated EmailRecipient to = 2 [(buf.validate.field).repeated.min_items = 1];
 
-  repeated string cc = 3;
+  repeated EmailRecipient cc = 3;
 
-  repeated string bcc = 4;
+  repeated EmailRecipient bcc = 4;
 
   string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 

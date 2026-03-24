@@ -141,6 +141,14 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                type: integer
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.
@@ -436,6 +444,25 @@ rules:
   - update
   - watch
 - apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
   - '*'
   resources:
   - '*'
@@ -656,6 +683,12 @@ data:
     logger:
       show-source: true
       level: 5
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
 
     actions:
       kubernetes:
@@ -700,6 +733,14 @@ data:
         port: 8090
       storagePrefix: s3://flyte-data
       watchBufferSize: 100
+    secret:
+      kubernetes:
+        burst: 200
+        clusterName: flyte-sandbox
+        kubeconfig: ""
+        namespace: flyte
+        qps: 100
+        timeout: 30s
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -754,6 +795,14 @@ data:
         - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
         - _U_INSECURE: "true"
         - _U_USE_ACTIONS: "1"
+    runs:
+      database:
+        postgres:
+          dbName: runs
+          host: 'flyte-sandbox-postgresql.flyte'
+          password: postgres
+          port: 5432
+          user: postgres
     storage:
       signedURL:
         stowConfigOverride:
@@ -877,6 +926,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
@@ -886,6 +940,15 @@ data:
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.secret.SecretService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/v2"
+                                              route:
+                                                  cluster: console
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -923,6 +986,19 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-http
                                           port_value: 8090
+            - name: console
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: console
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-console
+                                          port_value: 80
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -998,7 +1074,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aVdtdG5zSVVBS05tWHdYbA==
+  haSharedSecret: MFl3cGpYMVRnUmlYNU1oYg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1079,6 +1155,28 @@ metadata:
   name: kubernetes-dashboard-key-holder
   namespace: flyte
 type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
 ---
 apiVersion: v1
 kind: Service
@@ -1247,6 +1345,27 @@ spec:
   type: NodePort
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -1348,7 +1467,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: fbf5054950812545471a284b62acc548a3d375b8a4fe4082922f2531287e771a
+        checksum/configuration: d2d832fb02faa1b1a6c7ad361090cbef8ba1af501bcd0864bf089ced0cdb19a5
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1379,6 +1498,8 @@ spec:
         ports:
         - containerPort: 8090
           name: http
+        - containerPort: 9443
+          name: webhook
         readinessProbe:
           httpGet:
             path: /healthz
@@ -1387,6 +1508,9 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config.d
           name: config
+        - mountPath: /var/run/flyte/certs
+          name: webhook-certs
+          readOnly: false
       initContainers:
       - args:
         - |
@@ -1415,6 +1539,8 @@ spec:
               name: flyte-sandbox-config-secret
           - configMap:
               name: flyte-sandbox-extra-config
+      - emptyDir: {}
+        name: webhook-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1479,6 +1605,52 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: console
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: console
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: console
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -1496,7 +1668,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: f12bb394f0db3ad82ee183411cce5147db3b5149739b981f9bef2a7190f8c8f5
+        checksum/secret: 8edf847be07c91f2f9960d6b0cc8daca0883a10b55deef8f6177fd47de11f996
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1654,8 +1826,6 @@ spec:
         helm.sh/chart: minio-12.6.7
     spec:
       affinity:
-        nodeAffinity: null
-        podAffinity: null
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - podAffinityTerm:
@@ -1666,7 +1836,13 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
-      - env:
+      - command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
+        env:
         - name: BITNAMI_DEBUG
           value: "false"
         - name: MINIO_SCHEME
@@ -1693,7 +1869,6 @@ spec:
           value: "9001"
         - name: MINIO_BROWSER_REDIRECT_URL
           value: http://localhost:30080/minio
-        envFrom: null
         image: docker.io/bitnami/minio:sandbox
         imagePullPolicy: Never
         livenessProbe:
@@ -1737,6 +1912,8 @@ spec:
         - -ec
         - |
           chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
         image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: volume-permissions

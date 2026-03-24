@@ -13,6 +13,14 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
 
+# Webhook configuration
+# localCert: true writes the generated TLS cert to disk so the webhook server can read it.
+webhook:
+  localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
+
 # Executor configuration
 executor:
   gc:
@@ -22,12 +30,14 @@ executor:
 # Runs service configuration
 runs:
   storagePrefix: "s3://flyte-data"
-
-# Database configuration (SQLite)
-database:
-  type: "sqlite"
-  sqlite:
-    file: "flyte.db"
+  database:
+    postgres:
+      host: "localhost"
+      port: 30001
+      dbName: "runs"
+      username: "postgres"
+      password: "postgres"
+      options: "sslmode=disable"
 
 # Logger configuration
 logger:

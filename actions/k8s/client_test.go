@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
@@ -132,6 +133,32 @@ func TestNotifyRunService_NilFilter(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
 }
 
+func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-4")
+	ta.Status.Attempts = 3
+	ta.Status.CacheStatus = core.CatalogCacheStatus_CACHE_HIT
+	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		status := req.Msg.GetStatus()
+		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
+			status.GetAttempts() == 3 &&
+			status.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Modified)
+
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "org",
@@ -140,13 +167,13 @@ func TestBuildTaskActionName(t *testing.T) {
 		Name:    "rabc123",
 	}
 
-	t.Run("root action uses a0-0 suffix", func(t *testing.T) {
+	t.Run("root action uses a0 suffix", func(t *testing.T) {
 		// Root: action name == run name
 		actionID := &common.ActionIdentifier{
 			Run:  runID,
 			Name: runID.Name,
 		}
-		assert.Equal(t, "rabc123-a0-0", buildTaskActionName(actionID))
+		assert.Equal(t, "rabc123-a0", buildTaskActionName(actionID))
 	})
 
 	t.Run("child action includes action name", func(t *testing.T) {
@@ -154,7 +181,7 @@ func TestBuildTaskActionName(t *testing.T) {
 			Run:  runID,
 			Name: "train",
 		}
-		assert.Equal(t, "rabc123-train-0", buildTaskActionName(actionID))
+		assert.Equal(t, "rabc123-train", buildTaskActionName(actionID))
 	})
 }
 

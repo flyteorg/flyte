@@ -16,7 +16,7 @@ from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifi
 from flyteidl2.common import phase_pb2 as flyteidl2_dot_common_dot_phase__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/notification/definition.proto\x12\x16\x66lyteidl2.notification\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1c\x66lyteidl2/common/phase.proto\"\x8d\x01\n\x06RuleId\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\"\x97\x01\n\x10\x44\x65liveryConfigId\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\"\xbd\x01\n\x16\x44\x65liveryConfigTemplate\x12K\n\x07webhook\x18\x01 \x01(\x0b\x32/.flyteidl2.notification.WebhookDeliveryTemplateH\x00R\x07webhook\x12\x45\n\x05\x65mail\x18\x02 \x01(\x0b\x32-.flyteidl2.notification.EmailDeliveryTemplateH\x00R\x05\x65mailB\x0f\n\x06\x63onfig\x12\x05\xbaH\x02\x08\x01\"\xac\x01\n$RunCompletedNotificationTemplateData\x12\x39\n\x03run\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03run\x12\x33\n\x05phase\x18\x02 \x01(\x0e\x32\x1d.flyteidl2.common.ActionPhaseR\x05phase\x12\x14\n\x05\x65rror\x18\x03 \x01(\tR\x05\x65rror\"\xd0\x02\n\x17WebhookDeliveryTemplate\x12\x1c\n\x03url\x18\x01 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xd0\x0fR\x03url\x12\x44\n\x06method\x18\x02 \x01(\x0e\x32\".flyteidl2.notification.HttpMethodB\x08\xbaH\x05\x82\x01\x02 \x00R\x06method\x12p\n\x07headers\x18\x03 \x03(\x0b\x32<.flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntryB\x18\xbaH\x15\x9a\x01\x12\x10\x14\"\x06r\x04\x10\x01\x18\x14*\x06r\x04\x10\x01\x18\x32R\x07headers\x12#\n\rbody_template\x18\x04 \x01(\tR\x0c\x62odyTemplate\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xbf\x01\n\x15\x45mailDeliveryTemplate\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\x12\x0e\n\x02to\x18\x02 \x03(\tR\x02to\x12\x0e\n\x02\x63\x63\x18\x03 \x03(\tR\x02\x63\x63\x12\x10\n\x03\x62\x63\x63\x18\x04 \x03(\tR\x03\x62\x63\x63\x12,\n\rhtml_template\x18\x05 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0chtmlTemplate\x12#\n\rtext_template\x18\x06 \x01(\tR\x0ctextTemplate*\xf7\x01\n\nHttpMethod\x12\x1b\n\x17HTTP_METHOD_UNSPECIFIED\x10\x00\x12\x13\n\x0fHTTP_METHOD_GET\x10\x01\x12\x14\n\x10HTTP_METHOD_HEAD\x10\x02\x12\x14\n\x10HTTP_METHOD_POST\x10\x03\x12\x13\n\x0fHTTP_METHOD_PUT\x10\x04\x12\x16\n\x12HTTP_METHOD_DELETE\x10\x05\x12\x17\n\x13HTTP_METHOD_CONNECT\x10\x06\x12\x17\n\x13HTTP_METHOD_OPTIONS\x10\x07\x12\x15\n\x11HTTP_METHOD_TRACE\x10\x08\x12\x15\n\x11HTTP_METHOD_PATCH\x10\tB\xe4\x01\n\x1a\x63om.flyteidl2.notificationB\x0f\x44\x65\x66initionProtoH\x02P\x01Z:github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification\xa2\x02\x03\x46NX\xaa\x02\x16\x46lyteidl2.Notification\xca\x02\x16\x46lyteidl2\\Notification\xe2\x02\"Flyteidl2\\Notification\\GPBMetadata\xea\x02\x17\x46lyteidl2::Notificationb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/notification/definition.proto\x12\x16\x66lyteidl2.notification\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1c\x66lyteidl2/common/phase.proto\"\x9e\x02\n\x16\x44\x65liveryConfigTemplate\x12I\n\x07webhook\x18\x01 \x01(\x0b\x32/.flyteidl2.notification.WebhookDeliveryTemplateR\x07webhook\x12\x43\n\x05\x65mail\x18\x02 \x01(\x0b\x32-.flyteidl2.notification.EmailDeliveryTemplateR\x05\x65mail:t\xbaHq\x1ao\n\x15\x61t_least_one_required\x12\x30\x61t least one of the delivery options must be set\x1a$has(this.webhook) || has(this.email)\"\xac\x01\n$RunCompletedNotificationTemplateData\x12\x39\n\x03run\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03run\x12\x33\n\x05phase\x18\x02 \x01(\x0e\x32\x1d.flyteidl2.common.ActionPhaseR\x05phase\x12\x14\n\x05\x65rror\x18\x03 \x01(\tR\x05\x65rror\"\xd0\x02\n\x17WebhookDeliveryTemplate\x12\x1c\n\x03url\x18\x01 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xd0\x0fR\x03url\x12\x44\n\x06method\x18\x02 \x01(\x0e\x32\".flyteidl2.notification.HttpMethodB\x08\xbaH\x05\x82\x01\x02 \x00R\x06method\x12p\n\x07headers\x18\x03 \x03(\x0b\x32<.flyteidl2.notification.WebhookDeliveryTemplate.HeadersEntryB\x18\xbaH\x15\x9a\x01\x12\x10\x14\"\x06r\x04\x10\x01\x18\x14*\x06r\x04\x10\x01\x18\x32R\x07headers\x12#\n\rbody_template\x18\x04 \x01(\tR\x0c\x62odyTemplate\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\">\n\x0e\x45mailRecipient\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n\x07\x61\x64\x64ress\x18\x02 \x01(\tR\x07\x61\x64\x64ress\"\xc1\x02\n\x15\x45mailDeliveryTemplate\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\x12@\n\x02to\x18\x02 \x03(\x0b\x32&.flyteidl2.notification.EmailRecipientB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x02to\x12\x36\n\x02\x63\x63\x18\x03 \x03(\x0b\x32&.flyteidl2.notification.EmailRecipientR\x02\x63\x63\x12\x38\n\x03\x62\x63\x63\x18\x04 \x03(\x0b\x32&.flyteidl2.notification.EmailRecipientR\x03\x62\x63\x63\x12,\n\rhtml_template\x18\x05 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0chtmlTemplate\x12#\n\rtext_template\x18\x06 \x01(\tR\x0ctextTemplate*E\n\tEventType\x12\x1a\n\x16\x45VENT_TYPE_UNSPECIFIED\x10\x00\x12\x1c\n\x18\x45VENT_TYPE_RUN_COMPLETED\x10\x01*\xf7\x01\n\nHttpMethod\x12\x1b\n\x17HTTP_METHOD_UNSPECIFIED\x10\x00\x12\x13\n\x0fHTTP_METHOD_GET\x10\x01\x12\x14\n\x10HTTP_METHOD_HEAD\x10\x02\x12\x14\n\x10HTTP_METHOD_POST\x10\x03\x12\x13\n\x0fHTTP_METHOD_PUT\x10\x04\x12\x16\n\x12HTTP_METHOD_DELETE\x10\x05\x12\x17\n\x13HTTP_METHOD_CONNECT\x10\x06\x12\x17\n\x13HTTP_METHOD_OPTIONS\x10\x07\x12\x15\n\x11HTTP_METHOD_TRACE\x10\x08\x12\x15\n\x11HTTP_METHOD_PATCH\x10\tB\xe4\x01\n\x1a\x63om.flyteidl2.notificationB\x0f\x44\x65\x66initionProtoH\x02P\x01Z:github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification\xa2\x02\x03\x46NX\xaa\x02\x16\x46lyteidl2.Notification\xca\x02\x16\x46lyteidl2\\Notification\xe2\x02\"Flyteidl2\\Notification\\GPBMetadata\xea\x02\x17\x46lyteidl2::Notificationb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,24 +24,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.notification.defi
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\032com.flyteidl2.notificationB\017DefinitionProtoH\002P\001Z:github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification\242\002\003FNX\252\002\026Flyteidl2.Notification\312\002\026Flyteidl2\\Notification\342\002\"Flyteidl2\\Notification\\GPBMetadata\352\002\027Flyteidl2::Notification'
-  _RULEID.fields_by_name['org']._options = None
-  _RULEID.fields_by_name['org']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _RULEID.fields_by_name['project']._options = None
-  _RULEID.fields_by_name['project']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _RULEID.fields_by_name['domain']._options = None
-  _RULEID.fields_by_name['domain']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _RULEID.fields_by_name['name']._options = None
-  _RULEID.fields_by_name['name']._serialized_options = b'\272H\007r\005\020\001\030\377\001'
-  _DELIVERYCONFIGID.fields_by_name['org']._options = None
-  _DELIVERYCONFIGID.fields_by_name['org']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _DELIVERYCONFIGID.fields_by_name['project']._options = None
-  _DELIVERYCONFIGID.fields_by_name['project']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _DELIVERYCONFIGID.fields_by_name['domain']._options = None
-  _DELIVERYCONFIGID.fields_by_name['domain']._serialized_options = b'\272H\006r\004\020\001\030?'
-  _DELIVERYCONFIGID.fields_by_name['name']._options = None
-  _DELIVERYCONFIGID.fields_by_name['name']._serialized_options = b'\272H\007r\005\020\001\030\377\001'
-  _DELIVERYCONFIGTEMPLATE.oneofs_by_name['config']._options = None
-  _DELIVERYCONFIGTEMPLATE.oneofs_by_name['config']._serialized_options = b'\272H\002\010\001'
+  _DELIVERYCONFIGTEMPLATE._options = None
+  _DELIVERYCONFIGTEMPLATE._serialized_options = b'\272Hq\032o\n\025at_least_one_required\0220at least one of the delivery options must be set\032$has(this.webhook) || has(this.email)'
   _RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA.fields_by_name['run']._options = None
   _RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA.fields_by_name['run']._serialized_options = b'\272H\003\310\001\001'
   _WEBHOOKDELIVERYTEMPLATE_HEADERSENTRY._options = None
@@ -54,22 +38,24 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _WEBHOOKDELIVERYTEMPLATE.fields_by_name['headers']._serialized_options = b'\272H\025\232\001\022\020\024\"\006r\004\020\001\030\024*\006r\004\020\001\0302'
   _EMAILDELIVERYTEMPLATE.fields_by_name['subject']._options = None
   _EMAILDELIVERYTEMPLATE.fields_by_name['subject']._serialized_options = b'\272H\004r\002\020\001'
+  _EMAILDELIVERYTEMPLATE.fields_by_name['to']._options = None
+  _EMAILDELIVERYTEMPLATE.fields_by_name['to']._serialized_options = b'\272H\005\222\001\002\010\001'
   _EMAILDELIVERYTEMPLATE.fields_by_name['html_template']._options = None
   _EMAILDELIVERYTEMPLATE.fields_by_name['html_template']._serialized_options = b'\272H\004r\002\020\001'
-  _globals['_HTTPMETHOD']._serialized_start=1360
-  _globals['_HTTPMETHOD']._serialized_end=1607
-  _globals['_RULEID']._serialized_start=162
-  _globals['_RULEID']._serialized_end=303
-  _globals['_DELIVERYCONFIGID']._serialized_start=306
-  _globals['_DELIVERYCONFIGID']._serialized_end=457
-  _globals['_DELIVERYCONFIGTEMPLATE']._serialized_start=460
-  _globals['_DELIVERYCONFIGTEMPLATE']._serialized_end=649
-  _globals['_RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA']._serialized_start=652
-  _globals['_RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA']._serialized_end=824
-  _globals['_WEBHOOKDELIVERYTEMPLATE']._serialized_start=827
-  _globals['_WEBHOOKDELIVERYTEMPLATE']._serialized_end=1163
-  _globals['_WEBHOOKDELIVERYTEMPLATE_HEADERSENTRY']._serialized_start=1105
-  _globals['_WEBHOOKDELIVERYTEMPLATE_HEADERSENTRY']._serialized_end=1163
-  _globals['_EMAILDELIVERYTEMPLATE']._serialized_start=1166
-  _globals['_EMAILDELIVERYTEMPLATE']._serialized_end=1357
+  _globals['_EVENTTYPE']._serialized_start=1352
+  _globals['_EVENTTYPE']._serialized_end=1421
+  _globals['_HTTPMETHOD']._serialized_start=1424
+  _globals['_HTTPMETHOD']._serialized_end=1671
+  _globals['_DELIVERYCONFIGTEMPLATE']._serialized_start=162
+  _globals['_DELIVERYCONFIGTEMPLATE']._serialized_end=448
+  _globals['_RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA']._serialized_start=451
+  _globals['_RUNCOMPLETEDNOTIFICATIONTEMPLATEDATA']._serialized_end=623
+  _globals['_WEBHOOKDELIVERYTEMPLATE']._serialized_start=626
+  _globals['_WEBHOOKDELIVERYTEMPLATE']._serialized_end=962
+  _globals['_WEBHOOKDELIVERYTEMPLATE_HEADERSENTRY']._serialized_start=904
+  _globals['_WEBHOOKDELIVERYTEMPLATE_HEADERSENTRY']._serialized_end=962
+  _globals['_EMAILRECIPIENT']._serialized_start=964
+  _globals['_EMAILRECIPIENT']._serialized_end=1026
+  _globals['_EMAILDELIVERYTEMPLATE']._serialized_start=1029
+  _globals['_EMAILDELIVERYTEMPLATE']._serialized_end=1350
 # @@protoc_insertion_point(module_scope)
