@@ -295,9 +295,15 @@ func (s *RunService) GetRunDetails(
 		Name: run.Name,
 	}
 
+	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to build run action details: %v", err)
+		return nil, err
+	}
+
 	details := &workflow.RunDetails{
 		RunSpec: extractRunSpec(run.ActionSpec),
-		Action:  s.actionModelToDetails(run, rootActionID),
+		Action:  actionDetails,
 	}
 	cacheStatusStr, err := s.repo.ActionRepo().GetActionState(ctx, rootActionID)
 	if err != nil {

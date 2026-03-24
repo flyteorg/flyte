@@ -74,19 +74,136 @@ func (m *mockActionsClient) Abort(ctx context.Context, req *connect.Request[acti
 
 func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
 
 	svc := &RunService{repo: repo, actionsClient: actionsClient}
 
 	t.Cleanup(func() {
 		repo.AssertExpectations(t)
 		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
 		actionsClient.AssertExpectations(t)
 	})
 
 	return actionRepo, actionsClient, svc
+}
+
+func TestGetRunDetails_WithTaskSpec(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	runInfo := &workflow.RunInfo{
+		TaskSpecDigest: "abc123",
+		InputsUri:      "s3://bucket/inputs.pb",
+	}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	runModel := &models.Run{
+		Org:          runID.Org,
+		Project:      runID.Project,
+		Domain:       runID.Domain,
+		RunName:      runID.Name,
+		Name:         runID.Name,
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	taskSpecProto := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Type: "python",
+		},
+	}
+	taskSpecBytes, _ := proto.Marshal(taskSpecProto)
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	taskRepo.On("GetTaskSpec", mock.Anything, "abc123").Return(&models.TaskSpec{
+		Digest: "abc123",
+		Spec:   taskSpecBytes,
+	}, nil)
+	actionRepo.On("ListEvents", mock.Anything, rootActionID, 500).Return([]*models.ActionEvent{}, nil)
+	actionRepo.On("GetActionState", mock.Anything, rootActionID).Return("CACHE_DISABLED", nil)
+
+	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Details)
+	require.NotNil(t, resp.Msg.Details.Action)
+	require.NotNil(t, resp.Msg.Details.Action.GetTask())
+	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+}
+
+func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	runInfo := &workflow.RunInfo{TaskSpecDigest: "bad-digest"}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	runModel := &models.Run{
+		Org:          runID.Org,
+		Project:      runID.Project,
+		Domain:       runID.Domain,
+		RunName:      runID.Name,
+		Name:         runID.Name,
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
+	actionRepo.On("ListEvents", mock.Anything, &common.ActionIdentifier{Run: runID, Name: runID.Name}, 500).Return([]*models.ActionEvent{}, nil)
+
+	_, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	assert.Error(t, err)
 }
 
 func TestAbortRun(t *testing.T) {
