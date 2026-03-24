@@ -141,8 +141,8 @@ func TestTailLogs_PodNotFound(t *testing.T) {
 
 	err := streamer.TailLogs(context.Background(), logCtx, nil)
 	require.Error(t, err)
-	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
-	assert.Contains(t, err.Error(), "failed to get pod")
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	assert.Contains(t, err.Error(), "not found")
 }
 
 func TestTailLogs_FollowSetBasedOnPodPhase(t *testing.T) {

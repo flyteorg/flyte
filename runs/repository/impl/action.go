@@ -281,9 +281,31 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	if len(events) == 0 {
 		return nil
 	}
-	return r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(&events).Error
+		Create(&events).Error; err != nil {
+		return err
+	}
+
+	// Notify subscribers so watchers see new events (e.g. log context becoming available).
+	notified := make(map[string]bool)
+	for _, e := range events {
+		actionID := &common.ActionIdentifier{
+			Run: &common.RunIdentifier{
+				Org:     e.Org,
+				Project: e.Project,
+				Domain:  e.Domain,
+				Name:    e.RunName,
+			},
+			Name: e.Name,
+		}
+		key := e.Org + "/" + e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
+		if !notified[key] {
+			r.notifyActionUpdate(ctx, actionID)
+			notified[key] = true
+		}
+	}
+	return nil
 }
 
 // ListEvents lists action events for a given action identifier.
@@ -604,10 +626,17 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 				if notifPayload == runKey {
 					run, err := r.GetRun(ctx, runID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						errs <- err
 						return
 					}
-					updates <- run
+					select {
+					case updates <- run:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -676,12 +705,22 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 					Name:    parts[3],
 				}
 
+				if ctx.Err() != nil {
+					return
+				}
 				run, err := r.GetRun(ctx, runID)
 				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
 					logger.Errorf(ctx, "Failed to get run from notification: %v", err)
 					continue
 				}
-				updates <- run
+				select {
+				case updates <- run:
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	} else {
@@ -765,12 +804,22 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 						Run:  runID,
 						Name: actionName,
 					}
+					if ctx.Err() != nil {
+						return
+					}
 					action, err := r.GetAction(ctx, actionID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
 						continue
 					}
-					updates <- action
+					select {
+					case updates <- action:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
