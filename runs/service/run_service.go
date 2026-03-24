@@ -325,15 +325,19 @@ func (s *RunService) GetActionDetails(
 }
 
 func (s *RunService) getActionDetails(ctx context.Context, actionId *common.ActionIdentifier) (*workflow.ActionDetails, error) {
-	// Get action and task spec
+	model, err := s.repo.ActionRepo().GetAction(ctx, actionId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+	}
+	return s.buildActionDetails(ctx, model, actionId)
+}
+
+// buildActionDetails enriches a pre-fetched action model with task spec and attempts.
+func (s *RunService) buildActionDetails(ctx context.Context, model *models.Action, actionId *common.ActionIdentifier) (*workflow.ActionDetails, error) {
+	// Get task spec and attempts in parallel
 	var action *workflow.ActionDetails
 	var eg errgroup.Group
 	eg.Go(func() error {
-		model, err := s.repo.ActionRepo().GetAction(ctx, actionId)
-		if err != nil {
-			return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
-		}
-
 		var info *workflow.RunInfo
 		if len(model.DetailedInfo) > 0 {
 			info = &workflow.RunInfo{}
@@ -889,8 +893,14 @@ func (s *RunService) WatchActionDetails(
 			if updated.Name != actionID.Name {
 				continue
 			}
+			// Reuse the already-fetched action model from WatchActionUpdates
+			details, err := s.buildActionDetails(ctx, updated, actionID)
+			if err != nil {
+				logger.Errorf(ctx, "failed to get action details for action %s: %v", actionID.Name, err)
+				return connect.NewError(connect.CodeInternal, err)
+			}
 			if err := stream.Send(&workflow.WatchActionDetailsResponse{
-				Details: s.actionModelToDetails(updated, actionID),
+				Details: details,
 			}); err != nil {
 				return err
 			}
