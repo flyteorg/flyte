@@ -128,6 +128,13 @@ jobs:
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
+      - name: Save console image tarballs
+        run: |
+          mkdir -p docker/sandbox-bundled/images/tar/amd64 docker/sandbox-bundled/images/tar/arm64
+          docker pull --platform linux/amd64 ghcr.io/flyteorg/flyte-client-v2:latest
+          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/sandbox-bundled/images/tar/amd64/flyte-client-v2.tar
+          docker pull --platform linux/arm64 ghcr.io/flyteorg/flyte-client-v2:latest
+          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/sandbox-bundled/images/tar/arm64/flyte-client-v2.tar
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
