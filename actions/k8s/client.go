@@ -141,6 +141,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
+	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 	// Embed the inline TaskTemplate if present.
 	if err := embedTaskTemplate(action, taskAction); err != nil {
@@ -189,8 +190,7 @@ func (c *ActionsClient) GetState(ctx context.Context, actionID *common.ActionIde
 	return taskAction.Status.StateJSON, nil
 }
 
-// PutState updates the state JSON for a TaskAction.
-// attempt and status are accepted for future use (e.g. recording to RunService).
+// PutState updates the state JSON and latest attempt metadata for a TaskAction.
 func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, stateJSON string) error {
 	taskActionName := buildTaskActionName(actionID)
 
@@ -210,6 +210,10 @@ func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIde
 
 	// Update state JSON
 	taskAction.Status.StateJSON = stateJSON
+	if status != nil {
+		taskAction.Status.Attempts = status.GetAttempts()
+		taskAction.Status.CacheStatus = status.GetCacheStatus()
+	}
 
 	// Update status subresource
 	if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
@@ -499,7 +503,9 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		statusReq := &workflow.UpdateActionStatusRequest{
 			ActionId: update.ActionID,
 			Status: &workflow.ActionStatus{
-				Phase: update.Phase,
+				Phase:       update.Phase,
+				Attempts:    taskAction.Status.Attempts,
+				CacheStatus: taskAction.Status.CacheStatus,
 			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
@@ -548,15 +554,14 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.
-// For root actions (where action name == run name), the name is <run-id>-a0-0.
-// For child actions, the name is <run-id>-<action-id>-0.
-// The trailing "0" is the attempt number (0-indexed; hardcoded until retry support is added).
+// For root actions (where action name == run name), the name is <run-id>-a0.
+// For child actions, the name is <run-id>-<action-id>.
 func buildTaskActionName(actionID *common.ActionIdentifier) string {
 	isRoot := actionID.Name == actionID.Run.Name
 	if isRoot {
-		return fmt.Sprintf("%s-a0-0", actionID.Run.Name)
+		return fmt.Sprintf("%s-a0", actionID.Run.Name)
 	}
-	return fmt.Sprintf("%s-%s-0", actionID.Run.Name, actionID.Name)
+	return fmt.Sprintf("%s-%s", actionID.Run.Name, actionID.Name)
 }
 
 // buildNamespace returns the Kubernetes namespace for a run: "<project>-<domain>".
@@ -598,6 +603,19 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	}
 
 	return actionSpec
+}
+
+func extractTaskCacheKey(action *actions.Action) string {
+	taskSpec, ok := action.Spec.(*actions.Action_Task)
+	if !ok || taskSpec.Task == nil {
+		return ""
+	}
+
+	if taskSpec.Task.CacheKey == nil {
+		return ""
+	}
+
+	return taskSpec.Task.CacheKey.Value
 }
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.

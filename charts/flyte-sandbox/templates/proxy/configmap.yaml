@@ -81,6 +81,12 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             {{- end }}
+                                            {{- if .Values.sandbox.console.enabled }}
+                                            - match:
+                                                  prefix: "/v2"
+                                              route:
+                                                  cluster: console
+                                            {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
                                                   path: "/kubernetes-dashboard"
@@ -127,6 +133,21 @@ data:
                                           address: {{ include "flyte-sandbox.localHeadlessService" . }}
                                           {{- end }}
                                           port_value: 8090
+            {{- end }}
+            {{- if .Values.sandbox.console.enabled }}
+            - name: console
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: console
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: {{ include "flyte-sandbox.fullname" . }}-console
+                                          port_value: 80
             {{- end }}
             {{- if index .Values "kubernetes-dashboard" "enabled" }}
             - name: kubernetes-dashboard

@@ -82,6 +82,7 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
+	Catalog         catalog.Client
 	eventsClient    workflowconnect.EventsProxyServiceClient
 	cluster         string
 }
@@ -184,12 +185,31 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	// Invoke plugin.Handle
-	transition, err := p.Handle(ctx, tCtx)
+	// cacheShortCircuited is true when cache handling already decided the outcome,
+	// either via cache hit or waiting on the reservation owner.
+	var cacheShortCircuited bool
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	if err != nil {
-		logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
-			"Plugin %q Handle failed: %v", p.GetID(), err)
+		logger.Error(err, "cache pre-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+	// Even when cache handling short-circuits execution, we still continue through the
+	// shared reconcile tail below so the derived transition updates conditions, status,
+	// and emitted action events in the same way as the normal plugin path.
+
+	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	if !cacheShortCircuited {
+		transition, err = p.Handle(ctx, tCtx)
+		if err != nil {
+			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
+			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+				"Plugin %q Handle failed: %v", p.GetID(), err)
+			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		}
+	}
+
+	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
+		logger.Error(err, "cache post-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
@@ -211,6 +231,8 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
 	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	taskAction.Status.Attempts = observedAttempts(taskAction)
+	taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
@@ -290,6 +312,14 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
+	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to build cache config for finalization cleanup")
+	} else if ok {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
+			logger.Error(err, "failed to release cache reservation during finalization cleanup")
+		}
+	}
+
 	return r.removeFinalizer(ctx, taskAction)
 }
 
@@ -358,7 +388,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 
 	event := &workflow.ActionEvent{
 		Id:            actionID,
-		Attempt:       1, // TODO(nary): wire retry attempt once retry state is available in executor status.
+		Attempt:       observedAttempts(taskAction),
 		Phase:         phaseToActionPhase(phaseInfo.Phase()),
 		Version:       phaseInfo.Version(),
 		UpdatedTime:   updatedTime,
@@ -372,10 +402,25 @@ func (r *TaskActionReconciler) buildActionEvent(
 	if info != nil {
 		event.LogInfo = info.Logs
 		event.LogContext = info.LogContext
-		event.CacheStatus = cacheStatusFromExternalResources(info.ExternalResources)
 	}
+	event.CacheStatus = observedCacheStatus(info)
 
 	return event
+}
+
+func observedAttempts(taskAction *flyteorgv1.TaskAction) uint32 {
+	if taskAction.Status.Attempts > 0 {
+		return taskAction.Status.Attempts
+	}
+	// if attempts is not set, default to 1
+	return 1
+}
+
+func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
+	if info == nil {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	return cacheStatusFromExternalResources(info.ExternalResources)
 }
 
 func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
@@ -480,7 +525,9 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 	if oldStatus.StateJSON != newStatus.StateJSON ||
 		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
-		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion {
+		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
+		oldStatus.Attempts != newStatus.Attempts ||
+		oldStatus.CacheStatus != newStatus.CacheStatus {
 		return true
 	}
 

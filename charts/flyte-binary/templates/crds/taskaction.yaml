@@ -231,6 +231,14 @@ spec:
                   - phase
                   type: object
                 type: array
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                type: integer
               pluginPhase:
                 description: PluginPhase is a human-readable representation of the
                   plugin's current phase.

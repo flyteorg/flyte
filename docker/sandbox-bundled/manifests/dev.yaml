@@ -141,6 +141,14 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                type: integer
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.
@@ -680,6 +688,10 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/v2"
+                                              route:
+                                                  cluster: console
+                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -716,6 +728,19 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-local
                                           port_value: 8090
+            - name: console
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: console
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-console
+                                          port_value: 80
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -768,7 +793,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: N1FBUkJBWXVsMGtrVXVHQg==
+  haSharedSecret: TGpTSmFqVFJiMGFLc1h0eQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -871,6 +896,28 @@ subsets:
   - name: webhook
     port: 9443
     protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
 ---
 apiVersion: v1
 kind: Service
@@ -1180,6 +1227,52 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: console
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: console
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: console
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -1197,7 +1290,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: aae837f3c69208e5fc3a82ffe72c17a9f16614564a5a4d514092324810e24142
+        checksum/secret: e6384a2b222ab90f25479fa05763954c9cf1bc3cc257a0ac9aac4fc29f40659e
       labels:
         app: docker-registry
         release: flyte-sandbox
