@@ -82,6 +82,7 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
+	Catalog         catalog.Client
 	eventsClient    workflowconnect.EventsProxyServiceClient
 	cluster         string
 }
@@ -184,12 +185,31 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	// Invoke plugin.Handle
-	transition, err := p.Handle(ctx, tCtx)
+	// cacheShortCircuited is true when cache handling already decided the outcome,
+	// either via cache hit or waiting on the reservation owner.
+	var cacheShortCircuited bool
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	if err != nil {
-		logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
-			"Plugin %q Handle failed: %v", p.GetID(), err)
+		logger.Error(err, "cache pre-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+	// Even when cache handling short-circuits execution, we still continue through the
+	// shared reconcile tail below so the derived transition updates conditions, status,
+	// and emitted action events in the same way as the normal plugin path.
+
+	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	if !cacheShortCircuited {
+		transition, err = p.Handle(ctx, tCtx)
+		if err != nil {
+			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
+			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+				"Plugin %q Handle failed: %v", p.GetID(), err)
+			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		}
+	}
+
+	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
+		logger.Error(err, "cache post-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
@@ -290,6 +310,14 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if err := p.Finalize(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Finalize failed, will retry")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+
+	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to build cache config for finalization cleanup")
+	} else if ok {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
+			logger.Error(err, "failed to release cache reservation during finalization cleanup")
+		}
 	}
 
 	return r.removeFinalizer(ctx, taskAction)

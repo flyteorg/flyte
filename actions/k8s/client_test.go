@@ -8,11 +8,13 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"k8s.io/apimachinery/pkg/watch"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -198,5 +200,23 @@ func TestBuildNamespace(t *testing.T) {
 			Domain:  "production",
 		}
 		assert.Equal(t, "myproject-production", buildNamespace(runID))
+	})
+}
+
+func TestExtractTaskCacheKey(t *testing.T) {
+	t.Run("returns cache key for task action", func(t *testing.T) {
+		action := &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					CacheKey: wrapperspb.String("cache-v1"),
+				},
+			},
+		}
+
+		assert.Equal(t, "cache-v1", extractTaskCacheKey(action))
+	})
+
+	t.Run("returns empty for non-task action", func(t *testing.T) {
+		assert.Empty(t, extractTaskCacheKey(&actions.Action{}))
 	})
 }

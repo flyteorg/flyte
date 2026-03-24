@@ -141,6 +141,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
+	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 	// Embed the inline TaskTemplate if present.
 	if err := embedTaskTemplate(action, taskAction); err != nil {
@@ -602,6 +603,19 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	}
 
 	return actionSpec
+}
+
+func extractTaskCacheKey(action *actions.Action) string {
+	taskSpec, ok := action.Spec.(*actions.Action_Task)
+	if !ok || taskSpec.Task == nil {
+		return ""
+	}
+
+	if taskSpec.Task.CacheKey == nil {
+		return ""
+	}
+
+	return taskSpec.Task.CacheKey.Value
 }
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.
