@@ -946,6 +946,21 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.app.AppService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.trigger.TriggerService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/v2"
                                               route:
                                                   cluster: console
@@ -1074,7 +1089,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Z3VoY3VKMHRMdjlPbHNMZw==
+  haSharedSecret: UldmTVhHMmxYRDdlNzZKWg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1668,7 +1683,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: f3e238bc2accb04c809c7234ae83b2a08843319c27faf135d29b73c5f88e0b2a
+        checksum/secret: a6d9f56b2763fc3364b7e76929d71a5a2d1bd6ccc975227a395926adf85823af
       labels:
         app: docker-registry
         release: flyte-sandbox
