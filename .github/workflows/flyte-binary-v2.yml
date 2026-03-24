@@ -62,7 +62,7 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
           tags: |
-            type=raw,value=nightly,enable=${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/v2' }}
+            type=raw,value=nightly,enable=${{ github.event_name == 'pull_request' }}
             type=sha,format=long
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -146,7 +146,7 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
-            type=raw,value=nightly,enable=${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/v2' }}
+            type=raw,value=nightly,enable=${{ github.event_name == 'pull_request' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' }}
