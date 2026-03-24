@@ -131,6 +131,12 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MinLength=1
 	RunOutputBase string `json:"runOutputBase"`
 
+	// CacheKey enables cache lookup/writeback for this task action when set.
+	// This is propagated from workflow.TaskAction.cache_key.
+	// +optional
+	// +kubebuilder:validation:MaxLength=256
+	CacheKey string `json:"cacheKey,omitempty"`
+
 	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray")
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
