@@ -1098,41 +1098,6 @@ func (_c *ActionRepo_UpdateActionState_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// WatchAbortRequests provides a mock function with given fields: ctx, payloads, errs
-func (_m *ActionRepo) WatchAbortRequests(ctx context.Context, payloads chan<- string, errs chan<- error) {
-	_m.Called(ctx, payloads, errs)
-}
-
-// ActionRepo_WatchAbortRequests_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchAbortRequests'
-type ActionRepo_WatchAbortRequests_Call struct {
-	*mock.Call
-}
-
-// WatchAbortRequests is a helper method to define mock.On call
-//   - ctx context.Context
-//   - payloads chan<- string
-//   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchAbortRequests(ctx interface{}, payloads interface{}, errs interface{}) *ActionRepo_WatchAbortRequests_Call {
-	return &ActionRepo_WatchAbortRequests_Call{Call: _e.mock.On("WatchAbortRequests", ctx, payloads, errs)}
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) Run(run func(ctx context.Context, payloads chan<- string, errs chan<- error)) *ActionRepo_WatchAbortRequests_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(chan<- string), args[2].(chan<- error))
-	})
-	return _c
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) Return() *ActionRepo_WatchAbortRequests_Call {
-	_c.Call.Return()
-	return _c
-}
-
-func (_c *ActionRepo_WatchAbortRequests_Call) RunAndReturn(run func(context.Context, chan<- string, chan<- error)) *ActionRepo_WatchAbortRequests_Call {
-	_c.Run(run)
-	return _c
-}
-
 // WatchActionUpdates provides a mock function with given fields: ctx, runID, updates, errs
 func (_m *ActionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	_m.Called(ctx, runID, updates, errs)

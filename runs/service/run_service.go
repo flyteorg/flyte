@@ -33,10 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo          interfaces.Repository
-	actionsClient actionsconnect.ActionsServiceClient
-	storagePrefix string
-	dataStore     *storage.DataStore
+	repo             interfaces.Repository
+	actionsClient    actionsconnect.ActionsServiceClient
+	storagePrefix    string
+	dataStore        *storage.DataStore
+	abortReconciler  *AbortReconciler
 }
 
 const (
@@ -98,12 +99,13 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore) *RunService {
+func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore, reconciler *AbortReconciler) *RunService {
 	return &RunService{
-		repo:          repo,
-		actionsClient: actionsClient,
-		storagePrefix: storagePrefix,
-		dataStore:     dataStore,
+		repo:            repo,
+		actionsClient:   actionsClient,
+		storagePrefix:   storagePrefix,
+		dataStore:       dataStore,
+		abortReconciler: reconciler,
 	}
 }
 
@@ -252,10 +254,14 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database and enqueue for background pod termination.
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: req.Msg.RunId.Name}, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
@@ -783,10 +789,14 @@ func (s *RunService) AbortAction(
 		reason = req.Msg.Reason
 	}
 
-	// Abort in database and enqueue for background pod termination.
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, req.Msg.ActionId, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -85,8 +84,8 @@ func (q *dedupeQueue) push(ctx context.Context, task abortTask) bool {
 }
 
 // scheduleRequeue re-enqueues the task after delay.
-// The key remains in the set during the wait window so that any NOTIFY arriving during
-// the backoff is correctly deduped (no duplicate processing).
+// The key remains in the set during the wait window so that any Push call arriving
+// during the backoff is correctly deduped (no duplicate processing).
 func (q *dedupeQueue) scheduleRequeue(ctx context.Context, task abortTask, delay time.Duration) {
 	time.AfterFunc(delay, func() {
 		// Remove then re-push so push's dedup check passes.
@@ -139,6 +138,14 @@ func NewAbortReconciler(repo interfaces.Repository, actionsClient actionsconnect
 	}
 }
 
+// Push enqueues an abort request for the given action. Safe to call concurrently.
+// No-op if the key is already queued (dedup).
+func (r *AbortReconciler) Push(ctx context.Context, actionID *common.ActionIdentifier, reason string) {
+	key := fmt.Sprintf("%s/%s/%s/%s/%s",
+		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	r.queue.push(ctx, abortTask{actionID: actionID, reason: reason, key: key})
+}
+
 // Run starts the reconciler. It blocks until ctx is cancelled.
 func (r *AbortReconciler) Run(ctx context.Context) error {
 	logger.Infof(ctx, "AbortReconciler starting (%d workers, max %d attempts)", r.cfg.Workers, r.cfg.MaxAttempts)
@@ -155,46 +162,14 @@ func (r *AbortReconciler) Run(ctx context.Context) error {
 		}()
 	}
 
-	// Startup scan: enqueue any actions that were left pending from before this process started.
+	// Startup scan: enqueue any actions left pending before this process started (crash recovery).
 	if err := r.startupScan(ctx); err != nil {
 		logger.Errorf(ctx, "AbortReconciler startup scan failed: %v", err)
-		// Non-fatal — the NOTIFY watcher will still pick up new aborts.
 	}
 
-	// Watch for new abort requests via NOTIFY (or polling on SQLite).
-	payloads := make(chan string, 50)
-	errs := make(chan error, 10)
-	go r.repo.ActionRepo().WatchAbortRequests(ctx, payloads, errs)
-
-	for {
-		select {
-		case <-ctx.Done():
-			wg.Wait()
-			return nil
-		case err := <-errs:
-			logger.Warnf(ctx, "AbortReconciler watch error: %v", err)
-		case payload := <-payloads:
-			task, err := parseAbortPayload(payload)
-			if err != nil {
-				logger.Warnf(ctx, "AbortReconciler: invalid payload %q: %v", payload, err)
-				continue
-			}
-			// Fetch current abort_reason from DB (NOTIFY payload does not carry reason).
-			action, err := r.repo.ActionRepo().GetAction(ctx, task.actionID)
-			if err != nil {
-				logger.Warnf(ctx, "AbortReconciler: failed to fetch action %s: %v", task.key, err)
-				continue
-			}
-			if action.AbortRequestedAt == nil {
-				// Already cleared (race between scan and notify) — skip.
-				continue
-			}
-			if action.AbortReason != nil {
-				task.reason = *action.AbortReason
-			}
-			r.queue.push(ctx, task)
-		}
-	}
+	<-ctx.Done()
+	wg.Wait()
+	return nil
 }
 
 // startupScan enqueues all actions that have abort_requested_at set.
@@ -296,24 +271,4 @@ func isAlreadyTerminated(err error) bool {
 		return false
 	}
 	return connectErr.Code() == connect.CodeNotFound
-}
-
-// parseAbortPayload parses "org/project/domain/run/actionName" into an abortTask.
-func parseAbortPayload(payload string) (abortTask, error) {
-	parts := strings.SplitN(payload, "/", 5)
-	if len(parts) != 5 {
-		return abortTask{}, fmt.Errorf("expected 5 parts, got %d", len(parts))
-	}
-	return abortTask{
-		key: payload,
-		actionID: &common.ActionIdentifier{
-			Run: &common.RunIdentifier{
-				Org:     parts[0],
-				Project: parts[1],
-				Domain:  parts[2],
-				Name:    parts[3],
-			},
-			Name: parts[4],
-		},
-	}, nil
 }

@@ -32,7 +32,6 @@ type ActionRepo interface {
 	ListPendingAborts(ctx context.Context) ([]*models.Action, error)
 	MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (attemptCount int, err error)
 	ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error
-	WatchAbortRequests(ctx context.Context, payloads chan<- string, errs chan<- error)
 
 	// Watch operations (for streaming)
 	WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error)

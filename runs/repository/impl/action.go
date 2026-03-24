@@ -35,7 +35,6 @@ type actionRepo struct {
 	// Subscriber management for LISTEN/NOTIFY
 	runSubscribers    map[chan string]bool
 	actionSubscribers map[chan string]bool
-	abortSubscribers  map[chan string]bool
 	mu                sync.RWMutex
 }
 
@@ -51,7 +50,6 @@ func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRep
 		pgConfig:          dbConfig.Postgres,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
-		abortSubscribers:  make(map[chan string]bool),
 	}
 
 	// Start LISTEN/NOTIFY for PostgreSQL
@@ -275,9 +273,8 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		return fmt.Errorf("failed to abort run: %w", result.Error)
 	}
 
-	// Notify run subscribers and abort reconciler.
+	// Notify run subscribers.
 	r.notifyRunUpdate(ctx, runID)
-	r.notifyAbortRequest(ctx, &common.ActionIdentifier{Run: runID, Name: runID.Name})
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 	return nil
@@ -526,17 +523,16 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
 		return fmt.Errorf("failed to abort action: %w", result.Error)
 	}
 
-	// Notify action subscribers and abort reconciler.
+	// Notify action subscribers.
 	r.notifyActionUpdate(ctx, actionID)
-	r.notifyAbortRequest(ctx, actionID)
 
 	logger.Infof(ctx, "Aborted action: %s", actionID.Name)
 	return nil
@@ -559,8 +555,8 @@ func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, e
 func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(map[string]interface{}{
 			"abort_attempt_count": gorm.Expr("abort_attempt_count + 1"),
 			"updated_at":          time.Now(),
@@ -573,8 +569,8 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 	var action models.Action
 	if err := r.db.WithContext(ctx).
 		Select("abort_attempt_count").
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action).Error; err != nil {
 		return 0, fmt.Errorf("failed to read abort attempt count: %w", err)
 	}
@@ -585,8 +581,8 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(map[string]interface{}{
 			"abort_requested_at":  nil,
 			"abort_attempt_count": 0,
@@ -597,78 +593,6 @@ func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.Act
 		return fmt.Errorf("failed to clear abort request: %w", result.Error)
 	}
 	return nil
-}
-
-// WatchAbortRequests delivers abort_requests NOTIFY payloads to the caller.
-// On non-Postgres setups it polls for pending aborts every 5 seconds.
-func (r *actionRepo) WatchAbortRequests(ctx context.Context, payloads chan<- string, errs chan<- error) {
-	if r.isPostgres {
-		notifCh := make(chan string, 20)
-
-		r.mu.Lock()
-		r.abortSubscribers[notifCh] = true
-		r.mu.Unlock()
-
-		defer func() {
-			r.mu.Lock()
-			delete(r.abortSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case payload := <-notifCh:
-				select {
-				case payloads <- payload:
-				case <-ctx.Done():
-					return
-				}
-			}
-		}
-	} else {
-		// SQLite fallback: poll for pending aborts periodically.
-		ticker := time.NewTicker(5 * time.Second)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				actions, err := r.ListPendingAborts(ctx)
-				if err != nil {
-					select {
-					case errs <- err:
-					default:
-					}
-					continue
-				}
-				for _, a := range actions {
-					payload := fmt.Sprintf("%s/%s/%s/%s/%s", a.Org, a.Project, a.Domain, a.RunName, a.Name)
-					select {
-					case payloads <- payload:
-					case <-ctx.Done():
-						return
-					}
-				}
-			}
-		}
-	}
-}
-
-// notifyAbortRequest fires NOTIFY abort_requests so the AbortReconciler wakes immediately.
-func (r *actionRepo) notifyAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) {
-	if !r.isPostgres {
-		return
-	}
-	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifySQL := fmt.Sprintf("NOTIFY abort_requests, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
-		logger.Errorf(ctx, "Failed to NOTIFY abort_requests: %v", err)
-	}
 }
 
 // UpdateActionState updates the state of an action
@@ -1045,11 +969,6 @@ func (r *actionRepo) startPostgresListener() {
 		return
 	}
 
-	if err := r.listener.Listen("abort_requests"); err != nil {
-		logger.Errorf(context.Background(), "Failed to listen to abort_requests: %v", err)
-		return
-	}
-
 	logger.Infof(context.Background(), "PostgreSQL LISTEN/NOTIFY started")
 
 	// Process notifications
@@ -1086,17 +1005,6 @@ func (r *actionRepo) startPostgresListener() {
 				}
 				r.mu.RUnlock()
 
-			case "abort_requests":
-				// Broadcast to all abort reconciler subscribers
-				r.mu.RLock()
-				for ch := range r.abortSubscribers {
-					select {
-					case ch <- notif.Extra:
-					default:
-						logger.Warnf(context.Background(), "Abort subscriber channel full, dropping notification")
-					}
-				}
-				r.mu.RUnlock()
 			}
 
 		case <-time.After(90 * time.Second):

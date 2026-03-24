@@ -49,9 +49,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore)
-	taskSvc := service.NewTaskService(repo)
-
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -62,6 +59,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.AddWorker("abort-reconciler", func(ctx context.Context) error {
 		return abortReconciler.Run(ctx)
 	})
+
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
+	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
 	sc.Mux.Handle(runsPath, runsHandler)

@@ -18,20 +18,11 @@ import (
 )
 
 // newTestReconciler builds a reconciler wired to mocks with fast timing for tests.
-// WatchAbortRequests is set up to block until ctx is cancelled so tests control
-// the queue via the startup scan and direct queue pushes.
 func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *AbortReconciler) {
 	t.Helper()
 	actionRepo := repoMocks.NewActionRepo(t)
 	repo := repoMocks.NewRepository(t)
 	repo.On("ActionRepo").Return(actionRepo).Maybe()
-
-	actionRepo.On("WatchAbortRequests", mock.Anything, mock.Anything, mock.Anything).
-		Run(func(args mock.Arguments) {
-			ctx := args.Get(0).(context.Context)
-			<-ctx.Done()
-		}).
-		Return().Maybe()
 
 	actionsClient := &mockActionsClient{}
 
@@ -168,11 +159,7 @@ func TestAbortReconciler_DeduplicatesQueue(t *testing.T) {
 
 	// Push a duplicate while the first is being processed.
 	time.Sleep(5 * time.Millisecond)
-	reconciler.queue.push(ctx, abortTask{
-		actionID: actionID,
-		key:      "org/proj/dev/rtest1/rtest1",
-		reason:   "dup",
-	})
+	reconciler.Push(ctx, actionID, "dup")
 
 	assert.Eventually(t, cleared.Load, 400*time.Millisecond, 5*time.Millisecond)
 	// Abort should only have been called once.
