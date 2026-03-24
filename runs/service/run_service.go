@@ -880,6 +880,11 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
+	// If the action is already in a terminal phase, no further updates are expected.
+	if IsTerminalPhase(details.GetStatus().GetPhase()) {
+		return nil
+	}
+
 	// Step 2: Watch DB for updates
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
@@ -912,6 +917,10 @@ func (s *RunService) WatchActionDetails(
 				Details: details,
 			}); err != nil {
 				return err
+			}
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(details.GetStatus().GetPhase()) {
+				return nil
 			}
 		}
 	}
