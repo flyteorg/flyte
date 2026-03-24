@@ -1241,23 +1241,23 @@ func extractStorageURIs(specBytes []byte) (inputURI, runOutputBase string) {
 }
 
 // extractRunSpec parses ActionSpec JSON to extract the RunSpec
-func extractActionSpec(specJSON []byte) *workflow.ActionSpec {
-	if len(specJSON) == 0 {
+func extractActionSpec(specProto []byte) *workflow.ActionSpec {
+	if len(specProto) == 0 {
 		return nil
 	}
 	var specMsg workflow.ActionSpec
-	if err := json.Unmarshal(specJSON, &specMsg); err != nil {
+	if err := json.Unmarshal(specProto, &specMsg); err != nil {
 		return nil
 	}
 	return &specMsg
 }
 
 // extractRunSpec parses ActionSpec JSON to extract the RunSpec
-func extractRunSpec(specJSON []byte) *task.RunSpec {
-	if len(specJSON) == 0 {
+func extractRunSpec(specProto []byte) *task.RunSpec {
+	if len(specProto) == 0 {
 		return nil
 	}
-	spec := extractActionSpec(specJSON)
+	spec := extractActionSpec(specProto)
 	if spec == nil {
 		return nil
 	}
