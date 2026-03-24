@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -387,7 +388,12 @@ func TestListRuns(t *testing.T) {
 	actionRepo, _, svc := newTestService(t)
 	runs := []*workflow.Run{}
 	sqlRes := []*models.Run{}
+	baseTime := time.Date(2026, time.March, 24, 10, 0, 0, 0, time.UTC)
 	for i := 0; i < 10; i++ {
+		startTime := timestamppb.New(baseTime.Add(time.Duration(i) * time.Minute))
+		endTime := timestamppb.New(startTime.AsTime().Add(2 * time.Minute))
+		durationMs := uint64(2 * time.Minute / time.Millisecond)
+		envName := fmt.Sprintf("env-%d", i)
 		runs = append(runs, &workflow.Run{
 			Action: &workflow.Action{
 				Id: &common.ActionIdentifier{
@@ -399,17 +405,31 @@ func TestListRuns(t *testing.T) {
 					},
 					Name: fmt.Sprintf("run-%d", i),
 				},
-				Metadata: &workflow.ActionMetadata{},
-				Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+				Metadata: &workflow.ActionMetadata{
+					EnvironmentName: envName,
+				},
+				Status: &workflow.ActionStatus{
+					Phase:      common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+					StartTime:  startTime,
+					EndTime:    endTime,
+					DurationMs: &durationMs,
+				},
 			},
 		})
 		sqlRes = append(sqlRes, &models.Run{
-			ID:      uint(i),
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    fmt.Sprintf("run-%d", i),
-			Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ID:         uint(i),
+			Org:        "test-org",
+			Project:    "test-project",
+			Domain:     "test-domain",
+			Name:       fmt.Sprintf("run-%d", i),
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			CreatedAt:  startTime.AsTime(),
+			EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
+			DurationMs: sql.NullInt64{Int64: int64(durationMs), Valid: true},
+			EnvironmentName: sql.NullString{
+				String: envName,
+				Valid:  true,
+			},
 		})
 	}
 	type mockListRes struct {
@@ -486,7 +506,7 @@ func TestConvertRunToProto(t *testing.T) {
 	org := "test_org"
 	project := "test_project"
 	domain := "test_domain"
-	startTime := timestamppb.Now()
+	startTime := timestamppb.New(time.Date(2026, time.March, 24, 9, 0, 0, 0, time.UTC))
 	endTime := timestamppb.New(startTime.AsTime().Add(time.Minute))
 	durationMs := uint64(endTime.AsTime().Sub(startTime.AsTime()).Milliseconds())
 	status := &workflow.ActionStatus{
@@ -515,7 +535,12 @@ func TestConvertRunToProto(t *testing.T) {
 				Domain:        domain,
 				Name:          name,
 				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				CreatedAt:     startTime.AsTime(),
 				ActionDetails: detailJson,
+				EnvironmentName: sql.NullString{
+					String: "prod",
+					Valid:  true,
+				},
 			},
 			&workflow.Run{
 				Action: &workflow.Action{
@@ -528,7 +553,9 @@ func TestConvertRunToProto(t *testing.T) {
 						},
 						Name: name,
 					},
-					Metadata: &workflow.ActionMetadata{},
+					Metadata: &workflow.ActionMetadata{
+						EnvironmentName: "prod",
+					},
 					Status:   status,
 				},
 			},
@@ -536,12 +563,19 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"run with missing details",
 			&models.Run{
-				ID:      uint(0),
-				Org:     org,
-				Project: project,
-				Domain:  domain,
-				Name:    name,
-				Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				ID:         uint(0),
+				Org:        org,
+				Project:    project,
+				Domain:     domain,
+				Name:       name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				CreatedAt:  startTime.AsTime(),
+				EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
+				DurationMs: sql.NullInt64{Int64: int64(durationMs), Valid: true},
+				EnvironmentName: sql.NullString{
+					String: "staging",
+					Valid:  true,
+				},
 			},
 			&workflow.Run{
 				Action: &workflow.Action{
@@ -554,8 +588,15 @@ func TestConvertRunToProto(t *testing.T) {
 						},
 						Name: name,
 					},
-					Metadata: &workflow.ActionMetadata{},
-					Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_QUEUED},
+					Metadata: &workflow.ActionMetadata{
+						EnvironmentName: "staging",
+					},
+					Status: &workflow.ActionStatus{
+						Phase:      common.ActionPhase_ACTION_PHASE_QUEUED,
+						StartTime:  startTime,
+						EndTime:    endTime,
+						DurationMs: &durationMs,
+					},
 				},
 			},
 		},
