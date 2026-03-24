@@ -391,6 +391,11 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			}
 		}
 
+		if action.Spec == nil {
+			// Fall back to the embedded ActionSpec when no spec was loaded from task table.
+			setActionDetailsSpecFromActionSpec(action, model.ActionSpec)
+		}
+
 		return nil
 	})
 
@@ -1150,7 +1155,7 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	status := &workflow.ActionStatus{
 		Phase:     common.ActionPhase(action.Phase),
 		StartTime: timestamppb.New(action.CreatedAt),
-		Attempts:  1,
+		Attempts:  action.Attempts,
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
@@ -1160,45 +1165,31 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		status.DurationMs = &durationMs
 	}
 
-	phase := common.ActionPhase(action.Phase)
-	attempt := &workflow.ActionAttempt{
-		Attempt:   1,
-		Phase:     phase,
-		StartTime: timestamppb.New(action.CreatedAt),
-	}
-	if status.EndTime != nil {
-		attempt.EndTime = status.EndTime
-	}
-	attempt.PhaseTransitions = []*workflow.PhaseTransition{{
-		Phase:     phase,
-		StartTime: timestamppb.New(action.CreatedAt),
-		EndTime:   status.EndTime,
-	}}
-
 	metadata := actionMetadataFromModel(action)
 
-	details := &workflow.ActionDetails{
+	return &workflow.ActionDetails{
 		Id:       actionID,
 		Metadata: metadata,
 		Status:   status,
-		Attempts: []*workflow.ActionAttempt{attempt},
+	}
+}
+
+func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionSpecBytes []byte) {
+	specMsg := extractActionSpec(actionSpecBytes)
+	if specMsg == nil {
+		return
 	}
 
-	specMsg := extractActionSpec(action.ActionSpec)
-	if specMsg != nil {
-		switch s := specMsg.Spec.(type) {
-		case *workflow.ActionSpec_Task:
-			details.Spec = &workflow.ActionDetails_Task{
-				Task: s.Task.Spec,
-			}
-		case *workflow.ActionSpec_Trace:
-			details.Spec = &workflow.ActionDetails_Trace{
-				Trace: s.Trace.Spec,
-			}
+	switch s := specMsg.Spec.(type) {
+	case *workflow.ActionSpec_Task:
+		if s.Task.GetSpec() != nil {
+			details.Spec = &workflow.ActionDetails_Task{Task: s.Task.GetSpec()}
+		}
+	case *workflow.ActionSpec_Trace:
+		if s.Trace.GetSpec() != nil {
+			details.Spec = &workflow.ActionDetails_Trace{Trace: s.Trace.GetSpec()}
 		}
 	}
-
-	return details
 }
 
 // actionMetadataFromModel builds an ActionMetadata proto from DB model columns.
