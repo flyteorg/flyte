@@ -84,7 +84,9 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
 	}
 	for key, value := range ta.Spec.EnvVars {
-		envVars[key] = value
+		if _, exists := envVars[key]; !exists {
+			envVars[key] = value
+		}
 	}
 	generatedName := buildGeneratedName(ta)
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
