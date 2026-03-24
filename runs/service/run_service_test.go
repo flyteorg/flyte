@@ -92,13 +92,19 @@ func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *R
 	return actionRepo, actionsClient, svc
 }
 
+func matchActionID(expected *common.ActionIdentifier) interface{} {
+	return mock.MatchedBy(func(actual *common.ActionIdentifier) bool {
+		return proto.Equal(actual, expected)
+	})
+}
+
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
-	repo.On("TaskRepo").Return(taskRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
 
 	svc := &RunService{repo: repo, actionsClient: actionsClient}
 
@@ -146,7 +152,7 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 		Digest: "abc123",
 		Spec:   taskSpecBytes,
 	}, nil)
-	actionRepo.On("ListEvents", mock.Anything, rootActionID, 500).Return([]*models.ActionEvent{}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 
 	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
 		RunId: runID,
@@ -164,7 +170,7 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
-	repo.On("TaskRepo").Return(taskRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
 
 	svc := &RunService{repo: repo, actionsClient: actionsClient}
 
@@ -206,7 +212,7 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	eventModel, _ := models.NewActionEventModel(event)
 
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
-	actionRepo.On("ListEvents", mock.Anything, rootActionID, 500).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
 
 	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
 		RunId: runID,
@@ -222,7 +228,7 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
-	repo.On("TaskRepo").Return(taskRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
 
 	svc := &RunService{repo: repo, actionsClient: actionsClient}
 
@@ -255,7 +261,7 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
 	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
-	actionRepo.On("ListEvents", mock.Anything, &common.ActionIdentifier{Run: runID, Name: runID.Name}, 500).Return([]*models.ActionEvent{}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(&common.ActionIdentifier{Run: runID, Name: runID.Name}), 500).Return([]*models.ActionEvent{}, nil)
 
 	_, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
 		RunId: runID,
@@ -875,7 +881,7 @@ func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	eventModel, _ := models.NewActionEventModel(successEvent)
 
 	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil)
-	actionRepo.On("ListEvents", mock.Anything, actionID, 500).Return([]*models.ActionEvent{eventModel}, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
 
 	// Mock reading inputs
 	store.On("ReadProtobuf", mock.Anything, storage.DataReference("s3://bucket/inputs/inputs.pb"), mock.AnythingOfType("*task.Inputs")).
