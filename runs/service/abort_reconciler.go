@@ -143,13 +143,9 @@ func NewAbortReconciler(repo interfaces.Repository, actionsClient actionsconnect
 func (r *AbortReconciler) Run(ctx context.Context) error {
 	logger.Infof(ctx, "AbortReconciler starting (%d workers, max %d attempts)", r.cfg.Workers, r.cfg.MaxAttempts)
 
-	// Startup scan: enqueue any actions that were left pending from before this process started.
-	if err := r.startupScan(ctx); err != nil {
-		logger.Errorf(ctx, "AbortReconciler startup scan failed: %v", err)
-		// Non-fatal — the NOTIFY watcher will still pick up new aborts.
-	}
-
-	// Start workers.
+	// Start workers first so they can drain the queue as startupScan fills it.
+	// If workers started after the scan, a pending-abort count exceeding QueueSize
+	// would cause push() to block forever (no consumer, full channel).
 	var wg sync.WaitGroup
 	for i := 0; i < r.cfg.Workers; i++ {
 		wg.Add(1)
@@ -157,6 +153,12 @@ func (r *AbortReconciler) Run(ctx context.Context) error {
 			defer wg.Done()
 			r.runWorker(ctx)
 		}()
+	}
+
+	// Startup scan: enqueue any actions that were left pending from before this process started.
+	if err := r.startupScan(ctx); err != nil {
+		logger.Errorf(ctx, "AbortReconciler startup scan failed: %v", err)
+		// Non-fatal — the NOTIFY watcher will still pick up new aborts.
 	}
 
 	// Watch for new abort requests via NOTIFY (or polling on SQLite).
