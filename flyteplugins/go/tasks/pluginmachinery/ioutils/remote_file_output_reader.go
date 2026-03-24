@@ -115,6 +115,12 @@ func (r RemoteFileOutputReader) IsFile(ctx context.Context) bool {
 	return true
 }
 
+// GetOutputPath exposes the backing outputs.pb path so external systems can reuse
+// the existing artifact location instead of re-uploading the literal map.
+func (r RemoteFileOutputReader) GetOutputPath() storage.DataReference {
+	return r.OutPath.GetOutputPath()
+}
+
 func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 	md, err := r.store.Head(ctx, r.OutPath.GetDeckPath())
 	if err != nil {
