@@ -383,7 +383,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 	}
 
 	info := phaseInfo.Info()
-	updatedTime := updatedTimestamp(info, taskAction.Status.PhaseHistory)
+	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
 	reportedTime := reportedTimestamp(info)
 
 	event := &workflow.ActionEvent{
@@ -423,14 +423,11 @@ func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
 	return cacheStatusFromExternalResources(info.ExternalResources)
 }
 
-func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
-	if info != nil && info.OccurredAt != nil {
-		return timestamppb.New(*info.OccurredAt)
-	}
+func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
 	if n := len(history); n > 0 {
 		return timestamppb.New(history[n-1].OccurredAt.Time)
 	}
-	return nil
+	return timestamppb.Now()
 }
 
 func reportedTimestamp(info *pluginsCore.TaskInfo) *timestamppb.Timestamp {
