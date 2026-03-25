@@ -154,7 +154,64 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
-func TestUpdateActionPhase_SetsStartedAtOnRunning(t *testing.T) {
+func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
+	// Tasks may skip RUNNING and go QUEUED → INITIALIZING → terminal.
+	// started_at should be set on any execution phase (INITIALIZING, RUNNING, etc.)
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			db := setupActionDB(t)
+			defer func() { _ = db.Exec("DELETE FROM actions") }()
+			actionRepo := NewActionRepo(db, database.DbConfig{})
+			ctx := context.Background()
+
+			actionID := &common.ActionIdentifier{
+				Run: &common.RunIdentifier{
+					Org:     "org1",
+					Project: "proj1",
+					Domain:  "domain1",
+					Name:    "run1",
+				},
+				Name: "action1",
+			}
+
+			_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+				ActionId: actionID,
+				InputUri: "s3://bucket/input",
+			}, nil)
+			require.NoError(t, err)
+
+			// Transition to execution phase — should set started_at
+			err = actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 1,
+				core.CatalogCacheStatus_CACHE_DISABLED, nil)
+			require.NoError(t, err)
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.True(t, action.StartedAt.Valid, "started_at should be set after %s transition", phase)
+			startedAt := action.StartedAt.Time
+
+			// Transition to SUCCEEDED with an endTime — duration should be based on started_at
+			endTime := startedAt.Add(5 * time.Second)
+			err = actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
+				core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+			require.NoError(t, err)
+
+			action, err = actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.True(t, action.DurationMs.Valid)
+			// Duration should be ~5000ms (endTime - startedAt), not endTime - createdAt
+			assert.InDelta(t, 5000, action.DurationMs.Int64, 1000,
+				"duration should reflect execution time (started_at to ended_at), not queue time")
+		})
+	}
+}
+
+func TestUpdateActionPhase_StartedAtNotSetOnWaitingPhases(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
 	actionRepo := NewActionRepo(db, database.DbConfig{})
@@ -176,30 +233,15 @@ func TestUpdateActionPhase_SetsStartedAtOnRunning(t *testing.T) {
 	}, nil)
 	require.NoError(t, err)
 
-	// Transition to RUNNING — should set started_at
+	// QUEUED should not set started_at
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
+		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
-	assert.True(t, action.StartedAt.Valid, "started_at should be set after RUNNING transition")
-	startedAt := action.StartedAt.Time
-
-	// Transition to SUCCEEDED with an endTime — duration should be based on started_at
-	endTime := startedAt.Add(5 * time.Second)
-	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
-	require.NoError(t, err)
-
-	action, err = actionRepo.GetAction(ctx, actionID)
-	require.NoError(t, err)
-	assert.True(t, action.DurationMs.Valid)
-	// Duration should be ~5000ms (endTime - startedAt), not endTime - createdAt
-	assert.InDelta(t, 5000, action.DurationMs.Int64, 1000,
-		"duration should reflect execution time (started_at to ended_at), not queue time")
+	assert.False(t, action.StartedAt.Valid, "started_at should not be set for QUEUED phase")
 }
 
 func TestUpdateActionPhase_StartedAtNotOverwritten(t *testing.T) {

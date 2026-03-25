@@ -478,8 +478,12 @@ func (r *actionRepo) UpdateActionPhase(
 		"updated_at":   time.Now(),
 	}
 
-	// Record when the action first enters the RUNNING phase.
-	if phase == common.ActionPhase_ACTION_PHASE_RUNNING {
+	// Record when the action first enters an execution phase (anything beyond
+	// the waiting stages). Tasks may skip RUNNING and go QUEUED → INITIALIZING →
+	// terminal, so we set started_at on any non-waiting phase.
+	if phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED &&
+		phase != common.ActionPhase_ACTION_PHASE_QUEUED &&
+		phase != common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES {
 		updates["started_at"] = gorm.Expr(
 			"COALESCE(started_at, ?)", time.Now())
 	}
