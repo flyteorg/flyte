@@ -826,7 +826,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: cXJnVzVWY0VWdXg3M1BtRQ==
+  haSharedSecret: UDlLejhZVGR3NUx4WEpkYg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1323,7 +1323,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: fa998c05a8f5d2d373e7e490e32cd0202a5ae632c2c0de4763df0c7858f5bcc4
+        checksum/secret: 27396eb330be6303eb9f9e1f2a8ad6b63d75209eda0375e4fbcd009a307e78f5
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1617,7 +1617,8 @@ spec:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
         livenessProbe:
-          initialDelaySeconds: 30
+          failureThreshold: 10
+          initialDelaySeconds: 15
           tcpSocket:
             port: http
         name: proxy
@@ -1625,6 +1626,7 @@ spec:
         - containerPort: 8000
           name: http
         readinessProbe:
+          initialDelaySeconds: 5
           tcpSocket:
             port: http
         volumeMounts:
