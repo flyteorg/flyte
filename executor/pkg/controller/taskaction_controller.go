@@ -215,6 +215,40 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
+
+	// In-place pod restart: when a recoverable failure occurs, restart the pod within the
+	// same TaskAction rather than relying on the runs service to create a new TaskAction.
+	var restartAttempts uint32
+	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
+		currentAttempts := observedAttempts(taskAction)
+		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+
+		if currentAttempts < maxAttempts {
+			// Abort (delete) the current pod before incrementing attempts.
+			// tCtx was built with the current attempt number so Abort targets the right pod.
+			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+				logger.Error(abortErr, "failed to abort pod during in-place restart")
+			}
+			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
+			restartAttempts = currentAttempts + 1
+			// Override the transition to Queued so the TaskAction stays non-terminal.
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion,
+				fmt.Sprintf("restarting pod (attempt %d/%d)", currentAttempts+1, maxAttempts)))
+			phaseInfo = transition.Info()
+		} else {
+			// All retries exhausted — convert to a permanent (terminal) failure.
+			execErr := phaseInfo.Err()
+			if execErr == nil {
+				execErr = &core.ExecutionError{
+					Kind:    core.ExecutionError_USER,
+					Code:    "MaxRetriesExceeded",
+					Message: fmt.Sprintf("task failed after %d attempt(s)", currentAttempts),
+				}
+			}
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, phaseInfo.Info()))
+			phaseInfo = transition.Info()
+		}
+	}
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -227,6 +261,14 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if newBytes, newVersion, written := stateMgr.GetNewState(); written {
 		taskAction.Status.PluginState = newBytes
 		taskAction.Status.PluginStateVersion = newVersion
+	}
+
+	// If an in-place restart was triggered, increment attempts and clear plugin state so the
+	// next reconcile starts fresh with PluginPhaseNotStarted and creates a new pod.
+	if restartAttempts > 0 {
+		taskAction.Status.Attempts = restartAttempts
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
 	}
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
