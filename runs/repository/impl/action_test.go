@@ -51,7 +51,7 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		duration_ms INTEGER,
 		attempts INTEGER NOT NULL DEFAULT 1,
 		cache_status INTEGER NOT NULL DEFAULT 0,
-		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, name)
+		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, run_name, name)
 	)`).Error
 	require.NoError(t, err)
 	err = db.Exec(`CREATE INDEX idx_actions_org ON actions(org)`).Error
@@ -101,7 +101,7 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, runID.Project, run.Project)
 	assert.Equal(t, runID.Domain, run.Domain)
 	assert.Equal(t, runID.Name, run.RunName)
-	assert.Equal(t, runID.Name, run.Name)
+	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
 	require.NotZero(t, run.ID)
 	require.NotEmpty(t, run.ActionSpec)

@@ -75,7 +75,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	actionSpec := &workflow.ActionSpec{
 		ActionId: &common.ActionIdentifier{
 			Run:  runID,
-			Name: runID.Name, // For root actions, action name = run name
+			Name: "a0",
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
@@ -150,7 +150,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Project:          runID.Project,
 		Domain:           runID.Domain,
 		RunName:          runID.Name,
-		Name:             runID.Name,
+		Name:             "a0",
 		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
@@ -187,7 +187,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		First(&run)
 
@@ -262,7 +262,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Run{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		Updates(updates)
 

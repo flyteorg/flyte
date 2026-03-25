@@ -35,6 +35,13 @@ func RunMigrations(db *gorm.DB) error {
 		}
 	}
 
+	// Drop stale idx_actions_identifier (was missing run_name) so AutoMigrate recreates it correctly.
+	if db.Migrator().HasTable("actions") && db.Migrator().HasIndex(&models.Action{}, "idx_actions_identifier") {
+		if err := db.Migrator().DropIndex(&models.Action{}, "idx_actions_identifier"); err != nil {
+			return fmt.Errorf("failed to drop stale index idx_actions_identifier: %w", err)
+		}
+	}
+
 	// AutoMigrate creates missing tables and adds new columns without dropping existing data.
 	if err := db.AutoMigrate(AllModels...); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)

@@ -16,8 +16,8 @@ type Action struct {
 	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org" db:"org"`
 	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project" db:"project"`
 	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain" db:"domain"`
-	RunName string `gorm:"not null;default:'';index:idx_actions_run_name" db:"run_name"`
-	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4" db:"name"`
+	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:4;index:idx_actions_run_name" db:"run_name"`
+	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:5" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
 	ParentActionName sql.NullString `gorm:"index:idx_actions_parent" db:"parent_action_name"`

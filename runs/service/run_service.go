@@ -147,7 +147,7 @@ func (s *RunService) CreateRun(
 
 	actionID := &common.ActionIdentifier{
 		Run:  runId,
-		Name: runId.Name,
+		Name: "a0",
 	}
 
 	// Get the task template and taskID
@@ -161,7 +161,6 @@ func (s *RunService) CreateRun(
 	case *workflow.CreateRunRequest_TaskId:
 		taskID = request.GetTaskId()
 		taskSpec, err = fetchTaskSpecByID(ctx, s.repo.TaskRepo(), taskID)
-
 		if err != nil {
 			return nil, err
 		}
@@ -1328,7 +1327,7 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		Org:     run.Org,
 		Project: run.Project,
 		Domain:  run.Domain,
-		Name:    run.Name,
+		Name:    run.RunName,
 	}
 
 	action := &workflow.Action{
