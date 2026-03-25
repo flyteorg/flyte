@@ -1070,3 +1070,81 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	// Verify ReadProtobuf was only called once (for inputs, not outputs)
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
 }
+
+func TestConvertActionToEnrichedProto_IncludesDuration(t *testing.T) {
+	svc := &RunService{}
+	now := time.Now()
+	startedAt := now.Add(-3 * time.Second)
+	endedAt := now
+
+	t.Run("includes duration, start time, and end time", func(t *testing.T) {
+		action := &models.Action{
+			Org:              "org",
+			Project:          "proj",
+			Domain:           "dev",
+			RunName:          "run1",
+			Name:             "action1",
+			Phase:            int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			StartedAt:        sql.NullTime{Time: startedAt, Valid: true},
+			EndedAt:          sql.NullTime{Time: endedAt, Valid: true},
+			DurationMs:       sql.NullInt64{Int64: 3000, Valid: true},
+			Attempts:         1,
+			CacheStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
+			ParentActionName: sql.NullString{String: "run1", Valid: true},
+		}
+
+		enriched := svc.convertActionToEnrichedProto(action)
+		require.NotNil(t, enriched)
+		require.NotNil(t, enriched.Action)
+		require.NotNil(t, enriched.Action.Status)
+
+		status := enriched.Action.Status
+		assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, status.Phase)
+		assert.Equal(t, startedAt.Unix(), status.StartTime.AsTime().Unix())
+		assert.Equal(t, endedAt.Unix(), status.EndTime.AsTime().Unix())
+		require.NotNil(t, status.DurationMs)
+		assert.Equal(t, uint64(3000), *status.DurationMs)
+		assert.Equal(t, uint32(1), status.Attempts)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, status.CacheStatus)
+		assert.True(t, enriched.MeetsFilter)
+	})
+
+	t.Run("uses created_at when started_at is not set", func(t *testing.T) {
+		createdAt := now.Add(-5 * time.Second)
+		action := &models.Action{
+			Org:       "org",
+			Project:   "proj",
+			Domain:    "dev",
+			RunName:   "run1",
+			Name:      "action2",
+			Phase:     int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			CreatedAt: createdAt,
+		}
+
+		enriched := svc.convertActionToEnrichedProto(action)
+		require.NotNil(t, enriched)
+		assert.Equal(t, createdAt.Unix(), enriched.Action.Status.StartTime.AsTime().Unix())
+		assert.Nil(t, enriched.Action.Status.EndTime)
+		assert.Nil(t, enriched.Action.Status.DurationMs)
+	})
+
+	t.Run("nil action returns nil", func(t *testing.T) {
+		assert.Nil(t, svc.convertActionToEnrichedProto(nil))
+	})
+
+	t.Run("zero duration is not included", func(t *testing.T) {
+		action := &models.Action{
+			Org:        "org",
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			Name:       "action3",
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			DurationMs: sql.NullInt64{Int64: 0, Valid: true},
+		}
+
+		enriched := svc.convertActionToEnrichedProto(action)
+		require.NotNil(t, enriched)
+		assert.Nil(t, enriched.Action.Status.DurationMs)
+	})
+}

@@ -1455,8 +1455,25 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		Name: action.Name,
 	}
 
+	startTime := action.CreatedAt
+	if action.StartedAt.Valid {
+		startTime = action.StartedAt.Time
+	}
+
 	actionStatus := &workflow.ActionStatus{
-		Phase: common.ActionPhase(action.Phase),
+		Phase:       common.ActionPhase(action.Phase),
+		StartTime:   timestamppb.New(startTime),
+		Attempts:    action.Attempts,
+		CacheStatus: action.CacheStatus,
+	}
+
+	if action.EndedAt.Valid {
+		actionStatus.EndTime = timestamppb.New(action.EndedAt.Time)
+	}
+
+	if action.DurationMs.Valid && action.DurationMs.Int64 > 0 {
+		durationMs := uint64(action.DurationMs.Int64)
+		actionStatus.DurationMs = &durationMs
 	}
 
 	var metadata *workflow.ActionMetadata
