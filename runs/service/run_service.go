@@ -469,14 +469,23 @@ func (s *RunService) getAttempts(ctx context.Context, actionId *common.ActionIde
 
 // mergeEvents merges a set of events for the same attempt into a single ActionAttempt.
 func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.ActionAttempt {
-	// Order events by reported time, falling back to updated time.
+	// Order events by the controller-observed phase transition time.
+	// ReportedTime reflects when an observation was emitted and can arrive out of order,
+	// so it is only used as a tie-breaker for otherwise-identical UpdatedTime values.
 	sort.SliceStable(events, func(i, j int) bool {
+		updatedTimeI := events[i].GetUpdatedTime()
+		updatedTimeJ := events[j].GetUpdatedTime()
+		if updatedTimeI != nil && updatedTimeJ != nil && !updatedTimeI.AsTime().Equal(updatedTimeJ.AsTime()) {
+			return updatedTimeI.AsTime().Before(updatedTimeJ.AsTime())
+		}
+
 		reportedTimeI := events[i].GetReportedTime()
 		reportedTimeJ := events[j].GetReportedTime()
-		if reportedTimeI != nil && reportedTimeJ != nil {
+		if reportedTimeI != nil && reportedTimeJ != nil && !reportedTimeI.AsTime().Equal(reportedTimeJ.AsTime()) {
 			return reportedTimeI.AsTime().Before(reportedTimeJ.AsTime())
 		}
-		return events[i].GetUpdatedTime().AsTime().Before(events[j].GetUpdatedTime().AsTime())
+
+		return phaseOrder(events[i].GetPhase()) < phaseOrder(events[j].GetPhase())
 	})
 
 	if len(events) == 0 {
@@ -575,6 +584,26 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		ClusterEvents:    clusterEvents,
 		Cluster:          lastEvent.GetCluster(),
 		PhaseTransitions: phaseTransitions,
+	}
+}
+
+func phaseOrder(phase common.ActionPhase) int {
+	switch phase {
+	case common.ActionPhase_ACTION_PHASE_QUEUED:
+		return 0
+	case common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES:
+		return 1
+	case common.ActionPhase_ACTION_PHASE_INITIALIZING:
+		return 2
+	case common.ActionPhase_ACTION_PHASE_RUNNING:
+		return 3
+	case common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT:
+		return 4
+	default:
+		return 5
 	}
 }
 
