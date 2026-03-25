@@ -45,7 +45,7 @@ type Downloader struct {
 // So when e.g. FileExtension="csv", the file is written to "data.csv".
 // Also, when e.g. FileExtension="csv" and EnableLegacyFilename=true, the file is written to
 // "data" and "data.csv" (partially new behavior, bridges the gap of backward compatibility).
-func resolveVarFilenames(vars *core.VariableMap) (map[string][]string, error) {
+func resolveVarFilenames(vars *core.VariableMap) map[string][]string {
 	varFilenames := make(map[string][]string, len(vars.GetVariables()))
 	for varName, variable := range vars.GetVariables() {
 		varType := variable.GetType()
@@ -59,14 +59,11 @@ func resolveVarFilenames(vars *core.VariableMap) (map[string][]string, error) {
 					varFilenames[varName] = append(varFilenames[varName], varName)
 				}
 			}
-		case *core.LiteralType_Simple:
-			varFilenames[varName] = append(varFilenames[varName], varName)
 		default:
-			return nil, fmt.Errorf("currently CoPilot downloader does not support [%s], system error", varType)
+			varFilenames[varName] = append(varFilenames[varName], varName)
 		}
 	}
-	logger.Infof(context.Background(), "varFilenames: %v", varFilenames)
-	return varFilenames, nil
+	return varFilenames
 }
 
 // TODO add timeout and rate limit
@@ -582,11 +579,7 @@ func (d Downloader) DownloadInputs(ctx context.Context, vars *core.VariableMap, 
 		return errors.Wrapf(err, "failed to download input metadata message from remote store")
 	}
 
-	varFilenames, err := resolveVarFilenames(vars)
-	if err != nil {
-		return errors.Wrapf(err, "failed to resolve variable filenames")
-	}
-
+	varFilenames := resolveVarFilenames(vars)
 	varMap, lMap, err := d.RecursiveDownload(ctx, inputs, outputDir, varFilenames, true)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download input variable from remote store")
