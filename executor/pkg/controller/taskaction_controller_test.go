@@ -229,4 +229,41 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(updatedTaskAction.GetLabels()).To(HaveKey(LabelCompletedTime))
 		})
 	})
+
+	Context("taskActionStatusChanged", func() {
+		It("should detect PhaseHistory changes", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+					{Phase: "Executing", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+
+		It("should return false when nothing changed", func() {
+			now := metav1.Now()
+			status := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: now},
+				},
+			}
+			Expect(taskActionStatusChanged(status, status)).To(BeFalse())
+		})
+
+		It("should detect PhaseHistory addition from empty", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+	})
 })
