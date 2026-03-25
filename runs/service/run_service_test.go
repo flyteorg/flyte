@@ -1039,3 +1039,139 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	// Verify ReadProtobuf was only called once (for inputs, not outputs)
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
 }
+
+func TestActionModelToDetails(t *testing.T) {
+	svc := &RunService{}
+	now := time.Now().UTC().Truncate(time.Millisecond)
+	end := now.Add(5 * time.Second)
+
+	tests := []struct {
+		name     string
+		action   *models.Action
+		actionID *common.ActionIdentifier
+		verify   func(t *testing.T, result *workflow.ActionDetails)
+	}{
+		{
+			name:     "BothNilReturnsNil",
+			action:   nil,
+			actionID: nil,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				assert.Nil(t, result)
+			},
+		},
+		{
+			name: "BasicStatusFields",
+			action: &models.Action{
+				Phase:       int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				CreatedAt:   now,
+				Attempts:    2,
+				CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result)
+				assert.Equal(t, testActionID, result.Id)
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, result.Status.Phase)
+				assert.Equal(t, now, result.Status.StartTime.AsTime())
+				assert.Equal(t, uint32(2), result.Status.Attempts)
+				assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, result.Status.CacheStatus)
+				assert.Nil(t, result.Status.EndTime)
+				assert.Nil(t, result.Status.DurationMs)
+			},
+		},
+		{
+			name: "EndedAtSetsDurationFromTimestamps",
+			action: &models.Action{
+				Phase:     int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				CreatedAt: now,
+				EndedAt:   sql.NullTime{Time: end, Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result.Status.EndTime)
+				assert.Equal(t, end, result.Status.EndTime.AsTime())
+				require.NotNil(t, result.Status.DurationMs)
+				assert.Equal(t, uint64(5000), *result.Status.DurationMs)
+			},
+		},
+		{
+			name: "MetadataOptionalFields",
+			action: &models.Action{
+				Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:       int32(workflow.ActionType_ACTION_TYPE_TASK),
+				FunctionName:     "my_func",
+				ParentActionName: sql.NullString{String: "parent-action", Valid: true},
+				ActionGroup:      sql.NullString{String: "group-1", Valid: true},
+				EnvironmentName:  sql.NullString{String: "prod", Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result.Metadata)
+				assert.Equal(t, workflow.ActionType_ACTION_TYPE_TASK, result.Metadata.ActionType)
+				assert.Equal(t, "my_func", result.Metadata.FuntionName)
+				assert.Equal(t, "parent-action", result.Metadata.Parent)
+				assert.Equal(t, "group-1", result.Metadata.Group)
+				assert.Equal(t, "prod", result.Metadata.EnvironmentName)
+			},
+		},
+		{
+			name: "TaskMetadataWithFullID",
+			action: &models.Action{
+				Phase:         int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:    int32(workflow.ActionType_ACTION_TYPE_TASK),
+				TaskType:      "python",
+				TaskOrg:       sql.NullString{String: "org", Valid: true},
+				TaskProject:   sql.NullString{String: "proj", Valid: true},
+				TaskDomain:    sql.NullString{String: "dev", Valid: true},
+				TaskName:      sql.NullString{String: "my_task", Valid: true},
+				TaskVersion:   sql.NullString{String: "v1", Valid: true},
+				TaskShortName: sql.NullString{String: "short", Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				taskMeta := result.Metadata.GetTask()
+				require.NotNil(t, taskMeta)
+				assert.Equal(t, "python", taskMeta.TaskType)
+				assert.Equal(t, "short", taskMeta.ShortName)
+				require.NotNil(t, taskMeta.Id)
+				assert.Equal(t, "org", taskMeta.Id.Org)
+				assert.Equal(t, "proj", taskMeta.Id.Project)
+				assert.Equal(t, "dev", taskMeta.Id.Domain)
+				assert.Equal(t, "my_task", taskMeta.Id.Name)
+				assert.Equal(t, "v1", taskMeta.Id.Version)
+			},
+		},
+		{
+			name: "TraceMetadata",
+			action: &models.Action{
+				Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:   int32(workflow.ActionType_ACTION_TYPE_TRACE),
+				FunctionName: "trace_func",
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				traceMeta := result.Metadata.GetTrace()
+				require.NotNil(t, traceMeta)
+				assert.Equal(t, "trace_func", traceMeta.Name)
+				assert.Nil(t, result.Metadata.GetTask())
+			},
+		},
+		{
+			name: "NilActionID",
+			action: &models.Action{
+				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			},
+			actionID: nil,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result)
+				assert.Nil(t, result.Id)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.verify(t, svc.actionModelToDetails(tc.action, tc.actionID))
+		})
+	}
+}
