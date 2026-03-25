@@ -553,8 +553,10 @@ func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, e
 // MarkAbortAttempt increments abort_attempt_count and returns the new value.
 // Called by the reconciler before each actionsClient.Abort call.
 func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	var action models.Action
 	result := r.db.WithContext(ctx).
-		Model(&models.Action{}).
+		Model(&action).
+		Clauses(clause.Returning{Columns: []clause.Column{{Name: "abort_attempt_count"}}}).
 		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(map[string]interface{}{
@@ -563,16 +565,6 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 		})
 	if result.Error != nil {
 		return 0, fmt.Errorf("failed to mark abort attempt: %w", result.Error)
-	}
-
-	// Re-fetch the updated count.
-	var action models.Action
-	if err := r.db.WithContext(ctx).
-		Select("abort_attempt_count").
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		First(&action).Error; err != nil {
-		return 0, fmt.Errorf("failed to read abort attempt count: %w", err)
 	}
 	return action.AbortAttemptCount, nil
 }

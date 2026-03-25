@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -252,11 +253,13 @@ func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 		return
 	}
 
-	// Exponential backoff: initialDelay * 2^(attempt-1), capped at maxDelay.
-	delay := r.cfg.InitialDelay * (1 << (attemptCount - 1))
-	if delay > r.cfg.MaxDelay {
-		delay = r.cfg.MaxDelay
+	// Exponential backoff with full jitter: random(0, min(maxDelay, initialDelay * 2^(attempt-1))).
+	// Full jitter prevents thundering-herd when many actions retry simultaneously.
+	ceiling := r.cfg.InitialDelay * (1 << (attemptCount - 1))
+	if ceiling > r.cfg.MaxDelay {
+		ceiling = r.cfg.MaxDelay
 	}
+	delay := time.Duration(rand.Int63n(int64(ceiling) + 1))
 	logger.Infof(ctx, "AbortReconciler: scheduling retry for %s in %s", task.key, delay)
 	r.queue.scheduleRequeue(ctx, task, delay)
 }
