@@ -77,15 +77,31 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              cacheKey:
+                description: |-
+                  CacheKey enables cache lookup/writeback for this task action when set.
+                  This is propagated from workflow.TaskAction.cache_key.
+                maxLength: 256
+                type: string
               domain:
                 description: Domain this action belongs to
                 maxLength: 63
                 minLength: 1
                 type: string
+              envVars:
+                additionalProperties:
+                  type: string
+                description: EnvVars are run-scoped environment variables projected
+                  from RunSpec for executor runtime use.
+                type: object
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1
                 type: string
+              interruptible:
+                description: Interruptible is the run-scoped interruptibility override
+                  projected from RunSpec.
+                type: boolean
               org:
                 description: Org this action belongs to
                 maxLength: 63
@@ -144,10 +160,12 @@ spec:
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
+                format: int32
                 type: integer
               cacheStatus:
                 description: CacheStatus is the latest observed cache lookup result
                   for this action.
+                format: int32
                 type: integer
               conditions:
                 description: |-
@@ -189,7 +207,7 @@ spec:
                         reason contains a programmatic identifier indicating the reason for the condition's last transition.
                         Producers of specific condition types may define expected values and meanings for this field,
                         and whether the values are considered a guaranteed API.
-                        The value should be a CalmelCase string.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -1094,7 +1112,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZEFIMEQzSW1OeE5HZ1Z1UQ==
+  haSharedSecret: Qk9IVVU4bkFTR3A4UnlMYw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1688,7 +1706,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a19107aa7ee41ac729f9a35bf0e8c1dad540fce77c0ef7cd09024c0376afb3ac
+        checksum/secret: 95a620a15930e41d3191a31cb967f2abbc7986620582a5b00815c19b165a9296
       labels:
         app: docker-registry
         release: flyte-sandbox

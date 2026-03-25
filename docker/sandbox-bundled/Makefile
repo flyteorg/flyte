@@ -63,8 +63,12 @@ console:
 	docker pull --platform linux/arm64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
 	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/arm64/flyte-client-v2.tar
 
+.PHONY: sync-crds
+sync-crds:
+	$(MAKE) -C ../../executor manifests
+
 .PHONY: build
-build: flyte console dep_update manifests
+build: sync-crds flyte console dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox-v2:latest .
 
