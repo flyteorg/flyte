@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -160,6 +161,108 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	c.notifyRunService(ctx, ta, update, watch.Modified)
 
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestNotifyRunService_UpdateActionStatusIncludesEndTime(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	completionTime := metav1.Now()
+	ta, update := newTestActionUpdate("action-endtime")
+	ta.Status.Attempts = 1
+	ta.Status.PhaseHistory = []executorv1.PhaseTransition{
+		{Phase: "Queued", OccurredAt: metav1.NewTime(completionTime.Add(-30 * 1e9))},
+		{Phase: "Executing", OccurredAt: metav1.NewTime(completionTime.Add(-20 * 1e9))},
+		{Phase: "Succeeded", OccurredAt: completionTime},
+	}
+	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		status := req.Msg.GetStatus()
+		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
+			status.GetEndTime() != nil &&
+			status.GetEndTime().AsTime().Equal(completionTime.Time)
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Modified)
+
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestTerminalPhaseTimestamp(t *testing.T) {
+	now := metav1.Now()
+
+	tests := []struct {
+		name     string
+		history  []executorv1.PhaseTransition
+		expected *timestamppb.Timestamp
+	}{
+		{
+			name:     "empty history returns nil",
+			history:  nil,
+			expected: nil,
+		},
+		{
+			name: "non-terminal last phase returns nil",
+			history: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: now},
+				{Phase: "Executing", OccurredAt: now},
+			},
+			expected: nil,
+		},
+		{
+			name: "Succeeded returns timestamp",
+			history: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
+				{Phase: "Succeeded", OccurredAt: now},
+			},
+			expected: timestamppb.New(now.Time),
+		},
+		{
+			name: "Failed returns timestamp",
+			history: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
+				{Phase: "Failed", OccurredAt: now},
+			},
+			expected: timestamppb.New(now.Time),
+		},
+		{
+			name: "Aborted returns timestamp",
+			history: []executorv1.PhaseTransition{
+				{Phase: "Aborted", OccurredAt: now},
+			},
+			expected: timestamppb.New(now.Time),
+		},
+		{
+			name: "TimedOut returns timestamp",
+			history: []executorv1.PhaseTransition{
+				{Phase: "TimedOut", OccurredAt: now},
+			},
+			expected: timestamppb.New(now.Time),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ta := &executorv1.TaskAction{
+				Status: executorv1.TaskActionStatus{
+					PhaseHistory: tt.history,
+				},
+			}
+			result := terminalPhaseTimestamp(ta)
+			if tt.expected == nil {
+				assert.Nil(t, result)
+			} else {
+				require.NotNil(t, result)
+				assert.True(t, result.AsTime().Equal(tt.expected.AsTime()))
+			}
+		})
+	}
 }
 
 func TestBuildTaskActionName(t *testing.T) {
