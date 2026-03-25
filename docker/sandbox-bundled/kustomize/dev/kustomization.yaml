@@ -12,7 +12,7 @@ helmCharts:
 namespace: flyte
 resources:
 - ../namespace.yaml
-- ../../../../charts/flyte-binary/templates/crds/taskaction.yaml
+- ../../../../charts/flyte-binary/templates/crds/flyte.org_taskactions.yaml
 - ../dashboard-rbac.yaml
 patches:
 - target:
