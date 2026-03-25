@@ -431,7 +431,13 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
-	go c.notifyRunService(ctx, taskAction, update, event.Type)
+	// notifyRunService must be called synchronously (not in a goroutine) to
+	// preserve event ordering. If ADDED and MODIFIED events arrive in quick
+	// succession for the same action, running them concurrently can cause the
+	// MODIFIED event's UpdateActionStatus to execute before the ADDED event's
+	// RecordAction creates the DB row, leaving the action permanently stuck in
+	// the QUEUED phase.
+	c.notifyRunService(ctx, taskAction, update, event.Type)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -499,6 +505,25 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				c.recordedFilter.Add(ctx, actionKey)
 			}
 		}
+
+		// When a child action appears, the parent must already be running (it
+		// created the child). Promote the parent to RUNNING so the UI doesn't
+		// stay stuck on INITIALIZING while children are executing.
+		if update.ParentActionName != "" {
+			parentID := &common.ActionIdentifier{
+				Run:  update.ActionID.Run,
+				Name: update.ParentActionName,
+			}
+			parentStatusReq := &workflow.UpdateActionStatusRequest{
+				ActionId: parentID,
+				Status: &workflow.ActionStatus{
+					Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+				},
+			}
+			if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+				logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+			}
+		}
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
@@ -508,6 +533,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
+				StartTime:   executionStartTimestamp(taskAction),
 				EndTime:     terminalPhaseTimestamp(taskAction),
 			},
 		}
@@ -515,6 +541,21 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
 	}
+}
+
+// executionStartTimestamp returns the OccurredAt timestamp of the first
+// execution phase (Initializing or Executing) in the TaskAction's PhaseHistory.
+// This gives the run service an accurate started_at value instead of using
+// time.Now() at the time the status update is processed.
+func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
+	for _, entry := range ta.Status.PhaseHistory {
+		switch entry.Phase {
+		case string(executorv1.ConditionReasonInitializing),
+			string(executorv1.ConditionReasonExecuting):
+			return timestamppb.New(entry.OccurredAt.Time)
+		}
+	}
+	return nil
 }
 
 // terminalPhaseTimestamp returns the OccurredAt timestamp of the last entry in

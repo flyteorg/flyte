@@ -181,6 +181,11 @@ func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.Updat
 
 func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
+	var startTime *time.Time
+	if actionStatus.GetStartTime() != nil {
+		t := actionStatus.GetStartTime().AsTime()
+		startTime = &t
+	}
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
 		t := actionStatus.GetEndTime().AsTime()
@@ -197,6 +202,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetPhase(),
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
+		startTime,
 		endTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)

@@ -365,3 +365,74 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 }
+
+func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	runID := &common.RunIdentifier{
+		Org:     "org",
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "run1",
+	}
+
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Org:        runID.Org,
+			Project:    runID.Project,
+			Domain:     runID.Domain,
+			RunName:    runID.Name,
+			ActionName: "child-1",
+		},
+	}
+	update := &ActionUpdate{
+		ActionID: &common.ActionIdentifier{
+			Run:  runID,
+			Name: "child-1",
+		},
+		ParentActionName: "run1",
+	}
+
+	// Expect RecordAction for the child
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+
+	// Expect UpdateActionStatus for the PARENT with RUNNING phase
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		return req.Msg.GetActionId().GetName() == "run1" &&
+			req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_RUNNING
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	// Root action has no parent
+	ta, update := newTestActionUpdate("action-root")
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	// No UpdateActionStatus should be called for root (no parent to promote)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+}

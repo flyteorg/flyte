@@ -462,6 +462,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 }
 
 // UpdateActionPhase updates the phase of an action.
+// startTime, when non-nil, is the actual execution start from PhaseHistory.
 // endTime should be set when the action reaches a terminal phase.
 func (r *actionRepo) UpdateActionPhase(
 	ctx context.Context,
@@ -469,6 +470,7 @@ func (r *actionRepo) UpdateActionPhase(
 	phase common.ActionPhase,
 	attempts uint32,
 	cacheStatus core.CatalogCacheStatus,
+	startTime *time.Time,
 	endTime *time.Time,
 ) error {
 	updates := map[string]interface{}{
@@ -481,11 +483,17 @@ func (r *actionRepo) UpdateActionPhase(
 	// Record when the action first enters an execution phase (anything beyond
 	// the waiting stages). Tasks may skip RUNNING and go QUEUED → INITIALIZING →
 	// terminal, so we set started_at on any non-waiting phase.
+	// Prefer the actual timestamp from PhaseHistory when available; fall back to
+	// time.Now() for backward compatibility.
 	if phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED &&
 		phase != common.ActionPhase_ACTION_PHASE_QUEUED &&
 		phase != common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES {
+		actualStart := time.Now()
+		if startTime != nil {
+			actualStart = *startTime
+		}
 		updates["started_at"] = gorm.Expr(
-			"COALESCE(started_at, ?)", time.Now())
+			"COALESCE(started_at, ?)", actualStart)
 	}
 
 	if endTime != nil {
@@ -503,10 +511,11 @@ func (r *actionRepo) UpdateActionPhase(
 		}
 	}
 
+	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND name = ? AND phase <= ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name, phase).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -514,7 +523,9 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 
 	// Notify subscribers of action update
-	r.notifyActionUpdate(ctx, actionID)
+	if result.RowsAffected > 0 {
+		r.notifyActionUpdate(ctx, actionID)
+	}
 
 	return nil
 }

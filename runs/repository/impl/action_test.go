@@ -142,6 +142,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		3,
 		core.CatalogCacheStatus_CACHE_HIT,
+		nil,
 		&endTime,
 	)
 	require.NoError(t, err)
@@ -186,7 +187,7 @@ func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
 			// Transition to execution phase — should set started_at
 			err = actionRepo.UpdateActionPhase(ctx, actionID,
 				phase, 1,
-				core.CatalogCacheStatus_CACHE_DISABLED, nil)
+				core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 			require.NoError(t, err)
 
 			action, err := actionRepo.GetAction(ctx, actionID)
@@ -198,7 +199,7 @@ func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
 			endTime := startedAt.Add(5 * time.Second)
 			err = actionRepo.UpdateActionPhase(ctx, actionID,
 				common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
-				core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+				core.CatalogCacheStatus_CACHE_DISABLED, nil, &endTime)
 			require.NoError(t, err)
 
 			action, err = actionRepo.GetAction(ctx, actionID)
@@ -236,7 +237,7 @@ func TestUpdateActionPhase_StartedAtNotSetOnWaitingPhases(t *testing.T) {
 	// QUEUED should not set started_at
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -269,7 +270,7 @@ func TestUpdateActionPhase_StartedAtNotOverwritten(t *testing.T) {
 	// First RUNNING transition
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -280,7 +281,7 @@ func TestUpdateActionPhase_StartedAtNotOverwritten(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
