@@ -528,7 +528,10 @@ func terminalPhaseTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
 	}
 	last := history[len(history)-1]
 	switch last.Phase {
-	case "Succeeded", "Failed", "Aborted", "TimedOut":
+	case string(executorv1.ConditionReasonCompleted),
+		string(executorv1.ConditionReasonPermanentFailure),
+		string(executorv1.ConditionReasonRetryableFailure),
+		string(executorv1.ConditionReasonAborted):
 		return timestamppb.New(last.OccurredAt.Time)
 	}
 	return nil

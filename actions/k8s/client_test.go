@@ -178,7 +178,7 @@ func TestNotifyRunService_UpdateActionStatusIncludesEndTime(t *testing.T) {
 	ta.Status.PhaseHistory = []executorv1.PhaseTransition{
 		{Phase: "Queued", OccurredAt: metav1.NewTime(completionTime.Add(-30 * 1e9))},
 		{Phase: "Executing", OccurredAt: metav1.NewTime(completionTime.Add(-20 * 1e9))},
-		{Phase: "Succeeded", OccurredAt: completionTime},
+		{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: completionTime},
 	}
 	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
 
@@ -216,32 +216,32 @@ func TestTerminalPhaseTimestamp(t *testing.T) {
 			expected: nil,
 		},
 		{
-			name: "Succeeded returns timestamp",
+			name: "Completed returns timestamp",
 			history: []executorv1.PhaseTransition{
 				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
-				{Phase: "Succeeded", OccurredAt: now},
+				{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: now},
 			},
 			expected: timestamppb.New(now.Time),
 		},
 		{
-			name: "Failed returns timestamp",
+			name: "PermanentFailure returns timestamp",
 			history: []executorv1.PhaseTransition{
 				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
-				{Phase: "Failed", OccurredAt: now},
+				{Phase: string(executorv1.ConditionReasonPermanentFailure), OccurredAt: now},
+			},
+			expected: timestamppb.New(now.Time),
+		},
+		{
+			name: "RetryableFailure returns timestamp",
+			history: []executorv1.PhaseTransition{
+				{Phase: string(executorv1.ConditionReasonRetryableFailure), OccurredAt: now},
 			},
 			expected: timestamppb.New(now.Time),
 		},
 		{
 			name: "Aborted returns timestamp",
 			history: []executorv1.PhaseTransition{
-				{Phase: "Aborted", OccurredAt: now},
-			},
-			expected: timestamppb.New(now.Time),
-		},
-		{
-			name: "TimedOut returns timestamp",
-			history: []executorv1.PhaseTransition{
-				{Phase: "TimedOut", OccurredAt: now},
+				{Phase: string(executorv1.ConditionReasonAborted), OccurredAt: now},
 			},
 			expected: timestamppb.New(now.Time),
 		},
