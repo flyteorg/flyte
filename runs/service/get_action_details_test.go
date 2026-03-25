@@ -363,6 +363,36 @@ func TestMergeEvents_PhaseTransitions(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.PhaseTransitions[2].Phase)
 }
 
+func TestMergeEvents_PrefersUpdatedTimeOverReportedTime(t *testing.T) {
+	now := time.Now()
+	events := []*workflow.ActionEvent{
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_QUEUED,
+			UpdatedTime:  timestamppb.New(now),
+			ReportedTime: timestamppb.New(now.Add(2 * time.Second)),
+		},
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_RUNNING,
+			UpdatedTime:  timestamppb.New(now.Add(1 * time.Second)),
+			ReportedTime: timestamppb.New(now),
+		},
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			UpdatedTime:  timestamppb.New(now.Add(2 * time.Second)),
+			ReportedTime: timestamppb.New(now.Add(3 * time.Second)),
+		},
+	}
+
+	result := mergeEvents(1, events)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.Phase)
+	assert.Equal(t, 3, len(result.PhaseTransitions))
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, result.PhaseTransitions[0].Phase)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, result.PhaseTransitions[1].Phase)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.PhaseTransitions[2].Phase)
+	assert.True(t, result.PhaseTransitions[0].GetStartTime().AsTime().Equal(now))
+	assert.True(t, result.PhaseTransitions[1].GetStartTime().AsTime().Equal(now.Add(1*time.Second)))
+}
+
 func TestMergeEvents_MergesLogs(t *testing.T) {
 	now := time.Now()
 	events := []*workflow.ActionEvent{
