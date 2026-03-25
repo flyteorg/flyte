@@ -413,8 +413,11 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	case common.ActionPhase_ACTION_PHASE_FAILED:
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
 		// information from the latest attempt yet.
+		// When status.Attempts is 0, attempt tracking was not provided by the caller, so we use
+		// the last attempt's error info unconditionally.
 		numAttempts := len(action.GetAttempts())
-		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
+		statusAttempts := action.GetStatus().GetAttempts()
+		if numAttempts > 0 && (statusAttempts == 0 || action.GetAttempts()[numAttempts-1].GetAttempt() == statusAttempts) {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
 				ErrorInfo: action.GetAttempts()[numAttempts-1].GetErrorInfo(),
 			}
@@ -1212,9 +1215,6 @@ func (s *RunService) runModelToDetails(run *models.Run, runID *common.RunIdentif
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
 	if action == nil && actionID == nil {
 		return nil
-	}
-	details := &workflow.ActionDetails{
-		Id: actionID,
 	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
