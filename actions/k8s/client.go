@@ -543,11 +543,13 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	}
 }
 
-// executionStartTimestamp returns the OccurredAt timestamp of the first
-// execution phase (Initializing or Executing) in the TaskAction's PhaseHistory.
-// This gives the run service an accurate started_at value instead of using
-// time.Now() at the time the status update is processed.
+// executionStartTimestamp returns the actual execution start time for a TaskAction.
+// It prefers ExecutionStartedAt (the real pod container start time) over PhaseHistory
+// entries (which use controller observation time and can be delayed).
 func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
+	if ta.Status.ExecutionStartedAt != nil {
+		return timestamppb.New(ta.Status.ExecutionStartedAt.Time)
+	}
 	for _, entry := range ta.Status.PhaseHistory {
 		switch entry.Phase {
 		case string(executorv1.ConditionReasonInitializing),
@@ -558,11 +560,13 @@ func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
 	return nil
 }
 
-// terminalPhaseTimestamp returns the OccurredAt timestamp of the last entry in
-// the TaskAction's PhaseHistory if it represents a terminal phase. This allows
-// the run service to compute an accurate duration instead of falling back to
-// time.Now(), which can be significantly later than the actual completion time.
+// terminalPhaseTimestamp returns the actual completion time for a TaskAction.
+// It prefers CompletedAt (the real pod container finish time) over PhaseHistory
+// entries (which use controller observation time and can be delayed).
 func terminalPhaseTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
+	if ta.Status.CompletedAt != nil {
+		return timestamppb.New(ta.Status.CompletedAt.Time)
+	}
 	history := ta.Status.PhaseHistory
 	if len(history) == 0 {
 		return nil

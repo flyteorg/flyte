@@ -600,7 +600,9 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
+	// PhaseHistory uses metav1.Now() (controller observation time) to preserve
+	// monotonic ordering for event timestamps.
 	if phaseName != "" {
 		n := len(ta.Status.PhaseHistory)
 		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
@@ -609,6 +611,26 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 				OccurredAt: metav1.Now(),
 				Message:    msg,
 			})
+		}
+	}
+
+	// Store actual resource timestamps (e.g. pod container start/finish times)
+	// separately from PhaseHistory. These are used for accurate duration
+	// computation in the run service, while PhaseHistory retains controller
+	// observation times for event ordering.
+	taskInfo := info.Info()
+	if taskInfo != nil && taskInfo.OccurredAt != nil {
+		occurredAt := metav1.NewTime(*taskInfo.OccurredAt)
+		switch info.Phase() {
+		case pluginsCore.PhaseInitializing, pluginsCore.PhaseRunning:
+			if ta.Status.ExecutionStartedAt == nil {
+				ta.Status.ExecutionStartedAt = &occurredAt
+			}
+		case pluginsCore.PhaseSuccess, pluginsCore.PhasePermanentFailure, pluginsCore.PhaseRetryableFailure, pluginsCore.PhaseAborted:
+			if ta.Status.ExecutionStartedAt == nil {
+				ta.Status.ExecutionStartedAt = &occurredAt
+			}
+			ta.Status.CompletedAt = &occurredAt
 		}
 	}
 }

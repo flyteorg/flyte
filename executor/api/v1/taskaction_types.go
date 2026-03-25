@@ -267,6 +267,19 @@ type TaskActionStatus struct {
 	// Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
 	// +optional
 	PhaseHistory []PhaseTransition `json:"phaseHistory,omitempty"`
+
+	// ExecutionStartedAt is the actual execution start time from the underlying
+	// resource (e.g. pod container start time), as opposed to the controller's
+	// observation time stored in PhaseHistory. Set once when the task first enters
+	// an execution phase (Initializing or Running).
+	// +optional
+	ExecutionStartedAt *metav1.Time `json:"executionStartedAt,omitempty"`
+
+	// CompletedAt is the actual completion time from the underlying resource
+	// (e.g. pod container finish time). Set once when the task reaches a terminal
+	// phase (Succeeded, Failed, Aborted).
+	// +optional
+	CompletedAt *metav1.Time `json:"completedAt,omitempty"`
 }
 
 // +kubebuilder:object:root=true

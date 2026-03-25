@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -263,6 +264,61 @@ func TestTerminalPhaseTimestamp(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestExecutionStartTimestamp_PrefersActualTimestamp(t *testing.T) {
+	actualStart := time.Date(2026, 3, 25, 12, 0, 1, 0, time.UTC)
+	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
+	actualMeta := metav1.NewTime(actualStart)
+
+	ta := &executorv1.TaskAction{
+		Status: executorv1.TaskActionStatus{
+			ExecutionStartedAt: &actualMeta,
+			PhaseHistory: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-30 * time.Second))},
+				{Phase: "Executing", OccurredAt: metav1.NewTime(controllerTime)},
+			},
+		},
+	}
+	result := executionStartTimestamp(ta)
+	require.NotNil(t, result)
+	assert.True(t, result.AsTime().Equal(actualStart), "should use ExecutionStartedAt, not PhaseHistory")
+}
+
+func TestExecutionStartTimestamp_FallsBackToPhaseHistory(t *testing.T) {
+	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
+
+	ta := &executorv1.TaskAction{
+		Status: executorv1.TaskActionStatus{
+			// No ExecutionStartedAt set
+			PhaseHistory: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-10 * time.Second))},
+				{Phase: "Executing", OccurredAt: metav1.NewTime(controllerTime)},
+			},
+		},
+	}
+	result := executionStartTimestamp(ta)
+	require.NotNil(t, result)
+	assert.True(t, result.AsTime().Equal(controllerTime), "should fall back to PhaseHistory Executing entry")
+}
+
+func TestTerminalPhaseTimestamp_PrefersActualTimestamp(t *testing.T) {
+	actualEnd := time.Date(2026, 3, 25, 12, 0, 3, 0, time.UTC)
+	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
+	actualMeta := metav1.NewTime(actualEnd)
+
+	ta := &executorv1.TaskAction{
+		Status: executorv1.TaskActionStatus{
+			CompletedAt: &actualMeta,
+			PhaseHistory: []executorv1.PhaseTransition{
+				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-30 * time.Second))},
+				{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: metav1.NewTime(controllerTime)},
+			},
+		},
+	}
+	result := terminalPhaseTimestamp(ta)
+	require.NotNil(t, result)
+	assert.True(t, result.AsTime().Equal(actualEnd), "should use CompletedAt, not PhaseHistory")
 }
 
 func TestBuildTaskActionName(t *testing.T) {
