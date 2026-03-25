@@ -216,7 +216,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
 
-	// In-place pod restart: when a recoverable failure occurs, restart the pod within the
+	// In-place task restart: when a recoverable failure occurs, restart the pod within the
 	// same TaskAction rather than relying on the runs service to create a new TaskAction.
 	var restartAttempts uint32
 	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
@@ -233,7 +233,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			restartAttempts = currentAttempts + 1
 			// Override the transition to Queued so the TaskAction stays non-terminal.
 			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion,
-				fmt.Sprintf("restarting pod (attempt %d/%d)", currentAttempts+1, maxAttempts)))
+				fmt.Sprintf("restarting task (attempt %d/%d)", currentAttempts+1, maxAttempts)))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
