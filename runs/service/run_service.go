@@ -1170,9 +1170,13 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
+	startTime := action.CreatedAt
+	if action.StartedAt.Valid {
+		startTime = action.StartedAt.Time
+	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		StartTime:   timestamppb.New(action.CreatedAt),
+		StartTime:   timestamppb.New(startTime),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
 	}
@@ -1462,9 +1466,14 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		Name: action.Name,
 	}
 
+	startTime := action.CreatedAt
+	if action.StartedAt.Valid {
+		startTime = action.StartedAt.Time
+	}
+
 	actionStatus := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		StartTime:   timestamppb.New(action.CreatedAt),
+		StartTime:   timestamppb.New(startTime),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
 	}

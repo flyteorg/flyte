@@ -477,17 +477,25 @@ func (r *actionRepo) UpdateActionPhase(
 		"cache_status": cacheStatus,
 		"updated_at":   time.Now(),
 	}
+
+	// Record when the action first enters the RUNNING phase.
+	if phase == common.ActionPhase_ACTION_PHASE_RUNNING {
+		updates["started_at"] = gorm.Expr(
+			"COALESCE(started_at, ?)", time.Now())
+	}
+
 	if endTime != nil {
 		if r.isPostgres {
 			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
 			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			// Use started_at (actual execution start) when available, falling back to created_at.
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (GREATEST(?, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
 		} else {
 			// SQLite: use MAX() and compute duration via strftime
 			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 

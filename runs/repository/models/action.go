@@ -66,11 +66,13 @@ type Action struct {
 	RunSpec []byte `gorm:"type:bytea" db:"run_spec"`
 
 	// Timestamps
-	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
+	// CreatedAt is set by the DB (NOW()) on insert — represents when the action was queued.
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	// StartedAt is set when the action enters the RUNNING phase.
+	StartedAt sql.NullTime `db:"started_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt     sql.NullTime            `gorm:"index:idx_actions_ended" db:"ended_at"`
+	EndedAt sql.NullTime `gorm:"index:idx_actions_ended" db:"ended_at"`
 	DurationMs  sql.NullInt64           `db:"duration_ms"`
 	Attempts    uint32                  `db:"attempts" json:"attempts,omitempty"`
 	CacheStatus core.CatalogCacheStatus `db:"cache_status" json:"cache_status,omitempty"`
