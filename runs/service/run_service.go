@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -1088,7 +1089,7 @@ func (s *RunService) sendChangedActions(
 	})
 }
 
-// WatchClusterEvents streams cluster events from the DB action updates.
+// WatchClusterEvents streams Kubernetes cluster events recorded in action_events.
 func (s *RunService) WatchClusterEvents(
 	ctx context.Context,
 	req *connect.Request[workflow.WatchClusterEventsRequest],
@@ -1097,13 +1098,16 @@ func (s *RunService) WatchClusterEvents(
 	actionID := req.Msg.Id
 	logger.Infof(ctx, "Received WatchClusterEvents request for: %s/%s", actionID.Run.Name, actionID.Name)
 
-	// Step 1: Send existing events from current DB state
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
 
-	events := actionModelToClusterEvents(action)
+	sent := map[string]struct{}{}
+	events, err := s.listUnsentClusterEvents(ctx, actionID, sent)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
+	}
 	if len(events) > 0 {
 		if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: events}); err != nil {
 			return err
@@ -1120,8 +1124,6 @@ func (s *RunService) WatchClusterEvents(
 	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
 
-	lastPhase := action.Phase
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -1136,13 +1138,11 @@ func (s *RunService) WatchClusterEvents(
 			if updated.Name != actionID.Name {
 				continue
 			}
-			// Only emit an event when phase changes
-			if updated.Phase == lastPhase {
-				continue
-			}
-			lastPhase = updated.Phase
 
-			newEvents := actionModelToClusterEvents(updated)
+			newEvents, err := s.listUnsentClusterEvents(ctx, actionID, sent)
+			if err != nil {
+				return connect.NewError(connect.CodeInternal, err)
+			}
 			if len(newEvents) > 0 {
 				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
 					return err
@@ -1156,16 +1156,48 @@ func (s *RunService) WatchClusterEvents(
 	}
 }
 
-// actionModelToClusterEvents derives cluster events from an Action model's phase.
-func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent {
-	phase := common.ActionPhase(action.Phase)
-	if phase == common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
-		return nil
+func (s *RunService) listUnsentClusterEvents(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	sent map[string]struct{},
+) ([]*workflow.ClusterEvent, error) {
+	eventModels, err := s.repo.ActionRepo().ListEvents(ctx, actionID, 500)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list action events: %w", err)
 	}
-	return []*workflow.ClusterEvent{{
-		OccurredAt: timestamppb.New(action.UpdatedAt),
-		Message:    phase.String(),
-	}}
+
+	clusterEvents := make([]*workflow.ClusterEvent, 0)
+	for _, model := range eventModels {
+		event, err := model.ToActionEvent()
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert action event: %w", err)
+		}
+		for _, clusterEvent := range event.GetClusterEvents() {
+			key := clusterEventKey(event, clusterEvent)
+			if _, ok := sent[key]; ok {
+				continue
+			}
+			sent[key] = struct{}{}
+			clusterEvents = append(clusterEvents, clusterEvent)
+		}
+	}
+
+	return clusterEvents, nil
+}
+
+func clusterEventKey(event *workflow.ActionEvent, clusterEvent *workflow.ClusterEvent) string {
+	occurredAt := int64(0)
+	if clusterEvent.GetOccurredAt() != nil {
+		occurredAt = clusterEvent.GetOccurredAt().AsTime().UnixNano()
+	}
+
+	return strings.Join([]string{
+		strconv.FormatUint(uint64(event.GetAttempt()), 10),
+		strconv.FormatUint(uint64(event.GetVersion()), 10),
+		strconv.FormatInt(int64(event.GetPhase()), 10),
+		strconv.FormatInt(occurredAt, 10),
+		clusterEvent.GetMessage(),
+	}, "/")
 }
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.

@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -24,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -99,6 +102,17 @@ func matchActionID(expected *common.ActionIdentifier) interface{} {
 	})
 }
 
+func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunServiceClient {
+	path, handler := workflowconnect.NewRunServiceHandler(svc)
+
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+
+	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
+}
+
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -163,6 +177,154 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	require.NotNil(t, resp.Msg.Details.Action)
 	require.NotNil(t, resp.Msg.Details.Action.GetTask())
 	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+}
+
+func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	actionModel := &models.Action{
+		Org:     actionID.Run.Org,
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	}
+
+	clusterEvent := &workflow.ClusterEvent{
+		OccurredAt: timestamppb.New(time.Unix(100, 0)),
+		Message:    "Pod scheduled on node-a",
+	}
+	eventModel, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:            actionID,
+		Attempt:       0,
+		Phase:         common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:       1,
+		UpdatedTime:   timestamppb.New(time.Unix(101, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{clusterEvent},
+	})
+	require.NoError(t, err)
+
+	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil).Once()
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{eventModel}, nil).Once()
+
+	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+		Id: actionID,
+	}))
+	require.NoError(t, err)
+	require.True(t, stream.Receive())
+
+	resp := stream.Msg()
+	require.Len(t, resp.GetClusterEvents(), 1)
+	assert.Equal(t, "Pod scheduled on node-a", resp.GetClusterEvents()[0].GetMessage())
+
+	assert.False(t, stream.Receive())
+	assert.NoError(t, stream.Err())
+}
+
+func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	runningAction := &models.Action{
+		Org:     actionID.Run.Org,
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}
+	succeededAction := &models.Action{
+		Org:     actionID.Run.Org,
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	}
+
+	event1, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:     1,
+		UpdatedTime: timestamppb.New(time.Unix(101, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{{
+			OccurredAt: timestamppb.New(time.Unix(100, 0)),
+			Message:    "Pod created",
+		}},
+	})
+	require.NoError(t, err)
+
+	event2, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		Version:     2,
+		UpdatedTime: timestamppb.New(time.Unix(103, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{
+			{
+				OccurredAt: timestamppb.New(time.Unix(100, 0)),
+				Message:    "Pod created",
+			},
+			{
+				OccurredAt: timestamppb.New(time.Unix(102, 0)),
+				Message:    "Pulled container image",
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	actionRepo.On("GetAction", mock.Anything, actionID).Return(runningAction, nil).Once()
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{event1}, nil).Once()
+	actionRepo.On("WatchActionUpdates", mock.Anything, actionID.Run, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			errs := args.Get(3).(chan<- error)
+			updates <- succeededAction
+			close(updates)
+			close(errs)
+		}).Once()
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{event1, event2}, nil).Once()
+
+	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+		Id: actionID,
+	}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	first := stream.Msg()
+	require.Len(t, first.GetClusterEvents(), 1)
+	assert.Equal(t, "Pod created", first.GetClusterEvents()[0].GetMessage())
+
+	require.True(t, stream.Receive())
+	second := stream.Msg()
+	require.Len(t, second.GetClusterEvents(), 1)
+	assert.Equal(t, "Pulled container image", second.GetClusterEvents()[0].GetMessage())
+
+	assert.False(t, stream.Receive())
+	assert.NoError(t, stream.Err())
 }
 
 func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
