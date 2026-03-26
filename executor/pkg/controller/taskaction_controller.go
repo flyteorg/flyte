@@ -384,7 +384,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 	}
 
 	info := phaseInfo.Info()
-	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
+	updatedTime := realTimestamp(taskAction, phaseInfo.Phase())
 	reportedTime := reportedTimestamp(info)
 
 	event := &workflow.ActionEvent{
@@ -422,6 +422,28 @@ func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
 		return core.CatalogCacheStatus_CACHE_DISABLED
 	}
 	return cacheStatusFromExternalResources(info.ExternalResources)
+}
+
+// realTimestamp returns the real pod timestamp for the given phase:
+// - For terminal phases: CompletedAt (actual pod finish time)
+// - For running/initializing phases: ExecutionStartedAt (actual pod start time)
+// - Fallback: PhaseHistory last entry (controller observation time)
+func realTimestamp(ta *flyteorgv1.TaskAction, phase pluginsCore.Phase) *timestamppb.Timestamp {
+	switch phase {
+	case pluginsCore.PhaseSuccess, pluginsCore.PhasePermanentFailure, pluginsCore.PhaseRetryableFailure, pluginsCore.PhaseAborted:
+		if ta.Status.CompletedAt != nil {
+			return timestamppb.New(ta.Status.CompletedAt.Time)
+		}
+	case pluginsCore.PhaseInitializing, pluginsCore.PhaseRunning:
+		if ta.Status.ExecutionStartedAt != nil {
+			return timestamppb.New(ta.Status.ExecutionStartedAt.Time)
+		}
+	}
+	// Fallback to PhaseHistory controller observation time
+	if n := len(ta.Status.PhaseHistory); n > 0 {
+		return timestamppb.New(ta.Status.PhaseHistory[n-1].OccurredAt.Time)
+	}
+	return timestamppb.Now()
 }
 
 func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {

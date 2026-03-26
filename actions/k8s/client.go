@@ -564,9 +564,7 @@ func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
 		return timestamppb.New(ta.Status.ExecutionStartedAt.Time)
 	}
 	for _, entry := range ta.Status.PhaseHistory {
-		switch entry.Phase {
-		case string(executorv1.ConditionReasonInitializing),
-			string(executorv1.ConditionReasonExecuting):
+		if entry.Phase == string(executorv1.ConditionReasonQueued) {
 			return timestamppb.New(entry.OccurredAt.Time)
 		}
 	}

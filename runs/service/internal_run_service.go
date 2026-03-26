@@ -12,7 +12,6 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	coreIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -183,20 +182,6 @@ func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.Updat
 
 func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
-	var startTime *time.Time
-	if actionStatus.GetStartTime() != nil {
-		t := actionStatus.GetStartTime().AsTime()
-		startTime = &t
-	}
-	var endTime *time.Time
-	if actionStatus.GetEndTime() != nil {
-		t := actionStatus.GetEndTime().AsTime()
-		endTime = &t
-	} else if IsTerminalPhase(actionStatus.GetPhase()) {
-		// If no end time is provided but the phase is terminal, use now.
-		t := time.Now()
-		endTime = &t
-	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(
 		ctx,
@@ -204,8 +189,8 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetPhase(),
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
-		startTime,
-		endTime,
+		nil,
+		nil,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -253,6 +238,7 @@ func (s *RunService) RecordActionEventStream(
 
 // recordEvents inserts ActionEvents into the dedicated table and updates the action phase.
 func (s *RunService) recordEvents(ctx context.Context, events []*workflow.ActionEvent) error {
+	logger.Infof(ctx, "RecordActionEvents: received batch of %d events", len(events))
 	eventModels := make([]*models.ActionEvent, 0, len(events))
 	for _, event := range events {
 		m, err := models.NewActionEventModel(event)
@@ -272,40 +258,53 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 	// actions.phase column is updated via the slow path (K8s watcher → UpdateActionStatus).
 	// Without this, the sidebar (which reads actions.phase) lags behind the right panel
 	// (which reads action_events) during fast task executions.
-	best := make(map[string]*workflow.ActionEvent) // keyed by action name
+	// Collect per-action: the highest phase event (for phase advancement) and
+	// timestamps from all events.  A batch may contain [QUEUED, INITIALIZING,
+	// RUNNING, SUCCEEDED] for the same action; we need the non-terminal events'
+	// UpdatedTime for started_at and the terminal event's UpdatedTime for ended_at.
+	type actionUpdate struct {
+		best      *workflow.ActionEvent // highest phase event
+		startTime *time.Time           // from the highest non-terminal event
+		endTime   *time.Time           // from the terminal event
+	}
+	updates := make(map[string]*actionUpdate) // keyed by action name
 	for _, event := range events {
 		key := event.GetId().GetName()
-		if prev, ok := best[key]; !ok || event.GetPhase() > prev.GetPhase() {
-			best[key] = event
+		u, ok := updates[key]
+		if !ok {
+			u = &actionUpdate{}
+			updates[key] = u
 		}
-	}
-	for _, event := range best {
 		phase := event.GetPhase()
-		if phase <= common.ActionPhase_ACTION_PHASE_QUEUED {
-			continue
+		if u.best == nil || phase > u.best.GetPhase() {
+			u.best = event
 		}
-		// Use the event's UpdatedTime (from the controller's PhaseHistory)
-		// to set started_at so the frontend can show a live duration counter
-		// from the first non-queued phase. The SQL uses COALESCE(started_at, ?)
-		// so this only takes effect if started_at is still NULL.
-		// Do NOT pass endTime — the slow path sets accurate ended_at and
-		// duration_ms from real pod timestamps.
-		var startTime *time.Time
 		if event.GetUpdatedTime() != nil {
 			t := event.GetUpdatedTime().AsTime()
-			startTime = &t
+			if IsTerminalPhase(phase) {
+				u.endTime = &t
+			} else {
+				// Keep the latest non-terminal timestamp as startTime.
+				if u.startTime == nil || t.After(*u.startTime) {
+					u.startTime = &t
+				}
+			}
 		}
+	}
+	for _, u := range updates {
+		logger.Infof(ctx, "RecordActionEvents: advancing %s to phase %s startTime=%v endTime=%v",
+			u.best.GetId().GetName(), u.best.GetPhase(), u.startTime != nil, u.endTime != nil)
 		if err := s.repo.ActionRepo().UpdateActionPhase(
 			ctx,
-			event.GetId(),
-			phase,
-			event.GetAttempt(),
+			u.best.GetId(),
+			u.best.GetPhase(),
+			u.best.GetAttempt(),
 			coreIdl.CatalogCacheStatus_CACHE_DISABLED,
-			startTime,
-			nil, // endTime: let the slow path set this from real pod times
+			u.startTime,
+			u.endTime,
 		); err != nil {
 			logger.Warnf(ctx, "RecordActionEvents: failed to advance phase for %s to %s: %v",
-				event.GetId().GetName(), phase, err)
+				u.best.GetId().GetName(), u.best.GetPhase(), err)
 		}
 	}
 
