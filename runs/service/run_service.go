@@ -1199,15 +1199,13 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
-	startTime := action.CreatedAt
-	if action.StartedAt.Valid {
-		startTime = action.StartedAt.Time
-	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		StartTime:   timestamppb.New(startTime),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
+	}
+	if action.StartedAt.Valid {
+		status.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
@@ -1399,7 +1397,6 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		Metadata: actionMetadataFromModel(run),
 		Status: &workflow.ActionStatus{
 			Phase:       common.ActionPhase(run.Phase),
-			StartTime:   timestamppb.New(run.CreatedAt),
 			Attempts:    run.Attempts,
 			CacheStatus: run.CacheStatus,
 		},
@@ -1455,16 +1452,14 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		Name: action.Name,
 	}
 
-	startTime := action.CreatedAt
-	if action.StartedAt.Valid {
-		startTime = action.StartedAt.Time
-	}
-
 	actionStatus := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		StartTime:   timestamppb.New(startTime),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
+	}
+
+	if action.StartedAt.Valid {
+		actionStatus.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 
 	if action.EndedAt.Valid {
@@ -1512,16 +1507,14 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		Name: action.Name,
 	}
 
-	startTime := action.CreatedAt
-	if action.StartedAt.Valid {
-		startTime = action.StartedAt.Time
-	}
-
 	actionStatus := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		StartTime:   timestamppb.New(startTime),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
+	}
+
+	if action.StartedAt.Valid {
+		actionStatus.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 
 	if action.EndedAt.Valid {

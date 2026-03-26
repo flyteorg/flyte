@@ -431,6 +431,21 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
+
+	// Skip notifyRunService for terminal ADDED events during cold start.
+	// On the initial list, K8s replays all existing CRDs as ADDED events.
+	// Terminal actions (SUCCEEDED, FAILED, etc.) are already completed — processing
+	// them synchronously blocks the event loop and delays new events by tens of
+	// seconds when many old CRDs exist. We still add them to the bloom filter so
+	// they're skipped on subsequent reconnects too.
+	if event.Type == watch.Added && isTerminalActionPhase(update.Phase) {
+		if c.recordedFilter != nil {
+			actionKey := []byte(buildTaskActionName(update.ActionID))
+			c.recordedFilter.Add(ctx, actionKey)
+		}
+		return
+	}
+
 	// notifyRunService must be called synchronously (not in a goroutine) to
 	// preserve event ordering. If ADDED and MODIFIED events arrive in quick
 	// succession for the same action, running them concurrently can cause the
@@ -466,7 +481,13 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if eventType == watch.Added {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
-			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
+			// This action was already recorded in a previous watch session.
+			// Skip the entire notifyRunService call — RecordAction, parent
+			// promotion, and UpdateActionStatus are all redundant. Processing
+			// these duplicates synchronously blocks the event loop and delays
+			// new events by tens of seconds when many old CRDs exist.
+			logger.Debugf(ctx, "Skipping duplicate ADDED event for %s", update.ActionID.Name)
+			return
 		} else {
 			recordReq := &workflow.RecordActionRequest{
 				ActionId: update.ActionID,
@@ -619,6 +640,18 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 		}
 	}
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+}
+
+// isTerminalActionPhase returns true if the phase represents a final state.
+func isTerminalActionPhase(phase common.ActionPhase) bool {
+	switch phase {
+	case common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT:
+		return true
+	}
+	return false
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.

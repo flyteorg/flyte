@@ -471,6 +471,136 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
+func TestIsTerminalActionPhase(t *testing.T) {
+	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_SUCCEEDED))
+	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_FAILED))
+	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_ABORTED))
+	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_TIMED_OUT))
+
+	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_UNSPECIFIED))
+	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_QUEUED))
+	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_RUNNING))
+	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES))
+	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_INITIALIZING))
+}
+
+func TestHandleWatchEvent_SkipsTerminalAddedEvents(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	// Create a terminal TaskAction CRD (SUCCEEDED)
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Org:        "org",
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			ActionName: "completed-action",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeSucceeded), Status: "True"},
+			},
+		},
+	}
+
+	// handleWatchEvent should NOT call any RPC for terminal ADDED events
+	// If it did call RecordAction or UpdateActionStatus, the mock would fail
+	// since we haven't set up any expectations.
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+
+	// Verify no RPCs were called
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 0)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+
+	// Verify the action was added to the bloom filter for future dedup
+	actionKey := []byte(buildTaskActionName(&common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "completed-action",
+	}))
+	assert.True(t, filter.Contains(ctx, actionKey), "terminal ADDED action should be added to bloom filter")
+}
+
+func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	// Create a non-terminal TaskAction CRD (QUEUED)
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Org:        "org",
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			ActionName: "queued-action",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeProgressing), Status: "True", Reason: string(executorv1.ConditionReasonQueued)},
+			},
+		},
+	}
+
+	// Non-terminal ADDED events should be processed normally
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestNotifyRunService_DuplicateAddedSkipsEntireProcessing(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-dup")
+	update.Phase = common.ActionPhase_ACTION_PHASE_RUNNING
+
+	// First call — should process normally
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	// Second call (duplicate ADDED) — should skip entirely (no RPCs)
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
 func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	ctx := context.Background()
 

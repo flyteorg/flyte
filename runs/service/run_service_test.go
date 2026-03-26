@@ -410,7 +410,6 @@ func TestListRuns(t *testing.T) {
 				},
 				Status: &workflow.ActionStatus{
 					Phase:      common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-					StartTime:  startTime,
 					EndTime:    endTime,
 					DurationMs: &durationMs,
 				},
@@ -593,7 +592,6 @@ func TestConvertRunToProto(t *testing.T) {
 					},
 					Status: &workflow.ActionStatus{
 						Phase:      common.ActionPhase_ACTION_PHASE_QUEUED,
-						StartTime:  startTime,
 						EndTime:    endTime,
 						DurationMs: &durationMs,
 					},
@@ -1109,7 +1107,7 @@ func TestConvertActionToEnrichedProto_IncludesDuration(t *testing.T) {
 		assert.True(t, enriched.MeetsFilter)
 	})
 
-	t.Run("uses created_at when started_at is not set", func(t *testing.T) {
+	t.Run("start_time is nil when started_at is not set", func(t *testing.T) {
 		createdAt := now.Add(-5 * time.Second)
 		action := &models.Action{
 			Org:       "org",
@@ -1123,7 +1121,7 @@ func TestConvertActionToEnrichedProto_IncludesDuration(t *testing.T) {
 
 		enriched := svc.convertActionToEnrichedProto(action)
 		require.NotNil(t, enriched)
-		assert.Equal(t, createdAt.Unix(), enriched.Action.Status.StartTime.AsTime().Unix())
+		assert.Nil(t, enriched.Action.Status.StartTime)
 		assert.Nil(t, enriched.Action.Status.EndTime)
 		assert.Nil(t, enriched.Action.Status.DurationMs)
 	})

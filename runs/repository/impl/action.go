@@ -481,33 +481,33 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 
 	// Record when the action first enters an execution phase (anything beyond
-	// the waiting stages). Tasks may skip RUNNING and go QUEUED → INITIALIZING →
-	// terminal, so we set started_at on any non-waiting phase.
-	// Prefer the actual timestamp from PhaseHistory when available; fall back to
-	// time.Now() for backward compatibility.
-	if phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED &&
+	// the waiting stages). Only set started_at when a real start timestamp is
+	// provided — using time.Now() as a fallback can produce a value *after* the
+	// pod's actual end time, leading to zero or negative durations.
+	if startTime != nil &&
+		phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED &&
 		phase != common.ActionPhase_ACTION_PHASE_QUEUED &&
 		phase != common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES {
-		actualStart := time.Now()
-		if startTime != nil {
-			actualStart = *startTime
-		}
 		updates["started_at"] = gorm.Expr(
-			"COALESCE(started_at, ?)", actualStart)
+			"COALESCE(started_at, ?)", *startTime)
 	}
 
 	if endTime != nil {
+		// When started_at and ended_at are set in the same SQL UPDATE, the
+		// COALESCE(started_at, ...) expression reads the OLD row value (NULL).
+		// Use the startTime parameter as fallback so duration is computed from
+		// the actual start time being written, not from endTime (which gives 0).
+		startFallback := *endTime
+		if startTime != nil {
+			startFallback = *startTime
+		}
+		updates["ended_at"] = *endTime
 		if r.isPostgres {
-			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
-			// Use started_at (actual execution start) when available, falling back to created_at.
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (? - COALESCE(started_at, ?))) * 1000", *endTime, startFallback)
 		} else {
-			// SQLite: use MAX() and compute duration via strftime
-			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(?) - julianday(COALESCE(started_at, ?))) * 86400000 AS INTEGER)", *endTime, startFallback)
 		}
 	}
 

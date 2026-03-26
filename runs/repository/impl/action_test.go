@@ -158,6 +158,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
 	// Tasks may skip RUNNING and go QUEUED → INITIALIZING → terminal.
 	// started_at should be set on any execution phase (INITIALIZING, RUNNING, etc.)
+	// when a non-nil startTime is provided.
 	for _, phase := range []common.ActionPhase{
 		common.ActionPhase_ACTION_PHASE_INITIALIZING,
 		common.ActionPhase_ACTION_PHASE_RUNNING,
@@ -184,15 +185,16 @@ func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
 			}, nil)
 			require.NoError(t, err)
 
-			// Transition to execution phase — should set started_at
+			// Transition to execution phase with an explicit startTime — should set started_at
+			startTime := time.Now().Add(-10 * time.Second)
 			err = actionRepo.UpdateActionPhase(ctx, actionID,
 				phase, 1,
-				core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+				core.CatalogCacheStatus_CACHE_DISABLED, &startTime, nil)
 			require.NoError(t, err)
 
 			action, err := actionRepo.GetAction(ctx, actionID)
 			require.NoError(t, err)
-			assert.True(t, action.StartedAt.Valid, "started_at should be set after %s transition", phase)
+			assert.True(t, action.StartedAt.Valid, "started_at should be set after %s transition with non-nil startTime", phase)
 			startedAt := action.StartedAt.Time
 
 			// Transition to SUCCEEDED with an endTime — duration should be based on started_at
@@ -208,6 +210,51 @@ func TestUpdateActionPhase_SetsStartedAtOnExecutionPhase(t *testing.T) {
 			// Duration should be ~5000ms (endTime - startedAt), not endTime - createdAt
 			assert.InDelta(t, 5000, action.DurationMs.Int64, 1000,
 				"duration should reflect execution time (started_at to ended_at), not queue time")
+		})
+	}
+}
+
+func TestUpdateActionPhase_NilStartTimeDoesNotSetStartedAt(t *testing.T) {
+	// When startTime is nil (e.g. from the fast recordEvents path), started_at
+	// should NOT be set — we avoid time.Now() fallbacks that can produce
+	// started_at values after the actual pod end time.
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			db := setupActionDB(t)
+			defer func() { _ = db.Exec("DELETE FROM actions") }()
+			actionRepo := NewActionRepo(db, database.DbConfig{})
+			ctx := context.Background()
+
+			actionID := &common.ActionIdentifier{
+				Run: &common.RunIdentifier{
+					Org:     "org1",
+					Project: "proj1",
+					Domain:  "domain1",
+					Name:    "run1",
+				},
+				Name: "action1",
+			}
+
+			_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+				ActionId: actionID,
+				InputUri: "s3://bucket/input",
+			}, nil)
+			require.NoError(t, err)
+
+			// Pass nil startTime — started_at should remain NULL
+			err = actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 1,
+				core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+			require.NoError(t, err)
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.False(t, action.StartedAt.Valid,
+				"started_at should NOT be set when startTime is nil (phase=%s)", phase)
 		})
 	}
 }
@@ -267,21 +314,24 @@ func TestUpdateActionPhase_StartedAtNotOverwritten(t *testing.T) {
 	}, nil)
 	require.NoError(t, err)
 
-	// First RUNNING transition
+	// First RUNNING transition with explicit startTime
+	firstStart := time.Now().Add(-10 * time.Second)
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, &firstStart, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
+	assert.True(t, action.StartedAt.Valid)
 	firstStartedAt := action.StartedAt.Time
 
-	// Second RUNNING transition (e.g. retry) should NOT overwrite started_at
-	time.Sleep(10 * time.Millisecond)
+	// Second RUNNING transition (e.g. retry) with a different startTime should
+	// NOT overwrite started_at thanks to COALESCE(started_at, ?)
+	secondStart := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, &secondStart, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
