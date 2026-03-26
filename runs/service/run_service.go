@@ -42,6 +42,7 @@ type RunService struct {
 const (
 	runIDLength     = 20
 	runStringFormat = "r%s"
+	RootActionName  = "a0"
 )
 
 func generateRunName(seed int64) string {
@@ -147,7 +148,7 @@ func (s *RunService) CreateRun(
 
 	actionID := &common.ActionIdentifier{
 		Run:  runId,
-		Name: "a0",
+		Name: RootActionName,
 	}
 
 	// Get the task template and taskID
@@ -1389,7 +1390,7 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 			Org:     action.Org,
 			Project: action.Project,
 			Domain:  action.Domain,
-			Name:    action.GetRunName(),
+			Name:    action.RunName,
 		},
 		Name: action.Name,
 	}
