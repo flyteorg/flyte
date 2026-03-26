@@ -539,12 +539,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 }
 
 // executionStartTimestamp returns the actual execution start time for a TaskAction.
-// It prefers ExecutionStartedAt (the real pod container start time) over PhaseHistory
-// entries (which use controller observation time and can be delayed).
 func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
-	if ta.Status.ExecutionStartedAt != nil {
-		return timestamppb.New(ta.Status.ExecutionStartedAt.Time)
-	}
 	for _, entry := range ta.Status.PhaseHistory {
 		if entry.Phase == string(executorv1.ConditionReasonQueued) {
 			return timestamppb.New(entry.OccurredAt.Time)
@@ -554,12 +549,7 @@ func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
 }
 
 // terminalPhaseTimestamp returns the actual completion time for a TaskAction.
-// It prefers CompletedAt (the real pod container finish time) over PhaseHistory
-// entries (which use controller observation time and can be delayed).
 func terminalPhaseTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
-	if ta.Status.CompletedAt != nil {
-		return timestamppb.New(ta.Status.CompletedAt.Time)
-	}
 	history := ta.Status.PhaseHistory
 	if len(history) == 0 {
 		return nil
