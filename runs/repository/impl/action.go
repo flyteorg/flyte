@@ -501,7 +501,7 @@ func (r *actionRepo) UpdateActionPhase(
 	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
+		Where("org = ? AND project = ? AND domain = ? AND name = ? AND phase <= ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name, phase).
 		Updates(updates)
 
