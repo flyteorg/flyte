@@ -593,8 +593,6 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 	}
 
 	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
-	// PhaseHistory uses metav1.Now() (controller observation time) to preserve
-	// monotonic ordering for event timestamps.
 	if phaseName != "" {
 		n := len(ta.Status.PhaseHistory)
 		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {

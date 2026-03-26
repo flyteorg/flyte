@@ -431,7 +431,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	}
 
 	c.notifySubscribers(ctx, update)
-	c.notifyRunService(ctx, taskAction, update, event.Type)
+	go c.notifyRunService(ctx, taskAction, update, event.Type)
 }
 
 // notifySubscribers sends an update to all subscribers

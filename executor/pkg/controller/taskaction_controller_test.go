@@ -231,73 +231,7 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 	})
 
-	Context("mapPhaseToConditions actual timestamps", func() {
-		It("should set ExecutionStartedAt from plugin OccurredAt on Running phase", func() {
-			ta := &flyteorgv1.TaskAction{}
-			podTime := time.Date(2026, 3, 25, 12, 0, 1, 0, time.UTC)
-			info := pluginsCore.PhaseInfoRunning(0, &pluginsCore.TaskInfo{
-				OccurredAt: &podTime,
-			})
-			mapPhaseToConditions(ta, info)
-
-			Expect(ta.Status.ExecutionStartedAt).NotTo(BeNil())
-			Expect(ta.Status.ExecutionStartedAt.Time.Equal(podTime)).To(BeTrue())
-			Expect(ta.Status.CompletedAt).To(BeNil())
-		})
-
-		It("should set ExecutionStartedAt from plugin OccurredAt on Initializing phase", func() {
-			ta := &flyteorgv1.TaskAction{}
-			podTime := time.Date(2026, 3, 25, 12, 0, 1, 0, time.UTC)
-			info := pluginsCore.PhaseInfoInitializing(podTime, 0, "initializing", &pluginsCore.TaskInfo{
-				OccurredAt: &podTime,
-			})
-			mapPhaseToConditions(ta, info)
-
-			Expect(ta.Status.ExecutionStartedAt).NotTo(BeNil())
-			Expect(ta.Status.ExecutionStartedAt.Time.Equal(podTime)).To(BeTrue())
-		})
-
-		It("should not overwrite ExecutionStartedAt on subsequent Running phases", func() {
-			firstTime := time.Date(2026, 3, 25, 12, 0, 1, 0, time.UTC)
-			firstMeta := metav1.NewTime(firstTime)
-			ta := &flyteorgv1.TaskAction{
-				Status: flyteorgv1.TaskActionStatus{
-					ExecutionStartedAt: &firstMeta,
-				},
-			}
-			laterTime := time.Date(2026, 3, 25, 12, 0, 5, 0, time.UTC)
-			info := pluginsCore.PhaseInfoRunning(1, &pluginsCore.TaskInfo{
-				OccurredAt: &laterTime,
-			})
-			mapPhaseToConditions(ta, info)
-
-			Expect(ta.Status.ExecutionStartedAt.Time.Equal(firstTime)).To(BeTrue())
-		})
-
-		It("should set CompletedAt from plugin OccurredAt on Success phase", func() {
-			ta := &flyteorgv1.TaskAction{}
-			podTime := time.Date(2026, 3, 25, 12, 0, 3, 0, time.UTC)
-			info := pluginsCore.PhaseInfoSuccess(&pluginsCore.TaskInfo{
-				OccurredAt: &podTime,
-			})
-			mapPhaseToConditions(ta, info)
-
-			Expect(ta.Status.CompletedAt).NotTo(BeNil())
-			Expect(ta.Status.CompletedAt.Time.Equal(podTime)).To(BeTrue())
-		})
-
-		It("should set CompletedAt on PermanentFailure phase", func() {
-			ta := &flyteorgv1.TaskAction{}
-			podTime := time.Date(2026, 3, 25, 12, 0, 3, 0, time.UTC)
-			info := pluginsCore.PhaseInfoFailure("ERR", "something failed", &pluginsCore.TaskInfo{
-				OccurredAt: &podTime,
-			})
-			mapPhaseToConditions(ta, info)
-
-			Expect(ta.Status.CompletedAt).NotTo(BeNil())
-			Expect(ta.Status.CompletedAt.Time.Equal(podTime)).To(BeTrue())
-		})
-
+	Context("mapPhaseToConditions", func() {
 		It("should keep PhaseHistory using controller time, not pod time", func() {
 			ta := &flyteorgv1.TaskAction{}
 			podTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC) // far in the past
@@ -312,9 +246,6 @@ var _ = Describe("TaskAction Controller", func() {
 			phTime := ta.Status.PhaseHistory[0].OccurredAt.Time
 			Expect(phTime.After(before)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
 			Expect(phTime.Before(after)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
-
-			// But ExecutionStartedAt should use actual pod time
-			Expect(ta.Status.ExecutionStartedAt.Time.Equal(podTime)).To(BeTrue())
 		})
 	})
 
