@@ -1168,13 +1168,12 @@ func TestRecordEvents_AdvancesActionPhase(t *testing.T) {
 			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
 			Version:     0,
 			UpdatedTime: eventTime,
-			StartTime:   eventTime, // Real pod start time from controller
 		},
 	}
 
 	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// When the event has StartTime, pass it through so the frontend can
-	// show a live duration counter immediately. endTime stays nil.
+	// UpdatedTime from the event is passed as startTime so the frontend
+	// can show a live duration counter immediately. endTime stays nil.
 	actionRepo.On("UpdateActionPhase",
 		mock.Anything,
 		actionID,
@@ -1214,14 +1213,14 @@ func TestRecordEvents_AdvancesPhaseToTerminal(t *testing.T) {
 	}
 
 	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// Terminal phase: still no timestamps — the slow path sets accurate times.
+	// UpdatedTime from the event is passed as startTime for all phases.
 	actionRepo.On("UpdateActionPhase",
 		mock.Anything,
 		actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		uint32(1),
 		core.CatalogCacheStatus_CACHE_DISABLED,
-		(*time.Time)(nil),
+		mock.MatchedBy(func(t *time.Time) bool { return t != nil }),
 		(*time.Time)(nil),
 	).Return(nil).Once()
 
@@ -1290,14 +1289,15 @@ func TestRecordEvents_PicksHighestPhasePerAction(t *testing.T) {
 	}
 
 	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// Only the highest phase (SUCCEEDED) should trigger UpdateActionPhase
+	// Only the highest phase (SUCCEEDED) should trigger UpdateActionPhase.
+	// UpdatedTime from the event is passed as startTime.
 	actionRepo.On("UpdateActionPhase",
 		mock.Anything,
 		actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		uint32(1),
 		core.CatalogCacheStatus_CACHE_DISABLED,
-		(*time.Time)(nil),
+		mock.MatchedBy(func(t *time.Time) bool { return t != nil }),
 		(*time.Time)(nil),
 	).Return(nil).Once()
 

@@ -284,15 +284,15 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		if phase <= common.ActionPhase_ACTION_PHASE_QUEUED {
 			continue
 		}
-		// Use the event's StartTime (real pod execution start from the
-		// controller) so the frontend can show a live duration counter from
-		// the INITIALIZING phase. The SQL uses COALESCE(started_at, ?) so
-		// this only takes effect if started_at is still NULL.
+		// Use the event's UpdatedTime (from the controller's PhaseHistory)
+		// to set started_at so the frontend can show a live duration counter
+		// from the first non-queued phase. The SQL uses COALESCE(started_at, ?)
+		// so this only takes effect if started_at is still NULL.
 		// Do NOT pass endTime — the slow path sets accurate ended_at and
 		// duration_ms from real pod timestamps.
 		var startTime *time.Time
-		if event.GetStartTime() != nil {
-			t := event.GetStartTime().AsTime()
+		if event.GetUpdatedTime() != nil {
+			t := event.GetUpdatedTime().AsTime()
 			startTime = &t
 		}
 		if err := s.repo.ActionRepo().UpdateActionPhase(
