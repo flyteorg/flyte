@@ -528,8 +528,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				StartTime:   executionStartTimestamp(taskAction),
-				EndTime:     terminalPhaseTimestamp(taskAction),
+				// StartTime:   executionStartTimestamp(taskAction),
+				EndTime: terminalPhaseTimestamp(taskAction),
 			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {

@@ -1172,8 +1172,8 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
-		Attempts:    action.Attempts,
 		StartTime:   timestamppb.New(action.CreatedAt),
+		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
 	}
 	if action.EndedAt.Valid {
@@ -1366,6 +1366,7 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		Metadata: actionMetadataFromModel(run),
 		Status: &workflow.ActionStatus{
 			Phase:       common.ActionPhase(run.Phase),
+			StartTime:   timestamppb.New(run.CreatedAt),
 			Attempts:    run.Attempts,
 			CacheStatus: run.CacheStatus,
 		},

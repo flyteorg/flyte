@@ -1002,8 +1002,11 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 	return actions, nil
 }
 
-// notifyActionUpdate sends a notification about an action update
-func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+// notifyActionUpdate sends a notification about an action update.
+// If db is non-nil (e.g. an in-flight transaction), it reuses that connection;
+// otherwise it falls back to the pool.  Reusing a transaction avoids opening an
+// extra connection per NOTIFY and prevents "too many clients" under load.
+func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier, db ...*gorm.DB) {
 	if !r.isPostgres {
 		return
 	}
@@ -1011,9 +1014,13 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
 		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	// Execute NOTIFY
+	conn := r.db
+	if len(db) > 0 && db[0] != nil {
+		conn = db[0]
+	}
+
 	notifySQL := fmt.Sprintf("NOTIFY action_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
+	if err := conn.WithContext(ctx).Exec(notifySQL).Error; err != nil {
 		logger.Errorf(ctx, "Failed to NOTIFY action_updates: %v", err)
 	}
 }
