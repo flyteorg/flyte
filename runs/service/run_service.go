@@ -1131,6 +1131,8 @@ func (s *RunService) WatchClusterEvents(
 	for {
 		offset := 0
 		isTerminal := IsTerminalPhase(common.ActionPhase(action.Phase))
+
+		// Drain all available cluster events for current action since lastUpdatedAt
 		for {
 			info, err := s.getClusterEventsInfo(ctx, actionID, attempt, lastUpdatedAt, offset, maxEvents)
 			if err != nil {
