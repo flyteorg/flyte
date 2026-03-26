@@ -504,10 +504,10 @@ func (r *actionRepo) UpdateActionPhase(
 		updates["ended_at"] = *endTime
 		if r.isPostgres {
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (? - COALESCE(started_at, ?))) * 1000", *endTime, startFallback)
+				"GREATEST(0, EXTRACT(EPOCH FROM (? - COALESCE(started_at, ?))) * 1000)", *endTime, startFallback)
 		} else {
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(?) - julianday(COALESCE(started_at, ?))) * 86400000 AS INTEGER)", *endTime, startFallback)
+				"MAX(0, CAST((julianday(?) - julianday(COALESCE(started_at, ?))) * 86400000 AS INTEGER))", *endTime, startFallback)
 		}
 	}
 

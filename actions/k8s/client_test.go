@@ -484,7 +484,7 @@ func TestIsTerminalActionPhase(t *testing.T) {
 	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_INITIALIZING))
 }
 
-func TestHandleWatchEvent_SkipsTerminalAddedEvents(t *testing.T) {
+func TestHandleWatchEvent_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -513,21 +513,27 @@ func TestHandleWatchEvent_SkipsTerminalAddedEvents(t *testing.T) {
 		},
 	}
 
-	// handleWatchEvent should NOT call any RPC for terminal ADDED events
-	// If it did call RecordAction or UpdateActionStatus, the mock would fail
-	// since we haven't set up any expectations.
+	// First ADDED event (cold start, not in bloom filter): should process normally
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
 
-	// Verify no RPCs were called
-	mockClient.AssertNumberOfCalls(t, "RecordAction", 0)
-	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 
-	// Verify the action was added to the bloom filter for future dedup
+	// Action should now be in the bloom filter
 	actionKey := []byte(buildTaskActionName(&common.ActionIdentifier{
 		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
 		Name: "completed-action",
 	}))
-	assert.True(t, filter.Contains(ctx, actionKey), "terminal ADDED action should be added to bloom filter")
+	assert.True(t, filter.Contains(ctx, actionKey))
+
+	// Second ADDED event (reconnect, in bloom filter): should be skipped
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
 func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {

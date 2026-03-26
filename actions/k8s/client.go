@@ -432,18 +432,17 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 
 	c.notifySubscribers(ctx, update)
 
-	// Skip notifyRunService for terminal ADDED events during cold start.
-	// On the initial list, K8s replays all existing CRDs as ADDED events.
-	// Terminal actions (SUCCEEDED, FAILED, etc.) are already completed — processing
-	// them synchronously blocks the event loop and delays new events by tens of
-	// seconds when many old CRDs exist. We still add them to the bloom filter so
-	// they're skipped on subsequent reconnects too.
-	if event.Type == watch.Added && isTerminalActionPhase(update.Phase) {
-		if c.recordedFilter != nil {
-			actionKey := []byte(buildTaskActionName(update.ActionID))
-			c.recordedFilter.Add(ctx, actionKey)
+	// Skip terminal ADDED events that are already in the bloom filter.
+	// On watch reconnects, K8s replays all existing CRDs as ADDED events.
+	// Terminal actions that were already processed don't need another
+	// UpdateActionStatus RPC. Skip them to avoid blocking the event loop.
+	// NOTE: Do NOT skip terminal ADDED events on cold start — they still
+	// need UpdateActionStatus to set started_at/ended_at/duration_ms.
+	if event.Type == watch.Added && isTerminalActionPhase(update.Phase) && c.recordedFilter != nil {
+		actionKey := []byte(buildTaskActionName(update.ActionID))
+		if c.recordedFilter.Contains(ctx, actionKey) {
+			return
 		}
-		return
 	}
 
 	// notifyRunService must be called synchronously (not in a goroutine) to
