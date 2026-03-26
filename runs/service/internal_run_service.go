@@ -5,14 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"time"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	coreIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -182,6 +180,8 @@ func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.Updat
 
 func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
+	startTime := actionStatus.GetStartTime().AsTime()
+	endTime := actionStatus.GetEndTime().AsTime()
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(
 		ctx,
@@ -189,8 +189,8 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetPhase(),
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
-		nil,
-		nil,
+		&startTime,
+		&endTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -238,7 +238,6 @@ func (s *RunService) RecordActionEventStream(
 
 // recordEvents inserts ActionEvents into the dedicated table and updates the action phase.
 func (s *RunService) recordEvents(ctx context.Context, events []*workflow.ActionEvent) error {
-	logger.Infof(ctx, "RecordActionEvents: received batch of %d events", len(events))
 	eventModels := make([]*models.ActionEvent, 0, len(events))
 	for _, event := range events {
 		m, err := models.NewActionEventModel(event)
@@ -251,61 +250,6 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 	if err := s.repo.ActionRepo().InsertEvents(ctx, eventModels); err != nil {
 		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
 		return connect.NewError(connect.CodeInternal, err)
-	}
-
-	// Advance action phase in the actions table to match the highest event phase.
-	// Events arrive via the fast path (controller → events proxy → here) while the
-	// actions.phase column is updated via the slow path (K8s watcher → UpdateActionStatus).
-	// Without this, the sidebar (which reads actions.phase) lags behind the right panel
-	// (which reads action_events) during fast task executions.
-	// Collect per-action: the highest phase event (for phase advancement) and
-	// timestamps from all events.  A batch may contain [QUEUED, INITIALIZING,
-	// RUNNING, SUCCEEDED] for the same action; we need the non-terminal events'
-	// UpdatedTime for started_at and the terminal event's UpdatedTime for ended_at.
-	type actionUpdate struct {
-		best      *workflow.ActionEvent // highest phase event
-		startTime *time.Time           // from the highest non-terminal event
-		endTime   *time.Time           // from the terminal event
-	}
-	updates := make(map[string]*actionUpdate) // keyed by action name
-	for _, event := range events {
-		key := event.GetId().GetName()
-		u, ok := updates[key]
-		if !ok {
-			u = &actionUpdate{}
-			updates[key] = u
-		}
-		phase := event.GetPhase()
-		if u.best == nil || phase > u.best.GetPhase() {
-			u.best = event
-		}
-		if event.GetUpdatedTime() != nil {
-			t := event.GetUpdatedTime().AsTime()
-			if IsTerminalPhase(phase) {
-				u.endTime = &t
-			} else {
-				// Keep the latest non-terminal timestamp as startTime.
-				if u.startTime == nil || t.After(*u.startTime) {
-					u.startTime = &t
-				}
-			}
-		}
-	}
-	for _, u := range updates {
-		logger.Infof(ctx, "RecordActionEvents: advancing %s to phase %s startTime=%v endTime=%v",
-			u.best.GetId().GetName(), u.best.GetPhase(), u.startTime != nil, u.endTime != nil)
-		if err := s.repo.ActionRepo().UpdateActionPhase(
-			ctx,
-			u.best.GetId(),
-			u.best.GetPhase(),
-			u.best.GetAttempt(),
-			coreIdl.CatalogCacheStatus_CACHE_DISABLED,
-			u.startTime,
-			u.endTime,
-		); err != nil {
-			logger.Warnf(ctx, "RecordActionEvents: failed to advance phase for %s to %s: %v",
-				u.best.GetId().GetName(), u.best.GetPhase(), err)
-		}
 	}
 
 	return nil

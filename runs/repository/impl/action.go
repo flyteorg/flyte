@@ -490,14 +490,14 @@ func (r *actionRepo) UpdateActionPhase(
 				// Both start and end provided in the same call — compute duration
 				// from the new startTime directly since PostgreSQL evaluates SET
 				// expressions using old row values.
-				updates["ended_at"] = gorm.Expr("GREATEST(?, ?)", *endTime, *startTime)
+				updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, ?::timestamp)", *endTime, *startTime)
 				updates["duration_ms"] = gorm.Expr(
-					"EXTRACT(EPOCH FROM (GREATEST(?, ?) - ?)) * 1000", *endTime, *startTime, *startTime)
+					"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, ?::timestamp) - ?::timestamp)) * 1000", *endTime, *startTime, *startTime)
 			} else {
 				// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-				updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+				updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, created_at)", *endTime)
 				updates["duration_ms"] = gorm.Expr(
-					"EXTRACT(EPOCH FROM (GREATEST(?, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
+					"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
 			}
 		} else {
 			if startTime != nil {
@@ -523,69 +523,8 @@ func (r *actionRepo) UpdateActionPhase(
 	if result.Error != nil {
 		return result.Error
 	}
-
-	// If the phase update didn't match (action doesn't exist yet or phase already
-	// advanced past ours), backfill timestamps without the phase guard.  This
-	// handles the race where fast-path events arrive before RecordAction creates
-	// the action row, and by the time the row exists the phase is already terminal.
-	if result.RowsAffected == 0 && (startTime != nil || endTime != nil) {
-		tsUpdates := map[string]interface{}{
-			"updated_at": time.Now(),
-		}
-		conditions := []string{
-			"org = ?", "project = ?", "domain = ?", "name = ?",
-		}
-		args := []interface{}{
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name,
-		}
-
-		if startTime != nil {
-			// Only backfill started_at when it's currently NULL.
-			conditions = append(conditions, "started_at IS NULL")
-			tsUpdates["started_at"] = *startTime
-		}
-		if endTime != nil {
-			if r.isPostgres {
-				if startTime != nil {
-					tsUpdates["ended_at"] = gorm.Expr("GREATEST(?, ?)", *endTime, *startTime)
-					tsUpdates["duration_ms"] = gorm.Expr(
-						"EXTRACT(EPOCH FROM (GREATEST(?, ?) - ?)) * 1000", *endTime, *startTime, *startTime)
-				} else {
-					tsUpdates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
-					tsUpdates["duration_ms"] = gorm.Expr(
-						"EXTRACT(EPOCH FROM (GREATEST(?, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
-				}
-			} else {
-				if startTime != nil {
-					tsUpdates["ended_at"] = gorm.Expr("MAX(?, ?)", *endTime, *startTime)
-					tsUpdates["duration_ms"] = gorm.Expr(
-						"CAST((julianday(MAX(?, ?)) - julianday(?)) * 86400000 AS INTEGER)", *endTime, *startTime, *startTime)
-				} else {
-					tsUpdates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
-					tsUpdates["duration_ms"] = gorm.Expr(
-						"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
-				}
-			}
-		}
-
-		where := r.db.WithContext(ctx).Model(&models.Action{})
-		for i, cond := range conditions {
-			where = where.Where(cond, args[i])
-		}
-		retryResult := where.Updates(tsUpdates)
-		if retryResult.Error != nil {
-			return retryResult.Error
-		}
-		if retryResult.RowsAffected > 0 {
-			r.notifyActionUpdate(ctx, actionID)
-		}
-		return nil
-	}
-
-	// Notify subscribers of action update
-	if result.RowsAffected > 0 {
-		r.notifyActionUpdate(ctx, actionID)
-	}
+	// Notify subscribers of the action update
+	r.notifyActionUpdate(ctx, actionID)
 
 	return nil
 }
