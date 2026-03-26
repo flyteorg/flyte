@@ -189,6 +189,10 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	if actionStatus.GetEndTime() != nil {
 		t := actionStatus.GetEndTime().AsTime()
 		endTime = &t
+	} else if IsTerminalPhase(actionStatus.GetPhase()) {
+		// If no end time is provided but the phase is terminal, use now.
+		t := time.Now()
+		endTime = &t
 	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(

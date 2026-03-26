@@ -604,18 +604,6 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
-// isTerminalActionPhase returns true if the phase represents a final state.
-func isTerminalActionPhase(phase common.ActionPhase) bool {
-	switch phase {
-	case common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-		common.ActionPhase_ACTION_PHASE_FAILED,
-		common.ActionPhase_ACTION_PHASE_ABORTED,
-		common.ActionPhase_ACTION_PHASE_TIMED_OUT:
-		return true
-	}
-	return false
-}
-
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.
 // For root actions (where action name == run name), the name is <run-id>-a0.
 // For child actions, the name is <run-id>-<action-id>.

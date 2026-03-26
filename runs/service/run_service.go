@@ -1372,6 +1372,9 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 			CacheStatus: run.CacheStatus,
 		},
 	}
+	if run.StartedAt.Valid {
+		action.Status.StartTime = timestamppb.New(run.StartedAt.Time)
+	}
 	if run.EndedAt.Valid {
 		action.Status.EndTime = timestamppb.New(run.EndedAt.Time)
 	}

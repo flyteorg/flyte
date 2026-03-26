@@ -471,19 +471,6 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
-func TestIsTerminalActionPhase(t *testing.T) {
-	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_SUCCEEDED))
-	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_FAILED))
-	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_ABORTED))
-	assert.True(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_TIMED_OUT))
-
-	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_UNSPECIFIED))
-	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_QUEUED))
-	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_RUNNING))
-	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES))
-	assert.False(t, isTerminalActionPhase(common.ActionPhase_ACTION_PHASE_INITIALIZING))
-}
-
 func TestHandleWatchEvent_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {
 	ctx := context.Background()
 

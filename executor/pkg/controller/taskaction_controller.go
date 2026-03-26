@@ -33,7 +33,6 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -51,7 +50,7 @@ import (
 )
 
 const (
-	TaskActionDefaultRequeueDuration = 1 * time.Second
+	TaskActionDefaultRequeueDuration = 5 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
@@ -606,23 +605,6 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			})
 		}
 	}
-
-	// Store actual resource timestamps (e.g. pod container start/finish times)
-	// separately from PhaseHistory. These are used for accurate duration
-	// computation in the run service, while PhaseHistory retains controller
-	// observation times for event ordering.
-	taskInfo := info.Info()
-	if taskInfo != nil && taskInfo.OccurredAt != nil {
-		occurredAt := metav1.NewTime(*taskInfo.OccurredAt)
-		switch info.Phase() {
-		case pluginsCore.PhaseInitializing, pluginsCore.PhaseRunning:
-			if ta.Status.ExecutionStartedAt == nil {
-				ta.Status.ExecutionStartedAt = &occurredAt
-			}
-		case pluginsCore.PhaseSuccess, pluginsCore.PhasePermanentFailure, pluginsCore.PhaseRetryableFailure, pluginsCore.PhaseAborted:
-			ta.Status.CompletedAt = &occurredAt
-		}
-	}
 }
 
 // isTerminal returns true if the TaskAction has reached a terminal condition.
@@ -676,7 +658,6 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
-		WithOptions(controller.Options{MaxConcurrentReconciles: 10}).
 		Complete(r)
 }
 

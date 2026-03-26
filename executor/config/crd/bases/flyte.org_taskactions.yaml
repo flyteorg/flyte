@@ -163,13 +163,6 @@ spec:
                   for this action.
                 format: int32
                 type: integer
-              completedAt:
-                description: |-
-                  CompletedAt is the actual completion time from the underlying resource
-                  (e.g. pod container finish time). Set once when the task reaches a terminal
-                  phase (Succeeded, Failed, Aborted).
-                format: date-time
-                type: string
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.
@@ -239,14 +232,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              executionStartedAt:
-                description: |-
-                  ExecutionStartedAt is the actual execution start time from the underlying
-                  resource (e.g. pod container start time), as opposed to the controller's
-                  observation time stored in PhaseHistory. Set once when the task first enters
-                  an execution phase (Initializing or Running).
-                format: date-time
-                type: string
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions
