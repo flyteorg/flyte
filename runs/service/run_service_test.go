@@ -1148,3 +1148,157 @@ func TestConvertActionToEnrichedProto_IncludesDuration(t *testing.T) {
 		assert.Nil(t, enriched.Action.Status.DurationMs)
 	})
 }
+
+func TestRecordEvents_AdvancesActionPhase(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org",
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	eventTime := timestamppb.Now()
+	events := []*workflow.ActionEvent{
+		{
+			Id:          actionID,
+			Attempt:     1,
+			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+			Version:     0,
+			UpdatedTime: eventTime,
+		},
+	}
+
+	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("UpdateActionPhase",
+		mock.Anything,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+		uint32(1),
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		mock.AnythingOfType("*time.Time"),
+		(*time.Time)(nil), // non-terminal, no endTime
+	).Return(nil).Once()
+
+	err := svc.recordEvents(context.Background(), events)
+	require.NoError(t, err)
+}
+
+func TestRecordEvents_AdvancesPhaseToTerminal(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org",
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	eventTime := timestamppb.Now()
+	events := []*workflow.ActionEvent{
+		{
+			Id:          actionID,
+			Attempt:     1,
+			Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Version:     0,
+			UpdatedTime: eventTime,
+		},
+	}
+
+	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("UpdateActionPhase",
+		mock.Anything,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		uint32(1),
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		mock.AnythingOfType("*time.Time"),
+		mock.AnythingOfType("*time.Time"), // terminal → endTime is set
+	).Return(nil).Once()
+
+	err := svc.recordEvents(context.Background(), events)
+	require.NoError(t, err)
+}
+
+func TestRecordEvents_SkipsQueuedPhase(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org",
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	events := []*workflow.ActionEvent{
+		{
+			Id:      actionID,
+			Attempt: 1,
+			Phase:   common.ActionPhase_ACTION_PHASE_QUEUED,
+			Version: 0,
+		},
+	}
+
+	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	// No UpdateActionPhase call expected for QUEUED phase
+
+	err := svc.recordEvents(context.Background(), events)
+	require.NoError(t, err)
+}
+
+func TestRecordEvents_PicksHighestPhasePerAction(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org",
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	eventTime := timestamppb.Now()
+	events := []*workflow.ActionEvent{
+		{
+			Id:          actionID,
+			Attempt:     1,
+			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+			Version:     0,
+			UpdatedTime: eventTime,
+		},
+		{
+			Id:          actionID,
+			Attempt:     1,
+			Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Version:     0,
+			UpdatedTime: eventTime,
+		},
+	}
+
+	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	// Only the highest phase (SUCCEEDED) should trigger UpdateActionPhase
+	actionRepo.On("UpdateActionPhase",
+		mock.Anything,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		uint32(1),
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		mock.AnythingOfType("*time.Time"),
+		mock.AnythingOfType("*time.Time"),
+	).Return(nil).Once()
+
+	err := svc.recordEvents(context.Background(), events)
+	require.NoError(t, err)
+}

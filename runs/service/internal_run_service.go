@@ -12,6 +12,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -264,6 +266,53 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+
+	// Advance action phase in the actions table to match the highest event phase.
+	// Events arrive via the fast path (controller → events proxy → here) while the
+	// actions.phase column is updated via the slow path (K8s watcher → UpdateActionStatus).
+	// Without this, the sidebar (which reads actions.phase) lags behind the right panel
+	// (which reads action_events) during fast task executions.
+	best := make(map[string]*workflow.ActionEvent) // keyed by action name
+	for _, event := range events {
+		key := event.GetId().GetName()
+		if prev, ok := best[key]; !ok || event.GetPhase() > prev.GetPhase() {
+			best[key] = event
+		}
+	}
+	for _, event := range best {
+		phase := event.GetPhase()
+		if phase <= common.ActionPhase_ACTION_PHASE_QUEUED {
+			continue
+		}
+		var startTime *time.Time
+		if event.GetUpdatedTime() != nil {
+			t := event.GetUpdatedTime().AsTime()
+			startTime = &t
+		}
+		var endTime *time.Time
+		if IsTerminalPhase(phase) {
+			if event.GetUpdatedTime() != nil {
+				t := event.GetUpdatedTime().AsTime()
+				endTime = &t
+			} else {
+				t := time.Now()
+				endTime = &t
+			}
+		}
+		if err := s.repo.ActionRepo().UpdateActionPhase(
+			ctx,
+			event.GetId(),
+			phase,
+			event.GetAttempt(),
+			core.CatalogCacheStatus_CACHE_DISABLED,
+			startTime,
+			endTime,
+		); err != nil {
+			logger.Warnf(ctx, "RecordActionEvents: failed to advance phase for %s to %s: %v",
+				event.GetId().GetName(), phase, err)
+		}
+	}
+
 	return nil
 }
 
