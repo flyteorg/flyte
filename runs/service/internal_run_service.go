@@ -284,23 +284,24 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		if phase <= common.ActionPhase_ACTION_PHASE_QUEUED {
 			continue
 		}
-		// Only advance the phase — do NOT pass start/end timestamps.
-		// Event timestamps are controller observation times, not actual pod
-		// execution times. Passing them causes duration jumps: the live
-		// counter diverges from the final duration, so the sidebar value
-		// changes on completion. The slow path (K8s watcher →
-		// UpdateActionStatus) sets accurate started_at/ended_at/duration_ms
-		// from real pod timestamps. The watcher namespace fix ensures the
-		// slow path arrives within 1-2s. For edge cases where the slow path
-		// is delayed, the bloom filter terminal repair (on reconnect) sets
-		// timestamps from the CRD's real values.
+		// Use the event's StartTime (real pod execution start from the
+		// controller) so the frontend can show a live duration counter from
+		// the INITIALIZING phase. The SQL uses COALESCE(started_at, ?) so
+		// this only takes effect if started_at is still NULL.
+		// Do NOT pass endTime — the slow path sets accurate ended_at and
+		// duration_ms from real pod timestamps.
+		var startTime *time.Time
+		if event.GetStartTime() != nil {
+			t := event.GetStartTime().AsTime()
+			startTime = &t
+		}
 		if err := s.repo.ActionRepo().UpdateActionPhase(
 			ctx,
 			event.GetId(),
 			phase,
 			event.GetAttempt(),
 			coreIdl.CatalogCacheStatus_CACHE_DISABLED,
-			nil, // startTime: let the slow path set this from real pod times
+			startTime,
 			nil, // endTime: let the slow path set this from real pod times
 		); err != nil {
 			logger.Warnf(ctx, "RecordActionEvents: failed to advance phase for %s to %s: %v",

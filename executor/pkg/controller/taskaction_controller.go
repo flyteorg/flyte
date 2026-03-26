@@ -400,6 +400,13 @@ func (r *TaskActionReconciler) buildActionEvent(
 		ReportedTime:  reportedTime,
 	}
 
+	// Set start_time from the real pod execution start time so the fast path
+	// (events proxy → recordEvents) can set started_at immediately, enabling
+	// the frontend to show a live duration counter from the INITIALIZING phase.
+	if taskAction.Status.ExecutionStartedAt != nil {
+		event.StartTime = timestamppb.New(taskAction.Status.ExecutionStartedAt.Time)
+	}
+
 	if info != nil {
 		event.LogInfo = info.Logs
 		event.LogContext = info.LogContext
