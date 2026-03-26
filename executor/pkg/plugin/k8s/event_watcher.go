@@ -30,7 +30,12 @@ type objectEventWatcher interface {
 
 type controllerRuntimeEventWatcher struct {
 	mu          sync.RWMutex
-	objectCache map[watchedObjectKey]map[k8stypes.NamespacedName]*eventInfo
+	objectCache map[watchedObjectKey]*eventObjects
+}
+
+type eventObjects struct {
+	mu         sync.RWMutex
+	eventInfos map[k8stypes.NamespacedName]*eventInfo
 }
 
 func newControllerRuntimeEventWatcher(ctx context.Context, cache ctrlcache.Cache) (*controllerRuntimeEventWatcher, error) {
@@ -40,7 +45,7 @@ func newControllerRuntimeEventWatcher(ctx context.Context, cache ctrlcache.Cache
 	}
 
 	watcher := &controllerRuntimeEventWatcher{
-		objectCache: make(map[watchedObjectKey]map[k8stypes.NamespacedName]*eventInfo),
+		objectCache: make(map[watchedObjectKey]*eventObjects),
 	}
 	if _, err := informer.AddEventHandler(watcher); err != nil {
 		return nil, err
@@ -66,19 +71,42 @@ func (w *controllerRuntimeEventWatcher) OnAdd(obj interface{}, _ bool) {
 
 	eventKey := k8stypes.NamespacedName{Namespace: event.Namespace, Name: event.Name}
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	for {
+		w.mu.RLock()
+		eventInfos, ok := w.objectCache[objectKey]
+		w.mu.RUnlock()
+		// Create a new event object into objectCache.
+		if !ok {
+			w.mu.Lock()
+			eventInfos, ok = w.objectCache[objectKey]
+			if !ok {
+				eventInfos = &eventObjects{
+					eventInfos: make(map[k8stypes.NamespacedName]*eventInfo),
+				}
+				w.objectCache[objectKey] = eventInfos
+			}
+			w.mu.Unlock()
+		}
 
-	eventInfos, ok := w.objectCache[objectKey]
-	if !ok {
-		eventInfos = make(map[k8stypes.NamespacedName]*eventInfo)
-		w.objectCache[objectKey] = eventInfos
-	}
+		eventInfos.mu.Lock()
 
-	eventInfos[eventKey] = &eventInfo{
-		Message:    event.Note,
-		CreatedAt:  event.CreationTimestamp.Time,
-		RecordedAt: time.Now(),
+		// Revalidate this bucket is still current before writing.
+		w.mu.RLock()
+		stillCurrent := w.objectCache[objectKey] == eventInfos
+		w.mu.RUnlock()
+		if !stillCurrent {
+			// eventInfos being deleted/changed, we should get the newest object again
+			eventInfos.mu.Unlock()
+			continue
+		}
+
+		eventInfos.eventInfos[eventKey] = &eventInfo{
+			Message:    event.Note,
+			CreatedAt:  event.CreationTimestamp.Time,
+			RecordedAt: time.Now(),
+		}
+		eventInfos.mu.Unlock()
+		return
 	}
 }
 
@@ -110,31 +138,42 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 
 	eventKey := k8stypes.NamespacedName{Namespace: event.Namespace, Name: event.Name}
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
+	w.mu.RLock()
 	eventInfos, ok := w.objectCache[objectKey]
+	w.mu.RUnlock()
 	if !ok {
 		return
 	}
 
-	delete(eventInfos, eventKey)
-	if len(eventInfos) == 0 {
+	eventInfos.mu.Lock()
+	defer eventInfos.mu.Unlock()
+
+	delete(eventInfos.eventInfos, eventKey)
+	if len(eventInfos.eventInfos) != 0 {
+		return
+	}
+
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	// Delete only if this objectKey still points to the same event bucket.
+	if current, exists := w.objectCache[objectKey]; exists && current == eventInfos && len(eventInfos.eventInfos) == 0 {
 		delete(w.objectCache, objectKey)
 	}
 }
 
 func (w *controllerRuntimeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Time) []*eventInfo {
 	w.mu.RLock()
-	defer w.mu.RUnlock()
-
 	eventInfos, ok := w.objectCache[objectKey]
+	w.mu.RUnlock()
 	if !ok {
 		return nil
 	}
 
-	events := make([]*eventInfo, 0, len(eventInfos))
-	for _, info := range eventInfos {
+	eventInfos.mu.RLock()
+	defer eventInfos.mu.RUnlock()
+
+	events := make([]*eventInfo, 0, len(eventInfos.eventInfos))
+	for _, info := range eventInfos.eventInfos {
 		if info.CreatedAt.After(createdAfter) {
 			events = append(events, info)
 		}
