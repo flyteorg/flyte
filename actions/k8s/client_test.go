@@ -530,10 +530,13 @@ func TestHandleWatchEvent_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	}))
 	assert.True(t, filter.Contains(ctx, actionKey))
 
-	// Second ADDED event (reconnect, in bloom filter): should be skipped
+	// Second ADDED event (reconnect, in bloom filter): should skip RecordAction
+	// but still call UpdateActionStatus to repair potentially missing timestamps.
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
-	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
-	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)    // no new RecordAction
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2) // one more UpdateActionStatus
 }
 
 func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {
@@ -605,6 +608,37 @@ func TestNotifyRunService_DuplicateAddedSkipsEntireProcessing(t *testing.T) {
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestNotifyRunService_TerminalDuplicateRepairsTimestamps(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-terminal-dup")
+	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+
+	// First call — should process normally (RecordAction + UpdateActionStatus)
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Times(2)
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	// Second call (terminal duplicate ADDED) — should skip RecordAction but
+	// still call UpdateActionStatus to repair missing timestamps.
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)       // no new RecordAction
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2) // one more UpdateActionStatus
 }
 
 func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {

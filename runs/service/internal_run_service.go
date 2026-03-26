@@ -287,11 +287,13 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		// Only advance the phase — do NOT pass start/end timestamps.
 		// Event timestamps are controller observation times, not actual pod
 		// execution times. Passing them causes duration jumps: the live
-		// counter (Date.now() - eventTime) diverges from the final duration
-		// (realEnd - realStart), so the sidebar value drops on completion.
-		// The slow path (K8s watcher → UpdateActionStatus) sets accurate
-		// started_at/ended_at/duration_ms from real pod timestamps and now
-		// arrives within ~2-3s thanks to the watcher backlog fix.
+		// counter diverges from the final duration, so the sidebar value
+		// changes on completion. The slow path (K8s watcher →
+		// UpdateActionStatus) sets accurate started_at/ended_at/duration_ms
+		// from real pod timestamps. The watcher namespace fix ensures the
+		// slow path arrives within 1-2s. For edge cases where the slow path
+		// is delayed, the bloom filter terminal repair (on reconnect) sets
+		// timestamps from the CRD's real values.
 		if err := s.repo.ActionRepo().UpdateActionPhase(
 			ctx,
 			event.GetId(),

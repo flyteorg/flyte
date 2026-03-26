@@ -432,19 +432,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 
 	c.notifySubscribers(ctx, update)
 
-	// Skip terminal ADDED events that are already in the bloom filter.
-	// On watch reconnects, K8s replays all existing CRDs as ADDED events.
-	// Terminal actions that were already processed don't need another
-	// UpdateActionStatus RPC. Skip them to avoid blocking the event loop.
-	// NOTE: Do NOT skip terminal ADDED events on cold start — they still
-	// need UpdateActionStatus to set started_at/ended_at/duration_ms.
-	if event.Type == watch.Added && isTerminalActionPhase(update.Phase) && c.recordedFilter != nil {
-		actionKey := []byte(buildTaskActionName(update.ActionID))
-		if c.recordedFilter.Contains(ctx, actionKey) {
-			return
-		}
-	}
-
 	// notifyRunService must be called synchronously (not in a goroutine) to
 	// preserve event ordering. If ADDED and MODIFIED events arrive in quick
 	// succession for the same action, running them concurrently can cause the
@@ -479,14 +466,20 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
 	if eventType == watch.Added {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
-		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
-			// This action was already recorded in a previous watch session.
-			// Skip the entire notifyRunService call — RecordAction, parent
-			// promotion, and UpdateActionStatus are all redundant. Processing
-			// these duplicates synchronously blocks the event loop and delays
-			// new events by tens of seconds when many old CRDs exist.
-			logger.Debugf(ctx, "Skipping duplicate ADDED event for %s", update.ActionID.Name)
+		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
+		if isDuplicate && !isTerminalActionPhase(update.Phase) {
+			// Non-terminal duplicate: still running, future MODIFIED events
+			// will update it. Skip entirely to keep the event loop fast.
+			logger.Debugf(ctx, "Skipping non-terminal duplicate ADDED event for %s", update.ActionID.Name)
 			return
+		}
+		if isDuplicate {
+			// Terminal duplicate: no more MODIFIED events will arrive.
+			// Skip RecordAction and parent promotion (redundant), but still
+			// fall through to UpdateActionStatus below — the previous session
+			// may not have set started_at/ended_at if MODIFIED events were
+			// missed before the watcher reconnected.
+			logger.Debugf(ctx, "Repairing timestamps for terminal duplicate %s", update.ActionID.Name)
 		} else {
 			recordReq := &workflow.RecordActionRequest{
 				ActionId: update.ActionID,
@@ -529,7 +522,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		// When a child action appears, the parent must already be running (it
 		// created the child). Promote the parent to RUNNING so the UI doesn't
 		// stay stuck on INITIALIZING while children are executing.
-		if update.ParentActionName != "" {
+		if !isDuplicate && update.ParentActionName != "" {
 			parentID := &common.ActionIdentifier{
 				Run:  update.ActionID.Run,
 				Name: update.ParentActionName,
