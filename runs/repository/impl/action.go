@@ -254,10 +254,13 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 
 // AbortRun aborts a run and all its actions
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
-	// Update the run action to aborted
+	now := time.Now()
 	updates := map[string]interface{}{
-		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at": time.Now(),
+		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		"updated_at":          now,
+		"abort_requested_at":  now,
+		"abort_attempt_count": 0,
+		"abort_reason":        reason,
 	}
 
 	result := r.db.WithContext(ctx).
@@ -270,7 +273,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		return fmt.Errorf("failed to abort run: %w", result.Error)
 	}
 
-	// Notify subscribers
+	// Notify run subscribers.
 	r.notifyRunUpdate(ctx, runID)
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
@@ -531,25 +534,78 @@ func (r *actionRepo) UpdateActionPhase(
 
 // AbortAction aborts a specific action
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	now := time.Now()
 	updates := map[string]interface{}{
-		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at": time.Now(),
+		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		"updated_at":          now,
+		"abort_requested_at":  now,
+		"abort_attempt_count": 0,
+		"abort_reason":        reason,
 	}
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
 		return fmt.Errorf("failed to abort action: %w", result.Error)
 	}
 
-	// Notify subscribers
+	// Notify action subscribers.
 	r.notifyActionUpdate(ctx, actionID)
 
 	logger.Infof(ctx, "Aborted action: %s", actionID.Name)
+	return nil
+}
+
+// ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).
+func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
+	var actions []*models.Action
+	result := r.db.WithContext(ctx).
+		Where("abort_requested_at IS NOT NULL").
+		Find(&actions)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list pending aborts: %w", result.Error)
+	}
+	return actions, nil
+}
+
+// MarkAbortAttempt increments abort_attempt_count and returns the new value.
+// Called by the reconciler before each actionsClient.Abort call.
+func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	var action models.Action
+	result := r.db.WithContext(ctx).
+		Model(&action).
+		Clauses(clause.Returning{Columns: []clause.Column{{Name: "abort_attempt_count"}}}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Updates(map[string]interface{}{
+			"abort_attempt_count": gorm.Expr("abort_attempt_count + 1"),
+			"updated_at":          time.Now(),
+		})
+	if result.Error != nil {
+		return 0, fmt.Errorf("failed to mark abort attempt: %w", result.Error)
+	}
+	return action.AbortAttemptCount, nil
+}
+
+// ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
+func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
+	result := r.db.WithContext(ctx).
+		Model(&models.Action{}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Updates(map[string]interface{}{
+			"abort_requested_at":  nil,
+			"abort_attempt_count": 0,
+			"abort_reason":        nil,
+			"updated_at":          time.Now(),
+		})
+	if result.Error != nil {
+		return fmt.Errorf("failed to clear abort request: %w", result.Error)
+	}
 	return nil
 }
 
@@ -958,11 +1014,11 @@ func (r *actionRepo) startPostgresListener() {
 					select {
 					case ch <- notif.Extra:
 					default:
-						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification")
 					}
 				}
 				r.mu.RUnlock()
+
 			}
 
 		case <-time.After(90 * time.Second):

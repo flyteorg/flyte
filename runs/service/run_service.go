@@ -33,10 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo          interfaces.Repository
-	actionsClient actionsconnect.ActionsServiceClient
-	storagePrefix string
-	dataStore     *storage.DataStore
+	repo             interfaces.Repository
+	actionsClient    actionsconnect.ActionsServiceClient
+	storagePrefix    string
+	dataStore        *storage.DataStore
+	abortReconciler  *AbortReconciler
 }
 
 const (
@@ -98,12 +99,13 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore) *RunService {
+func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore, reconciler *AbortReconciler) *RunService {
 	return &RunService{
-		repo:          repo,
-		actionsClient: actionsClient,
-		storagePrefix: storagePrefix,
-		dataStore:     dataStore,
+		repo:            repo,
+		actionsClient:   actionsClient,
+		storagePrefix:   storagePrefix,
+		dataStore:       dataStore,
+		abortReconciler: reconciler,
 	}
 }
 
@@ -252,23 +254,14 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Abort via actions service
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: "a0",
-	}
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: rootActionID,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort run via actions service: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: req.Msg.RunId.Name}, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
@@ -469,14 +462,23 @@ func (s *RunService) getAttempts(ctx context.Context, actionId *common.ActionIde
 
 // mergeEvents merges a set of events for the same attempt into a single ActionAttempt.
 func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.ActionAttempt {
-	// Order events by reported time, falling back to updated time.
+	// Order events by the controller-observed phase transition time.
+	// ReportedTime reflects when an observation was emitted and can arrive out of order,
+	// so it is only used as a tie-breaker for otherwise-identical UpdatedTime values.
 	sort.SliceStable(events, func(i, j int) bool {
+		updatedTimeI := events[i].GetUpdatedTime()
+		updatedTimeJ := events[j].GetUpdatedTime()
+		if updatedTimeI != nil && updatedTimeJ != nil && !updatedTimeI.AsTime().Equal(updatedTimeJ.AsTime()) {
+			return updatedTimeI.AsTime().Before(updatedTimeJ.AsTime())
+		}
+
 		reportedTimeI := events[i].GetReportedTime()
 		reportedTimeJ := events[j].GetReportedTime()
-		if reportedTimeI != nil && reportedTimeJ != nil {
+		if reportedTimeI != nil && reportedTimeJ != nil && !reportedTimeI.AsTime().Equal(reportedTimeJ.AsTime()) {
 			return reportedTimeI.AsTime().Before(reportedTimeJ.AsTime())
 		}
-		return events[i].GetUpdatedTime().AsTime().Before(events[j].GetUpdatedTime().AsTime())
+
+		return phaseOrder(events[i].GetPhase()) < phaseOrder(events[j].GetPhase())
 	})
 
 	if len(events) == 0 {
@@ -575,6 +577,26 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		ClusterEvents:    clusterEvents,
 		Cluster:          lastEvent.GetCluster(),
 		PhaseTransitions: phaseTransitions,
+	}
+}
+
+func phaseOrder(phase common.ActionPhase) int {
+	switch phase {
+	case common.ActionPhase_ACTION_PHASE_QUEUED:
+		return 0
+	case common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES:
+		return 1
+	case common.ActionPhase_ACTION_PHASE_INITIALIZING:
+		return 2
+	case common.ActionPhase_ACTION_PHASE_RUNNING:
+		return 3
+	case common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT:
+		return 4
+	default:
+		return 5
 	}
 }
 
@@ -796,19 +818,14 @@ func (s *RunService) AbortAction(
 		reason = req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Abort via actions service
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: req.Msg.ActionId,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort action via actions service: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, req.Msg.ActionId, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
