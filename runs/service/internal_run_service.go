@@ -13,7 +13,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	coreIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -284,29 +284,21 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		if phase <= common.ActionPhase_ACTION_PHASE_QUEUED {
 			continue
 		}
-		var startTime *time.Time
-		if event.GetUpdatedTime() != nil {
-			t := event.GetUpdatedTime().AsTime()
-			startTime = &t
-		}
-		var endTime *time.Time
-		if IsTerminalPhase(phase) {
-			if event.GetUpdatedTime() != nil {
-				t := event.GetUpdatedTime().AsTime()
-				endTime = &t
-			} else {
-				t := time.Now()
-				endTime = &t
-			}
-		}
+		// Only advance the phase — do NOT pass start/end timestamps.
+		// Event timestamps are controller observation times, not actual pod
+		// execution times. The accurate started_at/ended_at/duration_ms are
+		// set by the slow path (K8s watcher → UpdateActionStatus) which has
+		// access to the real pod timestamps via ExecutionStartedAt/CompletedAt.
+		// Passing event times here can cause started_at > ended_at when the
+		// slow path later overwrites started_at with the actual pod start.
 		if err := s.repo.ActionRepo().UpdateActionPhase(
 			ctx,
 			event.GetId(),
 			phase,
 			event.GetAttempt(),
-			core.CatalogCacheStatus_CACHE_DISABLED,
-			startTime,
-			endTime,
+			coreIdl.CatalogCacheStatus_CACHE_DISABLED,
+			nil, // startTime: let the slow path set this from real pod times
+			nil, // endTime: let the slow path set this from real pod times
 		); err != nil {
 			logger.Warnf(ctx, "RecordActionEvents: failed to advance phase for %s to %s: %v",
 				event.GetId().GetName(), phase, err)

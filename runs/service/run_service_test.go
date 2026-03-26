@@ -1174,14 +1174,16 @@ func TestRecordEvents_AdvancesActionPhase(t *testing.T) {
 	}
 
 	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	// Phase-only advancement: no start/end times passed (nil, nil).
+	// Accurate timestamps come from the slow path (K8s watcher).
 	actionRepo.On("UpdateActionPhase",
 		mock.Anything,
 		actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING,
 		uint32(1),
 		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.AnythingOfType("*time.Time"),
-		(*time.Time)(nil), // non-terminal, no endTime
+		(*time.Time)(nil),
+		(*time.Time)(nil),
 	).Return(nil).Once()
 
 	err := svc.recordEvents(context.Background(), events)
@@ -1213,14 +1215,15 @@ func TestRecordEvents_AdvancesPhaseToTerminal(t *testing.T) {
 	}
 
 	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
+	// Terminal phase: still no timestamps — the slow path sets accurate times.
 	actionRepo.On("UpdateActionPhase",
 		mock.Anything,
 		actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		uint32(1),
 		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.AnythingOfType("*time.Time"),
-		mock.AnythingOfType("*time.Time"), // terminal → endTime is set
+		(*time.Time)(nil),
+		(*time.Time)(nil),
 	).Return(nil).Once()
 
 	err := svc.recordEvents(context.Background(), events)
@@ -1295,8 +1298,8 @@ func TestRecordEvents_PicksHighestPhasePerAction(t *testing.T) {
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		uint32(1),
 		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.AnythingOfType("*time.Time"),
-		mock.AnythingOfType("*time.Time"),
+		(*time.Time)(nil),
+		(*time.Time)(nil),
 	).Return(nil).Once()
 
 	err := svc.recordEvents(context.Background(), events)
