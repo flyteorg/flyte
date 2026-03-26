@@ -486,37 +486,22 @@ func (r *actionRepo) UpdateActionPhase(
 
 	if endTime != nil {
 		if r.isPostgres {
-			if startTime != nil {
-				// Both start and end provided in the same call — compute duration
-				// from the new startTime directly since PostgreSQL evaluates SET
-				// expressions using old row values.
-				updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, ?::timestamp)", *endTime, *startTime)
-				updates["duration_ms"] = gorm.Expr(
-					"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, ?::timestamp) - ?::timestamp)) * 1000", *endTime, *startTime, *startTime)
-			} else {
-				// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-				updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, created_at)", *endTime)
-				updates["duration_ms"] = gorm.Expr(
-					"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
-			}
+			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
+			updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, created_at)", *endTime)
+			updates["duration_ms"] = gorm.Expr(
+				"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
 		} else {
-			if startTime != nil {
-				updates["ended_at"] = gorm.Expr("MAX(?, ?)", *endTime, *startTime)
-				updates["duration_ms"] = gorm.Expr(
-					"CAST((julianday(MAX(?, ?)) - julianday(?)) * 86400000 AS INTEGER)", *endTime, *startTime, *startTime)
-			} else {
-				// SQLite: use MAX() and compute duration via strftime
-				updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
-				updates["duration_ms"] = gorm.Expr(
-					"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
-			}
+			// SQLite: use MAX() and compute duration via strftime
+			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			updates["duration_ms"] = gorm.Expr(
+				"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 
 	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND phase <= ?",
+		Where("org = ? AND project = ? AND domain = ? AND name = ?",
 			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name, phase).
 		Updates(updates)
 

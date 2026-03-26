@@ -650,9 +650,6 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 				ta.Status.ExecutionStartedAt = &occurredAt
 			}
 		case pluginsCore.PhaseSuccess, pluginsCore.PhasePermanentFailure, pluginsCore.PhaseRetryableFailure, pluginsCore.PhaseAborted:
-			if ta.Status.ExecutionStartedAt == nil {
-				ta.Status.ExecutionStartedAt = &occurredAt
-			}
 			ta.Status.CompletedAt = &occurredAt
 		}
 	}

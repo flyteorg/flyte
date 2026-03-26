@@ -432,13 +432,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 
 	c.notifySubscribers(ctx, update)
 
-	// notifyRunService must be called synchronously (not in a goroutine) to
-	// preserve event ordering. If ADDED and MODIFIED events arrive in quick
-	// succession for the same action, running them concurrently can cause the
-	// MODIFIED event's UpdateActionStatus to execute before the ADDED event's
-	// RecordAction creates the DB row, leaving the action permanently stuck in
-	// the QUEUED phase.
-	c.notifyRunService(ctx, taskAction, update, event.Type)
+	go c.notifyRunService(ctx, taskAction, update, event.Type)
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -467,19 +461,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if eventType == watch.Added {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
-		if isDuplicate && !isTerminalActionPhase(update.Phase) {
-			// Non-terminal duplicate: still running, future MODIFIED events
-			// will update it. Skip entirely to keep the event loop fast.
-			logger.Debugf(ctx, "Skipping non-terminal duplicate ADDED event for %s", update.ActionID.Name)
-			return
-		}
 		if isDuplicate {
-			// Terminal duplicate: no more MODIFIED events will arrive.
-			// Skip RecordAction and parent promotion (redundant), but still
-			// fall through to UpdateActionStatus below — the previous session
-			// may not have set started_at/ended_at if MODIFIED events were
-			// missed before the watcher reconnected.
-			logger.Debugf(ctx, "Repairing timestamps for terminal duplicate %s", update.ActionID.Name)
+			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 		} else {
 			recordReq := &workflow.RecordActionRequest{
 				ActionId: update.ActionID,
