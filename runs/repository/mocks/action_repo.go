@@ -838,7 +838,7 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(context.Conte
 }
 
 // UpdateActionPhase provides a mock function with given fields: ctx, actionID, phase, attempts, cacheStatus, startTime, endTime
-func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, startTime *time.Time, endTime *time.Time) error {
+func (_m *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error {
 	ret := _m.Called(ctx, actionID, phase, attempts, cacheStatus, startTime, endTime)
 
 	if len(ret) == 0 {
@@ -868,8 +868,8 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - cacheStatus core.CatalogCacheStatus
 //   - startTime *time.Time
 //   - endTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, startTime interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, startTime, endTime)}
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime)}
 }
 
 func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, startTime *time.Time, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {

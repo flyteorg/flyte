@@ -282,14 +282,10 @@ func TestAbortRun(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.ActionId.Run.Name == runID.Name &&
-				req.Msg.ActionId.Name == "a0" &&
-				req.Msg.Reason != nil && *req.Msg.Reason == "User requested abort"
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
 	t.Run("success with custom reason", func(t *testing.T) {
@@ -297,15 +293,13 @@ func TestAbortRun(t *testing.T) {
 		reason := "timeout exceeded"
 
 		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.Reason != nil && *req.Msg.Reason == reason
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID, Reason: &reason}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
-	t.Run("db error stops before actions service", func(t *testing.T) {
+	t.Run("db error returns error", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
@@ -313,16 +307,6 @@ func TestAbortRun(t *testing.T) {
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
-	})
-
-	t.Run("actions service error is returned", func(t *testing.T) {
-		actionRepo, actionsClient, svc := newTestService(t)
-
-		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.Anything).Return(nil, errors.New("actions service unavailable"))
-
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
-		assert.Error(t, err)
 	})
 }
 
@@ -341,13 +325,10 @@ func TestAbortAction(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.ActionId.Name == actionID.Name &&
-				req.Msg.Reason != nil && *req.Msg.Reason == "User requested abort"
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
 	t.Run("success with custom reason", func(t *testing.T) {
@@ -355,15 +336,13 @@ func TestAbortAction(t *testing.T) {
 		reason := "resource limit exceeded"
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.Reason != nil && *req.Msg.Reason == reason
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID, Reason: reason}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
-	t.Run("db error stops before actions service", func(t *testing.T) {
+	t.Run("db error returns error", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
@@ -371,16 +350,6 @@ func TestAbortAction(t *testing.T) {
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
-	})
-
-	t.Run("actions service error is returned", func(t *testing.T) {
-		actionRepo, actionsClient, svc := newTestService(t)
-
-		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.Anything).Return(nil, errors.New("actions service unavailable"))
-
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
-		assert.Error(t, err)
 	})
 }
 
@@ -410,6 +379,7 @@ func TestListRuns(t *testing.T) {
 				},
 				Status: &workflow.ActionStatus{
 					Phase:      common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+					StartTime:  startTime,
 					EndTime:    endTime,
 					DurationMs: &durationMs,
 				},
@@ -592,6 +562,7 @@ func TestConvertRunToProto(t *testing.T) {
 					},
 					Status: &workflow.ActionStatus{
 						Phase:      common.ActionPhase_ACTION_PHASE_QUEUED,
+						StartTime:  startTime,
 						EndTime:    endTime,
 						DurationMs: &durationMs,
 					},
@@ -1067,240 +1038,4 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	store.AssertExpectations(t)
 	// Verify ReadProtobuf was only called once (for inputs, not outputs)
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
-}
-
-func TestConvertActionToEnrichedProto_IncludesDuration(t *testing.T) {
-	svc := &RunService{}
-	now := time.Now()
-	startedAt := now.Add(-3 * time.Second)
-	endedAt := now
-
-	t.Run("includes duration, start time, and end time", func(t *testing.T) {
-		action := &models.Action{
-			Org:              "org",
-			Project:          "proj",
-			Domain:           "dev",
-			RunName:          "run1",
-			Name:             "action1",
-			Phase:            int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-			StartedAt:        sql.NullTime{Time: startedAt, Valid: true},
-			EndedAt:          sql.NullTime{Time: endedAt, Valid: true},
-			DurationMs:       sql.NullInt64{Int64: 3000, Valid: true},
-			Attempts:         1,
-			CacheStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
-			ParentActionName: sql.NullString{String: "run1", Valid: true},
-		}
-
-		enriched := svc.convertActionToEnrichedProto(action)
-		require.NotNil(t, enriched)
-		require.NotNil(t, enriched.Action)
-		require.NotNil(t, enriched.Action.Status)
-
-		status := enriched.Action.Status
-		assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, status.Phase)
-		assert.Equal(t, startedAt.Unix(), status.StartTime.AsTime().Unix())
-		assert.Equal(t, endedAt.Unix(), status.EndTime.AsTime().Unix())
-		require.NotNil(t, status.DurationMs)
-		assert.Equal(t, uint64(3000), *status.DurationMs)
-		assert.Equal(t, uint32(1), status.Attempts)
-		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, status.CacheStatus)
-		assert.True(t, enriched.MeetsFilter)
-	})
-
-	t.Run("start_time is nil when started_at is not set", func(t *testing.T) {
-		createdAt := now.Add(-5 * time.Second)
-		action := &models.Action{
-			Org:       "org",
-			Project:   "proj",
-			Domain:    "dev",
-			RunName:   "run1",
-			Name:      "action2",
-			Phase:     int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-			CreatedAt: createdAt,
-		}
-
-		enriched := svc.convertActionToEnrichedProto(action)
-		require.NotNil(t, enriched)
-		assert.Nil(t, enriched.Action.Status.StartTime)
-		assert.Nil(t, enriched.Action.Status.EndTime)
-		assert.Nil(t, enriched.Action.Status.DurationMs)
-	})
-
-	t.Run("nil action returns nil", func(t *testing.T) {
-		assert.Nil(t, svc.convertActionToEnrichedProto(nil))
-	})
-
-	t.Run("zero duration is not included", func(t *testing.T) {
-		action := &models.Action{
-			Org:        "org",
-			Project:    "proj",
-			Domain:     "dev",
-			RunName:    "run1",
-			Name:       "action3",
-			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-			DurationMs: sql.NullInt64{Int64: 0, Valid: true},
-		}
-
-		enriched := svc.convertActionToEnrichedProto(action)
-		require.NotNil(t, enriched)
-		assert.Nil(t, enriched.Action.Status.DurationMs)
-	})
-}
-
-func TestRecordEvents_AdvancesActionPhase(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "dev",
-			Name:    "run1",
-		},
-		Name: "action1",
-	}
-
-	eventTime := timestamppb.Now()
-	events := []*workflow.ActionEvent{
-		{
-			Id:          actionID,
-			Attempt:     1,
-			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
-			Version:     0,
-			UpdatedTime: eventTime,
-		},
-	}
-
-	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// UpdatedTime from the event is passed as startTime so the frontend
-	// can show a live duration counter immediately. endTime stays nil.
-	actionRepo.On("UpdateActionPhase",
-		mock.Anything,
-		actionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING,
-		uint32(1),
-		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.MatchedBy(func(t *time.Time) bool { return t != nil }),
-		(*time.Time)(nil),
-	).Return(nil).Once()
-
-	err := svc.recordEvents(context.Background(), events)
-	require.NoError(t, err)
-}
-
-func TestRecordEvents_AdvancesPhaseToTerminal(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "dev",
-			Name:    "run1",
-		},
-		Name: "action1",
-	}
-
-	eventTime := timestamppb.Now()
-	events := []*workflow.ActionEvent{
-		{
-			Id:          actionID,
-			Attempt:     1,
-			Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-			Version:     0,
-			UpdatedTime: eventTime,
-		},
-	}
-
-	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// UpdatedTime from the event is passed as startTime for all phases.
-	actionRepo.On("UpdateActionPhase",
-		mock.Anything,
-		actionID,
-		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-		uint32(1),
-		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.MatchedBy(func(t *time.Time) bool { return t != nil }),
-		(*time.Time)(nil),
-	).Return(nil).Once()
-
-	err := svc.recordEvents(context.Background(), events)
-	require.NoError(t, err)
-}
-
-func TestRecordEvents_SkipsQueuedPhase(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "dev",
-			Name:    "run1",
-		},
-		Name: "action1",
-	}
-
-	events := []*workflow.ActionEvent{
-		{
-			Id:      actionID,
-			Attempt: 1,
-			Phase:   common.ActionPhase_ACTION_PHASE_QUEUED,
-			Version: 0,
-		},
-	}
-
-	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// No UpdateActionPhase call expected for QUEUED phase
-
-	err := svc.recordEvents(context.Background(), events)
-	require.NoError(t, err)
-}
-
-func TestRecordEvents_PicksHighestPhasePerAction(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "dev",
-			Name:    "run1",
-		},
-		Name: "action1",
-	}
-
-	eventTime := timestamppb.Now()
-	events := []*workflow.ActionEvent{
-		{
-			Id:          actionID,
-			Attempt:     1,
-			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
-			Version:     0,
-			UpdatedTime: eventTime,
-		},
-		{
-			Id:          actionID,
-			Attempt:     1,
-			Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-			Version:     0,
-			UpdatedTime: eventTime,
-		},
-	}
-
-	actionRepo.On("InsertEvents", mock.Anything, mock.Anything).Return(nil).Once()
-	// Only the highest phase (SUCCEEDED) should trigger UpdateActionPhase.
-	// UpdatedTime from the event is passed as startTime.
-	actionRepo.On("UpdateActionPhase",
-		mock.Anything,
-		actionID,
-		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-		uint32(1),
-		core.CatalogCacheStatus_CACHE_DISABLED,
-		mock.MatchedBy(func(t *time.Time) bool { return t != nil }),
-		(*time.Time)(nil),
-	).Return(nil).Once()
-
-	err := svc.recordEvents(context.Background(), events)
-	require.NoError(t, err)
 }

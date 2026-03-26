@@ -462,7 +462,6 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 }
 
 // UpdateActionPhase updates the phase of an action.
-// startTime, when non-nil, is the actual execution start from PhaseHistory.
 // endTime should be set when the action reaches a terminal phase.
 func (r *actionRepo) UpdateActionPhase(
 	ctx context.Context,
@@ -470,7 +469,6 @@ func (r *actionRepo) UpdateActionPhase(
 	phase common.ActionPhase,
 	attempts uint32,
 	cacheStatus core.CatalogCacheStatus,
-	startTime *time.Time,
 	endTime *time.Time,
 ) error {
 	updates := map[string]interface{}{
@@ -480,21 +478,17 @@ func (r *actionRepo) UpdateActionPhase(
 		"updated_at":   time.Now(),
 	}
 
-	if startTime != nil {
-		updates["started_at"] = *startTime
-	}
-
 	if endTime != nil {
 		if r.isPostgres {
 			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?::timestamp, created_at)", *endTime)
+			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?::timestamp, COALESCE(started_at, created_at)) - COALESCE(started_at, created_at))) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
 		} else {
 			// SQLite: use MAX() and compute duration via strftime
 			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, COALESCE(started_at, created_at))) - julianday(COALESCE(started_at, created_at))) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 

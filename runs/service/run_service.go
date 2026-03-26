@@ -1173,10 +1173,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
 		Attempts:    action.Attempts,
+		StartTime:   timestamppb.New(action.CreatedAt),
 		CacheStatus: action.CacheStatus,
-	}
-	if action.StartedAt.Valid {
-		status.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
@@ -1372,9 +1370,6 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 			CacheStatus: run.CacheStatus,
 		},
 	}
-	if run.StartedAt.Valid {
-		action.Status.StartTime = timestamppb.New(run.StartedAt.Time)
-	}
 	if run.EndedAt.Valid {
 		action.Status.EndTime = timestamppb.New(run.EndedAt.Time)
 	}
@@ -1429,11 +1424,8 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 	actionStatus := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
 		Attempts:    action.Attempts,
+		StartTime:   timestamppb.New(action.CreatedAt),
 		CacheStatus: action.CacheStatus,
-	}
-
-	if action.StartedAt.Valid {
-		actionStatus.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 
 	if action.EndedAt.Valid {
@@ -1483,12 +1475,9 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 
 	actionStatus := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
+		StartTime:   timestamppb.New(action.CreatedAt),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,
-	}
-
-	if action.StartedAt.Valid {
-		actionStatus.StartTime = timestamppb.New(action.StartedAt.Time)
 	}
 
 	if action.EndedAt.Valid {

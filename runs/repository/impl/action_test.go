@@ -284,7 +284,7 @@ func TestUpdateActionPhase_StartedAtNotSetOnWaitingPhases(t *testing.T) {
 	// QUEUED should not set started_at
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -328,10 +328,9 @@ func TestUpdateActionPhase_StartedAtNotOverwritten(t *testing.T) {
 
 	// Second RUNNING transition (e.g. retry) with a different startTime should
 	// NOT overwrite started_at thanks to COALESCE(started_at, ?)
-	secondStart := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, &secondStart, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
