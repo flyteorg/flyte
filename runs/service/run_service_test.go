@@ -215,12 +215,15 @@ func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
 		ClusterEvents: []*workflow.ClusterEvent{clusterEvent},
 	})
 	require.NoError(t, err)
+	eventModel.UpdatedAt = time.Unix(101, 0)
 
 	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil).Once()
-	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{eventModel}, nil).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
+		Return([]*models.ActionEvent{eventModel}, nil).Once()
 
 	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
-		Id: actionID,
+		Id:      actionID,
+		Attempt: 0,
 	}))
 	require.NoError(t, err)
 	require.True(t, stream.Receive())
@@ -276,6 +279,7 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 		}},
 	})
 	require.NoError(t, err)
+	event1.UpdatedAt = time.Unix(101, 0)
 
 	event2, err := models.NewActionEventModel(&workflow.ActionEvent{
 		Id:          actionID,
@@ -295,9 +299,11 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 		},
 	})
 	require.NoError(t, err)
+	event2.UpdatedAt = time.Unix(103, 0)
 
 	actionRepo.On("GetAction", mock.Anything, actionID).Return(runningAction, nil).Once()
-	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{event1}, nil).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
+		Return([]*models.ActionEvent{event1}, nil).Once()
 	actionRepo.On("WatchActionUpdates", mock.Anything, actionID.Run, mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
 			updates := args.Get(2).(chan<- *models.Action)
@@ -306,10 +312,12 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 			close(updates)
 			close(errs)
 		}).Once()
-	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{event1, event2}, nil).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), event1.UpdatedAt, 0, 500).
+		Return([]*models.ActionEvent{event2}, nil).Once()
 
 	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
-		Id: actionID,
+		Id:      actionID,
+		Attempt: 0,
 	}))
 	require.NoError(t, err)
 
