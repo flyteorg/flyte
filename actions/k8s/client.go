@@ -110,6 +110,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		},
 		Spec: executorv1.TaskActionSpec{},
 	}
+	var parentTaskAction *executorv1.TaskAction
 
 	// Set OwnerReference to parent so K8s cascades deletion to children.
 	if !isRoot {
@@ -123,6 +124,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
 			return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
 		}
+		parentTaskAction = parent
 
 		blockOwnerDeletion := true
 		taskAction.OwnerReferences = []metav1.OwnerReference{
@@ -134,6 +136,11 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 				BlockOwnerDeletion: &blockOwnerDeletion,
 			},
 		}
+		// For child actions, inherit parent's run context
+		inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
+	} else {
+		// For root action, apply the RunSpec to TaskAction
+		applyRunSpecToTaskAction(taskAction, runSpec)
 	}
 
 	// Build and set the ActionSpec for the executor.
@@ -141,7 +148,6 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
-	applyRunSpecToTaskAction(taskAction, runSpec)
 	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 	// Embed the inline TaskTemplate if present.
@@ -635,6 +641,50 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 			taskAction.Annotations[key] = value
 		}
 	}
+}
+
+func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, parentTaskAction *executorv1.TaskAction) {
+	if taskAction == nil || parentTaskAction == nil {
+		return
+	}
+	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
+	if len(parentTaskAction.Annotations) > 0 {
+		if taskAction.Annotations == nil {
+			taskAction.Annotations = map[string]string{}
+		}
+		for k, v := range cloneStringMap(parentTaskAction.Annotations) {
+			if _, exists := taskAction.Annotations[k]; !exists {
+				taskAction.Annotations[k] = v
+			}
+		}
+	}
+	if len(parentTaskAction.Labels) > 0 {
+		if taskAction.Labels == nil {
+			taskAction.Labels = map[string]string{}
+		}
+		for k, v := range cloneStringMap(parentTaskAction.Labels) {
+			if _, exists := taskAction.Labels[k]; !exists {
+				taskAction.Labels[k] = v
+			}
+		}
+	}
+	if parentTaskAction.Spec.Interruptible != nil {
+		v := *parentTaskAction.Spec.Interruptible
+		taskAction.Spec.Interruptible = &v
+	} else {
+		taskAction.Spec.Interruptible = nil
+	}
+}
+
+func cloneStringMap(src map[string]string) map[string]string {
+	if len(src) == 0 {
+		return nil
+	}
+	out := make(map[string]string, len(src))
+	for k, v := range src {
+		out[k] = v
+	}
+	return out
 }
 
 func keyValuePairsToMap(values []*core.KeyValuePair) map[string]string {
