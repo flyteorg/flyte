@@ -237,7 +237,6 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return transition, err
 	}
 
-	pm.initEventWatcher(ctx)
 	phaseInfo := transition.Info()
 	lastEventUpdate := pluginState.LastEventUpdate
 	if resource != nil {
@@ -274,6 +273,16 @@ func (pm *PluginManager) initEventWatcher(ctx context.Context) {
 			logger.Warnf(ctx, "Failed to initialize k8s object event watcher for plugin [%s]: %v", pm.GetID(), pm.eventWatcherErr)
 		}
 	})
+}
+
+// InitializeObjectEventWatcher starts watching Kubernetes object events for this plugin.
+// It is intended to be called during plugin initialization (before task handling starts).
+func (pm *PluginManager) InitializeObjectEventWatcher(ctx context.Context) error {
+	pm.initEventWatcher(ctx)
+	if pm.eventWatcherErr != nil {
+		return fmt.Errorf("failed to initialize k8s object event watcher for plugin %s: %w", pm.GetID(), pm.eventWatcherErr)
+	}
+	return nil
 }
 
 func (pm *PluginManager) attachRecentObjectEvents(
