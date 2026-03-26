@@ -33,6 +33,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -50,7 +51,7 @@ import (
 )
 
 const (
-	TaskActionDefaultRequeueDuration = 5 * time.Second
+	TaskActionDefaultRequeueDuration = 1 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
@@ -686,6 +687,7 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
+		WithOptions(controller.Options{MaxConcurrentReconciles: 10}).
 		Complete(r)
 }
 
