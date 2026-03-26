@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
@@ -180,8 +181,15 @@ func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.Updat
 
 func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
-	startTime := actionStatus.GetStartTime().AsTime()
-	endTime := actionStatus.GetEndTime().AsTime()
+	var startTime, endTime *time.Time
+	if actionStatus.GetStartTime() != nil {
+		t := actionStatus.GetStartTime().AsTime()
+		startTime = &t
+	}
+	if actionStatus.GetEndTime() != nil {
+		t := actionStatus.GetEndTime().AsTime()
+		endTime = &t
+	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(
 		ctx,
@@ -189,8 +197,8 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetPhase(),
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
-		&startTime,
-		&endTime,
+		startTime,
+		endTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
