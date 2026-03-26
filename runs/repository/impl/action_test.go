@@ -191,7 +191,7 @@ func TestListRuns(t *testing.T) {
 			verify: func(t *testing.T, runs []*models.Run) {
 				runNames := map[string]bool{}
 				for _, r := range runs {
-					runNames[r.Name] = true
+					runNames[r.RunName] = true
 				}
 				assert.True(t, runNames["run-1"])
 				assert.True(t, runNames["run-2"])
