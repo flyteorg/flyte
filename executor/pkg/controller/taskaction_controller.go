@@ -386,7 +386,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
+	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
 	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{actionEvent},
 	})); err != nil {
@@ -411,6 +411,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 }
 
 func (r *TaskActionReconciler) buildActionEvent(
+	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	phaseInfo pluginsCore.PhaseInfo,
 ) *workflow.ActionEvent {
@@ -435,7 +436,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 		UpdatedTime:   updatedTime,
 		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
 		Cluster:       r.cluster,
-		Outputs:       outputRefs(taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName),
+		Outputs:       outputRefs(ctx, taskAction),
 		ClusterEvents: toClusterEvents(info, updatedTime),
 		ReportedTime:  timestamppb.New(time.Now()),
 	}
@@ -471,12 +472,17 @@ func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timesta
 	return timestamppb.Now()
 }
 
-func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
-	if runOutputBase == "" {
+func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.OutputReferences {
+	if taskAction.Spec.RunOutputBase == "" {
+		return nil
+	}
+	attempt := observedAttempts(taskAction)
+	prefix, err := plugin.ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)
+	if err != nil {
 		return nil
 	}
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName + "/outputs.pb",
+		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
 	}
 }
 
