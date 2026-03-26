@@ -508,6 +508,7 @@ func (r *actionRepo) UpdateActionPhase(
 	if result.Error != nil {
 		return result.Error
 	}
+
 	// Notify subscribers of the action update
 	r.notifyActionUpdate(ctx, actionID)
 

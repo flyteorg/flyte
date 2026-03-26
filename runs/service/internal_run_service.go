@@ -259,7 +259,6 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
-
 	return nil
 }
 
