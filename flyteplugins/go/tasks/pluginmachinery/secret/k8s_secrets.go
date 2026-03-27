@@ -38,9 +38,14 @@ func (i K8sSecretInjector) Type() config.SecretManagerType {
 }
 
 func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	if len(secret.Group) == 0 || len(secret.Key) == 0 {
-		return nil, false, fmt.Errorf("k8s Secrets Webhook require both key and group to be set. "+
-			"Secret: [%v]", secret)
+	if len(secret.Key) == 0 {
+		return nil, false, fmt.Errorf("k8s Secrets Webhook require key to be set. Secret: [%v]", secret)
+	}
+
+	// If group is not set, fall back to using MD5 hash of the key as the K8s secret object name.
+	// This matches the naming convention used by SecretService when creating K8s secrets.
+	if len(secret.Group) == 0 {
+		secret.Group = EncodeK8sSecretName(secret.Key)
 	}
 
 	switch secret.MountRequirement {
