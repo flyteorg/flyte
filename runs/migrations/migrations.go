@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -19,8 +20,23 @@ var AllModels = []interface{}{
 	&models.TaskSpec{},
 }
 
-// RunMigrations runs all database migrations for the runs service
-func RunMigrations(db *gorm.DB) error {
+const MigrationIDInitSchema = "20260327_001_runs_init_schema"
+
+var RunsMigrations = []*gormigrate.Migration{
+	{
+		ID: MigrationIDInitSchema,
+		Migrate: func(tx *gorm.DB) error {
+			return migrateInitSchema(tx)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			// Intentionally no-op for now; this migration can contain destructive steps.
+			return nil
+		},
+	},
+}
+
+// migrateInitSchema initializes the runs service database schema.
+func migrateInitSchema(db *gorm.DB) error {
 	ctx := context.Background()
 
 	// Drop stale tables from previous schema versions that are no longer used.

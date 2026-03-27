@@ -24,12 +24,7 @@ func main() {
 			return fmt.Errorf("failed to initialize logger: %w", err)
 		}
 
-		db, err := app.InitDB(ctx, database.GetConfig())
-		if err != nil {
-			return fmt.Errorf("failed to initialize database: %w", err)
-		}
-
-		if err := migrations.RunMigrations(db); err != nil {
+		if err := database.Migrate(ctx, database.GetConfig(), migrations.RunsMigrations); err != nil {
 			return fmt.Errorf("failed to run runs migrations: %w", err)
 		}
 		return nil

@@ -78,7 +78,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database initialized")
 
 	// Run migrations
-	if err := migrations.RunMigrations(testDB); err != nil {
+	if err := database.Migrate(ctx, dbConfig, migrations.RunsMigrations); err != nil {
 		log.Printf("Failed to run migrations: %v", err)
 		exitCode = 1
 		return
