@@ -1,0 +1,6 @@
+[codespell]
+skip = .git,*.pb,*.pdf,*.svg,go.sum,go.mod,*requirements.txt,gen,monodocs-environment.lock.yaml,*.lock,*.lock.yaml,*.swagger.json
+check-hidden = true
+# Ignore camelCase and PascalCase identifiers (common in Go code)
+ignore-regex = \b[a-z]+[A-Z]\w*\b|\b[A-Z][a-z]+[A-Z]\w*\b
+ignore-words-list = astroid,bootup,decorder,fo,lightyear,nd,notin,ser,te
