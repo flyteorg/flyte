@@ -46,8 +46,16 @@ func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string,
 }
 
 // secretNamespace returns the Kubernetes namespace for a secret based on its project and domain.
-func secretNamespace(project, domain string) string {
-	return fmt.Sprintf("%s-%s", project, domain)
+// If both project and domain are empty, it falls back to the configured default namespace.
+// If only one of them is set, it returns an error.
+func secretNamespace(project, domain string) (string, error) {
+	if project == "" && domain == "" {
+		return config.GetConfig().Kubernetes.Namespace, nil
+	}
+	if project == "" || domain == "" {
+		return "", fmt.Errorf("both project and domain must be set, got project=%q domain=%q", project, domain)
+	}
+	return fmt.Sprintf("%s-%s", project, domain), nil
 }
 
 func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[secretpb.CreateSecretRequest]) (*connect.Response[secretpb.CreateSecretResponse], error) {
@@ -63,7 +71,10 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	k8sSecret, err := buildK8sSecret(secretName, k8sSecretName, namespace, req.Msg.GetSecretSpec())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -94,7 +105,10 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
 	// Get the existing secret first to obtain the ResourceVersion required by controller-runtime Update.
-	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	existing := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
@@ -139,7 +153,10 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	k8sSecret := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
@@ -173,7 +190,10 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	k8sSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      k8sSecretName,
@@ -196,7 +216,10 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[secretpb.ListSecretsRequest]) (*connect.Response[secretpb.ListSecretsResponse], error) {
 	logger.Debugf(ctx, "SecretService.ListSecrets called")
 
-	namespace := secretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
+	namespace, err := secretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	k8sSecretList := &corev1.SecretList{}
 	listOpts := []client.ListOption{
 		client.InNamespace(namespace),
