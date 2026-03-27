@@ -775,6 +775,11 @@ impl V2TaskManager {
             .lock()
             .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
 
+        let exec_id = operation
+            .exec_id
+            .clone()
+            .ok_or_else(|| anyhow!("Execution ID is required for task assignment"))?;
+
         let running_count = tasks
             .values()
             .filter(|&task_info| {
@@ -782,13 +787,21 @@ impl V2TaskManager {
             })
             .count();
         if running_count >= max_parallelism as usize {
-            warn!(running_count, max_parallelism, "Max parallelism reached");
-            return Err(anyhow!("Max parallelism reached"));
+            warn!(running_count, max_parallelism, "Max parallelism reached, rejecting assignment");
+            tasks.insert(operation.task_id.clone(), TaskInfo {
+                task_id: operation.task_id.clone(),
+                namespace: operation.namespace.clone(),
+                exec_id,
+                phase: FAILED,
+                assigned_at: SystemTime::now(),
+                reason: Some("Max parallelism reached on worker".to_string()),
+                env_vars: operation.env_vars.clone(),
+                enqueue_labels: operation.enqueue_labels.clone(),
+                last_ack_time: None,
+                system_failure: true,
+            });
+            return Ok(());
         }
-        let exec_id = operation
-            .exec_id
-            .clone()
-            .ok_or_else(|| anyhow!("Execution ID is required for task assignment"))?;
 
         // Create the initial task info to track
         let task_info = TaskInfo {
@@ -825,8 +838,19 @@ impl V2TaskManager {
                 );
             }
             Err(TrySendError::Full(_)) => {
-                error!("Assignment channel is full");
-                return Err(anyhow!("Failed to send task assignment - channel full"));
+                error!("Assignment channel full, rejecting assignment");
+                tasks.insert(operation.task_id.clone(), TaskInfo {
+                    task_id: operation.task_id.clone(),
+                    namespace: operation.namespace.clone(),
+                    exec_id,
+                    phase: FAILED,
+                    assigned_at: SystemTime::now(),
+                    reason: Some("Assignment channel full on worker".to_string()),
+                    env_vars: task_info.env_vars.clone(),
+                    enqueue_labels: task_info.enqueue_labels.clone(),
+                    last_ack_time: None,
+                    system_failure: true,
+                });
             }
             Err(e) => {
                 error!(error = %e, "Failed to send task assignment");
@@ -1011,5 +1035,123 @@ mod tests {
         let duration = task_status.task_duration.unwrap();
         assert!(duration.seconds >= 0);
         assert!(duration.nanos >= 0);
+    }
+
+    fn create_assign_heartbeat_response(task_id: &str) -> HeartbeatResponse {
+        HeartbeatResponse {
+            task_id: task_id.to_string(),
+            namespace: "test-namespace".to_string(),
+            workflow_id: None,
+            cmd: vec!["python".to_string(), "test.py".to_string()],
+            operation: heartbeat_response::Operation::Assign as i32,
+            env_vars: HashMap::new(),
+            enqueue_labels: HashMap::new(),
+            exec_id: Some(ExecutionIdentifier {
+                org: "test-org".to_string(),
+                domain: "test-domain".to_string(),
+                name: "test-execution".to_string(),
+                project: "test-project".to_string(),
+            }),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_try_assign_task_at_max_parallelism() {
+        let max_parallelism = 2;
+        let (assignment_tx, _assignment_rx) = async_channel::bounded(10);
+        let tasks = Arc::new(Mutex::new(HashMap::new()));
+
+        // Fill to max parallelism with running tasks
+        for i in 0..max_parallelism {
+            let mut task_info = create_test_task_info();
+            task_info.task_id = format!("running-task-{}", i);
+            task_info.phase = RUNNING;
+            tasks.lock().unwrap().insert(task_info.task_id.clone(), task_info);
+        }
+
+        // Try to assign one more — should be rejected but tracked as FAILED
+        let operation = create_assign_heartbeat_response("overflow-task");
+        let result = V2TaskManager::try_assign_task_static(
+            operation,
+            &assignment_tx,
+            &tasks,
+            max_parallelism,
+        ).await;
+
+        assert!(result.is_ok(), "Should return Ok, not Err");
+
+        let tasks_guard = tasks.lock().unwrap();
+        let rejected_task = tasks_guard.get("overflow-task").expect("Rejected task should be in tasks_in_progress");
+        assert_eq!(rejected_task.phase, FAILED);
+        assert!(rejected_task.system_failure);
+        assert_eq!(rejected_task.reason.as_deref(), Some("Max parallelism reached on worker"));
+        assert!(rejected_task.last_ack_time.is_none());
+
+        // Verify the next heartbeat would include this failed task
+        drop(tasks_guard);
+        let heartbeat = V2TaskManager::create_heartbeat_request_static(
+            &tasks,
+            "test-worker",
+            "test-queue",
+            max_parallelism,
+        );
+        let failed_status = heartbeat.task_statuses.iter()
+            .find(|s| s.task_id == "overflow-task")
+            .expect("Failed task should appear in heartbeat");
+        assert_eq!(failed_status.phase, FAILED);
+        assert!(failed_status.system_failure);
+        assert!(failed_status.task_duration.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_try_assign_task_channel_full() {
+        let max_parallelism = 10;
+        // Create a channel with capacity 1 and pre-fill it so try_send returns Full
+        let (assignment_tx, _assignment_rx) = async_channel::bounded(1);
+        let tasks = Arc::new(Mutex::new(HashMap::new()));
+
+        // Pre-fill the channel to make it full
+        let filler_task = Task {
+            cmd: vec![],
+            additional_distribution: None,
+            fast_register_dir: None,
+            env_vars: None,
+            unique_task_id: "filler".to_string(),
+            cancel: false,
+        };
+        assignment_tx.try_send(filler_task).expect("Should fill the channel");
+
+        // Now try to assign — channel is full, should be rejected but tracked as FAILED
+        let operation = create_assign_heartbeat_response("blocked-task");
+        let result = V2TaskManager::try_assign_task_static(
+            operation,
+            &assignment_tx,
+            &tasks,
+            max_parallelism,
+        ).await;
+
+        assert!(result.is_ok(), "Should return Ok, not Err");
+
+        let tasks_guard = tasks.lock().unwrap();
+        let rejected_task = tasks_guard.get("blocked-task").expect("Rejected task should be in tasks_in_progress");
+        assert_eq!(rejected_task.phase, FAILED);
+        assert!(rejected_task.system_failure);
+        assert_eq!(rejected_task.reason.as_deref(), Some("Assignment channel full on worker"));
+        assert!(rejected_task.last_ack_time.is_none());
+
+        // Verify the next heartbeat would include this failed task
+        drop(tasks_guard);
+        let heartbeat = V2TaskManager::create_heartbeat_request_static(
+            &tasks,
+            "test-worker",
+            "test-queue",
+            max_parallelism,
+        );
+        let failed_status = heartbeat.task_statuses.iter()
+            .find(|s| s.task_id == "blocked-task")
+            .expect("Failed task should appear in heartbeat");
+        assert_eq!(failed_status.phase, FAILED);
+        assert!(failed_status.system_failure);
+        assert!(failed_status.task_duration.is_none());
     }
 }
