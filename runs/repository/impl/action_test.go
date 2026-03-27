@@ -51,7 +51,6 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		abort_reason TEXT,
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		started_at DATETIME,
 		ended_at DATETIME,
 		duration_ms INTEGER,
 		attempts INTEGER NOT NULL DEFAULT 1,
