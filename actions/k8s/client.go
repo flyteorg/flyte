@@ -384,8 +384,8 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 	})
 	if err != nil {
 		if apierrors.IsGone(err) {
-			if syncErr := c.syncResourceVersionFromList(ctx); syncErr != nil {
-				return fmt.Errorf("failed to refresh resource version after expired watch: %w", syncErr)
+			if syncErr := c.resyncFromList(ctx); syncErr != nil {
+				return fmt.Errorf("failed to resync after expired watch: %w", syncErr)
 			}
 			return nil
 		}
@@ -405,8 +405,8 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 			}
 			if event.Type == watch.Error {
 				if status, ok := event.Object.(*metav1.Status); ok && status.Reason == metav1.StatusReasonGone {
-					if syncErr := c.syncResourceVersionFromList(ctx); syncErr != nil {
-						return fmt.Errorf("failed to refresh resource version after expired watch event: %w", syncErr)
+					if syncErr := c.resyncFromList(ctx); syncErr != nil {
+						return fmt.Errorf("failed to resync after expired watch event: %w", syncErr)
 					}
 					return nil
 				}
@@ -417,16 +417,27 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 	}
 }
 
-// syncResourceVersionFromList performs a list operation to get the latest ResourceVersion.
-func (c *ActionsClient) syncResourceVersionFromList(ctx context.Context) error {
+// resyncFromList rebuilds watcher state from a fresh list after the watch stream expires.
+func (c *ActionsClient) resyncFromList(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 	if err := c.k8sClient.List(ctx, taskActionList); err != nil {
 		return fmt.Errorf("failed to list TaskActions: %w", err)
 	}
 
-	c.mu.Lock()
-	c.lastResourceVersion = taskActionList.ResourceVersion
-	c.mu.Unlock()
+	for i := range taskActionList.Items {
+		taskAction := taskActionList.Items[i]
+		// send all previous events to prevent event lost
+		c.handleWatchEvent(ctx, watch.Event{
+			Type:   watch.Added,
+			Object: &taskAction,
+		})
+	}
+
+	if taskActionList.ResourceVersion != "" {
+		c.mu.Lock()
+		c.lastResourceVersion = taskActionList.ResourceVersion
+		c.mu.Unlock()
+	}
 
 	return nil
 }

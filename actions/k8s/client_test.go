@@ -52,6 +52,10 @@ func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpda
 	return ta, update
 }
 
+func ptr[T any](v T) *T {
+	return &v
+}
+
 func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 	ctx := context.Background()
 
@@ -292,6 +296,22 @@ func TestDoWatch_PassesResourceVersionOnReconnect(t *testing.T) {
 }
 
 func TestDoWatch_HandlesGoneError(t *testing.T) {
+	taskAction := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "taskaction-1",
+			Namespace:       "default",
+			ResourceVersion: "200",
+		},
+		Spec: executorv1.TaskActionSpec{
+			Org:              "org",
+			Project:          "proj",
+			Domain:           "dev",
+			RunName:          "run1",
+			ActionName:       "action-1",
+			ParentActionName: ptr("parent-1"),
+		},
+	}
+
 	eventCh := make(chan watch.Event, 1)
 	eventCh <- watch.Event{
 		Type: watch.Error,
@@ -302,26 +322,36 @@ func TestDoWatch_HandlesGoneError(t *testing.T) {
 	}
 
 	woc := &watchOverrideClient{
-		WithWatch: newFakeK8sClient(),
+		WithWatch: newFakeK8sClient(taskAction),
 		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
 			return &mockWatcher{ch: eventCh}, nil
 		},
 	}
 
+	updateCh := make(chan *ActionUpdate, 1)
 	c := &ActionsClient{
 		k8sClient:           woc,
-		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:         map[string]map[chan *ActionUpdate]struct{}{"parent-1": {updateCh: {}}},
 		stopCh:              make(chan struct{}),
 		lastResourceVersion: "100",
 	}
 
 	err := c.doWatch(context.Background())
 
-	// syncResourceVersionFromList refreshes from List, doWatch returns nil
+	// resyncFromList replays the current snapshot and doWatch returns nil.
 	assert.NoError(t, err)
 
+	select {
+	case update := <-updateCh:
+		assert.Equal(t, "action-1", update.ActionID.Name)
+		assert.Equal(t, "parent-1", update.ParentActionName)
+		assert.False(t, update.IsDeleted)
+	default:
+		t.Fatal("expected relist replay to notify subscribers")
+	}
+
 	c.mu.RLock()
-	assert.NotEqual(t, "100", c.lastResourceVersion)
+	assert.Equal(t, "200", c.lastResourceVersion)
 	c.mu.RUnlock()
 }
 
