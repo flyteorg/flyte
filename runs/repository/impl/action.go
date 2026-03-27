@@ -36,6 +36,10 @@ type actionRepo struct {
 	runSubscribers    map[chan string]bool
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
+
+	// Dedicated channels for async NOTIFY to avoid pool contention
+	actionNotifyCh chan string
+	runNotifyCh    chan string
 }
 
 const rootActionName = "a0"
@@ -56,7 +60,10 @@ func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRep
 
 	// Start LISTEN/NOTIFY for PostgreSQL
 	if isPostgres {
+		repo.actionNotifyCh = make(chan string, 256)
+		repo.runNotifyCh = make(chan string, 256)
 		go repo.startPostgresListener()
+		go repo.startNotifyLoop()
 	}
 
 	return repo
@@ -1013,7 +1020,8 @@ func (r *actionRepo) startPostgresListener() {
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update
+// notifyRunUpdate sends a notification about a run update via the
+// dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
 	if !r.isPostgres {
 		return
@@ -1021,10 +1029,10 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 
 	payload := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 
-	// Execute NOTIFY
-	notifySQL := fmt.Sprintf("NOTIFY run_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
-		logger.Errorf(ctx, "Failed to NOTIFY run_updates: %v", err)
+	select {
+	case r.runNotifyCh <- payload:
+	default:
+		logger.Warnf(ctx, "Run NOTIFY channel full, dropping notification for %s", payload)
 	}
 }
 
@@ -1060,7 +1068,76 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 	return actions, nil
 }
 
-// notifyActionUpdate sends a notification about an action update
+// startNotifyLoop runs a dedicated goroutine that sends all NOTIFY commands
+// over a single persistent connection, avoiding GORM connection pool contention.
+func (r *actionRepo) startNotifyLoop() {
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		logger.Errorf(context.Background(), "Failed to get SQL DB for NOTIFY loop: %v", err)
+		return
+	}
+
+	conn, err := sqlDB.Conn(context.Background())
+	if err != nil {
+		logger.Errorf(context.Background(), "Failed to acquire dedicated NOTIFY connection: %v", err)
+		return
+	}
+	defer conn.Close()
+
+	reconnect := func() bool {
+		conn.Close()
+		conn, err = sqlDB.Conn(context.Background())
+		if err != nil {
+			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			return false
+		}
+		return true
+	}
+
+	// drainAndExec collects all immediately available payloads from a channel
+	// and sends them along with the initial payload in a single batched SQL call.
+	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
+		var b strings.Builder
+		b.WriteString(fmt.Sprintf("SELECT pg_notify('%s', '%s')", channel, firstPayload))
+
+		// Drain any additional queued payloads to batch them in one round-trip.
+	drain:
+		for {
+			select {
+			case payload, ok := <-ch:
+				if !ok {
+					break drain
+				}
+				b.WriteString(fmt.Sprintf(", pg_notify('%s', '%s')", channel, payload))
+			default:
+				break drain
+			}
+		}
+
+		if _, err := conn.ExecContext(context.Background(), b.String()); err != nil {
+			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+			reconnect()
+		}
+	}
+
+	for {
+		select {
+		case payload, ok := <-r.actionNotifyCh:
+			if !ok {
+				return
+			}
+			drainAndExec("action_updates", payload, r.actionNotifyCh)
+		case payload, ok := <-r.runNotifyCh:
+			if !ok {
+				return
+			}
+			drainAndExec("run_updates", payload, r.runNotifyCh)
+		}
+	}
+}
+
+// notifyActionUpdate sends a notification about an action update via the
+// dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
 	if !r.isPostgres {
 		return
@@ -1069,10 +1146,10 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
 		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	// Execute NOTIFY
-	notifySQL := fmt.Sprintf("NOTIFY action_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
-		logger.Errorf(ctx, "Failed to NOTIFY action_updates: %v", err)
+	select {
+	case r.actionNotifyCh <- payload:
+	default:
+		logger.Warnf(ctx, "Action NOTIFY channel full, dropping notification for %s", payload)
 	}
 }
 
