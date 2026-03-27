@@ -483,15 +483,15 @@ func (r *actionRepo) UpdateActionPhase(
 
 	if endTime != nil {
 		if r.isPostgres {
-			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			// Only set ended_at if not already set, clamped to at least created_at.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
 		} else {
-			// SQLite: use MAX() and compute duration via strftime
-			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			// SQLite: only set ended_at if not already set.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 
