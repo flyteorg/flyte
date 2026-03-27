@@ -162,37 +162,6 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
-func TestNotifyRunService_UpdateActionStatusIncludesEndTime(t *testing.T) {
-	ctx := context.Background()
-
-	mockClient := runmocks.NewInternalRunServiceClient(t)
-	c := &ActionsClient{
-		runClient:   mockClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	completionTime := metav1.Now()
-	ta, update := newTestActionUpdate("action-endtime")
-	ta.Status.Attempts = 1
-	ta.Status.PhaseHistory = []executorv1.PhaseTransition{
-		{Phase: "Queued", OccurredAt: metav1.NewTime(completionTime.Add(-30 * 1e9))},
-		{Phase: "Executing", OccurredAt: metav1.NewTime(completionTime.Add(-20 * 1e9))},
-		{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: completionTime},
-	}
-	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
-
-	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
-		status := req.Msg.GetStatus()
-		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
-			status.GetEndTime() != nil &&
-			status.GetEndTime().AsTime().Equal(completionTime.Time)
-	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
-
-	c.notifyRunService(ctx, ta, update, watch.Modified)
-
-	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
-}
-
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "org",

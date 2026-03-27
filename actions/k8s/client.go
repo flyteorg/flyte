@@ -527,7 +527,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-			},
+				},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
