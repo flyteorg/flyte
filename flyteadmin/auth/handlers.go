@@ -373,10 +373,6 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			// custom header set in the Config object
 			if len(authCtx.Options().HTTPAuthorizationHeader) > 0 {
 				header := authCtx.Options().HTTPAuthorizationHeader
-				// TODO: There may be a potential issue here when running behind a service mesh that uses the default Authorization
-				//       header. The grpc-gateway code will automatically translate the 'Authorization' header into the appropriate
-				//       metadata object so if two different tokens are presented, one with the default name and one with the
-				//       custom name, AuthFromMD will find the wrong one.
 				return metadata.MD{
 					DefaultAuthorizationHeader: []string{request.Header.Get(header)},
 				}
@@ -399,13 +395,11 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 		raw, err := json.Marshal(userInfo)
 		if err != nil {
 			logger.Infof(ctx, "Failed to marshal user info. Ignoring. Error: %v", err)
-
 		}
 
 		if len(raw) > 0 {
 			logger.Debugf(ctx, "Setting user info cookie [%s]", string(raw))
 			meta.Set(UserInfoMDKey, string(raw))
-
 		}
 
 		return meta
@@ -480,6 +474,7 @@ func GetHTTPRefreshedRequestCookieToMetadataHandler(authCtx interfaces.Authentic
 			rawUserInfoStr = string(rawUserInfo)
 		}
 
+		// IDtoken is injected into grpc authorization metadata
 		// IDtoken is injected into grpc authorization metadata
 		meta.Set(DefaultAuthorizationHeader, fmt.Sprintf("%s %s", IDTokenScheme, idToken))
 
@@ -674,6 +669,14 @@ func GetUserInfoForwardResponseHandler() ForwardResponseHandler {
 			}
 			w.Header().Set("X-User-Subject", info.Subject)
 		}
+
+		// Forward the bearer token for external authorization. The grpc-gateway
+		// client path (RegisterHandlerFromEndpoint) stores annotator metadata
+		// as outgoing context via AnnotateContext → NewOutgoingContext.
+		if token := metautils.ExtractOutgoing(ctx).Get(DefaultAuthorizationHeader); token != "" {
+			w.Header().Set(UserTokenHeader, token)
+		}
+
 		return nil
 	}
 }
