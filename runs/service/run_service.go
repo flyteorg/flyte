@@ -1115,15 +1115,16 @@ func (s *RunService) WatchClusterEvents(
 	attempt := req.Msg.GetAttempt()
 	logger.Infof(ctx, "Received WatchClusterEvents request for: %s/%s", actionID.Run.Name, actionID.Name)
 
+	// Start watching first to reduce the chance of missing action updates
+	// between initial state fetch and subscription setup.
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
+
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
-
-	// Watch for updates from DB
-	updatesCh := make(chan *models.Action, 50)
-	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
 
 	const maxEvents = 500
 	var lastUpdatedAt time.Time
