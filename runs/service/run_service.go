@@ -33,11 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo             interfaces.Repository
-	actionsClient    actionsconnect.ActionsServiceClient
-	storagePrefix    string
-	dataStore        *storage.DataStore
-	abortReconciler  *AbortReconciler
+	repo            interfaces.Repository
+	actionsClient   actionsconnect.ActionsServiceClient
+	storagePrefix   string
+	dataStore       *storage.DataStore
+	abortReconciler *AbortReconciler
 }
 
 const (
@@ -1170,6 +1170,9 @@ func (s *RunService) WatchClusterEvents(
 				return nil
 			}
 			if updated.Name != actionID.Name {
+				// TODO: Relying only on target action's update notifications can miss events
+				// when notifications are dropped (e.g. subscriber channel full) or during listener
+				// reconnect windows. Need to find out why we will miss the notification.
 				continue
 			}
 			action = updated
