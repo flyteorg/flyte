@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
-	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -32,10 +31,6 @@ import (
 // RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-
-	if err := migrations.RunMigrations(sc.DB); err != nil {
-		return fmt.Errorf("runs: failed to run migrations: %w", err)
-	}
 
 	repo := repository.NewRepository(sc.DB, cfg.Database)
 

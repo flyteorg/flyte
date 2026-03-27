@@ -6,6 +6,7 @@ SERVICE_NAME := runs-service
 BIN_NAME := runs-service
 CMD_PATH := cmd/main.go
 RUN_ARGS ?= --config config.yaml
+MIGRATE_CONFIG ?= config.yaml
 
 # Include common Go targets
 include ../go.Makefile
@@ -27,6 +28,11 @@ run-postgres: build-fast ## Run the service with PostgreSQL config
 run-testclient: build-client ## Run the test client
 	@echo "Running test client..."
 	@./bin/runs-client
+
+.PHONY: migrate
+migrate: ## Run DB migrations
+	@echo "Running runs migrations using $(MIGRATE_CONFIG)..."
+	@go run ./cmd/migrate/main.go --config $(MIGRATE_CONFIG)
 
 .PHONY: clean-db
 clean-db: ## Remove local database file
