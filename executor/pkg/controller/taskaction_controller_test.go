@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
@@ -227,6 +228,61 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(updatedTaskAction.GetLabels()).To(HaveKeyWithValue(LabelTerminationStatus, LabelValueTerminated))
 			Expect(updatedTaskAction.GetLabels()).To(HaveKey(LabelCompletedTime))
+		})
+	})
+
+	Context("mapPhaseToConditions", func() {
+		It("should keep PhaseHistory using controller time, not pod time", func() {
+			ta := &flyteorgv1.TaskAction{}
+			podTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC) // far in the past
+			info := pluginsCore.PhaseInfoRunning(0, &pluginsCore.TaskInfo{
+				OccurredAt: &podTime,
+			})
+			before := time.Now().Add(-time.Second)
+			mapPhaseToConditions(ta, info)
+			after := time.Now().Add(time.Second)
+
+			Expect(ta.Status.PhaseHistory).To(HaveLen(1))
+			phTime := ta.Status.PhaseHistory[0].OccurredAt.Time
+			Expect(phTime.After(before)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+			Expect(phTime.Before(after)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+		})
+	})
+
+	Context("taskActionStatusChanged", func() {
+		It("should detect PhaseHistory changes", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+					{Phase: "Executing", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+
+		It("should return false when nothing changed", func() {
+			now := metav1.Now()
+			status := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: now},
+				},
+			}
+			Expect(taskActionStatusChanged(status, status)).To(BeFalse())
+		})
+
+		It("should detect PhaseHistory addition from empty", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
 		})
 	})
 })

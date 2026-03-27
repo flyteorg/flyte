@@ -156,6 +156,50 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
+func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo := NewActionRepo(db, database.DbConfig{})
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+		ActionId: actionID,
+		InputUri: "s3://bucket/input",
+	}, nil)
+	require.NoError(t, err)
+
+	// Move to RUNNING
+	err = actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase)
+
+	// Try to downgrade to QUEUED — should be a no-op due to phase guard
+	err = actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	action, err = actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase,
+		"phase should not downgrade from RUNNING to QUEUED")
+}
+
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()

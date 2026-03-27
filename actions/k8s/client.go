@@ -458,7 +458,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
 	if eventType == watch.Added {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
-		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
+		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
+		if isDuplicate {
 			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 		} else {
 			recordReq := &workflow.RecordActionRequest{
@@ -498,6 +499,25 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				c.recordedFilter.Add(ctx, actionKey)
 			}
 		}
+
+		// When a child action appears, the parent must already be running (it
+		// created the child). Promote the parent to RUNNING so the UI doesn't
+		// stay stuck on INITIALIZING while children are executing.
+		if !isDuplicate && update.ParentActionName != "" {
+			parentID := &common.ActionIdentifier{
+				Run:  update.ActionID.Run,
+				Name: update.ParentActionName,
+			}
+			parentStatusReq := &workflow.UpdateActionStatusRequest{
+				ActionId: parentID,
+				Status: &workflow.ActionStatus{
+					Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+				},
+			}
+			if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+				logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+			}
+		}
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
@@ -507,7 +527,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-			},
+				},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)

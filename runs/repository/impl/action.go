@@ -480,31 +480,33 @@ func (r *actionRepo) UpdateActionPhase(
 		"cache_status": cacheStatus,
 		"updated_at":   time.Now(),
 	}
+
 	if endTime != nil {
 		if r.isPostgres {
-			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			// Only set ended_at if not already set, clamped to at least created_at.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
 		} else {
-			// SQLite: use MAX() and compute duration via strftime
-			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			// SQLite: only set ended_at if not already set.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 
+	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND name = ? AND phase <= ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name, phase).
 		Updates(updates)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
-	// Notify subscribers of action update
+	// Notify subscribers of the action update
 	r.notifyActionUpdate(ctx, actionID)
 
 	return nil

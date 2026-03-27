@@ -71,7 +71,7 @@ type Action struct {
 	AbortReason       *string    `db:"abort_reason"`
 
 	// Timestamps
-	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
+	// CreatedAt is set by the DB (NOW()) on insert — represents when the action was queued.
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
