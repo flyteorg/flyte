@@ -231,9 +231,9 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
 			restartAttempts = currentAttempts + 1
+			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
-			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion,
-				fmt.Sprintf("restarting task (attempt %d/%d)", currentAttempts+1, maxAttempts)))
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
