@@ -38,6 +38,8 @@ type actionRepo struct {
 	mu                sync.RWMutex
 }
 
+const rootActionName = "a0"
+
 // NewActionRepo creates a new PostgreSQL/SQLite repository
 func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
 	// Detect database type
@@ -75,7 +77,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	actionSpec := &workflow.ActionSpec{
 		ActionId: &common.ActionIdentifier{
 			Run:  runID,
-			Name: runID.Name, // For root actions, action name = run name
+			Name: rootActionName,
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
@@ -150,7 +152,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Project:          runID.Project,
 		Domain:           runID.Domain,
 		RunName:          runID.Name,
-		Name:             runID.Name,
+		Name:             rootActionName,
 		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
@@ -187,7 +189,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		First(&run)
 
@@ -265,7 +267,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Run{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		Updates(updates)
 
@@ -415,8 +417,8 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	var action models.Action
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {
@@ -498,8 +500,8 @@ func (r *actionRepo) UpdateActionPhase(
 	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND phase <= ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name, phase).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND phase <= ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -614,8 +616,8 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -638,8 +640,8 @@ func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.Action
 	var action models.Action
 	result := r.db.WithContext(ctx).
 		Select("action_details").
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {

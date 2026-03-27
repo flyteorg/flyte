@@ -512,7 +512,7 @@ func TestListRuns(t *testing.T) {
 						Domain:  "test-domain",
 						Name:    fmt.Sprintf("run-%d", i),
 					},
-					Name: fmt.Sprintf("run-%d", i),
+					Name: "a0",
 				},
 				Metadata: &workflow.ActionMetadata{
 					EnvironmentName: envName,
@@ -530,7 +530,8 @@ func TestListRuns(t *testing.T) {
 			Org:        "test-org",
 			Project:    "test-project",
 			Domain:     "test-domain",
-			Name:       fmt.Sprintf("run-%d", i),
+			RunName:    fmt.Sprintf("run-%d", i),
+			Name:       "a0",
 			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
 			CreatedAt:  startTime.AsTime(),
 			EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
@@ -636,13 +637,15 @@ func TestConvertRunToProto(t *testing.T) {
 		expect *workflow.Run
 	}{
 		{"empty run", nil, nil},
-		{"valid run",
+		{
+			"valid run",
 			&models.Run{
 				ID:            uint(0),
 				Org:           org,
 				Project:       project,
 				Domain:        domain,
-				Name:          name,
+				RunName:       name,
+				Name:          "a0",
 				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
 				CreatedAt:     startTime.AsTime(),
 				ActionDetails: detailJson,
@@ -660,7 +663,7 @@ func TestConvertRunToProto(t *testing.T) {
 							Domain:  domain,
 							Name:    name,
 						},
-						Name: name,
+						Name: "a0",
 					},
 					Metadata: &workflow.ActionMetadata{
 						EnvironmentName: "prod",
@@ -676,7 +679,8 @@ func TestConvertRunToProto(t *testing.T) {
 				Org:        org,
 				Project:    project,
 				Domain:     domain,
-				Name:       name,
+				RunName:    name,
+				Name:       "a0",
 				Phase:      int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 				CreatedAt:  startTime.AsTime(),
 				EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
@@ -695,7 +699,7 @@ func TestConvertRunToProto(t *testing.T) {
 							Domain:  domain,
 							Name:    name,
 						},
-						Name: name,
+						Name: "a0",
 					},
 					Metadata: &workflow.ActionMetadata{
 						EnvironmentName: "staging",
@@ -904,7 +908,8 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 		Org:     "myorg",
 		Project: "myproj",
 		Domain:  "production",
-		Name:    "rtest99999",
+		RunName: "rtest99999",
+		Name:    "a0",
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
@@ -920,7 +925,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
 	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
-	assert.Equal(t, "rtest99999", run.Action.Id.Name)
+	assert.Equal(t, "a0", run.Action.Id.Name)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
 }
 
@@ -956,11 +961,11 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", Name: "rmy-run-123"}, nil).Once()
+		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
-	// Verify the enqueue request uses the run name as the action name
+	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
 	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.Action.ActionId.Name == "rmy-run-123" &&
+		return req.Msg.Action.ActionId.Name == "a0" &&
 			req.Msg.Action.ActionId.Run.Name == "rmy-run-123"
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
