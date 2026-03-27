@@ -3,8 +3,11 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"sync"
@@ -1095,44 +1098,76 @@ func (r *actionRepo) startNotifyLoop() error {
 	return nil
 }
 
+// isConnError reports whether err indicates a broken or lost database connection.
+func isConnError(err error) bool {
+	if errors.Is(err, driver.ErrBadConn) {
+		return true
+	}
+	var netErr *net.OpError
+	if errors.As(err, &netErr) {
+		return true
+	}
+	// lib/pq wraps connection-class errors (Class 08) as *pq.Error.
+	var pqErr *pq.Error
+	if errors.As(err, &pqErr) && pqErr.Code.Class() == "08" {
+		return true
+	}
+	return false
+}
+
 // runNotifyLoop processes notify channels using the given connection.
 // On connection errors it attempts to reconnect; if reconnection fails
 // the error is logged and the notification is skipped.
 func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
-	defer conn.Close()
+	defer func() {
+		if conn != nil {
+			conn.Close()
+		}
+	}()
 
 	reconnect := func() {
-		conn.Close()
+		if conn != nil {
+			conn.Close()
+			conn = nil
+		}
+		if sqlDB == nil {
+			return
+		}
 		var err error
 		conn, err = sqlDB.Conn(context.Background())
 		if err != nil {
 			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			conn = nil
 		}
 	}
 
-	// drainAndExec collects all immediately available payloads from a channel
-	// and sends them along with the initial payload in a single batched SQL call.
-	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		var b strings.Builder
-		b.WriteString(fmt.Sprintf("SELECT pg_notify('%s', '%s')", channel, firstPayload))
+	execNotify := func(channel, payload string) {
+		if conn == nil {
+			reconnect()
+		}
+		if conn == nil {
+			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
+			return
+		}
+		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
+			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+			if isConnError(err) {
+				reconnect()
+			}
+		}
+	}
 
-		// Drain any additional queued payloads to batch them in one round-trip.
-	drain:
+	drain := func(channel string, ch <-chan string) {
 		for {
 			select {
 			case payload, ok := <-ch:
 				if !ok {
-					break drain
+					return
 				}
-				b.WriteString(fmt.Sprintf(", pg_notify('%s', '%s')", channel, payload))
+				execNotify(channel, payload)
 			default:
-				break drain
+				return
 			}
-		}
-
-		if _, err := conn.ExecContext(context.Background(), b.String()); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
-			reconnect()
 		}
 	}
 
@@ -1142,12 +1177,14 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			if !ok {
 				return
 			}
-			drainAndExec("action_updates", payload, r.actionNotifyCh)
+			execNotify("action_updates", payload)
+			drain("action_updates", r.actionNotifyCh)
 		case payload, ok := <-r.runNotifyCh:
 			if !ok {
 				return
 			}
-			drainAndExec("run_updates", payload, r.runNotifyCh)
+			execNotify("run_updates", payload)
+			drain("run_updates", r.runNotifyCh)
 		}
 	}
 }

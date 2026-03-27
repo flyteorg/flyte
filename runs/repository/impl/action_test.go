@@ -2,6 +2,10 @@ package impl
 
 import (
 	"context"
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"net"
 	"testing"
 	"time"
 
@@ -11,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -443,6 +448,128 @@ func TestInsertEvents_Empty(t *testing.T) {
 	// Insert empty slice should be no-op
 	err := repo.InsertEvents(ctx, []*models.ActionEvent{})
 	assert.NoError(t, err)
+}
+
+func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
+	r := &actionRepo{
+		isPostgres:     true,
+		actionNotifyCh: make(chan string, 256),
+		runNotifyCh:    make(chan string, 256),
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	// Payload with single quotes that would cause SQL injection with string interpolation.
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org",
+			Project: "proj",
+			Domain:  "domain",
+			Name:    "run'; DROP TABLE actions; --",
+		},
+		Name: "action",
+	}
+
+	r.notifyActionUpdate(ctx, actionID)
+
+	select {
+	case payload := <-r.actionNotifyCh:
+		assert.Equal(t, "org/proj/domain/run'; DROP TABLE actions; --/action", payload)
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for payload on actionNotifyCh")
+	}
+}
+
+func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
+	r := &actionRepo{
+		isPostgres:     true,
+		actionNotifyCh: make(chan string, 256),
+		runNotifyCh:    make(chan string, 256),
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	runID := &common.RunIdentifier{
+		Org:     "org",
+		Project: "proj",
+		Domain:  "domain",
+		Name:    "run'); SELECT pg_sleep(10); --",
+	}
+
+	r.notifyRunUpdate(ctx, runID)
+
+	select {
+	case payload := <-r.runNotifyCh:
+		assert.Equal(t, "org/proj/domain/run'); SELECT pg_sleep(10); --", payload)
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for payload on runNotifyCh")
+	}
+}
+
+func TestIsConnError(t *testing.T) {
+	tests := []struct {
+		name   string
+		err    error
+		expect bool
+	}{
+		{
+			name:   "driver.ErrBadConn",
+			err:    driver.ErrBadConn,
+			expect: true,
+		},
+		{
+			name:   "wrapped driver.ErrBadConn",
+			err:    fmt.Errorf("exec failed: %w", driver.ErrBadConn),
+			expect: true,
+		},
+		{
+			name:   "net.OpError",
+			err:    &net.OpError{Op: "read", Err: errors.New("connection reset")},
+			expect: true,
+		},
+		{
+			name:   "pq connection_exception class 08",
+			err:    &pq.Error{Code: "08006"},
+			expect: true,
+		},
+		{
+			name:   "pq non-connection error",
+			err:    &pq.Error{Code: "42P01"},
+			expect: false,
+		},
+		{
+			name:   "generic error",
+			err:    errors.New("something went wrong"),
+			expect: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expect, isConnError(tt.err))
+		})
+	}
+}
+
+func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
+	// Verify that runNotifyLoop handles a nil connection gracefully
+	// (e.g. after a failed reconnect) instead of panicking.
+	r := &actionRepo{
+		isPostgres:     true,
+		actionNotifyCh: make(chan string, 256),
+		runNotifyCh:    make(chan string, 256),
+	}
+
+	// Send a notification, then close the channel so the loop exits.
+	r.actionNotifyCh <- "org/proj/domain/run/action"
+	close(r.actionNotifyCh)
+
+	// Pass a nil conn — should not panic.
+	assert.NotPanics(t, func() {
+		r.runNotifyLoop(nil, nil)
+	})
 }
 
 func TestInsertEvents_WithLogContext(t *testing.T) {
