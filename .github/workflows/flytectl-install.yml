@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - v0.9.4
+          - v0.9.6
           - latest
           # Test the case where no version is specified
           - " "
@@ -31,4 +31,3 @@ jobs:
           chmod +x ./flytectl/install.sh
           ./flytectl/install.sh ${{ matrix.version }}
           ./bin/flytectl version
-
