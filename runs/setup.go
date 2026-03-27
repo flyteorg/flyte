@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -48,7 +49,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore)
+	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
+		Workers:      5,
+		MaxAttempts:  10,
+		QueueSize:    1000,
+		InitialDelay: time.Second,
+		MaxDelay:     5 * time.Minute,
+	})
+	sc.AddWorker("abort-reconciler", func(ctx context.Context) error {
+		return abortReconciler.Run(ctx)
+	})
+
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
 	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
