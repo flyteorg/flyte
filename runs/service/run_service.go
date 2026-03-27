@@ -33,10 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo          interfaces.Repository
-	actionsClient actionsconnect.ActionsServiceClient
-	storagePrefix string
-	dataStore     *storage.DataStore
+	repo             interfaces.Repository
+	actionsClient    actionsconnect.ActionsServiceClient
+	storagePrefix    string
+	dataStore        *storage.DataStore
+	abortReconciler  *AbortReconciler
 }
 
 const (
@@ -99,12 +100,13 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore) *RunService {
+func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, storagePrefix string, dataStore *storage.DataStore, reconciler *AbortReconciler) *RunService {
 	return &RunService{
-		repo:          repo,
-		actionsClient: actionsClient,
-		storagePrefix: storagePrefix,
-		dataStore:     dataStore,
+		repo:            repo,
+		actionsClient:   actionsClient,
+		storagePrefix:   storagePrefix,
+		dataStore:       dataStore,
+		abortReconciler: reconciler,
 	}
 }
 
@@ -173,18 +175,19 @@ func (s *RunService) CreateRun(
 	if runSpec == nil {
 		runSpec = &task.RunSpec{}
 	}
+	request.RunSpec = runSpec
 
 	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
-	runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
+	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
+		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
+	}
 
-	// Persist inputs to storage. The task runtime always tries to load inputs.pb,
-	// even when the task has no user inputs, so we must write an empty LiteralMap.
-	literalMap := inputsToLiteralMap(inputs)
+	// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
 	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, literalMap); err != nil {
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
 		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
 	}
@@ -251,23 +254,14 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Abort via actions service
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: "a0",
-	}
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: rootActionID,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort run via actions service: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: req.Msg.RunId.Name}, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
@@ -354,7 +348,9 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		if info.GetTaskSpecDigest() != "" {
 			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
 			if err != nil {
-				logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
+				if ctx.Err() == nil {
+					logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
+				}
 				return err
 			}
 
@@ -396,14 +392,18 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		var err error
 		attempts, err = s.getAttempts(ctx, actionId)
 		if err != nil {
-			logger.Warnf(ctx, "failed to get action attempts for action %v: %v", actionId, err)
+			if ctx.Err() == nil {
+				logger.Warnf(ctx, "failed to get action attempts for action %v: %v", actionId, err)
+			}
 			return err
 		}
 		return nil
 	})
 
 	if err := eg.Wait(); err != nil {
-		logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
+		if ctx.Err() == nil {
+			logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
+		}
 		return nil, err
 	}
 
@@ -789,19 +789,14 @@ func (s *RunService) AbortAction(
 		reason = req.Msg.Reason
 	}
 
-	// Abort in database
+	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Abort via actions service
-	if _, err := s.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
-		ActionId: req.Msg.ActionId,
-		Reason:   &reason,
-	})); err != nil {
-		logger.Errorf(ctx, "Failed to abort action via actions service: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if s.abortReconciler != nil {
+		s.abortReconciler.Push(ctx, req.Msg.ActionId, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
@@ -835,8 +830,8 @@ func (s *RunService) WatchRunDetails(
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
 	// Keep connection open and send updates (simplified)
-	updates := make(chan *models.Run)
-	errs := make(chan error)
+	updates := make(chan *models.Run, 50)
+	errs := make(chan error, 1)
 
 	go s.repo.ActionRepo().WatchRunUpdates(ctx, req.Msg.RunId, updates, errs)
 
@@ -881,9 +876,14 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
+	// If the action is already in a terminal phase, no further updates are expected.
+	if IsTerminalPhase(details.GetStatus().GetPhase()) {
+		return nil
+	}
+
 	// Step 2: Watch DB for updates
-	updates := make(chan *models.Action)
-	errs := make(chan error)
+	updates := make(chan *models.Action, 50)
+	errs := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updates, errs)
 
 	for {
@@ -903,6 +903,9 @@ func (s *RunService) WatchActionDetails(
 			// Reuse the already-fetched action model from WatchActionUpdates
 			details, err := s.buildActionDetails(ctx, updated, actionID)
 			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
 				logger.Errorf(ctx, "failed to get action details for action %s: %v", actionID.Name, err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
@@ -910,6 +913,10 @@ func (s *RunService) WatchActionDetails(
 				Details: details,
 			}); err != nil {
 				return err
+			}
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(details.GetStatus().GetPhase()) {
+				return nil
 			}
 		}
 	}
@@ -944,8 +951,8 @@ func (s *RunService) WatchRuns(
 	}
 
 	// Step 2: Watch for run updates from DB
-	updatesCh := make(chan *models.Run)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Run, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	for {
@@ -982,8 +989,8 @@ func (s *RunService) WatchActions(
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
 	// Start watching for updates from DB first to prevent event miss
-	updatesCh := make(chan *models.Action)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
@@ -1091,9 +1098,14 @@ func (s *RunService) WatchClusterEvents(
 		}
 	}
 
+	// If the action is already in a terminal phase, no further events are expected.
+	if IsTerminalPhase(common.ActionPhase(action.Phase)) {
+		return nil
+	}
+
 	// Step 2: Watch for updates from DB
-	updatesCh := make(chan *models.Action)
-	errsCh := make(chan error)
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
 
 	lastPhase := action.Phase
@@ -1119,11 +1131,14 @@ func (s *RunService) WatchClusterEvents(
 			lastPhase = updated.Phase
 
 			newEvents := actionModelToClusterEvents(updated)
-			if len(newEvents) == 0 {
-				continue
+			if len(newEvents) > 0 {
+				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
+					return err
+				}
 			}
-			if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
-				return err
+			// Close the stream once the action reaches a terminal phase.
+			if IsTerminalPhase(common.ActionPhase(updated.Phase)) {
+				return nil
 			}
 		}
 	}
@@ -1396,7 +1411,19 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 	}
 
 	actionStatus := &workflow.ActionStatus{
-		Phase: common.ActionPhase(action.Phase),
+		Phase:       common.ActionPhase(action.Phase),
+		Attempts:    action.Attempts,
+		StartTime:   timestamppb.New(action.CreatedAt),
+		CacheStatus: action.CacheStatus,
+	}
+
+	if action.EndedAt.Valid {
+		actionStatus.EndTime = timestamppb.New(action.EndedAt.Time)
+	}
+
+	if action.DurationMs.Valid && action.DurationMs.Int64 > 0 {
+		durationMs := uint64(action.DurationMs.Int64)
+		actionStatus.DurationMs = &durationMs
 	}
 
 	var metadata *workflow.ActionMetadata

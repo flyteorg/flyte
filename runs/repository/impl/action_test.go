@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
@@ -45,6 +46,9 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		action_details BLOB,
 		detailed_info BLOB,
 		run_spec BLOB,
+		abort_requested_at DATETIME,
+		abort_attempt_count INTEGER NOT NULL DEFAULT 0,
+		abort_reason TEXT,
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		ended_at DATETIME,
@@ -150,6 +154,50 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.Equal(t, uint32(3), action.Attempts)
 	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, action.CacheStatus)
 	assert.True(t, action.EndedAt.Valid)
+}
+
+func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo := NewActionRepo(db, database.DbConfig{})
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+		ActionId: actionID,
+		InputUri: "s3://bucket/input",
+	}, nil)
+	require.NoError(t, err)
+
+	// Move to RUNNING
+	err = actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase)
+
+	// Try to downgrade to QUEUED — should be a no-op due to phase guard
+	err = actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	action, err = actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase,
+		"phase should not downgrade from RUNNING to QUEUED")
 }
 
 func TestListRuns(t *testing.T) {
@@ -258,4 +306,165 @@ func TestListRuns(t *testing.T) {
 		assert.Equal(t, "proj1", r.Project)
 		assert.Equal(t, "domain1", r.Domain)
 	}
+}
+
+func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
+	db := setupActionDB(t)
+	err := db.Exec(`CREATE TABLE action_events (
+		org TEXT NOT NULL,
+		project TEXT NOT NULL,
+		domain TEXT NOT NULL,
+		run_name TEXT NOT NULL,
+		name TEXT NOT NULL,
+		attempt INTEGER NOT NULL,
+		phase INTEGER NOT NULL,
+		version INTEGER NOT NULL,
+		info BLOB,
+		error_kind TEXT,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY (org, project, domain, run_name, name, attempt, phase, version)
+	)`).Error
+	require.NoError(t, err)
+
+	repo := NewActionRepo(db, database.DbConfig{}).(*actionRepo)
+	return db, repo
+}
+
+var testActionID = &common.ActionIdentifier{
+	Run: &common.RunIdentifier{
+		Org:     "org1",
+		Project: "proj1",
+		Domain:  "domain1",
+		Name:    "run1",
+	},
+	Name: "action1",
+}
+
+func makeTestEvent(attempt, version uint32, phase common.ActionPhase) *workflow.ActionEvent {
+	return &workflow.ActionEvent{
+		Id:          testActionID,
+		Attempt:     attempt,
+		Phase:       phase,
+		Version:     version,
+		UpdatedTime: timestamppb.Now(),
+	}
+}
+
+func TestGetLatestEventByAttempt_HappyPath(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	// Insert two events for the same attempt with different versions
+	e1, err := models.NewActionEventModel(makeTestEvent(0, 0, common.ActionPhase_ACTION_PHASE_RUNNING))
+	require.NoError(t, err)
+	e2, err := models.NewActionEventModel(makeTestEvent(0, 1, common.ActionPhase_ACTION_PHASE_SUCCEEDED))
+	require.NoError(t, err)
+
+	require.NoError(t, repo.InsertEvents(ctx, []*models.ActionEvent{e1, e2}))
+
+	// Should return the latest version (version=1)
+	event, err := repo.GetLatestEventByAttempt(ctx, testActionID, 0)
+	require.NoError(t, err)
+	assert.Equal(t, uint32(1), event.Version)
+}
+
+func TestGetLatestEventByAttempt_NotFound(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	_, err := repo.GetLatestEventByAttempt(ctx, testActionID, 99)
+	require.Error(t, err)
+	assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
+}
+
+func TestGetLatestEventByAttempt_DifferentAttempts(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	// Insert events for attempt 0 and attempt 1
+	e0, _ := models.NewActionEventModel(makeTestEvent(0, 0, common.ActionPhase_ACTION_PHASE_RUNNING))
+	e1, _ := models.NewActionEventModel(makeTestEvent(1, 0, common.ActionPhase_ACTION_PHASE_RUNNING))
+	e1v1, _ := models.NewActionEventModel(makeTestEvent(1, 1, common.ActionPhase_ACTION_PHASE_SUCCEEDED))
+	require.NoError(t, repo.InsertEvents(ctx, []*models.ActionEvent{e0, e1, e1v1}))
+
+	// Attempt 0 should return version 0
+	event, err := repo.GetLatestEventByAttempt(ctx, testActionID, 0)
+	require.NoError(t, err)
+	assert.Equal(t, uint32(0), event.Attempt)
+	assert.Equal(t, uint32(0), event.Version)
+
+	// Attempt 1 should return version 1 (latest)
+	event, err = repo.GetLatestEventByAttempt(ctx, testActionID, 1)
+	require.NoError(t, err)
+	assert.Equal(t, uint32(1), event.Attempt)
+	assert.Equal(t, uint32(1), event.Version)
+}
+
+func TestInsertEvents_MultipleEventsForDifferentActions(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	// Insert events for two different actions in the same batch
+	actionID2 := &common.ActionIdentifier{
+		Run:  testActionID.Run,
+		Name: "action2",
+	}
+	e1, _ := models.NewActionEventModel(makeTestEvent(0, 0, common.ActionPhase_ACTION_PHASE_RUNNING))
+	e2, _ := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:          actionID2,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:     0,
+		UpdatedTime: timestamppb.Now(),
+	})
+	require.NoError(t, repo.InsertEvents(ctx, []*models.ActionEvent{e1, e2}))
+
+	// Both events should be retrievable
+	got1, err := repo.GetLatestEventByAttempt(ctx, testActionID, 0)
+	require.NoError(t, err)
+	assert.Equal(t, "action1", got1.Name)
+
+	got2, err := repo.GetLatestEventByAttempt(ctx, actionID2, 0)
+	require.NoError(t, err)
+	assert.Equal(t, "action2", got2.Name)
+}
+
+func TestInsertEvents_Empty(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	// Insert empty slice should be no-op
+	err := repo.InsertEvents(ctx, []*models.ActionEvent{})
+	assert.NoError(t, err)
+}
+
+func TestInsertEvents_WithLogContext(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	event := &workflow.ActionEvent{
+		Id:          testActionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:     1,
+		UpdatedTime: timestamppb.Now(),
+		LogContext: &core.LogContext{
+			PrimaryPodName: "my-pod",
+			Pods: []*core.PodLogContext{
+				{PodName: "my-pod", Namespace: "default"},
+			},
+		},
+	}
+	eventModel, err := models.NewActionEventModel(event)
+	require.NoError(t, err)
+
+	require.NoError(t, repo.InsertEvents(ctx, []*models.ActionEvent{eventModel}))
+
+	// Fetch it back via GetLatestEventByAttempt and verify log context is preserved
+	fetched, err := repo.GetLatestEventByAttempt(ctx, testActionID, 0)
+	require.NoError(t, err)
+	deserialized, err := fetched.ToActionEvent()
+	require.NoError(t, err)
+	assert.Equal(t, "my-pod", deserialized.GetLogContext().GetPrimaryPodName())
 }

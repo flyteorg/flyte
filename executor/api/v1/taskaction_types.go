@@ -151,6 +151,14 @@ type TaskActionSpec struct {
 	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
 	// +kubebuilder:validation:Required
 	TaskTemplate []byte `json:"taskTemplate"`
+
+	// EnvVars are run-scoped environment variables projected from RunSpec for executor runtime use.
+	// +optional
+	EnvVars map[string]string `json:"envVars,omitempty"`
+
+	// Interruptible is the run-scoped interruptibility override projected from RunSpec.
+	// +optional
+	Interruptible *bool `json:"interruptible,omitempty"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {

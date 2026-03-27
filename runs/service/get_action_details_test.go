@@ -363,6 +363,38 @@ func TestMergeEvents_PhaseTransitions(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.PhaseTransitions[2].Phase)
 }
 
+func TestMergeEvents_SortsByReportedTime(t *testing.T) {
+	now := time.Now()
+	// Events arrive with different ReportedTime and UpdatedTime.
+	// mergeEvents sorts by ReportedTime when both events have it.
+	events := []*workflow.ActionEvent{
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_QUEUED,
+			UpdatedTime:  timestamppb.New(now),
+			ReportedTime: timestamppb.New(now),
+		},
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_RUNNING,
+			UpdatedTime:  timestamppb.New(now.Add(1 * time.Second)),
+			ReportedTime: timestamppb.New(now.Add(1 * time.Second)),
+		},
+		{
+			Phase:        common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			UpdatedTime:  timestamppb.New(now.Add(2 * time.Second)),
+			ReportedTime: timestamppb.New(now.Add(2 * time.Second)),
+		},
+	}
+
+	result := mergeEvents(1, events)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.Phase)
+	assert.Equal(t, 3, len(result.PhaseTransitions))
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, result.PhaseTransitions[0].Phase)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, result.PhaseTransitions[1].Phase)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.PhaseTransitions[2].Phase)
+	assert.True(t, result.PhaseTransitions[0].GetStartTime().AsTime().Equal(now))
+	assert.True(t, result.PhaseTransitions[1].GetStartTime().AsTime().Equal(now.Add(1*time.Second)))
+}
+
 func TestMergeEvents_MergesLogs(t *testing.T) {
 	now := time.Now()
 	events := []*workflow.ActionEvent{
@@ -474,6 +506,58 @@ func TestMergeEvents_ReportURI(t *testing.T) {
 
 	result := mergeEvents(0, events)
 	assert.Equal(t, "s3://reports/report.html", result.GetOutputs().GetReportUri())
+}
+
+func TestBuildActionDetails_CanceledContextSuppressesErrors(t *testing.T) {
+	actionRepo, taskRepo, svc := newTestServiceWithTaskRepo(t)
+
+	runInfo := &workflow.RunInfo{TaskSpecDigest: "some-digest"}
+	runInfoBytes, _ := proto.Marshal(runInfo)
+
+	actionModel := &models.Action{
+		Org:          "test-org",
+		Project:      "test-project",
+		Domain:       "test-domain",
+		RunName:      "rtest12345",
+		Name:         "action-1",
+		Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+		DetailedInfo: runInfoBytes,
+	}
+
+	// Cancel context before calling buildActionDetails
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	// Both task spec and events queries will fail due to canceled context
+	taskRepo.On("GetTaskSpec", mock.Anything, "some-digest").Return(nil, context.Canceled)
+	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return(nil, context.Canceled)
+
+	_, err := svc.buildActionDetails(ctx, actionModel, testActionID)
+	// Should return an error but not panic or log excessively
+	assert.Error(t, err)
+}
+
+func TestGetActionDetails_SplitIntoGetAndBuild(t *testing.T) {
+	// Verify that getActionDetails calls GetAction then buildActionDetails
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	actionModel := &models.Action{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		RunName: "rtest12345",
+		Name:    "action-1",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}
+
+	actionRepo.On("GetAction", mock.Anything, testActionID).Return(actionModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
+
+	details, err := svc.getActionDetails(context.Background(), testActionID)
+	assert.NoError(t, err)
+	assert.NotNil(t, details)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, details.Status.Phase)
 }
 
 func TestMergeEvents_EndTimeNeverBeforeStartTime(t *testing.T) {

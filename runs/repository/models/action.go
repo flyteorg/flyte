@@ -65,8 +65,13 @@ type Action struct {
 	// interruptible, cluster, etc.) for this action's run.
 	RunSpec []byte `gorm:"type:bytea" db:"run_spec"`
 
+	// Abort tracking — set when a user requests abort; cleared once the pod is confirmed terminated.
+	AbortRequestedAt  *time.Time `gorm:"index:idx_actions_abort_pending" db:"abort_requested_at"`
+	AbortAttemptCount int        `gorm:"not null;default:0" db:"abort_attempt_count"`
+	AbortReason       *string    `db:"abort_reason"`
+
 	// Timestamps
-	// CreatedAt is set by the DB (NOW()) on insert — represents action start time.
+	// CreatedAt is set by the DB (NOW()) on insert — represents when the action was queued.
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.

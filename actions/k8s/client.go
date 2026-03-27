@@ -141,6 +141,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
 		return fmt.Errorf("failed to set action spec: %w", err)
 	}
+	applyRunSpecToTaskAction(taskAction, runSpec)
 	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 	// Embed the inline TaskTemplate if present.
@@ -457,7 +458,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
 	if eventType == watch.Added {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
-		if c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey) {
+		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
+		if isDuplicate {
 			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 		} else {
 			recordReq := &workflow.RecordActionRequest{
@@ -497,6 +499,25 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				c.recordedFilter.Add(ctx, actionKey)
 			}
 		}
+
+		// When a child action appears, the parent must already be running (it
+		// created the child). Promote the parent to RUNNING so the UI doesn't
+		// stay stuck on INITIALIZING while children are executing.
+		if !isDuplicate && update.ParentActionName != "" {
+			parentID := &common.ActionIdentifier{
+				Run:  update.ActionID.Run,
+				Name: update.ParentActionName,
+			}
+			parentStatusReq := &workflow.UpdateActionStatusRequest{
+				ActionId: parentID,
+				Status: &workflow.ActionStatus{
+					Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+				},
+			}
+			if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+				logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+			}
+		}
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
@@ -506,7 +527,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-			},
+				},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
@@ -603,6 +624,52 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	}
 
 	return actionSpec
+}
+
+func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) {
+	if runSpec == nil {
+		taskAction.Spec.EnvVars = nil
+		taskAction.Spec.Interruptible = nil
+		return
+	}
+
+	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
+	if runSpec.GetInterruptible() != nil {
+		value := runSpec.GetInterruptible().GetValue()
+		taskAction.Spec.Interruptible = &value
+	} else {
+		taskAction.Spec.Interruptible = nil
+	}
+
+	for key, value := range runSpec.GetLabels().GetValues() {
+		if _, exists := taskAction.Labels[key]; !exists {
+			taskAction.Labels[key] = value
+		}
+	}
+
+	if len(runSpec.GetAnnotations().GetValues()) > 0 {
+		if taskAction.Annotations == nil {
+			taskAction.Annotations = make(map[string]string, len(runSpec.GetAnnotations().GetValues()))
+		}
+		for key, value := range runSpec.GetAnnotations().GetValues() {
+			taskAction.Annotations[key] = value
+		}
+	}
+}
+
+func keyValuePairsToMap(values []*core.KeyValuePair) map[string]string {
+	if len(values) == 0 {
+		return nil
+	}
+
+	cloned := make(map[string]string, len(values))
+	for _, kv := range values {
+		if kv == nil {
+			continue
+		}
+		cloned[kv.GetKey()] = kv.GetValue()
+	}
+	return cloned
 }
 
 func extractTaskCacheKey(action *actions.Action) string {

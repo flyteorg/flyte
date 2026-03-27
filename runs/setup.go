@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -27,7 +28,8 @@ import (
 )
 
 // Setup registers Run and Task service handlers on the SetupContext mux.
-// Requires sc.DB, sc.DataStore, and sc.K8sClient to be set.
+// Requires sc.DB and sc.DataStore to be set. When sc.K8sConfig is provided,
+// RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
@@ -47,7 +49,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore)
+	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
+		Workers:      5,
+		MaxAttempts:  10,
+		QueueSize:    1000,
+		InitialDelay: time.Second,
+		MaxDelay:     5 * time.Minute,
+	})
+	sc.AddWorker("abort-reconciler", func(ctx context.Context) error {
+		return abortReconciler.Run(ctx)
+	})
+
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
 	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
@@ -93,6 +106,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
+
+	if sc.K8sConfig != nil {
+		logStreamer, err := service.NewK8sLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("runs: failed to create k8s log streamer: %w", err)
+		}
+		runLogsSvc := service.NewRunLogsService(repo, logStreamer)
+		runLogsPath, runLogsHandler := workflowconnect.NewRunLogsServiceHandler(runLogsSvc)
+		sc.Mux.Handle(runLogsPath, runLogsHandler)
+		logger.Infof(ctx, "Mounted RunLogsService at %s", runLogsPath)
+	}
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)

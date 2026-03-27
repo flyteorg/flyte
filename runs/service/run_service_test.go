@@ -270,6 +270,146 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestFillDefaultInputsForCreateRun(t *testing.T) {
+	inputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{
+				Name: "x",
+				Value: &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 7}},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	defaultInputs := []*task.NamedParameter{
+		{
+			Name: "x",
+			Parameter: &core.Parameter{
+				Behavior: &core.Parameter_Default{
+					Default: &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "y",
+			Parameter: &core.Parameter{
+				Behavior: &core.Parameter_Default{
+					Default: &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "default"}},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	gotInputs := fillDefaultInputs(inputs, defaultInputs)
+
+	assert.Len(t, gotInputs.Literals, 2)
+	got := make(map[string]*core.Literal, len(gotInputs.Literals))
+	for _, nl := range gotInputs.Literals {
+		got[nl.Name] = nl.Value
+	}
+	assert.Equal(t, int64(7), got["x"].GetScalar().GetPrimitive().GetInteger(), "provided input should not be overwritten")
+	assert.Equal(t, "default", got["y"].GetScalar().GetPrimitive().GetStringValue(), "missing input should be filled from default")
+}
+
+func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	createdAt := time.Now().UTC().Truncate(time.Second)
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, storage.Options{}, mock.Anything).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(&models.Run{
+			Org:         runID.Org,
+			Project:     runID.Project,
+			Domain:      runID.Domain,
+			Name:        runID.Name,
+			Phase:       int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			CreatedAt:   createdAt,
+			Attempts:    1,
+			CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
+		}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: runID,
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}))
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.NotNil(t, resp.Msg.GetRun())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetId())
+	assert.Equal(t, runID.Name, resp.Msg.GetRun().GetAction().GetId().GetName())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetMetadata())
+
+	status := resp.Msg.GetRun().GetAction().GetStatus()
+	assert.NotNil(t, status)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, status.GetPhase())
+	assert.NotNil(t, status.GetStartTime())
+	assert.True(t, status.GetStartTime().AsTime().Equal(createdAt))
+	assert.Equal(t, uint32(1), status.GetAttempts())
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, status.GetCacheStatus())
+	assert.Nil(t, status.EndTime)
+	assert.Nil(t, status.DurationMs)
+
+	repo.AssertExpectations(t)
+	actionRepo.AssertExpectations(t)
+	taskRepo.AssertExpectations(t)
+	actionsClient.AssertExpectations(t)
+	store.AssertExpectations(t)
+}
+
 func TestAbortRun(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "test-org",
@@ -282,14 +422,10 @@ func TestAbortRun(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.ActionId.Run.Name == runID.Name &&
-				req.Msg.ActionId.Name == "a0" &&
-				req.Msg.Reason != nil && *req.Msg.Reason == "User requested abort"
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
 	t.Run("success with custom reason", func(t *testing.T) {
@@ -297,15 +433,13 @@ func TestAbortRun(t *testing.T) {
 		reason := "timeout exceeded"
 
 		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.Reason != nil && *req.Msg.Reason == reason
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID, Reason: &reason}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
-	t.Run("db error stops before actions service", func(t *testing.T) {
+	t.Run("db error returns error", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
@@ -313,16 +447,6 @@ func TestAbortRun(t *testing.T) {
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
-	})
-
-	t.Run("actions service error is returned", func(t *testing.T) {
-		actionRepo, actionsClient, svc := newTestService(t)
-
-		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.Anything).Return(nil, errors.New("actions service unavailable"))
-
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
-		assert.Error(t, err)
 	})
 }
 
@@ -341,13 +465,10 @@ func TestAbortAction(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.ActionId.Name == actionID.Name &&
-				req.Msg.Reason != nil && *req.Msg.Reason == "User requested abort"
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
 	t.Run("success with custom reason", func(t *testing.T) {
@@ -355,15 +476,13 @@ func TestAbortAction(t *testing.T) {
 		reason := "resource limit exceeded"
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.Reason != nil && *req.Msg.Reason == reason
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil)
 
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID, Reason: reason}))
 		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
 	})
 
-	t.Run("db error stops before actions service", func(t *testing.T) {
+	t.Run("db error returns error", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
@@ -371,16 +490,6 @@ func TestAbortAction(t *testing.T) {
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
-	})
-
-	t.Run("actions service error is returned", func(t *testing.T) {
-		actionRepo, actionsClient, svc := newTestService(t)
-
-		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(nil)
-		actionsClient.On("Abort", mock.Anything, mock.Anything).Return(nil, errors.New("actions service unavailable"))
-
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
-		assert.Error(t, err)
 	})
 }
 
@@ -746,8 +855,8 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	}
 
 	store.On("WriteProtobuf", mock.Anything, mock.AnythingOfType("storage.DataReference"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
-		lm, ok := msg.(*core.LiteralMap)
-		return ok && len(lm.Literals) == 0
+		inputs, ok := msg.(*task.Inputs)
+		return ok && len(inputs.Literals) == 0 && len(inputs.Context) == 0
 	})).Return(nil).Once()
 
 	actionRepo.On("CreateRun", mock.Anything, mock.AnythingOfType("*workflow.CreateRunRequest"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
@@ -864,6 +973,69 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	assert.NoError(t, err)
 
 	actionsClient.AssertExpectations(t)
+}
+
+func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rctx-123",
+			},
+		},
+		Inputs: &task.Inputs{
+			Context: []*core.KeyValuePair{
+				{Key: "trace_id", Value: "root-abc"},
+			},
+		},
+		RunSpec: &task.RunSpec{
+			RawDataStorage: &task.RawDataStorage{RawDataPrefix: "s3://custom-raw"},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/org/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+		inputs, ok := msg.(*task.Inputs)
+		return ok &&
+			len(inputs.Context) == 1 &&
+			inputs.Context[0].GetKey() == "trace_id" &&
+			inputs.Context[0].GetValue() == "root-abc"
+	})).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.MatchedBy(func(actual *workflow.CreateRunRequest) bool {
+		return actual.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	}), "s3://flyte-data/org/proj/dev/rctx-123/inputs", "s3://flyte-data/org/proj/dev/rctx-123/").Return(&models.Run{
+		Org:     "org",
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "rctx-123",
+	}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
 }
 
 func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {

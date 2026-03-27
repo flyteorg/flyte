@@ -77,15 +77,31 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              cacheKey:
+                description: |-
+                  CacheKey enables cache lookup/writeback for this task action when set.
+                  This is propagated from workflow.TaskAction.cache_key.
+                maxLength: 256
+                type: string
               domain:
                 description: Domain this action belongs to
                 maxLength: 63
                 minLength: 1
                 type: string
+              envVars:
+                additionalProperties:
+                  type: string
+                description: EnvVars are run-scoped environment variables projected
+                  from RunSpec for executor runtime use.
+                type: object
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1
                 type: string
+              interruptible:
+                description: Interruptible is the run-scoped interruptibility override
+                  projected from RunSpec.
+                type: boolean
               org:
                 description: Org this action belongs to
                 maxLength: 63
@@ -144,10 +160,12 @@ spec:
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
+                format: int32
                 type: integer
               cacheStatus:
                 description: CacheStatus is the latest observed cache lookup result
                   for this action.
+                format: int32
                 type: integer
               conditions:
                 description: |-
@@ -189,7 +207,7 @@ spec:
                         reason contains a programmatic identifier indicating the reason for the condition's last transition.
                         Producers of specific condition types may define expected values and meanings for this field,
                         and whether the values are considered a guaranteed API.
-                        The value should be a CalmelCase string.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -946,6 +964,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.app.AppService"
                                               route:
                                                   cluster: flyte
@@ -1089,7 +1112,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UldmTVhHMmxYRDdlNzZKWg==
+  haSharedSecret: ZWNHdU9HMjB4T1VDWmt3Sg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1508,7 +1531,7 @@ spec:
           httpGet:
             path: /healthz
             port: http
-          initialDelaySeconds: 30
+          initialDelaySeconds: 5
         name: flyte
         ports:
         - containerPort: 8090
@@ -1517,9 +1540,10 @@ spec:
           name: webhook
         readinessProbe:
           httpGet:
-            path: /healthz
+            path: /readyz
             port: http
-          initialDelaySeconds: 30
+          initialDelaySeconds: 5
+          periodSeconds: 5
         volumeMounts:
         - mountPath: /etc/flyte/config.d
           name: config
@@ -1683,7 +1707,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a6d9f56b2763fc3364b7e76929d71a5a2d1bd6ccc975227a395926adf85823af
+        checksum/secret: bbe9534de4cd9d4e348a587369eada10e4abe82e2b349057547ab8de710171f8
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1977,7 +2001,8 @@ spec:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
         livenessProbe:
-          initialDelaySeconds: 30
+          failureThreshold: 10
+          initialDelaySeconds: 15
           tcpSocket:
             port: http
         name: proxy
@@ -1985,6 +2010,7 @@ spec:
         - containerPort: 8000
           name: http
         readinessProbe:
+          initialDelaySeconds: 5
           tcpSocket:
             port: http
         volumeMounts:

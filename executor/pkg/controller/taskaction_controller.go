@@ -360,7 +360,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
 	if err := r.Status().Update(ctx, newTaskAction); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
@@ -384,8 +383,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 	}
 
 	info := phaseInfo.Info()
-	updatedTime := updatedTimestamp(info, taskAction.Status.PhaseHistory)
-	reportedTime := reportedTimestamp(info)
+	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
 
 	event := &workflow.ActionEvent{
 		Id:            actionID,
@@ -397,7 +395,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 		Cluster:       r.cluster,
 		Outputs:       outputRefs(taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName),
 		ClusterEvents: toClusterEvents(info, updatedTime),
-		ReportedTime:  reportedTime,
+		ReportedTime:  timestamppb.New(time.Now()),
 	}
 
 	if info != nil {
@@ -424,19 +422,9 @@ func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
 	return cacheStatusFromExternalResources(info.ExternalResources)
 }
 
-func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
-	if info != nil && info.OccurredAt != nil {
-		return timestamppb.New(*info.OccurredAt)
-	}
+func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
 	if n := len(history); n > 0 {
 		return timestamppb.New(history[n-1].OccurredAt.Time)
-	}
-	return nil
-}
-
-func reportedTimestamp(info *pluginsCore.TaskInfo) *timestamppb.Timestamp {
-	if info != nil && info.ReportedAt != nil {
-		return timestamppb.New(*info.ReportedAt)
 	}
 	return timestamppb.Now()
 }
@@ -521,7 +509,7 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, and conditions.
+// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
 	if oldStatus.StateJSON != newStatus.StateJSON ||
 		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
@@ -533,6 +521,10 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 	}
 
 	if !bytes.Equal(oldStatus.PluginState, newStatus.PluginState) {
+		return true
+	}
+
+	if len(oldStatus.PhaseHistory) != len(newStatus.PhaseHistory) {
 		return true
 	}
 
@@ -600,7 +592,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
 	if phaseName != "" {
 		n := len(ta.Status.PhaseHistory)
 		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {

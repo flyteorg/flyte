@@ -256,10 +256,13 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 
 // AbortRun aborts a run and all its actions
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
-	// Update the run action to aborted
+	now := time.Now()
 	updates := map[string]interface{}{
-		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at": time.Now(),
+		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		"updated_at":          now,
+		"abort_requested_at":  now,
+		"abort_attempt_count": 0,
+		"abort_reason":        reason,
 	}
 
 	result := r.db.WithContext(ctx).
@@ -272,7 +275,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		return fmt.Errorf("failed to abort run: %w", result.Error)
 	}
 
-	// Notify subscribers
+	// Notify run subscribers.
 	r.notifyRunUpdate(ctx, runID)
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
@@ -284,9 +287,31 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	if len(events) == 0 {
 		return nil
 	}
-	return r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(&events).Error
+		Create(&events).Error; err != nil {
+		return err
+	}
+
+	// Notify subscribers so watchers see new events (e.g. log context becoming available).
+	notified := make(map[string]bool)
+	for _, e := range events {
+		actionID := &common.ActionIdentifier{
+			Run: &common.RunIdentifier{
+				Org:     e.Org,
+				Project: e.Project,
+				Domain:  e.Domain,
+				Name:    e.RunName,
+			},
+			Name: e.Name,
+		}
+		key := e.Org + "/" + e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
+		if !notified[key] {
+			r.notifyActionUpdate(ctx, actionID)
+			notified[key] = true
+		}
+	}
+	return nil
 }
 
 // ListEvents lists action events for a given action identifier.
@@ -302,6 +327,24 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 		return nil, fmt.Errorf("failed to list action events: %w", result.Error)
 	}
 	return events, nil
+}
+
+// GetLatestEventByAttempt returns the most recent event for a given attempt,
+// ordered by version descending, without deserializing all events.
+func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	var event models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
+		Order("phase DESC, version DESC").
+		First(&event)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("event not found for attempt %d: %w", attempt, gorm.ErrRecordNotFound)
+		}
+		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, result.Error)
+	}
+	return &event, nil
 }
 
 // CreateAction creates a new action
@@ -439,31 +482,33 @@ func (r *actionRepo) UpdateActionPhase(
 		"cache_status": cacheStatus,
 		"updated_at":   time.Now(),
 	}
+
 	if endTime != nil {
 		if r.isPostgres {
-			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			// Only set ended_at if not already set, clamped to at least created_at.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
 		} else {
-			// SQLite: use MAX() and compute duration via strftime
-			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			// SQLite: only set ended_at if not already set.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 
+	// Only move the phase forward or re-apply the same phase — never downgrade.
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND phase <= ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase).
 		Updates(updates)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
-	// Notify subscribers of action update
+	// Notify subscribers of the action update
 	r.notifyActionUpdate(ctx, actionID)
 
 	return nil
@@ -471,9 +516,13 @@ func (r *actionRepo) UpdateActionPhase(
 
 // AbortAction aborts a specific action
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	now := time.Now()
 	updates := map[string]interface{}{
-		"phase":      int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at": time.Now(),
+		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		"updated_at":          now,
+		"abort_requested_at":  now,
+		"abort_attempt_count": 0,
+		"abort_reason":        reason,
 	}
 
 	result := r.db.WithContext(ctx).
@@ -486,10 +535,59 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 		return fmt.Errorf("failed to abort action: %w", result.Error)
 	}
 
-	// Notify subscribers
+	// Notify action subscribers.
 	r.notifyActionUpdate(ctx, actionID)
 
 	logger.Infof(ctx, "Aborted action: %s", actionID.Name)
+	return nil
+}
+
+// ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).
+func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
+	var actions []*models.Action
+	result := r.db.WithContext(ctx).
+		Where("abort_requested_at IS NOT NULL").
+		Find(&actions)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list pending aborts: %w", result.Error)
+	}
+	return actions, nil
+}
+
+// MarkAbortAttempt increments abort_attempt_count and returns the new value.
+// Called by the reconciler before each actionsClient.Abort call.
+func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	var action models.Action
+	result := r.db.WithContext(ctx).
+		Model(&action).
+		Clauses(clause.Returning{Columns: []clause.Column{{Name: "abort_attempt_count"}}}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Updates(map[string]interface{}{
+			"abort_attempt_count": gorm.Expr("abort_attempt_count + 1"),
+			"updated_at":          time.Now(),
+		})
+	if result.Error != nil {
+		return 0, fmt.Errorf("failed to mark abort attempt: %w", result.Error)
+	}
+	return action.AbortAttemptCount, nil
+}
+
+// ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
+func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
+	result := r.db.WithContext(ctx).
+		Model(&models.Action{}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Updates(map[string]interface{}{
+			"abort_requested_at":  nil,
+			"abort_attempt_count": 0,
+			"abort_reason":        nil,
+			"updated_at":          time.Now(),
+		})
+	if result.Error != nil {
+		return fmt.Errorf("failed to clear abort request: %w", result.Error)
+	}
 	return nil
 }
 
@@ -574,7 +672,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -598,10 +696,17 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 				if notifPayload == runKey {
 					run, err := r.GetRun(ctx, runID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						errs <- err
 						return
 					}
-					updates <- run
+					select {
+					case updates <- run:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -636,7 +741,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -670,12 +775,22 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 					Name:    parts[3],
 				}
 
+				if ctx.Err() != nil {
+					return
+				}
 				run, err := r.GetRun(ctx, runID)
 				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
 					logger.Errorf(ctx, "Failed to get run from notification: %v", err)
 					continue
 				}
-				updates <- run
+				select {
+				case updates <- run:
+				case <-ctx.Done():
+					return
+				}
 			}
 		}
 	} else {
@@ -714,7 +829,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 10)
+		notifCh := make(chan string, 100)
 
 		// Register as subscriber
 		r.mu.Lock()
@@ -734,22 +849,47 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 			case <-ctx.Done():
 				return
 			case notifPayload := <-notifCh:
-				// Check if this notification is for an action in the run we're watching
-				// Payload format: org/project/domain/run/action
+				// Collect this notification plus any others already queued,
+				// deduplicating by action name so we only query the DB once
+				// per action during a burst of updates.
+				pending := make(map[string]bool)
 				if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
-					// Extract action name from payload
-					actionName := notifPayload[len(runPrefix):]
+					pending[notifPayload[len(runPrefix):]] = true
+				}
+				// Drain buffered notifications without blocking.
+			drain:
+				for {
+					select {
+					case extra := <-notifCh:
+						if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
+							pending[extra[len(runPrefix):]] = true
+						}
+					default:
+						break drain
+					}
+				}
+
+				for actionName := range pending {
 					actionID := &common.ActionIdentifier{
 						Run:  runID,
 						Name: actionName,
 					}
-
+					if ctx.Err() != nil {
+						return
+					}
 					action, err := r.GetAction(ctx, actionID)
 					if err != nil {
+						if ctx.Err() != nil {
+							return
+						}
 						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
 						continue
 					}
-					updates <- action
+					select {
+					case updates <- action:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
 		}
@@ -856,11 +996,11 @@ func (r *actionRepo) startPostgresListener() {
 					select {
 					case ch <- notif.Extra:
 					default:
-						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification")
 					}
 				}
 				r.mu.RUnlock()
+
 			}
 
 		case <-time.After(90 * time.Second):
