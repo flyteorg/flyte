@@ -45,7 +45,7 @@ type actionRepo struct {
 const rootActionName = "a0"
 
 // NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
+func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
@@ -62,11 +62,16 @@ func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRep
 	if isPostgres {
 		repo.actionNotifyCh = make(chan string, 256)
 		repo.runNotifyCh = make(chan string, 256)
-		go repo.startPostgresListener()
-		go repo.startNotifyLoop()
+
+		if err := repo.startPostgresListener(); err != nil {
+			return nil, fmt.Errorf("failed to start postgres listener: %w", err)
+		}
+		if err := repo.startNotifyLoop(); err != nil {
+			return nil, fmt.Errorf("failed to start notify loop: %w", err)
+		}
 	}
 
-	return repo
+	return repo, nil
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
@@ -932,28 +937,26 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 	}
 }
 
-// startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener
-func (r *actionRepo) startPostgresListener() {
+// startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener.
+// Returns an error if the connection or LISTEN setup fails.
+func (r *actionRepo) startPostgresListener() error {
 	// Get the underlying SQL DB
 	sqlDB, err := r.db.DB()
 	if err != nil {
-		logger.Errorf(context.Background(), "Failed to get SQL DB: %v", err)
-		return
+		return fmt.Errorf("get SQL DB: %w", err)
 	}
 
 	// Get the connection string
-	var connStr string
 	row := sqlDB.QueryRow("SELECT current_database()")
 	var dbName string
 	if err := row.Scan(&dbName); err != nil {
-		logger.Errorf(context.Background(), "Failed to get database name: %v", err)
-		return
+		return fmt.Errorf("get database name: %w", err)
 	}
 
 	// Build connection string from the database config
 	pgCfg := r.pgConfig
 	pgCfg.DbName = dbName
-	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
+	connStr := database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
@@ -963,15 +966,21 @@ func (r *actionRepo) startPostgresListener() {
 
 	// Listen to channels
 	if err := r.listener.Listen("run_updates"); err != nil {
-		logger.Errorf(context.Background(), "Failed to listen to run_updates: %v", err)
-		return
+		return fmt.Errorf("listen to run_updates: %w", err)
 	}
 
 	if err := r.listener.Listen("action_updates"); err != nil {
-		logger.Errorf(context.Background(), "Failed to listen to action_updates: %v", err)
-		return
+		return fmt.Errorf("listen to action_updates: %w", err)
 	}
 
+	// Process notifications in background
+	go r.processNotifications()
+
+	return nil
+}
+
+// processNotifications handles incoming LISTEN/NOTIFY messages.
+func (r *actionRepo) processNotifications() {
 	logger.Infof(context.Background(), "PostgreSQL LISTEN/NOTIFY started")
 
 	// Process notifications
@@ -1031,8 +1040,8 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 
 	select {
 	case r.runNotifyCh <- payload:
-	default:
-		logger.Warnf(ctx, "Run NOTIFY channel full, dropping notification for %s", payload)
+	case <-ctx.Done():
+		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
 }
 
@@ -1068,30 +1077,37 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 	return actions, nil
 }
 
-// startNotifyLoop runs a dedicated goroutine that sends all NOTIFY commands
-// over a single persistent connection, avoiding GORM connection pool contention.
-func (r *actionRepo) startNotifyLoop() {
+// startNotifyLoop acquires a dedicated DB connection for NOTIFY commands and
+// starts processing in the background. Returns an error if the initial
+// connection cannot be established.
+func (r *actionRepo) startNotifyLoop() error {
 	sqlDB, err := r.db.DB()
 	if err != nil {
-		logger.Errorf(context.Background(), "Failed to get SQL DB for NOTIFY loop: %v", err)
-		return
+		return fmt.Errorf("get SQL DB: %w", err)
 	}
 
 	conn, err := sqlDB.Conn(context.Background())
 	if err != nil {
-		logger.Errorf(context.Background(), "Failed to acquire dedicated NOTIFY connection: %v", err)
-		return
+		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
 	}
+
+	go r.runNotifyLoop(sqlDB, conn)
+	return nil
+}
+
+// runNotifyLoop processes notify channels using the given connection.
+// On connection errors it attempts to reconnect; if reconnection fails
+// the error is logged and the notification is skipped.
+func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 	defer conn.Close()
 
-	reconnect := func() bool {
+	reconnect := func() {
 		conn.Close()
+		var err error
 		conn, err = sqlDB.Conn(context.Background())
 		if err != nil {
 			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
-			return false
 		}
-		return true
 	}
 
 	// drainAndExec collects all immediately available payloads from a channel
@@ -1148,8 +1164,8 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 
 	select {
 	case r.actionNotifyCh <- payload:
-	default:
-		logger.Warnf(ctx, "Action NOTIFY channel full, dropping notification for %s", payload)
+	case <-ctx.Done():
+		logger.Warnf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
 }
 

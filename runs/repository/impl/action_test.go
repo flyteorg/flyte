@@ -83,7 +83,8 @@ func setupActionDB(t *testing.T) *gorm.DB {
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo := NewActionRepo(db, database.DbConfig{})
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
 	ctx := context.Background()
 
 	runID := &common.RunIdentifier{
@@ -118,7 +119,8 @@ func TestCreateRun(t *testing.T) {
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo := NewActionRepo(db, database.DbConfig{})
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
 	ctx := context.Background()
 
 	actionID := &common.ActionIdentifier{
@@ -131,7 +133,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
 		ActionId: actionID,
 		InputUri: "s3://bucket/input",
 	}, nil)
@@ -159,7 +161,8 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo := NewActionRepo(db, database.DbConfig{})
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
 	ctx := context.Background()
 
 	actionID := &common.ActionIdentifier{
@@ -172,7 +175,7 @@ func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err := actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
 		ActionId: actionID,
 		InputUri: "s3://bucket/input",
 	}, nil)
@@ -203,7 +206,8 @@ func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo := NewActionRepo(db, database.DbConfig{})
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
 	ctx := context.Background()
 
 	runsToCreate := []string{"run-1", "run-2", "run-3"}
@@ -327,7 +331,9 @@ func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
 	)`).Error
 	require.NoError(t, err)
 
-	repo := NewActionRepo(db, database.DbConfig{}).(*actionRepo)
+	r, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
+	repo := r.(*actionRepo)
 	return db, repo
 }
 
