@@ -296,7 +296,7 @@ func (s *RunService) GetRunDetails(
 	}
 
 	details := &workflow.RunDetails{
-		RunSpec: extractRunSpecFromActionModel(run),
+		RunSpec: extractRunSpecFromActionModel(ctx, run),
 		Action:  actionDetails,
 	}
 
@@ -1308,7 +1308,7 @@ func extractRunSpec(specProto []byte) *task.RunSpec {
 	return spec.RunSpec
 }
 
-func extractRunSpecFromActionModel(action *models.Action) *task.RunSpec {
+func extractRunSpecFromActionModel(ctx context.Context, action *models.Action) *task.RunSpec {
 	if action == nil {
 		return nil
 	}
@@ -1317,6 +1317,9 @@ func extractRunSpecFromActionModel(action *models.Action) *task.RunSpec {
 		spec := &task.RunSpec{}
 		if err := proto.Unmarshal(action.RunSpec, spec); err == nil {
 			return spec
+		} else {
+			logger.Warnf(ctx, "Failed to unmarshal action.RunSpec for %s/%s/%s/%s/%s, falling back to ActionSpec: %v",
+				action.Org, action.Project, action.Domain, action.RunName, action.Name, err)
 		}
 	}
 
