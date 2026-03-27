@@ -10,6 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"net/http"
+	"net/http/httptest"
+
 	"connectrpc.com/connect"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -95,6 +99,12 @@ func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *R
 
 func matchActionID(expected *common.ActionIdentifier) interface{} {
 	return mock.MatchedBy(func(actual *common.ActionIdentifier) bool {
+		return proto.Equal(actual, expected)
+	})
+}
+
+func matchRunID(expected *common.RunIdentifier) interface{} {
+	return mock.MatchedBy(func(actual *common.RunIdentifier) bool {
 		return proto.Equal(actual, expected)
 	})
 }
@@ -1285,6 +1295,163 @@ func TestRunModelToDetails(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.verify(t, svc.runModelToDetails(tc.run, tc.runID))
+		})
+	}
+}
+
+func newWatchRunDetailsTestClient(t *testing.T, actionRepo *repoMocks.ActionRepo) workflowconnect.RunServiceClient {
+	t.Helper()
+	taskRepo := &repoMocks.TaskRepo{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: &mockActionsClient{}}
+	path, handler := workflowconnect.NewRunServiceHandler(svc)
+
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+
+	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
+}
+
+func TestWatchRunDetails(t *testing.T) {
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest-watch-1",
+	}
+
+	runModel := &models.Run{
+		Org:     runID.Org,
+		Project: runID.Project,
+		Domain:  runID.Domain,
+		Name:    runID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}
+
+	tests := []struct {
+		name       string
+		setupMocks func(actionRepo *repoMocks.ActionRepo)
+		test       func(t *testing.T, client workflowconnect.RunServiceClient)
+	}{
+		{
+			name: "GetRun_Error_Returns_NotFound",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(nil, fmt.Errorf("run not found"))
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx := context.Background()
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+				assert.False(t, stream.Receive())
+				require.Error(t, stream.Err())
+				var connectErr *connect.Error
+				require.True(t, errors.As(stream.Err(), &connectErr))
+				assert.Equal(t, connect.CodeNotFound, connectErr.Code())
+			},
+		},
+		{
+			name: "Initial_State_Sent_On_Success",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, _ chan<- error) {
+						<-ctx.Done()
+					})
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				assert.True(t, stream.Receive())
+				require.NotNil(t, stream.Msg().Details)
+
+				cancel()
+				assert.False(t, stream.Receive())
+			},
+		},
+		{
+			name: "Watch_Error_Returns_Internal_Error",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(_ context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, errs chan<- error) {
+						errs <- fmt.Errorf("db watch failed")
+					})
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx := context.Background()
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				// First message: initial state
+				assert.True(t, stream.Receive())
+
+				// Watch error terminates the stream
+				assert.False(t, stream.Receive())
+				require.Error(t, stream.Err())
+				var connectErr *connect.Error
+				require.True(t, errors.As(stream.Err(), &connectErr))
+				assert.Equal(t, connect.CodeInternal, connectErr.Code())
+			},
+		},
+		{
+			name: "Run_Update_Sends_New_Response",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, updates chan<- *models.Run, _ chan<- error) {
+						updates <- &models.Run{
+							Org:     runID.Org,
+							Project: runID.Project,
+							Domain:  runID.Domain,
+							Name:    runID.Name,
+							Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+						}
+						<-ctx.Done()
+					})
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				// First message: initial state
+				assert.True(t, stream.Receive())
+				// Second message: run update
+				assert.True(t, stream.Receive())
+				assert.NotNil(t, stream.Msg().Details)
+
+				cancel()
+				assert.False(t, stream.Receive())
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo := &repoMocks.ActionRepo{}
+			tc.setupMocks(actionRepo)
+			client := newWatchRunDetailsTestClient(t, actionRepo)
+			tc.test(t, client)
+			actionRepo.AssertExpectations(t)
 		})
 	}
 }
