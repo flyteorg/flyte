@@ -1175,3 +1175,116 @@ func TestActionModelToDetails(t *testing.T) {
 		})
 	}
 }
+
+func TestRunModelToDetails(t *testing.T) {
+	svc := &RunService{}
+
+	testRunID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "test-run",
+	}
+
+	validActionSpecBytes, err := json.Marshal(&workflow.ActionSpec{
+		RunSpec: &task.RunSpec{
+			Labels: &task.Labels{
+				Values: map[string]string{"env": "prod"},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name   string
+		run    *models.Run
+		runID  *common.RunIdentifier
+		verify func(t *testing.T, result *workflow.RunDetails)
+	}{
+		{
+			name:  "BothNilReturnsNil",
+			run:   nil,
+			runID: nil,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				assert.Nil(t, result)
+			},
+		},
+		{
+			name: "EmptyActionSpecNilRunSpec",
+			run: &models.Run{
+				Name:  "test-run",
+				Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			},
+			runID: testRunID,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result)
+				assert.Nil(t, result.RunSpec)
+			},
+		},
+		{
+			name: "ValidActionSpecExtractsRunSpec",
+			run: &models.Run{
+				Name:       "test-run",
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: validActionSpecBytes,
+			},
+			runID: testRunID,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result)
+				require.NotNil(t, result.RunSpec)
+				require.NotNil(t, result.RunSpec.Labels)
+				assert.Equal(t, "prod", result.RunSpec.Labels.Values["env"])
+			},
+		},
+		{
+			name: "MalformedActionSpecNilRunSpec",
+			run: &models.Run{
+				Name:       "test-run",
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: []byte("not-valid-json{{"),
+			},
+			runID: testRunID,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result)
+				assert.Nil(t, result.RunSpec)
+			},
+		},
+		{
+			name: "RunNamePropagatedToActionID",
+			run: &models.Run{
+				Name:  "my-run-name",
+				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			},
+			runID: testRunID,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result)
+				require.NotNil(t, result.Action)
+				require.NotNil(t, result.Action.Id)
+				assert.Equal(t, "my-run-name", result.Action.Id.Name)
+			},
+		},
+		{
+			name: "RunIDPropagatedToActionID",
+			run: &models.Run{
+				Name:  testRunID.Name,
+				Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			},
+			runID: testRunID,
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result)
+				require.NotNil(t, result.Action)
+				require.NotNil(t, result.Action.Id)
+				assert.Equal(t, testRunID.Org, result.Action.Id.Run.Org)
+				assert.Equal(t, testRunID.Project, result.Action.Id.Run.Project)
+				assert.Equal(t, testRunID.Domain, result.Action.Id.Run.Domain)
+				assert.Equal(t, testRunID.Name, result.Action.Id.Run.Name)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.verify(t, svc.runModelToDetails(tc.run, tc.runID))
+		})
+	}
+}
