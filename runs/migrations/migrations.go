@@ -20,7 +20,7 @@ var AllModels = []interface{}{
 	&models.TaskSpec{},
 }
 
-const MigrationIDInitSchema = "20260327_001_runs_init_schema"
+const MigrationIDInitSchema = "20260327_runs_init_schema"
 
 var RunsMigrations = []*gormigrate.Migration{
 	{

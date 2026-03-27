@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-gormigrate/gormigrate/v2"
+
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/cache_service/migrations"
@@ -17,8 +19,9 @@ import (
 // Requires sc.DB and sc.DataStore to be set by the standalone binary.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-	if err := migrations.RunMigrations(sc.DB); err != nil {
-		return err
+	m := gormigrate.New(sc.DB, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
+	if err := m.Migrate(); err != nil {
+		return fmt.Errorf("cache_service: failed to run migrations: %w", err)
 	}
 
 	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService(cfg, sc.DB))

@@ -1,13 +1,12 @@
 package migrations
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/cache_service/repository/models"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 var allModels = []interface{}{
@@ -15,11 +14,25 @@ var allModels = []interface{}{
 	&models.Reservation{},
 }
 
-func RunMigrations(db *gorm.DB) error {
-	if err := db.AutoMigrate(allModels...); err != nil {
-		return fmt.Errorf("failed to run cache service migrations: %w", err)
-	}
+const MigrationIDInitSchema = "20260327_cache_service_init_schema"
 
-	logger.Infof(context.Background(), "Cache service migrations completed successfully")
+var CacheServiceMigrations = []*gormigrate.Migration{
+	{
+		ID: MigrationIDInitSchema,
+		Migrate: func(tx *gorm.DB) error {
+			return migrateInitSchema(tx)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			// Intentionally no-op for now; this migration can contain destructive steps.
+			return nil
+		},
+	},
+}
+
+// migrateInitSchema initializes the cache service database schema.
+func migrateInitSchema(db *gorm.DB) error {
+	if err := db.AutoMigrate(allModels...); err != nil {
+		return fmt.Errorf("failed to initialize cache service schema: %w", err)
+	}
 	return nil
 }

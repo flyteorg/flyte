@@ -266,11 +266,10 @@ manager:
 
 ### Database Issues
 
-**Error:** "failed to run migrations"
+**Error:** relation/table not found (runs schema missing)
 
 ```bash
-# Remove and recreate database
-rm flyte.db
+# Restart manager so startup migrations run
 ./bin/flyte-manager --config config.yaml
 ```
 
