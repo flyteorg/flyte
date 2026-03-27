@@ -528,31 +528,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				EndTime:     terminalPhaseTimestamp(taskAction),
 			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
-	}
-}
-
-// terminalPhaseTimestamp returns the OccurredAt timestamp from the last entry
-// in the TaskAction's PhaseHistory if it represents a terminal phase, or nil otherwise.
-func terminalPhaseTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
-	history := ta.Status.PhaseHistory
-	if len(history) == 0 {
-		return nil
-	}
-	last := history[len(history)-1]
-	switch executorv1.TaskActionConditionReason(last.Phase) {
-	case executorv1.ConditionReasonCompleted,
-		executorv1.ConditionReasonPermanentFailure,
-		executorv1.ConditionReasonRetryableFailure,
-		executorv1.ConditionReasonAborted:
-		return timestamppb.New(last.OccurredAt.Time)
-	default:
-		return nil
 	}
 }
 

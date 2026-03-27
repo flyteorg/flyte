@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -192,77 +191,6 @@ func TestNotifyRunService_UpdateActionStatusIncludesEndTime(t *testing.T) {
 	c.notifyRunService(ctx, ta, update, watch.Modified)
 
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
-}
-
-func TestTerminalPhaseTimestamp(t *testing.T) {
-	now := metav1.Now()
-
-	tests := []struct {
-		name     string
-		history  []executorv1.PhaseTransition
-		expected *timestamppb.Timestamp
-	}{
-		{
-			name:     "empty history returns nil",
-			history:  nil,
-			expected: nil,
-		},
-		{
-			name: "non-terminal last phase returns nil",
-			history: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: now},
-				{Phase: "Executing", OccurredAt: now},
-			},
-			expected: nil,
-		},
-		{
-			name: "Completed returns timestamp",
-			history: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
-				{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: now},
-			},
-			expected: timestamppb.New(now.Time),
-		},
-		{
-			name: "PermanentFailure returns timestamp",
-			history: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: metav1.NewTime(now.Add(-10 * 1e9))},
-				{Phase: string(executorv1.ConditionReasonPermanentFailure), OccurredAt: now},
-			},
-			expected: timestamppb.New(now.Time),
-		},
-		{
-			name: "RetryableFailure returns timestamp",
-			history: []executorv1.PhaseTransition{
-				{Phase: string(executorv1.ConditionReasonRetryableFailure), OccurredAt: now},
-			},
-			expected: timestamppb.New(now.Time),
-		},
-		{
-			name: "Aborted returns timestamp",
-			history: []executorv1.PhaseTransition{
-				{Phase: string(executorv1.ConditionReasonAborted), OccurredAt: now},
-			},
-			expected: timestamppb.New(now.Time),
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ta := &executorv1.TaskAction{
-				Status: executorv1.TaskActionStatus{
-					PhaseHistory: tt.history,
-				},
-			}
-			result := terminalPhaseTimestamp(ta)
-			if tt.expected == nil {
-				assert.Nil(t, result)
-			} else {
-				require.NotNil(t, result)
-				assert.True(t, result.AsTime().Equal(tt.expected.AsTime()))
-			}
-		})
-	}
 }
 
 func TestBuildTaskActionName(t *testing.T) {
@@ -468,7 +396,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	// Second ADDED event (reconnect, in bloom filter): should skip RecordAction
 	// but still call UpdateActionStatus.
 	c.notifyRunService(ctx, ta, update, watch.Added)
-	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)    // no new RecordAction
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)       // no new RecordAction
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2) // one more UpdateActionStatus
 }
 
