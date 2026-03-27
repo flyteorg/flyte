@@ -102,6 +102,12 @@ func matchActionID(expected *common.ActionIdentifier) interface{} {
 	})
 }
 
+func matchRunID(expected *common.RunIdentifier) interface{} {
+	return mock.MatchedBy(func(actual *common.RunIdentifier) bool {
+		return proto.Equal(actual, expected)
+	})
+}
+
 func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunServiceClient {
 	path, handler := workflowconnect.NewRunServiceHandler(svc)
 
@@ -217,7 +223,14 @@ func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
 	require.NoError(t, err)
 	eventModel.UpdatedAt = time.Unix(101, 0)
 
-	actionRepo.On("GetAction", mock.Anything, actionID).Return(actionModel, nil).Once()
+	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(actionModel, nil).Once()
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchRunID(actionID.Run), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			errs := args.Get(3).(chan<- error)
+			close(updates)
+			close(errs)
+		}).Once()
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
 		Return([]*models.ActionEvent{eventModel}, nil).Once()
 
@@ -287,30 +300,22 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		Version:     2,
 		UpdatedTime: timestamppb.New(time.Unix(103, 0)),
-		ClusterEvents: []*workflow.ClusterEvent{
-			{
-				OccurredAt: timestamppb.New(time.Unix(100, 0)),
-				Message:    "Pod created",
-			},
-			{
-				OccurredAt: timestamppb.New(time.Unix(102, 0)),
-				Message:    "Pulled container image",
-			},
-		},
+		ClusterEvents: []*workflow.ClusterEvent{{
+			OccurredAt: timestamppb.New(time.Unix(102, 0)),
+			Message:    "Pulled container image",
+		}},
 	})
 	require.NoError(t, err)
 	event2.UpdatedAt = time.Unix(103, 0)
 
-	actionRepo.On("GetAction", mock.Anything, actionID).Return(runningAction, nil).Once()
+	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(runningAction, nil).Once()
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
 		Return([]*models.ActionEvent{event1}, nil).Once()
-	actionRepo.On("WatchActionUpdates", mock.Anything, actionID.Run, mock.Anything, mock.Anything).
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchRunID(actionID.Run), mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
 			updates := args.Get(2).(chan<- *models.Action)
-			errs := args.Get(3).(chan<- error)
 			updates <- succeededAction
 			close(updates)
-			close(errs)
 		}).Once()
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), event1.UpdatedAt, 0, 500).
 		Return([]*models.ActionEvent{event2}, nil).Once()
