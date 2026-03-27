@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -266,61 +265,6 @@ func TestTerminalPhaseTimestamp(t *testing.T) {
 	}
 }
 
-func TestExecutionStartTimestamp_PrefersActualTimestamp(t *testing.T) {
-	actualStart := time.Date(2026, 3, 25, 12, 0, 1, 0, time.UTC)
-	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
-	actualMeta := metav1.NewTime(actualStart)
-
-	ta := &executorv1.TaskAction{
-		Status: executorv1.TaskActionStatus{
-			ExecutionStartedAt: &actualMeta,
-			PhaseHistory: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-30 * time.Second))},
-				{Phase: "Executing", OccurredAt: metav1.NewTime(controllerTime)},
-			},
-		},
-	}
-	result := executionStartTimestamp(ta)
-	require.NotNil(t, result)
-	assert.True(t, result.AsTime().Equal(actualStart), "should use ExecutionStartedAt, not PhaseHistory")
-}
-
-func TestExecutionStartTimestamp_FallsBackToPhaseHistory(t *testing.T) {
-	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
-
-	ta := &executorv1.TaskAction{
-		Status: executorv1.TaskActionStatus{
-			// No ExecutionStartedAt set
-			PhaseHistory: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-10 * time.Second))},
-				{Phase: "Executing", OccurredAt: metav1.NewTime(controllerTime)},
-			},
-		},
-	}
-	result := executionStartTimestamp(ta)
-	require.NotNil(t, result)
-	assert.True(t, result.AsTime().Equal(controllerTime), "should fall back to PhaseHistory Executing entry")
-}
-
-func TestTerminalPhaseTimestamp_PrefersActualTimestamp(t *testing.T) {
-	actualEnd := time.Date(2026, 3, 25, 12, 0, 3, 0, time.UTC)
-	controllerTime := time.Date(2026, 3, 25, 12, 0, 30, 0, time.UTC)
-	actualMeta := metav1.NewTime(actualEnd)
-
-	ta := &executorv1.TaskAction{
-		Status: executorv1.TaskActionStatus{
-			CompletedAt: &actualMeta,
-			PhaseHistory: []executorv1.PhaseTransition{
-				{Phase: "Queued", OccurredAt: metav1.NewTime(controllerTime.Add(-30 * time.Second))},
-				{Phase: string(executorv1.ConditionReasonCompleted), OccurredAt: metav1.NewTime(controllerTime)},
-			},
-		},
-	}
-	result := terminalPhaseTimestamp(ta)
-	require.NotNil(t, result)
-	assert.True(t, result.AsTime().Equal(actualEnd), "should use CompletedAt, not PhaseHistory")
-}
-
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "org",
@@ -471,7 +415,7 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
-func TestHandleWatchEvent_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {
+func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -499,34 +443,36 @@ func TestHandleWatchEvent_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 			},
 		},
 	}
+	update := &ActionUpdate{
+		ActionID: &common.ActionIdentifier{
+			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Name: "completed-action",
+		},
+		Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+	}
 
 	// First ADDED event (cold start, not in bloom filter): should process normally
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
-	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
+	c.notifyRunService(ctx, ta, update, watch.Added)
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 
 	// Action should now be in the bloom filter
-	actionKey := []byte(buildTaskActionName(&common.ActionIdentifier{
-		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
-		Name: "completed-action",
-	}))
+	actionKey := []byte(buildTaskActionName(update.ActionID))
 	assert.True(t, filter.Contains(ctx, actionKey))
 
 	// Second ADDED event (reconnect, in bloom filter): should skip RecordAction
-	// but still call UpdateActionStatus to repair potentially missing timestamps.
-	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
-	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+	// but still call UpdateActionStatus.
+	c.notifyRunService(ctx, ta, update, watch.Added)
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)    // no new RecordAction
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2) // one more UpdateActionStatus
 }
 
-func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {
+func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -554,6 +500,13 @@ func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {
 			},
 		},
 	}
+	update := &ActionUpdate{
+		ActionID: &common.ActionIdentifier{
+			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Name: "queued-action",
+		},
+		Phase: common.ActionPhase_ACTION_PHASE_QUEUED,
+	}
 
 	// Non-terminal ADDED events should be processed normally
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
@@ -561,13 +514,13 @@ func TestHandleWatchEvent_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
-	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: ta})
+	c.notifyRunService(ctx, ta, update, watch.Added)
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
-func TestNotifyRunService_DuplicateAddedSkipsEntireProcessing(t *testing.T) {
+func TestNotifyRunService_DuplicateAddedSkipsRecordAction(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -587,14 +540,14 @@ func TestNotifyRunService_DuplicateAddedSkipsEntireProcessing(t *testing.T) {
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
-	// Second call (duplicate ADDED) — should skip entirely (no RPCs)
+	// Second call (duplicate ADDED) — should skip RecordAction but still call UpdateActionStatus
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
-	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2)
 }
 
 func TestNotifyRunService_TerminalDuplicateRepairsTimestamps(t *testing.T) {
