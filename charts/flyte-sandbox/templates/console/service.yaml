@@ -1,0 +1,15 @@
+{{- if .Values.sandbox.console.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "flyte-sandbox.consoleSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+{{- end }}

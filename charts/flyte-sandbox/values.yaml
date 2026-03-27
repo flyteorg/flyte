@@ -76,6 +76,17 @@ flyte-binary:
       repository: flyte-binary-v2
       tag: sandbox
       pullPolicy: Never
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+      initialDelaySeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 5
     waitForDB:
       image:
         repository: bitnami/postgresql
@@ -164,6 +175,12 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  console:
+    enabled: true
+    image:
+      repository: ghcr.io/flyteorg/flyte-client-v2
+      tag: latest
+      pullPolicy: Never
   buildkit:
     enabled: true
     image:

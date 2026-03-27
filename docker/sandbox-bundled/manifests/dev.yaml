@@ -77,15 +77,31 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              cacheKey:
+                description: |-
+                  CacheKey enables cache lookup/writeback for this task action when set.
+                  This is propagated from workflow.TaskAction.cache_key.
+                maxLength: 256
+                type: string
               domain:
                 description: Domain this action belongs to
                 maxLength: 63
                 minLength: 1
                 type: string
+              envVars:
+                additionalProperties:
+                  type: string
+                description: EnvVars are run-scoped environment variables projected
+                  from RunSpec for executor runtime use.
+                type: object
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1
                 type: string
+              interruptible:
+                description: Interruptible is the run-scoped interruptibility override
+                  projected from RunSpec.
+                type: boolean
               org:
                 description: Org this action belongs to
                 maxLength: 63
@@ -141,6 +157,16 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                format: int32
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                format: int32
+                type: integer
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.
@@ -181,7 +207,7 @@ spec:
                         reason contains a programmatic identifier indicating the reason for the condition's last transition.
                         Producers of specific condition types may define expected values and meanings for this field,
                         and whether the values are considered a guaranteed API.
-                        The value should be a CalmelCase string.
+                        The value should be a CamelCase string.
                         This field may not be empty.
                       maxLength: 1024
                       minLength: 1
@@ -655,6 +681,11 @@ data:
                                                   cluster: flyte
                                                   timeout: 0s
                                             - match:
+                                                  prefix: "/flyteidl2.project.ProjectService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
                                                   prefix: "/flyteidl2.actions.ActionsService"
                                               route:
                                                   cluster: flyte
@@ -664,6 +695,35 @@ data:
                                               route:
                                                   cluster: flyte
                                                   timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.secret.SecretService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.app.AppService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.trigger.TriggerService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/flyteidl2.workflow.RunLogsService"
+                                              route:
+                                                  cluster: flyte
+                                                  timeout: 0s
+                                            - match:
+                                                  prefix: "/v2"
+                                              route:
+                                                  cluster: console
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -701,6 +761,19 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-local
                                           port_value: 8090
+            - name: console
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: console
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-console
+                                          port_value: 80
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -753,7 +826,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: dlJOV1dRdnA3dENpUkhDUg==
+  haSharedSecret: WFF5WVNXWWtPaXdsZTdycQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -853,6 +926,31 @@ subsets:
   - name: http
     port: 8090
     protocol: TCP
+  - name: webhook
+    port: 9443
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
 ---
 apiVersion: v1
 kind: Service
@@ -916,6 +1014,9 @@ spec:
   ports:
   - name: http
     port: 8090
+    protocol: TCP
+  - name: webhook
+    port: 9443
     protocol: TCP
 ---
 apiVersion: v1
@@ -1159,6 +1260,52 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: console
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: console
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: console
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -1176,7 +1323,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 426caf593431ecac84ef53585c9e08471e0da16870aed698439a3c30b1454131
+        checksum/secret: 8592e3ab7acecec70b8951766b7e7ca96eb81fa594706276ab3385ee723614f4
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1470,7 +1617,8 @@ spec:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
         livenessProbe:
-          initialDelaySeconds: 30
+          failureThreshold: 10
+          initialDelaySeconds: 15
           tcpSocket:
             port: http
         name: proxy
@@ -1478,6 +1626,7 @@ spec:
         - containerPort: 8000
           name: http
         readinessProbe:
+          initialDelaySeconds: 5
           tcpSocket:
             port: http
         volumeMounts:

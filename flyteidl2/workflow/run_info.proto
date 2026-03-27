@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "flyteidl2/task/run.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// RunInfo contains detailed metadata about an action/run, stored as serialized
+// bytes in the actions table's detailed_info column.
+message RunInfo {
+  // Task spec digest. Used to look up the full task spec from the task_specs table.
+  string task_spec_digest = 1;
+
+  // Inputs uri.
+  string inputs_uri = 2;
+
+  // Outputs uri.
+  string outputs_uri = 3;
+
+  // Run spec.
+  flyteidl2.task.RunSpec run_spec = 4;
+}

@@ -73,15 +73,31 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              cacheKey:
+                description: |-
+                  CacheKey enables cache lookup/writeback for this task action when set.
+                  This is propagated from workflow.TaskAction.cache_key.
+                maxLength: 256
+                type: string
               domain:
                 description: Domain this action belongs to
                 maxLength: 63
                 minLength: 1
                 type: string
+              envVars:
+                additionalProperties:
+                  type: string
+                description: EnvVars are run-scoped environment variables projected
+                  from RunSpec for executor runtime use.
+                type: object
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1
                 type: string
+              interruptible:
+                description: Interruptible is the run-scoped interruptibility override
+                  projected from RunSpec.
+                type: boolean
               org:
                 description: Org this action belongs to
                 maxLength: 63
@@ -137,6 +153,16 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                format: int32
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                format: int32
+                type: integer
               conditions:
                 description: |-
                   conditions represent the current state of the TaskAction resource.

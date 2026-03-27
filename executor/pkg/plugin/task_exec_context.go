@@ -106,7 +106,10 @@ func NewTaskExecutionContext(
 	outputWriter := ioutils.NewRemoteFileOutputWriter(ctx, dataStore, outputFilePaths)
 
 	// Task execution metadata
-	taskExecMeta := NewTaskExecutionMetadata(taskAction)
+	taskExecMeta, err := NewTaskExecutionMetadata(taskAction)
+	if err != nil {
+		return nil, err
+	}
 
 	return &taskExecutionContext{
 		resourceManager:      resourceManager,

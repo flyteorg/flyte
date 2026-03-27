@@ -8,8 +8,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/wrapperspb"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -17,7 +19,10 @@ import (
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
@@ -134,6 +139,32 @@ func TestNotifyRunService_NilFilter(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
 }
 
+func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-4")
+	ta.Status.Attempts = 3
+	ta.Status.CacheStatus = core.CatalogCacheStatus_CACHE_HIT
+	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		status := req.Msg.GetStatus()
+		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
+			status.GetAttempts() == 3 &&
+			status.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Modified)
+
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "org",
@@ -142,13 +173,13 @@ func TestBuildTaskActionName(t *testing.T) {
 		Name:    "rabc123",
 	}
 
-	t.Run("root action uses a0-0 suffix", func(t *testing.T) {
+	t.Run("root action uses a0 suffix", func(t *testing.T) {
 		// Root: action name == run name
 		actionID := &common.ActionIdentifier{
 			Run:  runID,
 			Name: runID.Name,
 		}
-		assert.Equal(t, "rabc123-a0-0", buildTaskActionName(actionID))
+		assert.Equal(t, "rabc123-a0", buildTaskActionName(actionID))
 	})
 
 	t.Run("child action includes action name", func(t *testing.T) {
@@ -156,7 +187,7 @@ func TestBuildTaskActionName(t *testing.T) {
 			Run:  runID,
 			Name: "train",
 		}
-		assert.Equal(t, "rabc123-train-0", buildTaskActionName(actionID))
+		assert.Equal(t, "rabc123-train", buildTaskActionName(actionID))
 	})
 }
 
@@ -325,4 +356,61 @@ func TestDoWatch_PreservesResourceVersionOnOtherErrors(t *testing.T) {
 	c.mu.RLock()
 	assert.Equal(t, "100", c.lastResourceVersion)
 	c.mu.RUnlock()
+}
+
+func TestExtractTaskCacheKey(t *testing.T) {
+	t.Run("returns cache key for task action", func(t *testing.T) {
+		action := &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					CacheKey: wrapperspb.String("cache-v1"),
+				},
+			},
+		}
+
+		assert.Equal(t, "cache-v1", extractTaskCacheKey(action))
+	})
+
+	t.Run("returns empty for non-task action", func(t *testing.T) {
+		assert.Empty(t, extractTaskCacheKey(&actions.Action{}))
+	})
+}
+
+func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
+	taskAction := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	applyRunSpecToTaskAction(taskAction, &task.RunSpec{
+		Envs: &task.Envs{
+			Values: []*core.KeyValuePair{
+				{Key: "TRACE_ID", Value: "abc123"},
+			},
+		},
+		Interruptible: wrapperspb.Bool(true),
+		Labels: &task.Labels{
+			Values: map[string]string{
+				"flyte.org/run": "should-not-override",
+				"team":          "platform",
+			},
+		},
+		Annotations: &task.Annotations{
+			Values: map[string]string{
+				"owner": "sdk",
+			},
+		},
+	})
+
+	require.NotNil(t, taskAction.Spec.Interruptible)
+	assert.True(t, *taskAction.Spec.Interruptible)
+	assert.Len(t, taskAction.Spec.EnvVars, 1)
+	assert.Equal(t, "abc123", taskAction.Spec.EnvVars["TRACE_ID"])
+	assert.Equal(t, "run1", taskAction.Labels["flyte.org/run"])
+	assert.Equal(t, "platform", taskAction.Labels["team"])
+	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 }

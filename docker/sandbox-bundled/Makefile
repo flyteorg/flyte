@@ -52,8 +52,23 @@ manifests: dep_update
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
 
+CONSOLE_IMAGE := ghcr.io/flyteorg/flyte-client-v2
+CONSOLE_TAG := latest
+
+.PHONY: console
+console:
+	mkdir -p images/tar/amd64 images/tar/arm64
+	docker pull --platform linux/amd64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/amd64/flyte-client-v2.tar
+	docker pull --platform linux/arm64 $(CONSOLE_IMAGE):$(CONSOLE_TAG)
+	docker save $(CONSOLE_IMAGE):$(CONSOLE_TAG) -o images/tar/arm64/flyte-client-v2.tar
+
+.PHONY: sync-crds
+sync-crds:
+	$(MAKE) -C ../../executor manifests
+
 .PHONY: build
-build: flyte dep_update manifests
+build: sync-crds flyte console dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox-v2:latest .
 
@@ -103,10 +118,6 @@ kubeconfig:
 .PHONY: stop
 stop:
 	docker stop flyte-sandbox
-
-.PHONY: console
-console:
-	open http://localhost:30080/console
 
 .venv:
 	python -m venv .venv

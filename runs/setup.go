@@ -5,13 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
@@ -25,7 +28,8 @@ import (
 )
 
 // Setup registers Run and Task service handlers on the SetupContext mux.
-// Requires sc.DB, sc.DataStore, and sc.K8sClient to be set.
+// Requires sc.DB and sc.DataStore to be set. When sc.K8sConfig is provided,
+// RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
@@ -45,7 +49,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore)
+	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
+		Workers:      5,
+		MaxAttempts:  10,
+		QueueSize:    1000,
+		InitialDelay: time.Second,
+		MaxDelay:     5 * time.Minute,
+	})
+	sc.AddWorker("abort-reconciler", func(ctx context.Context) error {
+		return abortReconciler.Run(ctx)
+	})
+
+	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
 	taskSvc := service.NewTaskService(repo)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
@@ -70,6 +85,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
+	appSvc := service.NewAppService()
+	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
+	sc.Mux.Handle(appPath, appHandler)
+	logger.Infof(ctx, "Mounted AppService at %s", appPath)
+
+	triggerSvc := service.NewTriggerService()
+	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
+	sc.Mux.Handle(triggerPath, triggerHandler)
+	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
+
 	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
 	for _, d := range cfg.Domains {
 		domains = append(domains, &projectpb.Domain{
@@ -81,6 +106,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
+
+	if sc.K8sConfig != nil {
+		logStreamer, err := service.NewK8sLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("runs: failed to create k8s log streamer: %w", err)
+		}
+		runLogsSvc := service.NewRunLogsService(repo, logStreamer)
+		runLogsPath, runLogsHandler := workflowconnect.NewRunLogsServiceHandler(runLogsSvc)
+		sc.Mux.Handle(runLogsPath, runLogsHandler)
+		logger.Infof(ctx, "Mounted RunLogsService at %s", runLogsPath)
+	}
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)

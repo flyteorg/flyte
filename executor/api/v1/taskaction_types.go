@@ -20,6 +20,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
@@ -130,6 +131,12 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MinLength=1
 	RunOutputBase string `json:"runOutputBase"`
 
+	// CacheKey enables cache lookup/writeback for this task action when set.
+	// This is propagated from workflow.TaskAction.cache_key.
+	// +optional
+	// +kubebuilder:validation:MaxLength=256
+	CacheKey string `json:"cacheKey,omitempty"`
+
 	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray")
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
@@ -144,6 +151,14 @@ type TaskActionSpec struct {
 	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
 	// +kubebuilder:validation:Required
 	TaskTemplate []byte `json:"taskTemplate"`
+
+	// EnvVars are run-scoped environment variables projected from RunSpec for executor runtime use.
+	// +optional
+	EnvVars map[string]string `json:"envVars,omitempty"`
+
+	// Interruptible is the run-scoped interruptibility override projected from RunSpec.
+	// +optional
+	Interruptible *bool `json:"interruptible,omitempty"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
@@ -224,6 +239,14 @@ type TaskActionStatus struct {
 	// PluginPhaseVersion is the version of the current plugin phase.
 	// +optional
 	PluginPhaseVersion uint32 `json:"pluginPhaseVersion,omitempty"`
+
+	// Attempts is the latest observed action attempt number, starting from 1.
+	// +optional
+	Attempts uint32 `json:"attempts,omitempty"`
+
+	// CacheStatus is the latest observed cache lookup result for this action.
+	// +optional
+	CacheStatus core.CatalogCacheStatus `json:"cacheStatus,omitempty"`
 
 	// conditions represent the current state of the TaskAction resource.
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.

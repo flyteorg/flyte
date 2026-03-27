@@ -13,11 +13,19 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.flyte/sandboxv2/kubeconfig"
 
+# Webhook configuration
+# localCert: true writes the generated TLS cert to disk so the webhook server can read it.
+webhook:
+  localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
+
 # Executor configuration
 executor:
   gc:
-    interval: 1m
-    maxTTL: 1m
+    interval: 1h
+    maxTTL: 24h
 
 # Runs service configuration
 runs:
@@ -33,7 +41,7 @@ runs:
 
 # Logger configuration
 logger:
-  level: 4  # Info level
+  level: 5  # Info level
   show-source: true
 
 # Data Proxy Configuration

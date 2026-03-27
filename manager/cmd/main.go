@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
@@ -18,6 +19,7 @@ import (
 	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
+	"github.com/flyteorg/flyte/v2/secret"
 )
 
 func main() {
@@ -88,7 +90,13 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := events.Setup(ctx, sc); err != nil {
 		return err
 	}
+	if err := cache_service.Setup(ctx, sc); err != nil {
+		return err
+	}
 	if err := executor.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := secret.Setup(ctx, sc); err != nil {
 		return err
 	}
 

@@ -76,6 +76,9 @@ message ListTasksRequest {
     oneof filter_by {
       // Filter by user
       string deployed_by = 1;
+
+      // Filter to only entrypoint tasks
+      bool is_entrypoint = 2;
     }
   }
 
