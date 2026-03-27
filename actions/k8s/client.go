@@ -9,7 +9,6 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -528,41 +527,12 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				// StartTime:   executionStartTimestamp(taskAction),
-				EndTime: terminalPhaseTimestamp(taskAction),
 			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		}
 	}
-}
-
-// executionStartTimestamp returns the actual execution start time for a TaskAction.
-func executionStartTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
-	for _, entry := range ta.Status.PhaseHistory {
-		if entry.Phase == string(executorv1.ConditionReasonQueued) {
-			return timestamppb.New(entry.OccurredAt.Time)
-		}
-	}
-	return nil
-}
-
-// terminalPhaseTimestamp returns the actual completion time for a TaskAction.
-func terminalPhaseTimestamp(ta *executorv1.TaskAction) *timestamppb.Timestamp {
-	history := ta.Status.PhaseHistory
-	if len(history) == 0 {
-		return nil
-	}
-	last := history[len(history)-1]
-	switch last.Phase {
-	case string(executorv1.ConditionReasonCompleted),
-		string(executorv1.ConditionReasonPermanentFailure),
-		string(executorv1.ConditionReasonRetryableFailure),
-		string(executorv1.ConditionReasonAborted):
-		return timestamppb.New(last.OccurredAt.Time)
-	}
-	return nil
 }
 
 // StopWatching stops the TaskAction watcher
