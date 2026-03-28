@@ -130,8 +130,9 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
-	enableIngress := true
 	cfg := GetConfig()
+
+	enableIngress := cfg.EnableIngress
 
 	headPodSpec := taskPodSpec.DeepCopy()
 	headPodTemplate, err := buildHeadPodTemplate(
@@ -223,6 +224,17 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.GetRuntimeEnv())
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	// We mustn't drop empty string arguments when converting from the yaml
+	// array representation of K8s container args to the single string representation
+	// of RayJobSpec's Entrypoint field.
+	//
+	// Example: ["--resolver", "ArrayNodeMapTaskResolver", "--", "vars", "", "resolver", "DefaultResolver"]
+	for i, arg := range primaryContainer.Args {
+		if arg == "" {
+			primaryContainer.Args[i] = "''"
 		}
 	}
 

@@ -18,6 +18,7 @@ var (
 	defaultConfig = Config{
 		ShutdownAfterJobFinishes: true,
 		TTLSecondsAfterFinished:  3600,
+		EnableIngress:            false,
 		ServiceType:              "NodePort",
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
@@ -68,6 +69,11 @@ type Config struct {
 
 	// Kubernetes Service Type, valid values are 'ClusterIP', 'NodePort' and 'LoadBalancer'
 	ServiceType string `json:"serviceType,omitempty"`
+
+	// EnableIngress controls whether KubeRay will create an Ingress for the head service.
+	// Nginx ingress is now officially retired, in favor of Gateway API.
+	// If false, ingress creation is disabled.
+	EnableIngress bool `json:"enableIngress,omitempty"`
 
 	// IncludeDashboard is used to start a Ray Dashboard if set to true
 	IncludeDashboard bool `json:"includeDashboard,omitempty"`
