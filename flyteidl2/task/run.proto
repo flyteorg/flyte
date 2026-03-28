@@ -2,8 +2,11 @@ syntax = "proto3";
 
 package flyteidl2.task;
 
+import "buf/validate/validate.proto";
+import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "flyteidl2/notification/definition.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -93,4 +96,42 @@ message RunSpec {
 
   // CacheConfig contains configurations that influence the behavior of cache reads and writes
   CacheConfig cache_config = 9;
+
+  // Optionally, you can send a notification when your run completes.
+  oneof notification_settings {
+    string notification_rule_name = 10; // either refer to a previously stored notification rule
+
+    InlineRuleList notification_rules = 11; // either define an inline one-off rule
+  }
+}
+
+message InlineRuleList {
+  repeated InlineRule rules = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message InlineRule {
+  repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+    items: {
+      enum: {
+        in: [ // terminal phases only
+          5, // ACTION_PHASE_SUCCEEDED
+          6, // ACTION_PHASE_FAILED
+          7, // ACTION_PHASE_ABORTED
+          8 // ACTION_PHASE_TIMED_OUT
+        ]
+      }
+    }
+  }];
+
+  oneof delivery {
+    option (buf.validate.oneof).required = true;
+
+    // (run org + delivery_config_name) will be used as a delivery config id
+    string delivery_config_name = 2;
+
+    // template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+    flyteidl2.notification.DeliveryConfigTemplate delivery_template = 3;
+  }
 }

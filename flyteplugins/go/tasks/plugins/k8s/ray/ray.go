@@ -586,7 +586,11 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 }
 
 func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
-	logPlugin, err := logs.InitializeLogPlugins(&logConfig)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read task template. Error: %w", err)
+	}
+	logPlugin, err := logs.InitializeLogPlugins(&logConfig, taskTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
 	}

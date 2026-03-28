@@ -14,7 +14,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-
 // Metadata to be associated with the catalog object
 type Metadata struct {
 	WorkflowExecutionIdentifier *core.WorkflowExecutionIdentifier
@@ -25,10 +24,10 @@ type Metadata struct {
 
 // An identifier for a catalog object.
 type Key struct {
-	Identifier           core.Identifier
+	Identifier           *core.Identifier
 	CacheVersion         string
 	CacheIgnoreInputVars []string
-	TypedInterface       core.TypedInterface
+	TypedInterface       *core.TypedInterface
 	InputReader          io.InputReader
 	CacheKey             string
 }
@@ -58,7 +57,7 @@ func (s Status) GetMetadata() *core.CatalogMetadata {
 
 func NewPutFailureStatus(key *Key) Status {
 	md := &core.CatalogMetadata{
-		DatasetId: &key.Identifier,
+		DatasetId: key.Identifier,
 	}
 	return Status{cacheStatus: core.CatalogCacheStatus_CACHE_PUT_FAILURE, metadata: md}
 }

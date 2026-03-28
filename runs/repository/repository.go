@@ -1,8 +1,11 @@
 package repository
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
@@ -14,11 +17,15 @@ type repository struct {
 }
 
 // NewRepository creates a new Repository instance
-func NewRepository(db *gorm.DB) interfaces.Repository {
-	return &repository{
-		actionRepo: impl.NewActionRepo(db),
-		taskRepo:   impl.NewTaskRepo(db),
+func NewRepository(db *gorm.DB, dbConfig database.DbConfig) (interfaces.Repository, error) {
+	actionRepo, err := impl.NewActionRepo(db, dbConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create action repo: %w", err)
 	}
+	return &repository{
+		actionRepo: actionRepo,
+		taskRepo:   impl.NewTaskRepo(db),
+	}, nil
 }
 
 // ActionRepo returns the action repository

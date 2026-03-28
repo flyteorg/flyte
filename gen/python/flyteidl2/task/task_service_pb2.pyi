@@ -39,10 +39,12 @@ class GetTaskDetailsResponse(_message.Message):
 class ListTasksRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "known_filters"]
     class KnownFilter(_message.Message):
-        __slots__ = ["deployed_by"]
+        __slots__ = ["deployed_by", "is_entrypoint"]
         DEPLOYED_BY_FIELD_NUMBER: _ClassVar[int]
+        IS_ENTRYPOINT_FIELD_NUMBER: _ClassVar[int]
         deployed_by: str
-        def __init__(self, deployed_by: _Optional[str] = ...) -> None: ...
+        is_entrypoint: bool
+        def __init__(self, deployed_by: _Optional[str] = ..., is_entrypoint: bool = ...) -> None: ...
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]

@@ -131,7 +131,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -161,7 +161,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
 	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
+	taskExecutionMetadata.EXPECT().GetSecurityContext().Return(&core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: serviceAccount},
 	})
 	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
@@ -649,7 +649,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 	rayJobObj := transformRayJobToCustomObj(dummyRayCustomObj())
 	params := []struct {
 		name         string
-		taskTemplate core.TaskTemplate
+		taskTemplate *core.TaskTemplate
 		// primaryContainerName string
 		logsSidecarCfg                       *corev1.Container
 		expectedVolumes                      []corev1.Volume
@@ -658,7 +658,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}{
 		{
 			"container target",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Id: &core.Identifier{Name: "ray-id"},
 				Target: &core.TaskTemplate_Container{
 					Container: &core.Container{
@@ -696,7 +696,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 		},
 		{
 			"container target with no sidecar",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Id: &core.Identifier{Name: "ray-id"},
 				Target: &core.TaskTemplate_Container{
 					Container: &core.Container{
@@ -713,7 +713,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 		},
 		{
 			"pod target",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Id: &core.Identifier{Name: "ray-id"},
 				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
 					Containers: []corev1.Container{
@@ -756,7 +756,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 		},
 		{
 			"pod target with existing ray state volume",
-			core.TaskTemplate{
+			&core.TaskTemplate{
 				Id: &core.Identifier{Name: "ray-id"},
 				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
 					Containers: []corev1.Container{
@@ -819,7 +819,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{
 				LogsSidecar: p.logsSidecarCfg,
 			}))
-			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil, "", serviceAccount)
+			taskContext := dummyRayTaskContext(p.taskTemplate, resourceRequirements, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -863,7 +863,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	plg := &k8smocks.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
-	taskExecID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	taskExecID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -895,6 +895,10 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		})
 
 	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{}, nil)
+	plg.EXPECT().TaskReader().Return(taskReader)
 
 	return plg
 }

@@ -580,6 +580,28 @@
       ],
       "default": "UNKNOWN"
     },
+    "commonRunIdentifier": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Org this run belongs to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Project this run belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain this run belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing."
+        }
+      },
+      "description": "Unique identifier of a run."
+    },
     "connectorConnector": {
       "type": "object",
       "properties": {
@@ -2156,6 +2178,18 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "description": "Log links associated with this task."
+        },
+        "image_build_run": {
+          "$ref": "#/definitions/commonRunIdentifier",
+          "description": "RunIdentifier of the remote image build run that produced the container image for this task."
+        },
+        "is_entrypoint": {
+          "type": "boolean",
+          "description": "IsEntryPoint indicates whether this task will launch additional actions as it runs."
+        },
+        "code_bundle_uri": {
+          "type": "string",
+          "description": "Remote URI pointing to the code bundle used to build this task."
         }
       },
       "title": "Task Metadata"

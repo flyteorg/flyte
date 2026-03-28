@@ -17,16 +17,15 @@ limitations under the License.
 package controller
 
 import (
+	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"net"
-	"net/http"
+	"reflect"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
-	"golang.org/x/net/http2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,57 +33,83 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	task "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+const (
+	TaskActionDefaultRequeueDuration = 5 * time.Second
+	taskActionFinalizer              = "flyte.org/plugin-finalizer"
+
+	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
+	LabelTerminationStatus = "flyte.org/termination-status"
+	// LabelCompletedTime records the UTC time (minute precision) when the TaskAction became terminal.
+	LabelCompletedTime = "flyte.org/completed-time"
+	// LabelValueTerminated is the value for LabelTerminationStatus.
+	LabelValueTerminated = "terminated"
+	// labelTimeFormat is the time format used for the completed-time label (lexicographically ordered, minute precision).
+	labelTimeFormat = "2006-01-02.15-04"
 )
 
 type K8sEventType string
 
 const (
-	TaskActionDefaultRequeueDuration              = 5 * time.Second
-	FailedUnmarshal                  K8sEventType = "FailedUnmarshal"
+	FailedUnmarshal     K8sEventType = "FailedUnmarshal"
+	FailedValidation    K8sEventType = "FailedValidation"
+	FailedPluginResolve K8sEventType = "FailedPluginResolve"
+	FailedPluginHandle  K8sEventType = "FailedPluginHandle"
 )
 
 // TaskActionReconciler reconciles a TaskAction object
 type TaskActionReconciler struct {
 	client.Client
-	Scheme             *runtime.Scheme
-	StateServiceURL    string
-	stateServiceClient workflowconnect.StateServiceClient
-	Recorder           record.EventRecorder
+	Scheme          *runtime.Scheme
+	Recorder        record.EventRecorder
+	PluginRegistry  *plugin.Registry
+	DataStore       *storage.DataStore
+	SecretManager   pluginsCore.SecretManager
+	ResourceManager pluginsCore.ResourceManager
+	CatalogClient   catalog.AsyncClient
+	Catalog         catalog.Client
+	eventsClient    workflowconnect.EventsProxyServiceClient
+	cluster         string
 }
 
-// NewTaskActionReconciler creates a new TaskActionReconciler with initialized clients
-func NewTaskActionReconciler(c client.Client, scheme *runtime.Scheme, stateServiceURL string) *TaskActionReconciler {
-	// Create HTTP/2 cleartext (h2c) client for buf connect
-	// This is required because the state service uses h2c (HTTP/2 without TLS)
-	httpClient := &http.Client{
-		Transport: &http2.Transport{
-			// Allow HTTP/2 without TLS (h2c)
-			AllowHTTP: true,
-			// Use HTTP/2 dialer
-			DialTLSContext: func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
-				// Dial without TLS for h2c
-				return net.Dial(network, addr)
-			},
-		},
-	}
-
+// NewTaskActionReconciler creates a new TaskActionReconciler
+func NewTaskActionReconciler(
+	c client.Client,
+	scheme *runtime.Scheme,
+	registry *plugin.Registry,
+	dataStore *storage.DataStore,
+	eventsClient workflowconnect.EventsProxyServiceClient,
+	cluster string,
+) *TaskActionReconciler {
 	return &TaskActionReconciler{
-		Client:             c,
-		Scheme:             scheme,
-		StateServiceURL:    stateServiceURL,
-		stateServiceClient: workflowconnect.NewStateServiceClient(httpClient, stateServiceURL),
+		Client:         c,
+		Scheme:         scheme,
+		PluginRegistry: registry,
+		DataStore:      dataStore,
+		eventsClient:   eventsClient,
+		cluster:        cluster,
 	}
 }
 
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -97,122 +122,569 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Get the ActionSpec from the TaskAction
-	actionSpec, err := taskAction.Spec.GetActionSpec()
+	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
+	// if the TaskAction instance changes
+	originalTaskActionInstance := taskAction.DeepCopy()
+
+	// Handle deletion
+	if !taskAction.DeletionTimestamp.IsZero() {
+		return r.handleAbortAndFinalize(ctx, taskAction)
+	}
+
+	// Check terminal conditions -- short-circuit
+	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+
+	// Validate spec fields and resolve plugin before adding the finalizer
+	// If either fails, the resource is marked terminal and not requeued — no finalizer to clean up
+	p, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
 	if err != nil {
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedUnmarshal), "Failed to unmarshal ActionSpec %s/%s: %v", taskAction.Namespace, taskAction.Name, err)
-		return ctrl.Result{}, err
+		logger.Error(err, "TaskAction validation failed")
+		eventType := FailedValidation
+		if reason == flyteorgv1.ConditionReasonPluginNotFound {
+			eventType = FailedPluginResolve
+		}
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
+		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
+		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
+		_ = r.Status().Update(ctx, taskAction)
+		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
-	// TODO (haytham): Remove when we add real code that executes plugins. For now this is here so that watchers can see
-	//  things transition between states.
-	time.Sleep(2 * time.Second)
-
-	// Check terminal conditions first
-	succeededCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeSucceeded)
-	if succeededCond != nil && succeededCond.Status == metav1.ConditionTrue {
-		logger.Info("TaskAction already succeeded",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+	// Ensure finalizer is present (once validation passes)
+	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
+		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
+		if err := r.Update(ctx, taskAction); err != nil {
+			logger.Error(err, "Failed to update TaskAction with finalizer")
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
-	failedCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeFailed)
-	if failedCond != nil && failedCond.Status == metav1.ConditionTrue {
-		logger.Info("TaskAction already failed",
-			"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-		return ctrl.Result{}, nil
+	// Build PluginStateManager from persisted state
+	stateMgr := plugin.NewPluginStateManager(
+		taskAction.Status.PluginState,
+		taskAction.Status.PluginStateVersion,
+	)
+
+	// Build TaskExecutionContext
+	tCtx, err := plugin.NewTaskExecutionContext(
+		taskAction,
+		r.DataStore,
+		stateMgr,
+		r.SecretManager,
+		r.ResourceManager,
+		r.CatalogClient,
+	)
+	if err != nil {
+		logger.Error(err, "failed to build task execution context")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	// Sequential condition evaluation for Progressing
-	progressingCond := findConditionByType(taskAction.Status.Conditions, flyteorgv1.ConditionTypeProgressing)
-	if progressingCond != nil && progressingCond.Status == metav1.ConditionTrue {
-		// Check the Reason to determine sub-state
-		if progressingCond.Reason == string(flyteorgv1.ConditionReasonExecuting) {
-			// Executing to Succeeded
-			logger.Info("TaskAction is executing, transitioning to Succeeded",
-				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
+	// cacheShortCircuited is true when cache handling already decided the outcome,
+	// either via cache hit or waiting on the reservation owner.
+	var cacheShortCircuited bool
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	if err != nil {
+		logger.Error(err, "cache pre-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+	// Even when cache handling short-circuits execution, we still continue through the
+	// shared reconcile tail below so the derived transition updates conditions, status,
+	// and emitted action events in the same way as the normal plugin path.
 
-			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-				flyteorgv1.ConditionReasonCompleted, "TaskAction has completed")
-			setCondition(taskAction, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
-				flyteorgv1.ConditionReasonCompleted, "TaskAction completed successfully")
-
-			stateJSON := r.createStateJSON(actionSpec, "Succeeded")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
-
-			if err := r.Status().Update(ctx, taskAction); err != nil {
-				return ctrl.Result{}, err
-			}
-			return ctrl.Result{}, nil
-		}
-
-		if progressingCond.Reason == string(flyteorgv1.ConditionReasonInitializing) {
-			// Initializing to Executing
-			logger.Info("TaskAction is initializing, transitioning to Executing",
-				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-				flyteorgv1.ConditionReasonExecuting, "TaskAction is executing")
-
-			stateJSON := r.createStateJSON(actionSpec, "Running")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
-
-			if err := r.Status().Update(ctx, taskAction); err != nil {
-				return ctrl.Result{}, err
-			}
-			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
-		}
-
-		if progressingCond.Reason == string(flyteorgv1.ConditionReasonQueued) {
-			// Queued to Initializing
-			logger.Info("TaskAction is queued, transitioning to Initializing",
-				"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-			setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-				flyteorgv1.ConditionReasonInitializing, "TaskAction is being initialized")
-
-			stateJSON := r.createStateJSON(actionSpec, "Initializing")
-			if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-				logger.Error(err, "Failed to update state service")
-			}
-			taskAction.Status.StateJSON = stateJSON
-
-			if err := r.Status().Update(ctx, taskAction); err != nil {
-				return ctrl.Result{}, err
-			}
-			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	if !cacheShortCircuited {
+		transition, err = p.Handle(ctx, tCtx)
+		if err != nil {
+			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
+			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+				"Plugin %q Handle failed: %v", p.GetID(), err)
+			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 		}
 	}
 
-	// No conditions exist, this is the first reconcile
-	// Set Condition to Queued
-	logger.Info("New TaskAction, setting Progressing condition",
-		"name", taskAction.Name, "action", actionSpec.ActionId.Name)
-
-	setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
-		flyteorgv1.ConditionReasonQueued, "TaskAction is queued and waiting for resources")
-
-	stateJSON := r.createStateJSON(actionSpec, "Queued")
-	if err := r.updateStateService(ctx, actionSpec.ActionId, actionSpec.ParentActionName, stateJSON); err != nil {
-		logger.Error(err, "Failed to update state service")
+	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
+		logger.Error(err, "cache post-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
-	taskAction.Status.StateJSON = stateJSON
 
-	if err := r.Status().Update(ctx, taskAction); err != nil {
+	// Map transition phase to TaskAction conditions
+	phaseInfo := transition.Info()
+
+	// In-place task restart: when a recoverable failure occurs, restart the pod within the
+	// same TaskAction rather than relying on the runs service to create a new TaskAction.
+	var restartAttempts uint32
+	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
+		currentAttempts := observedAttempts(taskAction)
+		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+
+		if currentAttempts < maxAttempts {
+			// Abort (delete) the current pod before incrementing attempts.
+			// tCtx was built with the current attempt number so Abort targets the right pod.
+			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+				logger.Error(abortErr, "failed to abort pod during in-place restart")
+			}
+			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
+			restartAttempts = currentAttempts + 1
+			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
+			// Override the transition to Queued so the TaskAction stays non-terminal.
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			phaseInfo = transition.Info()
+		} else {
+			// All retries exhausted — convert to a permanent (terminal) failure.
+			execErr := phaseInfo.Err()
+			if execErr == nil {
+				execErr = &core.ExecutionError{
+					Kind:    core.ExecutionError_USER,
+					Code:    "MaxRetriesExceeded",
+					Message: fmt.Sprintf("task failed after %d attempt(s)", currentAttempts),
+				}
+			}
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, phaseInfo.Info()))
+			phaseInfo = transition.Info()
+		}
+	}
+	mapPhaseToConditions(taskAction, phaseInfo)
+
+	// Update StateJSON for observability
+	actionSpec, _ := taskAction.Spec.GetActionSpec()
+	if actionSpec != nil {
+		taskAction.Status.StateJSON = createStateJSON(actionSpec, phaseInfo.Phase().String())
+	}
+
+	// Persist new PluginState
+	if newBytes, newVersion, written := stateMgr.GetNewState(); written {
+		taskAction.Status.PluginState = newBytes
+		taskAction.Status.PluginStateVersion = newVersion
+	}
+
+	// If an in-place restart was triggered, increment attempts and clear plugin state so the
+	// next reconcile starts fresh with PluginPhaseNotStarted and creates a new pod.
+	if restartAttempts > 0 {
+		taskAction.Status.Attempts = restartAttempts
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
+	}
+
+	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
+	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	taskAction.Status.Attempts = observedAttempts(taskAction)
+	taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
+
+	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// If the TaskAction just became terminal, stamp GC labels
+	if isTerminal(taskAction) {
+		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
 	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 }
 
-// createStateJSON creates a simplified NodeStatus JSON representation
-func (r *TaskActionReconciler) createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
-	// Create a simplified state object
+// ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
+// This is idempotent — if the labels are already set, it's a no-op.
+// Uses a MergeFrom patch instead of a full Update to reduce conflict surface with concurrent reconciles.
+func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAction *flyteorgv1.TaskAction) error {
+	labels := taskAction.GetLabels()
+	if labels != nil && labels[LabelTerminationStatus] == LabelValueTerminated && labels[LabelCompletedTime] != "" {
+		return nil // already labeled
+	}
+
+	patch := client.MergeFrom(taskAction.DeepCopy())
+
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	labels[LabelTerminationStatus] = LabelValueTerminated
+	labels[LabelCompletedTime] = terminalTransitionTime(taskAction).Format(labelTimeFormat)
+	taskAction.SetLabels(labels)
+
+	if err := r.Patch(ctx, taskAction, patch); err != nil {
+		log.FromContext(ctx).Error(err, "failed to set terminal labels on TaskAction")
+		return err
+	}
+	return nil
+}
+
+// handleAbortAndFinalize handles the deletion of a TaskAction by aborting and finalizing the plugin.
+func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
+		return ctrl.Result{}, nil
+	}
+
+	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		logger.Info("Cannot resolve plugin for abort/finalize, removing finalizer", "error", err)
+		return r.removeFinalizer(ctx, taskAction)
+	}
+
+	stateMgr := plugin.NewPluginStateManager(
+		taskAction.Status.PluginState,
+		taskAction.Status.PluginStateVersion,
+	)
+
+	tCtx, err := plugin.NewTaskExecutionContext(
+		taskAction, r.DataStore, stateMgr, r.SecretManager, r.ResourceManager, r.CatalogClient,
+	)
+	if err != nil {
+		logger.Error(err, "failed to build context for abort/finalize")
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, "FinalizationSkipped",
+			"Could not build task execution context; skipping Abort/Finalize. Underlying resources may need manual cleanup: %v", err)
+		return r.removeFinalizer(ctx, taskAction)
+	}
+
+	if err := p.Abort(ctx, tCtx); err != nil {
+		logger.Error(err, "plugin Abort failed, will retry")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+
+	if err := p.Finalize(ctx, tCtx); err != nil {
+		logger.Error(err, "plugin Finalize failed, will retry")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+
+	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to build cache config for finalization cleanup")
+	} else if ok {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
+			logger.Error(err, "failed to release cache reservation during finalization cleanup")
+		}
+	}
+
+	return r.removeFinalizer(ctx, taskAction)
+}
+
+func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
+	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
+	if err := r.Update(ctx, taskAction); err != nil {
+		return ctrl.Result{}, err
+	}
+	return ctrl.Result{}, nil
+}
+
+// updateTaskActionStatus updates the TaskAction status only when the status has changed,
+// avoiding unnecessary API calls for unchanged state.
+func (r *TaskActionReconciler) updateTaskActionStatus(
+	ctx context.Context,
+	oldTaskAction, newTaskAction *flyteorgv1.TaskAction,
+	phaseInfo pluginsCore.PhaseInfo,
+) error {
+	logger := log.FromContext(ctx)
+
+	if !taskActionStatusChanged(oldTaskAction.Status, newTaskAction.Status) {
+		return nil
+	}
+
+	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
+	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{actionEvent},
+	})); err != nil {
+		r.Recorder.Eventf(
+			newTaskAction,
+			corev1.EventTypeWarning,
+			"ActionEventPublishFailed",
+			"Failed to persist action event %q: %v",
+			actionEvent.GetId().GetName(),
+			err,
+		)
+		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		return err
+	}
+
+	if err := r.Status().Update(ctx, newTaskAction); err != nil {
+		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
+		return err
+	}
+
+	return nil
+}
+
+func (r *TaskActionReconciler) buildActionEvent(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	phaseInfo pluginsCore.PhaseInfo,
+) *workflow.ActionEvent {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     taskAction.Spec.Org,
+			Project: taskAction.Spec.Project,
+			Domain:  taskAction.Spec.Domain,
+			Name:    taskAction.Spec.RunName,
+		},
+		Name: taskAction.Spec.ActionName,
+	}
+
+	info := phaseInfo.Info()
+	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
+
+	event := &workflow.ActionEvent{
+		Id:            actionID,
+		Attempt:       observedAttempts(taskAction),
+		Phase:         phaseToActionPhase(phaseInfo.Phase()),
+		Version:       phaseInfo.Version(),
+		UpdatedTime:   updatedTime,
+		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
+		Cluster:       r.cluster,
+		Outputs:       outputRefs(ctx, taskAction),
+		ClusterEvents: toClusterEvents(info, updatedTime),
+		ReportedTime:  timestamppb.New(time.Now()),
+	}
+
+	if info != nil {
+		event.LogInfo = info.Logs
+		event.LogContext = info.LogContext
+	}
+	event.CacheStatus = observedCacheStatus(info)
+
+	return event
+}
+
+func observedAttempts(taskAction *flyteorgv1.TaskAction) uint32 {
+	if taskAction.Status.Attempts > 0 {
+		return taskAction.Status.Attempts
+	}
+	// if attempts is not set, default to 1
+	return 1
+}
+
+func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
+	if info == nil {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	return cacheStatusFromExternalResources(info.ExternalResources)
+}
+
+func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
+	if n := len(history); n > 0 {
+		return timestamppb.New(history[n-1].OccurredAt.Time)
+	}
+	return timestamppb.Now()
+}
+
+func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.OutputReferences {
+	if taskAction.Spec.RunOutputBase == "" {
+		return nil
+	}
+	attempt := observedAttempts(taskAction)
+	prefix, err := plugin.ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)
+	if err != nil {
+		return nil
+	}
+	return &task.OutputReferences{
+		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
+	}
+}
+
+func phaseToActionPhase(phase pluginsCore.Phase) common.ActionPhase {
+	switch phase {
+	case pluginsCore.PhaseNotReady, pluginsCore.PhaseQueued:
+		return common.ActionPhase_ACTION_PHASE_QUEUED
+	case pluginsCore.PhaseWaitingForResources, pluginsCore.PhaseWaitingForCache:
+		return common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES
+	case pluginsCore.PhaseInitializing:
+		return common.ActionPhase_ACTION_PHASE_INITIALIZING
+	case pluginsCore.PhaseRunning:
+		return common.ActionPhase_ACTION_PHASE_RUNNING
+	case pluginsCore.PhaseSuccess:
+		return common.ActionPhase_ACTION_PHASE_SUCCEEDED
+	case pluginsCore.PhaseRetryableFailure, pluginsCore.PhasePermanentFailure:
+		return common.ActionPhase_ACTION_PHASE_FAILED
+	case pluginsCore.PhaseAborted:
+		return common.ActionPhase_ACTION_PHASE_ABORTED
+	default:
+		return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+	}
+}
+
+func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
+	if err == nil {
+		return nil
+	}
+	out := &workflow.ErrorInfo{
+		Message: err.GetMessage(),
+		Kind:    workflow.ErrorInfo_KIND_UNSPECIFIED,
+	}
+	switch err.GetKind() {
+	case core.ExecutionError_USER:
+		out.Kind = workflow.ErrorInfo_KIND_USER
+	case core.ExecutionError_SYSTEM:
+		out.Kind = workflow.ErrorInfo_KIND_SYSTEM
+	}
+	return out
+}
+
+func toClusterEvents(info *pluginsCore.TaskInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
+	if info == nil || len(info.AdditionalReasons) == 0 {
+		return nil
+	}
+	out := make([]*workflow.ClusterEvent, 0, len(info.AdditionalReasons))
+	for _, reason := range info.AdditionalReasons {
+		e := &workflow.ClusterEvent{
+			Message: reason.Reason,
+		}
+		if reason.OccurredAt != nil {
+			e.OccurredAt = timestamppb.New(*reason.OccurredAt)
+		} else {
+			e.OccurredAt = fallbackTime
+		}
+		out = append(out, e)
+	}
+	return out
+}
+
+func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource) core.CatalogCacheStatus {
+	for _, resource := range resources {
+		if resource == nil {
+			continue
+		}
+		// Return the first explicit cache status signal.
+		if resource.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED {
+			return resource.CacheStatus
+		}
+	}
+	return core.CatalogCacheStatus_CACHE_DISABLED
+}
+
+// taskActionStatusChanged reports whether any status field has changed between old and new,
+// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
+func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
+	if oldStatus.StateJSON != newStatus.StateJSON ||
+		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+		oldStatus.PluginPhase != newStatus.PluginPhase ||
+		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
+		oldStatus.Attempts != newStatus.Attempts ||
+		oldStatus.CacheStatus != newStatus.CacheStatus {
+		return true
+	}
+
+	if !bytes.Equal(oldStatus.PluginState, newStatus.PluginState) {
+		return true
+	}
+
+	if len(oldStatus.PhaseHistory) != len(newStatus.PhaseHistory) {
+		return true
+	}
+
+	return !reflect.DeepEqual(oldStatus.Conditions, newStatus.Conditions)
+}
+
+// mapPhaseToConditions maps a plugin PhaseInfo to TaskAction conditions.
+func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo) {
+	var phaseName string
+	var msg string
+
+	switch info.Phase() {
+	case pluginsCore.PhaseNotReady, pluginsCore.PhaseQueued, pluginsCore.PhaseWaitingForResources, pluginsCore.PhaseWaitingForCache:
+		phaseName = string(flyteorgv1.ConditionReasonQueued)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonQueued, msg)
+
+	case pluginsCore.PhaseInitializing:
+		phaseName = string(flyteorgv1.ConditionReasonInitializing)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonInitializing, msg)
+
+	case pluginsCore.PhaseRunning:
+		phaseName = string(flyteorgv1.ConditionReasonExecuting)
+		msg = info.Reason()
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonExecuting, msg)
+
+	case pluginsCore.PhaseSuccess:
+		phaseName = string(flyteorgv1.ConditionReasonCompleted)
+		msg = "TaskAction completed successfully"
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonCompleted, "TaskAction has completed")
+		setCondition(ta, flyteorgv1.ConditionTypeSucceeded, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonCompleted, msg)
+
+	case pluginsCore.PhasePermanentFailure:
+		phaseName = string(flyteorgv1.ConditionReasonPermanentFailure)
+		msg = info.Reason()
+		if info.Err() != nil {
+			msg = info.Err().GetMessage()
+		}
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonPermanentFailure, msg)
+		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonPermanentFailure, msg)
+
+	case pluginsCore.PhaseRetryableFailure:
+		phaseName = string(flyteorgv1.ConditionReasonRetryableFailure)
+		msg = info.Reason()
+		if info.Err() != nil {
+			msg = info.Err().GetMessage()
+		}
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonRetryableFailure, msg)
+
+	case pluginsCore.PhaseAborted:
+		phaseName = string(flyteorgv1.ConditionReasonAborted)
+		msg = "TaskAction was aborted"
+		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
+			flyteorgv1.ConditionReasonAborted, msg)
+		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonAborted, msg)
+	}
+
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
+	if phaseName != "" {
+		n := len(ta.Status.PhaseHistory)
+		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
+			ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
+				Phase:      phaseName,
+				OccurredAt: metav1.Now(),
+				Message:    msg,
+			})
+		}
+	}
+}
+
+// isTerminal returns true if the TaskAction has reached a terminal condition.
+func isTerminal(ta *flyteorgv1.TaskAction) bool {
+	for _, cond := range ta.Status.Conditions {
+		if cond.Type == string(flyteorgv1.ConditionTypeSucceeded) && cond.Status == metav1.ConditionTrue {
+			return true
+		}
+		if cond.Type == string(flyteorgv1.ConditionTypeFailed) && cond.Status == metav1.ConditionTrue {
+			return true
+		}
+	}
+	return false
+}
+
+// terminalTransitionTime returns the LastTransitionTime from the terminal condition
+// (Succeeded or Failed). Falls back to time.Now().UTC() if no transition time is found.
+func terminalTransitionTime(ta *flyteorgv1.TaskAction) time.Time {
+	for _, cond := range ta.Status.Conditions {
+		if cond.Status != metav1.ConditionTrue {
+			continue
+		}
+		if cond.Type == string(flyteorgv1.ConditionTypeSucceeded) || cond.Type == string(flyteorgv1.ConditionTypeFailed) {
+			if !cond.LastTransitionTime.IsZero() {
+				return cond.LastTransitionTime.UTC()
+			}
+			break
+		}
+	}
+	return time.Now().UTC()
+}
+
+// createStateJSON creates a simplified state JSON for observability.
+func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 	state := map[string]interface{}{
 		"phase":     phase,
 		"actionId":  fmt.Sprintf("%s/%s", actionSpec.ActionId.Run.Name, actionSpec.ActionId.Name),
@@ -223,53 +695,70 @@ func (r *TaskActionReconciler) createStateJSON(actionSpec *workflow.ActionSpec, 
 	if err != nil {
 		return "{}"
 	}
-
 	return string(stateBytes)
-}
-
-// updateStateService sends a state update to the State Service via unary RPC
-func (r *TaskActionReconciler) updateStateService(ctx context.Context, actionID *common.ActionIdentifier, parentActionName *string, stateJSON string) error {
-	// Create PutRequest
-	reqMsg := &workflow.PutRequest{
-		ActionId:         actionID,
-		ParentActionName: parentActionName,
-		State:            stateJSON,
-	}
-
-	// Make unary Put call
-	resp, err := r.stateServiceClient.Put(ctx, connect.NewRequest(reqMsg))
-	if err != nil {
-		return fmt.Errorf("failed to call put: %w", err)
-	}
-
-	// Check response status
-	if resp.Msg.Status.Code != 0 {
-		return fmt.Errorf("state service returned error: %s", resp.Msg.Status.Message)
-	}
-
-	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
+		Owns(&corev1.Pod{}).
 		Named("taskaction").
 		Complete(r)
 }
 
-// findConditionByType finds a condition by type in the conditions list
-// Returns nil if not found
-func findConditionByType(conditions []metav1.Condition, condType flyteorgv1.TaskActionConditionType) *metav1.Condition {
-	for i := range conditions {
-		if conditions[i].Type == string(condType) {
-			return &conditions[i]
-		}
-	}
-	return nil
+// pluginResolver is satisfied by *plugin.Registry and allows mocking in tests.
+type pluginResolver interface {
+	ResolvePlugin(taskType string) (pluginsCore.Plugin, error)
 }
 
-// setCondition sets or updates a condition on the TaskAction
+// validateTaskAction checks that all required spec fields are populated and that a plugin
+// is registered for the given task type. Both checks happen before the finalizer is added,
+// so a failure here leaves the resource finalizer-free and trivially deletable.
+func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolver) (pluginsCore.Plugin, flyteorgv1.TaskActionConditionReason, error) {
+	var missing []string
+	if taskAction.Spec.RunName == "" {
+		missing = append(missing, "runName")
+	}
+	if taskAction.Spec.Org == "" {
+		missing = append(missing, "org")
+	}
+	if taskAction.Spec.Project == "" {
+		missing = append(missing, "project")
+	}
+	if taskAction.Spec.Domain == "" {
+		missing = append(missing, "domain")
+	}
+	if taskAction.Spec.ActionName == "" {
+		missing = append(missing, "actionName")
+	}
+	if taskAction.Spec.TaskType == "" {
+		missing = append(missing, "taskType")
+	}
+	if len(taskAction.Spec.TaskTemplate) == 0 {
+		missing = append(missing, "taskTemplate")
+	}
+	if taskAction.Spec.InputURI == "" {
+		missing = append(missing, "inputUri")
+	}
+	if taskAction.Spec.RunOutputBase == "" {
+		missing = append(missing, "runOutputBase")
+	}
+	if len(missing) > 0 {
+		return nil, flyteorgv1.ConditionReasonInvalidSpec,
+			fmt.Errorf("required spec fields are empty: %v", missing)
+	}
+
+	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		return nil, flyteorgv1.ConditionReasonPluginNotFound,
+			fmt.Errorf("no plugin found for task type %q: %w", taskAction.Spec.TaskType, err)
+	}
+
+	return p, "", nil
+}
+
+// setCondition sets or updates a condition on the TaskAction.
 func setCondition(taskAction *flyteorgv1.TaskAction, conditionType flyteorgv1.TaskActionConditionType, status metav1.ConditionStatus, reason flyteorgv1.TaskActionConditionReason, message string) {
 	condition := metav1.Condition{
 		Type:    string(conditionType),

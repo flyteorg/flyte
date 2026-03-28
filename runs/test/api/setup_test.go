@@ -16,7 +16,9 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/service"
@@ -32,7 +34,6 @@ var (
 	testServer *http.Server
 	testDB     *gorm.DB // Expose DB for cleanup
 )
-
 
 // TestMain sets up the test environment with SQLite database and runs service
 func TestMain(m *testing.M) {
@@ -77,7 +78,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database initialized")
 
 	// Run migrations
-	if err := migrations.RunMigrations(testDB); err != nil {
+	if err := database.Migrate(ctx, dbConfig, migrations.RunsMigrations); err != nil {
 		log.Printf("Failed to run migrations: %v", err)
 		exitCode = 1
 		return
@@ -85,13 +86,29 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo := repository.NewRepository(testDB)
+	repo, err := repository.NewRepository(testDB, *dbConfig)
+	if err != nil {
+		log.Printf("Failed to create repository: %v", err)
+		exitCode = 1
+		return
+	}
 	taskSvc := service.NewTaskService(repo)
+
+	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
+	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
+	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
+	runSvc := service.NewRunService(repo, actionsClient, "", nil, nil)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	mux.Handle(taskPath, taskHandler)
+
+	runPath, runHandler := workflowconnect.NewRunServiceHandler(runSvc)
+	mux.Handle(runPath, runHandler)
+
+	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
+	mux.Handle(internalRunPath, internalRunHandler)
 
 	// Add health check
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

@@ -83,13 +83,13 @@ func GetSecretID(secretKey string, labels map[string]string) (string, error) {
 
 func validateRequiredFieldsExist(labels map[string]string) error {
 	if labels[OrganizationLabel] == "" {
-		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, OrganizationLabel))
+		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, OrganizationLabel)
 	}
 	if labels[ProjectLabel] == "" {
-		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, ProjectLabel))
+		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, ProjectLabel)
 	}
 	if labels[DomainLabel] == "" {
-		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, DomainLabel))
+		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, DomainLabel)
 	}
 	return nil
 }

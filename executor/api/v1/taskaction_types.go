@@ -20,6 +20,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
@@ -65,6 +66,21 @@ const (
 
 	// ConditionReasonCompleted indicates the TaskAction has completed successfully
 	ConditionReasonCompleted TaskActionConditionReason = "Completed"
+
+	// ConditionReasonRetryableFailure indicates the TaskAction experienced a retryable failure
+	ConditionReasonRetryableFailure TaskActionConditionReason = "RetryableFailure"
+
+	// ConditionReasonPermanentFailure indicates the TaskAction experienced a permanent failure
+	ConditionReasonPermanentFailure TaskActionConditionReason = "PermanentFailure"
+
+	// ConditionReasonAborted indicates the TaskAction was aborted
+	ConditionReasonAborted TaskActionConditionReason = "Aborted"
+
+	// ConditionReasonPluginNotFound indicates no plugin was found for the task type
+	ConditionReasonPluginNotFound TaskActionConditionReason = "PluginNotFound"
+
+	// ConditionReasonInvalidSpec indicates the TaskAction spec is missing required fields
+	ConditionReasonInvalidSpec TaskActionConditionReason = "InvalidSpec"
 )
 
 // TaskActionSpec defines the desired state of TaskAction
@@ -114,6 +130,35 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	RunOutputBase string `json:"runOutputBase"`
+
+	// CacheKey enables cache lookup/writeback for this task action when set.
+	// This is propagated from workflow.TaskAction.cache_key.
+	// +optional
+	// +kubebuilder:validation:MaxLength=256
+	CacheKey string `json:"cacheKey,omitempty"`
+
+	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray")
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	TaskType string `json:"taskType"`
+
+	// ShortName is the human-readable display name for this task
+	// +optional
+	// +kubebuilder:validation:MaxLength=63
+	ShortName string `json:"shortName,omitempty"`
+
+	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
+	// +kubebuilder:validation:Required
+	TaskTemplate []byte `json:"taskTemplate"`
+
+	// EnvVars are run-scoped environment variables projected from RunSpec for executor runtime use.
+	// +optional
+	EnvVars map[string]string `json:"envVars,omitempty"`
+
+	// Interruptible is the run-scoped interruptibility override projected from RunSpec.
+	// +optional
+	Interruptible *bool `json:"interruptible,omitempty"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
@@ -154,6 +199,19 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
+// PhaseTransition records a phase change with its timestamp.
+type PhaseTransition struct {
+	// Phase is the phase that was entered (e.g. "Queued", "Initializing", "Executing", "Succeeded", "Failed").
+	Phase string `json:"phase"`
+
+	// OccurredAt is when this phase transition happened.
+	OccurredAt metav1.Time `json:"occurredAt"`
+
+	// Message is an optional human-readable message about the transition.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
 // TaskActionStatus defines the observed state of TaskAction.
 type TaskActionStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
@@ -165,6 +223,30 @@ type TaskActionStatus struct {
 	// StateJSON is the JSON serialized NodeStatus that was last sent to the State Service
 	// +optional
 	StateJSON string `json:"stateJson,omitempty"`
+
+	// PluginState is the Gob-encoded plugin state from the last reconciliation round.
+	// +optional
+	PluginState []byte `json:"pluginState,omitempty"`
+
+	// PluginStateVersion tracks the version of the plugin state schema for compatibility.
+	// +optional
+	PluginStateVersion uint8 `json:"pluginStateVersion,omitempty"`
+
+	// PluginPhase is a human-readable representation of the plugin's current phase.
+	// +optional
+	PluginPhase string `json:"pluginPhase,omitempty"`
+
+	// PluginPhaseVersion is the version of the current plugin phase.
+	// +optional
+	PluginPhaseVersion uint32 `json:"pluginPhaseVersion,omitempty"`
+
+	// Attempts is the latest observed action attempt number, starting from 1.
+	// +optional
+	Attempts uint32 `json:"attempts,omitempty"`
+
+	// CacheStatus is the latest observed cache lookup result for this action.
+	// +optional
+	CacheStatus core.CatalogCacheStatus `json:"cacheStatus,omitempty"`
 
 	// conditions represent the current state of the TaskAction resource.
 	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
@@ -179,12 +261,19 @@ type TaskActionStatus struct {
 	// +listMapKey=type
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// PhaseHistory is an append-only log of phase transitions. Unlike conditions
+	// (which are updated in-place by type), this preserves the full timeline:
+	// Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+	// +optional
+	PhaseHistory []PhaseTransition `json:"phaseHistory,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Run",type="string",JSONPath=".spec.runName"
 // +kubebuilder:printcolumn:name="Action",type="string",JSONPath=".spec.actionName"
+// +kubebuilder:printcolumn:name="TaskType",type="string",JSONPath=".spec.taskType"
 // +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].reason"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Progressing",type="string",JSONPath=".status.conditions[?(@.type=='Progressing')].status",priority=1

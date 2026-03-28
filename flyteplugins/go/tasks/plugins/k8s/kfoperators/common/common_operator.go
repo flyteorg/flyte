@@ -98,7 +98,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	taskLogs := make([]*core.TaskLog, 0, 10)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
-	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig(), taskTemplate)
 
 	if err != nil {
 		return nil, err
@@ -218,7 +218,7 @@ func OverridePrimaryContainerName(podSpec *v1.PodSpec, primaryContainerName stri
 }
 
 // ParseRunPolicy converts a kubeflow plugin RunPolicy object to a k8s RunPolicy object.
-func ParseRunPolicy(flyteRunPolicy kfplugins.RunPolicy) kubeflowv1.RunPolicy {
+func ParseRunPolicy(flyteRunPolicy *kfplugins.RunPolicy) kubeflowv1.RunPolicy {
 	runPolicy := kubeflowv1.RunPolicy{}
 	if flyteRunPolicy.GetBackoffLimit() != 0 {
 		var backoffLimit = flyteRunPolicy.GetBackoffLimit()

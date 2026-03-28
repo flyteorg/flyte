@@ -20,7 +20,7 @@ const podName = "PodName"
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
 	tID.EXPECT().GetGeneratedName().Return("generated-name")
-	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -42,7 +42,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 }
 
 func TestGetLogsForContainerInPod_NoPlugins(t *testing.T) {
-	logPlugin, err := InitializeLogPlugins(&LogConfig{})
+	logPlugin, err := InitializeLogPlugins(&LogConfig{}, nil)
 	assert.NoError(t, err)
 	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil, nil)
 	assert.NoError(t, err)
@@ -54,7 +54,7 @@ func TestGetLogsForContainerInPod_NoLogs(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil, nil)
 	assert.NoError(t, err)
@@ -66,7 +66,7 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -97,7 +97,7 @@ func TestGetLogsForContainerInPod_BadIndex_WithoutStatus(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -121,7 +121,7 @@ func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -145,7 +145,7 @@ func TestGetLogsForContainerInPod_Cloudwatch(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{IsCloudwatchEnabled: true,
 		CloudwatchRegion:   "us-east-1",
 		CloudwatchLogGroup: "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -181,7 +181,7 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 				MessageFormat: core.TaskLog_JSON,
 			},
 		},
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -220,7 +220,7 @@ func TestGetLogsForContainerInPod_All(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -253,7 +253,7 @@ func TestGetLogsForContainerInPod_HostName(t *testing.T) {
 		IsCloudwatchEnabled: true,
 		CloudwatchRegion:    "us-east-1",
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -285,7 +285,7 @@ func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 		IsStackDriverEnabled:       true,
 		GCPProjectName:             "myGCPProject",
 		StackdriverLogResourceName: "aws_ec2_instance",
-	})
+	}, nil)
 	assert.NoError(t, err)
 
 	pod := &v1.Pod{
@@ -360,7 +360,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 }
 
 func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string) {
-	logPlugin, err := InitializeLogPlugins(config)
+	logPlugin, err := InitializeLogPlugins(config, nil)
 	assert.NoError(tb, err)
 
 	pod := &v1.Pod{

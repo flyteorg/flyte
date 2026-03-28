@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
 import "flyteidl2/core/interface.proto";
@@ -189,9 +190,17 @@ message TaskMetadata {
 
   // Whether the task is able to run the debugger (vscode server) inside the task container.
   bool debuggable = 17;
-
   // Log links associated with this task.
   repeated core.TaskLog log_links = 18;
+
+  // RunIdentifier of the remote image build run that produced the container image for this task.
+  common.RunIdentifier image_build_run = 19;
+
+  // IsEntryPoint indicates whether this task will launch additional actions as it runs.
+  bool is_entrypoint = 20;
+
+  // Remote URI pointing to the code bundle used to build this task.
+  string code_bundle_uri = 21;
 }
 
 // A Task structure that uniquely identifies a task in the system
