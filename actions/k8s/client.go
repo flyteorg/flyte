@@ -15,6 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -423,7 +424,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            GetPhaseFromConditions(taskAction),
-		OutputUri:        buildOutputUri(taskAction),
+		OutputUri:        buildOutputUri(ctx, taskAction),
 		IsDeleted:        event.Type == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
@@ -591,11 +592,21 @@ func buildNamespace(runID *common.RunIdentifier) string {
 }
 
 // buildOutputUri computes the action-specific output URI from the TaskAction spec.
-func buildOutputUri(ta *executorv1.TaskAction) string {
+// It uses the same path structure as the executor's ComputeActionOutputPath so that
+// the SDK can find outputs written by the executor.
+func buildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
 	if ta.Spec.RunOutputBase == "" {
 		return ""
 	}
-	return strings.TrimRight(ta.Spec.RunOutputBase, "/") + "/" + ta.Spec.ActionName
+	attempt := ta.Status.Attempts
+	if attempt == 0 { // if attempts is not set, default to 1
+		attempt = 1
+	}
+	prefix, err := plugin.ComputeActionOutputPath(ctx, ta.Namespace, ta.Name, ta.Spec.RunOutputBase, ta.Spec.ActionName, attempt)
+	if err != nil {
+		return ""
+	}
+	return string(prefix)
 }
 
 // InitScheme adds the executor API types to the scheme
