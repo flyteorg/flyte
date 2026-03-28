@@ -1157,7 +1157,8 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 		}
 	}
 
-	drain := func(channel string, ch <-chan string) {
+	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
+		execNotify(channel, firstPayload)
 		for {
 			select {
 			case payload, ok := <-ch:
@@ -1177,14 +1178,12 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			if !ok {
 				return
 			}
-			execNotify("action_updates", payload)
-			drain("action_updates", r.actionNotifyCh)
+			drainAndExec("action_updates", payload, r.actionNotifyCh)
 		case payload, ok := <-r.runNotifyCh:
 			if !ok {
 				return
 			}
-			execNotify("run_updates", payload)
-			drain("run_updates", r.runNotifyCh)
+			drainAndExec("run_updates", payload, r.runNotifyCh)
 		}
 	}
 }
