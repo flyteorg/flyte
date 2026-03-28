@@ -5,6 +5,8 @@ docker-registry:
     pullPolicy: Never
   persistence:
     enabled: false
+  secrets:
+    haSharedSecret: flytesandboxsecret
   service:
     type: NodePort
     nodePort: 30000
