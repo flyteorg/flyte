@@ -415,7 +415,7 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		// information from the latest attempt yet.
 		numAttempts := len(action.GetAttempts())
 		statusAttempts := action.GetStatus().GetAttempts()
-		if numAttempts > 0 && (statusAttempts == 0 || action.GetAttempts()[numAttempts-1].GetAttempt() == statusAttempts) {
+		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == statusAttempts {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
 				ErrorInfo: action.GetAttempts()[numAttempts-1].GetErrorInfo(),
 			}
