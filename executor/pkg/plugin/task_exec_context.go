@@ -137,7 +137,7 @@ func NewTaskExecutionContext(
 	// Output writer — scope outputs per action and attempt so retries don't overwrite each other.
 	// Path: <RunOutputBase>/<shard>/<ActionName>/<attempt>/
 	attempt := taskAction.Status.Attempts
-	if attempt == 0 {
+	if attempt == 0 { // if attempts is not set, default to 1
 		attempt = 1
 	}
 	outputPrefix, err := ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)

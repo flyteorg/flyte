@@ -599,7 +599,7 @@ func buildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
 		return ""
 	}
 	attempt := ta.Status.Attempts
-	if attempt == 0 {
+	if attempt == 0 { // if attempts is not set, default to 1
 		attempt = 1
 	}
 	prefix, err := plugin.ComputeActionOutputPath(ctx, ta.Namespace, ta.Name, ta.Spec.RunOutputBase, ta.Spec.ActionName, attempt)
