@@ -22,6 +22,18 @@ message RayJob {
   string runtime_env_yaml = 5;
 }
 
+message AutoscalerOptions {
+  // "Default", "Aggressive", "Conservative"
+  string upscaling_mode = 1;
+  int32 idle_timeout_seconds = 2;
+  // autoscaler sidecar env vars
+  repeated EnvVar env = 3;
+  // custom autoscaler image
+  string image = 4;
+  // autoscaler container resources
+  Resources resources = 5;
+}
+
 // Define Ray cluster defines the desired state of RayCluster
 message RayCluster {
   // HeadGroupSpecs are the spec for the head pod
@@ -30,6 +42,7 @@ message RayCluster {
   repeated WorkerGroupSpec worker_group_spec = 2;
   // Whether to enable autoscaling.
   bool enable_autoscaling = 3;
+  AutoscalerOptions autoscaler_options = 4;
 }
 
 // HeadGroupSpec are the spec for the head pod
