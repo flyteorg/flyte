@@ -22,6 +22,26 @@ message RayJob {
   string runtime_env_yaml = 5;
 }
 
+message EnvValueFrom {
+  // Source of environment variable
+  enum Source{
+    CONFIGMAP = 0;
+    SECRET = 1;
+    RESOURCEFIELD = 2;
+    FIELD = 3;
+  }
+  Source source = 1;
+  // Name for config map or secret, container name for resource, path for field
+  string name = 2;
+  // Key for config map or secret, resource name for resource
+  string key = 3;
+}
+
+message EnvVar {
+  map<string, string> values = 1;
+  map<string, EnvValueFrom> valuesFrom = 2;
+}
+
 message AutoscalerOptions {
   // "Default", "Aggressive", "Conservative"
   string upscaling_mode = 1;
