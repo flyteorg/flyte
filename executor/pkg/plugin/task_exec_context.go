@@ -2,6 +2,9 @@ package plugin
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
@@ -53,6 +56,42 @@ func (t *taskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecution
 func (t *taskExecutionContext) OutputWriter() io.OutputWriter { return t.outputWriter }
 func (t *taskExecutionContext) Catalog() catalog.AsyncClient  { return t.catalogClient }
 
+// ComputeActionOutputPath constructs the full output directory for a task action:
+//
+//	<scheme>://<bucket>/<shard>/<rest-of-runOutputBase>/<actionName>/<attempt>
+//
+// The shard is a 2-char base-36 prefix derived deterministically from the
+// TaskAction's namespace and name. It is inserted immediately after the bucket
+// (AWS S3 hot-spot avoidance convention) so that storage traffic is spread
+// across key prefixes from the root. The attempt segment isolates each retry.
+func ComputeActionOutputPath(ctx context.Context, namespace, name, runOutputBase, actionName string, attempt uint32) (storage.DataReference, error) {
+	sharder, err := ioutils.NewBase36PrefixShardSelector(ctx)
+	if err != nil {
+		return "", err
+	}
+	shard, err := sharder.GetShardPrefix(ctx, []byte(namespace+"/"+name))
+	if err != nil {
+		return "", err
+	}
+
+	u, err := url.Parse(runOutputBase)
+	if err != nil {
+		return "", fmt.Errorf("invalid RunOutputBase %q: %w", runOutputBase, err)
+	}
+
+	// Insert shard between bucket and the rest of the path:
+	//   s3://bucket/org/proj/domain/run/ → s3://bucket/<shard>/org/proj/domain/run/<action>/<attempt>
+	restPath := strings.Trim(u.Path, "/")
+	segments := []string{shard}
+	if restPath != "" {
+		segments = append(segments, restPath)
+	}
+	segments = append(segments, actionName, strconv.Itoa(int(attempt)))
+	u.Path = "/" + strings.Join(segments, "/")
+
+	return storage.DataReference(u.String()), nil
+}
+
 // inlineTaskReader reads a TaskTemplate from bytes stored inline in the CRD.
 type inlineTaskReader struct {
 	data []byte
@@ -95,12 +134,16 @@ func NewTaskExecutionContext(
 	inputPaths := ioutils.NewInputFilePaths(ctx, dataStore, inputPathPrefix)
 	inputReader := ioutils.NewRemoteFileInputReader(ctx, dataStore, inputPaths)
 
-	// Output writer — scope outputs per action so actions don't overwrite each other.
-	// RunOutputBase is run-level (e.g. s3://bucket/org/proj/domain/run/),
-	// append the action name to make it action-specific.
-	outputPrefix := storage.DataReference(
-		strings.TrimRight(taskAction.Spec.RunOutputBase, "/") + "/" + taskAction.Spec.ActionName,
-	)
+	// Output writer — scope outputs per action and attempt so retries don't overwrite each other.
+	// Path: <RunOutputBase>/<shard>/<ActionName>/<attempt>/
+	attempt := taskAction.Status.Attempts
+	if attempt == 0 { // if attempts is not set, default to 1
+		attempt = 1
+	}
+	outputPrefix, err := ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)
+	if err != nil {
+		return nil, err
+	}
 	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, outputPrefix)
 	outputFilePaths := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, outputPrefix, rawOutputPaths, "")
 	outputWriter := ioutils.NewRemoteFileOutputWriter(ctx, dataStore, outputFilePaths)
