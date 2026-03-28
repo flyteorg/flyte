@@ -1201,7 +1201,7 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	select {
 	case r.actionNotifyCh <- payload:
 	case <-ctx.Done():
-		logger.Warnf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
 }
 
