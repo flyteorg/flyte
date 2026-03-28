@@ -39,7 +39,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
-	repo := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	if err != nil {
+		return fmt.Errorf("runs: failed to create repository: %w", err)
+	}
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsURL := cfg.ActionsServiceURL
