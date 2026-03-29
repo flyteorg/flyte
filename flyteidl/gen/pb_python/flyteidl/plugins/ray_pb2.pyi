@@ -63,21 +63,14 @@ class EnvValueFrom(_message.Message):
     def __init__(self, source: _Optional[_Union[EnvValueFrom.Source, str]] = ..., name: _Optional[str] = ..., key: _Optional[str] = ...) -> None: ...
 
 class EnvVar(_message.Message):
-    __slots__ = ["name", "value", "valuesFrom"]
-    class ValuesFromEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: EnvValueFrom
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[EnvValueFrom, _Mapping]] = ...) -> None: ...
+    __slots__ = ["name", "value", "valueFrom"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    VALUESFROM_FIELD_NUMBER: _ClassVar[int]
+    VALUEFROM_FIELD_NUMBER: _ClassVar[int]
     name: str
     value: str
-    valuesFrom: _containers.MessageMap[str, EnvValueFrom]
-    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ..., valuesFrom: _Optional[_Mapping[str, EnvValueFrom]] = ...) -> None: ...
+    valueFrom: EnvValueFrom
+    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ..., valueFrom: _Optional[_Union[EnvValueFrom, _Mapping]] = ...) -> None: ...
 
 class AutoscalerOptions(_message.Message):
     __slots__ = ["upscaling_mode", "idle_timeout_seconds", "env", "image", "resources"]

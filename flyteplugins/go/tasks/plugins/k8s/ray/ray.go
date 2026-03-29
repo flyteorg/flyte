@@ -129,6 +129,77 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return rayjob, err
 }
 
+func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
+	var autoScalarOptions *rayv1.AutoscalerOptions
+	if options != nil {
+		autoScalarOptions = &rayv1.AutoscalerOptions{}
+		idleTimeoutTime := options.GetIdleTimeoutSeconds()
+		autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
+		if upScalingMode := options.GetUpscalingMode(); upScalingMode == "" {
+			mode := rayv1.UpscalingMode(upScalingMode)
+			autoScalarOptions.UpscalingMode = &mode
+		}
+		if image := options.GetImage(); image != "" {
+			autoScalarOptions.Image = &image
+		}
+		if res := options.GetResources(); res != nil {
+			autoScalarOptions.Resources = nil
+		}
+		if envs := options.GetEnv(); len(envs) > 0 {
+			autoScalarOptions.Env = []v1.EnvVar{}
+			for _, env := range envs {
+				name := env.GetName()
+				if val := env.GetValue(); val != "" {
+					autoScalarOptions.Env = append(autoScalarOptions.Env, v1.EnvVar{
+						Name:  name,
+						Value: val,
+					})
+				} else if valueFrom := env.GetValueFrom(); valueFrom != nil {
+					var envValueSource *v1.EnvVarSource
+					switch valueFrom.Source {
+					case plugins.EnvValueFrom_CONFIGMAP:
+						envValueSource = &v1.EnvVarSource{
+							ConfigMapKeyRef: &v1.ConfigMapKeySelector{
+								LocalObjectReference: v1.LocalObjectReference{
+									Name: valueFrom.Name,
+								},
+								Key: valueFrom.Key,
+							},
+						}
+					case plugins.EnvValueFrom_SECRET:
+						envValueSource = &v1.EnvVarSource{
+							SecretKeyRef: &v1.SecretKeySelector{
+								LocalObjectReference: v1.LocalObjectReference{
+									Name: valueFrom.Name,
+								},
+								Key: valueFrom.Key,
+							},
+						}
+					case plugins.EnvValueFrom_RESOURCEFIELD:
+						envValueSource = &v1.EnvVarSource{
+							ResourceFieldRef: &v1.ResourceFieldSelector{
+								ContainerName: valueFrom.Name,
+								Resource:      valueFrom.Key,
+							},
+						}
+					default:
+						envValueSource = &v1.EnvVarSource{
+							FieldRef: &v1.ObjectFieldSelector{
+								FieldPath: valueFrom.Key,
+							},
+						}
+					}
+					autoScalarOptions.Env = append(autoScalarOptions.Env, v1.EnvVar{
+						Name:      name,
+						ValueFrom: envValueSource,
+					})
+				}
+			}
+		}
+	}
+	return autoScalarOptions
+}
+
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	cfg := GetConfig()
 
@@ -148,24 +219,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 	var autoScalarOptions *rayv1.AutoscalerOptions
 	if c := rayJob.GetRayCluster(); c != nil {
-		if options := c.GetAutoscalerOptions(); options != nil {
-			autoScalarOptions = &rayv1.AutoscalerOptions{}
-			idleTimeoutTime := options.GetIdleTimeoutSeconds()
-			autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
-			if upScalingMode := options.GetUpscalingMode(); upScalingMode == "" {
-				mode := rayv1.UpscalingMode(upScalingMode)
-				autoScalarOptions.UpscalingMode = &mode
-			}
-			if image := options.GetImage(); image != "" {
-				autoScalarOptions.Image = &image
-			}
-			if res := options.GetResources(); res != nil {
-				autoScalarOptions.Resources = nil
-			}
-			if envs := options.GetEnv(); len(envs) > 0 {
-				autoScalarOptions.Env = nil
-			}
-		}
+		autoScalarOptions = NewAutoscalerOptions(c.GetAutoscalerOptions())
 	}
 
 	rayClusterSpec := rayv1.RayClusterSpec{

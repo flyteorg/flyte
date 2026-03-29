@@ -305,9 +305,9 @@ export class EnvVar extends Message<EnvVar> {
   value = "";
 
   /**
-   * @generated from field: map<string, flyteidl.plugins.EnvValueFrom> valuesFrom = 3;
+   * @generated from field: flyteidl.plugins.EnvValueFrom valueFrom = 3;
    */
-  valuesFrom: { [key: string]: EnvValueFrom } = {};
+  valueFrom?: EnvValueFrom;
 
   constructor(data?: PartialMessage<EnvVar>) {
     super();
@@ -319,7 +319,7 @@ export class EnvVar extends Message<EnvVar> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "valuesFrom", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: EnvValueFrom} },
+    { no: 3, name: "valueFrom", kind: "message", T: EnvValueFrom },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnvVar {
