@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"connectrpc.com/connect"
 
@@ -24,7 +25,7 @@ func (s *AppService) Create(
 	ctx context.Context,
 	req *connect.Request[flyteapp.CreateRequest],
 ) (*connect.Response[flyteapp.CreateResponse], error) {
-	return connect.NewResponse(&flyteapp.CreateResponse{}), nil
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("App service is not implemented"))
 }
 
 func (s *AppService) Get(
