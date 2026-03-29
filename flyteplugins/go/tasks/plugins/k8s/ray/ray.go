@@ -146,6 +146,28 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		return nil, err
 	}
 
+	var autoScalarOptions *rayv1.AutoscalerOptions
+	if c := rayJob.GetRayCluster(); c != nil {
+		if options := c.GetAutoscalerOptions(); options != nil {
+			autoScalarOptions = &rayv1.AutoscalerOptions{}
+			idleTimeoutTime := options.GetIdleTimeoutSeconds()
+			autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
+			if upScalingMode := options.GetUpscalingMode(); upScalingMode == "" {
+				mode := rayv1.UpscalingMode(upScalingMode)
+				autoScalarOptions.UpscalingMode = &mode
+			}
+			if image := options.GetImage(); image != "" {
+				autoScalarOptions.Image = &image
+			}
+			if res := options.GetResources(); res != nil {
+				autoScalarOptions.Resources = nil
+			}
+			if envs := options.GetEnv(); len(envs) > 0 {
+				autoScalarOptions.Env = nil
+			}
+		}
+	}
+
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template:       headPodTemplate,
@@ -155,6 +177,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		},
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+		AutoscalerOptions:       autoScalarOptions,
 	}
 
 	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {
