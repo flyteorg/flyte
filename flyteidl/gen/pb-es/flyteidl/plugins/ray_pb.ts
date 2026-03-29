@@ -295,12 +295,17 @@ proto3.util.setEnumType(EnvValueFrom_Source, "flyteidl.plugins.EnvValueFrom.Sour
  */
 export class EnvVar extends Message<EnvVar> {
   /**
-   * @generated from field: map<string, string> values = 1;
+   * @generated from field: string name = 1;
    */
-  values: { [key: string]: string } = {};
+  name = "";
 
   /**
-   * @generated from field: map<string, flyteidl.plugins.EnvValueFrom> valuesFrom = 2;
+   * @generated from field: string value = 2;
+   */
+  value = "";
+
+  /**
+   * @generated from field: map<string, flyteidl.plugins.EnvValueFrom> valuesFrom = 3;
    */
   valuesFrom: { [key: string]: EnvValueFrom } = {};
 
@@ -312,8 +317,9 @@ export class EnvVar extends Message<EnvVar> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.plugins.EnvVar";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "values", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 2, name: "valuesFrom", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: EnvValueFrom} },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "valuesFrom", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: EnvValueFrom} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnvVar {
