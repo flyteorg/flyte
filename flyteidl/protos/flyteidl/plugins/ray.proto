@@ -63,8 +63,9 @@ message EnvValueFrom {
 }
 
 message EnvVar {
-  map<string, string> values = 1;
-  map<string, EnvValueFrom> valuesFrom = 2;
+  string name = 1;
+  string value = 2;
+  map<string, EnvValueFrom> valuesFrom = 3;
 }
 
 message AutoscalerOptions {

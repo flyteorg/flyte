@@ -337,9 +337,11 @@ pub mod env_value_from {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EnvVar {
-    #[prost(map="string, string", tag="1")]
-    pub values: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    #[prost(map="string, message", tag="2")]
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub value: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="3")]
     pub values_from: ::std::collections::HashMap<::prost::alloc::string::String, EnvValueFrom>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
