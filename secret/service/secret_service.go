@@ -45,15 +45,15 @@ func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string,
 	return secretName, k8sSecretName, nil
 }
 
-// secretNamespace returns the Kubernetes namespace for a secret based on its project and domain.
+// resolveSecretNamespace returns the Kubernetes namespace for a secret based on its project and domain.
 // If both project and domain are empty, it falls back to the configured default namespace.
 // If only one of them is set, it returns an error.
-func secretNamespace(project, domain string) (string, error) {
+func resolveSecretNamespace(project, domain string) (string, error) {
 	if project == "" && domain == "" {
 		return config.GetConfig().Kubernetes.Namespace, nil
 	}
 	if project == "" || domain == "" {
-		return "", fmt.Errorf("both project and domain must be set, got project=%q domain=%q", project, domain)
+		return "", fmt.Errorf("project and domain must both be set or both be empty, got project=%q domain=%q", project, domain)
 	}
 	return fmt.Sprintf("%s-%s", project, domain), nil
 }
@@ -71,7 +71,7 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -105,7 +105,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
 	// Get the existing secret first to obtain the ResourceVersion required by controller-runtime Update.
-	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -153,7 +153,7 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -190,7 +190,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
 
-	namespace, err := secretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -216,7 +216,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[secretpb.ListSecretsRequest]) (*connect.Response[secretpb.ListSecretsResponse], error) {
 	logger.Debugf(ctx, "SecretService.ListSecrets called")
 
-	namespace, err := secretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
+	namespace, err := resolveSecretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
