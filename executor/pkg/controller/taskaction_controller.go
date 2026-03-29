@@ -215,6 +215,40 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
+
+	// In-place task restart: when a recoverable failure occurs, restart the pod within the
+	// same TaskAction rather than relying on the runs service to create a new TaskAction.
+	var restartAttempts uint32
+	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
+		currentAttempts := observedAttempts(taskAction)
+		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+
+		if currentAttempts < maxAttempts {
+			// Abort (delete) the current pod before incrementing attempts.
+			// tCtx was built with the current attempt number so Abort targets the right pod.
+			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+				logger.Error(abortErr, "failed to abort pod during in-place restart")
+			}
+			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
+			restartAttempts = currentAttempts + 1
+			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
+			// Override the transition to Queued so the TaskAction stays non-terminal.
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			phaseInfo = transition.Info()
+		} else {
+			// All retries exhausted — convert to a permanent (terminal) failure.
+			execErr := phaseInfo.Err()
+			if execErr == nil {
+				execErr = &core.ExecutionError{
+					Kind:    core.ExecutionError_USER,
+					Code:    "MaxRetriesExceeded",
+					Message: fmt.Sprintf("task failed after %d attempt(s)", currentAttempts),
+				}
+			}
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, phaseInfo.Info()))
+			phaseInfo = transition.Info()
+		}
+	}
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -227,6 +261,14 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if newBytes, newVersion, written := stateMgr.GetNewState(); written {
 		taskAction.Status.PluginState = newBytes
 		taskAction.Status.PluginStateVersion = newVersion
+	}
+
+	// If an in-place restart was triggered, increment attempts and clear plugin state so the
+	// next reconcile starts fresh with PluginPhaseNotStarted and creates a new pod.
+	if restartAttempts > 0 {
+		taskAction.Status.Attempts = restartAttempts
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
 	}
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
@@ -344,7 +386,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
+	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
 	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{actionEvent},
 	})); err != nil {
@@ -369,6 +411,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 }
 
 func (r *TaskActionReconciler) buildActionEvent(
+	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	phaseInfo pluginsCore.PhaseInfo,
 ) *workflow.ActionEvent {
@@ -384,7 +427,6 @@ func (r *TaskActionReconciler) buildActionEvent(
 
 	info := phaseInfo.Info()
 	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
-	reportedTime := reportedTimestamp(info)
 
 	event := &workflow.ActionEvent{
 		Id:            actionID,
@@ -394,9 +436,9 @@ func (r *TaskActionReconciler) buildActionEvent(
 		UpdatedTime:   updatedTime,
 		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
 		Cluster:       r.cluster,
-		Outputs:       outputRefs(taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName),
+		Outputs:       outputRefs(ctx, taskAction),
 		ClusterEvents: toClusterEvents(info, updatedTime),
-		ReportedTime:  reportedTime,
+		ReportedTime:  timestamppb.New(time.Now()),
 	}
 
 	if info != nil {
@@ -430,19 +472,17 @@ func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timesta
 	return timestamppb.Now()
 }
 
-func reportedTimestamp(info *pluginsCore.TaskInfo) *timestamppb.Timestamp {
-	if info != nil && info.ReportedAt != nil {
-		return timestamppb.New(*info.ReportedAt)
+func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.OutputReferences {
+	if taskAction.Spec.RunOutputBase == "" {
+		return nil
 	}
-	return timestamppb.Now()
-}
-
-func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
-	if runOutputBase == "" {
+	attempt := observedAttempts(taskAction)
+	prefix, err := plugin.ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)
+	if err != nil {
 		return nil
 	}
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName + "/outputs.pb",
+		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
 	}
 }
 
@@ -517,7 +557,7 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, and conditions.
+// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
 	if oldStatus.StateJSON != newStatus.StateJSON ||
 		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
@@ -529,6 +569,10 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 	}
 
 	if !bytes.Equal(oldStatus.PluginState, newStatus.PluginState) {
+		return true
+	}
+
+	if len(oldStatus.PhaseHistory) != len(newStatus.PhaseHistory) {
 		return true
 	}
 
@@ -596,7 +640,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
 	if phaseName != "" {
 		n := len(ta.Status.PhaseHistory)
 		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/glebarez/sqlite"
+	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/stretchr/testify/require"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	"gorm.io/gorm"
@@ -21,7 +22,8 @@ func newTestManager(t *testing.T) *Manager {
 
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	require.NoError(t, err)
-	require.NoError(t, migrations.RunMigrations(db))
+	m := gormigrate.New(db, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
+	require.NoError(t, m.Migrate())
 
 	cfg := &cacheconfig.Config{
 		HeartbeatGracePeriodMultiplier: 3,
