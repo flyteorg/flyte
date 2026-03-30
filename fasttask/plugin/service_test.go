@@ -834,3 +834,597 @@ func TestPendingOwnerManagement(t *testing.T) {
 		assert.Equal(t, removal.totalOwnerCount, totalOwnerCount)
 	}
 }
+
+func newTestEnvironment(workers ...interfaces.Worker) *environmentImpl {
+	workersMap := &sync.Map{}
+	for _, w := range workers {
+		workersMap.Store(w.ID(), w)
+	}
+	return &environmentImpl{
+		activeTasks: &sync.Map{},
+		workers:     workersMap,
+	}
+}
+
+func newTestService(store interfaces.EnvironmentStore, enqueueOwner func(map[string]string) error) *fastTaskServiceImpl {
+	scope := promutils.NewTestScope()
+	kubeClientImpl := &pluginsCoreMock.KubeClient{}
+	kubeClientImpl.OnGetClient().Return(&kubeClient{})
+	kubeClientImpl.OnGetCache().Return(&kubeCache{})
+	builder := &environmentBuilderImpl{
+		kubeClient:  kubeClientImpl,
+		store:       store,
+		metrics:     newBuilderMetrics(scope),
+		randSource:  rand.New(rand.NewSource(time.Now().UnixNano())),
+		scaleUpChan: make(chan string, 1),
+	}
+	return newFastTaskService(enqueueOwner, builder, store, scope, testConfig)
+}
+
+var noopEnqueueOwner = func(labels map[string]string) error { return nil }
+
+func TestProcessHeartbeatAfterCleanupDoesNotLeak(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	taskID := "task-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+
+	svc := newTestService(store, noopEnqueueOwner)
+
+	// Offer task — registers it and creates status channel
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, taskID, "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, env.GetActiveTaskCount())
+
+	// Cleanup — unregisters task and deletes status channel
+	err = svc.Cleanup(ctx, taskID, queueID, workerID)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, env.GetActiveTaskCount())
+
+	// Drain the initial DELETE sent by Cleanup itself.
+	drainResponses(worker.responseChan)
+
+	// Simulate a post-Cleanup heartbeat that still reports the old task.
+	// This must NOT re-register the task (would permanently inflate demand).
+	hbReq := &pb.HeartbeatRequest{
+		QueueId:  queueID,
+		WorkerId: workerID,
+		TaskStatuses: []*pb.TaskStatus{
+			{
+				TaskId: taskID,
+				Phase:  int32(core.PhaseSuccess),
+			},
+		},
+	}
+	svc.processHeartbeatTaskStatuses(hbReq, env, env.GetWorker(workerID))
+
+	assert.Equal(t, 0, env.GetActiveTaskCount(), "post-Cleanup heartbeat must not re-register task")
+
+	// Verify DELETE was re-sent because the tombstone is still alive.
+	resp := drainResponses(worker.responseChan)
+	assert.Len(t, resp, 1, "should re-send DELETE on first post-Cleanup heartbeat")
+	assert.Equal(t, pb.HeartbeatResponse_DELETE, resp[0].Operation)
+	assert.Equal(t, taskID, resp[0].TaskId)
+
+	// Send a second heartbeat — DELETE should be re-sent again (not one-shot).
+	svc.processHeartbeatTaskStatuses(hbReq, env, env.GetWorker(workerID))
+
+	resp = drainResponses(worker.responseChan)
+	assert.Len(t, resp, 1, "should re-send DELETE on subsequent heartbeats while tombstone is alive")
+	assert.Equal(t, pb.HeartbeatResponse_DELETE, resp[0].Operation)
+}
+
+// cleanupRacingEnv wraps an Environment and simulates Cleanup running during
+// RegisterTask — the exact interleaving the double-check guards against.
+type cleanupRacingEnv struct {
+	interfaces.Environment
+	cleanupOnce     sync.Once
+	simulateCleanup func()
+}
+
+func (e *cleanupRacingEnv) RegisterTask(taskID string) {
+	e.cleanupOnce.Do(e.simulateCleanup)
+	e.Environment.RegisterTask(taskID)
+}
+
+func TestProcessHeartbeatDoubleCheckPreventsLeak(t *testing.T) {
+	queueID := "env-1"
+	taskID := "task-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	realEnv := newTestEnvironment(worker)
+	store := newEnvironmentStore()
+	store.GetOrCreate(queueID, realEnv)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	// Set up active task state: channel exists, task registered
+	svc.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, 1))
+	realEnv.RegisterTask(taskID)
+	assert.Equal(t, 1, realEnv.GetActiveTaskCount())
+
+	// Create env wrapper that simulates Cleanup running during RegisterTask.
+	raceEnv := &cleanupRacingEnv{
+		Environment: realEnv,
+		simulateCleanup: func() {
+			svc.taskStatusChannels.Delete(taskID)
+			realEnv.UnregisterTask(taskID)
+		},
+	}
+
+	svc.processHeartbeatTaskStatuses(&pb.HeartbeatRequest{
+		QueueId:  queueID,
+		WorkerId: workerID,
+		TaskStatuses: []*pb.TaskStatus{
+			{
+				TaskId: taskID,
+				Phase:  int32(core.PhaseSuccess),
+			},
+		},
+	}, raceEnv, worker)
+
+	assert.Equal(t, 0, realEnv.GetActiveTaskCount(),
+		"double-check must undo RegisterTask when Cleanup deletes the channel concurrently")
+}
+
+func TestCleanedUpTaskTombstoneExpiry(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	taskID := "task-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+
+	svc := newTestService(store, noopEnqueueOwner)
+
+	// Offer and cleanup
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, taskID, "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	err = svc.Cleanup(ctx, taskID, queueID, workerID)
+	assert.NoError(t, err)
+	drainResponses(worker.responseChan)
+
+	hbReq := &pb.HeartbeatRequest{
+		QueueId:  queueID,
+		WorkerId: workerID,
+		TaskStatuses: []*pb.TaskStatus{
+			{
+				TaskId: taskID,
+				Phase:  int32(core.PhaseSuccess),
+			},
+		},
+	}
+
+	// Tombstone alive — DELETE re-sent
+	svc.processHeartbeatTaskStatuses(hbReq, env, env.GetWorker(workerID))
+	resp := drainResponses(worker.responseChan)
+	assert.Len(t, resp, 1, "DELETE should be re-sent while tombstone is alive")
+
+	// Simulate tombstone expiry
+	svc.cleanedUpTasks.Delete(taskID)
+
+	// Tombstone gone — DELETE must NOT be re-sent
+	svc.processHeartbeatTaskStatuses(hbReq, env, env.GetWorker(workerID))
+	resp = drainResponses(worker.responseChan)
+	assert.Len(t, resp, 0, "DELETE should not be re-sent after tombstone expires")
+
+	assert.Equal(t, 0, env.GetActiveTaskCount(), "task must not be re-registered")
+}
+
+func TestOfferTaskConcurrentDoesNotOverAssign(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 200),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+	const goroutines = 100
+	results := make(chan error, goroutines)
+
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+	for i := range goroutines {
+		go func(idx int) {
+			defer wg.Done()
+			taskID := fmt.Sprintf("task-%d", idx)
+			_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, taskID, "ns", "wf", nil, nil, nil)
+			results <- err
+		}(i)
+	}
+	wg.Wait()
+	close(results)
+
+	successes := 0
+	failures := 0
+	for err := range results {
+		if err == nil {
+			successes++
+		} else {
+			assert.ErrorIs(t, err, noCapacityAvailableError)
+			failures++
+		}
+	}
+	assert.Equal(t, 1, successes, "exactly one goroutine should succeed")
+	assert.Equal(t, goroutines-1, failures)
+}
+
+func TestOfferTaskAccountsForPendingReservations(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 2},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// First and second offers succeed (pending=1, then pending=2)
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+
+	// Third offer fails (reported 0 + pending 2 >= limit 2)
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-3", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError)
+
+	// Cleanup first task (removes from pending → pending=1)
+	err = svc.Cleanup(ctx, "task-1", queueID, workerID)
+	assert.NoError(t, err)
+
+	// Fourth offer succeeds (reported 0 + pending 1 < limit 2)
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-4", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+}
+
+func TestHeartbeatDoesNotBreakReservations(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// OfferTask succeeds (pending=1)
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+
+	// Heartbeat arrives with exec_count=0 (worker hasn't processed ASSIGN yet).
+	// This overwrites worker capacity but must NOT erase the pending reservation.
+	worker.SetCapacity(&pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1})
+
+	// Second OfferTask must fail (reported 0 + pending 1 >= limit 1)
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError, "heartbeat overwrite must not create double-booking")
+}
+
+func TestPendingReservationRemovedOnCleanup(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+
+	// Pending=1, slot is full
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError)
+
+	// Cleanup removes pending reservation
+	err = svc.Cleanup(ctx, "task-1", queueID, workerID)
+	assert.NoError(t, err)
+
+	// Slot is free again
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-3", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+}
+
+func TestHeartbeatConfirmationRemovesPendingReservation(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	drainResponses(worker.responseChan)
+
+	// Pending=1, slot is full
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError)
+
+	// Worker reports status for task-1 → confirms receipt, removes pending reservation.
+	// Update worker capacity to reflect it's now running the task.
+	worker.SetCapacity(&pb.Capacity{ExecutionCount: 1, ExecutionLimit: 1})
+	svc.processHeartbeatTaskStatuses(&pb.HeartbeatRequest{
+		QueueId:  queueID,
+		WorkerId: workerID,
+		TaskStatuses: []*pb.TaskStatus{
+			{TaskId: "task-1", Phase: int32(core.PhaseRunning)},
+		},
+	}, env, worker)
+
+	// Verify pending reservation was removed
+	svc.pendingReservationsLock.Lock()
+	pendingCount := len(svc.pendingReservations[queueID][workerID])
+	svc.pendingReservationsLock.Unlock()
+	assert.Equal(t, 0, pendingCount, "heartbeat status should confirm and remove pending reservation")
+
+	// Slot still full because worker is actually running the task (exec_count=1)
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-3", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError)
+}
+
+func TestOfferTaskSkipsFullWorkerPicksNext(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+
+	worker0 := &workerImpl{
+		id:           "w0",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+	worker1 := &workerImpl{
+		id:           "w1",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker0, worker1)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// First offer goes to w0 (sorted alphabetically)
+	w, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w0", w.ID())
+
+	// Second offer should skip w0 (pending=1) and go to w1
+	w, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w1", w.ID())
+}
+
+func TestDisconnectPreservesReservationsOrphanedPreventsAssignment(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+	workerID := "w0"
+
+	worker := &workerImpl{
+		id:           workerID,
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 4),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+
+	// Simulate heartbeat disconnect: worker goes ORPHANED but reservations stay.
+	// This prevents stale ASSIGN + new ASSIGN from causing over-assignment on reconnect.
+	worker.SetState(interfaces.ORPHANED, "")
+
+	svc.pendingReservationsLock.Lock()
+	pendingCount := len(svc.pendingReservations[queueID][workerID])
+	svc.pendingReservationsLock.Unlock()
+	assert.Equal(t, 1, pendingCount, "pending reservation must survive disconnect")
+
+	// ORPHANED worker is skipped by OfferTask — no capacity available
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-2", "ns", "wf", nil, nil, nil)
+	assert.ErrorIs(t, err, noCapacityAvailableError, "ORPHANED worker must not receive new tasks")
+}
+
+func TestOfferTaskIdempotentRetry(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+
+	worker := &workerImpl{
+		id:           "w0",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// First offer succeeds and picks w0
+	w, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w0", w.ID())
+
+	// Retry with the same taskID (simulates failure between offer and state persistence).
+	// Must return the same worker, not fail with noCapacity.
+	w, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w0", w.ID(), "idempotent retry must return the same worker")
+
+	// Verify only one reservation exists (no duplicate)
+	svc.pendingReservationsLock.Lock()
+	pendingCount := len(svc.pendingReservations[queueID]["w0"])
+	svc.pendingReservationsLock.Unlock()
+	assert.Equal(t, 1, pendingCount, "should have exactly one reservation, not a duplicate")
+}
+
+func TestOfferTaskIdempotentRetryStaleWorker(t *testing.T) {
+	ctx := context.TODO()
+	queueID := "env-1"
+
+	worker0 := &workerImpl{
+		id:           "w0",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+	worker1 := &workerImpl{
+		id:           "w1",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+
+	store := newEnvironmentStore()
+	env := newTestEnvironment(worker0, worker1)
+	store.GetOrCreate(queueID, env)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// First offer picks w0
+	w, err := svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w0", w.ID())
+
+	// w0 goes unhealthy
+	worker0.SetState(interfaces.ORPHANED, "")
+
+	// Retry same taskID — stale reservation on w0 should be removed, w1 selected
+	w, err = svc.OfferTaskToEnvironment(ctx, execID, queueID, "task-1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "w1", w.ID(), "should select healthy worker after stale reservation removed")
+
+	// Verify reservation moved to w1
+	svc.pendingReservationsLock.Lock()
+	w0Count := len(svc.pendingReservations[queueID]["w0"])
+	w1Count := len(svc.pendingReservations[queueID]["w1"])
+	svc.pendingReservationsLock.Unlock()
+	assert.Equal(t, 0, w0Count, "stale reservation on w0 should be removed")
+	assert.Equal(t, 1, w1Count, "reservation should now be on w1")
+}
+
+func TestCrossQueueReservationIsolation(t *testing.T) {
+	ctx := context.TODO()
+	queueA := "env-a"
+	queueB := "env-b"
+
+	// Simulate two queues that happen to share a worker ID (extremely unlikely in
+	// production but the scoping must handle it correctly).
+	workerA := &workerImpl{
+		id:           "shared-worker-id",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+	workerB := &workerImpl{
+		id:           "shared-worker-id",
+		capacity:     &pb.Capacity{ExecutionCount: 0, ExecutionLimit: 1},
+		responseChan: make(chan *pb.HeartbeatResponse, 10),
+	}
+
+	store := newEnvironmentStore()
+	envA := newTestEnvironment(workerA)
+	envB := newTestEnvironment(workerB)
+	store.GetOrCreate(queueA, envA)
+	store.GetOrCreate(queueB, envB)
+	svc := newTestService(store, noopEnqueueOwner)
+
+	execID := &coreIdl.WorkflowExecutionIdentifier{Project: "p", Domain: "d", Name: "n"}
+
+	// Fill queue A's worker
+	_, err := svc.OfferTaskToEnvironment(ctx, execID, queueA, "task-a1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err)
+
+	// Queue B's worker with the same ID must still have capacity
+	_, err = svc.OfferTaskToEnvironment(ctx, execID, queueB, "task-b1", "ns", "wf", nil, nil, nil)
+	assert.NoError(t, err, "reservation in queue A must not block queue B's identically-named worker")
+}
+
+// drainResponses reads all pending messages from a heartbeat response channel.
+func drainResponses(ch chan *pb.HeartbeatResponse) []*pb.HeartbeatResponse {
+	var out []*pb.HeartbeatResponse
+	for {
+		select {
+		case r := <-ch:
+			out = append(out, r)
+		default:
+			return out
+		}
+	}
+}

@@ -26,6 +26,9 @@ import (
 const (
 	maxPendingOwnersPerQueue = 4096
 	queueIdLabel             = "queue_id"
+
+	cleanedUpTasksTTL        = 5 * time.Minute
+	cleanedUpTasksGCInterval = 1 * time.Minute
 )
 
 type fastTaskExecutionMetric struct {
@@ -103,13 +106,27 @@ type fastTaskServiceImpl struct {
 
 	builder            interfaces.EnvironmentBuilder
 	store              interfaces.EnvironmentStore
-	taskStatusChannels *sync.Map // map[taskID]chan interfaces.WorkerTaskStatus
+	taskStatusChannels *sync.Map    // map[taskID]chan interfaces.WorkerTaskStatus
+	cleanedUpTasks     *cache.Cache // TTL-based tombstones for DELETE re-send after Cleanup
 	metrics            serviceMetrics
 
 	// A map of pending owners by queue. When a new worker becomes available, use this to enqueue owners for reevaluation.
 	// Note, this is an optimistic approach and may not include all pending owners.
 	pendingTaskOwners     map[string]map[string]map[string]string // map[queueID]map[taskID]enqueueLabels
 	pendingTaskOwnersLock sync.RWMutex
+
+	// Tasks assigned to workers but not yet confirmed by a heartbeat status report.
+	// OfferTask adds entries; processHeartbeatTaskStatuses and Cleanup remove them.
+	pendingReservations       map[string]map[string]map[string]struct{} // map[queueID]map[workerID]map[taskID]
+	pendingReservationsByTask map[string]pendingReservationInfo         // map[taskID] -> location
+	pendingReservationsLock   sync.Mutex
+}
+
+// pendingReservationInfo records where a task's pending reservation lives
+// in the forward map so that idempotent retries can find it in O(1).
+type pendingReservationInfo struct {
+	queueID  string
+	workerID string
 }
 
 var _ interfaces.FastTaskService = (*fastTaskServiceImpl)(nil)
@@ -158,6 +175,45 @@ func (f *fastTaskServiceImpl) Collect(ch chan<- prometheus.Metric) {
 type workerTaskStatus struct {
 	workerID   string
 	taskStatus *pb.TaskStatus
+}
+
+func (f *fastTaskServiceImpl) addPendingReservation(queueID, workerID, taskID string) {
+	// caller must hold pendingReservationsLock
+	queuePending, ok := f.pendingReservations[queueID]
+	if !ok {
+		queuePending = make(map[string]map[string]struct{})
+		f.pendingReservations[queueID] = queuePending
+	}
+	workerPending, ok := queuePending[workerID]
+	if !ok {
+		workerPending = make(map[string]struct{})
+		queuePending[workerID] = workerPending
+	}
+	workerPending[taskID] = struct{}{}
+	f.pendingReservationsByTask[taskID] = pendingReservationInfo{queueID: queueID, workerID: workerID}
+}
+
+// removeReservationLocked removes a single reservation from both maps.
+// Caller must hold pendingReservationsLock.
+func (f *fastTaskServiceImpl) removeReservationLocked(queueID, workerID, taskID string) {
+	if queuePending, ok := f.pendingReservations[queueID]; ok {
+		if workerPending, ok := queuePending[workerID]; ok {
+			delete(workerPending, taskID)
+			if len(workerPending) == 0 {
+				delete(queuePending, workerID)
+			}
+		}
+		if len(queuePending) == 0 {
+			delete(f.pendingReservations, queueID)
+		}
+	}
+	delete(f.pendingReservationsByTask, taskID)
+}
+
+func (f *fastTaskServiceImpl) removePendingReservation(queueID, workerID, taskID string) {
+	f.pendingReservationsLock.Lock()
+	defer f.pendingReservationsLock.Unlock()
+	f.removeReservationLocked(queueID, workerID, taskID)
 }
 
 // AddPendingOwner adds to the pending owners list for the queue, if not already full.
@@ -308,7 +364,15 @@ Loop:
 // Cleanup is used to indicate a task is no longer being tracked by the worker and delete the
 // associated task context.
 func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, workerID string) error {
-	// send delete taskID message to worker
+	// Record that this task was explicitly cleaned up so that
+	// processHeartbeatTaskStatuses can re-send DELETE if the worker still
+	// reports it. Must be set before deleting the channel (the gate check).
+	f.cleanedUpTasks.Set(taskID, struct{}{}, cache.DefaultExpiration)
+
+	// Close the gate first — prevents processHeartbeatTaskStatuses from
+	// re-registering this task after we unregister it below.
+	f.taskStatusChannels.Delete(taskID)
+
 	if env := f.store.Get(queueID); env != nil {
 		if worker := env.GetWorker(workerID); worker != nil {
 			worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
@@ -319,11 +383,9 @@ func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, work
 		env.UnregisterTask(taskID)
 	}
 
-	// delete task context
-	f.taskStatusChannels.Delete(taskID)
-
-	// remove pending owner
+	// remove pending owner and reservation
 	f.RemovePendingOwner(queueID, taskID)
+	f.removePendingReservation(queueID, workerID, taskID)
 
 	return nil
 }
@@ -440,22 +502,49 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 
 func (f *fastTaskServiceImpl) processHeartbeatTaskStatuses(heartbeatRequest *pb.HeartbeatRequest, env interfaces.Environment, worker interfaces.Worker) {
 	for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
-		// register task for demand-based scaling (backup for restart recovery)
-		// tasks remain registered until Cleanup is called, regardless of phase
-		env.RegisterTask(taskStatus.GetTaskId())
+		taskID := taskStatus.GetTaskId()
 
-		// if the taskContext exists then send the taskStatus to the statusChannel
-		// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
-		// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
-		// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
-		// cleanup would require a separate GC process.
-		if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
+		// Only register demand and forward status when the channel exists.
+		// Missing channel means either Cleanup ran (re-registering would leak
+		// demand permanently) or plugin restarted (CheckStatus will recreate
+		// the channel on the next evaluation).
+		taskStatusChannelResult, channelExists := f.taskStatusChannels.Load(taskID)
+		if channelExists {
+			env.RegisterTask(taskID)
+
+			// Double-check: if Cleanup deleted the channel between our Load
+			// and RegisterTask, undo the registration to prevent demand
+			// inflation. Cleanup deletes the channel before calling
+			// UnregisterTask, so a missing channel here means Cleanup is
+			// running concurrently.
+			if _, stillExists := f.taskStatusChannels.Load(taskID); !stillExists {
+				env.UnregisterTask(taskID)
+				channelExists = false
+			}
+		}
+
+		if channelExists {
+			// Per-task confirmation: the worker reported a status for this task,
+			// so it has received the ASSIGN. Remove the pending reservation.
+			f.removePendingReservation(heartbeatRequest.GetQueueId(), worker.ID(), taskID)
+
 			taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
 			taskStatusChannel <- &workerTaskStatus{
 				workerID:   worker.ID(),
 				taskStatus: taskStatus,
 			}
+		} else if _, cleanedUp := f.cleanedUpTasks.Get(taskID); cleanedUp {
+			// Cleanup explicitly ran for this task but the worker is still
+			// reporting it — the original DELETE was likely lost. Re-send.
+			worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
+				TaskId:    taskID,
+				Operation: pb.HeartbeatResponse_DELETE,
+			})
 		}
+
+		// Metrics and fast-feedback run unconditionally — after Cleanup this
+		// may produce a benign duplicate reevaluation at the Flyte level;
+		// after restart it preserves observability and fast completion feedback.
 		execID := taskStatus.GetExecId()
 		if taskStatus.GetTaskDuration().AsDuration() > 0 {
 			f.metrics.fastTaskExecutionDuration.add(execID,
@@ -482,7 +571,7 @@ func (f *fastTaskServiceImpl) processHeartbeatTaskStatuses(heartbeatRequest *pb.
 
 			if err := f.enqueueOwner(labels); err != nil {
 				f.metrics.enqueueOwnerFailure.Inc()
-				logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
+				logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskID, err)
 			}
 		}
 	}
@@ -500,57 +589,90 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 	// so demand includes tasks waiting for capacity
 	env.RegisterTask(taskID)
 
-	// identify preferred (ie. has capacity) and acceptable (ie. has backlog capacity) worker(s)
-	preferredWorkers := make([]interfaces.Worker, 0)
-	acceptableWorkers := make([]interfaces.Worker, 0)
-	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
-		if worker.State() != interfaces.HEALTHY {
-			return true
-		}
-		capacity := worker.Capacity()
-		if capacity.GetExecutionCount() < capacity.GetExecutionLimit() {
-			preferredWorkers = append(preferredWorkers, worker)
-		} else if capacity.GetBacklogCount() < capacity.GetBacklogLimit() {
-			acceptableWorkers = append(acceptableWorkers, worker)
-		}
+	// Select a worker and reserve a slot under the pending reservations lock.
+	// The lock serializes concurrent OfferTask calls, preventing two goroutines
+	// from both reading the same capacity and double-booking a slot.
+	f.pendingReservationsLock.Lock()
 
-		return true
-	})
-
-	// we sort workers by ID to ensure determinism in the selection process. this is important to
-	// (1) assign to the same worker in case of failures between assignment and state persistence
-	// and (2) allow the maximum number of workers to be cleaned up if unused. each worker
-	// maintains a `lastAccessedAt` timestamp to determine when it was last used. by assigning
-	// tasks to workers alphabetically, we can ensure that workers are allowed to become stale.
+	// Idempotent retry: if this task already has a reservation, reuse the same
+	// worker. This handles the case where OfferTask succeeded but the caller
+	// failed before persisting state and is now retrying with the same taskID.
 	var worker interfaces.Worker
-	if len(preferredWorkers) > 0 {
-		sort.Slice(preferredWorkers, func(i, j int) bool {
-			return preferredWorkers[i].ID() < preferredWorkers[j].ID()
-		})
-
-		for _, w := range preferredWorkers {
-			capacity := *w.Capacity()
-			capacity.ExecutionCount++
-			w.SetCapacity(&capacity)
-
+	if info, exists := f.pendingReservationsByTask[taskID]; exists && info.queueID == environmentID {
+		if w := env.GetWorker(info.workerID); w != nil && w.State() == interfaces.HEALTHY {
 			worker = w
-			break
+		} else {
+			// Worker gone or unhealthy — remove stale reservation, fall through to re-select
+			f.removeReservationLocked(info.queueID, info.workerID, taskID)
 		}
 	}
 
-	if worker == nil && len(acceptableWorkers) > 0 {
-		sort.Slice(acceptableWorkers, func(i, j int) bool {
-			return acceptableWorkers[i].ID() < acceptableWorkers[j].ID()
+	if worker == nil {
+		// identify preferred (ie. has capacity) and acceptable (ie. has backlog capacity) worker(s)
+		queuePending := f.pendingReservations[environmentID]
+		preferredWorkers := make([]interfaces.Worker, 0)
+		acceptableWorkers := make([]interfaces.Worker, 0)
+		env.RangeWorkers(func(workerID string, w interfaces.Worker) bool {
+			if w.State() != interfaces.HEALTHY {
+				return true
+			}
+			cap := w.Capacity()
+			pendingCount := int32(len(queuePending[workerID]))
+			if cap.GetExecutionCount()+pendingCount < cap.GetExecutionLimit() {
+				preferredWorkers = append(preferredWorkers, w)
+			} else {
+				totalUsed := cap.GetExecutionCount() + cap.GetBacklogCount() + pendingCount
+				totalCap := cap.GetExecutionLimit() + cap.GetBacklogLimit()
+				if totalUsed < totalCap {
+					acceptableWorkers = append(acceptableWorkers, w)
+				}
+			}
+			return true
 		})
 
-		for _, w := range acceptableWorkers {
-			capacity := *w.Capacity()
-			capacity.BacklogCount++
-			w.SetCapacity(&capacity)
+		// we sort workers by ID to ensure determinism in the selection process. this is important to
+		// (1) assign to the same worker in case of failures between assignment and state persistence
+		// and (2) allow the maximum number of workers to be cleaned up if unused. each worker
+		// maintains a `lastAccessedAt` timestamp to determine when it was last used. by assigning
+		// tasks to workers alphabetically, we can ensure that workers are allowed to become stale.
+		if len(preferredWorkers) > 0 {
+			sort.Slice(preferredWorkers, func(i, j int) bool {
+				return preferredWorkers[i].ID() < preferredWorkers[j].ID()
+			})
 
-			worker = w
+			for _, w := range preferredWorkers {
+				cap := w.Capacity()
+				pendingCount := int32(len(queuePending[w.ID()]))
+				if cap.GetExecutionCount()+pendingCount >= cap.GetExecutionLimit() {
+					continue
+				}
+				f.addPendingReservation(environmentID, w.ID(), taskID)
+				worker = w
+				break
+			}
+		}
+
+		if worker == nil && len(acceptableWorkers) > 0 {
+			sort.Slice(acceptableWorkers, func(i, j int) bool {
+				return acceptableWorkers[i].ID() < acceptableWorkers[j].ID()
+			})
+
+			for _, w := range acceptableWorkers {
+				cap := w.Capacity()
+				pendingCount := int32(len(queuePending[w.ID()]))
+				totalUsed := cap.GetExecutionCount() + cap.GetBacklogCount() + pendingCount
+				totalCap := cap.GetExecutionLimit() + cap.GetBacklogLimit()
+				if totalUsed >= totalCap {
+					continue
+				}
+				f.addPendingReservation(environmentID, w.ID(), taskID)
+				worker = w
+				break
+			}
 		}
 	}
+
+	f.pendingReservationsLock.Unlock()
 
 	if worker == nil {
 		f.metrics.taskNoCapacityAvailable.Inc()
@@ -582,12 +704,15 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 
 func newFastTaskService(enqueueOwner core.EnqueueOwner, builder interfaces.EnvironmentBuilder, store interfaces.EnvironmentStore, scope promutils.Scope, cfg *Config) *fastTaskServiceImpl {
 	svc := &fastTaskServiceImpl{
-		enqueueOwner:       enqueueOwner,
-		builder:            builder,
-		pendingTaskOwners:  make(map[string]map[string]map[string]string),
-		store:              store,
-		taskStatusChannels: &sync.Map{},
-		metrics:            newServiceMetrics(scope, cfg),
+		enqueueOwner:        enqueueOwner,
+		builder:             builder,
+		pendingTaskOwners:   make(map[string]map[string]map[string]string),
+		pendingReservations:       make(map[string]map[string]map[string]struct{}),
+		pendingReservationsByTask: make(map[string]pendingReservationInfo),
+		store:               store,
+		taskStatusChannels:  &sync.Map{},
+		cleanedUpTasks:      cache.New(cleanedUpTasksTTL, cleanedUpTasksGCInterval),
+		metrics:             newServiceMetrics(scope, cfg),
 	}
 	prometheus.MustRegister(svc)
 	return svc
