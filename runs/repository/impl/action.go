@@ -512,21 +512,42 @@ func (r *actionRepo) UpdateActionPhase(
 		}
 	}
 
-	// Only move the phase forward or re-apply the same phase — never downgrade.
-	result := r.db.WithContext(ctx).
+	query := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND phase <= ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase).
-		Updates(updates)
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+
+	// Terminal updates are idempotent after the final state has been fully recorded.
+	// Keep allowing retries until ended_at is persisted or other terminal fields differ.
+	if isTerminalActionPhase(phase) {
+		query = query.Where("(phase < ? OR ended_at IS NULL OR attempts <> ? OR cache_status <> ?)",
+			phase, attempts, cacheStatus)
+	} else {
+		// Only move the phase forward or re-apply the same phase
+		query = query.Where("phase <= ?", phase)
+	}
+
+	result := query.Updates(updates)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
-	// Notify subscribers of the action update
+	if result.RowsAffected == 0 {
+		return nil
+	}
+
+	// Notify subscribers of the action update.
 	r.notifyActionUpdate(ctx, actionID)
 
 	return nil
+}
+
+func isTerminalActionPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
 }
 
 // AbortAction aborts a specific action

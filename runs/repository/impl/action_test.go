@@ -208,6 +208,118 @@ func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
 		"phase should not downgrade from RUNNING to QUEUED")
 }
 
+func TestUpdateActionPhase_TerminalDuplicateIsNoOp(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+		ActionId: actionID,
+		InputUri: "s3://bucket/input",
+	}, nil)
+	require.NoError(t, err)
+
+	firstEndTime := time.Now().Add(-time.Minute).UTC().Truncate(time.Millisecond)
+	err = actionRepo.UpdateActionPhase(
+		ctx,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1,
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		&firstEndTime,
+	)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.EndedAt.Valid)
+	firstUpdatedAt := action.UpdatedAt
+	firstEndedAt := action.EndedAt.Time
+
+	secondEndTime := firstEndTime.Add(30 * time.Second)
+	err = actionRepo.UpdateActionPhase(
+		ctx,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1,
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		&secondEndTime,
+	)
+	require.NoError(t, err)
+
+	action, err = actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, firstUpdatedAt, action.UpdatedAt)
+	assert.Equal(t, firstEndedAt, action.EndedAt.Time)
+}
+
+func TestUpdateActionPhase_TerminalDuplicateRepairsMissingEndedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
+		ActionId: actionID,
+		InputUri: "s3://bucket/input",
+	}, nil)
+	require.NoError(t, err)
+
+	result := db.Model(&models.Action{}).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Updates(map[string]interface{}{
+			"phase":        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			"ended_at":     nil,
+			"duration_ms":  nil,
+			"updated_at":   time.Now().Add(-time.Minute),
+			"attempts":     0,
+			"cache_status": core.CatalogCacheStatus_CACHE_DISABLED,
+		})
+	require.NoError(t, result.Error)
+	require.Equal(t, int64(1), result.RowsAffected)
+
+	endTime := time.Now().UTC().Truncate(time.Millisecond)
+	err = actionRepo.UpdateActionPhase(
+		ctx,
+		actionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1,
+		core.CatalogCacheStatus_CACHE_DISABLED,
+		&endTime,
+	)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.True(t, action.EndedAt.Valid)
+	assert.Equal(t, uint32(1), action.Attempts)
+	assert.NotZero(t, action.DurationMs)
+}
+
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
