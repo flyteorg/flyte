@@ -21,6 +21,7 @@ var AllModels = []interface{}{
 }
 
 const MigrationIDInitSchema = "20260327_runs_init_schema"
+const MigrationIDFixActionIndexes = "20260330_fix_action_indexes"
 
 var RunsMigrations = []*gormigrate.Migration{
 	{
@@ -33,6 +34,42 @@ var RunsMigrations = []*gormigrate.Migration{
 			return nil
 		},
 	},
+	{
+		ID: MigrationIDFixActionIndexes,
+		Migrate: func(tx *gorm.DB) error {
+			return migrateFixActionIndexes(tx)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return nil
+		},
+	},
+}
+
+// migrateFixActionIndexes drops high-contention indexes and creates replacements.
+//
+// idx_actions_updated and idx_actions_ended caused B-tree right-hand page contention:
+// UpdateActionPhase writes updated_at/ended_at ≈ NOW() on every call, so all concurrent
+// writers compete for the same rightmost leaf page, producing 200ms+ lock-wait latency.
+//
+// idx_actions_org/project/domain/run_name are replaced by the composite
+// idx_actions_run_lookup(org, project, domain, run_name) which serves ListActions,
+// AbortAction, MarkAbortAttempt, and ClearAbortRequest with a single selective index.
+func migrateFixActionIndexes(db *gorm.DB) error {
+	staleIndexes := []string{
+		"idx_actions_updated",
+		"idx_actions_ended",
+		"idx_actions_org",
+		"idx_actions_project",
+		"idx_actions_domain",
+		"idx_actions_run_name",
+	}
+	for _, idx := range staleIndexes {
+		if err := db.Exec("DROP INDEX IF EXISTS " + idx).Error; err != nil {
+			return fmt.Errorf("failed to drop stale index %s: %w", idx, err)
+		}
+	}
+	// AutoMigrate picks up idx_actions_run_lookup from the updated model struct tags.
+	return db.AutoMigrate(&models.Action{})
 }
 
 // migrateInitSchema initializes the runs service database schema.
