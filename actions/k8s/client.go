@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"strings"
 	"sync"
 	"time"
@@ -56,14 +57,23 @@ type ActionsClient struct {
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
+
+	// Worker pool: numWorkers goroutines each own one channel.
+	// Events are sharded by TaskAction name so per-resource ordering is preserved.
+	numWorkers int
+	workerChs  []chan watch.Event
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+	if numWorkers <= 0 {
+		numWorkers = 1
+	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+		numWorkers:  numWorkers,
 		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
@@ -336,10 +346,18 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.watching = true
 	c.stopCh = make(chan struct{})
+	stopCh := c.stopCh // capture before releasing so workers reference the right channel
+	c.workerChs = make([]chan watch.Event, c.numWorkers)
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
+	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s", c.namespace)
+	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
+	for _, ch := range c.workerChs {
+		go c.worker(ctx, ch, stopCh)
+	}
 	go c.watchLoop(ctx)
 
 	return nil
@@ -386,8 +404,51 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 			if !ok {
 				return fmt.Errorf("watch channel closed")
 			}
+			c.dispatchEvent(ctx, event)
+		}
+	}
+}
+
+// worker drains its event channel and calls handleWatchEvent for each event.
+// It exits when stopCh is closed or ctx is cancelled.
+// Each worker owns a disjoint shard of TaskAction names, so per-resource
+// event ordering is preserved across the pool.
+func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopCh <-chan struct{}) {
+	for {
+		select {
+		case <-stopCh:
+			return
+		case <-ctx.Done():
+			return
+		case event, ok := <-ch:
+			if !ok {
+				return
+			}
 			c.handleWatchEvent(ctx, event)
 		}
+	}
+}
+
+// dispatchEvent routes a watch event to the worker responsible for the
+// event's TaskAction, using FNV-32a hashing for consistent sharding.
+// Error events and non-TaskAction objects are handled inline and not dispatched.
+func (c *ActionsClient) dispatchEvent(ctx context.Context, event watch.Event) {
+	if event.Type == watch.Error {
+		logger.Warnf(ctx, "received error event from watch: %v", event.Object)
+		return
+	}
+	ta, ok := event.Object.(*executorv1.TaskAction)
+	if !ok {
+		logger.Warnf(ctx, "received non-TaskAction object in watch event: %T", event.Object)
+		return
+	}
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(ta.Name)) // FNV Write never returns an error
+	shard := h.Sum32() % uint32(c.numWorkers)
+	select {
+	case c.workerChs[shard] <- event:
+	default:
+		logger.Warnf(ctx, "worker %d channel full, dropping event for TaskAction %s", shard, ta.Name)
 	}
 }
 
@@ -527,7 +588,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				},
+			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)

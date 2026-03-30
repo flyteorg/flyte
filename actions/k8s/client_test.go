@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -498,4 +499,126 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	// No UpdateActionStatus should be called for root (no parent to promote)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+}
+
+func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
+	c := &ActionsClient{
+		numWorkers: numWorkers,
+		workerChs:  make([]chan watch.Event, numWorkers),
+	}
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, bufSize)
+	}
+	return c
+}
+
+func newTaskActionEvent(name string, eventType watch.EventType) watch.Event {
+	ta := &executorv1.TaskAction{}
+	ta.Name = name
+	return watch.Event{Type: eventType, Object: ta}
+}
+
+func TestDispatchEvent_ConsistentSharding(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+	event := newTaskActionEvent("run1-action1", watch.Modified)
+
+	c.dispatchEvent(context.Background(), event)
+	c.dispatchEvent(context.Background(), event)
+
+	// Both events must land in exactly one shard (the same one each time)
+	var total int
+	for _, ch := range c.workerChs {
+		total += len(ch)
+	}
+	assert.Equal(t, 2, total)
+}
+
+func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+
+	// Send many differently-named events and confirm they spread across shards
+	names := []string{"run1-a", "run1-b", "run1-c", "run1-d", "run1-e", "run1-f", "run1-g", "run1-h"}
+	for _, name := range names {
+		c.dispatchEvent(context.Background(), newTaskActionEvent(name, watch.Modified))
+	}
+
+	var nonEmpty int
+	for _, ch := range c.workerChs {
+		if len(ch) > 0 {
+			nonEmpty++
+		}
+	}
+	assert.Greater(t, nonEmpty, 1, "expected events to spread across more than one shard")
+}
+
+func TestDispatchEvent_DropsErrorEvents(t *testing.T) {
+	c := newWorkerTestClient(2, 10)
+
+	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Error})
+
+	for i, ch := range c.workerChs {
+		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
+	}
+}
+
+func TestDispatchEvent_DropsNonTaskActionObjects(t *testing.T) {
+	c := newWorkerTestClient(2, 10)
+
+	// Send an event whose Object is not a *TaskAction
+	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Modified, Object: &executorv1.TaskActionList{}})
+
+	for i, ch := range c.workerChs {
+		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
+	}
+}
+
+func TestDispatchEvent_FullChannelDropsWithoutBlocking(t *testing.T) {
+	c := newWorkerTestClient(1, 1) // single worker, capacity 1
+	event := newTaskActionEvent("run1-action1", watch.Modified)
+
+	c.dispatchEvent(context.Background(), event) // fills the channel
+	c.dispatchEvent(context.Background(), event) // must drop, not block
+
+	assert.Equal(t, 1, len(c.workerChs[0]))
+}
+
+func TestWorker_ExitsOnStopCh(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(context.Background(), ch, stopCh)
+		close(done)
+	}()
+
+	close(stopCh)
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after stopCh was closed")
+	}
+}
+
+func TestWorker_ExitsOnContextCancel(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(ctx, ch, stopCh)
+		close(done)
+	}()
+
+	cancel()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after context was cancelled")
+	}
 }
