@@ -24,7 +24,7 @@ message TailLogsRequest {
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 }
 
-// Reponse message for tailing logs.
+// Response message for tailing logs.
 message TailLogsResponse {
   // A batch of logs.
   message Logs {

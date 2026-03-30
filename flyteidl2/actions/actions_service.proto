@@ -34,7 +34,7 @@ service ActionsService {
   rpc Abort(AbortRequest) returns (AbortResponse) {}
 }
 
-// Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
+// Action represents a unit of work to be executed. These can be task executions, traces, or conditions.
 // Note: This is different from the Action protobuf defined in flyteidl2/workflow/run_definition.proto.
 message Action {
   // the unique identifier for the action.

@@ -9,7 +9,7 @@ import "google/protobuf/struct.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
-// TranslatorService provides an interface for all diferent types of translations for the platform.
+// TranslatorService provides an interface for all different types of translations for the platform.
 service TranslatorService {
   rpc LiteralsToLaunchFormJson(LiteralsToLaunchFormJsonRequest) returns (LiteralsToLaunchFormJsonResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;

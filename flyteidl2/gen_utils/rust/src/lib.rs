@@ -10,7 +10,7 @@ use pyo3::prelude::*;
 // include!("flyteidl.common.rs");
 // include!("flyteidl.workflow.rs");
 // include!("flyteidl.workflow.tonic.rs");
-// inculde!("flyteidl.logs.dataplane.rs");
+// include!("flyteidl.logs.dataplane.rs");
 // include!("flyteidl.core.rs");
 // include!("google.rpc.rs");
 // include!("validate.rs");
