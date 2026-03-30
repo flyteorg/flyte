@@ -13,6 +13,7 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
 
+
 # Webhook configuration
 # localCert: true writes the generated TLS cert to disk so the webhook server can read it.
 webhook:
