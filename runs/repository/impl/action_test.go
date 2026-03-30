@@ -163,7 +163,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
-func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
+func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()
 	actionRepo, err := NewActionRepo(db, database.DbConfig{})
@@ -186,26 +186,28 @@ func TestUpdateActionPhase_PhaseGuard(t *testing.T) {
 	}, nil)
 	require.NoError(t, err)
 
-	// Move to RUNNING
+	// Move to FAILED (terminal state)
+	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		common.ActionPhase_ACTION_PHASE_FAILED, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
-	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_FAILED), action.Phase)
 
-	// Try to downgrade to QUEUED — should be a no-op due to phase guard
+	// Retry: transition from FAILED back to QUEUED — should succeed
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
+		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
-	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase,
-		"phase should not downgrade from RUNNING to QUEUED")
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), action.Phase,
+		"phase should transition from FAILED to QUEUED on retry")
+	assert.Equal(t, uint32(2), action.Attempts)
 }
 
 func TestListRuns(t *testing.T) {
