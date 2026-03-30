@@ -50,8 +50,8 @@ func GetUploadModeVals() []string {
 }
 
 func (d *DownloadOptions) Download(ctx context.Context) error {
-	inputInterface := &core.VariableMap{}
-	if err := proto.Unmarshal(d.inputInterface, inputInterface); err != nil {
+	variableMap := &core.VariableMap{}
+	if err := proto.Unmarshal(d.inputInterface, variableMap); err != nil {
 		logger.Warnf(ctx, "Bad input interface passed, failed to unmarshal err: %s", err)
 	}
 
@@ -83,7 +83,7 @@ func (d *DownloadOptions) Download(ctx context.Context) error {
 			childCtx, cancelFn = context.WithTimeout(ctx, d.timeout)
 		}
 		defer cancelFn()
-		err := dl.DownloadInputs(childCtx, inputInterface, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath)
+		err := dl.DownloadInputs(childCtx, variableMap, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath)
 		if err != nil {
 			logger.Errorf(ctx, "Downloading failed, err %s", err)
 			return err
