@@ -46,8 +46,9 @@ func (a *App) Run() error {
 // Command returns the root cobra.Command with config init wired in.
 func (a *App) Command() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   a.Name,
-		Short: a.Short,
+		Use:          a.Name,
+		Short:        a.Short,
+		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			return initConfig(cmd)
 		},

@@ -78,7 +78,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database initialized")
 
 	// Run migrations
-	if err := migrations.RunMigrations(testDB); err != nil {
+	if err := database.Migrate(ctx, dbConfig, migrations.RunsMigrations); err != nil {
 		log.Printf("Failed to run migrations: %v", err)
 		exitCode = 1
 		return
@@ -86,7 +86,12 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo := repository.NewRepository(testDB, *dbConfig)
+	repo, err := repository.NewRepository(testDB, *dbConfig)
+	if err != nil {
+		log.Printf("Failed to create repository: %v", err)
+		exitCode = 1
+		return
+	}
 	taskSvc := service.NewTaskService(repo)
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)

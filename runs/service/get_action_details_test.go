@@ -363,23 +363,25 @@ func TestMergeEvents_PhaseTransitions(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, result.PhaseTransitions[2].Phase)
 }
 
-func TestMergeEvents_PrefersUpdatedTimeOverReportedTime(t *testing.T) {
+func TestMergeEvents_SortsByReportedTime(t *testing.T) {
 	now := time.Now()
+	// Events arrive with different ReportedTime and UpdatedTime.
+	// mergeEvents sorts by ReportedTime when both events have it.
 	events := []*workflow.ActionEvent{
 		{
 			Phase:        common.ActionPhase_ACTION_PHASE_QUEUED,
 			UpdatedTime:  timestamppb.New(now),
-			ReportedTime: timestamppb.New(now.Add(2 * time.Second)),
+			ReportedTime: timestamppb.New(now),
 		},
 		{
 			Phase:        common.ActionPhase_ACTION_PHASE_RUNNING,
 			UpdatedTime:  timestamppb.New(now.Add(1 * time.Second)),
-			ReportedTime: timestamppb.New(now),
+			ReportedTime: timestamppb.New(now.Add(1 * time.Second)),
 		},
 		{
 			Phase:        common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 			UpdatedTime:  timestamppb.New(now.Add(2 * time.Second)),
-			ReportedTime: timestamppb.New(now.Add(3 * time.Second)),
+			ReportedTime: timestamppb.New(now.Add(2 * time.Second)),
 		},
 	}
 

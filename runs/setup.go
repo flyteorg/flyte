@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-gormigrate/gormigrate/v2"
+
 	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
@@ -32,12 +34,15 @@ import (
 // RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-
-	if err := migrations.RunMigrations(sc.DB); err != nil {
+	m := gormigrate.New(sc.DB, gormigrate.DefaultOptions, migrations.RunsMigrations)
+	if err := m.Migrate(); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
-	repo := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	if err != nil {
+		return fmt.Errorf("runs: failed to create repository: %w", err)
+	}
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsURL := cfg.ActionsServiceURL

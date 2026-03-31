@@ -43,6 +43,7 @@ type RunService struct {
 const (
 	runIDLength     = 20
 	runStringFormat = "r%s"
+	RootActionName  = "a0"
 )
 
 func generateRunName(seed int64) string {
@@ -149,7 +150,7 @@ func (s *RunService) CreateRun(
 
 	actionID := &common.ActionIdentifier{
 		Run:  runId,
-		Name: runId.Name,
+		Name: RootActionName,
 	}
 
 	// Get the task template and taskID
@@ -163,7 +164,6 @@ func (s *RunService) CreateRun(
 	case *workflow.CreateRunRequest_TaskId:
 		taskID = request.GetTaskId()
 		taskSpec, err = fetchTaskSpecByID(ctx, s.repo.TaskRepo(), taskID)
-
 		if err != nil {
 			return nil, err
 		}
@@ -462,23 +462,14 @@ func (s *RunService) getAttempts(ctx context.Context, actionId *common.ActionIde
 
 // mergeEvents merges a set of events for the same attempt into a single ActionAttempt.
 func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.ActionAttempt {
-	// Order events by the controller-observed phase transition time.
-	// ReportedTime reflects when an observation was emitted and can arrive out of order,
-	// so it is only used as a tie-breaker for otherwise-identical UpdatedTime values.
+	// Order events by reported time, falling back to updated time.
 	sort.SliceStable(events, func(i, j int) bool {
-		updatedTimeI := events[i].GetUpdatedTime()
-		updatedTimeJ := events[j].GetUpdatedTime()
-		if updatedTimeI != nil && updatedTimeJ != nil && !updatedTimeI.AsTime().Equal(updatedTimeJ.AsTime()) {
-			return updatedTimeI.AsTime().Before(updatedTimeJ.AsTime())
-		}
-
 		reportedTimeI := events[i].GetReportedTime()
 		reportedTimeJ := events[j].GetReportedTime()
-		if reportedTimeI != nil && reportedTimeJ != nil && !reportedTimeI.AsTime().Equal(reportedTimeJ.AsTime()) {
+		if reportedTimeI != nil && reportedTimeJ != nil {
 			return reportedTimeI.AsTime().Before(reportedTimeJ.AsTime())
 		}
-
-		return phaseOrder(events[i].GetPhase()) < phaseOrder(events[j].GetPhase())
+		return events[i].GetUpdatedTime().AsTime().Before(events[j].GetUpdatedTime().AsTime())
 	})
 
 	if len(events) == 0 {
@@ -577,26 +568,6 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		ClusterEvents:    clusterEvents,
 		Cluster:          lastEvent.GetCluster(),
 		PhaseTransitions: phaseTransitions,
-	}
-}
-
-func phaseOrder(phase common.ActionPhase) int {
-	switch phase {
-	case common.ActionPhase_ACTION_PHASE_QUEUED:
-		return 0
-	case common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES:
-		return 1
-	case common.ActionPhase_ACTION_PHASE_INITIALIZING:
-		return 2
-	case common.ActionPhase_ACTION_PHASE_RUNNING:
-		return 3
-	case common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-		common.ActionPhase_ACTION_PHASE_FAILED,
-		common.ActionPhase_ACTION_PHASE_ABORTED,
-		common.ActionPhase_ACTION_PHASE_TIMED_OUT:
-		return 4
-	default:
-		return 5
 	}
 }
 
@@ -1393,7 +1364,7 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		Org:     run.Org,
 		Project: run.Project,
 		Domain:  run.Domain,
-		Name:    run.Name,
+		Name:    run.RunName,
 	}
 
 	action := &workflow.Action{
@@ -1455,13 +1426,25 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 			Org:     action.Org,
 			Project: action.Project,
 			Domain:  action.Domain,
-			Name:    action.GetRunName(),
+			Name:    action.RunName,
 		},
 		Name: action.Name,
 	}
 
 	actionStatus := &workflow.ActionStatus{
-		Phase: common.ActionPhase(action.Phase),
+		Phase:       common.ActionPhase(action.Phase),
+		Attempts:    action.Attempts,
+		StartTime:   timestamppb.New(action.CreatedAt),
+		CacheStatus: action.CacheStatus,
+	}
+
+	if action.EndedAt.Valid {
+		actionStatus.EndTime = timestamppb.New(action.EndedAt.Time)
+	}
+
+	if action.DurationMs.Valid && action.DurationMs.Int64 > 0 {
+		durationMs := uint64(action.DurationMs.Int64)
+		actionStatus.DurationMs = &durationMs
 	}
 
 	var metadata *workflow.ActionMetadata
