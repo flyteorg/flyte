@@ -81,9 +81,6 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err
 	}
-	if err := actions.Setup(ctx, sc); err != nil {
-		return err
-	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
 		return err
 	}
@@ -94,6 +91,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := actions.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := secret.Setup(ctx, sc); err != nil {
