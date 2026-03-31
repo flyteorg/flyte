@@ -33,17 +33,17 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo            interfaces.Repository
-	actionsClient   actionsconnect.ActionsServiceClient
-	storagePrefix   string
-	dataStore       *storage.DataStore
-	abortReconciler *AbortReconciler
+	repo             interfaces.Repository
+	actionsClient    actionsconnect.ActionsServiceClient
+	storagePrefix    string
+	dataStore        *storage.DataStore
+	abortReconciler  *AbortReconciler
 }
 
 const (
 	runIDLength     = 20
 	runStringFormat = "r%s"
-	rootActionName  = "a0"
+	RootActionName  = "a0"
 )
 
 func generateRunName(seed int64) string {
@@ -150,7 +150,7 @@ func (s *RunService) CreateRun(
 
 	actionID := &common.ActionIdentifier{
 		Run:  runId,
-		Name: rootActionName,
+		Name: RootActionName,
 	}
 
 	// Get the task template and taskID
