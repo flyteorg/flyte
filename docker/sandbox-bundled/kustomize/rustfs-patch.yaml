@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-sandbox-rustfs
+  namespace: flyte
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: volume-permissions
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          chown -R 10001:10001 /data
+      containers:
+      - name: rustfs
+        env:
+        - name: RUSTFS_ADDRESS
+          value: "0.0.0.0:9000"
+        - name: RUSTFS_CONSOLE_ADDRESS
+          value: "0.0.0.0:9001"
+        - name: RUSTFS_VOLUMES
+          value: "/data"

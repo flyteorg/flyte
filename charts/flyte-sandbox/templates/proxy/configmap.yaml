@@ -113,15 +113,15 @@ data:
                                                   cluster: kubernetes-dashboard
                                                   prefix_rewrite: /
                                             {{- end }}
-                                            {{- if .Values.minio.enabled }}
+                                            {{- if .Values.rustfs.enabled }}
                                             - match:
-                                                  path: "/minio"
+                                                  path: "/rustfs"
                                               redirect:
-                                                  path_redirect: "/minio/"
+                                                  path_redirect: "/rustfs/"
                                             - match:
-                                                  prefix: "/minio/"
+                                                  prefix: "/rustfs/"
                                               route:
-                                                  cluster: minio
+                                                  cluster: rustfs
                                                   prefix_rewrite: /
                                             {{- end }}
                               http_filters:
@@ -179,19 +179,19 @@ data:
                                           address: {{ .Release.Name }}-kubernetes-dashboard
                                           port_value: 80
             {{- end }}
-            {{- if .Values.minio.enabled }}
-            - name: minio
+            {{- if .Values.rustfs.enabled }}
+            - name: rustfs
               connect_timeout: 0.25s
               type: STRICT_DNS
               lb_policy: ROUND_ROBIN
               load_assignment:
-                  cluster_name: minio
+                  cluster_name: rustfs
                   endpoints:
                       - lb_endpoints:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: {{ .Release.Name }}-minio
+                                          address: {{ .Release.Name }}-rustfs
                                           port_value: 9001
             {{- end }}
 

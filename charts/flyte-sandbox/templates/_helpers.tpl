@@ -83,10 +83,10 @@ Name of PersistentVolume and PersistentVolumeClaim for PostgreSQL database
 {{- end }}
 
 {{/*
-Name of PersistentVolume and PersistentVolumeClaim for Minio
+Name of PersistentVolume and PersistentVolumeClaim for RustFS
 */}}
-{{- define "flyte-sandbox.persistence.minioVolumeName" -}}
-{{- printf "%s-minio-storage" .Release.Name -}}
+{{- define "flyte-sandbox.persistence.rustfsVolumeName" -}}
+{{- printf "%s-rustfs-storage" .Release.Name -}}
 {{- end }}
 
 {{/*

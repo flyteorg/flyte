@@ -76,7 +76,7 @@ build: sync-crds flyte console dep_update manifests
 # 6443 - k8s API server
 # 30000 - Docker Registry
 # 30001 - DB
-# 30002 - Minio
+# 30002 - RustFS
 # 30003 - Buildkit
 # 30080 - Flyte Proxy
 .PHONY: start

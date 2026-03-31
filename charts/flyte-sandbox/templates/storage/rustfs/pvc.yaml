@@ -1,7 +1,8 @@
+{{- if .Values.rustfs.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "flyte-sandbox.persistence.minioVolumeName" . }}
+  name: {{ include "flyte-sandbox.persistence.rustfsVolumeName" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "flyte-sandbox.labels" . | nindent 4 }}
@@ -12,4 +13,5 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  volumeName: {{ include "flyte-sandbox.persistence.minioVolumeName" . }}
+  volumeName: {{ include "flyte-sandbox.persistence.rustfsVolumeName" . }}
+{{- end }}
