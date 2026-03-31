@@ -95,9 +95,7 @@ message ProviderEmailTemplate {
       }
     }
     values: {
-      string: {
-        max_len: 4000
-      }
+      string: {max_len: 4000}
     }
     max_pairs: 100
   }];
