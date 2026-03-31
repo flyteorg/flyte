@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -42,6 +43,9 @@ type SetupContext struct {
 
 	// K8sConfig is the Kubernetes REST config (may be nil).
 	K8sConfig *rest.Config
+
+	// K8sCache is an optional shared controller-runtime cache.
+	K8sCache cache.Cache
 
 	// DataStore is the object storage client (may be nil).
 	DataStore *storage.DataStore
