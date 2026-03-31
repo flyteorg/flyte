@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// Captures required data to reference offloaded inputs.
+message OffloadedInputData {
+  string uri = 1 [(buf.validate.field).string.min_len = 1];
+
+  string cache_key = 2 [(buf.validate.field).string.min_len = 1];
+}

@@ -5,6 +5,7 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -100,7 +101,7 @@ message CreateRunRequest {
   oneof input_wrapper {
     task.Inputs inputs = 4;
 
-    string input_uri = 9 [(buf.validate.field).string.min_len = 1];
+    common.OffloadedInputData offloaded_input_data = 9;
   }
 
   // The run spec to use.
@@ -109,7 +110,11 @@ message CreateRunRequest {
   // Indicates client that created this run.
   RunSource source = 8;
 
-  // Next field number: 10
+  // Optional, pre-computed cache key for the inputs for this run.
+  // Only required when inputs are offloaded
+  string cache_key = 10;
+
+  // Next field number: 11
 }
 
 // Response message for creating a run.

@@ -4,6 +4,7 @@ package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
@@ -120,7 +121,5 @@ message UploadInputsRequest {
 }
 
 message UploadInputsResponse {
-  string uri = 1;
-
-  string cache_key = 2;
+  common.OffloadedInputData offloaded_input_data = 1;
 }
