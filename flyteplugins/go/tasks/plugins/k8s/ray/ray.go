@@ -164,36 +164,36 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 					})
 				} else if valueFrom := env.GetValueFrom(); valueFrom != nil {
 					var envValueSource *v1.EnvVarSource
-					switch valueFrom.Source {
+					switch valueFrom.GetSource() {
 					case plugins.EnvValueFrom_CONFIGMAP:
 						envValueSource = &v1.EnvVarSource{
 							ConfigMapKeyRef: &v1.ConfigMapKeySelector{
 								LocalObjectReference: v1.LocalObjectReference{
-									Name: valueFrom.Name,
+									Name: valueFrom.GetName(),
 								},
-								Key: valueFrom.Key,
+								Key: valueFrom.GetKey(),
 							},
 						}
 					case plugins.EnvValueFrom_SECRET:
 						envValueSource = &v1.EnvVarSource{
 							SecretKeyRef: &v1.SecretKeySelector{
 								LocalObjectReference: v1.LocalObjectReference{
-									Name: valueFrom.Name,
+									Name: valueFrom.GetName(),
 								},
-								Key: valueFrom.Key,
+								Key: valueFrom.GetKey(),
 							},
 						}
 					case plugins.EnvValueFrom_RESOURCEFIELD:
 						envValueSource = &v1.EnvVarSource{
 							ResourceFieldRef: &v1.ResourceFieldSelector{
-								ContainerName: valueFrom.Name,
-								Resource:      valueFrom.Key,
+								ContainerName: valueFrom.GetName(),
+								Resource:      valueFrom.GetKey(),
 							},
 						}
 					default:
 						envValueSource = &v1.EnvVarSource{
 							FieldRef: &v1.ObjectFieldSelector{
-								FieldPath: valueFrom.Key,
+								FieldPath: valueFrom.GetKey(),
 							},
 						}
 					}
