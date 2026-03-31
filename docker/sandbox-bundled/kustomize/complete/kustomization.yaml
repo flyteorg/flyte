@@ -5,6 +5,8 @@ helmCharts:
   releaseName: flyte-sandbox
   namespace: flyte
   valuesInline:
+    # Disabled: PostgreSQL runs as an embedded process on the host via
+    # the fergusstrange/embedded-postgres library instead of a pod.
     postgresql:
       enabled: false
     flyte-binary:
