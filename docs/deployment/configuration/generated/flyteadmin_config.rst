@@ -38,6 +38,8 @@ Flyte Admin Configuration
 
 - `plugins <#section-plugins>`_
 
+- `prof <#section-prof>`_
+
 - `propeller <#section-propeller>`_
 
 - `qualityofservice <#section-qualityofservice>`_
@@ -5336,6 +5338,19 @@ templates ([]tasklog.TemplateLogPlugin)
 .. code-block:: yaml
 
   null
+  
+
+Section: prof
+========================================================================================================================
+
+DisableConfigEndpoint (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 Section: propeller
