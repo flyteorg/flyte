@@ -97,7 +97,11 @@ message CreateRunRequest {
   }
 
   // Inputs to use.
-  task.Inputs inputs = 4;
+  oneof input_wrapper {
+    task.Inputs inputs = 4;
+
+    string input_uri = 9 [(buf.validate.field).string.min_len = 1];
+  }
 
   // The run spec to use.
   task.RunSpec run_spec = 5;

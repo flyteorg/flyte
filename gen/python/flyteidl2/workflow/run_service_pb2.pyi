@@ -14,13 +14,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateRunRequest(_message.Message):
-    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "run_spec", "source"]
+    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "input_uri", "run_spec", "source"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_SPEC_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_URI_FIELD_NUMBER: _ClassVar[int]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
@@ -29,9 +30,10 @@ class CreateRunRequest(_message.Message):
     task_spec: _task_definition_pb2.TaskSpec
     trigger_name: _identifier_pb2.TriggerName
     inputs: _common_pb2.Inputs
+    input_uri: str
     run_spec: _run_pb2.RunSpec
     source: _run_definition_pb2.RunSource
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., source: _Optional[_Union[_run_definition_pb2.RunSource, str]] = ...) -> None: ...
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., source: _Optional[_Union[_run_definition_pb2.RunSource, str]] = ...) -> None: ...
 
 class CreateRunResponse(_message.Message):
     __slots__ = ["run"]

@@ -62,35 +62,6 @@ func (m *CreateRunRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetInputs()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, CreateRunRequestValidationError{
-					field:  "Inputs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, CreateRunRequestValidationError{
-					field:  "Inputs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CreateRunRequestValidationError{
-				field:  "Inputs",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
 		switch v := interface{}(m.GetRunSpec()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -331,6 +302,63 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 		}
 
+	default:
+		_ = v // ensures v is used
+	}
+	switch v := m.InputWrapper.(type) {
+	case *CreateRunRequest_Inputs:
+		if v == nil {
+			err := CreateRunRequestValidationError{
+				field:  "InputWrapper",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetInputs()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "Inputs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "Inputs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateRunRequestValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CreateRunRequest_InputUri:
+		if v == nil {
+			err := CreateRunRequestValidationError{
+				field:  "InputWrapper",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for InputUri
 	default:
 		_ = v // ensures v is used
 	}
