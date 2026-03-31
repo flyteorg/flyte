@@ -1,5 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
-from flyteidl2.org import settings_definition_pb2 as _settings_definition_pb2
+from flyteidl2.settings import settings_definition_pb2 as _settings_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -16,23 +16,6 @@ class SettingsRecord(_message.Message):
     settings: _settings_definition_pb2.Settings
     version: int
     def __init__(self, key: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ..., settings: _Optional[_Union[_settings_definition_pb2.Settings, _Mapping]] = ..., version: _Optional[int] = ...) -> None: ...
-
-class RawSettingsRecord(_message.Message):
-    __slots__ = ["key", "data", "version"]
-    class DataEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: _settings_definition_pb2.SettingValue
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_settings_definition_pb2.SettingValue, _Mapping]] = ...) -> None: ...
-    KEY_FIELD_NUMBER: _ClassVar[int]
-    DATA_FIELD_NUMBER: _ClassVar[int]
-    VERSION_FIELD_NUMBER: _ClassVar[int]
-    key: _settings_definition_pb2.SettingsKey
-    data: _containers.MessageMap[str, _settings_definition_pb2.SettingValue]
-    version: int
-    def __init__(self, key: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ..., data: _Optional[_Mapping[str, _settings_definition_pb2.SettingValue]] = ..., version: _Optional[int] = ...) -> None: ...
 
 class GetSettingsRequest(_message.Message):
     __slots__ = ["key"]
@@ -59,20 +42,6 @@ class GetSettingsForEditResponse(_message.Message):
     requestedKey: _settings_definition_pb2.SettingsKey
     levels: _containers.RepeatedCompositeFieldContainer[SettingsRecord]
     def __init__(self, requestedKey: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ..., levels: _Optional[_Iterable[_Union[SettingsRecord, _Mapping]]] = ...) -> None: ...
-
-class GetSettingsForEditRawRequest(_message.Message):
-    __slots__ = ["key"]
-    KEY_FIELD_NUMBER: _ClassVar[int]
-    key: _settings_definition_pb2.SettingsKey
-    def __init__(self, key: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ...) -> None: ...
-
-class GetSettingsForEditRawResponse(_message.Message):
-    __slots__ = ["requestedKey", "levels"]
-    REQUESTEDKEY_FIELD_NUMBER: _ClassVar[int]
-    LEVELS_FIELD_NUMBER: _ClassVar[int]
-    requestedKey: _settings_definition_pb2.SettingsKey
-    levels: _containers.RepeatedCompositeFieldContainer[RawSettingsRecord]
-    def __init__(self, requestedKey: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ..., levels: _Optional[_Iterable[_Union[RawSettingsRecord, _Mapping]]] = ...) -> None: ...
 
 class CreateSettingsRequest(_message.Message):
     __slots__ = ["key", "settings"]
@@ -103,24 +72,3 @@ class UpdateSettingsResponse(_message.Message):
     SETTINGSRECORD_FIELD_NUMBER: _ClassVar[int]
     settingsRecord: SettingsRecord
     def __init__(self, settingsRecord: _Optional[_Union[SettingsRecord, _Mapping]] = ...) -> None: ...
-
-class UpdateSettingsRawRequest(_message.Message):
-    __slots__ = ["key", "data", "version"]
-    class DataEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: _settings_definition_pb2.SettingValue
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_settings_definition_pb2.SettingValue, _Mapping]] = ...) -> None: ...
-    KEY_FIELD_NUMBER: _ClassVar[int]
-    DATA_FIELD_NUMBER: _ClassVar[int]
-    VERSION_FIELD_NUMBER: _ClassVar[int]
-    key: _settings_definition_pb2.SettingsKey
-    data: _containers.MessageMap[str, _settings_definition_pb2.SettingValue]
-    version: int
-    def __init__(self, key: _Optional[_Union[_settings_definition_pb2.SettingsKey, _Mapping]] = ..., data: _Optional[_Mapping[str, _settings_definition_pb2.SettingValue]] = ..., version: _Optional[int] = ...) -> None: ...
-
-class UpdateSettingsRawResponse(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
