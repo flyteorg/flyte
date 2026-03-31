@@ -13,6 +13,7 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/ptr"
@@ -135,7 +136,7 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 		autoScalarOptions = &rayv1.AutoscalerOptions{}
 		idleTimeoutTime := options.GetIdleTimeoutSeconds()
 		autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
-		if upScalingMode := options.GetUpscalingMode(); upScalingMode == "" {
+		if upScalingMode := options.GetUpscalingMode(); upScalingMode != "" {
 			mode := rayv1.UpscalingMode(upScalingMode)
 			autoScalarOptions.UpscalingMode = &mode
 		}
@@ -143,7 +144,14 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 			autoScalarOptions.Image = &image
 		}
 		if res := options.GetResources(); res != nil {
-			autoScalarOptions.Resources = nil
+			resourceRequirements := v1.ResourceRequirements{}
+			if requests := res.GetRequests(); len(requests) > 0 {
+				resourceRequirements.Requests = convertResourceEntriesToResourceList(requests)
+			}
+			if limits := res.GetLimits(); len(limits) > 0 {
+				resourceRequirements.Limits = convertResourceEntriesToResourceList(limits)
+			}
+			autoScalarOptions.Resources = &resourceRequirements
 		}
 		if envs := options.GetEnv(); len(envs) > 0 {
 			autoScalarOptions.Env = []v1.EnvVar{}
@@ -198,6 +206,25 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 		}
 	}
 	return autoScalarOptions
+}
+
+func convertResourceEntriesToResourceList(entries []*plugins.Resources_ResourceEntry) v1.ResourceList {
+	resourceList := v1.ResourceList{}
+	for _, entry := range entries {
+		var name v1.ResourceName
+		switch entry.GetName() {
+		case plugins.Resources_CPU:
+			name = v1.ResourceCPU
+		case plugins.Resources_MEMORY:
+			name = v1.ResourceMemory
+		default:
+			continue
+		}
+		if q, err := resource.ParseQuantity(entry.GetValue()); err == nil {
+			resourceList[name] = q
+		}
+	}
+	return resourceList
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
