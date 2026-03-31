@@ -969,56 +969,91 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 
 // WatchActionUpdates watches the current action update
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
-	targetPayload := fmt.Sprintf("%s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, 100)
+	if r.isPostgres {
+		targetPayload := fmt.Sprintf("%s/%s/%s/%s/%s",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+		notifCh := make(chan string, 100)
 
-	r.mu.Lock()
-	r.actionSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
 		r.mu.Lock()
-		delete(r.actionSubscribers, notifCh)
-		close(notifCh)
+		r.actionSubscribers[notifCh] = true
 		r.mu.Unlock()
-	}()
 
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case notifPayload := <-notifCh:
-			if notifPayload != targetPayload {
-				continue
-			}
+		defer func() {
+			r.mu.Lock()
+			delete(r.actionSubscribers, notifCh)
+			close(notifCh)
+			r.mu.Unlock()
+		}()
 
-		drain:
-			for {
-				// Prevent continuous update from the action
-				select {
-				case extra := <-notifCh:
-					if extra != targetPayload {
-						continue
-					}
-				default:
-					break drain
-				}
-			}
-
-			action, err := r.GetAction(ctx, actionID)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-				continue
-			}
-
+		for {
 			select {
-			case updates <- action:
 			case <-ctx.Done():
 				return
+			case notifPayload := <-notifCh:
+				if notifPayload != targetPayload {
+					continue
+				}
+
+			drain:
+				for {
+					// Prevent continuous update from the action
+					select {
+					case extra := <-notifCh:
+						if extra != targetPayload {
+							continue
+						}
+					default:
+						break drain
+					}
+				}
+
+				action, err := r.GetAction(ctx, actionID)
+				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
+					logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+					continue
+				}
+
+				select {
+				case updates <- action:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	} else {
+		ticker := time.NewTicker(250 * time.Millisecond)
+		defer ticker.Stop()
+
+		lastCheck := time.Now()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				action, err := r.GetAction(ctx, actionID)
+				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
+					errs <- err
+					return
+				}
+
+				if action.UpdatedAt.After(lastCheck) {
+					select {
+					case updates <- action:
+					case <-ctx.Done():
+						return
+					}
+					lastCheck = action.UpdatedAt
+					continue
+				}
+
+				lastCheck = time.Now()
 			}
 		}
 	}
