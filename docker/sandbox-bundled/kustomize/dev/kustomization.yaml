@@ -7,8 +7,6 @@ helmCharts:
   valuesInline:
     flyte-binary:
       enabled: false
-    postgresql:
-      enabled: false
     sandbox:
       dev: true
 namespace: flyte
@@ -16,7 +14,6 @@ resources:
 - ../namespace.yaml
 - ../../../../charts/flyte-binary/templates/crds/flyte.org_taskactions.yaml
 - ../dashboard-rbac.yaml
-- ../embedded-postgres-service.yaml
 patches:
 - target:
     kind: Secret
