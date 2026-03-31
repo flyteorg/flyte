@@ -842,8 +842,8 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 	}
 }
 
-// WatchActionUpdates watches for action updates
-func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
+// WatchAllActionUpdates watches for action updates
+func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)

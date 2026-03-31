@@ -37,7 +37,7 @@ type ActionRepo interface {
 	// Watch operations (for streaming)
 	WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error)
 	WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error)
-	WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error)
+	WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error)
 
 	// State operations
 	UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error

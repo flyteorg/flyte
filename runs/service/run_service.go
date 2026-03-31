@@ -913,7 +913,7 @@ func (s *RunService) WatchActionDetails(
 	// Step 2: Watch DB for updates
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updates, errs)
+	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, actionID.Run, updates, errs)
 
 	for {
 		select {
@@ -1020,7 +1020,7 @@ func (s *RunService) WatchActions(
 	// Start watching for updates from DB first to prevent event miss
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
 	if err != nil {
@@ -1119,7 +1119,7 @@ func (s *RunService) WatchClusterEvents(
 	// between initial state fetch and subscription setup.
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
 
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
