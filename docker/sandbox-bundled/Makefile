@@ -92,8 +92,7 @@ start:
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
-			--volume $(HOME)/.flyte/sandboxv2:/var/lib/flyte/config \
-			--volume flyte-sandbox:/var/lib/flyte/storage \
+				--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
 			--publish "30000:30000" \
 			--publish "30001:5432" \
@@ -106,9 +105,14 @@ start:
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
 	@# On WSL, the bind-mounted kubeconfig may be root-owned, which makes the host-side cp fail with permission denied.
 	@docker exec flyte-sandbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
-	@mkdir -p $(HOME)/.flyte/sandboxv2
-	@cp $(PWD)/.kube/kubeconfig $(HOME)/.flyte/sandboxv2/kubeconfig
-	@echo "Kubeconfig copied to ~/.flyte/sandboxv2/kubeconfig"
+	@mkdir -p $(HOME)/.kube
+	@if [ -f $(HOME)/.kube/config ]; then \
+		KUBECONFIG=$(PWD)/.kube/kubeconfig:$(HOME)/.kube/config kubectl config view --flatten > /tmp/kubeconfig-merged && \
+		mv /tmp/kubeconfig-merged $(HOME)/.kube/config; \
+	else \
+		cp $(PWD)/.kube/kubeconfig $(HOME)/.kube/config; \
+	fi
+	@echo "Kubeconfig merged into ~/.kube/config"
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:
