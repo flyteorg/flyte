@@ -9,6 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -57,6 +58,9 @@ type ActionsClient struct {
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
+	// lastResourceVersion tracks the most recent ResourceVersion from watch events,
+	// used to resume watches without replaying already-seen events.
+	lastResourceVersion string
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
@@ -374,11 +378,24 @@ func (c *ActionsClient) watchLoop(ctx context.Context) {
 func (c *ActionsClient) doWatch(ctx context.Context) error {
 	taskActionList := &executorv1.TaskActionList{}
 
+	c.mu.RLock()
+	rv := c.lastResourceVersion
+	c.mu.RUnlock()
+
 	timeout := int64(300) // 5 minutes
 	watcher, err := c.k8sClient.Watch(ctx, taskActionList, &client.ListOptions{
-		Raw: &metav1.ListOptions{TimeoutSeconds: &timeout},
+		Raw: &metav1.ListOptions{
+			TimeoutSeconds:  &timeout,
+			ResourceVersion: rv,
+		},
 	})
 	if err != nil {
+		if apierrors.IsGone(err) {
+			if syncErr := c.resyncFromList(ctx); syncErr != nil {
+				return fmt.Errorf("failed to resync after expired watch: %w", syncErr)
+			}
+			return nil
+		}
 		return fmt.Errorf("failed to start watch: %w", err)
 	}
 	defer watcher.Stop()
@@ -393,9 +410,43 @@ func (c *ActionsClient) doWatch(ctx context.Context) error {
 			if !ok {
 				return fmt.Errorf("watch channel closed")
 			}
+			if event.Type == watch.Error {
+				if status, ok := event.Object.(*metav1.Status); ok && status.Reason == metav1.StatusReasonGone {
+					if syncErr := c.resyncFromList(ctx); syncErr != nil {
+						return fmt.Errorf("failed to resync after expired watch event: %w", syncErr)
+					}
+					return nil
+				}
+				return fmt.Errorf("watch error: %v", event.Object)
+			}
 			c.handleWatchEvent(ctx, event)
 		}
 	}
+}
+
+// resyncFromList rebuilds watcher state from a fresh list after the watch stream expires.
+func (c *ActionsClient) resyncFromList(ctx context.Context) error {
+	taskActionList := &executorv1.TaskActionList{}
+	if err := c.k8sClient.List(ctx, taskActionList); err != nil {
+		return fmt.Errorf("failed to list TaskActions: %w", err)
+	}
+
+	for i := range taskActionList.Items {
+		taskAction := taskActionList.Items[i]
+		// send all previous events to prevent event lost
+		c.handleWatchEvent(ctx, watch.Event{
+			Type:   watch.Added,
+			Object: &taskAction,
+		})
+	}
+
+	if taskActionList.ResourceVersion != "" {
+		c.mu.Lock()
+		c.lastResourceVersion = taskActionList.ResourceVersion
+		c.mu.Unlock()
+	}
+
+	return nil
 }
 
 // handleWatchEvent processes a watch event
@@ -404,6 +455,13 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !ok {
 		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
 		return
+	}
+
+	// Track ResourceVersion for watch resumption
+	if taskAction.GetResourceVersion() != "" {
+		c.mu.Lock()
+		c.lastResourceVersion = taskAction.GetResourceVersion()
+		c.mu.Unlock()
 	}
 
 	var parentName string

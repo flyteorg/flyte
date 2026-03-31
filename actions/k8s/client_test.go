@@ -8,10 +8,13 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -47,6 +50,10 @@ func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpda
 		},
 	}
 	return ta, update
+}
+
+func ptr[T any](v T) *T {
+	return &v
 }
 
 func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
@@ -204,6 +211,181 @@ func TestBuildNamespace(t *testing.T) {
 		}
 		assert.Equal(t, "myproject-production", buildNamespace(runID))
 	})
+}
+
+// mockWatcher implements watch.Interface for testing
+type mockWatcher struct {
+	ch chan watch.Event
+}
+
+func (m *mockWatcher) Stop()                         {}
+func (m *mockWatcher) ResultChan() <-chan watch.Event { return m.ch }
+
+// newFakeK8sClient creates a fake client.WithWatch with executorv1 scheme registered.
+func newFakeK8sClient(objs ...client.Object) client.WithWatch {
+	scheme := runtime.NewScheme()
+	_ = executorv1.AddToScheme(scheme)
+	return fake.NewClientBuilder().WithScheme(scheme).WithObjects(objs...).Build()
+}
+
+// watchOverrideClient wraps a fake client but overrides Watch for testing doWatch behavior.
+type watchOverrideClient struct {
+	client.WithWatch
+	watchFn func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error)
+}
+
+func (w *watchOverrideClient) Watch(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+	return w.watchFn(ctx, obj, opts...)
+}
+
+func TestHandleWatchEvent_UpdatesResourceVersion(t *testing.T) {
+	c := &ActionsClient{
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Org:        "org",
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			ActionName: "action-1",
+		},
+	}
+	ta.ResourceVersion = "500"
+
+	c.handleWatchEvent(context.Background(), watch.Event{
+		Type:   watch.Modified,
+		Object: ta,
+	})
+
+	c.mu.RLock()
+	assert.Equal(t, "500", c.lastResourceVersion)
+	c.mu.RUnlock()
+}
+
+func TestDoWatch_PassesResourceVersionOnReconnect(t *testing.T) {
+	var capturedOpts *client.ListOptions
+
+	eventCh := make(chan watch.Event)
+	close(eventCh)
+
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(),
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			capturedOpts = &client.ListOptions{}
+			for _, opt := range opts {
+				opt.ApplyToList(capturedOpts)
+			}
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	c := &ActionsClient{
+		k8sClient:           woc,
+		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	_ = c.doWatch(context.Background())
+
+	assert.NotNil(t, capturedOpts)
+	assert.NotNil(t, capturedOpts.Raw)
+	assert.Equal(t, "100", capturedOpts.Raw.ResourceVersion)
+}
+
+func TestDoWatch_HandlesGoneError(t *testing.T) {
+	taskAction := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "taskaction-1",
+			Namespace:       "default",
+			ResourceVersion: "200",
+		},
+		Spec: executorv1.TaskActionSpec{
+			Org:              "org",
+			Project:          "proj",
+			Domain:           "dev",
+			RunName:          "run1",
+			ActionName:       "action-1",
+			ParentActionName: ptr("parent-1"),
+		},
+	}
+
+	eventCh := make(chan watch.Event, 1)
+	eventCh <- watch.Event{
+		Type: watch.Error,
+		Object: &metav1.Status{
+			Code:   410,
+			Reason: metav1.StatusReasonGone,
+		},
+	}
+
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(taskAction),
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	updateCh := make(chan *ActionUpdate, 1)
+	c := &ActionsClient{
+		k8sClient:           woc,
+		subscribers:         map[string]map[chan *ActionUpdate]struct{}{"parent-1": {updateCh: {}}},
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	err := c.doWatch(context.Background())
+
+	// resyncFromList replays the current snapshot and doWatch returns nil.
+	assert.NoError(t, err)
+
+	select {
+	case update := <-updateCh:
+		assert.Equal(t, "action-1", update.ActionID.Name)
+		assert.Equal(t, "parent-1", update.ParentActionName)
+		assert.False(t, update.IsDeleted)
+	default:
+		t.Fatal("expected relist replay to notify subscribers")
+	}
+
+	c.mu.RLock()
+	assert.Equal(t, "200", c.lastResourceVersion)
+	c.mu.RUnlock()
+}
+
+func TestDoWatch_PreservesResourceVersionOnOtherErrors(t *testing.T) {
+	eventCh := make(chan watch.Event, 1)
+	eventCh <- watch.Event{
+		Type: watch.Error,
+		Object: &metav1.Status{
+			Code:   500,
+			Reason: metav1.StatusReasonInternalError,
+		},
+	}
+
+	woc := &watchOverrideClient{
+		WithWatch: newFakeK8sClient(),
+		watchFn: func(ctx context.Context, obj client.ObjectList, opts ...client.ListOption) (watch.Interface, error) {
+			return &mockWatcher{ch: eventCh}, nil
+		},
+	}
+
+	c := &ActionsClient{
+		k8sClient:           woc,
+		subscribers:         make(map[string]map[chan *ActionUpdate]struct{}),
+		stopCh:              make(chan struct{}),
+		lastResourceVersion: "100",
+	}
+
+	err := c.doWatch(context.Background())
+
+	assert.Error(t, err)
+
+	c.mu.RLock()
+	assert.Equal(t, "100", c.lastResourceVersion)
+	c.mu.RUnlock()
 }
 
 func TestExtractTaskCacheKey(t *testing.T) {
