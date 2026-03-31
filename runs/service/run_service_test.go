@@ -334,6 +334,146 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestFillDefaultInputsForCreateRun(t *testing.T) {
+	inputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{
+				Name: "x",
+				Value: &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 7}},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	defaultInputs := []*task.NamedParameter{
+		{
+			Name: "x",
+			Parameter: &core.Parameter{
+				Behavior: &core.Parameter_Default{
+					Default: &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "y",
+			Parameter: &core.Parameter{
+				Behavior: &core.Parameter_Default{
+					Default: &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "default"}},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	gotInputs := fillDefaultInputs(inputs, defaultInputs)
+
+	assert.Len(t, gotInputs.Literals, 2)
+	got := make(map[string]*core.Literal, len(gotInputs.Literals))
+	for _, nl := range gotInputs.Literals {
+		got[nl.Name] = nl.Value
+	}
+	assert.Equal(t, int64(7), got["x"].GetScalar().GetPrimitive().GetInteger(), "provided input should not be overwritten")
+	assert.Equal(t, "default", got["y"].GetScalar().GetPrimitive().GetStringValue(), "missing input should be filled from default")
+}
+
+func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	createdAt := time.Now().UTC().Truncate(time.Second)
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, storage.Options{}, mock.Anything).Return(nil).Once()
+
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(&models.Run{
+			Org:         runID.Org,
+			Project:     runID.Project,
+			Domain:      runID.Domain,
+			Name:        runID.Name,
+			Phase:       int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			CreatedAt:   createdAt,
+			Attempts:    1,
+			CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
+		}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: runID,
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}))
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.NotNil(t, resp.Msg.GetRun())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetId())
+	assert.Equal(t, runID.Name, resp.Msg.GetRun().GetAction().GetId().GetName())
+	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetMetadata())
+
+	status := resp.Msg.GetRun().GetAction().GetStatus()
+	assert.NotNil(t, status)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, status.GetPhase())
+	assert.NotNil(t, status.GetStartTime())
+	assert.True(t, status.GetStartTime().AsTime().Equal(createdAt))
+	assert.Equal(t, uint32(1), status.GetAttempts())
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, status.GetCacheStatus())
+	assert.Nil(t, status.EndTime)
+	assert.Nil(t, status.DurationMs)
+
+	repo.AssertExpectations(t)
+	actionRepo.AssertExpectations(t)
+	taskRepo.AssertExpectations(t)
+	actionsClient.AssertExpectations(t)
+	store.AssertExpectations(t)
+}
+
 func TestAbortRun(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Org:     "test-org",
@@ -436,7 +576,7 @@ func TestListRuns(t *testing.T) {
 						Domain:  "test-domain",
 						Name:    fmt.Sprintf("run-%d", i),
 					},
-					Name: fmt.Sprintf("run-%d", i),
+					Name: "a0",
 				},
 				Metadata: &workflow.ActionMetadata{
 					EnvironmentName: envName,
@@ -454,7 +594,8 @@ func TestListRuns(t *testing.T) {
 			Org:        "test-org",
 			Project:    "test-project",
 			Domain:     "test-domain",
-			Name:       fmt.Sprintf("run-%d", i),
+			RunName:    fmt.Sprintf("run-%d", i),
+			Name:       "a0",
 			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
 			CreatedAt:  startTime.AsTime(),
 			EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
@@ -560,13 +701,15 @@ func TestConvertRunToProto(t *testing.T) {
 		expect *workflow.Run
 	}{
 		{"empty run", nil, nil},
-		{"valid run",
+		{
+			"valid run",
 			&models.Run{
 				ID:            uint(0),
 				Org:           org,
 				Project:       project,
 				Domain:        domain,
-				Name:          name,
+				RunName:       name,
+				Name:          "a0",
 				Phase:         int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
 				CreatedAt:     startTime.AsTime(),
 				ActionDetails: detailJson,
@@ -584,7 +727,7 @@ func TestConvertRunToProto(t *testing.T) {
 							Domain:  domain,
 							Name:    name,
 						},
-						Name: name,
+						Name: "a0",
 					},
 					Metadata: &workflow.ActionMetadata{
 						EnvironmentName: "prod",
@@ -600,7 +743,8 @@ func TestConvertRunToProto(t *testing.T) {
 				Org:        org,
 				Project:    project,
 				Domain:     domain,
-				Name:       name,
+				RunName:    name,
+				Name:       "a0",
 				Phase:      int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 				CreatedAt:  startTime.AsTime(),
 				EndedAt:    sql.NullTime{Time: endTime.AsTime(), Valid: true},
@@ -619,7 +763,7 @@ func TestConvertRunToProto(t *testing.T) {
 							Domain:  domain,
 							Name:    name,
 						},
-						Name: name,
+						Name: "a0",
 					},
 					Metadata: &workflow.ActionMetadata{
 						EnvironmentName: "staging",
@@ -828,7 +972,8 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 		Org:     "myorg",
 		Project: "myproj",
 		Domain:  "production",
-		Name:    "rtest99999",
+		RunName: "rtest99999",
+		Name:    "a0",
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
@@ -844,7 +989,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
 	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
-	assert.Equal(t, "rtest99999", run.Action.Id.Name)
+	assert.Equal(t, "a0", run.Action.Id.Name)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
 }
 
@@ -880,11 +1025,11 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", Name: "rmy-run-123"}, nil).Once()
+		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
-	// Verify the enqueue request uses the run name as the action name
+	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
 	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.Action.ActionId.Name == "rmy-run-123" &&
+		return req.Msg.Action.ActionId.Name == "a0" &&
 			req.Msg.Action.ActionId.Run.Name == "rmy-run-123"
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 

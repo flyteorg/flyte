@@ -3,8 +3,11 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"sync"
@@ -36,10 +39,16 @@ type actionRepo struct {
 	runSubscribers    map[chan string]bool
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
+
+	// Dedicated channels for async NOTIFY to avoid pool contention
+	actionNotifyCh chan string
+	runNotifyCh    chan string
 }
 
+const rootActionName = "a0"
+
 // NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRepo {
+func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
 	// Detect database type
 	dbName := db.Name()
 	isPostgres := dbName == "postgres"
@@ -54,10 +63,18 @@ func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) interfaces.ActionRep
 
 	// Start LISTEN/NOTIFY for PostgreSQL
 	if isPostgres {
-		go repo.startPostgresListener()
+		repo.actionNotifyCh = make(chan string, 256)
+		repo.runNotifyCh = make(chan string, 256)
+
+		if err := repo.startPostgresListener(); err != nil {
+			return nil, fmt.Errorf("failed to start postgres listener: %w", err)
+		}
+		if err := repo.startNotifyLoop(); err != nil {
+			return nil, fmt.Errorf("failed to start notify loop: %w", err)
+		}
 	}
 
-	return repo
+	return repo, nil
 }
 
 // CreateRun creates a new run (root action with parent_action_name = null)
@@ -75,7 +92,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	actionSpec := &workflow.ActionSpec{
 		ActionId: &common.ActionIdentifier{
 			Run:  runID,
-			Name: runID.Name, // For root actions, action name = run name
+			Name: rootActionName,
 		},
 		ParentActionName: nil, // NULL for root actions
 		RunSpec:          req.RunSpec,
@@ -150,7 +167,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Project:          runID.Project,
 		Domain:           runID.Domain,
 		RunName:          runID.Name,
-		Name:             runID.Name,
+		Name:             rootActionName,
 		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
@@ -187,7 +204,7 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		First(&run)
 
@@ -265,7 +282,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Run{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND parent_action_name IS NULL",
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
 			runID.Org, runID.Project, runID.Domain, runID.Name).
 		Updates(updates)
 
@@ -415,8 +432,8 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	var action models.Action
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {
@@ -480,31 +497,38 @@ func (r *actionRepo) UpdateActionPhase(
 		"cache_status": cacheStatus,
 		"updated_at":   time.Now(),
 	}
+
 	if endTime != nil {
 		if r.isPostgres {
-			// Clamp ended_at to be at least created_at, matching union cloud behaviour.
-			updates["ended_at"] = gorm.Expr("GREATEST(?, created_at)", *endTime)
+			// Only set ended_at if not already set, clamped to at least created_at.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (GREATEST(?, created_at) - created_at)) * 1000", *endTime)
+				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
 		} else {
-			// SQLite: use MAX() and compute duration via strftime
-			updates["ended_at"] = gorm.Expr("MAX(?, created_at)", *endTime)
+			// SQLite: only set ended_at if not already set.
+			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
 			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(MAX(?, created_at)) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
+				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
 		}
 	}
 
+	// Allow forward phase transitions (phase <= new) and retries from
+	// retryable terminal states (FAILED, TIMED_OUT) back to earlier phases.
+	retryablePhases := []int32{
+		int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+	}
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND (phase <= ? OR phase IN ?)",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, retryablePhases).
 		Updates(updates)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
-	// Notify subscribers of action update
+	// Notify subscribers of the action update
 	r.notifyActionUpdate(ctx, actionID)
 
 	return nil
@@ -612,8 +636,8 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -636,8 +660,8 @@ func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.Action
 	var action models.Action
 	result := r.db.WithContext(ctx).
 		Select("action_details").
-		Where("org = ? AND project = ? AND domain = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {
@@ -921,28 +945,26 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 	}
 }
 
-// startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener
-func (r *actionRepo) startPostgresListener() {
+// startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener.
+// Returns an error if the connection or LISTEN setup fails.
+func (r *actionRepo) startPostgresListener() error {
 	// Get the underlying SQL DB
 	sqlDB, err := r.db.DB()
 	if err != nil {
-		logger.Errorf(context.Background(), "Failed to get SQL DB: %v", err)
-		return
+		return fmt.Errorf("get SQL DB: %w", err)
 	}
 
 	// Get the connection string
-	var connStr string
 	row := sqlDB.QueryRow("SELECT current_database()")
 	var dbName string
 	if err := row.Scan(&dbName); err != nil {
-		logger.Errorf(context.Background(), "Failed to get database name: %v", err)
-		return
+		return fmt.Errorf("get database name: %w", err)
 	}
 
 	// Build connection string from the database config
 	pgCfg := r.pgConfig
 	pgCfg.DbName = dbName
-	connStr = database.GetPostgresDsn(context.Background(), pgCfg)
+	connStr := database.GetPostgresDsn(context.Background(), pgCfg)
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
@@ -952,15 +974,21 @@ func (r *actionRepo) startPostgresListener() {
 
 	// Listen to channels
 	if err := r.listener.Listen("run_updates"); err != nil {
-		logger.Errorf(context.Background(), "Failed to listen to run_updates: %v", err)
-		return
+		return fmt.Errorf("listen to run_updates: %w", err)
 	}
 
 	if err := r.listener.Listen("action_updates"); err != nil {
-		logger.Errorf(context.Background(), "Failed to listen to action_updates: %v", err)
-		return
+		return fmt.Errorf("listen to action_updates: %w", err)
 	}
 
+	// Process notifications in background
+	go r.processNotifications()
+
+	return nil
+}
+
+// processNotifications handles incoming LISTEN/NOTIFY messages.
+func (r *actionRepo) processNotifications() {
 	logger.Infof(context.Background(), "PostgreSQL LISTEN/NOTIFY started")
 
 	// Process notifications
@@ -1009,7 +1037,8 @@ func (r *actionRepo) startPostgresListener() {
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update
+// notifyRunUpdate sends a notification about a run update via the
+// dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
 	if !r.isPostgres {
 		return
@@ -1017,10 +1046,10 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 
 	payload := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
 
-	// Execute NOTIFY
-	notifySQL := fmt.Sprintf("NOTIFY run_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
-		logger.Errorf(ctx, "Failed to NOTIFY run_updates: %v", err)
+	select {
+	case r.runNotifyCh <- payload:
+	case <-ctx.Done():
+		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
 }
 
@@ -1056,7 +1085,116 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 	return actions, nil
 }
 
-// notifyActionUpdate sends a notification about an action update
+// startNotifyLoop acquires a dedicated DB connection for NOTIFY commands and
+// starts processing in the background. Returns an error if the initial
+// connection cannot be established.
+func (r *actionRepo) startNotifyLoop() error {
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return fmt.Errorf("get SQL DB: %w", err)
+	}
+
+	conn, err := sqlDB.Conn(context.Background())
+	if err != nil {
+		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
+	}
+
+	go r.runNotifyLoop(sqlDB, conn)
+	return nil
+}
+
+// isConnError reports whether err indicates a broken or lost database connection.
+func isConnError(err error) bool {
+	if errors.Is(err, driver.ErrBadConn) {
+		return true
+	}
+	var netErr *net.OpError
+	if errors.As(err, &netErr) {
+		return true
+	}
+	// lib/pq wraps connection-class errors (Class 08) as *pq.Error.
+	var pqErr *pq.Error
+	if errors.As(err, &pqErr) && pqErr.Code.Class() == "08" {
+		return true
+	}
+	return false
+}
+
+// runNotifyLoop processes notify channels using the given connection.
+// On connection errors it attempts to reconnect; if reconnection fails
+// the error is logged and the notification is skipped.
+func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
+	defer func() {
+		if conn != nil {
+			conn.Close()
+		}
+	}()
+
+	reconnect := func() {
+		if conn != nil {
+			conn.Close()
+			conn = nil
+		}
+		if sqlDB == nil {
+			return
+		}
+		var err error
+		conn, err = sqlDB.Conn(context.Background())
+		if err != nil {
+			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			conn = nil
+		}
+	}
+
+	execNotify := func(channel, payload string) {
+		if conn == nil {
+			reconnect()
+		}
+		if conn == nil {
+			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
+			return
+		}
+		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
+			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+			if isConnError(err) {
+				reconnect()
+			}
+		}
+	}
+
+	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
+		execNotify(channel, firstPayload)
+		for {
+			select {
+			case payload, ok := <-ch:
+				if !ok {
+					return
+				}
+				execNotify(channel, payload)
+			default:
+				return
+			}
+		}
+	}
+
+	for {
+		select {
+		case payload, ok := <-r.actionNotifyCh:
+			if !ok {
+				return
+			}
+			drainAndExec("action_updates", payload, r.actionNotifyCh)
+		case payload, ok := <-r.runNotifyCh:
+			if !ok {
+				return
+			}
+			drainAndExec("run_updates", payload, r.runNotifyCh)
+		}
+	}
+}
+
+// notifyActionUpdate sends a notification about an action update via the
+// dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
 	if !r.isPostgres {
 		return
@@ -1065,10 +1203,10 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
 		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	// Execute NOTIFY
-	notifySQL := fmt.Sprintf("NOTIFY action_updates, '%s'", payload)
-	if err := r.db.WithContext(ctx).Exec(notifySQL).Error; err != nil {
-		logger.Errorf(ctx, "Failed to NOTIFY action_updates: %v", err)
+	select {
+	case r.actionNotifyCh <- payload:
+	case <-ctx.Done():
+		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
 }
 
