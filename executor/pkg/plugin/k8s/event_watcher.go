@@ -22,6 +22,7 @@ type eventInfo struct {
 	Message    string
 	CreatedAt  time.Time
 	RecordedAt time.Time
+	Reason     string
 }
 
 type objectEventWatcher interface {
@@ -104,6 +105,7 @@ func (w *controllerRuntimeEventWatcher) OnAdd(obj interface{}, _ bool) {
 			Message:    event.Note,
 			CreatedAt:  event.CreationTimestamp.Time,
 			RecordedAt: time.Now(),
+			Reason:     event.Reason,
 		}
 		eventInfos.mu.Unlock()
 		return
