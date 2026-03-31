@@ -414,7 +414,8 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
 		// information from the latest attempt yet.
 		numAttempts := len(action.GetAttempts())
-		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
+		statusAttempts := action.GetStatus().GetAttempts()
+		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == statusAttempts {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
 				ErrorInfo: action.GetAttempts()[numAttempts-1].GetErrorInfo(),
 			}
@@ -818,9 +819,7 @@ func (s *RunService) WatchRunDetails(
 	}
 
 	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+		Details: s.runModelToDetails(run, req.Msg.RunId),
 	}
 
 	if err := stream.Send(resp); err != nil {
@@ -1156,8 +1155,36 @@ func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent 
 	}}
 }
 
+// runModelToDetails converts a DB Run model to a RunDetails proto.
+func (s *RunService) runModelToDetails(run *models.Run, runID *common.RunIdentifier) *workflow.RunDetails {
+	if run == nil && runID == nil {
+		return nil
+	}
+	var runSpec *task.RunSpec
+	if run != nil && len(run.ActionSpec) > 0 {
+		var actionSpec workflow.ActionSpec
+		if err := json.Unmarshal(run.ActionSpec, &actionSpec); err == nil {
+			runSpec = actionSpec.RunSpec
+		}
+	}
+
+	id := &common.ActionIdentifier{
+		Run: runID,
+	}
+	if run != nil {
+		id.Name = run.Name
+	}
+	return &workflow.RunDetails{
+		RunSpec: runSpec,
+		Action:  s.actionModelToDetails(run, id),
+	}
+}
+
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
+	if action == nil && actionID == nil {
+		return nil
+	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
 		StartTime:   timestamppb.New(action.CreatedAt),
@@ -1166,6 +1193,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
