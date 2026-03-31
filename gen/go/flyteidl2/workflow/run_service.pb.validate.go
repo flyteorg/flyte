@@ -92,6 +92,8 @@ func (m *CreateRunRequest) validate(all bool) error {
 
 	// no validation rules for Source
 
+	// no validation rules for CacheKey
+
 	switch v := m.Id.(type) {
 	case *CreateRunRequest_RunId:
 		if v == nil {
@@ -347,7 +349,7 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 		}
 
-	case *CreateRunRequest_InputUri:
+	case *CreateRunRequest_OffloadedInputData:
 		if v == nil {
 			err := CreateRunRequestValidationError{
 				field:  "InputWrapper",
@@ -358,7 +360,36 @@ func (m *CreateRunRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-		// no validation rules for InputUri
+
+		if all {
+			switch v := interface{}(m.GetOffloadedInputData()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "OffloadedInputData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CreateRunRequestValidationError{
+						field:  "OffloadedInputData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetOffloadedInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateRunRequestValidationError{
+					field:  "OffloadedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}

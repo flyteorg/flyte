@@ -200,6 +200,18 @@
         }
       }
     },
+    "commonOffloadedInputData": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "cache_key": {
+          "type": "string"
+        }
+      },
+      "description": "Captures required data to reference offloaded inputs."
+    },
     "commonProjectIdentifier": {
       "type": "object",
       "properties": {
@@ -722,11 +734,8 @@
     "dataproxyUploadInputsResponse": {
       "type": "object",
       "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "cache_key": {
-          "type": "string"
+        "offloaded_input_data": {
+          "$ref": "#/definitions/commonOffloadedInputData"
         }
       }
     },

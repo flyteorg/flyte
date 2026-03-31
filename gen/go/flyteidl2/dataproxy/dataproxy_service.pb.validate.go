@@ -561,9 +561,34 @@ func (m *UploadInputsResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Uri
-
-	// no validation rules for CacheKey
+	if all {
+		switch v := interface{}(m.GetOffloadedInputData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UploadInputsResponseValidationError{
+					field:  "OffloadedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UploadInputsResponseValidationError{
+					field:  "OffloadedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOffloadedInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UploadInputsResponseValidationError{
+				field:  "OffloadedInputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return UploadInputsResponseMultiError(errors)

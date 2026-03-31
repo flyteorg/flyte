@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
@@ -64,9 +65,7 @@ class UploadInputsRequest(_message.Message):
     def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ...) -> None: ...
 
 class UploadInputsResponse(_message.Message):
-    __slots__ = ["uri", "cache_key"]
-    URI_FIELD_NUMBER: _ClassVar[int]
-    CACHE_KEY_FIELD_NUMBER: _ClassVar[int]
-    uri: str
-    cache_key: str
-    def __init__(self, uri: _Optional[str] = ..., cache_key: _Optional[str] = ...) -> None: ...
+    __slots__ = ["offloaded_input_data"]
+    OFFLOADED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    offloaded_input_data: _run_pb2.OffloadedInputData
+    def __init__(self, offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ...) -> None: ...

@@ -14,6 +14,7 @@ _sym_db = _symbol_database.Default()
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 from flyteidl2.common import list_pb2 as flyteidl2_dot_common_dot_list__pb2
+from flyteidl2.common import run_pb2 as flyteidl2_dot_common_dot_run__pb2
 from flyteidl2.task import common_pb2 as flyteidl2_dot_task_dot_common__pb2
 from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
 from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__definition__pb2
@@ -21,7 +22,7 @@ from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/workflow/run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a$flyteidl2/task/task_definition.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbc\x04\n\x10\x43reateRunRequest\x12\x38\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierH\x00R\x05runId\x12\x44\n\nproject_id\x18\x06 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x02 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x01R\x06taskId\x12\x37\n\ttask_spec\x18\x03 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x08taskSpec\x12\x42\n\x0ctrigger_name\x18\x07 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameH\x01R\x0btriggerName\x12\x30\n\x06inputs\x18\x04 \x01(\x0b\x32\x16.flyteidl2.task.InputsH\x02R\x06inputs\x12&\n\tinput_uri\x18\t \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x02R\x08inputUri\x12\x32\n\x08run_spec\x18\x05 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12\x35\n\x06source\x18\x08 \x01(\x0e\x32\x1d.flyteidl2.workflow.RunSourceR\x06sourceB\x0b\n\x02id\x12\x05\xbaH\x02\x08\x01\x42\r\n\x04task\x12\x05\xbaH\x02\x08\x01\x42\x0f\n\rinput_wrapper\">\n\x11\x43reateRunResponse\x12)\n\x03run\x18\x01 \x01(\x0b\x32\x17.flyteidl2.workflow.RunR\x03run\"y\n\x0f\x41\x62ortRunRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x12\n\x10\x41\x62ortRunResponse\"V\n\x14GetRunDetailsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"Q\n\x15GetRunDetailsResponse\x12\x38\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.workflow.RunDetailsR\x07\x64\x65tails\"X\n\x16WatchRunDetailsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"S\n\x17WatchRunDetailsResponse\x12\x38\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.workflow.RunDetailsR\x07\x64\x65tails\"b\n\x17GetActionDetailsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"W\n\x18GetActionDetailsResponse\x12;\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x07\x64\x65tails\"d\n\x19WatchActionDetailsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"Y\n\x1aWatchActionDetailsResponse\x12;\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x07\x64\x65tails\"_\n\x14GetActionDataRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"z\n\x15GetActionDataResponse\x12.\n\x06inputs\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.InputsR\x06inputs\x12\x31\n\x07outputs\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.OutputsR\x07outputs\"\x84\x03\n\x0fListRunsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x42\n\x0ctrigger_name\x18\x06 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameH\x00R\x0btriggerName\x12\x37\n\ttask_name\x18\x07 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameH\x00R\x08taskName\x12\x39\n\x07task_id\x18\x08 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskIdB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01J\x04\x08\x03\x10\x04J\x04\x08\x05\x10\x06\"U\n\x10ListRunsResponse\x12+\n\x04runs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.workflow.RunR\x04runs\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x87\x02\n\x10WatchRunsRequest\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12\x44\n\nproject_id\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x05 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskIdB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"@\n\x11WatchRunsResponse\x12+\n\x04runs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.workflow.RunR\x04runs\"\x8d\x01\n\x12ListActionsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12>\n\x06run_id\x18\x02 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"a\n\x13ListActionsResponse\x12\x34\n\x07\x61\x63tions\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x07\x61\x63tions\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x87\x01\n\x13WatchActionsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x30\n\x06\x66ilter\x18\x02 \x03(\x0b\x32\x18.flyteidl2.common.FilterR\x06\x66ilter\"e\n\x14WatchActionsResponse\x12M\n\x10\x65nriched_actions\x18\x01 \x03(\x0b\x32\".flyteidl2.workflow.EnrichedActionR\x0f\x65nrichedActions\"z\n\x19WatchClusterEventsRequest\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"e\n\x1aWatchClusterEventsResponse\x12G\n\x0e\x63luster_events\x18\x01 \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\"u\n\x12\x41\x62ortActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x16\n\x06reason\x18\x02 \x01(\tR\x06reason\"\x15\n\x13\x41\x62ortActionResponse\"\xe3\x03\n\x12WatchGroupsRequest\x12\x44\n\nproject_id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x41\n\nstart_date\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\tstartDate\x12\x35\n\x08\x65nd_date\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x07\x65ndDate\x12\x37\n\x07request\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x61\n\x11known_sort_fields\x18\x05 \x03(\x0b\x32\x35.flyteidl2.workflow.WatchGroupsRequest.KnownSortFieldR\x0fknownSortFields\x1a^\n\x0eKnownSortField\x12\x41\n\ncreated_at\x18\x01 \x01(\x0e\x32 .flyteidl2.common.Sort.DirectionH\x00R\tcreatedAtB\t\n\x07sort_byB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"q\n\x13WatchGroupsResponse\x12>\n\x0btask_groups\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.workflow.TaskGroupR\ntaskGroups\x12\x1a\n\x08sentinel\x18\x02 \x01(\x08R\x08sentinel2\xb9\x0b\n\nRunService\x12Z\n\tCreateRun\x12$.flyteidl2.workflow.CreateRunRequest\x1a%.flyteidl2.workflow.CreateRunResponse\"\x00\x12W\n\x08\x41\x62ortRun\x12#.flyteidl2.workflow.AbortRunRequest\x1a$.flyteidl2.workflow.AbortRunResponse\"\x00\x12i\n\rGetRunDetails\x12(.flyteidl2.workflow.GetRunDetailsRequest\x1a).flyteidl2.workflow.GetRunDetailsResponse\"\x03\x90\x02\x01\x12n\n\x0fWatchRunDetails\x12*.flyteidl2.workflow.WatchRunDetailsRequest\x1a+.flyteidl2.workflow.WatchRunDetailsResponse\"\x00\x30\x01\x12r\n\x10GetActionDetails\x12+.flyteidl2.workflow.GetActionDetailsRequest\x1a,.flyteidl2.workflow.GetActionDetailsResponse\"\x03\x90\x02\x01\x12w\n\x12WatchActionDetails\x12-.flyteidl2.workflow.WatchActionDetailsRequest\x1a..flyteidl2.workflow.WatchActionDetailsResponse\"\x00\x30\x01\x12i\n\rGetActionData\x12(.flyteidl2.workflow.GetActionDataRequest\x1a).flyteidl2.workflow.GetActionDataResponse\"\x03\x90\x02\x01\x12Z\n\x08ListRuns\x12#.flyteidl2.workflow.ListRunsRequest\x1a$.flyteidl2.workflow.ListRunsResponse\"\x03\x90\x02\x01\x12\\\n\tWatchRuns\x12$.flyteidl2.workflow.WatchRunsRequest\x1a%.flyteidl2.workflow.WatchRunsResponse\"\x00\x30\x01\x12\x63\n\x0bListActions\x12&.flyteidl2.workflow.ListActionsRequest\x1a\'.flyteidl2.workflow.ListActionsResponse\"\x03\x90\x02\x01\x12\x65\n\x0cWatchActions\x12\'.flyteidl2.workflow.WatchActionsRequest\x1a(.flyteidl2.workflow.WatchActionsResponse\"\x00\x30\x01\x12w\n\x12WatchClusterEvents\x12-.flyteidl2.workflow.WatchClusterEventsRequest\x1a..flyteidl2.workflow.WatchClusterEventsResponse\"\x00\x30\x01\x12`\n\x0b\x41\x62ortAction\x12&.flyteidl2.workflow.AbortActionRequest\x1a\'.flyteidl2.workflow.AbortActionResponse\"\x00\x12\x62\n\x0bWatchGroups\x12&.flyteidl2.workflow.WatchGroupsRequest\x1a\'.flyteidl2.workflow.WatchGroupsResponse\"\x00\x30\x01\x42\xcc\x01\n\x16\x63om.flyteidl2.workflowB\x0fRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/workflow/run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a\x1a\x66lyteidl2/common/run.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a$flyteidl2/task/task_definition.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8b\x05\n\x10\x43reateRunRequest\x12\x38\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierH\x00R\x05runId\x12\x44\n\nproject_id\x18\x06 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x02 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x01R\x06taskId\x12\x37\n\ttask_spec\x18\x03 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x08taskSpec\x12\x42\n\x0ctrigger_name\x18\x07 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameH\x01R\x0btriggerName\x12\x30\n\x06inputs\x18\x04 \x01(\x0b\x32\x16.flyteidl2.task.InputsH\x02R\x06inputs\x12X\n\x14offloaded_input_data\x18\t \x01(\x0b\x32$.flyteidl2.common.OffloadedInputDataH\x02R\x12offloadedInputData\x12\x32\n\x08run_spec\x18\x05 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12\x35\n\x06source\x18\x08 \x01(\x0e\x32\x1d.flyteidl2.workflow.RunSourceR\x06source\x12\x1b\n\tcache_key\x18\n \x01(\tR\x08\x63\x61\x63heKeyB\x0b\n\x02id\x12\x05\xbaH\x02\x08\x01\x42\r\n\x04task\x12\x05\xbaH\x02\x08\x01\x42\x0f\n\rinput_wrapper\">\n\x11\x43reateRunResponse\x12)\n\x03run\x18\x01 \x01(\x0b\x32\x17.flyteidl2.workflow.RunR\x03run\"y\n\x0f\x41\x62ortRunRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x12\n\x10\x41\x62ortRunResponse\"V\n\x14GetRunDetailsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"Q\n\x15GetRunDetailsResponse\x12\x38\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.workflow.RunDetailsR\x07\x64\x65tails\"X\n\x16WatchRunDetailsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"S\n\x17WatchRunDetailsResponse\x12\x38\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.workflow.RunDetailsR\x07\x64\x65tails\"b\n\x17GetActionDetailsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"W\n\x18GetActionDetailsResponse\x12;\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x07\x64\x65tails\"d\n\x19WatchActionDetailsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"Y\n\x1aWatchActionDetailsResponse\x12;\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32!.flyteidl2.workflow.ActionDetailsR\x07\x64\x65tails\"_\n\x14GetActionDataRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\"z\n\x15GetActionDataResponse\x12.\n\x06inputs\x18\x01 \x01(\x0b\x32\x16.flyteidl2.task.InputsR\x06inputs\x12\x31\n\x07outputs\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.OutputsR\x07outputs\"\x84\x03\n\x0fListRunsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x42\n\x0ctrigger_name\x18\x06 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameH\x00R\x0btriggerName\x12\x37\n\ttask_name\x18\x07 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameH\x00R\x08taskName\x12\x39\n\x07task_id\x18\x08 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskIdB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01J\x04\x08\x03\x10\x04J\x04\x08\x05\x10\x06\"U\n\x10ListRunsResponse\x12+\n\x04runs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.workflow.RunR\x04runs\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x87\x02\n\x10WatchRunsRequest\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12\x44\n\nproject_id\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x05 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskIdB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"@\n\x11WatchRunsResponse\x12+\n\x04runs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.workflow.RunR\x04runs\"\x8d\x01\n\x12ListActionsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12>\n\x06run_id\x18\x02 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\"a\n\x13ListActionsResponse\x12\x34\n\x07\x61\x63tions\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.workflow.ActionR\x07\x61\x63tions\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x87\x01\n\x13WatchActionsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x30\n\x06\x66ilter\x18\x02 \x03(\x0b\x32\x18.flyteidl2.common.FilterR\x06\x66ilter\"e\n\x14WatchActionsResponse\x12M\n\x10\x65nriched_actions\x18\x01 \x03(\x0b\x32\".flyteidl2.workflow.EnrichedActionR\x0f\x65nrichedActions\"z\n\x19WatchClusterEventsRequest\x12:\n\x02id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"e\n\x1aWatchClusterEventsResponse\x12G\n\x0e\x63luster_events\x18\x01 \x03(\x0b\x32 .flyteidl2.workflow.ClusterEventR\rclusterEvents\"u\n\x12\x41\x62ortActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x16\n\x06reason\x18\x02 \x01(\tR\x06reason\"\x15\n\x13\x41\x62ortActionResponse\"\xe3\x03\n\x12WatchGroupsRequest\x12\x44\n\nproject_id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x41\n\nstart_date\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\tstartDate\x12\x35\n\x08\x65nd_date\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x07\x65ndDate\x12\x37\n\x07request\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x61\n\x11known_sort_fields\x18\x05 \x03(\x0b\x32\x35.flyteidl2.workflow.WatchGroupsRequest.KnownSortFieldR\x0fknownSortFields\x1a^\n\x0eKnownSortField\x12\x41\n\ncreated_at\x18\x01 \x01(\x0e\x32 .flyteidl2.common.Sort.DirectionH\x00R\tcreatedAtB\t\n\x07sort_byB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"q\n\x13WatchGroupsResponse\x12>\n\x0btask_groups\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.workflow.TaskGroupR\ntaskGroups\x12\x1a\n\x08sentinel\x18\x02 \x01(\x08R\x08sentinel2\xb9\x0b\n\nRunService\x12Z\n\tCreateRun\x12$.flyteidl2.workflow.CreateRunRequest\x1a%.flyteidl2.workflow.CreateRunResponse\"\x00\x12W\n\x08\x41\x62ortRun\x12#.flyteidl2.workflow.AbortRunRequest\x1a$.flyteidl2.workflow.AbortRunResponse\"\x00\x12i\n\rGetRunDetails\x12(.flyteidl2.workflow.GetRunDetailsRequest\x1a).flyteidl2.workflow.GetRunDetailsResponse\"\x03\x90\x02\x01\x12n\n\x0fWatchRunDetails\x12*.flyteidl2.workflow.WatchRunDetailsRequest\x1a+.flyteidl2.workflow.WatchRunDetailsResponse\"\x00\x30\x01\x12r\n\x10GetActionDetails\x12+.flyteidl2.workflow.GetActionDetailsRequest\x1a,.flyteidl2.workflow.GetActionDetailsResponse\"\x03\x90\x02\x01\x12w\n\x12WatchActionDetails\x12-.flyteidl2.workflow.WatchActionDetailsRequest\x1a..flyteidl2.workflow.WatchActionDetailsResponse\"\x00\x30\x01\x12i\n\rGetActionData\x12(.flyteidl2.workflow.GetActionDataRequest\x1a).flyteidl2.workflow.GetActionDataResponse\"\x03\x90\x02\x01\x12Z\n\x08ListRuns\x12#.flyteidl2.workflow.ListRunsRequest\x1a$.flyteidl2.workflow.ListRunsResponse\"\x03\x90\x02\x01\x12\\\n\tWatchRuns\x12$.flyteidl2.workflow.WatchRunsRequest\x1a%.flyteidl2.workflow.WatchRunsResponse\"\x00\x30\x01\x12\x63\n\x0bListActions\x12&.flyteidl2.workflow.ListActionsRequest\x1a\'.flyteidl2.workflow.ListActionsResponse\"\x03\x90\x02\x01\x12\x65\n\x0cWatchActions\x12\'.flyteidl2.workflow.WatchActionsRequest\x1a(.flyteidl2.workflow.WatchActionsResponse\"\x00\x30\x01\x12w\n\x12WatchClusterEvents\x12-.flyteidl2.workflow.WatchClusterEventsRequest\x1a..flyteidl2.workflow.WatchClusterEventsResponse\"\x00\x30\x01\x12`\n\x0b\x41\x62ortAction\x12&.flyteidl2.workflow.AbortActionRequest\x1a\'.flyteidl2.workflow.AbortActionResponse\"\x00\x12\x62\n\x0bWatchGroups\x12&.flyteidl2.workflow.WatchGroupsRequest\x1a\'.flyteidl2.workflow.WatchGroupsResponse\"\x00\x30\x01\x42\xcc\x01\n\x16\x63om.flyteidl2.workflowB\x0fRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,8 +34,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CREATERUNREQUEST.oneofs_by_name['id']._serialized_options = b'\272H\002\010\001'
   _CREATERUNREQUEST.oneofs_by_name['task']._options = None
   _CREATERUNREQUEST.oneofs_by_name['task']._serialized_options = b'\272H\002\010\001'
-  _CREATERUNREQUEST.fields_by_name['input_uri']._options = None
-  _CREATERUNREQUEST.fields_by_name['input_uri']._serialized_options = b'\272H\004r\002\020\001'
   _ABORTRUNREQUEST.fields_by_name['run_id']._options = None
   _ABORTRUNREQUEST.fields_by_name['run_id']._serialized_options = b'\272H\003\310\001\001'
   _GETRUNDETAILSREQUEST.fields_by_name['run_id']._options = None
@@ -79,64 +78,64 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _RUNSERVICE.methods_by_name['ListRuns']._serialized_options = b'\220\002\001'
   _RUNSERVICE.methods_by_name['ListActions']._options = None
   _RUNSERVICE.methods_by_name['ListActions']._serialized_options = b'\220\002\001'
-  _globals['_CREATERUNREQUEST']._serialized_start=321
-  _globals['_CREATERUNREQUEST']._serialized_end=893
-  _globals['_CREATERUNRESPONSE']._serialized_start=895
-  _globals['_CREATERUNRESPONSE']._serialized_end=957
-  _globals['_ABORTRUNREQUEST']._serialized_start=959
-  _globals['_ABORTRUNREQUEST']._serialized_end=1080
-  _globals['_ABORTRUNRESPONSE']._serialized_start=1082
-  _globals['_ABORTRUNRESPONSE']._serialized_end=1100
-  _globals['_GETRUNDETAILSREQUEST']._serialized_start=1102
-  _globals['_GETRUNDETAILSREQUEST']._serialized_end=1188
-  _globals['_GETRUNDETAILSRESPONSE']._serialized_start=1190
-  _globals['_GETRUNDETAILSRESPONSE']._serialized_end=1271
-  _globals['_WATCHRUNDETAILSREQUEST']._serialized_start=1273
-  _globals['_WATCHRUNDETAILSREQUEST']._serialized_end=1361
-  _globals['_WATCHRUNDETAILSRESPONSE']._serialized_start=1363
-  _globals['_WATCHRUNDETAILSRESPONSE']._serialized_end=1446
-  _globals['_GETACTIONDETAILSREQUEST']._serialized_start=1448
-  _globals['_GETACTIONDETAILSREQUEST']._serialized_end=1546
-  _globals['_GETACTIONDETAILSRESPONSE']._serialized_start=1548
-  _globals['_GETACTIONDETAILSRESPONSE']._serialized_end=1635
-  _globals['_WATCHACTIONDETAILSREQUEST']._serialized_start=1637
-  _globals['_WATCHACTIONDETAILSREQUEST']._serialized_end=1737
-  _globals['_WATCHACTIONDETAILSRESPONSE']._serialized_start=1739
-  _globals['_WATCHACTIONDETAILSRESPONSE']._serialized_end=1828
-  _globals['_GETACTIONDATAREQUEST']._serialized_start=1830
-  _globals['_GETACTIONDATAREQUEST']._serialized_end=1925
-  _globals['_GETACTIONDATARESPONSE']._serialized_start=1927
-  _globals['_GETACTIONDATARESPONSE']._serialized_end=2049
-  _globals['_LISTRUNSREQUEST']._serialized_start=2052
-  _globals['_LISTRUNSREQUEST']._serialized_end=2440
-  _globals['_LISTRUNSRESPONSE']._serialized_start=2442
-  _globals['_LISTRUNSRESPONSE']._serialized_end=2527
-  _globals['_WATCHRUNSREQUEST']._serialized_start=2530
-  _globals['_WATCHRUNSREQUEST']._serialized_end=2793
-  _globals['_WATCHRUNSRESPONSE']._serialized_start=2795
-  _globals['_WATCHRUNSRESPONSE']._serialized_end=2859
-  _globals['_LISTACTIONSREQUEST']._serialized_start=2862
-  _globals['_LISTACTIONSREQUEST']._serialized_end=3003
-  _globals['_LISTACTIONSRESPONSE']._serialized_start=3005
-  _globals['_LISTACTIONSRESPONSE']._serialized_end=3102
-  _globals['_WATCHACTIONSREQUEST']._serialized_start=3105
-  _globals['_WATCHACTIONSREQUEST']._serialized_end=3240
-  _globals['_WATCHACTIONSRESPONSE']._serialized_start=3242
-  _globals['_WATCHACTIONSRESPONSE']._serialized_end=3343
-  _globals['_WATCHCLUSTEREVENTSREQUEST']._serialized_start=3345
-  _globals['_WATCHCLUSTEREVENTSREQUEST']._serialized_end=3467
-  _globals['_WATCHCLUSTEREVENTSRESPONSE']._serialized_start=3469
-  _globals['_WATCHCLUSTEREVENTSRESPONSE']._serialized_end=3570
-  _globals['_ABORTACTIONREQUEST']._serialized_start=3572
-  _globals['_ABORTACTIONREQUEST']._serialized_end=3689
-  _globals['_ABORTACTIONRESPONSE']._serialized_start=3691
-  _globals['_ABORTACTIONRESPONSE']._serialized_end=3712
-  _globals['_WATCHGROUPSREQUEST']._serialized_start=3715
-  _globals['_WATCHGROUPSREQUEST']._serialized_end=4198
-  _globals['_WATCHGROUPSREQUEST_KNOWNSORTFIELD']._serialized_start=4085
-  _globals['_WATCHGROUPSREQUEST_KNOWNSORTFIELD']._serialized_end=4179
-  _globals['_WATCHGROUPSRESPONSE']._serialized_start=4200
-  _globals['_WATCHGROUPSRESPONSE']._serialized_end=4313
-  _globals['_RUNSERVICE']._serialized_start=4316
-  _globals['_RUNSERVICE']._serialized_end=5781
+  _globals['_CREATERUNREQUEST']._serialized_start=349
+  _globals['_CREATERUNREQUEST']._serialized_end=1000
+  _globals['_CREATERUNRESPONSE']._serialized_start=1002
+  _globals['_CREATERUNRESPONSE']._serialized_end=1064
+  _globals['_ABORTRUNREQUEST']._serialized_start=1066
+  _globals['_ABORTRUNREQUEST']._serialized_end=1187
+  _globals['_ABORTRUNRESPONSE']._serialized_start=1189
+  _globals['_ABORTRUNRESPONSE']._serialized_end=1207
+  _globals['_GETRUNDETAILSREQUEST']._serialized_start=1209
+  _globals['_GETRUNDETAILSREQUEST']._serialized_end=1295
+  _globals['_GETRUNDETAILSRESPONSE']._serialized_start=1297
+  _globals['_GETRUNDETAILSRESPONSE']._serialized_end=1378
+  _globals['_WATCHRUNDETAILSREQUEST']._serialized_start=1380
+  _globals['_WATCHRUNDETAILSREQUEST']._serialized_end=1468
+  _globals['_WATCHRUNDETAILSRESPONSE']._serialized_start=1470
+  _globals['_WATCHRUNDETAILSRESPONSE']._serialized_end=1553
+  _globals['_GETACTIONDETAILSREQUEST']._serialized_start=1555
+  _globals['_GETACTIONDETAILSREQUEST']._serialized_end=1653
+  _globals['_GETACTIONDETAILSRESPONSE']._serialized_start=1655
+  _globals['_GETACTIONDETAILSRESPONSE']._serialized_end=1742
+  _globals['_WATCHACTIONDETAILSREQUEST']._serialized_start=1744
+  _globals['_WATCHACTIONDETAILSREQUEST']._serialized_end=1844
+  _globals['_WATCHACTIONDETAILSRESPONSE']._serialized_start=1846
+  _globals['_WATCHACTIONDETAILSRESPONSE']._serialized_end=1935
+  _globals['_GETACTIONDATAREQUEST']._serialized_start=1937
+  _globals['_GETACTIONDATAREQUEST']._serialized_end=2032
+  _globals['_GETACTIONDATARESPONSE']._serialized_start=2034
+  _globals['_GETACTIONDATARESPONSE']._serialized_end=2156
+  _globals['_LISTRUNSREQUEST']._serialized_start=2159
+  _globals['_LISTRUNSREQUEST']._serialized_end=2547
+  _globals['_LISTRUNSRESPONSE']._serialized_start=2549
+  _globals['_LISTRUNSRESPONSE']._serialized_end=2634
+  _globals['_WATCHRUNSREQUEST']._serialized_start=2637
+  _globals['_WATCHRUNSREQUEST']._serialized_end=2900
+  _globals['_WATCHRUNSRESPONSE']._serialized_start=2902
+  _globals['_WATCHRUNSRESPONSE']._serialized_end=2966
+  _globals['_LISTACTIONSREQUEST']._serialized_start=2969
+  _globals['_LISTACTIONSREQUEST']._serialized_end=3110
+  _globals['_LISTACTIONSRESPONSE']._serialized_start=3112
+  _globals['_LISTACTIONSRESPONSE']._serialized_end=3209
+  _globals['_WATCHACTIONSREQUEST']._serialized_start=3212
+  _globals['_WATCHACTIONSREQUEST']._serialized_end=3347
+  _globals['_WATCHACTIONSRESPONSE']._serialized_start=3349
+  _globals['_WATCHACTIONSRESPONSE']._serialized_end=3450
+  _globals['_WATCHCLUSTEREVENTSREQUEST']._serialized_start=3452
+  _globals['_WATCHCLUSTEREVENTSREQUEST']._serialized_end=3574
+  _globals['_WATCHCLUSTEREVENTSRESPONSE']._serialized_start=3576
+  _globals['_WATCHCLUSTEREVENTSRESPONSE']._serialized_end=3677
+  _globals['_ABORTACTIONREQUEST']._serialized_start=3679
+  _globals['_ABORTACTIONREQUEST']._serialized_end=3796
+  _globals['_ABORTACTIONRESPONSE']._serialized_start=3798
+  _globals['_ABORTACTIONRESPONSE']._serialized_end=3819
+  _globals['_WATCHGROUPSREQUEST']._serialized_start=3822
+  _globals['_WATCHGROUPSREQUEST']._serialized_end=4305
+  _globals['_WATCHGROUPSREQUEST_KNOWNSORTFIELD']._serialized_start=4192
+  _globals['_WATCHGROUPSREQUEST_KNOWNSORTFIELD']._serialized_end=4286
+  _globals['_WATCHGROUPSRESPONSE']._serialized_start=4307
+  _globals['_WATCHGROUPSRESPONSE']._serialized_end=4420
+  _globals['_RUNSERVICE']._serialized_start=4423
+  _globals['_RUNSERVICE']._serialized_end=5888
 # @@protoc_insertion_point(module_scope)
