@@ -512,10 +512,16 @@ func (r *actionRepo) UpdateActionPhase(
 		}
 	}
 
+	// Allow forward phase transitions (phase <= new) and retries from
+	// retryable terminal states (FAILED, TIMED_OUT) back to earlier phases.
+	retryablePhases := []int32{
+		int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+	}
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND (phase <= ? OR phase IN ?)",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, retryablePhases).
 		Updates(updates)
 
 	if result.Error != nil {
