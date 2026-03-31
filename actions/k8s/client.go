@@ -445,11 +445,7 @@ func (c *ActionsClient) dispatchEvent(ctx context.Context, event watch.Event) {
 	h := fnv.New32a()
 	_, _ = h.Write([]byte(ta.Name)) // FNV Write never returns an error
 	shard := h.Sum32() % uint32(c.numWorkers)
-	select {
-	case c.workerChs[shard] <- event:
-	default:
-		logger.Warnf(ctx, "worker %d channel full, dropping event for TaskAction %s", shard, ta.Name)
-	}
+	c.workerChs[shard] <- event
 }
 
 // handleWatchEvent processes a watch event
