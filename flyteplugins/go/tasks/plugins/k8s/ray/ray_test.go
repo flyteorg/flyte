@@ -1539,3 +1539,212 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 	assert.Nil(t, err)
 	return s
 }
+
+func TestConvertResourceEntriesToResourceList(t *testing.T) {
+	tests := []struct {
+		name     string
+		entries  []*plugins.Resources_ResourceEntry
+		wantKeys []corev1.ResourceName
+		wantLen  int
+	}{
+		{
+			name: "cpu entry",
+			entries: []*plugins.Resources_ResourceEntry{
+				{Name: plugins.Resources_CPU, Value: "500m"},
+			},
+			wantKeys: []corev1.ResourceName{corev1.ResourceCPU},
+			wantLen:  1,
+		},
+		{
+			name: "memory entry",
+			entries: []*plugins.Resources_ResourceEntry{
+				{Name: plugins.Resources_MEMORY, Value: "1Gi"},
+			},
+			wantKeys: []corev1.ResourceName{corev1.ResourceMemory},
+			wantLen:  1,
+		},
+		{
+			name: "unknown resource skipped",
+			entries: []*plugins.Resources_ResourceEntry{
+				{Name: plugins.Resources_ResourceName(99), Value: "1"},
+			},
+			wantLen: 0,
+		},
+		{
+			name: "invalid quantity skipped",
+			entries: []*plugins.Resources_ResourceEntry{
+				{Name: plugins.Resources_CPU, Value: "not-a-quantity"},
+			},
+			wantLen: 0,
+		},
+		{
+			name:    "empty input",
+			entries: []*plugins.Resources_ResourceEntry{},
+			wantLen: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := convertResourceEntriesToResourceList(tt.entries)
+			require.NotNil(t, result)
+			assert.Len(t, result, tt.wantLen)
+			for _, key := range tt.wantKeys {
+				_, ok := result[key]
+				assert.True(t, ok, "expected key %s in result", key)
+			}
+		})
+	}
+}
+
+func TestNewAutoscalerOptions(t *testing.T) {
+	t.Run("nil input returns nil", func(t *testing.T) {
+		assert.Nil(t, NewAutoscalerOptions(nil))
+	})
+
+	t.Run("idle timeout propagated", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{IdleTimeoutSeconds: 30})
+		require.NotNil(t, result)
+		require.NotNil(t, result.IdleTimeoutSeconds)
+		assert.Equal(t, int32(30), *result.IdleTimeoutSeconds)
+	})
+
+	t.Run("upscaling mode set when non-empty", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: "Conservative"})
+		require.NotNil(t, result)
+		require.NotNil(t, result.UpscalingMode)
+		assert.Equal(t, rayv1.UpscalingMode("Conservative"), *result.UpscalingMode)
+	})
+
+	t.Run("upscaling mode nil when empty", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: ""})
+		require.NotNil(t, result)
+		assert.Nil(t, result.UpscalingMode)
+	})
+
+	t.Run("image set when non-empty", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{Image: "my-image:latest"})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Image)
+		assert.Equal(t, "my-image:latest", *result.Image)
+	})
+
+	t.Run("image nil when empty", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
+		require.NotNil(t, result)
+		assert.Nil(t, result.Image)
+	})
+
+	t.Run("resources requests and limits converted", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{
+			Resources: &plugins.Resources{
+				Requests: []*plugins.Resources_ResourceEntry{
+					{Name: plugins.Resources_CPU, Value: "250m"},
+					{Name: plugins.Resources_MEMORY, Value: "512Mi"},
+				},
+				Limits: []*plugins.Resources_ResourceEntry{
+					{Name: plugins.Resources_CPU, Value: "1"},
+					{Name: plugins.Resources_MEMORY, Value: "1Gi"},
+				},
+			},
+		})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Resources)
+		assert.Equal(t, resource.MustParse("250m"), result.Resources.Requests[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("512Mi"), result.Resources.Requests[corev1.ResourceMemory])
+		assert.Equal(t, resource.MustParse("1"), result.Resources.Limits[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("1Gi"), result.Resources.Limits[corev1.ResourceMemory])
+	})
+
+	t.Run("env literal value", func(t *testing.T) {
+		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{
+			Env: []*plugins.EnvVar{{Name: "FOO", Value: "bar"}},
+		})
+		require.NotNil(t, result)
+		require.Len(t, result.Env, 1)
+		assert.Equal(t, "FOO", result.Env[0].Name)
+		assert.Equal(t, "bar", result.Env[0].Value)
+	})
+
+	envValueFromTests := []struct {
+		name   string
+		envVar *plugins.EnvVar
+		check  func(t *testing.T, env corev1.EnvVar)
+	}{
+		{
+			name: "configmap source",
+			envVar: &plugins.EnvVar{
+				Name: "CM_VAR",
+				ValueFrom: &plugins.EnvValueFrom{
+					Source: plugins.EnvValueFrom_CONFIGMAP,
+					Name:   "my-cm",
+					Key:    "key1",
+				},
+			},
+			check: func(t *testing.T, env corev1.EnvVar) {
+				require.NotNil(t, env.ValueFrom)
+				require.NotNil(t, env.ValueFrom.ConfigMapKeyRef)
+				assert.Equal(t, "my-cm", env.ValueFrom.ConfigMapKeyRef.Name)
+				assert.Equal(t, "key1", env.ValueFrom.ConfigMapKeyRef.Key)
+			},
+		},
+		{
+			name: "secret source",
+			envVar: &plugins.EnvVar{
+				Name: "SECRET_VAR",
+				ValueFrom: &plugins.EnvValueFrom{
+					Source: plugins.EnvValueFrom_SECRET,
+					Name:   "my-secret",
+					Key:    "token",
+				},
+			},
+			check: func(t *testing.T, env corev1.EnvVar) {
+				require.NotNil(t, env.ValueFrom)
+				require.NotNil(t, env.ValueFrom.SecretKeyRef)
+				assert.Equal(t, "my-secret", env.ValueFrom.SecretKeyRef.Name)
+				assert.Equal(t, "token", env.ValueFrom.SecretKeyRef.Key)
+			},
+		},
+		{
+			name: "resourcefield source",
+			envVar: &plugins.EnvVar{
+				Name: "RESOURCE_VAR",
+				ValueFrom: &plugins.EnvValueFrom{
+					Source: plugins.EnvValueFrom_RESOURCEFIELD,
+					Name:   "ray-head",
+					Key:    "limits.cpu",
+				},
+			},
+			check: func(t *testing.T, env corev1.EnvVar) {
+				require.NotNil(t, env.ValueFrom)
+				require.NotNil(t, env.ValueFrom.ResourceFieldRef)
+				assert.Equal(t, "ray-head", env.ValueFrom.ResourceFieldRef.ContainerName)
+				assert.Equal(t, "limits.cpu", env.ValueFrom.ResourceFieldRef.Resource)
+			},
+		},
+		{
+			name: "fieldref source (default)",
+			envVar: &plugins.EnvVar{
+				Name: "FIELD_VAR",
+				ValueFrom: &plugins.EnvValueFrom{
+					Source: plugins.EnvValueFrom_FIELD,
+					Key:    "metadata.name",
+				},
+			},
+			check: func(t *testing.T, env corev1.EnvVar) {
+				require.NotNil(t, env.ValueFrom)
+				require.NotNil(t, env.ValueFrom.FieldRef)
+				assert.Equal(t, "metadata.name", env.ValueFrom.FieldRef.FieldPath)
+			},
+		},
+	}
+	for _, tt := range envValueFromTests {
+		t.Run("env valueFrom "+tt.name, func(t *testing.T) {
+			result := NewAutoscalerOptions(&plugins.AutoscalerOptions{
+				Env: []*plugins.EnvVar{tt.envVar},
+			})
+			require.NotNil(t, result)
+			require.Len(t, result.Env, 1)
+			tt.check(t, result.Env[0])
+		})
+	}
+}
