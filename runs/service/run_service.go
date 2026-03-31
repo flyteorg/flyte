@@ -913,7 +913,7 @@ func (s *RunService) WatchActionDetails(
 	// Step 2: Watch DB for updates
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, actionID.Run, updates, errs)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	for {
 		select {
@@ -924,10 +924,6 @@ func (s *RunService) WatchActionDetails(
 		case updated, ok := <-updates:
 			if !ok {
 				return nil
-			}
-			// Filter to this specific action
-			if updated.Name != actionID.Name {
-				continue
 			}
 			// Reuse the already-fetched action model from WatchActionUpdates
 			details, err := s.buildActionDetails(ctx, updated, actionID)
@@ -1119,7 +1115,7 @@ func (s *RunService) WatchClusterEvents(
 	// between initial state fetch and subscription setup.
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updatesCh, errsCh)
 
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
@@ -1168,12 +1164,6 @@ func (s *RunService) WatchClusterEvents(
 		case updated, ok := <-updatesCh:
 			if !ok {
 				return nil
-			}
-			if updated.Name != actionID.Name {
-				// TODO: Relying only on target action's update notifications can miss events
-				// when notifications are dropped (e.g. subscriber channel full) or during listener
-				// reconnect windows. Need to find out why we will miss the notification.
-				continue
 			}
 			action = updated
 		}

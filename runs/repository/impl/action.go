@@ -842,7 +842,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 	}
 }
 
-// WatchAllActionUpdates watches for action updates
+// WatchAllActionUpdates watches for all action updates for a run
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
@@ -938,6 +938,63 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 				}
 
 				lastCheck = time.Now()
+			}
+		}
+	}
+}
+
+// WatchActionUpdates watches the current action update
+func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	targetPayload := fmt.Sprintf("%s/%s/%s/%s/%s",
+		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	notifCh := make(chan string, 100)
+
+	r.mu.Lock()
+	r.actionSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
+		r.mu.Lock()
+		delete(r.actionSubscribers, notifCh)
+		close(notifCh)
+		r.mu.Unlock()
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			if notifPayload != targetPayload {
+				continue
+			}
+
+		drain:
+			for {
+				// Prevent continuous update from the action
+				select {
+				case extra := <-notifCh:
+					if extra != targetPayload {
+						continue
+					}
+				default:
+					break drain
+				}
+			}
+
+			action, err := r.GetAction(ctx, actionID)
+			if err != nil {
+				if ctx.Err() != nil {
+					return
+				}
+				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+				continue
+			}
+
+			select {
+			case updates <- action:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}

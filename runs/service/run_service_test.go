@@ -224,7 +224,7 @@ func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
 	eventModel.UpdatedAt = time.Unix(101, 0)
 
 	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(actionModel, nil).Once()
-	actionRepo.On("WatchActionUpdates", mock.Anything, matchRunID(actionID.Run), mock.Anything, mock.Anything).
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
 			updates := args.Get(2).(chan<- *models.Action)
 			errs := args.Get(3).(chan<- error)
@@ -311,7 +311,7 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(runningAction, nil).Once()
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
 		Return([]*models.ActionEvent{event1}, nil).Once()
-	actionRepo.On("WatchActionUpdates", mock.Anything, matchRunID(actionID.Run), mock.Anything, mock.Anything).
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
 			updates := args.Get(2).(chan<- *models.Action)
 			updates <- succeededAction
