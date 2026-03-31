@@ -572,14 +572,28 @@ func TestDispatchEvent_DropsNonTaskActionObjects(t *testing.T) {
 	}
 }
 
-func TestDispatchEvent_FullChannelDropsWithoutBlocking(t *testing.T) {
+func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
 	c := newWorkerTestClient(1, 1) // single worker, capacity 1
 	event := newTaskActionEvent("run1-action1", watch.Modified)
 
 	c.dispatchEvent(context.Background(), event) // fills the channel
-	c.dispatchEvent(context.Background(), event) // must drop, not block
 
-	assert.Equal(t, 1, len(c.workerChs[0]))
+	// Second dispatch must block because the channel is full.
+	// Run it in a goroutine and verify it unblocks once the channel is drained.
+	done := make(chan struct{})
+	go func() {
+		c.dispatchEvent(context.Background(), event)
+		close(done)
+	}()
+
+	// Drain the channel to unblock the sender.
+	<-c.workerChs[0]
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("dispatchEvent did not unblock after channel was drained")
+	}
 }
 
 func TestWorker_ExitsOnStopCh(t *testing.T) {
