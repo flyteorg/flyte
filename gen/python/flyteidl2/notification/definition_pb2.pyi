@@ -84,18 +84,35 @@ class EmailRecipient(_message.Message):
     address: str
     def __init__(self, name: _Optional[str] = ..., address: _Optional[str] = ...) -> None: ...
 
+class ProviderEmailTemplate(_message.Message):
+    __slots__ = ["template_id", "template_data"]
+    class TemplateDataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    TEMPLATE_ID_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_DATA_FIELD_NUMBER: _ClassVar[int]
+    template_id: str
+    template_data: _containers.ScalarMap[str, str]
+    def __init__(self, template_id: _Optional[str] = ..., template_data: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class EmailDeliveryTemplate(_message.Message):
-    __slots__ = ["subject", "to", "cc", "bcc", "html_template", "text_template"]
+    __slots__ = ["subject", "to", "cc", "bcc", "html_template", "text_template", "provider_template"]
     SUBJECT_FIELD_NUMBER: _ClassVar[int]
     TO_FIELD_NUMBER: _ClassVar[int]
     CC_FIELD_NUMBER: _ClassVar[int]
     BCC_FIELD_NUMBER: _ClassVar[int]
     HTML_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     TEXT_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    PROVIDER_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     subject: str
     to: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
     cc: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
     bcc: _containers.RepeatedCompositeFieldContainer[EmailRecipient]
     html_template: str
     text_template: str
-    def __init__(self, subject: _Optional[str] = ..., to: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., cc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., bcc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., html_template: _Optional[str] = ..., text_template: _Optional[str] = ...) -> None: ...
+    provider_template: ProviderEmailTemplate
+    def __init__(self, subject: _Optional[str] = ..., to: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., cc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., bcc: _Optional[_Iterable[_Union[EmailRecipient, _Mapping]]] = ..., html_template: _Optional[str] = ..., text_template: _Optional[str] = ..., provider_template: _Optional[_Union[ProviderEmailTemplate, _Mapping]] = ...) -> None: ...

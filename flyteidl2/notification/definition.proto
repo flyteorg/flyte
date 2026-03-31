@@ -81,8 +81,36 @@ message EmailRecipient {
   string address = 2;
 }
 
+message ProviderEmailTemplate {
+  string template_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
+
+  map<string, string> template_data = 2 [(buf.validate.field).map = {
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 100
+      }
+    }
+    values: {
+      string: {
+        max_len: 4000
+      }
+    }
+    max_pairs: 100
+  }];
+}
+
 message EmailDeliveryTemplate {
-  string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+  option (buf.validate.message).cel = {
+    id: "inline_email_or_provider_template_required"
+    message: "either inline email subject/html_template or provider_template must be set"
+    expression: "(has(this.provider_template) && size(this.subject) == 0 && size(this.html_template) == 0 && size(this.text_template) == 0) || (!has(this.provider_template) && size(this.subject) > 0 && size(this.html_template) > 0)"
+  };
+
+  string subject = 1; // this is a Go template that may contain placeholders
 
   repeated EmailRecipient to = 2 [(buf.validate.field).repeated.min_items = 1];
 
@@ -90,7 +118,9 @@ message EmailDeliveryTemplate {
 
   repeated EmailRecipient bcc = 4;
 
-  string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+  string html_template = 5; // this is a Go template that may contain placeholders
 
   string text_template = 6; // this is a Go template that may contain placeholders
+
+  ProviderEmailTemplate provider_template = 7;
 }
