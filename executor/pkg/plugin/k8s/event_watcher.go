@@ -26,7 +26,7 @@ type eventInfo struct {
 }
 
 type objectEventWatcher interface {
-	List(objectKey watchedObjectKey, createdAfter time.Time) []*eventInfo
+	List(objectKey watchedObjectKey, createdAfter time.Time, recordedAfter time.Time) []*eventInfo
 }
 
 type controllerRuntimeEventWatcher struct {
@@ -126,7 +126,7 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 	// a new event is being added to the bucket while the top-level map entry is concurrently removed.
 }
 
-func (w *controllerRuntimeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Time) []*eventInfo {
+func (w *controllerRuntimeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Time, recordedAfter time.Time) []*eventInfo {
 	value, ok := w.objectCache.Load(objectKey)
 	if !ok {
 		return nil
@@ -138,7 +138,8 @@ func (w *controllerRuntimeEventWatcher) List(objectKey watchedObjectKey, created
 
 	events := make([]*eventInfo, 0, len(eventInfos.eventInfos))
 	for _, info := range eventInfos.eventInfos {
-		if info.CreatedAt.After(createdAfter) {
+		if info.CreatedAt.After(createdAfter) ||
+			(info.CreatedAt.Equal(createdAfter) && info.RecordedAt.After(recordedAfter)) {
 			events = append(events, info)
 		}
 	}

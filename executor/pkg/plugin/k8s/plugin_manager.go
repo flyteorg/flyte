@@ -36,9 +36,10 @@ const (
 
 // PluginState is the state persisted by the PluginManager between reconciliation rounds.
 type PluginState struct {
-	Phase           PluginPhase
-	K8sPluginState  k8s.PluginState
-	LastEventUpdate time.Time
+	Phase               PluginPhase
+	K8sPluginState      k8s.PluginState
+	LastEventUpdate     time.Time
+	LastEventRecordedAt time.Time
 }
 
 var _ pluginsCore.Plugin = &PluginManager{}
@@ -239,8 +240,15 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	phaseInfo := transition.Info()
 	lastEventUpdate := pluginState.LastEventUpdate
+	lastEventRecordedAt := pluginState.LastEventRecordedAt
 	if resource != nil {
-		phaseInfo, lastEventUpdate = pm.attachRecentObjectEvents(resource, phaseInfo, pluginState.K8sPluginState, lastEventUpdate)
+		phaseInfo, lastEventUpdate, lastEventRecordedAt = pm.attachRecentObjectEvents(
+			resource,
+			phaseInfo,
+			pluginState.K8sPluginState,
+			lastEventUpdate,
+			lastEventRecordedAt,
+		)
 		transition.SetInfo(phaseInfo)
 	}
 
@@ -251,7 +259,8 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			PhaseVersion: phaseInfo.Version(),
 			Reason:       phaseInfo.Reason(),
 		},
-		LastEventUpdate: lastEventUpdate,
+		LastEventUpdate:     lastEventUpdate,
+		LastEventRecordedAt: lastEventRecordedAt,
 	}
 	if pluginState != newPluginState {
 		if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &newPluginState); err != nil {
@@ -290,14 +299,15 @@ func (pm *PluginManager) attachRecentObjectEvents(
 	phaseInfo pluginsCore.PhaseInfo,
 	lastObservedState k8s.PluginState,
 	lastEventUpdate time.Time,
-) (pluginsCore.PhaseInfo, time.Time) {
+	lastEventRecordedAt time.Time,
+) (pluginsCore.PhaseInfo, time.Time, time.Time) {
 	if pm.eventWatcher == nil || resource == nil {
-		return phaseInfo, lastEventUpdate
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
 	info := phaseInfo.Info()
 	if info == nil {
-		return phaseInfo, lastEventUpdate
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
 	objectKey := watchedObjectKey{
@@ -305,9 +315,9 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		Name:      resource.GetName(),
 		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
 	}
-	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate)
+	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate, lastEventRecordedAt)
 	if len(recentEvents) == 0 {
-		return phaseInfo, lastEventUpdate
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
 	for _, event := range recentEvents {
@@ -316,13 +326,14 @@ func (pm *PluginManager) attachRecentObjectEvents(
 			OccurredAt: &event.CreatedAt,
 		})
 		lastEventUpdate = event.CreatedAt
+		lastEventRecordedAt = event.RecordedAt
 	}
 
 	if phaseInfo.Phase() == lastObservedState.Phase && phaseInfo.Version() <= lastObservedState.PhaseVersion {
 		phaseInfo = phaseInfo.WithVersion(lastObservedState.PhaseVersion + 1)
 	}
 
-	return phaseInfo, lastEventUpdate
+	return phaseInfo, lastEventUpdate, lastEventRecordedAt
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.
