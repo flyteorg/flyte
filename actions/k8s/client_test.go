@@ -263,6 +263,87 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 }
 
+func TestInheritRunContextFromParentTaskAction(t *testing.T) {
+	interruptible := true
+	parent := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"team": "platform",
+			},
+			Annotations: map[string]string{
+				"owner": "sdk",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{
+			EnvVars: map[string]string{
+				"TRACE_ID": "abc123",
+				"TEAM":     "platform",
+			},
+			Interruptible: &interruptible,
+		},
+	}
+
+	child := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	inheritRunContextFromParentTaskAction(child, parent)
+
+	require.NotNil(t, child.Spec.Interruptible)
+	assert.True(t, *child.Spec.Interruptible)
+	assert.Equal(t, parent.Spec.EnvVars, child.Spec.EnvVars)
+	assert.Equal(t, "platform", child.Labels["team"])
+	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
+	assert.Equal(t, "sdk", child.Annotations["owner"])
+
+	// Verify deep copy (child mutation must not mutate parent map).
+	child.Spec.EnvVars["TRACE_ID"] = "mutated"
+	assert.Equal(t, "abc123", parent.Spec.EnvVars["TRACE_ID"])
+	child.Annotations["owner"] = "mutated"
+	assert.Equal(t, "sdk", parent.Annotations["owner"])
+}
+
+func TestInheritRunContextFromParentTaskAction_DoesNotOverrideExistingLabels(t *testing.T) {
+	parentInterruptible := true
+	parent := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "should-not-override",
+				"team":          "platform",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{
+			EnvVars: map[string]string{
+				"TRACE_ID": "parent",
+				"TEAM":     "platform",
+			},
+			Interruptible: &parentInterruptible,
+		},
+	}
+
+	child := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	inheritRunContextFromParentTaskAction(child, parent)
+
+	require.NotNil(t, child.Spec.Interruptible)
+	assert.True(t, *child.Spec.Interruptible)
+	assert.Equal(t, map[string]string{"TRACE_ID": "parent", "TEAM": "platform"}, child.Spec.EnvVars)
+	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
+	assert.Equal(t, "platform", child.Labels["team"])
+}
+
 func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	ctx := context.Background()
 
