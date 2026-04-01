@@ -340,6 +340,70 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 	assert.NoError(t, stream.Err())
 }
 
+func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(taskRepo)
+
+	svc := &RunService{repo: repo, actionsClient: actionsClient}
+
+	t.Cleanup(func() {
+		repo.AssertExpectations(t)
+		actionRepo.AssertExpectations(t)
+		taskRepo.AssertExpectations(t)
+		actionsClient.AssertExpectations(t)
+	})
+
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest12345",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	runSpecBytes, err := proto.Marshal(&task.RunSpec{
+		Envs: &task.Envs{
+			Values: []*core.KeyValuePair{
+				{Key: "foo", Value: "boo"},
+				{Key: "LOG_LEVEL", Value: "30"},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	runModel := &models.Run{
+		Org:        runID.Org,
+		Project:    runID.Project,
+		Domain:     runID.Domain,
+		RunName:    runID.Name,
+		Name:       runID.Name,
+		Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+		RunSpec:    runSpecBytes,
+	}
+
+	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+
+	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+		RunId: runID,
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Details)
+	require.NotNil(t, resp.Msg.Details.GetRunSpec())
+
+	gotEnv := map[string]string{}
+	for _, kv := range resp.Msg.Details.GetRunSpec().GetEnvs().GetValues() {
+		gotEnv[kv.GetKey()] = kv.GetValue()
+	}
+	assert.Equal(t, "boo", gotEnv["foo"])
+	assert.Equal(t, "30", gotEnv["LOG_LEVEL"])
+}
+
 func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}

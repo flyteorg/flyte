@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -263,6 +264,87 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 }
 
+func TestInheritRunContextFromParentTaskAction(t *testing.T) {
+	interruptible := true
+	parent := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"team": "platform",
+			},
+			Annotations: map[string]string{
+				"owner": "sdk",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{
+			EnvVars: map[string]string{
+				"TRACE_ID": "abc123",
+				"TEAM":     "platform",
+			},
+			Interruptible: &interruptible,
+		},
+	}
+
+	child := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	inheritRunContextFromParentTaskAction(child, parent)
+
+	require.NotNil(t, child.Spec.Interruptible)
+	assert.True(t, *child.Spec.Interruptible)
+	assert.Equal(t, parent.Spec.EnvVars, child.Spec.EnvVars)
+	assert.Equal(t, "platform", child.Labels["team"])
+	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
+	assert.Equal(t, "sdk", child.Annotations["owner"])
+
+	// Verify deep copy (child mutation must not mutate parent map).
+	child.Spec.EnvVars["TRACE_ID"] = "mutated"
+	assert.Equal(t, "abc123", parent.Spec.EnvVars["TRACE_ID"])
+	child.Annotations["owner"] = "mutated"
+	assert.Equal(t, "sdk", parent.Annotations["owner"])
+}
+
+func TestInheritRunContextFromParentTaskAction_DoesNotOverrideExistingLabels(t *testing.T) {
+	parentInterruptible := true
+	parent := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "should-not-override",
+				"team":          "platform",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{
+			EnvVars: map[string]string{
+				"TRACE_ID": "parent",
+				"TEAM":     "platform",
+			},
+			Interruptible: &parentInterruptible,
+		},
+	}
+
+	child := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"flyte.org/run": "run1",
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+
+	inheritRunContextFromParentTaskAction(child, parent)
+
+	require.NotNil(t, child.Spec.Interruptible)
+	assert.True(t, *child.Spec.Interruptible)
+	assert.Equal(t, map[string]string{"TRACE_ID": "parent", "TEAM": "platform"}, child.Spec.EnvVars)
+	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
+	assert.Equal(t, "platform", child.Labels["team"])
+}
+
 func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	ctx := context.Background()
 
@@ -498,4 +580,140 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	// No UpdateActionStatus should be called for root (no parent to promote)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+}
+
+func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
+	c := &ActionsClient{
+		numWorkers: numWorkers,
+		workerChs:  make([]chan watch.Event, numWorkers),
+	}
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, bufSize)
+	}
+	return c
+}
+
+func newTaskActionEvent(name string, eventType watch.EventType) watch.Event {
+	ta := &executorv1.TaskAction{}
+	ta.Name = name
+	return watch.Event{Type: eventType, Object: ta}
+}
+
+func TestDispatchEvent_ConsistentSharding(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+	event := newTaskActionEvent("run1-action1", watch.Modified)
+
+	c.dispatchEvent(context.Background(), event)
+	c.dispatchEvent(context.Background(), event)
+
+	// Both events must land in exactly one shard (the same one each time)
+	var total int
+	for _, ch := range c.workerChs {
+		total += len(ch)
+	}
+	assert.Equal(t, 2, total)
+}
+
+func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+
+	// Send many differently-named events and confirm they spread across shards
+	names := []string{"run1-a", "run1-b", "run1-c", "run1-d", "run1-e", "run1-f", "run1-g", "run1-h"}
+	for _, name := range names {
+		c.dispatchEvent(context.Background(), newTaskActionEvent(name, watch.Modified))
+	}
+
+	var nonEmpty int
+	for _, ch := range c.workerChs {
+		if len(ch) > 0 {
+			nonEmpty++
+		}
+	}
+	assert.Greater(t, nonEmpty, 1, "expected events to spread across more than one shard")
+}
+
+func TestDispatchEvent_DropsErrorEvents(t *testing.T) {
+	c := newWorkerTestClient(2, 10)
+
+	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Error})
+
+	for i, ch := range c.workerChs {
+		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
+	}
+}
+
+func TestDispatchEvent_DropsNonTaskActionObjects(t *testing.T) {
+	c := newWorkerTestClient(2, 10)
+
+	// Send an event whose Object is not a *TaskAction
+	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Modified, Object: &executorv1.TaskActionList{}})
+
+	for i, ch := range c.workerChs {
+		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
+	}
+}
+
+func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
+	c := newWorkerTestClient(1, 1) // single worker, capacity 1
+	event := newTaskActionEvent("run1-action1", watch.Modified)
+
+	c.dispatchEvent(context.Background(), event) // fills the channel
+
+	// Second dispatch must block because the channel is full.
+	// Run it in a goroutine and verify it unblocks once the channel is drained.
+	done := make(chan struct{})
+	go func() {
+		c.dispatchEvent(context.Background(), event)
+		close(done)
+	}()
+
+	// Drain the channel to unblock the sender.
+	<-c.workerChs[0]
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("dispatchEvent did not unblock after channel was drained")
+	}
+}
+
+func TestWorker_ExitsOnStopCh(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(context.Background(), ch, stopCh)
+		close(done)
+	}()
+
+	close(stopCh)
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after stopCh was closed")
+	}
+}
+
+func TestWorker_ExitsOnContextCancel(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(ctx, ch, stopCh)
+		close(done)
+	}()
+
+	cancel()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after context was cancelled")
+	}
 }

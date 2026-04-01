@@ -17,6 +17,7 @@ var defaultConfig = &Config{
 		Namespace: "flyte",
 	},
 	WatchBufferSize: 100,
+	WatchWorkers:    4,
 	RunServiceURL:   "http://localhost:8090",
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
@@ -32,8 +33,12 @@ type Config struct {
 	// Kubernetes configuration
 	Kubernetes KubernetesConfig `json:"kubernetes"`
 
-	// WatchBufferSize is the buffer size for watch channels
+	// WatchBufferSize is the buffer size for each worker's event channel.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch channels"`
+
+	// WatchWorkers is the number of parallel event-processing goroutines.
+	// Events for the same TaskAction are always routed to the same worker to preserve ordering.
+	WatchWorkers int `json:"watchWorkers" pflag:",Number of parallel worker goroutines for processing watch events"`
 
 	// RunServiceURL is the base URL for the internal run service.
 	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
