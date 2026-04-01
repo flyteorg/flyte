@@ -45,7 +45,7 @@ message GetOAuth2MetadataResponse {
 
 message GetPublicClientConfigRequest {}
 
-// FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
+// GetPublicClientConfigResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
 message GetPublicClientConfigResponse {
   // client_id to use when initiating OAuth2 authorization requests.
   string client_id = 1;

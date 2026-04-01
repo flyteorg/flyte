@@ -128,7 +128,7 @@ export const GetPublicClientConfigRequestSchema: GenMessage<GetPublicClientConfi
   messageDesc(file_flyteidl2_auth_auth_service, 2);
 
 /**
- * FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
+ * GetPublicClientConfigResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
  *
  * @generated from message flyteidl2.auth.GetPublicClientConfigResponse
  */

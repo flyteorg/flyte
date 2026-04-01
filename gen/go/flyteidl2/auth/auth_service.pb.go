@@ -231,7 +231,7 @@ func (*GetPublicClientConfigRequest) Descriptor() ([]byte, []int) {
 	return file_flyteidl2_auth_auth_service_proto_rawDescGZIP(), []int{2}
 }
 
-// FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
+// GetPublicClientConfigResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
 type GetPublicClientConfigResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
