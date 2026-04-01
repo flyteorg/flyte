@@ -213,27 +213,6 @@ metadata:
   name: kubernetes-dashboard-settings
 data:
 ---
-# Source: flyte-sandbox/templates/storage/db/pv.yaml
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: flyte-db-storage
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: "/var/lib/flyte/storage/db"
----
 # Source: flyte-sandbox/templates/storage/minio/pv.yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -254,27 +233,6 @@ spec:
     storage: 1Gi
   hostPath:
     path: "/var/lib/flyte/storage/minio"
----
-# Source: flyte-sandbox/templates/storage/db/pvc.yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: flyte-db-storage
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  volumeName: flyte-db-storage
 ---
 # Source: flyte-sandbox/templates/storage/minio/pvc.yaml
 apiVersion: v1

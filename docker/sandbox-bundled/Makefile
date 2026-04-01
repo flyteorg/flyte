@@ -94,7 +94,7 @@ start:
 				--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
 			--publish "30000:30000" \
-			--publish "30001:30001" \
+			--publish "30001:5432" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE); \
