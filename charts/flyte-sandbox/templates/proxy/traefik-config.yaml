@@ -1,0 +1,18 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  valuesContent: |
+    service:
+      type: NodePort
+    ports:
+      web:
+        nodePort: 30080
+      websecure:
+        expose:
+          default: false
+    additionalArguments:
+      - "--entryPoints.web.transport.respondingTimeouts.readTimeout=0"

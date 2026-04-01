@@ -111,8 +111,4 @@ A Helm chart for the Flyte local sandbox
 | sandbox.console.image.repository | string | `"ghcr.io/flyteorg/flyte-client-v2"` |  |
 | sandbox.console.image.tag | string | `"latest"` |  |
 | sandbox.dev | bool | `false` |  |
-| sandbox.proxy.enabled | bool | `true` |  |
-| sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
-| sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
-| sandbox.proxy.image.tag | string | `"sandbox"` |  |
 

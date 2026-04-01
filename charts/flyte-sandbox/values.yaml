@@ -189,9 +189,3 @@ sandbox:
       repository: moby/buildkit
       tag: sandbox
       pullPolicy: Never
-  proxy:
-    enabled: true
-    image:
-      repository: envoyproxy/envoy
-      tag: sandbox
-      pullPolicy: Never

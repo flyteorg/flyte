@@ -1,0 +1,135 @@
+{{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-api
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /healthz
+            pathType: Exact
+            backend:
+              service:
+                {{- if index .Values "flyte-binary" "enabled" }}
+                name: {{ include "flyte-binary.service.http.name" . }}
+                {{- else }}
+                name: {{ include "flyte-sandbox.localHeadlessService" . }}
+                {{- end }}
+                port:
+                  number: 8090
+          - path: /readyz
+            pathType: Exact
+            backend:
+              service:
+                {{- if index .Values "flyte-binary" "enabled" }}
+                name: {{ include "flyte-binary.service.http.name" . }}
+                {{- else }}
+                name: {{ include "flyte-sandbox.localHeadlessService" . }}
+                {{- end }}
+                port:
+                  number: 8090
+          - path: /flyteidl2.
+            pathType: Prefix
+            backend:
+              service:
+                {{- if index .Values "flyte-binary" "enabled" }}
+                name: {{ include "flyte-binary.service.http.name" . }}
+                {{- else }}
+                name: {{ include "flyte-sandbox.localHeadlessService" . }}
+                {{- end }}
+                port:
+                  number: 8090
+{{- end }}
+---
+{{- if .Values.sandbox.console.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-sandbox.fullname" . }}-console
+                port:
+                  number: 80
+{{- end }}
+---
+{{- if index .Values "kubernetes-dashboard" "enabled" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-kubernetes-dashboard
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-strip-kubernetes-dashboard@kubernetescrd
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /kubernetes-dashboard
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-kubernetes-dashboard
+                port:
+                  number: 80
+{{- end }}
+---
+{{- if index .Values "kubernetes-dashboard" "enabled" }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-kubernetes-dashboard
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  stripPrefix:
+    prefixes:
+      - /kubernetes-dashboard
+{{- end }}
+---
+{{- if .Values.minio.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-minio
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-strip-minio@kubernetescrd
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /minio
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-minio
+                port:
+                  number: 9001
+{{- end }}
+---
+{{- if .Values.minio.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-minio
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  stripPrefix:
+    prefixes:
+      - /minio
+{{- end }}
