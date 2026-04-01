@@ -69,11 +69,6 @@ type ActionsClient struct {
 	workerChs  []chan watch.Event
 }
 
-type taskActionEvent struct {
-	taskAction *executorv1.TaskAction
-	eventType  watch.EventType
-}
-
 // NewActionsClient creates a new Kubernetes-based actions client.
 func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
 	if numWorkers <= 0 {
