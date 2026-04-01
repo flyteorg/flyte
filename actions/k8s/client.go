@@ -6,13 +6,14 @@ import (
 	"hash/fnv"
 	"strings"
 	"sync"
-	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
+	toolscache "k8s.io/client-go/tools/cache"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -41,12 +42,15 @@ type ActionUpdate struct {
 	ShortName        string
 }
 
+const labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient  client.WithWatch
-	namespace  string
-	bufferSize int
-	runClient  workflowconnect.InternalRunServiceClient
+	k8sClient   client.WithWatch
+	sharedCache ctrlcache.Cache
+	namespace   string
+	bufferSize  int
+	runClient   workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -66,12 +70,13 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
+		sharedCache: sharedCache,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
 		numWorkers:  numWorkers,
@@ -344,7 +349,8 @@ func (c *ActionsClient) Unsubscribe(parentActionName string, ch chan *ActionUpda
 	}
 }
 
-// StartWatching starts watching TaskAction resources and notifies all subscribers
+// StartWatching starts watching TaskAction resources and notifies all subscribers.
+// It requires a shared controller-runtime cache.
 func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.mu.Lock()
 	if c.watching {
@@ -357,67 +363,49 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.workerChs = make([]chan watch.Event, c.numWorkers)
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
+		go c.worker(ctx, c.workerChs[i], stopCh)
 	}
 	c.mu.Unlock()
 
 	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
-	for _, ch := range c.workerChs {
-		go c.worker(ctx, ch, stopCh)
+	if c.sharedCache == nil {
+		return fmt.Errorf("shared cache is required for TaskAction informer")
 	}
-	go c.watchLoop(ctx)
+
+	return c.setupInformer(ctx)
+}
+
+func (c *ActionsClient) setupInformer(ctx context.Context) error {
+	informer, err := c.sharedCache.GetInformer(ctx, &executorv1.TaskAction{})
+	if err != nil {
+		return fmt.Errorf("failed to get TaskAction informer: %w", err)
+	}
+
+	_, err = informer.AddEventHandler(toolscache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			taskAction, ok := obj.(*executorv1.TaskAction)
+			if !ok || c.shouldSkipTaskAction(taskAction) {
+				return
+			}
+			c.dispatchEvent(taskAction, watch.Added)
+		},
+		UpdateFunc: func(_, newObj interface{}) {
+			taskAction, ok := newObj.(*executorv1.TaskAction)
+			if !ok || c.shouldSkipTaskAction(taskAction) {
+				return
+			}
+			c.dispatchEvent(taskAction, watch.Modified)
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to add TaskAction informer handler: %w", err)
+	}
 
 	return nil
 }
 
-// watchLoop continuously watches TaskAction resources
-func (c *ActionsClient) watchLoop(ctx context.Context) {
-	for {
-		select {
-		case <-c.stopCh:
-			logger.Infof(ctx, "TaskAction watcher stopped")
-			return
-		case <-ctx.Done():
-			logger.Infof(ctx, "TaskAction watcher context cancelled")
-			return
-		default:
-			if err := c.doWatch(ctx); err != nil {
-				time.Sleep(5 * time.Second)
-			}
-		}
-	}
-}
-
-// doWatch performs a single watch operation
-func (c *ActionsClient) doWatch(ctx context.Context) error {
-	taskActionList := &executorv1.TaskActionList{}
-
-	timeout := int64(300) // 5 minutes
-	watcher, err := c.k8sClient.Watch(ctx, taskActionList, &client.ListOptions{
-		Raw: &metav1.ListOptions{TimeoutSeconds: &timeout},
-	})
-	if err != nil {
-		return fmt.Errorf("failed to start watch: %w", err)
-	}
-	defer watcher.Stop()
-
-	for {
-		select {
-		case <-c.stopCh:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		case event, ok := <-watcher.ResultChan():
-			if !ok {
-				return fmt.Errorf("watch channel closed")
-			}
-			c.dispatchEvent(ctx, event)
-		}
-	}
-}
-
-// worker drains its event channel and calls handleWatchEvent for each event.
-// It exits when stopCh is closed or ctx is cancelled.
+// worker drains its event channel and handles each event inline.
 // Each worker owns a disjoint shard of TaskAction names, so per-resource
 // event ordering is preserved across the pool.
 func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopCh <-chan struct{}) {
@@ -436,33 +424,40 @@ func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopC
 	}
 }
 
-// dispatchEvent routes a watch event to the worker responsible for the
-// event's TaskAction, using FNV-32a hashing for consistent sharding.
-// Error events and non-TaskAction objects are handled inline and not dispatched.
-func (c *ActionsClient) dispatchEvent(ctx context.Context, event watch.Event) {
-	if event.Type == watch.Error {
-		logger.Warnf(ctx, "received error event from watch: %v", event.Object)
+// dispatchEvent routes an informer event to the worker responsible for the
+// TaskAction, using FNV-32a hashing for consistent sharding.
+func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventType watch.EventType) {
+	if taskAction == nil {
 		return
 	}
-	ta, ok := event.Object.(*executorv1.TaskAction)
+
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
+	shard := h.Sum32() % uint32(c.numWorkers)
+	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
+}
+
+func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
+	taskAction, ok := event.Object.(*executorv1.TaskAction)
 	if !ok {
 		logger.Warnf(ctx, "received non-TaskAction object in watch event: %T", event.Object)
 		return
 	}
-	h := fnv.New32a()
-	_, _ = h.Write([]byte(ta.Name)) // FNV Write never returns an error
-	shard := h.Sum32() % uint32(c.numWorkers)
-	c.workerChs[shard] <- event
+
+	c.handleTaskActionEvent(ctx, taskAction, event.Type)
 }
 
-// handleWatchEvent processes a watch event
-func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
-	taskAction, ok := event.Object.(*executorv1.TaskAction)
-	if !ok {
-		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
+func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) {
+	update := buildActionUpdate(ctx, taskAction, eventType)
+	if update == nil {
 		return
 	}
 
+	c.notifySubscribers(ctx, update)
+	c.notifyRunService(ctx, taskAction, update, eventType)
+}
+
+func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) *ActionUpdate {
 	var parentName string
 	if taskAction.Spec.ParentActionName != nil {
 		parentName = *taskAction.Spec.ParentActionName
@@ -474,7 +469,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
 	}
 
-	update := &ActionUpdate{
+	return &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
 				Org:     taskAction.Spec.Org,
@@ -488,13 +483,17 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            GetPhaseFromConditions(taskAction),
 		OutputUri:        buildOutputUri(ctx, taskAction),
-		IsDeleted:        event.Type == watch.Deleted,
+		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
 	}
+}
 
-	c.notifySubscribers(ctx, update)
-	go c.notifyRunService(ctx, taskAction, update, event.Type)
+func (c *ActionsClient) shouldSkipTaskAction(taskAction *executorv1.TaskAction) bool {
+	if taskAction == nil {
+		return true
+	}
+	return taskAction.GetLabels()[labelTerminalStatusRecorded] == "true"
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -595,6 +594,10 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
+		} else if isTerminalPhase(update.Phase) {
+			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
+				logger.Warnf(ctx, "Failed to mark terminal status recorded for %s: %v", update.ActionID.Name, err)
+			}
 		}
 	}
 }
@@ -636,6 +639,33 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 		}
 	}
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+}
+
+func isTerminalPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
+		phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
+func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskAction *executorv1.TaskAction) error {
+	if c.k8sClient == nil || taskAction == nil || c.shouldSkipTaskAction(taskAction) {
+		return nil
+	}
+
+	original := taskAction.DeepCopy()
+	patched := taskAction.DeepCopy()
+	labels := patched.GetLabels()
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	labels[labelTerminalStatusRecorded] = "true"
+	patched.SetLabels(labels)
+
+	if err := c.k8sClient.Patch(ctx, patched, client.MergeFrom(original)); err != nil {
+		return err
+	}
+	return nil
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.

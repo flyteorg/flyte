@@ -599,12 +599,18 @@ func newTaskActionEvent(name string, eventType watch.EventType) watch.Event {
 	return watch.Event{Type: eventType, Object: ta}
 }
 
+func newTaskAction(name string) *executorv1.TaskAction {
+	ta := &executorv1.TaskAction{}
+	ta.Name = name
+	return ta
+}
+
 func TestDispatchEvent_ConsistentSharding(t *testing.T) {
 	c := newWorkerTestClient(4, 10)
-	event := newTaskActionEvent("run1-action1", watch.Modified)
+	taskAction := newTaskAction("run1-action1")
 
-	c.dispatchEvent(context.Background(), event)
-	c.dispatchEvent(context.Background(), event)
+	c.dispatchEvent(taskAction, watch.Modified)
+	c.dispatchEvent(taskAction, watch.Modified)
 
 	// Both events must land in exactly one shard (the same one each time)
 	var total int
@@ -620,7 +626,7 @@ func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
 	// Send many differently-named events and confirm they spread across shards
 	names := []string{"run1-a", "run1-b", "run1-c", "run1-d", "run1-e", "run1-f", "run1-g", "run1-h"}
 	for _, name := range names {
-		c.dispatchEvent(context.Background(), newTaskActionEvent(name, watch.Modified))
+		c.dispatchEvent(newTaskAction(name), watch.Modified)
 	}
 
 	var nonEmpty int
@@ -632,21 +638,10 @@ func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
 	assert.Greater(t, nonEmpty, 1, "expected events to spread across more than one shard")
 }
 
-func TestDispatchEvent_DropsErrorEvents(t *testing.T) {
+func TestDispatchEvent_NilTaskActionIsIgnored(t *testing.T) {
 	c := newWorkerTestClient(2, 10)
 
-	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Error})
-
-	for i, ch := range c.workerChs {
-		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
-	}
-}
-
-func TestDispatchEvent_DropsNonTaskActionObjects(t *testing.T) {
-	c := newWorkerTestClient(2, 10)
-
-	// Send an event whose Object is not a *TaskAction
-	c.dispatchEvent(context.Background(), watch.Event{Type: watch.Modified, Object: &executorv1.TaskActionList{}})
+	c.dispatchEvent(nil, watch.Modified)
 
 	for i, ch := range c.workerChs {
 		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
@@ -655,15 +650,15 @@ func TestDispatchEvent_DropsNonTaskActionObjects(t *testing.T) {
 
 func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
 	c := newWorkerTestClient(1, 1) // single worker, capacity 1
-	event := newTaskActionEvent("run1-action1", watch.Modified)
+	taskAction := newTaskAction("run1-action1")
 
-	c.dispatchEvent(context.Background(), event) // fills the channel
+	c.dispatchEvent(taskAction, watch.Modified) // fills the channel
 
 	// Second dispatch must block because the channel is full.
 	// Run it in a goroutine and verify it unblocks once the channel is drained.
 	done := make(chan struct{})
 	go func() {
-		c.dispatchEvent(context.Background(), event)
+		c.dispatchEvent(taskAction, watch.Modified)
 		close(done)
 	}()
 
@@ -675,6 +670,19 @@ func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("dispatchEvent did not unblock after channel was drained")
 	}
+}
+
+func TestDispatchEvent_DeepCopiesTaskAction(t *testing.T) {
+	c := newWorkerTestClient(1, 10)
+	taskAction := newTaskAction("run1-action1")
+
+	c.dispatchEvent(taskAction, watch.Modified)
+	taskAction.Name = "mutated-after-dispatch"
+
+	event := <-c.workerChs[0]
+	dispatched, ok := event.Object.(*executorv1.TaskAction)
+	require.True(t, ok)
+	assert.Equal(t, "run1-action1", dispatched.Name)
 }
 
 func TestWorker_ExitsOnStopCh(t *testing.T) {
