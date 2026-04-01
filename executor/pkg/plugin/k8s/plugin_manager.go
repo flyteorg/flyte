@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
@@ -35,8 +36,10 @@ const (
 
 // PluginState is the state persisted by the PluginManager between reconciliation rounds.
 type PluginState struct {
-	Phase          PluginPhase
-	K8sPluginState k8s.PluginState
+	Phase               PluginPhase
+	K8sPluginState      k8s.PluginState
+	LastEventUpdate     time.Time
+	LastEventRecordedAt time.Time
 }
 
 var _ pluginsCore.Plugin = &PluginManager{}
@@ -47,6 +50,10 @@ type PluginManager struct {
 	id         string
 	plugin     k8s.Plugin
 	kubeClient pluginsCore.KubeClient
+
+	eventWatcher     objectEventWatcher
+	eventWatcherOnce sync.Once
+	eventWatcherErr  error
 }
 
 // NewPluginManager creates a PluginManager that wraps a k8s.Plugin.
@@ -209,6 +216,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 	var err error
 	var transition pluginsCore.Transition
 	pluginPhase := pluginState.Phase
+	var resource client.Object
 
 	if pluginState.Phase == PluginPhaseNotStarted {
 		transition, err = pm.launchResource(ctx, tCtx)
@@ -221,6 +229,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			transition, err = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskDefinition",
 				fmt.Sprintf("Failed to build resource, caused by: %s", getErr.Error()), nil)), nil
 		} else {
+			resource = o
 			transition, err = pm.checkResourcePhase(ctx, tCtx, o, &pluginState.K8sPluginState)
 		}
 	}
@@ -230,6 +239,18 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	phaseInfo := transition.Info()
+	lastEventUpdate := pluginState.LastEventUpdate
+	lastEventRecordedAt := pluginState.LastEventRecordedAt
+	if resource != nil {
+		phaseInfo, lastEventUpdate, lastEventRecordedAt = pm.attachRecentObjectEvents(
+			resource,
+			phaseInfo,
+			pluginState.K8sPluginState,
+			lastEventUpdate,
+			lastEventRecordedAt,
+		)
+		transition.SetInfo(phaseInfo)
+	}
 
 	newPluginState := PluginState{
 		Phase: pluginPhase,
@@ -238,6 +259,8 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			PhaseVersion: phaseInfo.Version(),
 			Reason:       phaseInfo.Reason(),
 		},
+		LastEventUpdate:     lastEventUpdate,
+		LastEventRecordedAt: lastEventRecordedAt,
 	}
 	if pluginState != newPluginState {
 		if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &newPluginState); err != nil {
@@ -246,6 +269,71 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	return transition, nil
+}
+
+func (pm *PluginManager) initEventWatcher(ctx context.Context) {
+	if pm.eventWatcher != nil {
+		return
+	}
+
+	pm.eventWatcherOnce.Do(func() {
+		pm.eventWatcher, pm.eventWatcherErr = newControllerRuntimeEventWatcher(ctx, pm.kubeClient.GetCache())
+		if pm.eventWatcherErr != nil {
+			logger.Warnf(ctx, "Failed to initialize k8s object event watcher for plugin [%s]: %v", pm.GetID(), pm.eventWatcherErr)
+		}
+	})
+}
+
+// InitializeObjectEventWatcher starts watching Kubernetes object events for this plugin.
+// It is intended to be called during plugin initialization (before task handling starts).
+func (pm *PluginManager) InitializeObjectEventWatcher(ctx context.Context) error {
+	pm.initEventWatcher(ctx)
+	if pm.eventWatcherErr != nil {
+		return fmt.Errorf("failed to initialize k8s object event watcher for plugin %s: %w", pm.GetID(), pm.eventWatcherErr)
+	}
+	return nil
+}
+
+func (pm *PluginManager) attachRecentObjectEvents(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+	lastObservedState k8s.PluginState,
+	lastEventUpdate time.Time,
+	lastEventRecordedAt time.Time,
+) (pluginsCore.PhaseInfo, time.Time, time.Time) {
+	if pm.eventWatcher == nil || resource == nil {
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
+	}
+
+	info := phaseInfo.Info()
+	if info == nil {
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
+	}
+
+	objectKey := watchedObjectKey{
+		Namespace: resource.GetNamespace(),
+		Name:      resource.GetName(),
+		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
+	}
+	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate, lastEventRecordedAt)
+	if len(recentEvents) == 0 {
+		return phaseInfo, lastEventUpdate, lastEventRecordedAt
+	}
+
+	for _, event := range recentEvents {
+		info.AdditionalReasons = append(info.AdditionalReasons, pluginsCore.ReasonInfo{
+			Reason:     event.Message,
+			OccurredAt: &event.CreatedAt,
+		})
+		lastEventUpdate = event.CreatedAt
+		lastEventRecordedAt = event.RecordedAt
+	}
+
+	if phaseInfo.Phase() == lastObservedState.Phase && phaseInfo.Version() <= lastObservedState.PhaseVersion {
+		phaseInfo = phaseInfo.WithVersion(lastObservedState.PhaseVersion + 1)
+	}
+
+	return phaseInfo, lastEventUpdate, lastEventRecordedAt
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.

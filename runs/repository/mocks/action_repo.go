@@ -707,6 +707,69 @@ func (_c *ActionRepo_ListEvents_Call) RunAndReturn(run func(context.Context, *co
 	return _c
 }
 
+// ListEventsSince provides a mock function with given fields: ctx, actionID, attempt, since, offset, limit
+func (_m *ActionRepo) ListEventsSince(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, since time.Time, offset int, limit int) ([]*models.ActionEvent, error) {
+	ret := _m.Called(ctx, actionID, attempt, since, offset, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListEventsSince")
+	}
+
+	var r0 []*models.ActionEvent
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32, time.Time, int, int) ([]*models.ActionEvent, error)); ok {
+		return rf(ctx, actionID, attempt, since, offset, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32, time.Time, int, int) []*models.ActionEvent); ok {
+		r0 = rf(ctx, actionID, attempt, since, offset, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.ActionEvent)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *common.ActionIdentifier, uint32, time.Time, int, int) error); ok {
+		r1 = rf(ctx, actionID, attempt, since, offset, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ActionRepo_ListEventsSince_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListEventsSince'
+type ActionRepo_ListEventsSince_Call struct {
+	*mock.Call
+}
+
+// ListEventsSince is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - attempt uint32
+//   - since time.Time
+//   - offset int
+//   - limit int
+func (_e *ActionRepo_Expecter) ListEventsSince(ctx interface{}, actionID interface{}, attempt interface{}, since interface{}, offset interface{}, limit interface{}) *ActionRepo_ListEventsSince_Call {
+	return &ActionRepo_ListEventsSince_Call{Call: _e.mock.On("ListEventsSince", ctx, actionID, attempt, since, offset, limit)}
+}
+
+func (_c *ActionRepo_ListEventsSince_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, since time.Time, offset int, limit int)) *ActionRepo_ListEventsSince_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(uint32), args[3].(time.Time), args[4].(int), args[5].(int))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListEventsSince_Call) Return(_a0 []*models.ActionEvent, _a1 error) *ActionRepo_ListEventsSince_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ActionRepo_ListEventsSince_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, uint32, time.Time, int, int) ([]*models.ActionEvent, error)) *ActionRepo_ListEventsSince_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListPendingAborts provides a mock function with given fields: ctx
 func (_m *ActionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
 	ret := _m.Called(ctx)
@@ -1098,9 +1161,9 @@ func (_c *ActionRepo_UpdateActionState_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// WatchActionUpdates provides a mock function with given fields: ctx, runID, updates, errs
-func (_m *ActionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
-	_m.Called(ctx, runID, updates, errs)
+// WatchActionUpdates provides a mock function with given fields: ctx, actionID, updates, errs
+func (_m *ActionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	_m.Called(ctx, actionID, updates, errs)
 }
 
 // ActionRepo_WatchActionUpdates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchActionUpdates'
@@ -1110,16 +1173,16 @@ type ActionRepo_WatchActionUpdates_Call struct {
 
 // WatchActionUpdates is a helper method to define mock.On call
 //   - ctx context.Context
-//   - runID *common.RunIdentifier
+//   - actionID *common.ActionIdentifier
 //   - updates chan<- *models.Action
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchActionUpdates(ctx interface{}, runID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchActionUpdates_Call {
-	return &ActionRepo_WatchActionUpdates_Call{Call: _e.mock.On("WatchActionUpdates", ctx, runID, updates, errs)}
+func (_e *ActionRepo_Expecter) WatchActionUpdates(ctx interface{}, actionID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchActionUpdates_Call {
+	return &ActionRepo_WatchActionUpdates_Call{Call: _e.mock.On("WatchActionUpdates", ctx, actionID, updates, errs)}
 }
 
-func (_c *ActionRepo_WatchActionUpdates_Call) Run(run func(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error)) *ActionRepo_WatchActionUpdates_Call {
+func (_c *ActionRepo_WatchActionUpdates_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error)) *ActionRepo_WatchActionUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*common.RunIdentifier), args[2].(chan<- *models.Action), args[3].(chan<- error))
+		run(args[0].(context.Context), args[1].(*common.ActionIdentifier), args[2].(chan<- *models.Action), args[3].(chan<- error))
 	})
 	return _c
 }
@@ -1129,7 +1192,43 @@ func (_c *ActionRepo_WatchActionUpdates_Call) Return() *ActionRepo_WatchActionUp
 	return _c
 }
 
-func (_c *ActionRepo_WatchActionUpdates_Call) RunAndReturn(run func(context.Context, *common.RunIdentifier, chan<- *models.Action, chan<- error)) *ActionRepo_WatchActionUpdates_Call {
+func (_c *ActionRepo_WatchActionUpdates_Call) RunAndReturn(run func(context.Context, *common.ActionIdentifier, chan<- *models.Action, chan<- error)) *ActionRepo_WatchActionUpdates_Call {
+	_c.Run(run)
+	return _c
+}
+
+// WatchAllActionUpdates provides a mock function with given fields: ctx, runID, updates, errs
+func (_m *ActionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	_m.Called(ctx, runID, updates, errs)
+}
+
+// ActionRepo_WatchAllActionUpdates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchAllActionUpdates'
+type ActionRepo_WatchAllActionUpdates_Call struct {
+	*mock.Call
+}
+
+// WatchAllActionUpdates is a helper method to define mock.On call
+//   - ctx context.Context
+//   - runID *common.RunIdentifier
+//   - updates chan<- *models.Action
+//   - errs chan<- error
+func (_e *ActionRepo_Expecter) WatchAllActionUpdates(ctx interface{}, runID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchAllActionUpdates_Call {
+	return &ActionRepo_WatchAllActionUpdates_Call{Call: _e.mock.On("WatchAllActionUpdates", ctx, runID, updates, errs)}
+}
+
+func (_c *ActionRepo_WatchAllActionUpdates_Call) Run(run func(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error)) *ActionRepo_WatchAllActionUpdates_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*common.RunIdentifier), args[2].(chan<- *models.Action), args[3].(chan<- error))
+	})
+	return _c
+}
+
+func (_c *ActionRepo_WatchAllActionUpdates_Call) Return() *ActionRepo_WatchAllActionUpdates_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *ActionRepo_WatchAllActionUpdates_Call) RunAndReturn(run func(context.Context, *common.RunIdentifier, chan<- *models.Action, chan<- error)) *ActionRepo_WatchAllActionUpdates_Call {
 	_c.Run(run)
 	return _c
 }
