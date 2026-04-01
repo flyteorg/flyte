@@ -90,14 +90,6 @@ Name of PersistentVolume and PersistentVolumeClaim for Minio
 {{- end }}
 
 {{/*
-Selector labels for Buildkit
-*/}}
-{{- define "flyte-sandbox.buildkitSelectorLabels" -}}
-{{ include "flyte-sandbox.selectorLabels" . }}
-app.kubernetes.io/component: buildkit
-{{- end }}
-
-{{/*
 Selector labels for Envoy proxy
 */}}
 {{- define "flyte-sandbox.proxySelectorLabels" -}}

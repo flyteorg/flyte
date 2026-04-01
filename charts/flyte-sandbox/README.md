@@ -102,10 +102,6 @@ A Helm chart for the Flyte local sandbox
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
-| sandbox.buildkit.enabled | bool | `true` |  |
-| sandbox.buildkit.image.pullPolicy | string | `"Never"` |  |
-| sandbox.buildkit.image.repository | string | `"moby/buildkit"` |  |
-| sandbox.buildkit.image.tag | string | `"sandbox"` |  |
 | sandbox.console.enabled | bool | `true` |  |
 | sandbox.console.image.pullPolicy | string | `"IfNotPresent"` |  |
 | sandbox.console.image.repository | string | `"ghcr.io/flyteorg/flyte-client-v2"` |  |
