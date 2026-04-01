@@ -1,4 +1,10 @@
 {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
+{{- $backendService := "" }}
+{{- if index .Values "flyte-binary" "enabled" }}
+{{- $backendService = include "flyte-binary.service.http.name" . }}
+{{- else }}
+{{- $backendService = include "flyte-sandbox.localHeadlessService" . }}
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,37 +15,20 @@ spec:
   rules:
     - http:
         paths:
-          - path: /healthz
+          {{- range $path := list "/healthz" "/readyz" }}
+          - path: {{ $path }}
             pathType: Exact
             backend:
               service:
-                {{- if index .Values "flyte-binary" "enabled" }}
-                name: {{ include "flyte-binary.service.http.name" . }}
-                {{- else }}
-                name: {{ include "flyte-sandbox.localHeadlessService" . }}
-                {{- end }}
+                name: {{ $backendService }}
                 port:
                   number: 8090
-          - path: /readyz
-            pathType: Exact
-            backend:
-              service:
-                {{- if index .Values "flyte-binary" "enabled" }}
-                name: {{ include "flyte-binary.service.http.name" . }}
-                {{- else }}
-                name: {{ include "flyte-sandbox.localHeadlessService" . }}
-                {{- end }}
-                port:
-                  number: 8090
+          {{- end }}
           - path: /flyteidl2.
             pathType: Prefix
             backend:
               service:
-                {{- if index .Values "flyte-binary" "enabled" }}
-                name: {{ include "flyte-binary.service.http.name" . }}
-                {{- else }}
-                name: {{ include "flyte-sandbox.localHeadlessService" . }}
-                {{- end }}
+                name: {{ $backendService }}
                 port:
                   number: 8090
 {{- end }}
