@@ -9,9 +9,6 @@ options:
     disableLoadbalancer: true
   k3s:
     extraArgs:
-      - arg: --disable=traefik
-        nodeFilters:
-          - server:*
       - arg: --disable=servicelb
         nodeFilters:
           - server:*

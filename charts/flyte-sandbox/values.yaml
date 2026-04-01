@@ -183,9 +183,3 @@ sandbox:
       repository: ghcr.io/flyteorg/flyte-client-v2
       tag: latest
       pullPolicy: Never
-  proxy:
-    enabled: true
-    image:
-      repository: envoyproxy/envoy
-      tag: sandbox
-      pullPolicy: Never
