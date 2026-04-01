@@ -17,7 +17,7 @@ var defaultConfig = &Config{
 		Namespace: "flyte",
 	},
 	WatchBufferSize: 100,
-	WatchWorkers:    4,
+	WatchWorkers:    10,
 	RunServiceURL:   "http://localhost:8090",
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
