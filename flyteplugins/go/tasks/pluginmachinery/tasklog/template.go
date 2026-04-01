@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const vscode = "vscode"
@@ -139,7 +140,7 @@ func (input Input) templateVars() []TemplateVar {
 			},
 			TemplateVar{
 				defaultRegexes.GeneratedName,
-				input.TaskExecutionID.GetGeneratedName(),
+				utils.ConvertToDNS1123SubdomainCompatibleString(input.TaskExecutionID.GetGeneratedName()),
 			},
 			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,
