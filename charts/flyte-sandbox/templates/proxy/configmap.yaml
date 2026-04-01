@@ -133,6 +133,10 @@ data:
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               http2_protocol_options: {}
               load_assignment:
@@ -153,6 +157,10 @@ data:
             - name: console
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: console
@@ -168,6 +176,10 @@ data:
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: kubernetes-dashboard
@@ -183,6 +195,10 @@ data:
             - name: minio
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: minio

@@ -750,6 +750,10 @@ data:
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               http2_protocol_options: {}
               load_assignment:
@@ -764,6 +768,10 @@ data:
             - name: console
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: console
@@ -777,6 +785,10 @@ data:
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: kubernetes-dashboard
@@ -790,6 +802,10 @@ data:
             - name: minio
               connect_timeout: 0.25s
               type: STRICT_DNS
+              dns_refresh_rate: 1s
+              dns_failure_refresh_rate:
+                  base_interval: 1s
+                  max_interval: 5s
               lb_policy: ROUND_ROBIN
               load_assignment:
                   cluster_name: minio
@@ -1613,12 +1629,21 @@ spec:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/name: flyte-sandbox
     spec:
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until nslookup kube-dns.kube-system.svc.cluster.local; do sleep 1; done
+        image: rancher/mirrored-library-busybox:1.34.1
+        imagePullPolicy: Never
+        name: wait-for-dns
       containers:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
         livenessProbe:
           failureThreshold: 10
-          initialDelaySeconds: 15
+          initialDelaySeconds: 30
+          periodSeconds: 5
           tcpSocket:
             port: http
         name: proxy
@@ -1626,7 +1651,8 @@ spec:
         - containerPort: 8000
           name: http
         readinessProbe:
-          initialDelaySeconds: 5
+          initialDelaySeconds: 1
+          periodSeconds: 3
           tcpSocket:
             port: http
         volumeMounts:

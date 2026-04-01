@@ -13,6 +13,11 @@ spec:
     metadata:
       labels: {{- include "flyte-sandbox.proxySelectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: wait-for-dns
+          image: "rancher/mirrored-library-busybox:1.34.1"
+          imagePullPolicy: Never
+          command: ['sh', '-c', 'until nslookup kube-dns.kube-system.svc.cluster.local; do sleep 1; done']
       containers:
         - name: proxy
           {{- with .Values.sandbox.proxy.image }}
@@ -28,12 +33,14 @@ spec:
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
+            periodSeconds: 5
             failureThreshold: 10
           readinessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 1
+            periodSeconds: 3
       volumes:
         - name: config
           configMap:
