@@ -123,6 +123,9 @@ export const EmailRecipientSchema: GenMessage<EmailRecipient> = /*@__PURE__*/
   messageDesc(file_flyteidl2_notification_definition, 3);
 
 /**
+ * InlineEmailTemplate contains subject and body content rendered by the
+ * notification system using Go templates.
+ *
  * @generated from message flyteidl2.notification.InlineEmailTemplate
  */
 export type InlineEmailTemplate = Message<"flyteidl2.notification.InlineEmailTemplate"> & {
@@ -156,15 +159,24 @@ export const InlineEmailTemplateSchema: GenMessage<InlineEmailTemplate> = /*@__P
   messageDesc(file_flyteidl2_notification_definition, 4);
 
 /**
+ * ProviderEmailTemplate references an externally managed email template owned
+ * by an email provider.
+ *
  * @generated from message flyteidl2.notification.ProviderEmailTemplate
  */
 export type ProviderEmailTemplate = Message<"flyteidl2.notification.ProviderEmailTemplate"> & {
   /**
+   * Template ID is interpreted by the configured email provider.
+   *
    * @generated from field: string template_id = 1;
    */
   templateId: string;
 
   /**
+   * Template data contains provider-defined key/value pairs used when rendering
+   * an externally managed email template, for example dynamic template
+   * variables referenced by the provider template's subject or body.
+   *
    * @generated from field: map<string, string> template_data = 2;
    */
   templateData: { [key: string]: string };
@@ -197,6 +209,8 @@ export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliver
   bcc: EmailRecipient[];
 
   /**
+   * Content may be provided either inline or via an external provider template.
+   *
    * @generated from oneof flyteidl2.notification.EmailDeliveryTemplate.content
    */
   content: {

@@ -382,6 +382,8 @@ func (x *EmailRecipient) GetAddress() string {
 	return ""
 }
 
+// InlineEmailTemplate contains subject and body content rendered by the
+// notification system using Go templates.
 type InlineEmailTemplate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -445,12 +447,18 @@ func (x *InlineEmailTemplate) GetTextTemplate() string {
 	return ""
 }
 
+// ProviderEmailTemplate references an externally managed email template owned
+// by an email provider.
 type ProviderEmailTemplate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TemplateId   string            `protobuf:"bytes,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	// Template ID is interpreted by the configured email provider.
+	TemplateId string `protobuf:"bytes,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	// Template data contains provider-defined key/value pairs used when rendering
+	// an externally managed email template, for example dynamic template
+	// variables referenced by the provider template's subject or body.
 	TemplateData map[string]string `protobuf:"bytes,2,rep,name=template_data,json=templateData,proto3" json:"template_data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -508,6 +516,8 @@ type EmailDeliveryTemplate struct {
 	To  []*EmailRecipient `protobuf:"bytes,1,rep,name=to,proto3" json:"to,omitempty"`
 	Cc  []*EmailRecipient `protobuf:"bytes,2,rep,name=cc,proto3" json:"cc,omitempty"`
 	Bcc []*EmailRecipient `protobuf:"bytes,3,rep,name=bcc,proto3" json:"bcc,omitempty"`
+	// Content may be provided either inline or via an external provider template.
+	//
 	// Types that are assignable to Content:
 	//
 	//	*EmailDeliveryTemplate_Inline

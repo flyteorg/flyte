@@ -81,6 +81,8 @@ message EmailRecipient {
   string address = 2;
 }
 
+// InlineEmailTemplate contains subject and body content rendered by the
+// notification system using Go templates.
 message InlineEmailTemplate {
   string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
@@ -89,12 +91,18 @@ message InlineEmailTemplate {
   string text_template = 3; // this is a Go template that may contain placeholders
 }
 
+// ProviderEmailTemplate references an externally managed email template owned
+// by an email provider.
 message ProviderEmailTemplate {
+  // Template ID is interpreted by the configured email provider.
   string template_id = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 200
   }];
 
+  // Template data contains provider-defined key/value pairs used when rendering
+  // an externally managed email template, for example dynamic template
+  // variables referenced by the provider template's subject or body.
   map<string, string> template_data = 2 [(buf.validate.field).map = {
     keys: {
       string: {
@@ -116,6 +124,7 @@ message EmailDeliveryTemplate {
 
   repeated EmailRecipient bcc = 3;
 
+  // Content may be provided either inline or via an external provider template.
   oneof content {
     InlineEmailTemplate inline = 4;
 
