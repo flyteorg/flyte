@@ -46,7 +46,7 @@ export const TailLogsRequestSchema: GenMessage<TailLogsRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_run_logs_service, 0);
 
 /**
- * Reponse message for tailing logs.
+ * Response message for tailing logs.
  *
  * @generated from message flyteidl2.workflow.TailLogsResponse
  */

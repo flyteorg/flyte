@@ -81,7 +81,7 @@ func (x *TailLogsRequest) GetAttempt() uint32 {
 	return 0
 }
 
-// Reponse message for tailing logs.
+// Response message for tailing logs.
 type TailLogsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

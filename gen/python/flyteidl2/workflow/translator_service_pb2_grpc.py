@@ -6,7 +6,7 @@ from flyteidl2.workflow import translator_service_pb2 as flyteidl2_dot_workflow_
 
 
 class TranslatorServiceStub(object):
-    """TranslatorService provides an interface for all diferent types of translations for the platform.
+    """TranslatorService provides an interface for all different types of translations for the platform.
     """
 
     def __init__(self, channel):
@@ -38,7 +38,7 @@ class TranslatorServiceStub(object):
 
 
 class TranslatorServiceServicer(object):
-    """TranslatorService provides an interface for all diferent types of translations for the platform.
+    """TranslatorService provides an interface for all different types of translations for the platform.
     """
 
     def LiteralsToLaunchFormJson(self, request, context):
@@ -96,7 +96,7 @@ def add_TranslatorServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class TranslatorService(object):
-    """TranslatorService provides an interface for all diferent types of translations for the platform.
+    """TranslatorService provides an interface for all different types of translations for the platform.
     """
 
     @staticmethod
