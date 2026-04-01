@@ -1565,11 +1565,11 @@ spec:
     ports:
       web:
         nodePort: 30080
+        transport:
+          respondingTimeouts:
+            readTimeout: 0
       websecure:
-        expose:
-          default: false
-    additionalArguments:
-      - "--entryPoints.web.transport.respondingTimeouts.readTimeout=0"
+        expose: false
 ---
 # Source: flyte-sandbox/templates/proxy/ingress.yaml
 apiVersion: traefik.io/v1alpha1

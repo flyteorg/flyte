@@ -11,8 +11,8 @@ spec:
     ports:
       web:
         nodePort: 30080
+        transport:
+          respondingTimeouts:
+            readTimeout: 0
       websecure:
-        expose:
-          default: false
-    additionalArguments:
-      - "--entryPoints.web.transport.respondingTimeouts.readTimeout=0"
+        expose: false
