@@ -1466,11 +1466,9 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		actionStatus.DurationMs = &durationMs
 	}
 
-	var metadata *workflow.ActionMetadata
-	if action.ParentActionName.Valid {
-		metadata = &workflow.ActionMetadata{
-			Parent: action.ParentActionName.String,
-		}
+	metadata := &workflow.ActionMetadata{
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
 
 	return &workflow.EnrichedAction{
@@ -1519,8 +1517,9 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	}
 
 	metadata := &workflow.ActionMetadata{
-		Parent: CoalesceNullString(action.ParentActionName),
-		Group:  CoalesceNullString(action.ActionGroup),
+		Parent:     CoalesceNullString(action.ParentActionName),
+		Group:      CoalesceNullString(action.ActionGroup),
+		ActionType: workflow.ActionType(action.ActionType),
 	}
 
 	// Pivot on known task types for response types
