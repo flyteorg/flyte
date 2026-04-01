@@ -1,466 +1,8 @@
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/serviceaccount.yaml
 apiVersion: v1
-kind: ServiceAccount
+kind: Namespace
 metadata:
-  name: flyte-flyte-sandbox
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-  annotations:
+  name: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/serviceaccount.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-  name: flyte-kubernetes-dashboard
----
-# Source: flyte-sandbox/charts/minio/templates/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: flyte-minio
-  namespace: "flyte"
-  labels:
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-automountServiceAccountToken: true
-secrets:
-  - name: flyte-minio
----
-# Source: flyte-sandbox/charts/docker-registry/templates/secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-docker-registry-secret
-  namespace: flyte
-  labels:
-    app: docker-registry
-    chart: docker-registry-2.2.2
-    heritage: Helm
-    release: flyte
-type: Opaque
-data:
-  haSharedSecret: "Zmx5dGVzYW5kYm94c2VjcmV0"
-  proxyUsername: ""
-  proxyPassword: ""
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/config-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-flyte-sandbox-config-secret
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-type: Opaque
-stringData:
-  012-database-secrets.yaml: |
-    database:
-      postgres:
-        password: "postgres"
-  013-storage-secrets.yaml: |
-    storage:
-      stow:
-        config:
-          access_key_id: "minio"
-          secret_key: "miniostorage"
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# kubernetes-dashboard-certs
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-  name: flyte-kubernetes-dashboard-certs
-type: Opaque
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
-# kubernetes-dashboard-csrf
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  name: kubernetes-dashboard-csrf
-type: Opaque
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/secret.yaml
-# kubernetes-dashboard-key-holder
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  name: kubernetes-dashboard-key-holder
-type: Opaque
----
-# Source: flyte-sandbox/charts/minio/templates/secrets.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-minio
-  namespace: "flyte"
-  labels:
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-type: Opaque
-data:
-  root-user: "bWluaW8="
-  root-password: "bWluaW9zdG9yYWdl"
----
-# Source: flyte-sandbox/charts/postgresql/templates/secrets.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: flyte-postgresql
-  namespace: "flyte"
-  labels:
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-type: Opaque
-data:
-  postgres-password: "cG9zdGdyZXM="
-  # We don't auto-generate LDAP password when it's not provided as we do for other passwords
----
-# Source: flyte-sandbox/charts/docker-registry/templates/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-docker-registry-config
-  namespace: flyte
-  labels:
-    app: docker-registry
-    chart: docker-registry-2.2.2
-    heritage: Helm
-    release: flyte
-data:
-  config.yml: |-
-    health:
-      storagedriver:
-        enabled: true
-        interval: 10s
-        threshold: 3
-    http:
-      addr: :5000
-      debug:
-        addr: :5001
-        prometheus:
-          enabled: false
-          path: /metrics
-      headers:
-        X-Content-Type-Options:
-        - nosniff
-    log:
-      fields:
-        service: registry
-    storage:
-      cache:
-        blobdescriptor: inmemory
-    version: 0.1
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-flyte-sandbox-config
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-data:
-  000-core.yaml: |
-    logger:
-      show-source: true
-      level: 5
-    webhook:
-      certDir: /var/run/flyte/certs
-      localCert: true
-      secretName: flyte-flyte-sandbox-webhook-secret
-      serviceName: flyte-flyte-sandbox-webhook
-      servicePort: 443
-
-    actions:
-      kubernetes:
-        kubeconfig: ""
-        namespace: flyte
-      watchBufferSize: 100
-    dataproxy:
-      download:
-        maxExpiresIn: 1h
-      upload:
-        defaultFileNameLength: 20
-        maxExpiresIn: 1h
-        maxSize: 100Mi
-        storagePrefix: uploads
-    manager:
-      executor:
-        healthProbePort: 8081
-      kubernetes:
-        burst: 2000
-        kubeconfig: ""
-        namespace: flyte
-        qps: 1000
-        timeout: 30s
-      server:
-        host: 0.0.0.0
-        port: 8090
-    runs:
-      database:
-        connMaxLifeTime: 1h
-        maxIdleConnections: 10
-        maxOpenConnections: 100
-        postgres:
-          dbname: flyte
-          debug: false
-          host: 127.0.0.1
-          options: sslmode=disable
-          password: ""
-          port: 5432
-          username: postgres
-      server:
-        host: 0.0.0.0
-        port: 8090
-      storagePrefix: s3://flyte-data
-      watchBufferSize: 100
-    secret:
-      kubernetes:
-        burst: 200
-        clusterName: flyte-sandbox
-        kubeconfig: ""
-        namespace: flyte
-        qps: 100
-        timeout: 30s
-  001-plugins.yaml: |
-    tasks:
-      task-plugins:
-        default-for-task-types:
-          container: container
-          container_array: k8s-array
-          sidecar: sidecar
-        enabled-plugins:
-        - container
-        - sidecar
-        - connector-service
-        - echo
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-        cloudwatch-enabled: false
-        stackdriver-enabled: false
-      k8s:
-        co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
-      k8s-array:
-        logs:
-          config:
-            kubernetes-enabled: true
-            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-            cloudwatch-enabled: false
-            stackdriver-enabled: false
-  002-database.yaml: |
-    database:
-      sqlite:
-        file: "/var/lib/flyte/flyte.db"
-  003-storage.yaml: |
-    storage:
-      type: stow
-      stow:
-        kind: s3
-        config:
-          region: us-east-1
-          disable_ssl: true
-          v2_signing: true
-          endpoint: http://flyte-minio.flyte:9000
-          auth_type: accesskey
-      container: flyte-data
-  100-inline-config.yaml: |
-    plugins:
-      k8s:
-        default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://flyte-minio.flyte:9000
-        - FLYTE_AWS_ACCESS_KEY_ID: minio
-        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-        - _U_EP_OVERRIDE: 'flyte-http.flyte:8090'
-        - _U_INSECURE: "true"
-        - _U_USE_ACTIONS: "1"
-    runs:
-      database:
-        postgres:
-          dbName: runs
-          host: 'flyte-postgresql.flyte'
-          password: postgres
-          port: 5432
-          user: postgres
-    storage:
-      signedURL:
-        stowConfigOverride:
-          endpoint: http://localhost:30002
-    task_resources:
-      defaults:
-        cpu: 500m
-        ephemeralStorage: 0
-        gpu: 0
-        memory: 1Gi
-      limits:
-        cpu: 0
-        ephemeralStorage: 0
-        gpu: 0
-        memory: 0
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/configmap.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-  name: kubernetes-dashboard-settings
-data:
----
-# Source: flyte-sandbox/templates/config/cluster-resource-template-inline-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-extra-cluster-resource-templates
-  namespace: "flyte"
----
-# Source: flyte-sandbox/templates/config/configuration-inline-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-extra-config
-  namespace: "flyte"
----
-# Source: flyte-sandbox/templates/storage/minio/pv.yaml
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: flyte-minio-storage
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: "/var/lib/flyte/storage/minio"
----
-# Source: flyte-sandbox/templates/storage/minio/pvc.yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: flyte-minio-storage
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  volumeName: flyte-minio-storage
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/crds/flyte.org_taskactions.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -750,842 +292,1182 @@ spec:
     subresources:
       status: {}
 ---
-# Source: flyte-sandbox/charts/flyte-binary/templates/clusterrole.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: flyte-flyte-sandbox-cluster-role
-  namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.2.0
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-rules:
-  - apiGroups:
-    - ""
-    resources:
-    - pods
-    verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - ""
-    resources:
-    - events
-    verbs:
-    - create
-    - delete
-    - patch
-    - update
-  - apiGroups:
-    - flyte.org
-    resources:
-    - taskactions
-    verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - admissionregistration.k8s.io
-    resources:
-    - mutatingwebhookconfigurations
-    verbs:
-    - create
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - ""
-    resources:
-    - secrets
-    verbs:
-    - create
-    - get
-    - update
-  - apiGroups:
-    - '*'
-    resources:
-    - '*'
-    verbs:
-    - '*'
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrole-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: "flyte-kubernetes-dashboard-readonly"
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - endpoints
-      - persistentvolumeclaims
-      - pods
-      - replicationcontrollers
-      - replicationcontrollers/scale
-      - serviceaccounts
-      - services
-      - nodes
-      - persistentvolumeclaims
-      - persistentvolumes
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - bindings
-      - events
-      - limitranges
-      - namespaces/status
-      - pods/log
-      - pods/status
-      - replicationcontrollers/status
-      - resourcequotas
-      - resourcequotas/status
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - namespaces
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - apps
-    resources:
-      - daemonsets
-      - deployments
-      - deployments/scale
-      - replicasets
-      - replicasets/scale
-      - statefulsets
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - autoscaling
-    resources:
-      - horizontalpodautoscalers
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - batch
-    resources:
-      - cronjobs
-      - jobs
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - extensions
-    resources:
-      - daemonsets
-      - deployments
-      - deployments/scale
-      - ingresses
-      - networkpolicies
-      - replicasets
-      - replicasets/scale
-      - replicationcontrollers/scale
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - policy
-    resources:
-      - poddisruptionbudgets
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - networkpolicies
-      - ingresses
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - storage.k8s.io
-    resources:
-      - storageclasses
-      - volumeattachments
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - rbac.authorization.k8s.io
-    resources:
-      - clusterrolebindings
-      - clusterroles
-      - roles
-      - rolebindings
-    verbs:
-      - get
-      - list
-      - watch
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/clusterrolebinding.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: flyte-flyte-sandbox-cluster-role-binding
-  namespace: "flyte"
-  labels:
     helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-flyte-sandbox-cluster-role
-subjects:
-  - kind: ServiceAccount
-    name: flyte-flyte-sandbox
-    namespace: "flyte"
+  name: flyte-sandbox
+  namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: flyte-kubernetes-dashboard-readonly
   labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-  annotations:
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-kubernetes-dashboard-readonly
-subjects:
-  - kind: ServiceAccount
-    name: flyte-kubernetes-dashboard
-    namespace: flyte
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/role.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+secrets:
+- name: flyte-sandbox-minio
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: flyte-kubernetes-dashboard
   labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-  annotations:
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
 rules:
-    # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
-  - apiGroups: [""]
-    resources: ["secrets"]
-    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
-    verbs: ["get", "update", "delete"]
-    # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    resourceNames: ["kubernetes-dashboard-settings"]
-    verbs: ["get", "update"]
-    # Allow Dashboard to get metrics.
-  - apiGroups: [""]
-    resources: ["services"]
-    resourceNames: ["heapster", "dashboard-metrics-scraper"]
-    verbs: ["proxy"]
-  - apiGroups: [""]
-    resources: ["services/proxy"]
-    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
-    verbs: ["get"]
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-key-holder
+  - kubernetes-dashboard-certs
+  - kubernetes-dashboard-csrf
+  resources:
+  - secrets
+  verbs:
+  - get
+  - update
+  - delete
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-settings
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - dashboard-metrics-scraper
+  resources:
+  - services
+  verbs:
+  - proxy
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - 'http:heapster:'
+  - 'https:heapster:'
+  - dashboard-metrics-scraper
+  - http:dashboard-metrics-scraper
+  resources:
+  - services/proxy
+  verbs:
+  - get
 ---
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/rolebinding.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kubernetes-dashboard
+  namespace: flyte
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-csrf
+  - kubernetes-dashboard-key-holder
+  resources:
+  - secrets
+  verbs:
+  - get
+  - update
+  - delete
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-settings
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-cluster-role
+  namespace: flyte
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - flyte.org
+  resources:
+  - taskactions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-readonly
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - pods
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  - serviceaccounts
+  - services
+  - nodes
+  - persistentvolumeclaims
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - bindings
+  - events
+  - limitranges
+  - namespaces/status
+  - pods/log
+  - pods/status
+  - replicationcontrollers/status
+  - resourcequotas
+  - resourcequotas/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  - volumeattachments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - list
+  - watch
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: flyte-kubernetes-dashboard
   labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-  annotations:
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: flyte-kubernetes-dashboard
+  name: flyte-sandbox-kubernetes-dashboard
 subjects:
-  - kind: ServiceAccount
-    name: flyte-kubernetes-dashboard
-    namespace: flyte
----
-# Source: flyte-sandbox/charts/docker-registry/templates/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-docker-registry
+- kind: ServiceAccount
+  name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kubernetes-dashboard
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kubernetes-dashboard
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-cluster-role-binding
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-sandbox-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-sandbox-kubernetes-dashboard-readonly
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: 5
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
+
+    actions:
+      kubernetes:
+        kubeconfig: ""
+        namespace: flyte
+      watchBufferSize: 100
+    dataproxy:
+      download:
+        maxExpiresIn: 1h
+      upload:
+        defaultFileNameLength: 20
+        maxExpiresIn: 1h
+        maxSize: 100Mi
+        storagePrefix: uploads
+    manager:
+      executor:
+        healthProbePort: 8081
+      kubernetes:
+        burst: 2000
+        kubeconfig: ""
+        namespace: flyte
+        qps: 1000
+        timeout: 30s
+      server:
+        host: 0.0.0.0
+        port: 8090
+    runs:
+      database:
+        connMaxLifeTime: 1h
+        maxIdleConnections: 10
+        maxOpenConnections: 100
+        postgres:
+          dbname: flyte
+          debug: false
+          host: 127.0.0.1
+          options: sslmode=disable
+          password: ""
+          port: 5432
+          username: postgres
+      server:
+        host: 0.0.0.0
+        port: 8090
+      storagePrefix: s3://flyte-data
+      watchBufferSize: 100
+    secret:
+      kubernetes:
+        burst: 200
+        clusterName: flyte-sandbox
+        kubeconfig: ""
+        namespace: flyte
+        qps: 100
+        timeout: 30s
+  001-plugins.yaml: |
+    tasks:
+      task-plugins:
+        default-for-task-types:
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - connector-service
+        - echo
+    plugins:
+      logs:
+        kubernetes-enabled: true
+        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        cloudwatch-enabled: false
+        stackdriver-enabled: false
+      k8s:
+        co-pilot:
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
+      k8s-array:
+        logs:
+          config:
+            kubernetes-enabled: true
+            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+            cloudwatch-enabled: false
+            stackdriver-enabled: false
+  002-database.yaml: |
+    database:
+      sqlite:
+        file: "/var/lib/flyte/flyte.db"
+  003-storage.yaml: |
+    storage:
+      type: stow
+      stow:
+        kind: s3
+        config:
+          region: us-east-1
+          disable_ssl: true
+          v2_signing: true
+          endpoint: http://flyte-sandbox-minio.flyte:9000
+          auth_type: accesskey
+      container: flyte-data
+  100-inline-config.yaml: |
+    plugins:
+      k8s:
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+        - FLYTE_AWS_ACCESS_KEY_ID: minio
+        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
+        - _U_INSECURE: "true"
+        - _U_USE_ACTIONS: "1"
+    runs:
+      database:
+        postgres:
+          dbName: runs
+          host: 'flyte-sandbox-postgresql.flyte'
+          password: postgres
+          port: 5432
+          user: postgres
+    storage:
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
+    task_resources:
+      defaults:
+        cpu: 500m
+        ephemeralStorage: 0
+        gpu: 0
+        memory: 1Gi
+      limits:
+        cpu: 0
+        ephemeralStorage: 0
+        gpu: 0
+        memory: 0
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yml: |-
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+    http:
+      addr: :5000
+      debug:
+        addr: :5001
+        prometheus:
+          enabled: false
+          path: /metrics
+      headers:
+        X-Content-Type-Options:
+        - nosniff
+    log:
+      fields:
+        service: registry
+    storage:
+      cache:
+        blobdescriptor: inmemory
+    version: 0.1
+kind: ConfigMap
+metadata:
   labels:
     app: docker-registry
     chart: docker-registry-2.2.2
-    release: flyte
     heritage: Helm
-spec:
-  type: NodePort
-  ports:
-    - port: 5000
-      protocol: TCP
-      name: http-5000
-      targetPort: 5000
-      nodePort: 30000
-  selector:
-    app: docker-registry
-    release: flyte
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry-config
+  namespace: flyte
 ---
-# Source: flyte-sandbox/charts/flyte-binary/templates/service/http.yaml
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: flyte-flyte-sandbox-http
-  namespace: "flyte"
+  name: flyte-sandbox-extra-cluster-resource-templates
+  namespace: flyte
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-sandbox-extra-config
+  namespace: flyte
+---
+apiVersion: v1
+data: null
+kind: ConfigMap
+metadata:
   labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-  annotations:
-spec:
-  type: ClusterIP
-  ports:
-    - name: http
-      port: 8090
-      targetPort: http
-      nodePort: null
-  selector:
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: flyte-binary
----
-# Source: flyte-sandbox/charts/flyte-binary/templates/service/webhook.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-flyte-sandbox-webhook
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-spec:
-  selector:
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: flyte-binary
-  ports:
-    - name: webhook
-      port: 443
-      targetPort: 9443
-      protocol: TCP
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/service.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-kubernetes-dashboard
-  labels:
-    
     app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: kubernetes-dashboard
-    
-    kubernetes.io/cluster-service: "true"
-  annotations:
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    targetPort: http
-    name: http
-  selector:
-
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: kubernetes-dashboard
+  name: kubernetes-dashboard-settings
+  namespace: flyte
 ---
-# Source: flyte-sandbox/charts/minio/templates/service.yaml
 apiVersion: v1
-kind: Service
+kind: Secret
 metadata:
-  name: flyte-minio
-  namespace: "flyte"
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-config-secret
+  namespace: flyte
+stringData:
+  012-database-secrets.yaml: |
+    database:
+      postgres:
+        password: "postgres"
+  013-storage-secrets.yaml: |
+    storage:
+      stow:
+        config:
+          access_key_id: "minio"
+          secret_key: "miniostorage"
+type: Opaque
+---
+apiVersion: v1
+data:
+  haSharedSecret: Zmx5dGVzYW5kYm94c2VjcmV0
+  proxyPassword: ""
+  proxyUsername: ""
+kind: Secret
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry-secret
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-certs
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+data:
+  root-password: bWluaW9zdG9yYWdl
+  root-user: bWluaW8=
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: NodePort
-  externalTrafficPolicy: "Cluster"
-  ports:
-    - name: minio-api
-      port: 9000
-      targetPort: minio-api
-      nodePort: 30002
-    - name: minio-console
-      port: 9001
-      targetPort: minio-console
-  selector:
-    app.kubernetes.io/name: minio
-    app.kubernetes.io/instance: flyte
+  name: flyte-sandbox-minio
+  namespace: flyte
+type: Opaque
 ---
-# Source: flyte-sandbox/charts/postgresql/templates/primary/svc-headless.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: kubernetes-dashboard-csrf
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: kubernetes-dashboard-key-holder
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: flyte-sandbox-postgresql
+  namespace: flyte
+subsets:
+- addresses:
+  - ip: '%{NODE_IP}%'
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte-postgresql-hl
-  namespace: "flyte"
   labels:
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: primary
-    # Use this annotation in addition to the actual publishNotReadyAddresses
-    # field below because the annotation will stop being respected soon but the
-    # field is broken in some versions of Kubernetes:
-    # https://github.com/kubernetes/kubernetes/issues/58662
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-spec:
-  type: ClusterIP
-  clusterIP: None
-  # We want all pods in the StatefulSet to have their addresses published for
-  # the sake of the other Postgresql pods even before they're ready, since they
-  # have to be able to talk to each other in order to become ready.
-  publishNotReadyAddresses: true
-  ports:
-    - name: tcp-postgresql
-      port: 5432
-      targetPort: tcp-postgresql
-  selector:
-    app.kubernetes.io/name: postgresql
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: primary
----
-# Source: flyte-sandbox/charts/postgresql/templates/primary/svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-postgresql
-  namespace: "flyte"
-  labels:
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: primary
-spec:
-  type: NodePort
-  externalTrafficPolicy: "Cluster"
-  sessionAffinity: None
-  ports:
-    - name: tcp-postgresql
-      port: 5432
-      targetPort: tcp-postgresql
-      nodePort: 30001
-  selector:
-    app.kubernetes.io/name: postgresql
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: primary
----
-# Source: flyte-sandbox/templates/console/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-flyte-sandbox-console
-  namespace: "flyte"
-  labels:
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
+  name: flyte-sandbox-console
+  namespace: flyte
 spec:
-  selector:
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: console
   ports:
-    - name: http
-      port: 80
-      targetPort: http
-      protocol: TCP
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
 ---
-# Source: flyte-sandbox/charts/docker-registry/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry
+  namespace: flyte
+spec:
+  ports:
+  - name: http-5000
+    nodePort: 30000
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: docker-registry
+    release: flyte-sandbox
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-http
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 8090
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+    kubernetes.io/cluster-service: "true"
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: kubernetes-dashboard
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: minio-api
+    nodePort: 30002
+    port: 9000
+    targetPort: minio-api
+  - name: minio-console
+    port: 9001
+    targetPort: minio-console
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: minio
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: flyte-sandbox-postgresql
+  namespace: flyte
+spec:
+  ports:
+  - name: tcp-postgresql
+    nodePort: 30001
+    port: 5432
+    targetPort: 5432
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /var/lib/flyte/storage/minio
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  volumeName: flyte-sandbox-minio-storage
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-docker-registry
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox
   namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: flyte-binary
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configuration: d2d832fb02faa1b1a6c7ad361090cbef8ba1af501bcd0864bf089ced0cdb19a5
+        checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
+      labels:
+        app.kubernetes.io/component: flyte-binary
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - args:
+        - --config
+        - /etc/flyte/config.d/*.yaml
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: flyte-binary-v2:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+        name: flyte
+        ports:
+        - containerPort: 8090
+          name: http
+        - containerPort: 9443
+          name: webhook
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /etc/flyte/config.d
+          name: config
+        - mountPath: /var/run/flyte/certs
+          name: webhook-certs
+          readOnly: false
+      initContainers:
+      - args:
+        - |
+          until nc -z flyte-sandbox-postgresql.flyte 5432; do
+            echo waiting for database
+            sleep 0.5
+          done
+        command:
+        - sh
+        - -ec
+        image: rancher/mirrored-library-busybox:1.34.1
+        imagePullPolicy: Never
+        name: wait-for-db
+      serviceAccountName: flyte-sandbox
+      volumes:
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: flyte-sandbox-config
+          - secret:
+              name: flyte-sandbox-config-secret
+          - configMap:
+              name: flyte-sandbox-extra-config
+      - emptyDir: {}
+        name: webhook-certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: console
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: console
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: console
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   labels:
     app: docker-registry
     chart: docker-registry-2.2.2
-    release: flyte
     heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry
+  namespace: flyte
 spec:
+  minReadySeconds: 5
+  replicas: 1
   selector:
     matchLabels:
       app: docker-registry
-      release: flyte
-  replicas: 1
-  minReadySeconds: 5
+      release: flyte-sandbox
   template:
     metadata:
+      annotations:
+        checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
+        checksum/secret: 829c19e3c86dcb9b7d4c44e6a73463c6a6467d824200e87e2d7999f70dc0f5f9
       labels:
         app: docker-registry
-        release: flyte
-      annotations:
-        checksum/config: c7161d45e95aa22fb2f71f00617ebb53552bf88b4a001f5e7e0bf7fee9235567
-        checksum/secret: 2e25ad0b4767f4e266cfd5580effdbf52efcd5f4d7b7da32c4cd94ee535a150f
+        release: flyte-sandbox
     spec:
+      containers:
+      - command:
+        - /bin/registry
+        - serve
+        - /etc/docker/registry/config.yml
+        env:
+        - name: REGISTRY_HTTP_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: haSharedSecret
+              name: flyte-sandbox-docker-registry-secret
+        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+          value: /var/lib/registry
+        image: registry:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        name: docker-registry
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/docker/registry
+          name: flyte-sandbox-docker-registry-config
+        - mountPath: /var/lib/registry/
+          name: data
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
-      containers:
-        - name: docker-registry
-          image: "registry:sandbox"
-          imagePullPolicy: Never
-          command:
-          - /bin/registry
-          - serve
-          - /etc/docker/registry/config.yml
-          ports:
-            - containerPort: 5000
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 5000
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 5000
-          resources: 
-            {}
-          env: 
-            - name: REGISTRY_HTTP_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: flyte-docker-registry-secret
-                  key: haSharedSecret
-            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
-              value: "/var/lib/registry"
-          volumeMounts: 
-            - name: "flyte-docker-registry-config"
-              mountPath: "/etc/docker/registry"
-            - name: data
-              mountPath: /var/lib/registry/
-      volumes: 
-        - name: flyte-docker-registry-config
-          configMap:
-            name: flyte-docker-registry-config
-        - name: data
-          emptyDir: {}
+      volumes:
+      - configMap:
+          name: flyte-sandbox-docker-registry-config
+        name: flyte-sandbox-docker-registry-config
+      - emptyDir: {}
+        name: data
 ---
-# Source: flyte-sandbox/charts/flyte-binary/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-flyte-sandbox
-  namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.2.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-  annotations:
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: flyte-sandbox
-      app.kubernetes.io/instance: flyte
-      app.kubernetes.io/component: flyte-binary
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: flyte-sandbox
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/component: flyte-binary
-      annotations:
-        checksum/configuration: 22d8e67e59af23aa3c43a4306df0e08551860ce11b6071a0ffa2479b3417ff35
-        checksum/configuration-secret: 1244096c96a3669e35a7b826ff095beae0d3debd4c48d86843cebb0376b00c27
-    spec:
-      serviceAccountName: flyte-flyte-sandbox
-      initContainers:
-        - name: wait-for-db
-          image: "bitnami/postgresql:sandbox"
-          imagePullPolicy: "Never"
-          command:
-            - sh
-            - -ec
-          args:
-            - |
-              until pg_isready \
-                -h flyte-postgresql \
-                -p 5432 \
-                -U postgres
-              do
-                echo waiting for database
-                sleep 0.1
-              done
-      containers:
-        - name: flyte
-          image: "flyte-binary-v2:sandbox"
-          imagePullPolicy: "Never"
-          args:
-            - --config
-            - /etc/flyte/config.d/*.yaml
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - name: http
-              containerPort: 8090
-            - name: webhook
-              containerPort: 9443
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-            initialDelaySeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          volumeMounts:
-            - name: config
-              mountPath: /etc/flyte/config.d
-            - name: webhook-certs
-              mountPath: /var/run/flyte/certs
-              readOnly: false
-      volumes:
-        - name: config
-          projected:
-            sources:
-            - configMap:
-                name: flyte-flyte-sandbox-config
-            - secret:
-                name: flyte-flyte-sandbox-config-secret
-            - configMap:
-                name: flyte-extra-config
-        - name: webhook-certs
-          emptyDir: {}
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/deployment.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flyte-kubernetes-dashboard
-  annotations:
-  labels:
-    app.kubernetes.io/name: kubernetes-dashboard
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "2.7.0"
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: kubernetes-dashboard
-spec:
-  replicas: 1
+      app.kubernetes.io/component: kubernetes-dashboard
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: kubernetes-dashboard
   strategy:
     rollingUpdate:
       maxSurge: 0
       maxUnavailable: 1
     type: RollingUpdate
-  selector:
-    matchLabels:
-
-      app.kubernetes.io/name: kubernetes-dashboard
-      app.kubernetes.io/instance: flyte
-      app.kubernetes.io/component: kubernetes-dashboard
   template:
     metadata:
-      annotations:
+      annotations: null
       labels:
-        app.kubernetes.io/name: kubernetes-dashboard
-        helm.sh/chart: kubernetes-dashboard-6.0.0
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/version: "2.7.0"
-        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: kubernetes-dashboard
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kubernetes-dashboard
+        app.kubernetes.io/version: 2.7.0
+        helm.sh/chart: kubernetes-dashboard-6.0.0
     spec:
-      securityContext:
-
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: flyte-kubernetes-dashboard
       containers:
-      - name: kubernetes-dashboard
-        image: "kubernetesui/dashboard:sandbox"
+      - args:
+        - --namespace=flyte
+        - --metrics-provider=none
+        - --enable-insecure-login
+        - --enable-skip-login
+        image: kubernetesui/dashboard:sandbox
         imagePullPolicy: Never
-        args:
-          - --namespace=flyte
-          - --metrics-provider=none
-
-          - --enable-insecure-login
-          - --enable-skip-login
-        ports:
-        - name: http
-          containerPort: 9090
-          protocol: TCP
-        volumeMounts:
-        - name: kubernetes-dashboard-certs
-          mountPath: /certs
-          # Create on-disk volume to store exec logs
-        - mountPath: /tmp
-          name: tmp-volume
         livenessProbe:
           httpGet:
-            scheme: HTTP
             path: /
             port: 9090
+            scheme: HTTP
           initialDelaySeconds: 30
           timeoutSeconds: 30
+        name: kubernetes-dashboard
+        ports:
+        - containerPort: 9090
+          name: http
+          protocol: TCP
         resources:
-
           limits:
             cpu: 2
             memory: 200Mi
@@ -1593,618 +1475,172 @@ spec:
             cpu: 100m
             memory: 200Mi
         securityContext:
-
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           runAsGroup: 2001
           runAsUser: 1001
+        volumeMounts:
+        - mountPath: /certs
+          name: kubernetes-dashboard-certs
+        - mountPath: /tmp
+          name: tmp-volume
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: flyte-sandbox-kubernetes-dashboard
       volumes:
       - name: kubernetes-dashboard-certs
         secret:
-          secretName: flyte-kubernetes-dashboard-certs
-      - name: tmp-volume
-        emptyDir: {}
+          secretName: flyte-sandbox-kubernetes-dashboard-certs
+      - emptyDir: {}
+        name: tmp-volume
 ---
-# Source: flyte-sandbox/charts/minio/templates/standalone/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyte-minio
-  namespace: "flyte"
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
+  name: flyte-sandbox-minio
+  namespace: flyte
 spec:
   selector:
     matchLabels:
+      app.kubernetes.io/instance: flyte-sandbox
       app.kubernetes.io/name: minio
-      app.kubernetes.io/instance: flyte
   strategy:
     type: Recreate
   template:
     metadata:
+      annotations:
+        checksum/credentials-secret: ecce809e3af19025d134846a9a81e163dd41df7e26abf2c6657895d9d13607a9
       labels:
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: minio
         helm.sh/chart: minio-12.6.7
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/managed-by: Helm
-      annotations:
-        checksum/credentials-secret: 194564f0bb37f9ef121ab33f9a81e9777b634c0ee937f94205e10112627ec3aa
     spec:
-      
-      serviceAccountName: flyte-minio
       affinity:
-        podAffinity:
-          
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app.kubernetes.io/name: minio
-                    app.kubernetes.io/instance: flyte
-                topologyKey: kubernetes.io/hostname
-              weight: 1
-        nodeAffinity:
-          
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: flyte-sandbox
+                  app.kubernetes.io/name: minio
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
+        env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: MINIO_SCHEME
+          value: http
+        - name: MINIO_FORCE_NEW_KEYS
+          value: "no"
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: root-user
+              name: flyte-sandbox-minio
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: root-password
+              name: flyte-sandbox-minio
+        - name: MINIO_DEFAULT_BUCKETS
+          value: flyte-data
+        - name: MINIO_BROWSER
+          value: "on"
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: public
+        - name: MINIO_CONSOLE_PORT_NUMBER
+          value: "9001"
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: http://localhost:30080/minio
+        image: docker.io/bitnami/minio:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /minio/health/live
+            port: minio-api
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: minio-api
+          protocol: TCP
+        - containerPort: 9001
+          name: minio-console
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: minio-api
+          timeoutSeconds: 1
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      initContainers:
+      - command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
+        image: docker.io/bitnami/os-shell:sandbox
+        imagePullPolicy: Never
+        name: volume-permissions
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
       securityContext:
         fsGroup: 1001
-      initContainers:
-        - name: volume-permissions
-          image: docker.io/bitnami/os-shell:sandbox
-          imagePullPolicy: "Never"
-          command:
-            - /bin/bash
-            - -ec
-            - |
-              chown -R 1001:1001 /data
-          securityContext:
-            runAsUser: 0
-          resources:
-            limits: {}
-            requests: {}
-          volumeMounts:
-            - name: data
-              mountPath: /data
-      containers:
-        - name: minio
-          image: docker.io/bitnami/minio:sandbox
-          imagePullPolicy: "Never"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-          env:
-            - name: BITNAMI_DEBUG
-              value: "false"
-            - name: MINIO_SCHEME
-              value: "http"
-            - name: MINIO_FORCE_NEW_KEYS
-              value: "no"
-            - name: MINIO_ROOT_USER
-              valueFrom:
-                secretKeyRef:
-                  name: flyte-minio
-                  key: root-user
-            - name: MINIO_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: flyte-minio
-                  key: root-password
-            - name: MINIO_DEFAULT_BUCKETS
-              value: flyte-data
-            - name: MINIO_BROWSER
-              value: "on"
-            - name: MINIO_PROMETHEUS_AUTH_TYPE
-              value: "public"
-            - name: MINIO_CONSOLE_PORT_NUMBER
-              value: "9001"
-            - name: MINIO_BROWSER_REDIRECT_URL
-              value: http://localhost:30080/minio
-          envFrom:
-          ports:
-            - name: minio-api
-              containerPort: 9000
-              protocol: TCP
-            - name: minio-console
-              containerPort: 9001
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /minio/health/live
-              port: minio-api
-              scheme: "HTTP"
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 5
-          readinessProbe:
-            tcpSocket:
-              port: minio-api
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 1
-            successThreshold: 1
-            failureThreshold: 5
-          resources:
-            limits: {}
-            requests: {}
-          volumeMounts:
-            - name: data
-              mountPath: /data
+      serviceAccountName: flyte-sandbox-minio
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: flyte-minio-storage
+      - name: data
+        persistentVolumeClaim:
+          claimName: flyte-sandbox-minio-storage
 ---
-# Source: flyte-sandbox/templates/console/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: flyte-flyte-sandbox-console
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: flyte-sandbox
-      app.kubernetes.io/instance: flyte
-      app.kubernetes.io/component: console
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: flyte-sandbox
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/component: console
-    spec:
-      containers:
-        - name: console
-          image: "ghcr.io/flyteorg/flyte-client-v2:latest"
-          imagePullPolicy: "Never"
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /v2
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /v2
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 30
----
-# Source: flyte-sandbox/charts/postgresql/templates/primary/statefulset.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: flyte-postgresql
-  namespace: "flyte"
-  labels:
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: primary
-spec:
-  replicas: 1
-  serviceName: flyte-postgresql-hl
-  updateStrategy:
-    rollingUpdate: {}
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: postgresql
-      app.kubernetes.io/instance: flyte
-      app.kubernetes.io/component: primary
-  template:
-    metadata:
-      name: flyte-postgresql
-      labels:
-        app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-12.8.1
-        app.kubernetes.io/instance: flyte
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/component: primary
-    spec:
-      serviceAccountName: default
-      
-      affinity:
-        podAffinity:
-          
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app.kubernetes.io/name: postgresql
-                    app.kubernetes.io/instance: flyte
-                    app.kubernetes.io/component: primary
-                topologyKey: kubernetes.io/hostname
-              weight: 1
-        nodeAffinity:
-          
-      securityContext:
-        fsGroup: 1001
-      hostNetwork: false
-      hostIPC: false
-      initContainers:
-        - name: init-chmod-data
-          image: docker.io/bitnami/os-shell:sandbox
-          imagePullPolicy: "Never"
-          resources:
-            limits: {}
-            requests: {}
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              chown 1001:1001 /bitnami/postgresql
-              mkdir -p /bitnami/postgresql/data
-              chmod 700 /bitnami/postgresql/data
-              find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
-                xargs -r chown -R 1001:1001
-          securityContext:
-            runAsGroup: 0
-            runAsNonRoot: false
-            runAsUser: 0
-            seccompProfile:
-              type: RuntimeDefault
-          volumeMounts:
-            - name: data
-              mountPath: /bitnami/postgresql
-      containers:
-        - name: postgresql
-          image: docker.io/bitnami/postgresql:sandbox
-          imagePullPolicy: "Never"
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-              - ALL
-            runAsGroup: 0
-            runAsNonRoot: true
-            runAsUser: 1001
-            seccompProfile:
-              type: RuntimeDefault
-          env:
-            - name: BITNAMI_DEBUG
-              value: "false"
-            - name: POSTGRESQL_PORT_NUMBER
-              value: "5432"
-            - name: POSTGRESQL_VOLUME_DIR
-              value: "/bitnami/postgresql"
-            - name: PGDATA
-              value: "/bitnami/postgresql/data"
-            # Authentication
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: flyte-postgresql
-                  key: postgres-password
-            # Replication
-            # Initdb
-            # Standby
-            # LDAP
-            - name: POSTGRESQL_ENABLE_LDAP
-              value: "no"
-            # TLS
-            - name: POSTGRESQL_ENABLE_TLS
-              value: "no"
-            # Audit
-            - name: POSTGRESQL_LOG_HOSTNAME
-              value: "false"
-            - name: POSTGRESQL_LOG_CONNECTIONS
-              value: "false"
-            - name: POSTGRESQL_LOG_DISCONNECTIONS
-              value: "false"
-            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
-              value: "off"
-            # Others
-            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
-              value: "error"
-            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
-              value: "pgaudit"
-          ports:
-            - name: tcp-postgresql
-              containerPort: 5432
-          livenessProbe:
-            failureThreshold: 6
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-          readinessProbe:
-            failureThreshold: 6
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - -e
-                - |
-                  exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
-          resources:
-            limits: {}
-            requests:
-              cpu: 250m
-              memory: 256Mi
-          volumeMounts:
-            - name: data
-              mountPath: /bitnami/postgresql
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: flyte-db-storage
----
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: flyte-flyte-sandbox-api
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /healthz
-            pathType: Exact
-            backend:
-              service:
-                name: flyte-flyte-sandbox-http
-                port:
-                  number: 8090
-          - path: /readyz
-            pathType: Exact
-            backend:
-              service:
-                name: flyte-flyte-sandbox-http
-                port:
-                  number: 8090
-          - path: /flyteidl2.
-            pathType: Prefix
-            backend:
-              service:
-                name: flyte-flyte-sandbox-http
-                port:
-                  number: 8090
----
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: flyte-flyte-sandbox-console
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /v2
-            pathType: Prefix
-            backend:
-              service:
-                name: flyte-flyte-sandbox-console
-                port:
-                  number: 80
----
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: flyte-flyte-sandbox-kubernetes-dashboard
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-kubernetes-dashboard@kubernetescrd
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /kubernetes-dashboard
-            pathType: Prefix
-            backend:
-              service:
-                name: flyte-kubernetes-dashboard
-                port:
-                  number: 80
----
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: flyte-flyte-sandbox-minio
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /minio
-            pathType: Prefix
-            backend:
-              service:
-                name: flyte-minio
-                port:
-                  number: 9001
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/clusterrolebinding-metrics.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/extra-manifests.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/ingress.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/networkpolicy.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/pdb.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/psp.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/charts/kubernetes-dashboard/templates/servicemonitor.yaml
-# Copyright 2017 The Kubernetes Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
----
-# Source: flyte-sandbox/templates/proxy/traefik-config.yaml
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
   name: traefik
   namespace: kube-system
-  labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
-    app.kubernetes.io/managed-by: Helm
 spec:
   valuesContent: |
     service:
@@ -2218,36 +1654,144 @@ spec:
       websecure:
         expose: false
 ---
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: strip-kubernetes-dashboard
-  namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-api
+  namespace: flyte
 spec:
-  stripPrefix:
-    prefixes:
-      - /kubernetes-dashboard
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /healthz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /readyz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /flyteidl2.
+        pathType: Prefix
 ---
-# Source: flyte-sandbox/templates/proxy/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-console
+            port:
+              number: 80
+        path: /v2
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-kubernetes-dashboard@kubernetescrd
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-kubernetes-dashboard
+            port:
+              number: 80
+        path: /kubernetes-dashboard
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-minio
+            port:
+              number: 9001
+        path: /minio
+        pathType: Prefix
+---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-minio
-  namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-sandbox-0.1.0
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.1"
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: strip-kubernetes-dashboard
+  namespace: flyte
 spec:
   stripPrefix:
     prefixes:
-      - /minio
+    - /kubernetes-dashboard
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: strip-minio
+  namespace: flyte
+spec:
+  stripPrefix:
+    prefixes:
+    - /minio
