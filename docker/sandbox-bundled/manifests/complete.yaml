@@ -1155,20 +1155,6 @@ metadata:
 type: Opaque
 ---
 apiVersion: v1
-data:
-  postgres-password: cG9zdGdyZXM=
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-  name: flyte-sandbox-postgresql
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
 kind: Secret
 metadata:
   labels:
@@ -1193,6 +1179,20 @@ metadata:
   name: kubernetes-dashboard-key-holder
   namespace: flyte
 type: Opaque
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: flyte-sandbox-postgresql
+  namespace: flyte
+subsets:
+- addresses:
+  - ip: '%{NODE_IP}%'
+  ports:
+  - name: tcp-postgresql
+    port: 5432
 ---
 apiVersion: v1
 kind: Service
@@ -1313,51 +1313,16 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
+    app.kubernetes.io/name: embedded-postgresql
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - name: tcp-postgresql
     nodePort: 30001
     port: 5432
-    targetPort: tcp-postgresql
-  selector:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: postgresql
-  sessionAffinity: None
+    targetPort: 5432
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: flyte-sandbox-postgresql-hl
-  namespace: flyte
-spec:
-  clusterIP: None
-  ports:
-  - name: tcp-postgresql
-    port: 5432
-    targetPort: tcp-postgresql
-  publishNotReadyAddresses: true
-  selector:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: postgresql
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1412,26 +1377,6 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-db-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: /var/lib/flyte/storage/db
-  storageClassName: manual
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-minio-storage
   namespace: flyte
 spec:
@@ -1442,26 +1387,6 @@ spec:
   hostPath:
     path: /var/lib/flyte/storage/minio
   storageClassName: manual
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-db-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: manual
-  volumeName: flyte-sandbox-db-storage
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -1553,18 +1478,14 @@ spec:
       initContainers:
       - args:
         - |
-          until pg_isready \
-            -h flyte-sandbox-postgresql \
-            -p 5432 \
-            -U postgres
-          do
+          until nc -z flyte-sandbox-postgresql.flyte 5432; do
             echo waiting for database
-            sleep 0.1
+            sleep 0.5
           done
         command:
         - sh
         - -ec
-        image: bitnami/postgresql:sandbox
+        image: rancher/mirrored-library-busybox:1.34.1
         imagePullPolicy: Never
         name: wait-for-db
       serviceAccountName: flyte-sandbox
@@ -1961,163 +1882,3 @@ spec:
       - configMap:
           name: flyte-sandbox-proxy-config
         name: config
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  labels:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-  name: flyte-sandbox-postgresql
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: primary
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: postgresql
-  serviceName: flyte-sandbox-postgresql-hl
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: primary
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-12.8.1
-      name: flyte-sandbox-postgresql
-    spec:
-      affinity:
-        nodeAffinity: null
-        podAffinity: null
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/component: primary
-                  app.kubernetes.io/instance: flyte-sandbox
-                  app.kubernetes.io/name: postgresql
-              topologyKey: kubernetes.io/hostname
-            weight: 1
-      containers:
-      - env:
-        - name: BITNAMI_DEBUG
-          value: "false"
-        - name: POSTGRESQL_PORT_NUMBER
-          value: "5432"
-        - name: POSTGRESQL_VOLUME_DIR
-          value: /bitnami/postgresql
-        - name: PGDATA
-          value: /bitnami/postgresql/data
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: postgres-password
-              name: flyte-sandbox-postgresql
-        - name: POSTGRESQL_ENABLE_LDAP
-          value: "no"
-        - name: POSTGRESQL_ENABLE_TLS
-          value: "no"
-        - name: POSTGRESQL_LOG_HOSTNAME
-          value: "false"
-        - name: POSTGRESQL_LOG_CONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_LOG_DISCONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
-          value: "off"
-        - name: POSTGRESQL_CLIENT_MIN_MESSAGES
-          value: error
-        - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
-          value: pgaudit
-        image: docker.io/bitnami/postgresql:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-          failureThreshold: 6
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: postgresql
-        ports:
-        - containerPort: 5432
-          name: tcp-postgresql
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - -e
-            - |
-              exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-              [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
-          failureThreshold: 6
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        resources:
-          limits: {}
-          requests:
-            cpu: 250m
-            memory: 256Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          runAsGroup: 0
-          runAsNonRoot: true
-          runAsUser: 1001
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
-      hostIPC: false
-      hostNetwork: false
-      initContainers:
-      - command:
-        - /bin/sh
-        - -ec
-        - |
-          chown 1001:1001 /bitnami/postgresql
-          mkdir -p /bitnami/postgresql/data
-          chmod 700 /bitnami/postgresql/data
-          find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
-            xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/os-shell:sandbox
-        imagePullPolicy: Never
-        name: init-chmod-data
-        resources:
-          limits: {}
-          requests: {}
-        securityContext:
-          runAsGroup: 0
-          runAsNonRoot: false
-          runAsUser: 0
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
-      securityContext:
-        fsGroup: 1001
-      serviceAccountName: default
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-sandbox-db-storage
-  updateStrategy:
-    rollingUpdate: {}
-    type: RollingUpdate
