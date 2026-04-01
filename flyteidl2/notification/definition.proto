@@ -126,6 +126,8 @@ message EmailDeliveryTemplate {
 
   // Content may be provided either inline or via an external provider template.
   oneof content {
+    option (buf.validate.oneof).required = true;
+
     InlineEmailTemplate inline = 4;
 
     ProviderEmailTemplate provider_template = 5;
