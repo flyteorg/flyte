@@ -73,9 +73,7 @@ spec:
                 name: {{ .Release.Name }}-kubernetes-dashboard
                 port:
                   number: 80
-{{- end }}
 ---
-{{- if index .Values "kubernetes-dashboard" "enabled" }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -108,9 +106,7 @@ spec:
                 name: {{ .Release.Name }}-minio
                 port:
                   number: 9001
-{{- end }}
 ---
-{{- if .Values.minio.enabled }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
