@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Fix ownership of PostgreSQL data directory if it exists from a previous run
+# (e.g., old bitnami PostgreSQL used uid 1001, embedded-postgres uses uid 999).
+if [ -d /var/lib/flyte/storage/db ]; then
+  chown -R 999:999 /var/lib/flyte/storage/db
+fi
+
 # Start embedded PostgreSQL in the background (must be running before k3s
 # deploys the flyte-binary pod, which has a wait-for-db init container).
 embedded-postgres &
