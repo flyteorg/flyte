@@ -88,7 +88,8 @@ type GCConfig struct {
 	Interval stdconfig.Duration `json:"interval" pflag:",How often the garbage collector runs. 0 disables GC."`
 
 	// MaxTTL is the time-to-live for terminal TaskActions before deletion.
-	MaxTTL stdconfig.Duration `json:"maxTTL" pflag:",Time-to-live for terminal TaskActions before deletion."`
+	// A value <= 0 means terminal TaskActions are deleted immediately on the next GC cycle.
+	MaxTTL stdconfig.Duration `json:"maxTTL" pflag:",Time-to-live for terminal TaskActions before deletion. Use 0 or negative for immediate deletion."`
 }
 
 // GetConfig returns the parsed executor configuration

@@ -102,6 +102,38 @@ var _ = Describe("GarbageCollector", func() {
 		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 	})
+
+	It("should delete all terminal TaskActions immediately when maxTTL is zero", func() {
+		recentTime := time.Now().UTC().Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-zero-ttl", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     recentTime,
+		})
+
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 0)
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		ta := &flyteorgv1.TaskAction{}
+		err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-zero-ttl", Namespace: "default"}, ta)
+		Expect(err).To(HaveOccurred())
+		Expect(client.IgnoreNotFound(err)).To(Succeed())
+	})
+
+	It("should delete all terminal TaskActions immediately when maxTTL is negative", func() {
+		recentTime := time.Now().UTC().Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-negative-ttl", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     recentTime,
+		})
+
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, -1*time.Hour)
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		ta := &flyteorgv1.TaskAction{}
+		err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-negative-ttl", Namespace: "default"}, ta)
+		Expect(err).To(HaveOccurred())
+		Expect(client.IgnoreNotFound(err)).To(Succeed())
+	})
 })
 
 var _ = Describe("ensureTerminalLabels", func() {
