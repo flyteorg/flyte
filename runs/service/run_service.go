@@ -1517,9 +1517,8 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	}
 
 	metadata := &workflow.ActionMetadata{
-		Parent:     CoalesceNullString(action.ParentActionName),
-		Group:      CoalesceNullString(action.ActionGroup),
-		ActionType: workflow.ActionType(action.ActionType),
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
 
 	// Pivot on known task types for response types
