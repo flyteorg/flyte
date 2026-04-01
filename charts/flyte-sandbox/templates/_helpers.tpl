@@ -89,14 +89,6 @@ Name of PersistentVolume and PersistentVolumeClaim for Minio
 {{- printf "%s-minio-storage" .Release.Name -}}
 {{- end }}
 
-{{/*
-Selector labels for Buildkit
-*/}}
-{{- define "flyte-sandbox.buildkitSelectorLabels" -}}
-{{ include "flyte-sandbox.selectorLabels" . }}
-app.kubernetes.io/component: buildkit
-{{- end }}
-
 
 {{/*
 Selector labels for console

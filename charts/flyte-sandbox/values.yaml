@@ -183,9 +183,3 @@ sandbox:
       repository: ghcr.io/flyteorg/flyte-client-v2
       tag: latest
       pullPolicy: Never
-  buildkit:
-    enabled: true
-    image:
-      repository: moby/buildkit
-      tag: sandbox
-      pullPolicy: Never
