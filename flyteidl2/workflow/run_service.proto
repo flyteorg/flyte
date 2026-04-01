@@ -110,11 +110,7 @@ message CreateRunRequest {
   // Indicates client that created this run.
   RunSource source = 8;
 
-  // Optional, pre-computed cache key for the inputs for this run.
-  // Only required when inputs are offloaded
-  string cache_key = 10;
-
-  // Next field number: 11
+  // Next field number: 10
 }
 
 // Response message for creating a run.
