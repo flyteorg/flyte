@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"strings"
 	"sync"
 
@@ -61,15 +62,29 @@ type ActionsClient struct {
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
+
+	// Worker pool: numWorkers goroutines each own one channel.
+	// Events are sharded by TaskAction name so per-resource ordering is preserved.
+	numWorkers int
+	workerChs  []chan watch.Event
+}
+
+type taskActionEvent struct {
+	taskAction *executorv1.TaskAction
+	eventType  watch.EventType
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+	if numWorkers <= 0 {
+		numWorkers = 1
+	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		sharedCache: sharedCache,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+		numWorkers:  numWorkers,
 		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
@@ -349,9 +364,15 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.watching = true
 	c.stopCh = make(chan struct{})
+	stopCh := c.stopCh // capture before releasing so workers reference the right channel
+	c.workerChs = make([]chan watch.Event, c.numWorkers)
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
+		go c.worker(ctx, c.workerChs[i], stopCh)
+	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s", c.namespace)
+	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
 	if c.sharedCache == nil {
 		return fmt.Errorf("shared cache is required for TaskAction informer")
@@ -372,14 +393,14 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 			if !ok || c.shouldSkipTaskAction(taskAction) {
 				return
 			}
-			c.handleTaskActionEvent(ctx, taskAction, watch.Added)
+			c.dispatchEvent(taskAction, watch.Added)
 		},
 		UpdateFunc: func(_, newObj interface{}) {
 			taskAction, ok := newObj.(*executorv1.TaskAction)
 			if !ok || c.shouldSkipTaskAction(taskAction) {
 				return
 			}
-			c.handleTaskActionEvent(ctx, taskAction, watch.Modified)
+			c.dispatchEvent(taskAction, watch.Modified)
 		},
 	})
 	if err != nil {
@@ -389,6 +410,48 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 	return nil
 }
 
+// worker drains its event channel and handles each event inline.
+// Each worker owns a disjoint shard of TaskAction names, so per-resource
+// event ordering is preserved across the pool.
+func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopCh <-chan struct{}) {
+	for {
+		select {
+		case <-stopCh:
+			return
+		case <-ctx.Done():
+			return
+		case event, ok := <-ch:
+			if !ok {
+				return
+			}
+			c.handleWatchEvent(ctx, event)
+		}
+	}
+}
+
+// dispatchEvent routes an informer event to the worker responsible for the
+// TaskAction, using FNV-32a hashing for consistent sharding.
+func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventType watch.EventType) {
+	if taskAction == nil {
+		return
+	}
+
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
+	shard := h.Sum32() % uint32(c.numWorkers)
+	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
+}
+
+func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
+	taskAction, ok := event.Object.(*executorv1.TaskAction)
+	if !ok {
+		logger.Warnf(ctx, "received non-TaskAction object in watch event: %T", event.Object)
+		return
+	}
+
+	c.handleTaskActionEvent(ctx, taskAction, event.Type)
+}
+
 func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) {
 	update := buildActionUpdate(ctx, taskAction, eventType)
 	if update == nil {
@@ -396,7 +459,7 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 	}
 
 	c.notifySubscribers(ctx, update)
-	go c.notifyRunService(ctx, taskAction, update, eventType)
+	c.notifyRunService(ctx, taskAction, update, eventType)
 }
 
 func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) *ActionUpdate {
