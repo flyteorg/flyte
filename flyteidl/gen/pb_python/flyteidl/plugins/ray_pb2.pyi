@@ -42,35 +42,13 @@ class Resources(_message.Message):
     limits: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
-class EnvValueFrom(_message.Message):
-    __slots__ = ["source", "name", "key"]
-    class Source(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        CONFIGMAP: _ClassVar[EnvValueFrom.Source]
-        SECRET: _ClassVar[EnvValueFrom.Source]
-        RESOURCEFIELD: _ClassVar[EnvValueFrom.Source]
-        FIELD: _ClassVar[EnvValueFrom.Source]
-    CONFIGMAP: EnvValueFrom.Source
-    SECRET: EnvValueFrom.Source
-    RESOURCEFIELD: EnvValueFrom.Source
-    FIELD: EnvValueFrom.Source
-    SOURCE_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    KEY_FIELD_NUMBER: _ClassVar[int]
-    source: EnvValueFrom.Source
-    name: str
-    key: str
-    def __init__(self, source: _Optional[_Union[EnvValueFrom.Source, str]] = ..., name: _Optional[str] = ..., key: _Optional[str] = ...) -> None: ...
-
 class EnvVar(_message.Message):
-    __slots__ = ["name", "value", "valueFrom"]
+    __slots__ = ["name", "value"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    VALUEFROM_FIELD_NUMBER: _ClassVar[int]
     name: str
     value: str
-    valueFrom: EnvValueFrom
-    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ..., valueFrom: _Optional[_Union[EnvValueFrom, _Mapping]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class AutoscalerOptions(_message.Message):
     __slots__ = ["upscaling_mode", "idle_timeout_seconds", "env", "image", "resources"]

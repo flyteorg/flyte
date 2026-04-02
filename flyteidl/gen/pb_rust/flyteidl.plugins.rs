@@ -288,61 +288,11 @@ pub mod resources {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EnvValueFrom {
-    #[prost(enumeration="env_value_from::Source", tag="1")]
-    pub source: i32,
-    /// Name for config map or secret, container name for resource, path for field
-    #[prost(string, tag="2")]
-    pub name: ::prost::alloc::string::String,
-    /// Key for config map or secret, resource name for resource
-    #[prost(string, tag="3")]
-    pub key: ::prost::alloc::string::String,
-}
-/// Nested message and enum types in `EnvValueFrom`.
-pub mod env_value_from {
-    /// Source of environment variable
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Source {
-        Configmap = 0,
-        Secret = 1,
-        Resourcefield = 2,
-        Field = 3,
-    }
-    impl Source {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Source::Configmap => "CONFIGMAP",
-                Source::Secret => "SECRET",
-                Source::Resourcefield => "RESOURCEFIELD",
-                Source::Field => "FIELD",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "CONFIGMAP" => Some(Self::Configmap),
-                "SECRET" => Some(Self::Secret),
-                "RESOURCEFIELD" => Some(Self::Resourcefield),
-                "FIELD" => Some(Self::Field),
-                _ => None,
-            }
-        }
-    }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EnvVar {
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub value: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="3")]
-    pub value_from: ::core::option::Option<EnvValueFrom>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

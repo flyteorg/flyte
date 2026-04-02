@@ -47,25 +47,9 @@ message Resources {
     repeated ResourceEntry limits = 2;
 }
 
-message EnvValueFrom {
-  // Source of environment variable
-  enum Source{
-    CONFIGMAP = 0;
-    SECRET = 1;
-    RESOURCEFIELD = 2;
-    FIELD = 3;
-  }
-  Source source = 1;
-  // Name for config map or secret, container name for resource, path for field
-  string name = 2;
-  // Key for config map or secret, resource name for resource
-  string key = 3;
-}
-
 message EnvVar {
   string name = 1;
   string value = 2;
-  EnvValueFrom valueFrom = 3;
 }
 
 message AutoscalerOptions {
