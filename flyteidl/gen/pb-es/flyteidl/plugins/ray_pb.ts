@@ -204,93 +204,6 @@ export class Resources_ResourceEntry extends Message<Resources_ResourceEntry> {
 }
 
 /**
- * @generated from message flyteidl.plugins.EnvValueFrom
- */
-export class EnvValueFrom extends Message<EnvValueFrom> {
-  /**
-   * @generated from field: flyteidl.plugins.EnvValueFrom.Source source = 1;
-   */
-  source = EnvValueFrom_Source.CONFIGMAP;
-
-  /**
-   * Name for config map or secret, container name for resource, path for field
-   *
-   * @generated from field: string name = 2;
-   */
-  name = "";
-
-  /**
-   * Key for config map or secret, resource name for resource
-   *
-   * @generated from field: string key = 3;
-   */
-  key = "";
-
-  constructor(data?: PartialMessage<EnvValueFrom>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.plugins.EnvValueFrom";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(EnvValueFrom_Source) },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnvValueFrom {
-    return new EnvValueFrom().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EnvValueFrom {
-    return new EnvValueFrom().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EnvValueFrom {
-    return new EnvValueFrom().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: EnvValueFrom | PlainMessage<EnvValueFrom> | undefined, b: EnvValueFrom | PlainMessage<EnvValueFrom> | undefined): boolean {
-    return proto3.util.equals(EnvValueFrom, a, b);
-  }
-}
-
-/**
- * Source of environment variable
- *
- * @generated from enum flyteidl.plugins.EnvValueFrom.Source
- */
-export enum EnvValueFrom_Source {
-  /**
-   * @generated from enum value: CONFIGMAP = 0;
-   */
-  CONFIGMAP = 0,
-
-  /**
-   * @generated from enum value: SECRET = 1;
-   */
-  SECRET = 1,
-
-  /**
-   * @generated from enum value: RESOURCEFIELD = 2;
-   */
-  RESOURCEFIELD = 2,
-
-  /**
-   * @generated from enum value: FIELD = 3;
-   */
-  FIELD = 3,
-}
-// Retrieve enum metadata with: proto3.getEnumType(EnvValueFrom_Source)
-proto3.util.setEnumType(EnvValueFrom_Source, "flyteidl.plugins.EnvValueFrom.Source", [
-  { no: 0, name: "CONFIGMAP" },
-  { no: 1, name: "SECRET" },
-  { no: 2, name: "RESOURCEFIELD" },
-  { no: 3, name: "FIELD" },
-]);
-
-/**
  * @generated from message flyteidl.plugins.EnvVar
  */
 export class EnvVar extends Message<EnvVar> {
@@ -304,11 +217,6 @@ export class EnvVar extends Message<EnvVar> {
    */
   value = "";
 
-  /**
-   * @generated from field: flyteidl.plugins.EnvValueFrom valueFrom = 3;
-   */
-  valueFrom?: EnvValueFrom;
-
   constructor(data?: PartialMessage<EnvVar>) {
     super();
     proto3.util.initPartial(data, this);
@@ -319,7 +227,6 @@ export class EnvVar extends Message<EnvVar> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "valueFrom", kind: "message", T: EnvValueFrom },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnvVar {
