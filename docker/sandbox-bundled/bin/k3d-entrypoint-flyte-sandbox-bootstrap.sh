@@ -10,12 +10,18 @@ fi
 # deploys the flyte-binary pod, which has a wait-for-db init container).
 embedded-postgres &
 
-# Wait for PostgreSQL to be ready before proceeding
-while ! [ -f /tmp/embedded-postgres-ready ]; do
-  sleep 0.5
-done
+# Run the rest in a background subshell so K3s can start immediately.
+# K3s takes ~5-10s to initialize — by that time postgres and the manifest
+# will be ready.
+(
+  # Wait for PostgreSQL to be ready
+  while ! [ -f /tmp/embedded-postgres-ready ]; do
+    sleep 0.1
+  done
 
-flyte-sandbox-bootstrap
+  # Render and write the K3s auto-deploy manifest
+  flyte-sandbox-bootstrap
+) &
 
 KUBECONFIG_PATH="${K3S_KUBECONFIG_OUTPUT:-/etc/rancher/k3s/k3s.yaml}"
 (
