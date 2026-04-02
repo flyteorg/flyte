@@ -14,6 +14,8 @@ Flyte Datacatalog Configuration
 
 - `otel <#section-otel>`_
 
+- `prof <#section-prof>`_
+
 - `storage <#section-storage>`_
 
 Section: application
@@ -677,6 +679,19 @@ traceIdRatio (float64)
 .. code-block:: yaml
 
   "0.01"
+  
+
+Section: prof
+========================================================================================================================
+
+DisableConfigEndpoint (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 Section: storage
