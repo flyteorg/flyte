@@ -23,21 +23,16 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          startupProbe:
+          readinessProbe:
             httpGet:
               path: /v2
               port: http
             initialDelaySeconds: 1
             periodSeconds: 1
-            failureThreshold: 60
-          readinessProbe:
-            httpGet:
-              path: /v2
-              port: http
-            periodSeconds: 1
           livenessProbe:
             httpGet:
               path: /v2
               port: http
+            initialDelaySeconds: 30
             periodSeconds: 30
 {{- end }}

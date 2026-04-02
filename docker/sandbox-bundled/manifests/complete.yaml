@@ -974,6 +974,7 @@ spec:
           httpGet:
             path: /healthz
             port: http
+          initialDelaySeconds: 30
         name: flyte
         ports:
         - containerPort: 8090
@@ -983,12 +984,6 @@ spec:
         readinessProbe:
           httpGet:
             path: /readyz
-            port: http
-          periodSeconds: 1
-        startupProbe:
-          failureThreshold: 30
-          httpGet:
-            path: /healthz
             port: http
           initialDelaySeconds: 1
           periodSeconds: 1
@@ -1056,6 +1051,7 @@ spec:
           httpGet:
             path: /v2
             port: http
+          initialDelaySeconds: 30
           periodSeconds: 30
         name: console
         ports:
@@ -1063,12 +1059,6 @@ spec:
           name: http
           protocol: TCP
         readinessProbe:
-          httpGet:
-            path: /v2
-            port: http
-          periodSeconds: 1
-        startupProbe:
-          failureThreshold: 60
           httpGet:
             path: /v2
             port: http

@@ -73,21 +73,16 @@ flyte-binary:
       repository: flyte-binary-v2
       tag: sandbox
       pullPolicy: Never
-    startupProbe:
-      httpGet:
-        path: /healthz
-        port: http
-      initialDelaySeconds: 1
-      periodSeconds: 1
-      failureThreshold: 30
     livenessProbe:
       httpGet:
         path: /healthz
         port: http
+      initialDelaySeconds: 30
     readinessProbe:
       httpGet:
         path: /readyz
         port: http
+      initialDelaySeconds: 1
       periodSeconds: 1
     waitForDB:
       image:
