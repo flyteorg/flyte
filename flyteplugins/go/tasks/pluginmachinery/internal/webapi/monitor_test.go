@@ -30,7 +30,7 @@ func Test_monitor(t *testing.T) {
 	ctxMeta.On("GetTaskExecutionID").Return(execID)
 	tCtx.On("TaskExecutionMetadata").Return(ctxMeta)
 
-	client := &internalMocks.Client{}
+	client := internalMocks.NewClient(t)
 	client.EXPECT().Status(ctx, mock.Anything).Return(core2.PhaseInfoSuccess(nil), nil)
 
 	wg := sync.WaitGroup{}
