@@ -117,3 +117,32 @@ packages:
       all: true
       dir: runs/repository/mocks
       include-auto-generated: true
+  github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache:
+    config:
+      all: true
+      dir: flytestdlib/autorefreshcache/mocks
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi:
+    config:
+      all: true
+      dir: flyteplugins/go/tasks/pluginmachinery/webapi/mocks
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/internal/webapi:
+    config:
+      all: true
+      dir: flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks
+  github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret:
+    config:
+      all: false
+      dir: flyteplugins/go/tasks/pluginmachinery/secret/mocks
+    interfaces:
+      GlobalSecretProvider:
+      SecretsInjector:
+      AWSSecretManagerClient:
+      GCPSecretManagerClient:
+      AzureKeyVaultClient:
+      MockableControllerRuntimeClient:
+  github.com/flyteorg/flyte/v2/actions/service:
+    config:
+      all: false
+      dir: actions/service/mocks
+    interfaces:
+      ActionsClientInterface:
