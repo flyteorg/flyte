@@ -6,9 +6,9 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class OffloadedInputData(_message.Message):
-    __slots__ = ["uri", "cache_key"]
+    __slots__ = ["uri", "inputs_hash"]
     URI_FIELD_NUMBER: _ClassVar[int]
-    CACHE_KEY_FIELD_NUMBER: _ClassVar[int]
+    INPUTS_HASH_FIELD_NUMBER: _ClassVar[int]
     uri: str
-    cache_key: str
-    def __init__(self, uri: _Optional[str] = ..., cache_key: _Optional[str] = ...) -> None: ...
+    inputs_hash: str
+    def __init__(self, uri: _Optional[str] = ..., inputs_hash: _Optional[str] = ...) -> None: ...

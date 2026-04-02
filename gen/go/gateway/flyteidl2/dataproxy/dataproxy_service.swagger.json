@@ -206,7 +206,7 @@
         "uri": {
           "type": "string"
         },
-        "cache_key": {
+        "inputs_hash": {
           "type": "string"
         }
       },

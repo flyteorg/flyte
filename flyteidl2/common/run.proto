@@ -10,5 +10,5 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 message OffloadedInputData {
   string uri = 1 [(buf.validate.field).string.min_len = 1];
 
-  string cache_key = 2 [(buf.validate.field).string.min_len = 1];
+  string inputs_hash = 2 [(buf.validate.field).string.min_len = 1];
 }

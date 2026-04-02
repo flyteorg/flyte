@@ -59,7 +59,7 @@ func (m *OffloadedInputData) validate(all bool) error {
 
 	// no validation rules for Uri
 
-	// no validation rules for CacheKey
+	// no validation rules for InputsHash
 
 	if len(errors) > 0 {
 		return OffloadedInputDataMultiError(errors)

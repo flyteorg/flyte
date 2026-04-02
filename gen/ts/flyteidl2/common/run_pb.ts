@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/common/run.proto.
  */
 export const file_flyteidl2_common_run: GenFile = /*@__PURE__*/
-  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJGChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhoKCWNhY2hlX2tleRgCIAEoCUIHukgEcgIQAUK5AQoUY29tLmZseXRlaWRsMi5jb21tb25CCFJ1blByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate]);
+  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJIChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhwKC2lucHV0c19oYXNoGAIgASgJQge6SARyAhABQrkBChRjb20uZmx5dGVpZGwyLmNvbW1vbkIIUnVuUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw", [file_buf_validate_validate]);
 
 /**
  * Captures required data to reference offloaded inputs.
@@ -25,9 +25,9 @@ export type OffloadedInputData = Message<"flyteidl2.common.OffloadedInputData"> 
   uri: string;
 
   /**
-   * @generated from field: string cache_key = 2;
+   * @generated from field: string inputs_hash = 2;
    */
-  cacheKey: string;
+  inputsHash: string;
 };
 
 /**
