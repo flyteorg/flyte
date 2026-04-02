@@ -6,22 +6,15 @@ if [ -d /var/lib/flyte/storage/db ]; then
   chown -R 999:999 /var/lib/flyte/storage/db
 fi
 
-# Start embedded PostgreSQL in the background (must be running before k3s
-# deploys the flyte-binary pod, which has a wait-for-db init container).
+# Start embedded PostgreSQL in the background. The flyte-binary pod has a
+# wait-for-db init container, so postgres doesn't need to be ready before
+# K3s starts — it just needs to be running by the time the pod is scheduled.
 embedded-postgres &
 
-# Run the rest in a background subshell so K3s can start immediately.
-# K3s takes ~5-10s to initialize — by that time postgres and the manifest
-# will be ready.
-(
-  # Wait for PostgreSQL to be ready
-  while ! [ -f /tmp/embedded-postgres-ready ]; do
-    sleep 0.1
-  done
-
-  # Render and write the K3s auto-deploy manifest
-  flyte-sandbox-bootstrap
-) &
+# Render and write the K3s auto-deploy manifest. This only does template
+# variable substitution (HOST_GATEWAY_IP, NODE_IP) — no postgres needed.
+# Runs synchronously so the manifest is in place before K3s starts.
+flyte-sandbox-bootstrap
 
 KUBECONFIG_PATH="${K3S_KUBECONFIG_OUTPUT:-/etc/rancher/k3s/k3s.yaml}"
 (
