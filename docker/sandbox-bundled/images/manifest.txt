@@ -1,6 +1,5 @@
 docker.io/bitnami/os-shell:sandbox=bitnamilegacy/os-shell:11-debian-11
 docker.io/bitnami/minio:sandbox=minio/minio:RELEASE.2024-01-31T20-20-33Z
-docker.io/kubernetesui/dashboard:sandbox=kubernetesui/dashboard:v2.7.0
 docker.io/library/registry:sandbox=registry:2.8.1
 docker.io/rancher/local-path-provisioner:v0.0.21
 docker.io/rancher/mirrored-coredns-coredns:1.9.1
