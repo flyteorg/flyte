@@ -235,82 +235,55 @@ pub struct RayJob {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Resources {
-    /// The desired set of resources requested. ResourceNames must be unique within the list.
-    #[prost(message, repeated, tag="1")]
-    pub requests: ::prost::alloc::vec::Vec<resources::ResourceEntry>,
-    /// Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
-    /// within the list.
-    #[prost(message, repeated, tag="2")]
-    pub limits: ::prost::alloc::vec::Vec<resources::ResourceEntry>,
+pub struct AutoscalerOptions {
+    #[prost(enumeration="autoscaler_options::UpscalingMode", tag="1")]
+    pub upscaling_mode: i32,
+    #[prost(int32, tag="2")]
+    pub idle_timeout_seconds: i32,
+    /// autoscaler sidecar env vars
+    #[prost(message, repeated, tag="3")]
+    pub env: ::prost::alloc::vec::Vec<super::core::KeyValuePair>,
+    /// custom autoscaler image
+    #[prost(string, tag="4")]
+    pub image: ::prost::alloc::string::String,
+    /// autoscaler container resources
+    #[prost(message, optional, tag="5")]
+    pub resources: ::core::option::Option<super::core::Resources>,
 }
-/// Nested message and enum types in `Resources`.
-pub mod resources {
-    /// Encapsulates a resource name and value.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-    pub struct ResourceEntry {
-        /// Resource name.
-        #[prost(enumeration="ResourceName", tag="1")]
-        pub name: i32,
-        /// Value must be a valid k8s quantity. See
-        /// <https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80>
-        #[prost(string, tag="2")]
-        pub value: ::prost::alloc::string::String,
-    }
-    /// Known resource names.
+/// Nested message and enum types in `AutoscalerOptions`.
+pub mod autoscaler_options {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
-    pub enum ResourceName {
-        Cpu = 0,
-        Memory = 1,
+    pub enum UpscalingMode {
+        Unspecified = 0,
+        Default = 1,
+        Aggressive = 2,
+        Conservative = 3,
     }
-    impl ResourceName {
+    impl UpscalingMode {
         /// String value of the enum field names used in the ProtoBuf definition.
         ///
         /// The values are not transformed in any way and thus are considered stable
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                ResourceName::Cpu => "CPU",
-                ResourceName::Memory => "MEMORY",
+                UpscalingMode::Unspecified => "UPSCALING_MODE_UNSPECIFIED",
+                UpscalingMode::Default => "UPSCALING_MODE_DEFAULT",
+                UpscalingMode::Aggressive => "UPSCALING_MODE_AGGRESSIVE",
+                UpscalingMode::Conservative => "UPSCALING_MODE_CONSERVATIVE",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
         pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
             match value {
-                "CPU" => Some(Self::Cpu),
-                "MEMORY" => Some(Self::Memory),
+                "UPSCALING_MODE_UNSPECIFIED" => Some(Self::Unspecified),
+                "UPSCALING_MODE_DEFAULT" => Some(Self::Default),
+                "UPSCALING_MODE_AGGRESSIVE" => Some(Self::Aggressive),
+                "UPSCALING_MODE_CONSERVATIVE" => Some(Self::Conservative),
                 _ => None,
             }
         }
     }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EnvVar {
-    #[prost(string, tag="1")]
-    pub name: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub value: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct AutoscalerOptions {
-    /// "Default", "Aggressive", "Conservative"
-    #[prost(string, tag="1")]
-    pub upscaling_mode: ::prost::alloc::string::String,
-    #[prost(int32, tag="2")]
-    pub idle_timeout_seconds: i32,
-    /// autoscaler sidecar env vars
-    #[prost(message, repeated, tag="3")]
-    pub env: ::prost::alloc::vec::Vec<EnvVar>,
-    /// custom autoscaler image
-    #[prost(string, tag="4")]
-    pub image: ::prost::alloc::string::String,
-    /// autoscaler container resources
-    #[prost(message, optional, tag="5")]
-    pub resources: ::core::option::Option<Resources>,
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[allow(clippy::derive_partial_eq_without_eq)]

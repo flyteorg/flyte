@@ -5,7 +5,8 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { K8sPod } from "../core/tasks_pb.js";
+import { KeyValuePair } from "../core/literals_pb.js";
+import { K8sPod, Resources } from "../core/tasks_pb.js";
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -84,178 +85,13 @@ export class RayJob extends Message<RayJob> {
 }
 
 /**
- * @generated from message flyteidl.plugins.Resources
- */
-export class Resources extends Message<Resources> {
-  /**
-   * The desired set of resources requested. ResourceNames must be unique within the list.
-   *
-   * @generated from field: repeated flyteidl.plugins.Resources.ResourceEntry requests = 1;
-   */
-  requests: Resources_ResourceEntry[] = [];
-
-  /**
-   * Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
-   * within the list.
-   *
-   * @generated from field: repeated flyteidl.plugins.Resources.ResourceEntry limits = 2;
-   */
-  limits: Resources_ResourceEntry[] = [];
-
-  constructor(data?: PartialMessage<Resources>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.plugins.Resources";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "requests", kind: "message", T: Resources_ResourceEntry, repeated: true },
-    { no: 2, name: "limits", kind: "message", T: Resources_ResourceEntry, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resources {
-    return new Resources().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Resources {
-    return new Resources().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Resources {
-    return new Resources().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Resources | PlainMessage<Resources> | undefined, b: Resources | PlainMessage<Resources> | undefined): boolean {
-    return proto3.util.equals(Resources, a, b);
-  }
-}
-
-/**
- * Known resource names.
- *
- * @generated from enum flyteidl.plugins.Resources.ResourceName
- */
-export enum Resources_ResourceName {
-  /**
-   * @generated from enum value: CPU = 0;
-   */
-  CPU = 0,
-
-  /**
-   * @generated from enum value: MEMORY = 1;
-   */
-  MEMORY = 1,
-}
-// Retrieve enum metadata with: proto3.getEnumType(Resources_ResourceName)
-proto3.util.setEnumType(Resources_ResourceName, "flyteidl.plugins.Resources.ResourceName", [
-  { no: 0, name: "CPU" },
-  { no: 1, name: "MEMORY" },
-]);
-
-/**
- * Encapsulates a resource name and value.
- *
- * @generated from message flyteidl.plugins.Resources.ResourceEntry
- */
-export class Resources_ResourceEntry extends Message<Resources_ResourceEntry> {
-  /**
-   * Resource name.
-   *
-   * @generated from field: flyteidl.plugins.Resources.ResourceName name = 1;
-   */
-  name = Resources_ResourceName.CPU;
-
-  /**
-   * Value must be a valid k8s quantity. See
-   * https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80
-   *
-   * @generated from field: string value = 2;
-   */
-  value = "";
-
-  constructor(data?: PartialMessage<Resources_ResourceEntry>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.plugins.Resources.ResourceEntry";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "enum", T: proto3.getEnumType(Resources_ResourceName) },
-    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resources_ResourceEntry {
-    return new Resources_ResourceEntry().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Resources_ResourceEntry {
-    return new Resources_ResourceEntry().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Resources_ResourceEntry {
-    return new Resources_ResourceEntry().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Resources_ResourceEntry | PlainMessage<Resources_ResourceEntry> | undefined, b: Resources_ResourceEntry | PlainMessage<Resources_ResourceEntry> | undefined): boolean {
-    return proto3.util.equals(Resources_ResourceEntry, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.plugins.EnvVar
- */
-export class EnvVar extends Message<EnvVar> {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name = "";
-
-  /**
-   * @generated from field: string value = 2;
-   */
-  value = "";
-
-  constructor(data?: PartialMessage<EnvVar>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.plugins.EnvVar";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnvVar {
-    return new EnvVar().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EnvVar {
-    return new EnvVar().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EnvVar {
-    return new EnvVar().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: EnvVar | PlainMessage<EnvVar> | undefined, b: EnvVar | PlainMessage<EnvVar> | undefined): boolean {
-    return proto3.util.equals(EnvVar, a, b);
-  }
-}
-
-/**
  * @generated from message flyteidl.plugins.AutoscalerOptions
  */
 export class AutoscalerOptions extends Message<AutoscalerOptions> {
   /**
-   * "Default", "Aggressive", "Conservative"
-   *
-   * @generated from field: string upscaling_mode = 1;
+   * @generated from field: flyteidl.plugins.AutoscalerOptions.UpscalingMode upscaling_mode = 1;
    */
-  upscalingMode = "";
+  upscalingMode = AutoscalerOptions_UpscalingMode.UNSPECIFIED;
 
   /**
    * @generated from field: int32 idle_timeout_seconds = 2;
@@ -265,9 +101,9 @@ export class AutoscalerOptions extends Message<AutoscalerOptions> {
   /**
    * autoscaler sidecar env vars
    *
-   * @generated from field: repeated flyteidl.plugins.EnvVar env = 3;
+   * @generated from field: repeated flyteidl.core.KeyValuePair env = 3;
    */
-  env: EnvVar[] = [];
+  env: KeyValuePair[] = [];
 
   /**
    * custom autoscaler image
@@ -279,7 +115,7 @@ export class AutoscalerOptions extends Message<AutoscalerOptions> {
   /**
    * autoscaler container resources
    *
-   * @generated from field: flyteidl.plugins.Resources resources = 5;
+   * @generated from field: flyteidl.core.Resources resources = 5;
    */
   resources?: Resources;
 
@@ -291,9 +127,9 @@ export class AutoscalerOptions extends Message<AutoscalerOptions> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.plugins.AutoscalerOptions";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "upscaling_mode", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "upscaling_mode", kind: "enum", T: proto3.getEnumType(AutoscalerOptions_UpscalingMode) },
     { no: 2, name: "idle_timeout_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "env", kind: "message", T: EnvVar, repeated: true },
+    { no: 3, name: "env", kind: "message", T: KeyValuePair, repeated: true },
     { no: 4, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "resources", kind: "message", T: Resources },
   ]);
@@ -314,6 +150,38 @@ export class AutoscalerOptions extends Message<AutoscalerOptions> {
     return proto3.util.equals(AutoscalerOptions, a, b);
   }
 }
+
+/**
+ * @generated from enum flyteidl.plugins.AutoscalerOptions.UpscalingMode
+ */
+export enum AutoscalerOptions_UpscalingMode {
+  /**
+   * @generated from enum value: UPSCALING_MODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_DEFAULT = 1;
+   */
+  DEFAULT = 1,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_AGGRESSIVE = 2;
+   */
+  AGGRESSIVE = 2,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_CONSERVATIVE = 3;
+   */
+  CONSERVATIVE = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(AutoscalerOptions_UpscalingMode)
+proto3.util.setEnumType(AutoscalerOptions_UpscalingMode, "flyteidl.plugins.AutoscalerOptions.UpscalingMode", [
+  { no: 0, name: "UPSCALING_MODE_UNSPECIFIED" },
+  { no: 1, name: "UPSCALING_MODE_DEFAULT" },
+  { no: 2, name: "UPSCALING_MODE_AGGRESSIVE" },
+  { no: 3, name: "UPSCALING_MODE_CONSERVATIVE" },
+]);
 
 /**
  * Define Ray cluster defines the desired state of RayCluster
