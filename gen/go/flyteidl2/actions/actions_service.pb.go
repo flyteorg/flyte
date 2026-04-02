@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
+// Action represents a unit of work to be executed. These can be task executions, traces, or conditions.
 // Note: This is different from the Action protobuf defined in flyteidl2/workflow/run_definition.proto.
 type Action struct {
 	state         protoimpl.MessageState

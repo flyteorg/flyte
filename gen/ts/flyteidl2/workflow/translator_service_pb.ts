@@ -185,7 +185,7 @@ export const JsonValuesToLiteralsResponseSchema: GenMessage<JsonValuesToLiterals
   messageDesc(file_flyteidl2_workflow_translator_service, 7);
 
 /**
- * TranslatorService provides an interface for all diferent types of translations for the platform.
+ * TranslatorService provides an interface for all different types of translations for the platform.
  *
  * @generated from service flyteidl2.workflow.TranslatorService
  */
