@@ -202,7 +202,9 @@ func createRun(ctx context.Context, client workflowconnect.RunServiceClient) *co
 		Task: &workflow.CreateRunRequest_TaskId{
 			TaskId: taskID,
 		},
-		Inputs: &task.Inputs{},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{
+			Inputs: &task.Inputs{},
+		},
 	}
 
 	resp, err := client.CreateRun(ctx, connect.NewRequest(req))
