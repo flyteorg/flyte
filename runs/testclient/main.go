@@ -47,7 +47,9 @@ func main() {
 				},
 			},
 		},
-		Inputs: &task.Inputs{},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{
+			Inputs: &task.Inputs{},
+		},
 	}
 
 	createResp, err := client.CreateRun(ctx, connect.NewRequest(createRunReq))
@@ -78,7 +80,9 @@ func main() {
 				},
 			},
 		},
-		Inputs: &task.Inputs{},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{
+			Inputs: &task.Inputs{},
+		},
 	}
 
 	createResp2, err := client.CreateRun(ctx, connect.NewRequest(createRunReq2))
