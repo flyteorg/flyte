@@ -90,6 +90,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
+	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL)
+	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
+	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
+	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
+
 	appSvc := service.NewAppService()
 	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
 	sc.Mux.Handle(appPath, appHandler)
