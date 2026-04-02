@@ -27,7 +27,6 @@ flyte: create_builder
 .PHONY: helm-repos
 helm-repos:
 	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
-	helm repo add kubernetes-dashboard https://kubernetes-retired.github.io/dashboard/
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo update
 
@@ -77,7 +76,6 @@ build: sync-crds flyte console dep_update manifests
 # 30000 - Docker Registry
 # 30001 - DB
 # 30002 - Minio
-# 30003 - Buildkit
 # 30080 - Flyte Proxy
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox-v2:latest
@@ -95,9 +93,8 @@ start:
 				--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
 			--publish "30000:30000" \
-			--publish "30001:30001" \
+			--publish "30001:5432" \
 			--publish "30002:30002" \
-			--publish "30003:30003" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE); \
 	fi

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -24,6 +25,35 @@ const (
 	fullTemplatePath     = "/var/lib/rancher/k3s/server/manifests-staging/complete.yaml"
 	renderedManifestPath = "/var/lib/rancher/k3s/server/manifests/flyte.yaml"
 )
+
+// getNodeIP returns the preferred outbound IP address of the node.
+// This is used to create Kubernetes Endpoints that point back to
+// services running on the host (e.g., embedded PostgreSQL).
+func getNodeIP() (string, error) {
+	// Use a UDP dial to determine the preferred outbound IP.
+	// No actual connection is made.
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		// Fallback: scan interfaces for a non-loopback address
+		return getFirstNonLoopbackIP()
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String(), nil
+}
+
+func getFirstNonLoopbackIP() (string, error) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "", err
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			return ipnet.IP.String(), nil
+		}
+	}
+	return "", fmt.Errorf("no suitable IP address found")
+}
 
 func main() {
 	var tmplPath string
@@ -57,6 +87,9 @@ func main() {
 				return "", err
 			}
 			return addrs[0], nil
+		},
+		"%{NODE_IP}%": func() (string, error) {
+			return getNodeIP()
 		},
 	})
 	tPlugins = append(tPlugins, v)

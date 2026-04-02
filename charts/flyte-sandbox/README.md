@@ -11,7 +11,6 @@ A Helm chart for the Flyte local sandbox
 | file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 12.6.7 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.8.1 |
-| https://kubernetes-retired.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 | https://twuni.github.io/docker-registry.helm | docker-registry | 2.2.2 |
 
 ## Values
@@ -44,7 +43,6 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.logging.level | int | `5` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
-| flyte-binary.configuration.logging.plugins.kubernetes.templateUri | string | `"http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"` |  |
 | flyte-binary.configuration.storage.metadataContainer | string | `"my-s3-bucket"` |  |
 | flyte-binary.configuration.storage.provider | string | `"s3"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.accessKey | string | `"minio"` |  |
@@ -65,16 +63,6 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.rbac.extraRules[0].apiGroups[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].resources[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].verbs[0] | string | `"*"` |  |
-| kubernetes-dashboard.enabled | bool | `true` |  |
-| kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
-| kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |
-| kubernetes-dashboard.image.pullPolicy | string | `"Never"` |  |
-| kubernetes-dashboard.image.tag | string | `"sandbox"` |  |
-| kubernetes-dashboard.protocolHttp | bool | `true` |  |
-| kubernetes-dashboard.rbac.clusterReadOnlyRole | bool | `true` |  |
-| kubernetes-dashboard.rbac.clusterRoleMetrics | bool | `false` |  |
-| kubernetes-dashboard.rbac.create | bool | `true` |  |
-| kubernetes-dashboard.service.externalPort | int | `80` |  |
 | minio.auth.rootPassword | string | `"miniostorage"` |  |
 | minio.auth.rootUser | string | `"minio"` |  |
 | minio.defaultBuckets | string | `"my-s3-bucket"` |  |
@@ -102,17 +90,9 @@ A Helm chart for the Flyte local sandbox
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
-| sandbox.buildkit.enabled | bool | `true` |  |
-| sandbox.buildkit.image.pullPolicy | string | `"Never"` |  |
-| sandbox.buildkit.image.repository | string | `"moby/buildkit"` |  |
-| sandbox.buildkit.image.tag | string | `"sandbox"` |  |
 | sandbox.console.enabled | bool | `true` |  |
 | sandbox.console.image.pullPolicy | string | `"IfNotPresent"` |  |
 | sandbox.console.image.repository | string | `"ghcr.io/flyteorg/flyte-client-v2"` |  |
 | sandbox.console.image.tag | string | `"latest"` |  |
 | sandbox.dev | bool | `false` |  |
-| sandbox.proxy.enabled | bool | `true` |  |
-| sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
-| sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
-| sandbox.proxy.image.tag | string | `"sandbox"` |  |
 

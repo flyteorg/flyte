@@ -101,7 +101,7 @@ message UpdateRequest {
   flyteidl2.workflow.ActionStatus status = 3 [(buf.validate.field).required = true];
 
   // The new state in form of a JSON serialized `NodeStatus` object.
-  string state = 4 [(buf.validate.field).string.min_len = 2];
+  string state = 4;
 }
 
 // UpdateResponse is the response message for updating the status of an action.

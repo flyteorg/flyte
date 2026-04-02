@@ -33,11 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo             interfaces.Repository
-	actionsClient    actionsconnect.ActionsServiceClient
-	storagePrefix    string
-	dataStore        *storage.DataStore
-	abortReconciler  *AbortReconciler
+	repo            interfaces.Repository
+	actionsClient   actionsconnect.ActionsServiceClient
+	storagePrefix   string
+	dataStore       *storage.DataStore
+	abortReconciler *AbortReconciler
 }
 
 const (
@@ -884,7 +884,7 @@ func (s *RunService) WatchActionDetails(
 	// Step 2: Watch DB for updates
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updates, errs)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	for {
 		select {
@@ -895,10 +895,6 @@ func (s *RunService) WatchActionDetails(
 		case updated, ok := <-updates:
 			if !ok {
 				return nil
-			}
-			// Filter to this specific action
-			if updated.Name != actionID.Name {
-				continue
 			}
 			// Reuse the already-fetched action model from WatchActionUpdates
 			details, err := s.buildActionDetails(ctx, updated, actionID)
@@ -991,7 +987,7 @@ func (s *RunService) WatchActions(
 	// Start watching for updates from DB first to prevent event miss
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
 	if err != nil {
@@ -1076,41 +1072,61 @@ func (s *RunService) sendChangedActions(
 	})
 }
 
-// WatchClusterEvents streams cluster events from the DB action updates.
+// WatchClusterEvents streams Kubernetes cluster events recorded in action_events.
 func (s *RunService) WatchClusterEvents(
 	ctx context.Context,
 	req *connect.Request[workflow.WatchClusterEventsRequest],
 	stream *connect.ServerStream[workflow.WatchClusterEventsResponse],
 ) error {
 	actionID := req.Msg.Id
+	attempt := req.Msg.GetAttempt()
 	logger.Infof(ctx, "Received WatchClusterEvents request for: %s/%s", actionID.Run.Name, actionID.Name)
 
-	// Step 1: Send existing events from current DB state
+	// Start watching first to reduce the chance of missing action updates
+	// between initial state fetch and subscription setup.
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updatesCh, errsCh)
+
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
 
-	events := actionModelToClusterEvents(action)
-	if len(events) > 0 {
-		if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: events}); err != nil {
-			return err
-		}
-	}
-
-	// If the action is already in a terminal phase, no further events are expected.
-	if IsTerminalPhase(common.ActionPhase(action.Phase)) {
-		return nil
-	}
-
-	// Step 2: Watch for updates from DB
-	updatesCh := make(chan *models.Action, 50)
-	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
-
-	lastPhase := action.Phase
+	const maxEvents = 500
+	var lastUpdatedAt time.Time
 
 	for {
+		offset := 0
+		isTerminal := IsTerminalPhase(common.ActionPhase(action.Phase))
+
+		// Drain all available cluster events for current action since lastUpdatedAt
+		for {
+			info, err := s.getClusterEventsInfo(ctx, actionID, attempt, lastUpdatedAt, offset, maxEvents)
+			if err != nil {
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			isTerminal = isTerminal || info.isTerminal
+
+			if len(info.events) > 0 {
+				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: info.events}); err != nil {
+					return err
+				}
+			}
+
+			if info.lastUpdatedAt.After(lastUpdatedAt) {
+				lastUpdatedAt = info.lastUpdatedAt
+			}
+
+			if len(info.events) < maxEvents {
+				break
+			}
+			offset += maxEvents
+		}
+		if isTerminal {
+			return nil
+		}
+
 		select {
 		case <-ctx.Done():
 			return nil
@@ -1120,40 +1136,45 @@ func (s *RunService) WatchClusterEvents(
 			if !ok {
 				return nil
 			}
-			// Filter to this specific action
-			if updated.Name != actionID.Name {
-				continue
-			}
-			// Only emit an event when phase changes
-			if updated.Phase == lastPhase {
-				continue
-			}
-			lastPhase = updated.Phase
-
-			newEvents := actionModelToClusterEvents(updated)
-			if len(newEvents) > 0 {
-				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
-					return err
-				}
-			}
-			// Close the stream once the action reaches a terminal phase.
-			if IsTerminalPhase(common.ActionPhase(updated.Phase)) {
-				return nil
-			}
+			action = updated
 		}
 	}
 }
 
-// actionModelToClusterEvents derives cluster events from an Action model's phase.
-func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent {
-	phase := common.ActionPhase(action.Phase)
-	if phase == common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
-		return nil
+type clusterEventsInfo struct {
+	events        []*workflow.ClusterEvent
+	lastUpdatedAt time.Time
+	isTerminal    bool
+}
+
+func (s *RunService) getClusterEventsInfo(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	attempt uint32,
+	since time.Time,
+	offset, limit int,
+) (clusterEventsInfo, error) {
+	eventModels, err := s.repo.ActionRepo().ListEventsSince(ctx, actionID, attempt, since, offset, limit)
+	if err != nil {
+		return clusterEventsInfo{}, fmt.Errorf("failed to list action events since %s: %w", since.Format(time.RFC3339Nano), err)
 	}
-	return []*workflow.ClusterEvent{{
-		OccurredAt: timestamppb.New(action.UpdatedAt),
-		Message:    phase.String(),
-	}}
+
+	var info clusterEventsInfo
+	for _, model := range eventModels {
+		event, err := model.ToActionEvent()
+		if err != nil {
+			return clusterEventsInfo{}, fmt.Errorf("failed to convert action event: %w", err)
+		}
+		if model.UpdatedAt.After(info.lastUpdatedAt) {
+			info.lastUpdatedAt = model.UpdatedAt
+		}
+		info.events = append(info.events, event.GetClusterEvents()...)
+		if IsTerminalPhase(event.GetPhase()) {
+			info.isTerminal = true
+		}
+	}
+
+	return info, nil
 }
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
@@ -1445,11 +1466,9 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		actionStatus.DurationMs = &durationMs
 	}
 
-	var metadata *workflow.ActionMetadata
-	if action.ParentActionName.Valid {
-		metadata = &workflow.ActionMetadata{
-			Parent: action.ParentActionName.String,
-		}
+	metadata := &workflow.ActionMetadata{
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
 
 	return &workflow.EnrichedAction{
