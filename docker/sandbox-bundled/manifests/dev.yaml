@@ -347,6 +347,71 @@ metadata:
 ---
 apiVersion: v1
 data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Flyte Sandbox</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #0d1117;
+          color: #e6edf3;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }
+        .container { text-align: center; }
+        h1 { font-size: 2rem; margin-bottom: 1rem; }
+        .spinner {
+          width: 40px; height: 40px; margin: 1.5rem auto;
+          border: 4px solid #30363d;
+          border-top-color: #58a6ff;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        p { color: #8b949e; font-size: 0.95rem; }
+        .status { margin-top: 1rem; font-size: 0.85rem; color: #484f58; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Starting Flyte Sandbox</h1>
+        <div class="spinner"></div>
+        <p>Waiting for services to initialize...</p>
+        <p class="status" id="status"></p>
+      </div>
+      <script>
+        async function check() {
+          try {
+            const r = await fetch('/v2', { redirect: 'follow' });
+            if (r.ok) { window.location.href = '/v2'; return; }
+          } catch (_) {}
+          document.getElementById('status').textContent =
+            'Checking... ' + new Date().toLocaleTimeString();
+          setTimeout(check, 1000);
+        }
+        check();
+      </script>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-loading-page
+  namespace: flyte
+---
+apiVersion: v1
+data:
   haSharedSecret: Zmx5dGVzYW5kYm94c2VjcmV0
   proxyPassword: ""
   proxyUsername: ""
@@ -455,6 +520,26 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-loading
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/component: loading
+    app.kubernetes.io/name: flyte-sandbox
 ---
 apiVersion: v1
 kind: Service
@@ -589,7 +674,6 @@ spec:
           httpGet:
             path: /v2
             port: http
-          initialDelaySeconds: 5
           periodSeconds: 30
         name: console
         ports:
@@ -600,8 +684,14 @@ spec:
           httpGet:
             path: /v2
             port: http
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 1
+        startupProbe:
+          failureThreshold: 60
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 1
+          periodSeconds: 1
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -670,6 +760,50 @@ spec:
         name: flyte-sandbox-docker-registry-config
       - emptyDir: {}
         name: data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-loading
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: loading
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: loading
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - command:
+        - httpd
+        - -f
+        - -p
+        - "8080"
+        - -h
+        - /www
+        image: rancher/mirrored-library-busybox:1.34.1
+        imagePullPolicy: Never
+        name: httpd
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /www
+          name: html
+      volumes:
+      - configMap:
+          name: flyte-sandbox-loading-page
+        name: html
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -888,6 +1022,31 @@ spec:
             port:
               number: 80
         path: /v2
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.priority: "1"
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-loading
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-loading
+            port:
+              number: 80
+        path: /
         pathType: Prefix
 ---
 apiVersion: networking.k8s.io/v1
