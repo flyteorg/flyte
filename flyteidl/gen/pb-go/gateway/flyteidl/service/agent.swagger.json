@@ -505,6 +505,33 @@
       "description": "- UPLOAD_ON_EXIT: All data will be uploaded after the main container exits\n - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details\n - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written",
       "title": "Mode to use for uploading"
     },
+    "ResourcesResourceEntry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ResourcesResourceName",
+          "description": "Resource name."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value must be a valid k8s quantity. See\nhttps://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80"
+        }
+      },
+      "description": "Encapsulates a resource name and value."
+    },
+    "ResourcesResourceName": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CPU",
+        "GPU",
+        "MEMORY",
+        "STORAGE",
+        "EPHEMERAL_STORAGE"
+      ],
+      "default": "UNKNOWN",
+      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
+    },
     "RuntimeMetadataRuntimeType": {
       "type": "string",
       "enum": [
@@ -1023,7 +1050,7 @@
           "description": "These will default to Flyte given paths. If provided, the system will not append known paths. If the task still\nneeds flyte's inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the\nsystem will populate these before executing the container."
         },
         "resources": {
-          "$ref": "#/definitions/flyteidlcoreResources",
+          "$ref": "#/definitions/coreResources",
           "description": "Container resources requirement as specified by the container engine."
         },
         "env": {
@@ -1545,6 +1572,28 @@
       "default": "UNSPECIFIED",
       "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
     },
+    "coreResources": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ResourcesResourceEntry"
+          },
+          "description": "The desired set of resources requested. ResourceNames must be unique within the list."
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ResourcesResourceEntry"
+          },
+          "description": "Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique\nwithin the list."
+        }
+      },
+      "description": "A customizable interface to convey resources requested for a container. This can be interpreted differently for different\ncontainer engines."
+    },
     "coreRetryStrategy": {
       "type": "object",
       "properties": {
@@ -1897,7 +1946,7 @@
       "type": "object",
       "properties": {
         "resources": {
-          "$ref": "#/definitions/flyteidlcoreResources",
+          "$ref": "#/definitions/coreResources",
           "description": "A customizable interface to convey resources requested for a task container."
         },
         "extended_resources": {
@@ -2223,55 +2272,6 @@
         "PLUS"
       ],
       "default": "MINUS"
-    },
-    "flyteidlcoreResources": {
-      "type": "object",
-      "properties": {
-        "requests": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidlcoreResourcesResourceEntry"
-          },
-          "description": "The desired set of resources requested. ResourceNames must be unique within the list."
-        },
-        "limits": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/flyteidlcoreResourcesResourceEntry"
-          },
-          "description": "Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique\nwithin the list."
-        }
-      },
-      "description": "A customizable interface to convey resources requested for a container. This can be interpreted differently for different\ncontainer engines."
-    },
-    "flyteidlcoreResourcesResourceEntry": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/flyteidlcoreResourcesResourceName",
-          "description": "Resource name."
-        },
-        "value": {
-          "type": "string",
-          "title": "Value must be a valid k8s quantity. See\nhttps://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80"
-        }
-      },
-      "description": "Encapsulates a resource name and value."
-    },
-    "flyteidlcoreResourcesResourceName": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "CPU",
-        "GPU",
-        "MEMORY",
-        "STORAGE",
-        "EPHEMERAL_STORAGE"
-      ],
-      "default": "UNKNOWN",
-      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
     },
     "flyteidlcoreSchema": {
       "type": "object",

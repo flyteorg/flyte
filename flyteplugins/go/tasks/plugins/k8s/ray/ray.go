@@ -130,14 +130,22 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return rayjob, err
 }
 
-func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
+func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
 	var autoScalarOptions *rayv1.AutoscalerOptions
 	if options != nil {
 		autoScalarOptions = &rayv1.AutoscalerOptions{}
 		idleTimeoutTime := options.GetIdleTimeoutSeconds()
 		autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
-		if upScalingMode := options.GetUpscalingMode(); upScalingMode != "" {
-			mode := rayv1.UpscalingMode(upScalingMode)
+		if upscalingMode := options.GetUpscalingMode(); upscalingMode != plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED {
+			var mode rayv1.UpscalingMode
+			switch upscalingMode {
+			case plugins.AutoscalerOptions_UPSCALING_MODE_DEFAULT:
+				mode = rayv1.UpscalingMode("Default")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE:
+				mode = rayv1.UpscalingMode("Conservative")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_AGGRESSIVE:
+				mode = rayv1.UpscalingMode("Aggressive")
+			}
 			autoScalarOptions.UpscalingMode = &mode
 		}
 		if image := options.GetImage(); image != "" {
@@ -156,7 +164,7 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 		if envs := options.GetEnv(); len(envs) > 0 {
 			autoScalarOptions.Env = []v1.EnvVar{}
 			for _, env := range envs {
-				name := env.GetName()
+				name := env.GetKey()
 				if val := env.GetValue(); val != "" {
 					autoScalarOptions.Env = append(autoScalarOptions.Env, v1.EnvVar{
 						Name:  name,
@@ -169,14 +177,14 @@ func NewAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerO
 	return autoScalarOptions
 }
 
-func convertResourceEntriesToResourceList(entries []*plugins.Resources_ResourceEntry) v1.ResourceList {
+func convertResourceEntriesToResourceList(entries []*core.Resources_ResourceEntry) v1.ResourceList {
 	resourceList := v1.ResourceList{}
 	for _, entry := range entries {
 		var name v1.ResourceName
 		switch entry.GetName() {
-		case plugins.Resources_CPU:
+		case core.Resources_CPU:
 			name = v1.ResourceCPU
-		case plugins.Resources_MEMORY:
+		case core.Resources_MEMORY:
 			name = v1.ResourceMemory
 		default:
 			continue
@@ -205,11 +213,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		return nil, err
 	}
 
-	var autoScalarOptions *rayv1.AutoscalerOptions
-	if c := rayJob.GetRayCluster(); c != nil {
-		autoScalarOptions = NewAutoscalerOptions(c.GetAutoscalerOptions())
-	}
-
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template:       headPodTemplate,
@@ -219,7 +222,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		},
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
-		AutoscalerOptions:       autoScalarOptions,
+		AutoscalerOptions:       buildAutoscalerOptions(rayJob.GetRayCluster().GetAutoscalerOptions()),
 	}
 
 	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {

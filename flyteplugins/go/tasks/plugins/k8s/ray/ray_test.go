@@ -1543,43 +1543,43 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 func TestConvertResourceEntriesToResourceList(t *testing.T) {
 	tests := []struct {
 		name     string
-		entries  []*plugins.Resources_ResourceEntry
+		entries  []*core.Resources_ResourceEntry
 		wantKeys []corev1.ResourceName
 		wantLen  int
 	}{
 		{
 			name: "cpu entry",
-			entries: []*plugins.Resources_ResourceEntry{
-				{Name: plugins.Resources_CPU, Value: "500m"},
+			entries: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_CPU, Value: "500m"},
 			},
 			wantKeys: []corev1.ResourceName{corev1.ResourceCPU},
 			wantLen:  1,
 		},
 		{
 			name: "memory entry",
-			entries: []*plugins.Resources_ResourceEntry{
-				{Name: plugins.Resources_MEMORY, Value: "1Gi"},
+			entries: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_MEMORY, Value: "1Gi"},
 			},
 			wantKeys: []corev1.ResourceName{corev1.ResourceMemory},
 			wantLen:  1,
 		},
 		{
 			name: "unknown resource skipped",
-			entries: []*plugins.Resources_ResourceEntry{
-				{Name: plugins.Resources_ResourceName(99), Value: "1"},
+			entries: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_ResourceName(99), Value: "1"},
 			},
 			wantLen: 0,
 		},
 		{
 			name: "invalid quantity skipped",
-			entries: []*plugins.Resources_ResourceEntry{
-				{Name: plugins.Resources_CPU, Value: "not-a-quantity"},
+			entries: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_CPU, Value: "not-a-quantity"},
 			},
 			wantLen: 0,
 		},
 		{
 			name:    "empty input",
-			entries: []*plugins.Resources_ResourceEntry{},
+			entries: []*core.Resources_ResourceEntry{},
 			wantLen: 0,
 		},
 	}
@@ -1598,52 +1598,52 @@ func TestConvertResourceEntriesToResourceList(t *testing.T) {
 
 func TestNewAutoscalerOptions(t *testing.T) {
 	t.Run("nil input returns nil", func(t *testing.T) {
-		assert.Nil(t, NewAutoscalerOptions(nil))
+		assert.Nil(t, buildAutoscalerOptions(nil))
 	})
 
 	t.Run("idle timeout propagated", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{IdleTimeoutSeconds: 30})
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{IdleTimeoutSeconds: 30})
 		require.NotNil(t, result)
 		require.NotNil(t, result.IdleTimeoutSeconds)
 		assert.Equal(t, int32(30), *result.IdleTimeoutSeconds)
 	})
 
 	t.Run("upscaling mode set when non-empty", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: "Conservative"})
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE})
 		require.NotNil(t, result)
 		require.NotNil(t, result.UpscalingMode)
 		assert.Equal(t, rayv1.UpscalingMode("Conservative"), *result.UpscalingMode)
 	})
 
 	t.Run("upscaling mode nil when empty", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: ""})
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED})
 		require.NotNil(t, result)
 		assert.Nil(t, result.UpscalingMode)
 	})
 
 	t.Run("image set when non-empty", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{Image: "my-image:latest"})
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: "my-image:latest"})
 		require.NotNil(t, result)
 		require.NotNil(t, result.Image)
 		assert.Equal(t, "my-image:latest", *result.Image)
 	})
 
 	t.Run("image nil when empty", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
 		require.NotNil(t, result)
 		assert.Nil(t, result.Image)
 	})
 
 	t.Run("resources requests and limits converted", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{
-			Resources: &plugins.Resources{
-				Requests: []*plugins.Resources_ResourceEntry{
-					{Name: plugins.Resources_CPU, Value: "250m"},
-					{Name: plugins.Resources_MEMORY, Value: "512Mi"},
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "512Mi"},
 				},
-				Limits: []*plugins.Resources_ResourceEntry{
-					{Name: plugins.Resources_CPU, Value: "1"},
-					{Name: plugins.Resources_MEMORY, Value: "1Gi"},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 			},
 		})
@@ -1656,8 +1656,8 @@ func TestNewAutoscalerOptions(t *testing.T) {
 	})
 
 	t.Run("env literal value", func(t *testing.T) {
-		result := NewAutoscalerOptions(&plugins.AutoscalerOptions{
-			Env: []*plugins.EnvVar{{Name: "FOO", Value: "bar"}},
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}},
 		})
 		require.NotNil(t, result)
 		require.Len(t, result.Env, 1)

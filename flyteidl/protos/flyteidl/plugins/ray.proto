@@ -5,6 +5,7 @@ package flyteidl.plugins;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
 import "flyteidl/core/tasks.proto";
+import "flyteidl/core/literals.proto";
 
 // RayJobSpec defines the desired state of RayJob
 message RayJob {
@@ -22,46 +23,21 @@ message RayJob {
   string runtime_env_yaml = 5;
 }
 
-message Resources {
-    // Known resource names.
-    enum ResourceName {
-        CPU = 0;
-        MEMORY = 1;
-    }
-
-    // Encapsulates a resource name and value.
-    message ResourceEntry {
-        // Resource name.
-        ResourceName name = 1;
-
-        // Value must be a valid k8s quantity. See
-        // https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80
-        string value = 2;
-    }
-
-    // The desired set of resources requested. ResourceNames must be unique within the list.
-    repeated ResourceEntry requests = 1;
-
-    // Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
-    // within the list.
-    repeated ResourceEntry limits = 2;
-}
-
-message EnvVar {
-  string name = 1;
-  string value = 2;
-}
-
 message AutoscalerOptions {
-  // "Default", "Aggressive", "Conservative"
-  string upscaling_mode = 1;
+  enum UpscalingMode {
+    UPSCALING_MODE_UNSPECIFIED = 0;
+    UPSCALING_MODE_DEFAULT = 1;
+    UPSCALING_MODE_AGGRESSIVE = 2;
+    UPSCALING_MODE_CONSERVATIVE = 3;
+  }
+  UpscalingMode upscaling_mode = 1;
   int32 idle_timeout_seconds = 2;
   // autoscaler sidecar env vars
-  repeated EnvVar env = 3;
+  repeated core.KeyValuePair env = 3;
   // custom autoscaler image
   string image = 4;
   // autoscaler container resources
-  Resources resources = 5;
+  core.Resources resources = 5;
 }
 
 // Define Ray cluster defines the desired state of RayCluster

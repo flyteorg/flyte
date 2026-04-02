@@ -1,4 +1,5 @@
 from flyteidl.core import tasks_pb2 as _tasks_pb2
+from flyteidl.core import literals_pb2 as _literals_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -21,48 +22,29 @@ class RayJob(_message.Message):
     runtime_env_yaml: str
     def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ..., shutdown_after_job_finishes: bool = ..., ttl_seconds_after_finished: _Optional[int] = ..., runtime_env_yaml: _Optional[str] = ...) -> None: ...
 
-class Resources(_message.Message):
-    __slots__ = ["requests", "limits"]
-    class ResourceName(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        CPU: _ClassVar[Resources.ResourceName]
-        MEMORY: _ClassVar[Resources.ResourceName]
-    CPU: Resources.ResourceName
-    MEMORY: Resources.ResourceName
-    class ResourceEntry(_message.Message):
-        __slots__ = ["name", "value"]
-        NAME_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        name: Resources.ResourceName
-        value: str
-        def __init__(self, name: _Optional[_Union[Resources.ResourceName, str]] = ..., value: _Optional[str] = ...) -> None: ...
-    REQUESTS_FIELD_NUMBER: _ClassVar[int]
-    LIMITS_FIELD_NUMBER: _ClassVar[int]
-    requests: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
-    limits: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
-    def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
-
-class EnvVar(_message.Message):
-    __slots__ = ["name", "value"]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    VALUE_FIELD_NUMBER: _ClassVar[int]
-    name: str
-    value: str
-    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-
 class AutoscalerOptions(_message.Message):
     __slots__ = ["upscaling_mode", "idle_timeout_seconds", "env", "image", "resources"]
+    class UpscalingMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        UPSCALING_MODE_UNSPECIFIED: _ClassVar[AutoscalerOptions.UpscalingMode]
+        UPSCALING_MODE_DEFAULT: _ClassVar[AutoscalerOptions.UpscalingMode]
+        UPSCALING_MODE_AGGRESSIVE: _ClassVar[AutoscalerOptions.UpscalingMode]
+        UPSCALING_MODE_CONSERVATIVE: _ClassVar[AutoscalerOptions.UpscalingMode]
+    UPSCALING_MODE_UNSPECIFIED: AutoscalerOptions.UpscalingMode
+    UPSCALING_MODE_DEFAULT: AutoscalerOptions.UpscalingMode
+    UPSCALING_MODE_AGGRESSIVE: AutoscalerOptions.UpscalingMode
+    UPSCALING_MODE_CONSERVATIVE: AutoscalerOptions.UpscalingMode
     UPSCALING_MODE_FIELD_NUMBER: _ClassVar[int]
     IDLE_TIMEOUT_SECONDS_FIELD_NUMBER: _ClassVar[int]
     ENV_FIELD_NUMBER: _ClassVar[int]
     IMAGE_FIELD_NUMBER: _ClassVar[int]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
-    upscaling_mode: str
+    upscaling_mode: AutoscalerOptions.UpscalingMode
     idle_timeout_seconds: int
-    env: _containers.RepeatedCompositeFieldContainer[EnvVar]
+    env: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     image: str
-    resources: Resources
-    def __init__(self, upscaling_mode: _Optional[str] = ..., idle_timeout_seconds: _Optional[int] = ..., env: _Optional[_Iterable[_Union[EnvVar, _Mapping]]] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[Resources, _Mapping]] = ...) -> None: ...
+    resources: _tasks_pb2.Resources
+    def __init__(self, upscaling_mode: _Optional[_Union[AutoscalerOptions.UpscalingMode, str]] = ..., idle_timeout_seconds: _Optional[int] = ..., env: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...
 
 class RayCluster(_message.Message):
     __slots__ = ["head_group_spec", "worker_group_spec", "enable_autoscaling", "autoscaler_options"]
