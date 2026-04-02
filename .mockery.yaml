@@ -146,3 +146,9 @@ packages:
       dir: actions/service/mocks
     interfaces:
       ActionsClientInterface:
+  github.com/eko/gocache/lib/v4/cache:
+    config:
+      all: false
+      dir: flytestdlib/cache/mocks
+    interfaces:
+      CacheInterface:
