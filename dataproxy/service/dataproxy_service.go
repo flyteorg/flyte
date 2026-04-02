@@ -17,10 +17,11 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 )
 
 type Service struct {
-	dataproxy.UnimplementedDataProxyServiceServer
+	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
 	cfg       config.DataProxyConfig
 	dataStore *storage.DataStore
