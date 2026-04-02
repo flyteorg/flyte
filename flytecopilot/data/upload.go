@@ -107,7 +107,7 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 			}
 		}
 
-		return coreutils.MakeLiteralForBlob(toPath, false, ""), nil
+		return coreutils.MakeLiteralForBlob(toPath, true, ""), nil
 	}
 	size := info.Size()
 	// Should we make this a go routine as well, so that we can introduce timeouts
