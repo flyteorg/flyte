@@ -29,16 +29,6 @@ packages:
     config:
       all: true
       dir: flytestdlib/cache/mocks
-  github.com/flyteorg/flyte/v2/flytestdlib/fastcheck:
-    config:
-      all: false
-      dir: flytestdlib/fastcheck/mocks
-    interfaces:
-      Filter: {}
-  github.com/flyteorg/flyte/v2/flytestdlib/random:
-    config:
-      all: true
-      dir: flytestdlib/random/mocks
   github.com/flyteorg/flyte/v2/flytestdlib/storage:
     config:
       all: false
@@ -48,64 +38,20 @@ packages:
       Metadata: {}
       RawStore: {}
       ReferenceConstructor: {}
-  github.com/flyteorg/flyte/v2/flytestdlib/utils:
-    config:
-      all: true
-      dir: flytestdlib/utils/mocks
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/actions/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/actions/actionsconnect/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/app/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/common/mocks
-      include-auto-generated: true
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector:
     config:
       all: true
       dir: gen/go/flyteidl2/connector/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/imagebuilder/mocks
       include-auto-generated: true
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins:
     config:
       all: true
       dir: gen/go/flyteidl2/plugins/mocks
       include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/secret/mocks
-      include-auto-generated: true
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/service:
     config:
       all: true
       dir: gen/go/flyteidl2/service/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/task/mocks
-      include-auto-generated: true
-  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow:
-    config:
-      all: true
-      dir: gen/go/flyteidl2/workflow/mocks
       include-auto-generated: true
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect:
     config:
