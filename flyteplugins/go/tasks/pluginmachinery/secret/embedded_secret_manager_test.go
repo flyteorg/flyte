@@ -18,7 +18,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/mocks"
-	cacheMocks "github.com/flyteorg/flyte/v2/flytestdlib/cache/mocks"
+	cacheMocks "github.com/flyteorg/flyte/v2/flytestdlib/cache/gocachemocks"
 	stdlibErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
