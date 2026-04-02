@@ -529,6 +529,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				ActionId: update.ActionID,
 				Parent:   update.ParentActionName,
 				InputUri: taskAction.Spec.InputURI,
+				Group:    taskAction.Spec.Group,
 			}
 			if taskAction.Spec.TaskType != "" {
 				ta := &workflow.TaskAction{
