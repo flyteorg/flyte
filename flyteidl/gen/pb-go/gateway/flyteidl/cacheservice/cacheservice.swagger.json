@@ -156,6 +156,14 @@
         },
         "dimensionality": {
           "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        },
+        "file_extension": {
+          "type": "string",
+          "description": "Optional file extension (e.g. \"csv\", \"parquet\") to use during copilot download.\nDefault is \"\", which means no extension is appended.\nDifferences from \"format\":\n  1. \"format\" is used for type validation in flytekit, \"file_extension\" is not.\n  2. \"file_extension\" controls the file extension of the blob when materializing\n   to local disk during copilot download, unlike \"format\"."
+        },
+        "enable_legacy_filename": {
+          "type": "boolean",
+          "description": "When true and file_extension is non-empty, the copilot download phase\nwrites the blob to both the full path (with extension) and the\nold path (without extension), preserving backward compatibility for\nworkflows with tasks that may read from both. Default is false."
         }
       },
       "title": "Defines type behavior for blob objects"

@@ -341,6 +341,28 @@ export class BlobType extends Message<BlobType> {
    */
   dimensionality = BlobType_BlobDimensionality.SINGLE;
 
+  /**
+   * Optional file extension (e.g. "csv", "parquet") to use during copilot download.
+   * Default is "", which means no extension is appended.
+   * Differences from "format":
+   *   1. "format" is used for type validation in flytekit, "file_extension" is not.
+   *   2. "file_extension" controls the file extension of the blob when materializing
+   *    to local disk during copilot download, unlike "format".
+   *
+   * @generated from field: string file_extension = 3;
+   */
+  fileExtension = "";
+
+  /**
+   * When true and file_extension is non-empty, the copilot download phase
+   * writes the blob to both the full path (with extension) and the
+   * old path (without extension), preserving backward compatibility for
+   * workflows with tasks that may read from both. Default is false.
+   *
+   * @generated from field: bool enable_legacy_filename = 4;
+   */
+  enableLegacyFilename = false;
+
   constructor(data?: PartialMessage<BlobType>) {
     super();
     proto3.util.initPartial(data, this);
@@ -351,6 +373,8 @@ export class BlobType extends Message<BlobType> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "format", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "dimensionality", kind: "enum", T: proto3.getEnumType(BlobType_BlobDimensionality) },
+    { no: 3, name: "file_extension", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "enable_legacy_filename", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobType {

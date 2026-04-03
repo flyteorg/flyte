@@ -105,6 +105,20 @@ pub struct BlobType {
     pub format: ::prost::alloc::string::String,
     #[prost(enumeration="blob_type::BlobDimensionality", tag="2")]
     pub dimensionality: i32,
+    /// Optional file extension (e.g. "csv", "parquet") to use during copilot download.
+    /// Default is "", which means no extension is appended.
+    /// Differences from "format":
+    ///    1. "format" is used for type validation in flytekit, "file_extension" is not.
+    ///    2. "file_extension" controls the file extension of the blob when materializing
+    ///     to local disk during copilot download, unlike "format".
+    #[prost(string, tag="3")]
+    pub file_extension: ::prost::alloc::string::String,
+    /// When true and file_extension is non-empty, the copilot download phase
+    /// writes the blob to both the full path (with extension) and the
+    /// old path (without extension), preserving backward compatibility for
+    /// workflows with tasks that may read from both. Default is false.
+    #[prost(bool, tag="4")]
+    pub enable_legacy_filename: bool,
 }
 /// Nested message and enum types in `BlobType`.
 pub mod blob_type {
