@@ -3,7 +3,10 @@ package catalog
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 
+	"github.com/shamaton/msgpack/v2"
 	"k8s.io/utils/strings/slices"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -11,6 +14,44 @@ import (
 )
 
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
+
+// toJSONCompatible recursively converts map[interface{}]interface{} (produced by msgpack
+// unmarshal) into map[string]interface{} so that encoding/json can marshal it.
+func toJSONCompatible(v interface{}) interface{} {
+	switch val := v.(type) {
+	case map[interface{}]interface{}:
+		m := make(map[string]interface{}, len(val))
+		for k, elem := range val {
+			m[fmt.Sprintf("%v", k)] = toJSONCompatible(elem)
+		}
+		return m
+	case []interface{}:
+		result := make([]interface{}, len(val))
+		for i, item := range val {
+			result[i] = toJSONCompatible(item)
+		}
+		return result
+	default:
+		return v
+	}
+}
+
+// normalizeMsgpackBytes unmarshals msgpack bytes and re-marshals them to JSON, which
+// deterministically sorts map keys at every nesting level. This ensures that semantically
+// identical dicts serialized with different key orderings produce the same hash.
+// If normalization fails, the original bytes are returned unchanged.
+func normalizeMsgpackBytes(data []byte) []byte {
+	var obj interface{}
+	if err := msgpack.Unmarshal(data, &obj); err != nil {
+		return data
+	}
+	obj = toJSONCompatible(obj)
+	normalized, err := json.Marshal(obj)
+	if err != nil {
+		return data
+	}
+	return normalized
+}
 
 // Hashify a literal, in other words, produce a new literal where the corresponding value is removed in case
 // the literal hash is set.
@@ -49,6 +90,23 @@ func hashify(literal *core.Literal) *core.Literal {
 			Value: &core.Literal_Map{
 				Map: &core.LiteralMap{
 					Literals: literalsMap,
+				},
+			},
+		}
+	}
+
+	// Normalize msgpack Binary scalars to ensure deterministic hashing regardless of key order
+	if binary := literal.GetScalar().GetBinary(); binary != nil && binary.GetTag() == "msgpack" {
+		normalized := normalizeMsgpackBytes(binary.GetValue())
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: normalized,
+							Tag:   binary.GetTag(),
+						},
+					},
 				},
 			},
 		}
