@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
+	"hash/fnv"
 	"strings"
 	"time"
 
@@ -250,13 +250,14 @@ func (s *Service) UploadInputs(
 	}), nil
 }
 
-// hashInputsProto computes a deterministic SHA-256 hash of the serialized inputs.
+// hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.
 func hashInputsProto(inputs proto.Message) (string, error) {
 	marshaller := proto.MarshalOptions{Deterministic: true}
 	data, err := marshaller.Marshal(inputs)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal inputs: %w", err)
 	}
-	hash := sha256.Sum256(data)
-	return base64.StdEncoding.EncodeToString(hash[:]), nil
+	h := fnv.New64a()
+	_, _ = h.Write(data)
+	return base64.RawURLEncoding.EncodeToString(h.Sum(nil)), nil
 }
