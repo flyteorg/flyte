@@ -34,8 +34,8 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 
 	t.Run("First fail", func(t *testing.T) {
 		mutator := &mocks.SecretsInjector{}
-		mutator.OnInjectMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, false, fmt.Errorf("failed"))
-		mutator.OnType().Return(config.SecretManagerTypeGlobal)
+		mutator.EXPECT().Inject(mock.Anything, mock.Anything, mock.Anything).Return(nil, false, fmt.Errorf("failed"))
+		mutator.EXPECT().Type().Return(config.SecretManagerTypeGlobal)
 
 		m := SecretsPodMutator{
 			enabledSecretManagerTypes: []config.SecretManagerType{config.SecretManagerTypeGlobal},
@@ -51,8 +51,8 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 
 	t.Run("added", func(t *testing.T) {
 		mutator := &mocks.SecretsInjector{}
-		mutator.OnInjectMatch(mock.Anything, mock.Anything, mock.Anything).Return(&corev1.Pod{}, true, nil)
-		mutator.OnType().Return(config.SecretManagerTypeGlobal)
+		mutator.EXPECT().Inject(mock.Anything, mock.Anything, mock.Anything).Return(&corev1.Pod{}, true, nil)
+		mutator.EXPECT().Type().Return(config.SecretManagerTypeGlobal)
 		ctx := context.Background()
 
 		m := SecretsPodMutator{
