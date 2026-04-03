@@ -34,11 +34,21 @@ export enum LaunchPlanState {
    * @generated from enum value: ACTIVE = 1;
    */
   ACTIVE = 1,
+
+  /**
+   * Archived launch plans are considered old/unused and can be excluded from list queries
+   * using a ne(state,2) filter. Archiving a launch plan also disables any active schedule.
+   * An archived launch plan can still be used to launch executions.
+   *
+   * @generated from enum value: ARCHIVED = 2;
+   */
+  ARCHIVED = 2,
 }
 // Retrieve enum metadata with: proto3.getEnumType(LaunchPlanState)
 proto3.util.setEnumType(LaunchPlanState, "flyteidl.admin.LaunchPlanState", [
   { no: 0, name: "INACTIVE" },
   { no: 1, name: "ACTIVE" },
+  { no: 2, name: "ARCHIVED" },
 ]);
 
 /**
