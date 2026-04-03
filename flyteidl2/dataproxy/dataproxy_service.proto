@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
+import "flyteidl2/task/task_definition.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
@@ -117,7 +118,23 @@ message UploadInputsRequest {
     common.ProjectIdentifier project_id = 2;
   }
 
-  task.Inputs inputs = 3;
+  // The task these inputs are used for.
+  // This is used to determine which inputs can be excluded from the hash used for cache key computation in a subsequent CreateRun call.
+  oneof task {
+    option (buf.validate.oneof).required = true;
+
+    // The task id to use.
+    task.TaskIdentifier task_id = 3;
+
+    // The task spec to use.
+    task.TaskSpec task_spec = 4;
+
+    // The trigger name to use.
+    common.TriggerName trigger_name = 5;
+  }
+
+  // The actual inputs.
+  task.Inputs inputs = 6;
 }
 
 message UploadInputsResponse {
