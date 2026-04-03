@@ -85,3 +85,23 @@ spec:
     prefixes:
       - /minio
 {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-loading
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.priority: "1"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-sandbox.fullname" . }}-loading
+                port:
+                  number: 80

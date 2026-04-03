@@ -21,8 +21,7 @@ helmCharts:
           args:
             - |
               until nc -z flyte-sandbox-postgresql.flyte 5432; do
-                echo waiting for database
-                sleep 0.5
+                sleep 0.1
               done
 namespace: flyte
 resources:

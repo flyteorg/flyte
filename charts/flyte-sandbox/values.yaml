@@ -77,13 +77,13 @@ flyte-binary:
       httpGet:
         path: /healthz
         port: http
-      initialDelaySeconds: 5
+      initialDelaySeconds: 30
     readinessProbe:
       httpGet:
         path: /readyz
         port: http
-      initialDelaySeconds: 5
-      periodSeconds: 5
+      initialDelaySeconds: 1
+      periodSeconds: 1
     waitForDB:
       image:
         repository: bitnami/postgresql

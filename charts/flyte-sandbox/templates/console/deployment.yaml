@@ -27,12 +27,12 @@ spec:
             httpGet:
               path: /v2
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 1
+            periodSeconds: 1
           livenessProbe:
             httpGet:
               path: /v2
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 30
 {{- end }}

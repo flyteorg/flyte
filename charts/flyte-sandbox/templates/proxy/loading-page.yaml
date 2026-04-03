@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-loading-page
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Flyte Sandbox</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #0d1117;
+          color: #e6edf3;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }
+        .container { text-align: center; }
+        h1 { font-size: 2rem; margin-bottom: 1rem; }
+        .spinner {
+          width: 40px; height: 40px; margin: 1.5rem auto;
+          border: 4px solid #30363d;
+          border-top-color: #58a6ff;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        p { color: #8b949e; font-size: 0.95rem; }
+        .status { margin-top: 1rem; font-size: 0.85rem; color: #484f58; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>Starting Flyte Sandbox</h1>
+        <div class="spinner"></div>
+        <p>Waiting for services to initialize...</p>
+        <p class="status" id="status"></p>
+      </div>
+      <script>
+        async function check() {
+          try {
+            const r = await fetch('/v2', { redirect: 'follow' });
+            if (r.ok) { window.location.href = '/v2'; return; }
+          } catch (_) {}
+          document.getElementById('status').textContent =
+            'Checking... ' + new Date().toLocaleTimeString();
+          setTimeout(check, 1000);
+        }
+        check();
+      </script>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-loading
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: loading
+      app.kubernetes.io/name: {{ include "flyte-sandbox.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: loading
+        app.kubernetes.io/name: {{ include "flyte-sandbox.name" . }}
+    spec:
+      containers:
+        - name: httpd
+          image: rancher/mirrored-library-busybox:1.34.1
+          imagePullPolicy: Never
+          command: ["httpd", "-f", "-p", "8080", "-h", "/www"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: html
+              mountPath: /www
+      volumes:
+        - name: html
+          configMap:
+            name: {{ include "flyte-sandbox.fullname" . }}-loading-page
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-sandbox.fullname" . }}-loading
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: loading
+    app.kubernetes.io/name: {{ include "flyte-sandbox.name" . }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
