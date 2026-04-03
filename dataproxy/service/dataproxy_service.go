@@ -2,20 +2,24 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/stow"
 	"github.com/samber/lo"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 )
@@ -174,4 +178,85 @@ func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.Creat
 	})
 
 	return s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
+}
+
+// UploadInputs persists the given inputs to storage and returns a URI and hash
+// that can be passed to CreateRun via OffloadedInputData.
+func (s *Service) UploadInputs(
+	ctx context.Context,
+	req *connect.Request[dataproxy.UploadInputsRequest],
+) (*connect.Response[dataproxy.UploadInputsResponse], error) {
+	logger.Infof(ctx, "UploadInputs request received")
+
+	if err := req.Msg.Validate(); err != nil {
+		logger.Errorf(ctx, "Invalid UploadInputs request: %v", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	// Resolve org/project/domain from the identifier.
+	var org, project, domain string
+	switch id := req.Msg.Id.(type) {
+	case *dataproxy.UploadInputsRequest_RunId:
+		org = id.RunId.GetOrg()
+		project = id.RunId.GetProject()
+		domain = id.RunId.GetDomain()
+	case *dataproxy.UploadInputsRequest_ProjectId:
+		org = id.ProjectId.GetOrganization()
+		project = id.ProjectId.GetName()
+		domain = id.ProjectId.GetDomain()
+	default:
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("id is required"))
+	}
+
+	// Deterministically hash the inputs for content-addressable storage.
+	inputsHash, err := hashInputsProto(req.Msg.GetInputs())
+	if err != nil {
+		logger.Errorf(ctx, "Failed to hash inputs: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to hash inputs: %w", err))
+	}
+
+	// Build the storage path: storagePrefix/org/project/domain/offloaded-inputs/<hash>/inputs.pb
+	storagePrefix := strings.TrimRight(s.cfg.Upload.StoragePrefix, "/")
+	pathComponents := []string{storagePrefix, org, project, domain, "offloaded-inputs", inputsHash}
+	pathComponents = lo.Filter(pathComponents, func(key string, _ int) bool {
+		return key != ""
+	})
+
+	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
+	dirRef, err := s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to construct storage path: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct storage path: %w", err))
+	}
+
+	inputRef, err := s.dataStore.ConstructReference(ctx, dirRef, "inputs.pb")
+	if err != nil {
+		logger.Errorf(ctx, "Failed to construct input ref: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
+	}
+
+	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, req.Msg.GetInputs()); err != nil {
+		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+	}
+
+	logger.Infof(ctx, "Successfully uploaded inputs to %s (hash=%s)", inputRef, inputsHash)
+
+	return connect.NewResponse(&dataproxy.UploadInputsResponse{
+		OffloadedInputData: &common.OffloadedInputData{
+			Uri:        string(dirRef),
+			InputsHash: inputsHash,
+		},
+	}), nil
+}
+
+// hashInputsProto computes a deterministic SHA-256 hash of the serialized inputs.
+func hashInputsProto(inputs proto.Message) (string, error) {
+	marshaller := proto.MarshalOptions{Deterministic: true}
+	data, err := marshaller.Marshal(inputs)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal inputs: %w", err)
+	}
+	hash := sha256.Sum256(data)
+	return base64.StdEncoding.EncodeToString(hash[:]), nil
 }

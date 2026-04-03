@@ -157,7 +157,6 @@ func (s *RunService) CreateRun(
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
 	var err error
-	inputs := request.GetInputs()
 	runSpec := request.GetRunSpec()
 	// TODO: Add trigger
 	switch request.GetTask().(type) {
@@ -177,13 +176,30 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
-	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
 		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 	}
+
+	// Resolve inputs: either inline or from a previously uploaded offloaded location.
+	var inputs *task.Inputs
+	switch request.GetInputWrapper().(type) {
+	case *workflow.CreateRunRequest_OffloadedInputData:
+		offloaded := request.GetOffloadedInputData()
+		offloadedRef := storage.DataReference(offloaded.GetUri() + "/inputs.pb")
+		inputs = &task.Inputs{}
+		if err := s.dataStore.ReadProtobuf(ctx, offloadedRef, inputs); err != nil {
+			logger.Errorf(ctx, "Failed to read offloaded inputs from %s: %v", offloadedRef, err)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to read offloaded inputs: %w", err))
+		}
+		logger.Infof(ctx, "Read offloaded inputs from %s", offloadedRef)
+	default:
+		inputs = request.GetInputs()
+	}
+
+	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 
 	// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
 	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
