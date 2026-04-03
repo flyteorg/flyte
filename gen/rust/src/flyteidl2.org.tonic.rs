@@ -703,9 +703,9 @@ pub mod settings_service_client {
                 .insert(GrpcMethod::new("flyteidl2.org.SettingsService", "GetSettings"));
             self.inner.unary(req, path, codec).await
         }
-        /** GetSettingsForEdit returns unmerged settings at all scope levels with
- descriptions, for use in an edit form. One SettingsRecord per level,
- ordered broadest to most specific.
+        /** GetSettingsForEdit returns unmerged settings at all scope levels,
+ for use in an edit form. One SettingsRecord per level, ordered broadest
+ to most specific.
 */
         pub async fn get_settings_for_edit(
             &mut self,
@@ -733,39 +733,6 @@ pub mod settings_service_client {
                     GrpcMethod::new(
                         "flyteidl2.org.SettingsService",
                         "GetSettingsForEdit",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        /** GetSettingsForEditRaw returns raw dot-notation settings maps at all scope
- levels, for clients not up to date with the current settings schema.
-*/
-        pub async fn get_settings_for_edit_raw(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetSettingsForEditRawRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetSettingsForEditRawResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.SettingsService/GetSettingsForEditRaw",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.org.SettingsService",
-                        "GetSettingsForEditRaw",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -830,36 +797,6 @@ pub mod settings_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        /** UpdateSettingsRaw upserts settings via a flat dot-notation map at the scope
- implied by the key. For clients not up to date with the current settings schema.
-*/
-        pub async fn update_settings_raw(
-            &mut self,
-            request: impl tonic::IntoRequest<super::UpdateSettingsRawRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UpdateSettingsRawResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.SettingsService/UpdateSettingsRaw",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.org.SettingsService", "UpdateSettingsRaw"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
     }
 }
 /// Generated server implementations.
@@ -879,25 +816,15 @@ pub mod settings_service_server {
             tonic::Response<super::GetSettingsResponse>,
             tonic::Status,
         >;
-        /** GetSettingsForEdit returns unmerged settings at all scope levels with
- descriptions, for use in an edit form. One SettingsRecord per level,
- ordered broadest to most specific.
+        /** GetSettingsForEdit returns unmerged settings at all scope levels,
+ for use in an edit form. One SettingsRecord per level, ordered broadest
+ to most specific.
 */
         async fn get_settings_for_edit(
             &self,
             request: tonic::Request<super::GetSettingsForEditRequest>,
         ) -> std::result::Result<
             tonic::Response<super::GetSettingsForEditResponse>,
-            tonic::Status,
-        >;
-        /** GetSettingsForEditRaw returns raw dot-notation settings maps at all scope
- levels, for clients not up to date with the current settings schema.
-*/
-        async fn get_settings_for_edit_raw(
-            &self,
-            request: tonic::Request<super::GetSettingsForEditRawRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetSettingsForEditRawResponse>,
             tonic::Status,
         >;
         /** CreateSettings creates a new settings record at the scope implied by the key.
@@ -918,16 +845,6 @@ pub mod settings_service_server {
             request: tonic::Request<super::UpdateSettingsRequest>,
         ) -> std::result::Result<
             tonic::Response<super::UpdateSettingsResponse>,
-            tonic::Status,
-        >;
-        /** UpdateSettingsRaw upserts settings via a flat dot-notation map at the scope
- implied by the key. For clients not up to date with the current settings schema.
-*/
-        async fn update_settings_raw(
-            &self,
-            request: tonic::Request<super::UpdateSettingsRawRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UpdateSettingsRawResponse>,
             tonic::Status,
         >;
     }
@@ -1102,55 +1019,6 @@ pub mod settings_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.org.SettingsService/GetSettingsForEditRaw" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetSettingsForEditRawSvc<T: SettingsService>(pub Arc<T>);
-                    impl<
-                        T: SettingsService,
-                    > tonic::server::UnaryService<super::GetSettingsForEditRawRequest>
-                    for GetSettingsForEditRawSvc<T> {
-                        type Response = super::GetSettingsForEditRawResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetSettingsForEditRawRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as SettingsService>::get_settings_for_edit_raw(
-                                        &inner,
-                                        request,
-                                    )
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = GetSettingsForEditRawSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/flyteidl2.org.SettingsService/CreateSettings" => {
                     #[allow(non_camel_case_types)]
                     struct CreateSettingsSvc<T: SettingsService>(pub Arc<T>);
@@ -1228,52 +1096,6 @@ pub mod settings_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = UpdateSettingsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.org.SettingsService/UpdateSettingsRaw" => {
-                    #[allow(non_camel_case_types)]
-                    struct UpdateSettingsRawSvc<T: SettingsService>(pub Arc<T>);
-                    impl<
-                        T: SettingsService,
-                    > tonic::server::UnaryService<super::UpdateSettingsRawRequest>
-                    for UpdateSettingsRawSvc<T> {
-                        type Response = super::UpdateSettingsRawResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::UpdateSettingsRawRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as SettingsService>::update_settings_raw(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = UpdateSettingsRawSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

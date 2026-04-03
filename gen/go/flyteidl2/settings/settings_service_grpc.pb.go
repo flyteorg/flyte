@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: flyteidl2/org/settings_service.proto
+// source: flyteidl2/settings/settings_service.proto
 
-package org
+package settings
 
 import (
 	context "context"
@@ -19,12 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SettingsService_GetSettings_FullMethodName           = "/flyteidl2.org.SettingsService/GetSettings"
-	SettingsService_GetSettingsForEdit_FullMethodName    = "/flyteidl2.org.SettingsService/GetSettingsForEdit"
-	SettingsService_GetSettingsForEditRaw_FullMethodName = "/flyteidl2.org.SettingsService/GetSettingsForEditRaw"
-	SettingsService_CreateSettings_FullMethodName        = "/flyteidl2.org.SettingsService/CreateSettings"
-	SettingsService_UpdateSettings_FullMethodName        = "/flyteidl2.org.SettingsService/UpdateSettings"
-	SettingsService_UpdateSettingsRaw_FullMethodName     = "/flyteidl2.org.SettingsService/UpdateSettingsRaw"
+	SettingsService_GetSettings_FullMethodName        = "/flyteidl2.org.SettingsService/GetSettings"
+	SettingsService_GetSettingsForEdit_FullMethodName = "/flyteidl2.org.SettingsService/GetSettingsForEdit"
+	SettingsService_CreateSettings_FullMethodName     = "/flyteidl2.org.SettingsService/CreateSettings"
+	SettingsService_UpdateSettings_FullMethodName     = "/flyteidl2.org.SettingsService/UpdateSettings"
 )
 
 // SettingsServiceClient is the client API for SettingsService service.
@@ -34,22 +32,16 @@ type SettingsServiceClient interface {
 	// GetSettings returns resolved effective settings at the scope implied by
 	// the key, incorporating inherited values from parent scopes.
 	GetSettings(ctx context.Context, in *GetSettingsRequest, opts ...grpc.CallOption) (*GetSettingsResponse, error)
-	// GetSettingsForEdit returns unmerged settings at all scope levels with
-	// descriptions, for use in an edit form. One SettingsRecord per level,
-	// ordered broadest to most specific.
+	// GetSettingsForEdit returns unmerged settings at all scope levels,
+	// for use in an edit form. One SettingsRecord per level, ordered broadest
+	// to most specific.
 	GetSettingsForEdit(ctx context.Context, in *GetSettingsForEditRequest, opts ...grpc.CallOption) (*GetSettingsForEditResponse, error)
-	// GetSettingsForEditRaw returns raw dot-notation settings maps at all scope
-	// levels, for clients not up to date with the current settings schema.
-	GetSettingsForEditRaw(ctx context.Context, in *GetSettingsForEditRawRequest, opts ...grpc.CallOption) (*GetSettingsForEditRawResponse, error)
 	// CreateSettings creates a new settings record at the scope implied by the key.
 	// Fails if a record already exists at that scope.
 	CreateSettings(ctx context.Context, in *CreateSettingsRequest, opts ...grpc.CallOption) (*CreateSettingsResponse, error)
 	// UpdateSettings upserts strongly-typed settings at the scope implied by
 	// the key. Uses optimistic locking via the version field.
 	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error)
-	// UpdateSettingsRaw upserts settings via a flat dot-notation map at the scope
-	// implied by the key. For clients not up to date with the current settings schema.
-	UpdateSettingsRaw(ctx context.Context, in *UpdateSettingsRawRequest, opts ...grpc.CallOption) (*UpdateSettingsRawResponse, error)
 }
 
 type settingsServiceClient struct {
@@ -78,15 +70,6 @@ func (c *settingsServiceClient) GetSettingsForEdit(ctx context.Context, in *GetS
 	return out, nil
 }
 
-func (c *settingsServiceClient) GetSettingsForEditRaw(ctx context.Context, in *GetSettingsForEditRawRequest, opts ...grpc.CallOption) (*GetSettingsForEditRawResponse, error) {
-	out := new(GetSettingsForEditRawResponse)
-	err := c.cc.Invoke(ctx, SettingsService_GetSettingsForEditRaw_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *settingsServiceClient) CreateSettings(ctx context.Context, in *CreateSettingsRequest, opts ...grpc.CallOption) (*CreateSettingsResponse, error) {
 	out := new(CreateSettingsResponse)
 	err := c.cc.Invoke(ctx, SettingsService_CreateSettings_FullMethodName, in, out, opts...)
@@ -105,15 +88,6 @@ func (c *settingsServiceClient) UpdateSettings(ctx context.Context, in *UpdateSe
 	return out, nil
 }
 
-func (c *settingsServiceClient) UpdateSettingsRaw(ctx context.Context, in *UpdateSettingsRawRequest, opts ...grpc.CallOption) (*UpdateSettingsRawResponse, error) {
-	out := new(UpdateSettingsRawResponse)
-	err := c.cc.Invoke(ctx, SettingsService_UpdateSettingsRaw_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // SettingsServiceServer is the server API for SettingsService service.
 // All implementations should embed UnimplementedSettingsServiceServer
 // for forward compatibility
@@ -121,22 +95,16 @@ type SettingsServiceServer interface {
 	// GetSettings returns resolved effective settings at the scope implied by
 	// the key, incorporating inherited values from parent scopes.
 	GetSettings(context.Context, *GetSettingsRequest) (*GetSettingsResponse, error)
-	// GetSettingsForEdit returns unmerged settings at all scope levels with
-	// descriptions, for use in an edit form. One SettingsRecord per level,
-	// ordered broadest to most specific.
+	// GetSettingsForEdit returns unmerged settings at all scope levels,
+	// for use in an edit form. One SettingsRecord per level, ordered broadest
+	// to most specific.
 	GetSettingsForEdit(context.Context, *GetSettingsForEditRequest) (*GetSettingsForEditResponse, error)
-	// GetSettingsForEditRaw returns raw dot-notation settings maps at all scope
-	// levels, for clients not up to date with the current settings schema.
-	GetSettingsForEditRaw(context.Context, *GetSettingsForEditRawRequest) (*GetSettingsForEditRawResponse, error)
 	// CreateSettings creates a new settings record at the scope implied by the key.
 	// Fails if a record already exists at that scope.
 	CreateSettings(context.Context, *CreateSettingsRequest) (*CreateSettingsResponse, error)
 	// UpdateSettings upserts strongly-typed settings at the scope implied by
 	// the key. Uses optimistic locking via the version field.
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error)
-	// UpdateSettingsRaw upserts settings via a flat dot-notation map at the scope
-	// implied by the key. For clients not up to date with the current settings schema.
-	UpdateSettingsRaw(context.Context, *UpdateSettingsRawRequest) (*UpdateSettingsRawResponse, error)
 }
 
 // UnimplementedSettingsServiceServer should be embedded to have forward compatible implementations.
@@ -149,17 +117,11 @@ func (UnimplementedSettingsServiceServer) GetSettings(context.Context, *GetSetti
 func (UnimplementedSettingsServiceServer) GetSettingsForEdit(context.Context, *GetSettingsForEditRequest) (*GetSettingsForEditResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSettingsForEdit not implemented")
 }
-func (UnimplementedSettingsServiceServer) GetSettingsForEditRaw(context.Context, *GetSettingsForEditRawRequest) (*GetSettingsForEditRawResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSettingsForEditRaw not implemented")
-}
 func (UnimplementedSettingsServiceServer) CreateSettings(context.Context, *CreateSettingsRequest) (*CreateSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSettings not implemented")
 }
 func (UnimplementedSettingsServiceServer) UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSettings not implemented")
-}
-func (UnimplementedSettingsServiceServer) UpdateSettingsRaw(context.Context, *UpdateSettingsRawRequest) (*UpdateSettingsRawResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateSettingsRaw not implemented")
 }
 
 // UnsafeSettingsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -209,24 +171,6 @@ func _SettingsService_GetSettingsForEdit_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SettingsService_GetSettingsForEditRaw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSettingsForEditRawRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SettingsServiceServer).GetSettingsForEditRaw(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SettingsService_GetSettingsForEditRaw_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServiceServer).GetSettingsForEditRaw(ctx, req.(*GetSettingsForEditRawRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _SettingsService_CreateSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateSettingsRequest)
 	if err := dec(in); err != nil {
@@ -263,24 +207,6 @@ func _SettingsService_UpdateSettings_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SettingsService_UpdateSettingsRaw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateSettingsRawRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SettingsServiceServer).UpdateSettingsRaw(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SettingsService_UpdateSettingsRaw_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServiceServer).UpdateSettingsRaw(ctx, req.(*UpdateSettingsRawRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // SettingsService_ServiceDesc is the grpc.ServiceDesc for SettingsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -297,10 +223,6 @@ var SettingsService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SettingsService_GetSettingsForEdit_Handler,
 		},
 		{
-			MethodName: "GetSettingsForEditRaw",
-			Handler:    _SettingsService_GetSettingsForEditRaw_Handler,
-		},
-		{
 			MethodName: "CreateSettings",
 			Handler:    _SettingsService_CreateSettings_Handler,
 		},
@@ -308,11 +230,7 @@ var SettingsService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "UpdateSettings",
 			Handler:    _SettingsService_UpdateSettings_Handler,
 		},
-		{
-			MethodName: "UpdateSettingsRaw",
-			Handler:    _SettingsService_UpdateSettingsRaw_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "flyteidl2/org/settings_service.proto",
+	Metadata: "flyteidl2/settings/settings_service.proto",
 }
