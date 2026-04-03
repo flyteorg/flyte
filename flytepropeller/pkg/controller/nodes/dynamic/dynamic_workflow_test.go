@@ -604,3 +604,37 @@ func (e existsMetadata) Size() int64 {
 func (e existsMetadata) Etag() string {
 	return ""
 }
+func TestClearNodeInputs_WithCoreBindings(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("clear inputs for regular nodes with core bindings", func(t *testing.T) {
+		nodes := []*core.Node{
+			{Inputs: []*core.Binding{{Var: "input1"}}},
+			{Inputs: []*core.Binding{{Var: "input2"}}},
+		}
+		clearNodeInputs(ctx, nodes)
+		for _, node := range nodes {
+			assert.Nil(t, node.GetInputs())
+		}
+	})
+
+	t.Run("clear inputs for array nodes with core bindings", func(t *testing.T) {
+		nodes := []*core.Node{
+			{
+				Inputs: []*core.Binding{{Var: "input1"}},
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: &core.Node{Inputs: []*core.Binding{{Var: "input2"}}},
+					},
+				},
+			},
+		}
+		clearNodeInputs(ctx, nodes)
+		for _, node := range nodes {
+			assert.Nil(t, node.GetInputs())
+			if arrayNode, ok := node.GetTarget().(*core.Node_ArrayNode); ok {
+				assert.Nil(t, arrayNode.ArrayNode.GetNode().GetInputs())
+			}
+		}
+	})
+}
