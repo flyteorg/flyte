@@ -13,6 +13,7 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/ptr"
@@ -129,6 +130,72 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return rayjob, err
 }
 
+func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
+	var autoScalarOptions *rayv1.AutoscalerOptions
+	if options != nil {
+		autoScalarOptions = &rayv1.AutoscalerOptions{}
+		idleTimeoutTime := options.GetIdleTimeoutSeconds()
+		autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
+		if upscalingMode := options.GetUpscalingMode(); upscalingMode != plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED {
+			var mode rayv1.UpscalingMode
+			switch upscalingMode {
+			case plugins.AutoscalerOptions_UPSCALING_MODE_DEFAULT:
+				mode = rayv1.UpscalingMode("Default")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE:
+				mode = rayv1.UpscalingMode("Conservative")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_AGGRESSIVE:
+				mode = rayv1.UpscalingMode("Aggressive")
+			}
+			autoScalarOptions.UpscalingMode = &mode
+		}
+		if image := options.GetImage(); image != "" {
+			autoScalarOptions.Image = &image
+		}
+		if res := options.GetResources(); res != nil {
+			resourceRequirements := v1.ResourceRequirements{}
+			if requests := res.GetRequests(); len(requests) > 0 {
+				resourceRequirements.Requests = convertResourceEntriesToResourceList(requests)
+			}
+			if limits := res.GetLimits(); len(limits) > 0 {
+				resourceRequirements.Limits = convertResourceEntriesToResourceList(limits)
+			}
+			autoScalarOptions.Resources = &resourceRequirements
+		}
+		if envs := options.GetEnv(); len(envs) > 0 {
+			autoScalarOptions.Env = []v1.EnvVar{}
+			for _, env := range envs {
+				name := env.GetKey()
+				if val := env.GetValue(); val != "" {
+					autoScalarOptions.Env = append(autoScalarOptions.Env, v1.EnvVar{
+						Name:  name,
+						Value: val,
+					})
+				}
+			}
+		}
+	}
+	return autoScalarOptions
+}
+
+func convertResourceEntriesToResourceList(entries []*core.Resources_ResourceEntry) v1.ResourceList {
+	resourceList := v1.ResourceList{}
+	for _, entry := range entries {
+		var name v1.ResourceName
+		switch entry.GetName() {
+		case core.Resources_CPU:
+			name = v1.ResourceCPU
+		case core.Resources_MEMORY:
+			name = v1.ResourceMemory
+		default:
+			continue
+		}
+		if q, err := resource.ParseQuantity(entry.GetValue()); err == nil {
+			resourceList[name] = q
+		}
+	}
+	return resourceList
+}
+
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	cfg := GetConfig()
 
@@ -155,6 +222,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		},
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+		AutoscalerOptions:       buildAutoscalerOptions(rayJob.GetRayCluster().GetAutoscalerOptions()),
 	}
 
 	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {
