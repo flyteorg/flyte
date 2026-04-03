@@ -1,0 +1,1310 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: taskactions.flyte.org
+spec:
+  group: flyte.org
+  names:
+    kind: TaskAction
+    listKind: TaskActionList
+    plural: taskactions
+    singular: taskaction
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.runName
+      name: Run
+      type: string
+    - jsonPath: .spec.actionName
+      name: Action
+      type: string
+    - jsonPath: .spec.taskType
+      name: TaskType
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Progressing')].reason
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=='Progressing')].status
+      name: Progressing
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Succeeded')].status
+      name: Succeeded
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Failed')].status
+      name: Failed
+      priority: 1
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: TaskAction is the Schema for the taskactions API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec defines the desired state of TaskAction
+            properties:
+              actionName:
+                description: ActionName is the unique name of this action within the
+                  run
+                maxLength: 30
+                minLength: 1
+                type: string
+              cacheKey:
+                description: |-
+                  CacheKey enables cache lookup/writeback for this task action when set.
+                  This is propagated from workflow.TaskAction.cache_key.
+                maxLength: 256
+                type: string
+              domain:
+                description: Domain this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              envVars:
+                additionalProperties:
+                  type: string
+                description: EnvVars are run-scoped environment variables projected
+                  from RunSpec for executor runtime use.
+                type: object
+              group:
+                description: Group is the group this action belongs to, if applicable.
+                maxLength: 256
+                type: string
+              inputUri:
+                description: InputURI is the path to the input data for this action
+                minLength: 1
+                type: string
+              interruptible:
+                description: Interruptible is the run-scoped interruptibility override
+                  projected from RunSpec.
+                type: boolean
+              org:
+                description: Org this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              parentActionName:
+                description: ParentActionName is the optional name of the parent action
+                maxLength: 30
+                minLength: 1
+                type: string
+              project:
+                description: Project this action belongs to
+                maxLength: 63
+                minLength: 1
+                type: string
+              runName:
+                description: RunName is the name of the run this action belongs to
+                maxLength: 30
+                minLength: 1
+                type: string
+              runOutputBase:
+                description: RunOutputBase is the base path where this action should
+                  write its output
+                minLength: 1
+                type: string
+              shortName:
+                description: ShortName is the human-readable display name for this
+                  task
+                maxLength: 63
+                type: string
+              taskTemplate:
+                description: TaskTemplate is the proto-serialized core.TaskTemplate
+                  stored inline in etcd
+                format: byte
+                type: string
+              taskType:
+                description: TaskType identifies which plugin handles this task (e.g.
+                  "container", "spark", "ray")
+                maxLength: 63
+                minLength: 1
+                type: string
+            required:
+            - actionName
+            - domain
+            - inputUri
+            - org
+            - project
+            - runName
+            - runOutputBase
+            - taskTemplate
+            - taskType
+            type: object
+          status:
+            description: status defines the observed state of TaskAction
+            properties:
+              attempts:
+                description: Attempts is the latest observed action attempt number,
+                  starting from 1.
+                format: int32
+                type: integer
+              cacheStatus:
+                description: CacheStatus is the latest observed cache lookup result
+                  for this action.
+                format: int32
+                type: integer
+              conditions:
+                description: |-
+                  conditions represent the current state of the TaskAction resource.
+                  Each condition has a unique type and reflects the status of a specific aspect of the resource.
+
+                  Standard condition types include:
+                  - "Available": the resource is fully functional
+                  - "Progressing": the resource is being created or updated
+                  - "Degraded": the resource failed to reach or maintain its desired state
+
+                  The status of each condition is one of True, False, or Unknown.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              phaseHistory:
+                description: |-
+                  PhaseHistory is an append-only log of phase transitions. Unlike conditions
+                  (which are updated in-place by type), this preserves the full timeline:
+                  Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
+                items:
+                  description: PhaseTransition records a phase change with its timestamp.
+                  properties:
+                    message:
+                      description: Message is an optional human-readable message about
+                        the transition.
+                      type: string
+                    occurredAt:
+                      description: OccurredAt is when this phase transition happened.
+                      format: date-time
+                      type: string
+                    phase:
+                      description: Phase is the phase that was entered (e.g. "Queued",
+                        "Initializing", "Executing", "Succeeded", "Failed").
+                      type: string
+                  required:
+                  - occurredAt
+                  - phase
+                  type: object
+                type: array
+              pluginPhase:
+                description: PluginPhase is a human-readable representation of the
+                  plugin's current phase.
+                type: string
+              pluginPhaseVersion:
+                description: PluginPhaseVersion is the version of the current plugin
+                  phase.
+                format: int32
+                type: integer
+              pluginState:
+                description: PluginState is the Gob-encoded plugin state from the
+                  last reconciliation round.
+                format: byte
+                type: string
+              pluginStateVersion:
+                description: PluginStateVersion tracks the version of the plugin state
+                  schema for compatibility.
+                type: integer
+              stateJson:
+                description: StateJSON is the JSON serialized NodeStatus that was
+                  last sent to the State Service
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox
+  namespace: flyte
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+secrets:
+- name: flyte-sandbox-minio
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-cluster-role
+  namespace: flyte
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - flyte.org
+  resources:
+  - taskactions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-cluster-role-binding
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-sandbox-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: 5
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
+
+    actions:
+      kubernetes:
+        kubeconfig: ""
+        namespace: flyte
+      watchBufferSize: 100
+    dataproxy:
+      download:
+        maxExpiresIn: 1h
+      upload:
+        defaultFileNameLength: 20
+        maxExpiresIn: 1h
+        maxSize: 100Mi
+        storagePrefix: uploads
+    manager:
+      executor:
+        healthProbePort: 8081
+      kubernetes:
+        burst: 2000
+        kubeconfig: ""
+        namespace: flyte
+        qps: 1000
+        timeout: 30s
+      server:
+        host: 0.0.0.0
+        port: 8090
+    runs:
+      database:
+        connMaxLifeTime: 1h
+        maxIdleConnections: 10
+        maxOpenConnections: 100
+        postgres:
+          dbname: flyte
+          debug: false
+          host: 127.0.0.1
+          options: sslmode=disable
+          password: ""
+          port: 5432
+          username: postgres
+      server:
+        host: 0.0.0.0
+        port: 8090
+      storagePrefix: s3://flyte-data
+      watchBufferSize: 100
+    secret:
+      kubernetes:
+        burst: 200
+        clusterName: flyte-sandbox
+        kubeconfig: ""
+        namespace: flyte
+        qps: 100
+        timeout: 30s
+  001-plugins.yaml: |
+    tasks:
+      task-plugins:
+        default-for-task-types:
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - connector-service
+        - echo
+    plugins:
+      logs:
+        kubernetes-enabled: false
+        cloudwatch-enabled: false
+        stackdriver-enabled: false
+      k8s:
+        co-pilot:
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
+      k8s-array:
+        logs:
+          config:
+            kubernetes-enabled: false
+            cloudwatch-enabled: false
+            stackdriver-enabled: false
+  002-database.yaml: |
+    database:
+      sqlite:
+        file: "/var/lib/flyte/flyte.db"
+  003-storage.yaml: |
+    storage:
+      type: stow
+      stow:
+        kind: s3
+        config:
+          region: us-east-1
+          disable_ssl: true
+          v2_signing: true
+          endpoint: http://flyte-sandbox-minio.flyte:9000
+          auth_type: accesskey
+      container: flyte-data
+  100-inline-config.yaml: |
+    plugins:
+      k8s:
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+        - FLYTE_AWS_ACCESS_KEY_ID: minio
+        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
+        - _U_INSECURE: "true"
+        - _U_USE_ACTIONS: "1"
+    runs:
+      database:
+        postgres:
+          dbName: runs
+          host: 'flyte-sandbox-postgresql.flyte'
+          password: postgres
+          port: 5432
+          user: postgres
+    storage:
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
+    task_resources:
+      defaults:
+        cpu: 500m
+        ephemeralStorage: 0
+        gpu: 0
+        memory: 1Gi
+      limits:
+        cpu: 0
+        ephemeralStorage: 0
+        gpu: 0
+        memory: 0
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yml: |-
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+    http:
+      addr: :5000
+      debug:
+        addr: :5001
+        prometheus:
+          enabled: false
+          path: /metrics
+      headers:
+        X-Content-Type-Options:
+        - nosniff
+    log:
+      fields:
+        service: registry
+    storage:
+      cache:
+        blobdescriptor: inmemory
+    version: 0.1
+kind: ConfigMap
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry-config
+  namespace: flyte
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-sandbox-extra-cluster-resource-templates
+  namespace: flyte
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-sandbox-extra-config
+  namespace: flyte
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-config-secret
+  namespace: flyte
+stringData:
+  012-database-secrets.yaml: |
+    database:
+      postgres:
+        password: "postgres"
+  013-storage-secrets.yaml: |
+    storage:
+      stow:
+        config:
+          access_key_id: "minio"
+          secret_key: "miniostorage"
+type: Opaque
+---
+apiVersion: v1
+data:
+  haSharedSecret: Zmx5dGVzYW5kYm94c2VjcmV0
+  proxyPassword: ""
+  proxyUsername: ""
+kind: Secret
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry-secret
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+data:
+  root-password: bWluaW9zdG9yYWdl
+  root-user: bWluaW8=
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: flyte-sandbox-postgresql
+  namespace: flyte
+subsets:
+- addresses:
+  - ip: '%{NODE_IP}%'
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry
+  namespace: flyte
+spec:
+  ports:
+  - name: http-5000
+    nodePort: 30000
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: docker-registry
+    release: flyte-sandbox
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-http
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 8090
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: minio-api
+    nodePort: 30002
+    port: 9000
+    targetPort: minio-api
+  - name: minio-console
+    port: 9001
+    targetPort: minio-console
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: minio
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: flyte-sandbox-postgresql
+  namespace: flyte
+spec:
+  ports:
+  - name: tcp-postgresql
+    nodePort: 30001
+    port: 5432
+    targetPort: 5432
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /var/lib/flyte/storage/minio
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  volumeName: flyte-sandbox-minio-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-sandbox
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: flyte-binary
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configuration: 9e7747a143204b8a4db43d430408bd50a0a6238dfb085fd00d9c5fd40cc8241f
+        checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
+      labels:
+        app.kubernetes.io/component: flyte-binary
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - args:
+        - --config
+        - /etc/flyte/config.d/*.yaml
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: flyte-binary-v2:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+        name: flyte
+        ports:
+        - containerPort: 8090
+          name: http
+        - containerPort: 9443
+          name: webhook
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /etc/flyte/config.d
+          name: config
+        - mountPath: /var/run/flyte/certs
+          name: webhook-certs
+          readOnly: false
+      initContainers:
+      - args:
+        - |
+          until nc -z flyte-sandbox-postgresql.flyte 5432; do
+            echo waiting for database
+            sleep 0.5
+          done
+        command:
+        - sh
+        - -ec
+        image: rancher/mirrored-library-busybox:1.34.1
+        imagePullPolicy: Never
+        name: wait-for-db
+      serviceAccountName: flyte-sandbox
+      volumes:
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: flyte-sandbox-config
+          - secret:
+              name: flyte-sandbox-config-secret
+          - configMap:
+              name: flyte-sandbox-extra-config
+      - emptyDir: {}
+        name: webhook-certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: console
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: console
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: console
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /v2
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-sandbox
+  name: flyte-sandbox-docker-registry
+  namespace: flyte
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-registry
+      release: flyte-sandbox
+  template:
+    metadata:
+      annotations:
+        checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
+        checksum/secret: 829c19e3c86dcb9b7d4c44e6a73463c6a6467d824200e87e2d7999f70dc0f5f9
+      labels:
+        app: docker-registry
+        release: flyte-sandbox
+    spec:
+      containers:
+      - command:
+        - /bin/registry
+        - serve
+        - /etc/docker/registry/config.yml
+        env:
+        - name: REGISTRY_HTTP_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: haSharedSecret
+              name: flyte-sandbox-docker-registry-secret
+        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+          value: /var/lib/registry
+        image: registry:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        name: docker-registry
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/docker/registry
+          name: flyte-sandbox-docker-registry-config
+        - mountPath: /var/lib/registry/
+          name: data
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      volumes:
+      - configMap:
+          name: flyte-sandbox-docker-registry-config
+        name: flyte-sandbox-docker-registry-config
+      - emptyDir: {}
+        name: data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/credentials-secret: ecce809e3af19025d134846a9a81e163dd41df7e26abf2c6657895d9d13607a9
+      labels:
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: minio
+        helm.sh/chart: minio-12.6.7
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: flyte-sandbox
+                  app.kubernetes.io/name: minio
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
+        env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: MINIO_SCHEME
+          value: http
+        - name: MINIO_FORCE_NEW_KEYS
+          value: "no"
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: root-user
+              name: flyte-sandbox-minio
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: root-password
+              name: flyte-sandbox-minio
+        - name: MINIO_DEFAULT_BUCKETS
+          value: flyte-data
+        - name: MINIO_BROWSER
+          value: "on"
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: public
+        - name: MINIO_CONSOLE_PORT_NUMBER
+          value: "9001"
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: http://localhost:30080/minio
+        image: docker.io/bitnami/minio:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /minio/health/live
+            port: minio-api
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: minio-api
+          protocol: TCP
+        - containerPort: 9001
+          name: minio-console
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: minio-api
+          timeoutSeconds: 1
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      initContainers:
+      - command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
+        image: docker.io/bitnami/os-shell:sandbox
+        imagePullPolicy: Never
+        name: volume-permissions
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: flyte-sandbox-minio
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: flyte-sandbox-minio-storage
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |
+    service:
+      type: NodePort
+    ports:
+      web:
+        nodePort: 30080
+        transport:
+          respondingTimeouts:
+            readTimeout: 0
+      websecure:
+        expose: false
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-api
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /healthz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /readyz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /flyteidl2.
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-console
+            port:
+              number: 80
+        path: /v2
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-minio
+            port:
+              number: 9001
+        path: /minio
+        pathType: Prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: strip-minio
+  namespace: flyte
+spec:
+  stripPrefix:
+    prefixes:
+    - /minio

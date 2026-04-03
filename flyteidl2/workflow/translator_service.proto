@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "flyteidl2/core/interface.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/task_definition.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// TranslatorService provides an interface for all diferent types of translations for the platform.
+service TranslatorService {
+  rpc LiteralsToLaunchFormJson(LiteralsToLaunchFormJsonRequest) returns (LiteralsToLaunchFormJsonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc LaunchFormJsonToLiterals(LaunchFormJsonToLiteralsRequest) returns (LaunchFormJsonToLiteralsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc TaskSpecToLaunchFormJson(TaskSpecToLaunchFormJsonRequest) returns (TaskSpecToLaunchFormJsonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc JsonValuesToLiterals(JsonValuesToLiteralsRequest) returns (JsonValuesToLiteralsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message LiteralsToLaunchFormJsonRequest {
+  // The literals to convert to JSON.
+  repeated task.NamedLiteral literals = 1;
+  flyteidl2.core.VariableMap variables = 2;
+}
+
+message LiteralsToLaunchFormJsonResponse {
+  // The JSON for the literals.
+  google.protobuf.Struct json = 1;
+}
+
+message LaunchFormJsonToLiteralsRequest {
+  // The JSON schema to convert to literals.
+  google.protobuf.Struct json = 1;
+}
+
+message LaunchFormJsonToLiteralsResponse {
+  // The literals generated from the JSON schema.
+  repeated task.NamedLiteral literals = 1;
+}
+
+message TaskSpecToLaunchFormJsonRequest {
+  // The task spec to convert to JSON.
+  // Merges the VariableMap and the default inputs
+  flyteidl2.task.TaskSpec task_spec = 1;
+}
+
+message TaskSpecToLaunchFormJsonResponse {
+  // The JSON for the variables.
+  google.protobuf.Struct json = 1;
+}
+
+message JsonValuesToLiteralsRequest {
+  // The type definitions (VariableMap) describing the expected structure.
+  flyteidl2.core.VariableMap variables = 1;
+  // The raw JSON values to convert to literals.
+  google.protobuf.Struct values = 2;
+}
+
+message JsonValuesToLiteralsResponse {
+  // The literals generated from the JSON values using the type definitions.
+  repeated task.NamedLiteral literals = 1;
+}

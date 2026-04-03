@@ -1,0 +1,25 @@
+version: v2
+name: buf.build/flyteorg/flyte
+deps:
+  - buf.build/googleapis/googleapis:62f35d8aed1149c291d606d958a7ce32
+  - buf.build/bufbuild/protovalidate:v0.14.1
+  - buf.build/grpc-ecosystem/grpc-gateway
+lint:
+  except:
+    - PACKAGE_VERSION_SUFFIX
+    - FIELD_LOWER_SNAKE_CASE
+    - ENUM_VALUE_PREFIX
+    - ENUM_ZERO_VALUE_SUFFIX
+  ignore_only:
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - flyteidl2/cacheservice/cacheservice.proto
+      - flyteidl2/cacheservice/v2/cacheservice.proto
+      - flyteidl2/project/project_service.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - flyteidl2/cacheservice/cacheservice.proto
+      - flyteidl2/cacheservice/v2/cacheservice.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - flyteidl2/cacheservice/cacheservice.proto
+      - flyteidl2/cacheservice/v2/cacheservice.proto
+    SERVICE_SUFFIX:
+      - flyteidl2/datacatalog/datacatalog.proto

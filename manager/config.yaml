@@ -1,0 +1,86 @@
+# Unified Flyte Manager Configuration
+
+manager:
+  # Single server port for all Connect services (Runs, State, Queue, DataProxy)
+  server:
+    host: "0.0.0.0"
+    port: 8090
+
+  executor:
+    healthProbePort: 8081
+
+  kubernetes:
+    namespace: "flyte"
+    kubeconfig: "~/.kube/config"
+
+
+# Webhook configuration
+# localCert: true writes the generated TLS cert to disk so the webhook server can read it.
+webhook:
+  localCert: true
+  certDir: /tmp/flyte/webhook/certs
+  serviceName: flyte-sandbox-local
+  servicePort: 9443
+
+# Executor configuration
+executor:
+  gc:
+    interval: 1h
+    maxTTL: 24h
+
+# Runs service configuration
+runs:
+  storagePrefix: "s3://flyte-data"
+  database:
+    postgres:
+      host: "localhost"
+      port: 30001
+      dbName: "runs"
+      username: "postgres"
+      password: "postgres"
+      options: "sslmode=disable"
+
+# Logger configuration
+logger:
+  level: 5  # Info level
+  show-source: true
+
+# Data Proxy Configuration
+dataproxy:
+  upload:
+    maxSize: "100Mi"
+    maxExpiresIn: 1h
+    defaultFileNameLength: 20
+    storagePrefix: "uploads"
+  download:
+    maxExpiresIn: 1h
+
+# Default env vars injected into task pods by the executor.
+# flyte-host is injected into the kind node's /etc/hosts by `make cluster-create`,
+# pointing to the host machine's gateway IP so pods can reach host services.
+plugins:
+  k8s:
+    default-env-vars:
+      - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+      - _U_EP_OVERRIDE: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
+      - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
+
+# Storage Configuration
+# For local development, using RustFS (run: bash start-rustfs.sh)
+# You can also use "mem" type for in-memory storage during testing
+storage:
+  type: minio
+  container: "flyte-data"
+  enable-multicontainer: false
+  stow:
+    kind: "s3"
+    config:
+      auth_type: "accesskey"
+      access_key_id: "minio"
+      secret_key: "miniostorage"
+      region: "us-east-1"
+      endpoint: "http://localhost:30002"
+      disable_ssl: "true"
