@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
+from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -55,14 +56,20 @@ class CreateUploadLocationResponse(_message.Message):
     def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UploadInputsRequest(_message.Message):
-    __slots__ = ["run_id", "project_id", "inputs"]
+    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    TASK_SPEC_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
     project_id: _identifier_pb2.ProjectIdentifier
+    task_id: _task_definition_pb2.TaskIdentifier
+    task_spec: _task_definition_pb2.TaskSpec
+    trigger_name: _identifier_pb2.TriggerName
     inputs: _common_pb2.Inputs
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ...) -> None: ...
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ...) -> None: ...
 
 class UploadInputsResponse(_message.Message):
     __slots__ = ["offloaded_input_data"]
