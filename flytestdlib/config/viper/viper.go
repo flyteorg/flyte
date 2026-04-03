@@ -6,16 +6,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	viperLib "github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -182,17 +184,21 @@ func sliceToMapHook(f reflect.Kind, t reflect.Kind, data interface{}) (interface
 	// Only handle slice -> map conversion
 	if f == reflect.Slice && t == reflect.Map {
 		// this will be the target result
-		res := map[interface{}]interface{}{}
+		res := map[string]interface{}{}
 		// It's safe to convert data into a slice since we did the type assertion above.
 		asSlice := data.([]interface{})
 		for _, item := range asSlice {
-			asMap, casted := item.(map[interface{}]interface{})
-			if !casted {
+			switch m := item.(type) {
+			case map[string]interface{}:
+				for key, value := range m {
+					res[key] = value
+				}
+			case map[interface{}]interface{}:
+				for key, value := range m {
+					res[fmt.Sprintf("%v", key)] = value
+				}
+			default:
 				return data, nil
-			}
-
-			for key, value := range asMap {
-				res[key] = value
 			}
 		}
 
@@ -261,7 +267,61 @@ func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, er
 // Parses RootType config from parsed Viper settings. This should be called after viper has parsed config file/pflags...etc.
 func (v viperAccessor) parseViperConfig(root config.Section) error {
 	// We use AllSettings instead of AllKeys to get the root level keys folded.
-	return v.parseViperConfigRecursive(root, v.viper.AllSettings())
+	settings := v.viper.AllSettings()
+
+	// Viper v1.21+ recursively lowercases all map keys, including those inside
+	// arrays. This breaks the array-based workaround for case-sensitive map keys
+	// (see: https://github.com/spf13/viper#does-viper-support-case-sensitive-keys).
+	// Re-read config files directly to restore case-sensitive keys within arrays.
+	for _, configFile := range v.viper.ConfigFilesUsed() {
+		if configFile == "" {
+			continue
+		}
+
+		data, err := os.ReadFile(configFile)
+		if err != nil {
+			return fmt.Errorf("failed to read config file %q for case-sensitive key restoration: %w", configFile, err)
+		}
+
+		var rawSettings map[string]interface{}
+		if err := yaml.Unmarshal(data, &rawSettings); err != nil {
+			return fmt.Errorf("failed to parse config file %q for case-sensitive key restoration: %w", configFile, err)
+		}
+
+		restoreCaseSensitiveArrayKeys(settings, rawSettings)
+	}
+
+	return v.parseViperConfigRecursive(root, settings)
+}
+
+// restoreCaseSensitiveArrayKeys walks viperData and rawData in parallel.
+// When an array value is found in viperData, it is replaced with the
+// corresponding value from rawData to preserve the original key casing.
+func restoreCaseSensitiveArrayKeys(viperData, rawData map[string]interface{}) {
+	for lowerKey, viperVal := range viperData {
+		// Find matching key in rawData (case-insensitive match)
+		var rawVal interface{}
+		for rawKey, rv := range rawData {
+			if strings.EqualFold(rawKey, lowerKey) {
+				rawVal = rv
+				break
+			}
+		}
+
+		if rawVal == nil {
+			continue
+		}
+
+		switch viperVal.(type) {
+		case []interface{}:
+			// Replace the lowercased array with the case-preserved original
+			viperData[lowerKey] = rawVal
+		case map[string]interface{}:
+			if rawMap, ok := rawVal.(map[string]interface{}); ok {
+				restoreCaseSensitiveArrayKeys(viperVal.(map[string]interface{}), rawMap)
+			}
+		}
+	}
 }
 
 func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings interface{}) error {
