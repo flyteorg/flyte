@@ -5,6 +5,7 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -97,13 +98,19 @@ message CreateRunRequest {
   }
 
   // Inputs to use.
-  task.Inputs inputs = 4;
+  oneof input_wrapper {
+    task.Inputs inputs = 4;
+
+    common.OffloadedInputData offloaded_input_data = 9;
+  }
 
   // The run spec to use.
   task.RunSpec run_spec = 5;
 
   // Indicates client that created this run.
   RunSource source = 8;
+
+  // Next field number: 10
 }
 
 // Response message for creating a run.

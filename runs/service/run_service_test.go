@@ -1239,9 +1239,11 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 				Name:    "rctx-123",
 			},
 		},
-		Inputs: &task.Inputs{
-			Context: []*core.KeyValuePair{
-				{Key: "trace_id", Value: "root-abc"},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{
+			&task.Inputs{
+				Context: []*core.KeyValuePair{
+					{Key: "trace_id", Value: "root-abc"},
+				},
 			},
 		},
 		RunSpec: &task.RunSpec{
