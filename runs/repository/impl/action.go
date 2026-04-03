@@ -384,48 +384,8 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	return &event, nil
 }
 
-// CreateAction creates a new action
-func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
-	// Serialize action spec
-	actionSpecBytes, err := proto.Marshal(actionSpec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
-	}
-
-	// Determine parent action name
-	var parentActionName string
-	if actionSpec.ParentActionName != nil {
-		parentActionName = *actionSpec.ParentActionName
-	}
-
-	// Extract metadata columns from action spec
-	meta := extractActionMetadata(actionSpec)
-
-	action := &models.Action{
-		Org:              actionSpec.ActionId.Run.Org,
-		Project:          actionSpec.ActionId.Run.Project,
-		Domain:           actionSpec.ActionId.Run.Domain,
-		RunName:          actionSpec.ActionId.Run.Name,
-		Name:             actionSpec.ActionId.Name,
-		ParentActionName: newNullString(parentActionName),
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:       meta.ActionType,
-		ActionGroup:      newNullString(actionSpec.GetGroup()),
-		TaskOrg:          meta.TaskOrg,
-		TaskProject:      meta.TaskProject,
-		TaskDomain:       meta.TaskDomain,
-		TaskName:         meta.TaskName,
-		TaskVersion:      meta.TaskVersion,
-		TaskType:         meta.TaskType,
-		TaskShortName:    meta.TaskShortName,
-		FunctionName:     meta.FunctionName,
-		EnvironmentName:  meta.EnvironmentName,
-		ActionSpec:       actionSpecBytes,
-		ActionDetails:    []byte("{}"), // Empty details initially
-		DetailedInfo:     detailedInfo,
-		Attempts:         1,
-	}
-
+// CreateAction inserts an Action model into the database.
+func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
 	result := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true}).
 		Create(action)
@@ -433,9 +393,19 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 		return nil, fmt.Errorf("failed to create action: %w", result.Error)
 	}
 
+	actionID := &common.ActionIdentifier{
+		Name: action.Name,
+		Run: &common.RunIdentifier{
+			Org:     action.Org,
+			Project: action.Project,
+			Domain:  action.Domain,
+			Name:    action.RunName,
+		},
+	}
+
 	// If no rows were affected, the action already exists — fetch and return it.
 	if result.RowsAffected == 0 {
-		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+		existing, err := r.GetAction(ctx, actionID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get existing action: %w", err)
 		}
@@ -445,7 +415,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
 
 	// Notify subscribers of action creation
-	r.notifyActionUpdate(ctx, actionSpec.ActionId)
+	r.notifyActionUpdate(ctx, actionID)
 
 	return action, nil
 }
@@ -478,14 +448,16 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
 			runID.Org, runID.Project, runID.Domain, runID.Name)
 
-	// Apply pagination token
+	// Apply pagination token (encoded as RFC3339Nano created_at cursor)
 	if token != "" {
-		query = query.Where("id > ?", token)
+		if t, err := time.Parse(time.RFC3339Nano, token); err == nil {
+			query = query.Where("created_at > ?", t)
+		}
 	}
 
 	var actions []*models.Action
 	result := query.
-		Order("id ASC").
+		Order("created_at ASC").
 		Limit(limit + 1).
 		Find(&actions)
 
@@ -497,7 +469,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	var nextToken string
 	if len(actions) > limit {
 		actions = actions[:limit]
-		nextToken = fmt.Sprintf("%d", actions[len(actions)-1].ID)
+		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
 	}
 
 	return actions, nextToken, nil
