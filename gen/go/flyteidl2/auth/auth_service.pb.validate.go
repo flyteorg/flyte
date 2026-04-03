@@ -384,6 +384,8 @@ func (m *GetPublicClientConfigResponse) validate(all bool) error {
 
 	// no validation rules for Audience
 
+	// no validation rules for DataplaneDomain
+
 	if len(errors) > 0 {
 		return GetPublicClientConfigResponseMultiError(errors)
 	}

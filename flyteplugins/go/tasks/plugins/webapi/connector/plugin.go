@@ -331,18 +331,17 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
+		var literalMap *flyteIdl.LiteralMap
 		if resource.Outputs != nil {
-			var literalMap *flyteIdl.LiteralMap
 			literalMap = &flyteIdl.LiteralMap{Literals: make(map[string]*flyteIdl.Literal)}
 			for _, val := range resource.Outputs.Literals {
 				literalMap.Literals[val.Name] = val.Value
 			}
-			// TODO: Add support writing outputs proto.
-			err = writeOutput(ctx, taskCtx, literalMap)
-			if err != nil {
-				logger.Errorf(ctx, "failed to write output with err %s", err.Error())
-				return core.PhaseInfoUndefined, err
-			}
+		}
+		err = writeOutput(ctx, taskCtx, literalMap)
+		if err != nil {
+			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
+			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:

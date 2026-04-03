@@ -13,11 +13,11 @@ import (
 type Action struct {
 	ID uint `gorm:"primaryKey" db:"id"`
 
-	// Action Identifier (unique across org/project/domain/name)
-	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org" db:"org"`
-	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project" db:"project"`
-	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain" db:"domain"`
-	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:4;index:idx_actions_run_name" db:"run_name"`
+	// Action Identifier (unique across org/project/domain/run_name/name)
+	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_run_lookup,priority:1" db:"org"`
+	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_run_lookup,priority:2" db:"project"`
+	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_run_lookup,priority:3" db:"domain"`
+	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:4;index:idx_actions_run_lookup,priority:4" db:"run_name"`
 	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:5" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
@@ -74,9 +74,9 @@ type Action struct {
 	// Timestamps
 	// CreatedAt is set by the DB (NOW()) on insert — represents when the action was queued.
 	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
-	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP" db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt     sql.NullTime            `gorm:"index:idx_actions_ended" db:"ended_at"`
+	EndedAt     sql.NullTime            `db:"ended_at"`
 	DurationMs  sql.NullInt64           `db:"duration_ms"`
 	Attempts    uint32                  `db:"attempts" json:"attempts,omitempty"`
 	CacheStatus core.CatalogCacheStatus `db:"cache_status" json:"cache_status,omitempty"`

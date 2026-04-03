@@ -58,6 +58,9 @@ func (r *Registry) Initialize(ctx context.Context) error {
 			entry.Plugin,
 			r.setupCtx.KubeClient(),
 		)
+		if err := pm.InitializeObjectEventWatcher(ctx); err != nil {
+			return fmt.Errorf("failed to initialize k8s object event watcher for plugin %s: %w", entry.ID, err)
+		}
 
 		for _, taskType := range entry.RegisteredTaskTypes {
 			if existing, ok := r.plugins[taskType]; ok {

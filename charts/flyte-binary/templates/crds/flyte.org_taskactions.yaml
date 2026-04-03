@@ -90,6 +90,10 @@ spec:
                 description: EnvVars are run-scoped environment variables projected
                   from RunSpec for executor runtime use.
                 type: object
+              group:
+                description: Group is the group this action belongs to, if applicable.
+                maxLength: 256
+                type: string
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1

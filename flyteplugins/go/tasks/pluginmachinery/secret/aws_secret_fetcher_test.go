@@ -34,7 +34,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 	t.Run("get secret successful", func(t *testing.T) {
 		SetupTest()
 		awsSecretsFetcher := NewAWSSecretFetcher(config.AWSConfig{}, awsClient)
-		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
+		awsClient.EXPECT().GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
 			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(&secretsmanager.GetSecretValueOutput{
@@ -49,7 +49,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 		SetupTest()
 		awsSecretsFetcher := NewAWSSecretFetcher(config.AWSConfig{}, awsClient)
 		cause := &types.ResourceNotFoundException{}
-		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
+		awsClient.EXPECT().GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
 			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(nil, cause)
@@ -62,7 +62,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 		SetupTest()
 		awsSecretsFetcher := NewAWSSecretFetcher(config.AWSConfig{}, awsClient)
 		cause := fmt.Errorf("some error")
-		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
+		awsClient.EXPECT().GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
 			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(nil, cause)

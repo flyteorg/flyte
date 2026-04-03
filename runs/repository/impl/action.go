@@ -344,6 +344,28 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 	return events, nil
 }
 
+// ListEventsSince lists action events for a given action identifier updated at or after the provided checkpoint.
+func (r *actionRepo) ListEventsSince(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	attempt uint32,
+	since time.Time,
+	offset, limit int,
+) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
+	result := r.db.WithContext(ctx).
+		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ? AND updated_at > ?",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt, since).
+		Order("updated_at ASC, attempt ASC, phase ASC, version ASC").
+		Offset(offset).
+		Limit(limit).
+		Find(&events)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to list action events since %s: %w", since.Format(time.RFC3339Nano), result.Error)
+	}
+	return events, nil
+}
+
 // GetLatestEventByAttempt returns the most recent event for a given attempt,
 // ordered by version descending, without deserializing all events.
 func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
@@ -816,8 +838,8 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 	}
 }
 
-// WatchActionUpdates watches for action updates
-func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
+// WatchAllActionUpdates watches for all action updates for a run
+func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
 		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
@@ -900,8 +922,8 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 				// Query actions updated since last check
 				var actions []*models.Action
 				if err := r.db.WithContext(ctx).
-					Where("org = ? AND project = ? AND domain = ? AND updated_at > ?",
-						runID.Org, runID.Project, runID.Domain, lastCheck).
+					Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND updated_at > ?",
+						runID.Org, runID.Project, runID.Domain, runID.Name, lastCheck).
 					Find(&actions).Error; err != nil {
 					errs <- err
 					return
@@ -909,6 +931,98 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 
 				for _, action := range actions {
 					updates <- action
+				}
+
+				lastCheck = time.Now()
+			}
+		}
+	}
+}
+
+// WatchActionUpdates watches the current action update
+func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	if r.isPostgres {
+		targetPayload := fmt.Sprintf("%s/%s/%s/%s/%s",
+			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+		notifCh := make(chan string, 100)
+
+		r.mu.Lock()
+		r.actionSubscribers[notifCh] = true
+		r.mu.Unlock()
+
+		defer func() {
+			r.mu.Lock()
+			delete(r.actionSubscribers, notifCh)
+			close(notifCh)
+			r.mu.Unlock()
+		}()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case notifPayload := <-notifCh:
+				if notifPayload != targetPayload {
+					continue
+				}
+
+			drain:
+				for {
+					// Prevent continuous update from the action
+					select {
+					case extra := <-notifCh:
+						if extra != targetPayload {
+							continue
+						}
+					default:
+						break drain
+					}
+				}
+
+				action, err := r.GetAction(ctx, actionID)
+				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
+					logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+					continue
+				}
+
+				select {
+				case updates <- action:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	} else {
+		ticker := time.NewTicker(250 * time.Millisecond)
+		defer ticker.Stop()
+
+		lastCheck := time.Now()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				action, err := r.GetAction(ctx, actionID)
+				if err != nil {
+					if ctx.Err() != nil {
+						return
+					}
+					errs <- err
+					return
+				}
+
+				if action.UpdatedAt.After(lastCheck) {
+					select {
+					case updates <- action:
+					case <-ctx.Done():
+						return
+					}
+					lastCheck = action.UpdatedAt
+					continue
 				}
 
 				lastCheck = time.Now()

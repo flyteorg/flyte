@@ -159,6 +159,11 @@ type TaskActionSpec struct {
 	// Interruptible is the run-scoped interruptibility override projected from RunSpec.
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
+
+	// Group is the group this action belongs to, if applicable.
+	// +optional
+	// +kubebuilder:validation:MaxLength=256
+	Group string `json:"group,omitempty"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
@@ -176,6 +181,7 @@ func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
 		ParentActionName: in.ParentActionName,
 		InputUri:         in.InputURI,
 		RunOutputBase:    in.RunOutputBase,
+		Group:            in.Group,
 	}
 
 	return spec, nil
@@ -195,6 +201,7 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	in.ParentActionName = spec.ParentActionName
 	in.InputURI = spec.InputUri
 	in.RunOutputBase = spec.RunOutputBase
+	in.Group = spec.Group
 
 	return nil
 }

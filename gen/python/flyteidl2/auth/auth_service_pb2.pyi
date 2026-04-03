@@ -38,17 +38,19 @@ class GetPublicClientConfigRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetPublicClientConfigResponse(_message.Message):
-    __slots__ = ["client_id", "redirect_uri", "scopes", "authorization_metadata_key", "service_http_endpoint", "audience"]
+    __slots__ = ["client_id", "redirect_uri", "scopes", "authorization_metadata_key", "service_http_endpoint", "audience", "dataplane_domain"]
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     REDIRECT_URI_FIELD_NUMBER: _ClassVar[int]
     SCOPES_FIELD_NUMBER: _ClassVar[int]
     AUTHORIZATION_METADATA_KEY_FIELD_NUMBER: _ClassVar[int]
     SERVICE_HTTP_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    DATAPLANE_DOMAIN_FIELD_NUMBER: _ClassVar[int]
     client_id: str
     redirect_uri: str
     scopes: _containers.RepeatedScalarFieldContainer[str]
     authorization_metadata_key: str
     service_http_endpoint: str
     audience: str
-    def __init__(self, client_id: _Optional[str] = ..., redirect_uri: _Optional[str] = ..., scopes: _Optional[_Iterable[str]] = ..., authorization_metadata_key: _Optional[str] = ..., service_http_endpoint: _Optional[str] = ..., audience: _Optional[str] = ...) -> None: ...
+    dataplane_domain: str
+    def __init__(self, client_id: _Optional[str] = ..., redirect_uri: _Optional[str] = ..., scopes: _Optional[_Iterable[str]] = ..., authorization_metadata_key: _Optional[str] = ..., service_http_endpoint: _Optional[str] = ..., audience: _Optional[str] = ..., dataplane_domain: _Optional[str] = ...) -> None: ...

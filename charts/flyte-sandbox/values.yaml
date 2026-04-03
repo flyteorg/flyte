@@ -32,11 +32,6 @@ flyte-binary:
           secretKey: miniostorage
     logging:
       level: 5
-      plugins:
-        kubernetes:
-          enabled: true
-          templateUri: |-
-            http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
       task_resources:
         defaults:
@@ -109,22 +104,6 @@ flyte-binary:
         verbs:
         - '*'
 
-kubernetes-dashboard:
-  enabled: true
-  image:
-    tag: sandbox
-    pullPolicy: Never
-  extraArgs:
-    - --enable-insecure-login
-    - --enable-skip-login
-  protocolHttp: true
-  service:
-    externalPort: 80
-  rbac:
-    create: true
-    clusterRoleMetrics: false
-    clusterReadOnlyRole: true
-
 minio:
   enabled: true
   image:
@@ -182,16 +161,4 @@ sandbox:
     image:
       repository: ghcr.io/flyteorg/flyte-client-v2
       tag: latest
-      pullPolicy: Never
-  buildkit:
-    enabled: true
-    image:
-      repository: moby/buildkit
-      tag: sandbox
-      pullPolicy: Never
-  proxy:
-    enabled: true
-    image:
-      repository: envoyproxy/envoy
-      tag: sandbox
       pullPolicy: Never

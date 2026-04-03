@@ -160,6 +160,60 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
+func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { _ = db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	require.NoError(t, err)
+
+	runID := &common.RunIdentifier{
+		Org:     "org1",
+		Project: "proj1",
+		Domain:  "domain1",
+		Name:    "run1",
+	}
+	targetActionID := &common.ActionIdentifier{Run: runID, Name: "target"}
+	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
+
+	ctx := context.Background()
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: targetActionID}, nil)
+	require.NoError(t, err)
+	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: otherActionID}, nil)
+	require.NoError(t, err)
+
+	watchCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	updates := make(chan *models.Action, 2)
+	errs := make(chan error, 1)
+	go actionRepo.WatchActionUpdates(watchCtx, targetActionID, updates, errs)
+
+	time.Sleep(1100 * time.Millisecond)
+
+	err = actionRepo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	select {
+	case action := <-updates:
+		t.Fatalf("unexpected update for action %s", action.Name)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(1200 * time.Millisecond):
+	}
+
+	err = actionRepo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	select {
+	case action := <-updates:
+		require.Equal(t, targetActionID.Name, action.Name)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for target action update")
+	}
+}
+
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { _ = db.Exec("DELETE FROM actions") }()

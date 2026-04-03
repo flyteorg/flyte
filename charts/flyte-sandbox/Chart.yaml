@@ -32,10 +32,6 @@ dependencies:
     version: v0.2.0
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
-  - name: kubernetes-dashboard
-    version: 6.0.0
-    repository: https://kubernetes-retired.github.io/dashboard/
-    condition: kubernetes-dashboard.enabled
   - name: minio
     version: 12.6.7
     repository: https://charts.bitnami.com/bitnami

@@ -24,6 +24,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -283,6 +284,36 @@ var _ = Describe("TaskAction Controller", func() {
 				},
 			}
 			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+	})
+
+	Context("toClusterEvents", func() {
+		It("should include both phase reason and additional reasons", func() {
+			phaseOccurredAt := time.Date(2026, 4, 2, 10, 0, 0, 0, time.UTC)
+			eventOccurredAt := phaseOccurredAt.Add(2 * time.Minute)
+			fallbackTime := metav1.NewTime(phaseOccurredAt.Add(5 * time.Minute))
+
+			phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+				phaseOccurredAt,
+				pluginsCore.DefaultPhaseVersion,
+				"cluster is creating",
+				&pluginsCore.TaskInfo{
+					OccurredAt: &phaseOccurredAt,
+					AdditionalReasons: []pluginsCore.ReasonInfo{
+						{
+							Reason:     "Head pod pending",
+							OccurredAt: &eventOccurredAt,
+						},
+					},
+				},
+			)
+
+			events := toClusterEvents(phaseInfo, timestamppb.New(fallbackTime.Time))
+			Expect(events).To(HaveLen(2))
+			Expect(events[0].GetMessage()).To(Equal("cluster is creating"))
+			Expect(events[0].GetOccurredAt().AsTime()).To(Equal(phaseOccurredAt))
+			Expect(events[1].GetMessage()).To(Equal("Head pod pending"))
+			Expect(events[1].GetOccurredAt().AsTime()).To(Equal(eventOccurredAt))
 		})
 	})
 })
