@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -61,7 +62,17 @@ func (s *RunService) recordAction(ctx context.Context, req *workflow.RecordActio
 func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.RecordActionRequest) error {
 	actionID := req.GetActionId()
 
-	// Build an ActionSpec from the RecordActionRequest to persist via CreateAction.
+	// Build the base action model with fields common to all action types.
+	action := models.NewActionModel(actionID)
+	if req.GetParent() != "" {
+		action.ParentActionName = sql.NullString{String: req.GetParent(), Valid: true}
+	}
+
+	action.ActionGroup = sql.NullString{String: req.GetGroup(), Valid: req.GetGroup() != ""}
+	action.ActionDetails = []byte("{}")
+	action.Attempts = 1
+
+	// Build the ActionSpec proto (stored as bytes for later deserialization).
 	spec := &workflow.ActionSpec{
 		ActionId: actionID,
 		InputUri: req.GetInputUri(),
@@ -72,21 +83,37 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		spec.ParentActionName = &parent
 	}
 
-	// Build RunInfo with task spec digest and storage URIs
+	// Build RunInfo for storage URIs and task spec digest.
 	info := &workflow.RunInfo{
 		InputsUri: req.GetInputUri(),
 	}
-
-	logger.Infof(ctx, "RecordAction: action=%s parent=%s taskId=%v taskSpec=%v",
-		actionID.GetName(), req.GetParent(), req.GetTask().GetId(), req.GetTask().GetSpec() != nil)
 
 	switch v := req.GetSpec().(type) {
 	case *workflow.RecordActionRequest_Task:
 		taskAction := v.Task
 		spec.Spec = &workflow.ActionSpec_Task{Task: taskAction}
 
-		// Store task spec separately and record its digest
+		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
+
+		taskID := taskAction.GetId()
+		if taskID != nil {
+			action.TaskOrg = sql.NullString{String: taskID.GetOrg(), Valid: taskID.GetOrg() != ""}
+			action.TaskProject = sql.NullString{String: taskID.GetProject(), Valid: taskID.GetProject() != ""}
+			action.TaskDomain = sql.NullString{String: taskID.GetDomain(), Valid: taskID.GetDomain() != ""}
+			action.TaskName = sql.NullString{String: taskID.GetName(), Valid: taskID.GetName() != ""}
+			action.TaskVersion = sql.NullString{String: taskID.GetVersion(), Valid: taskID.GetVersion() != ""}
+			action.FunctionName = taskID.GetName()
+			action.TaskShortName = sql.NullString{String: taskID.GetName(), Valid: taskID.GetName() != ""}
+		}
 		if taskSpec := taskAction.GetSpec(); taskSpec != nil {
+			action.TaskType = taskSpec.GetTaskTemplate().GetType()
+			if taskSpec.GetShortName() != "" {
+				action.TaskShortName = sql.NullString{String: taskSpec.GetShortName(), Valid: true}
+			}
+			if env := taskSpec.GetEnvironment(); env != nil && env.GetName() != "" {
+				action.EnvironmentName = sql.NullString{String: env.GetName(), Valid: true}
+			}
+
 			taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
 			if err != nil {
 				logger.Warnf(ctx, "RecordAction: failed to create task spec model: %v", err)
@@ -103,7 +130,21 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 	case *workflow.RecordActionRequest_Trace:
 		spec.Spec = &workflow.ActionSpec_Trace{Trace: v.Trace}
 
-		// Store trace spec separately and record its digest
+		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
+		action.TaskName = sql.NullString{String: v.Trace.GetName(), Valid: v.Trace.GetName() != ""}
+		action.FunctionName = v.Trace.GetName()
+		action.Phase = int32(v.Trace.GetPhase())
+
+		// Use the trace's start_time as created_at so that parent traces
+		// (which start earlier but are written to DB later) sort before their
+		// children when ordered by created_at ASC.
+		if st := v.Trace.GetStartTime(); st != nil {
+			action.CreatedAt = st.AsTime()
+		}
+		if et := v.Trace.GetEndTime(); et != nil {
+			action.EndedAt = sql.NullTime{Time: et.AsTime(), Valid: true}
+		}
+
 		if traceSpec := v.Trace.GetSpec(); traceSpec != nil {
 			traceSpecModel, err := models.NewTaskSpecModelFromTraceSpec(ctx, traceSpec)
 			if err != nil {
@@ -124,14 +165,23 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
 	}
 
+	// Marshal ActionSpec proto into bytes for storage.
+	actionSpecBytes, err := proto.Marshal(spec)
+	if err != nil {
+		logger.Warnf(ctx, "RecordAction: failed to marshal action spec: %v", err)
+		return connect.NewError(connect.CodeInternal, err)
+	}
+	action.ActionSpec = actionSpecBytes
+
+	// Marshal RunInfo proto into bytes for storage.
 	detailedInfo, err := proto.Marshal(info)
 	if err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	action.DetailedInfo = detailedInfo
 
-	_, err = s.repo.ActionRepo().CreateAction(ctx, spec, detailedInfo)
-	if err != nil {
+	if _, err := s.repo.ActionRepo().CreateAction(ctx, action); err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -121,6 +122,17 @@ func (a *Action) GetRunName() string {
 		return a.Name
 	}
 	return ""
+}
+
+func NewActionModel(actionID *common.ActionIdentifier) *Action {
+	return &Action{
+		Org:     actionID.GetRun().GetOrg(),
+		Project: actionID.GetRun().GetProject(),
+		Domain:  actionID.GetRun().GetDomain(),
+		RunName: actionID.GetRun().GetName(),
+		Name:    actionID.GetName(),
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}
 }
 
 // Run is a type alias for Action (runs are just actions with ParentActionName == nil)

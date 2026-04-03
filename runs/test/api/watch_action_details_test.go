@@ -138,7 +138,7 @@ func TestWatchActionDetails_StreamedUpdateIncludesErrorInfo(t *testing.T) {
 		ActionId: actionID,
 		Status: &workflow.ActionStatus{
 			Phase:    common.ActionPhase_ACTION_PHASE_FAILED,
-			Attempts: 0,
+			Attempts: 1,
 		},
 	}))
 	require.NoError(t, err)

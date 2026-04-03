@@ -138,10 +138,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	endTime := time.Now()
@@ -180,10 +177,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to FAILED (terminal state)
@@ -227,10 +221,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		Name: "action-no-backward",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to RUNNING
@@ -268,10 +259,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		Name: "action-no-backward-succeeded",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to SUCCEEDED (terminal, non-retryable)

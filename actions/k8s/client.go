@@ -90,77 +90,122 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 	isRoot := action.ParentActionName == nil || *action.ParentActionName == ""
 
-	taskActionName := buildTaskActionName(actionID)
-	namespace := buildNamespace(actionID.Run)
-	if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
-		return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
-	}
-	taskAction := &executorv1.TaskAction{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      taskActionName,
-			Namespace: namespace,
-			Labels: map[string]string{
-				"flyte.org/org":         actionID.Run.Org,
-				"flyte.org/project":     actionID.Run.Project,
-				"flyte.org/domain":      actionID.Run.Domain,
-				"flyte.org/run":         actionID.Run.Name,
-				"flyte.org/action":      actionID.Name,
-				"flyte.org/action-type": "task", // TODO: derive from action.Spec
-				"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+	switch action.Spec.(type) {
+	case *actions.Action_Task:
+		taskActionName := buildTaskActionName(actionID)
+		namespace := buildNamespace(actionID.Run)
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
+		}
+		taskAction := &executorv1.TaskAction{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      taskActionName,
+				Namespace: namespace,
+				Labels: map[string]string{
+					"flyte.org/org":         actionID.Run.Org,
+					"flyte.org/project":     actionID.Run.Project,
+					"flyte.org/domain":      actionID.Run.Domain,
+					"flyte.org/run":         actionID.Run.Name,
+					"flyte.org/action":      actionID.Name,
+					"flyte.org/action-type": "task", // TODO: derive from action.Spec
+					"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+				},
 			},
-		},
-		Spec: executorv1.TaskActionSpec{},
-	}
-	var parentTaskAction *executorv1.TaskAction
-
-	// Set OwnerReference to parent so K8s cascades deletion to children.
-	if !isRoot {
-		parentID := &common.ActionIdentifier{
-			Run:  actionID.Run,
-			Name: *action.ParentActionName,
+			Spec: executorv1.TaskActionSpec{},
 		}
-		parentName := buildTaskActionName(parentID)
+		var parentTaskAction *executorv1.TaskAction
 
-		parent := &executorv1.TaskAction{}
-		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
-			return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+		// Set OwnerReference to parent so K8s cascades deletion to children.
+		if !isRoot {
+			parentID := &common.ActionIdentifier{
+				Run:  actionID.Run,
+				Name: *action.ParentActionName,
+			}
+			parentName := buildTaskActionName(parentID)
+
+			parent := &executorv1.TaskAction{}
+			if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
+				return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+			}
+			parentTaskAction = parent
+
+			blockOwnerDeletion := true
+			taskAction.OwnerReferences = []metav1.OwnerReference{
+				{
+					APIVersion:         "flyte.org/v1",
+					Kind:               "TaskAction",
+					Name:               parent.Name,
+					UID:                parent.UID,
+					BlockOwnerDeletion: &blockOwnerDeletion,
+				},
+			}
+			// For child actions, inherit parent's run context
+			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
+		} else {
+			// For root action, apply the RunSpec to TaskAction
+			applyRunSpecToTaskAction(taskAction, runSpec)
 		}
-		parentTaskAction = parent
 
-		blockOwnerDeletion := true
-		taskAction.OwnerReferences = []metav1.OwnerReference{
-			{
-				APIVersion:         "flyte.org/v1",
-				Kind:               "TaskAction",
-				Name:               parent.Name,
-				UID:                parent.UID,
-				BlockOwnerDeletion: &blockOwnerDeletion,
+		// Build and set the ActionSpec for the executor.
+		actionSpec := buildActionSpec(action, runSpec)
+		if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
+			return fmt.Errorf("failed to set action spec: %w", err)
+		}
+		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
+
+		// Embed the inline TaskTemplate if present.
+		if err := embedTaskTemplate(action, taskAction); err != nil {
+			return fmt.Errorf("failed to embed task template: %w", err)
+		}
+
+		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
+		}
+
+		logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
+	case *actions.Action_Trace:
+		// For trace action, we only need to record result in RunService as it is already computed in SDK runtime
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: actionID,
+			Parent:   action.GetParentActionName(),
+			InputUri: action.GetInputUri(),
+			Group:    action.GetGroup(),
+			Subject:  action.GetSubject(),
+			Spec: &workflow.RecordActionRequest_Trace{
+				Trace: action.GetTrace(),
 			},
 		}
-		// For child actions, inherit parent's run context
-		inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
-	} else {
-		// For root action, apply the RunSpec to TaskAction
-		applyRunSpecToTaskAction(taskAction, runSpec)
+		_, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
+		if err != nil {
+			return err
+		}
+
+		// Trace actions complete immediately (they carry precomputed SDK results).
+		// No TaskAction CR is created, so no K8s watch event will fire and
+		// notifySubscribers will never be called through the normal path.
+		// Mark the action as SUCCEEDED in the run service and push the update
+		// directly to any parent waiting in WatchForUpdates, otherwise the
+		// parent blocks indefinitely.
+		statusReq := &workflow.UpdateActionStatusRequest{
+			ActionId: actionID,
+			Status: &workflow.ActionStatus{
+				Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			},
+		}
+		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+			logger.Warnf(ctx, "Failed to mark trace action %s as succeeded: %v", actionID.Name, err)
+		}
+
+		// Notify SDK runtime informer
+		c.notifySubscribers(ctx, &ActionUpdate{
+			ActionID:         actionID,
+			ParentActionName: action.GetParentActionName(),
+			Phase:            common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			OutputUri:        action.GetTrace().GetOutputs().GetOutputUri(),
+			TaskType:         "trace",
+		})
 	}
 
-	// Build and set the ActionSpec for the executor.
-	actionSpec := buildActionSpec(action, runSpec)
-	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
-		return fmt.Errorf("failed to set action spec: %w", err)
-	}
-	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
-
-	// Embed the inline TaskTemplate if present.
-	if err := embedTaskTemplate(action, taskAction); err != nil {
-		return fmt.Errorf("failed to embed task template: %w", err)
-	}
-
-	if err := c.k8sClient.Create(ctx, taskAction); err != nil {
-		return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
-	}
-
-	logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
 	return nil
 }
 
@@ -534,7 +579,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				},
+			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
