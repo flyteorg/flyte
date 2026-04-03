@@ -1136,9 +1136,9 @@ func TestGetTaskPhaseFailedRetryable(t *testing.T) {
 	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-	assert.Contains(t, phaseInfo.Err().Message, "test-ray-job")
-	assert.Contains(t, phaseInfo.Err().Message, "OOMKilled")
-	assert.Contains(t, phaseInfo.Err().Message, "head node ran out of memory")
+	assert.Contains(t, phaseInfo.Err().GetMessage(), "test-ray-job")
+	assert.Contains(t, phaseInfo.Err().GetMessage(), "OOMKilled")
+	assert.Contains(t, phaseInfo.Err().GetMessage(), "head node ran out of memory")
 }
 
 func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
