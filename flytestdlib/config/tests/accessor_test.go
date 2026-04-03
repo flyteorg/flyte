@@ -462,6 +462,12 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler k8s configmaps", provider(config.Options{}).ID()), func(t *testing.T) {
+			// Skip on macOS/Darwin as fsnotify doesn't reliably detect symlink changes
+			// This is a known limitation: https://github.com/fsnotify/fsnotify/issues/372
+			if runtime.GOOS == "darwin" {
+				t.Skip("Skipping on macOS: fsnotify doesn't reliably detect symlink changes on Darwin systems")
+			}
+
 			reg := config.NewRootSection()
 			section, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
 			assert.NoError(t, err)
