@@ -458,6 +458,133 @@ func (m *UploadInputsRequest) validate(all bool) error {
 	default:
 		_ = v // ensures v is used
 	}
+	switch v := m.Task.(type) {
+	case *UploadInputsRequest_TaskId:
+		if v == nil {
+			err := UploadInputsRequestValidationError{
+				field:  "Task",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTaskId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TaskId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TaskId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadInputsRequestValidationError{
+					field:  "TaskId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UploadInputsRequest_TaskSpec:
+		if v == nil {
+			err := UploadInputsRequestValidationError{
+				field:  "Task",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTaskSpec()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TaskSpec",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TaskSpec",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTaskSpec()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadInputsRequestValidationError{
+					field:  "TaskSpec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UploadInputsRequest_TriggerName:
+		if v == nil {
+			err := UploadInputsRequestValidationError{
+				field:  "Task",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTriggerName()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadInputsRequestValidationError{
+						field:  "TriggerName",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTriggerName()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadInputsRequestValidationError{
+					field:  "TriggerName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
 		return UploadInputsRequestMultiError(errors)
