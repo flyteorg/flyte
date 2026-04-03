@@ -35,6 +35,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/google/go-github/v42/github"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -234,13 +235,26 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 	}
 }
 
-func hydrateNode(node *core.Node, version string, force bool) error {
+func hydrateNode(node *core.Node, version string, force bool, sourceUploadedLocation storage.DataReference, destinationDir string) error {
 	targetNode := node.GetTarget()
 	switch v := targetNode.(type) {
 	case *core.Node_TaskNode:
 		taskNodeWrapper := targetNode.(*core.Node_TaskNode)
 		taskNodeReference := taskNodeWrapper.TaskNode.GetReference().(*core.TaskNode_ReferenceId)
 		hydrateIdentifier(taskNodeReference.ReferenceId, version, force)
+		// Substitute fast-registration templates in TaskNodeOverrides pod_template.
+		// When .with_overrides(pod_template=...) is used in a workflow, flytekit embeds
+		// the task container args (including {{ .remote_package_path }}) into the workflow
+		// proto's TaskNodeOverrides. flytectl must substitute them here, just as it does
+		// for task specs, otherwise the pod entrypoint will have an unresolved template.
+		overrides := taskNodeWrapper.TaskNode.GetOverrides()
+		if overrides != nil && overrides.GetPodTemplate() != nil && overrides.GetPodTemplate().GetPodSpec() != nil {
+			podSpecStruct, err := hydrateFastRegistrationArgs(overrides.GetPodTemplate().GetPodSpec(), sourceUploadedLocation, destinationDir)
+			if err != nil {
+				return err
+			}
+			overrides.PodTemplate.PodSpec = podSpecStruct
+		}
 	case *core.Node_WorkflowNode:
 		workflowNodeWrapper := targetNode.(*core.Node_WorkflowNode)
 		switch workflowNodeWrapper.WorkflowNode.GetReference().(type) {
@@ -255,12 +269,12 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 		}
 	case *core.Node_BranchNode:
 		branchNodeWrapper := targetNode.(*core.Node_BranchNode)
-		if err := hydrateNode(branchNodeWrapper.BranchNode.GetIfElse().GetCase().GetThenNode(), version, force); err != nil {
+		if err := hydrateNode(branchNodeWrapper.BranchNode.GetIfElse().GetCase().GetThenNode(), version, force, sourceUploadedLocation, destinationDir); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
 		if len(branchNodeWrapper.BranchNode.GetIfElse().GetOther()) > 0 {
 			for _, ifBlock := range branchNodeWrapper.BranchNode.GetIfElse().GetOther() {
-				if err := hydrateNode(ifBlock.GetThenNode(), version, force); err != nil {
+				if err := hydrateNode(ifBlock.GetThenNode(), version, force, sourceUploadedLocation, destinationDir); err != nil {
 					return fmt.Errorf("failed to hydrateNode")
 				}
 			}
@@ -268,7 +282,7 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 		switch branchNodeWrapper.BranchNode.GetIfElse().GetDefault().(type) {
 		case *core.IfElseBlock_ElseNode:
 			elseNodeReference := branchNodeWrapper.BranchNode.GetIfElse().GetDefault().(*core.IfElseBlock_ElseNode)
-			if err := hydrateNode(elseNodeReference.ElseNode, version, force); err != nil {
+			if err := hydrateNode(elseNodeReference.ElseNode, version, force, sourceUploadedLocation, destinationDir); err != nil {
 				return fmt.Errorf("failed to hydrateNode")
 			}
 
@@ -280,7 +294,7 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 	case *core.Node_GateNode:
 		// Do nothing.
 	case *core.Node_ArrayNode:
-		if err := hydrateNode(v.ArrayNode.GetNode(), version, force); err != nil {
+		if err := hydrateNode(v.ArrayNode.GetNode(), version, force, sourceUploadedLocation, destinationDir); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
 	default:
@@ -301,6 +315,29 @@ func hydrateIdentifier(identifier *core.Identifier, version string, force bool) 
 	}
 }
 
+// hydrateFastRegistrationArgs substitutes fast-registration template placeholders
+// in a serialized k8s PodSpec struct, returning the updated struct.
+func hydrateFastRegistrationArgs(podSpecStruct *structpb.Struct, sourceUploadedLocation storage.DataReference, destinationDir string) (*structpb.Struct, error) {
+	var podSpec v1.PodSpec
+	if err := utils.UnmarshalStructToObj(podSpecStruct, &podSpec); err != nil {
+		return nil, err
+	}
+	for containerIdx, container := range podSpec.Containers {
+		for argIdx, arg := range container.Args {
+			if arg == registrationRemotePackagePattern {
+				podSpec.Containers[containerIdx].Args[argIdx] = sourceUploadedLocation.String()
+			}
+			if arg == registrationDestDirPattern {
+				podSpec.Containers[containerIdx].Args[argIdx] = "."
+				if len(destinationDir) > 0 {
+					podSpec.Containers[containerIdx].Args[argIdx] = destinationDir
+				}
+			}
+		}
+	}
+	return utils.MarshalObjToStruct(podSpec)
+}
+
 func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataReference, destinationDir string) error {
 	if task.GetTemplate().GetContainer() != nil {
 		for k := range task.GetTemplate().GetContainer().GetArgs() {
@@ -315,25 +352,7 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataRe
 			}
 		}
 	} else if task.GetTemplate().GetK8SPod() != nil && task.GetTemplate().GetK8SPod().GetPodSpec() != nil {
-		var podSpec = v1.PodSpec{}
-		err := utils.UnmarshalStructToObj(task.GetTemplate().GetK8SPod().GetPodSpec(), &podSpec)
-		if err != nil {
-			return err
-		}
-		for containerIdx, container := range podSpec.Containers {
-			for argIdx, arg := range container.Args {
-				if arg == registrationRemotePackagePattern {
-					podSpec.Containers[containerIdx].Args[argIdx] = sourceUploadedLocation.String()
-				}
-				if arg == registrationDestDirPattern {
-					podSpec.Containers[containerIdx].Args[argIdx] = "."
-					if len(destinationDir) > 0 {
-						podSpec.Containers[containerIdx].Args[argIdx] = destinationDir
-					}
-				}
-			}
-		}
-		podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+		podSpecStruct, err := hydrateFastRegistrationArgs(task.GetTemplate().GetK8SPod().GetPodSpec(), sourceUploadedLocation, destinationDir)
 		if err != nil {
 			return err
 		}
@@ -483,24 +502,24 @@ func hydrateSpec(message proto.Message, uploadLocation storage.DataReference, co
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		for _, Noderef := range workflowSpec.GetTemplate().GetNodes() {
-			if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
+			if err := hydrateNode(Noderef, config.Version, config.Force, uploadLocation, config.DestinationDirectory); err != nil {
 				return err
 			}
 		}
 		if workflowSpec.GetTemplate().GetFailureNode() != nil {
-			if err := hydrateNode(workflowSpec.GetTemplate().GetFailureNode(), config.Version, config.Force); err != nil {
+			if err := hydrateNode(workflowSpec.GetTemplate().GetFailureNode(), config.Version, config.Force, uploadLocation, config.DestinationDirectory); err != nil {
 				return err
 			}
 		}
 		hydrateIdentifier(workflowSpec.GetTemplate().GetId(), config.Version, config.Force)
 		for _, subWorkflow := range workflowSpec.GetSubWorkflows() {
 			for _, Noderef := range subWorkflow.GetNodes() {
-				if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
+				if err := hydrateNode(Noderef, config.Version, config.Force, uploadLocation, config.DestinationDirectory); err != nil {
 					return err
 				}
 			}
 			if subWorkflow.GetFailureNode() != nil {
-				if err := hydrateNode(subWorkflow.GetFailureNode(), config.Version, config.Force); err != nil {
+				if err := hydrateNode(subWorkflow.GetFailureNode(), config.Version, config.Force, uploadLocation, config.DestinationDirectory); err != nil {
 					return err
 				}
 			}
