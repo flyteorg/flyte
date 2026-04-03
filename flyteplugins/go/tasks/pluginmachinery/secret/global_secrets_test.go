@@ -17,10 +17,10 @@ import (
 
 func TestGlobalSecrets_Inject(t *testing.T) {
 	secretFound := &mocks.GlobalSecretProvider{}
-	secretFound.OnGetForSecretMatch(mock.Anything, mock.Anything).Return("my_password", nil)
+	secretFound.EXPECT().GetForSecret(mock.Anything, mock.Anything).Return("my_password", nil)
 
 	secretNotFound := &mocks.GlobalSecretProvider{}
-	secretNotFound.OnGetForSecretMatch(mock.Anything, mock.Anything).Return("", fmt.Errorf("secret not found"))
+	secretNotFound.EXPECT().GetForSecret(mock.Anything, mock.Anything).Return("", fmt.Errorf("secret not found"))
 
 	inputPod := corev1.Pod{
 		Spec: corev1.PodSpec{
