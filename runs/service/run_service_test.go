@@ -1425,3 +1425,71 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	// Verify ReadProtobuf was only called once (for inputs, not outputs)
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
 }
+
+func TestCreateRun_WithOffloadedInputData(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	offloadedURI := "s3://test-bucket/uploads/testorg/testproject/development/offloaded-inputs/somehash"
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "testorg",
+				Project: "testproject",
+				Domain:  "development",
+				Name:    "rtest-offloaded",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+		InputWrapper: &workflow.CreateRunRequest_OffloadedInputData{
+			OffloadedInputData: &common.OffloadedInputData{
+				Uri:        offloadedURI,
+				InputsHash: "testhash123",
+			},
+		},
+	}
+
+	expectedRun := &models.Run{
+		Org:     "testorg",
+		Project: "testproject",
+		Domain:  "development",
+		RunName: "rtest-offloaded",
+		Name:    "a0",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}
+
+	// No ReadProtobuf or WriteProtobuf expected — offloaded inputs are used directly.
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.MatchedBy(func(inputPrefix string) bool {
+		return inputPrefix == offloadedURI
+	}), mock.AnythingOfType("string")).Return(expectedRun, nil).Once()
+	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.Action.InputUri == offloadedURI
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+
+	run := resp.Msg.Run
+	assert.Equal(t, "testorg", run.Action.Id.Run.Org)
+	assert.Equal(t, "testproject", run.Action.Id.Run.Project)
+	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
+
+	store.AssertExpectations(t)
+	store.AssertNumberOfCalls(t, "ReadProtobuf", 0)
+	store.AssertNumberOfCalls(t, "WriteProtobuf", 0)
+}

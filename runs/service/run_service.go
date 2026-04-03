@@ -157,7 +157,6 @@ func (s *RunService) CreateRun(
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
 	var err error
-	inputs := request.GetInputs()
 	runSpec := request.GetRunSpec()
 	// TODO: Add trigger
 	switch request.GetTask().(type) {
@@ -177,7 +176,6 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
-	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
@@ -185,21 +183,40 @@ func (s *RunService) CreateRun(
 		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 	}
 
-	// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
-	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
-		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-	}
-	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
-
 	cacheKey := ""
-	// Generate cache key for the root action if its task is discoverable
-	// Executor determines if an action is cacheable on the setting of the cache key
-	if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
-		cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputs)
-		if err != nil {
-			logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+	switch iw := request.GetInputWrapper().(type) {
+	case *workflow.CreateRunRequest_OffloadedInputData:
+		// Inputs are already persisted by UploadInputs. Use the offloaded URI directly.
+		inputPrefix = iw.OffloadedInputData.GetUri()
+
+		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
+			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), iw.OffloadedInputData.GetInputsHash())
+			if err != nil {
+				logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+			}
+		}
+	default:
+		inputs := request.GetInputs()
+		inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
+
+		// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
+		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
+			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+		}
+		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+
+		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
+			inputsHash, hashErr := computeFilteredInputsHash(taskSpec.GetTaskTemplate(), inputs)
+			if hashErr != nil {
+				logger.Warnf(ctx, "Failed to hash inputs for root action %v: %v", actionID, hashErr)
+			} else {
+				cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputsHash)
+				if err != nil {
+					logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+				}
+			}
 		}
 	}
 

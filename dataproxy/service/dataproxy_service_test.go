@@ -17,7 +17,10 @@ import (
 	flyteconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
 
 func TestCreateUploadLocation(t *testing.T) {
@@ -94,7 +97,7 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -215,7 +218,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -293,7 +296,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -336,6 +339,150 @@ func setupMockDataStore(t *testing.T) *storage.DataStore {
 			URL:                    *testURL,
 			RequiredRequestHeaders: map[string]string{"Content-Type": "application/octet-stream"},
 		}, nil).Maybe()
+
+	return &storage.DataStore{
+		ComposedProtobufStore: mockComposedStore,
+		ReferenceConstructor:  &simpleRefConstructor{},
+	}
+}
+
+func TestUploadInputs(t *testing.T) {
+	ctx := context.Background()
+
+	cfg := config.DataProxyConfig{
+		Upload: config.DataProxyUploadConfig{
+			StoragePrefix: "uploads",
+		},
+	}
+
+	testTaskSpec := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Id:       &core.Identifier{Name: "test-task"},
+			Metadata: &core.TaskMetadata{},
+		},
+	}
+
+	testTaskSpecWithIgnoredVars := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Id: &core.Identifier{Name: "test-task"},
+			Metadata: &core.TaskMetadata{
+				CacheIgnoreInputVars: []string{"y"},
+			},
+		},
+	}
+
+	tests := []struct {
+		name           string
+		req            *dataproxy.UploadInputsRequest
+		wantErr        bool
+		errCode        connect.Code
+		validateResult func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse])
+	}{
+		{
+			name: "success with run_id and task_spec",
+			req: &dataproxy.UploadInputsRequest{
+				Id: &dataproxy.UploadInputsRequest_RunId{
+					RunId: &common.RunIdentifier{
+						Org:     "test-org",
+						Project: "test-project",
+						Domain:  "test-domain",
+						Name:    "test-run",
+					},
+				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Inputs: &task.Inputs{
+					Literals: []*task.NamedLiteral{
+						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
+					},
+				},
+			},
+			wantErr: false,
+			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
+				assert.NotNil(t, resp.Msg.OffloadedInputData)
+				assert.NotEmpty(t, resp.Msg.OffloadedInputData.Uri)
+				assert.NotEmpty(t, resp.Msg.OffloadedInputData.InputsHash)
+				assert.Contains(t, resp.Msg.OffloadedInputData.Uri, "uploads/test-org/test-project/test-domain/offloaded-inputs/")
+			},
+		},
+		{
+			name: "success with project_id",
+			req: &dataproxy.UploadInputsRequest{
+				Id: &dataproxy.UploadInputsRequest_ProjectId{
+					ProjectId: &common.ProjectIdentifier{
+						Organization: "test-org",
+						Name:         "test-project",
+						Domain:       "test-domain",
+					},
+				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Inputs: &task.Inputs{
+					Literals: []*task.NamedLiteral{
+						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}},
+					},
+				},
+			},
+			wantErr: false,
+			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
+				assert.NotNil(t, resp.Msg.OffloadedInputData)
+				assert.Contains(t, resp.Msg.OffloadedInputData.Uri, "uploads/test-org/test-project/test-domain/offloaded-inputs/")
+			},
+		},
+		{
+			name: "cache_ignore_input_vars excludes inputs from hash",
+			req: &dataproxy.UploadInputsRequest{
+				Id: &dataproxy.UploadInputsRequest_RunId{
+					RunId: &common.RunIdentifier{
+						Org: "org", Project: "proj", Domain: "dom", Name: "run1",
+					},
+				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
+				Inputs: &task.Inputs{
+					Literals: []*task.NamedLiteral{
+						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
+						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 2}}}}}}},
+					},
+				},
+			},
+			wantErr: false,
+			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
+				assert.NotEmpty(t, resp.Msg.OffloadedInputData.InputsHash)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockStore := setupMockDataStoreWithWriteProtobuf(t)
+			svc := NewService(cfg, mockStore, nil, nil)
+
+			req := &connect.Request[dataproxy.UploadInputsRequest]{
+				Msg: tt.req,
+			}
+
+			resp, err := svc.UploadInputs(ctx, req)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				if tt.errCode != 0 {
+					assert.Equal(t, tt.errCode, connect.CodeOf(err))
+				}
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, resp)
+				if tt.validateResult != nil {
+					tt.validateResult(t, resp)
+				}
+			}
+		})
+	}
+}
+
+func setupMockDataStoreWithWriteProtobuf(t *testing.T) *storage.DataStore {
+	mockComposedStore := storageMocks.NewComposedProtobufStore(t)
+
+	mockComposedStore.On("GetBaseContainerFQN", mock.Anything).Return(storage.DataReference("s3://test-bucket")).Maybe()
+	mockComposedStore.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 
 	return &storage.DataStore{
 		ComposedProtobufStore: mockComposedStore,
