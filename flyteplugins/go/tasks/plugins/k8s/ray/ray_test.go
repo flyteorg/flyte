@@ -1088,6 +1088,59 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}
 }
 
+func TestBuildResourceRayMissingPrimaryContainer(t *testing.T) {
+	// When the pod spec has no container matching the primary container name,
+	// BuildResource should return an error.
+	rayJobResourceHandler := rayJobResourceHandler{}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	rayJob := dummyRayCustomObj()
+	taskTemplate := &core.TaskTemplate{
+		Id:   &core.Identifier{Name: "ray-id"},
+		Type: "container",
+		Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:  "not-the-primary",
+					Image: testImage,
+				},
+			},
+		}),
+		Custom: transformRayJobToCustomObj(rayJob),
+		Config: map[string]string{
+			flytek8s.PrimaryContainerKey: "my-primary",
+		},
+	}
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	_, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "my-primary")
+}
+
+func TestGetTaskPhaseFailedRetryable(t *testing.T) {
+	// Verify that a failed Ray job returns a retryable failure with the
+	// reason and message from the RayJob status.
+	ctx := context.Background()
+	rayJobResourceHandler := rayJobResourceHandler{}
+	pluginCtx := newPluginContext(k8s.PluginState{})
+
+	rayObject := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-ray-job",
+		},
+	}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusFailed
+	rayObject.Status.Reason = "OOMKilled"
+	rayObject.Status.Message = "head node ran out of memory"
+
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+	assert.Contains(t, phaseInfo.Err().Message, "test-ray-job")
+	assert.Contains(t, phaseInfo.Err().Message, "OOMKilled")
+	assert.Contains(t, phaseInfo.Err().Message, "head node ran out of memory")
+}
+
 func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
 	plg := &mocks2.PluginContext{}
 
@@ -1155,7 +1208,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
 		{rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
 		{rayv1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
-		{rayv1.JobDeploymentStatusFailed, pluginsCore.PhasePermanentFailure, false},
+		{rayv1.JobDeploymentStatusFailed, pluginsCore.PhaseRetryableFailure, false},
 		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseQueued, false},
 		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
