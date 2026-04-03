@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"io"
 	"time"
 
@@ -133,7 +134,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
 		action.TaskName = sql.NullString{String: v.Trace.GetName(), Valid: v.Trace.GetName() != ""}
 		action.FunctionName = v.Trace.GetName()
-		action.Phase = int32(v.Trace.GetPhase())
+		action.Phase = int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED)
 
 		// Use the trace's start_time as created_at so that parent traces
 		// (which start earlier but are written to DB later) sort before their

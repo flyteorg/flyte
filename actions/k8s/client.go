@@ -195,22 +195,6 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return err
 		}
 
-		// Trace actions complete immediately (they carry precomputed SDK results).
-		// No TaskAction CR is created, so no K8s watch event will fire and
-		// notifySubscribers will never be called through the normal path.
-		// Mark the action as SUCCEEDED in the run service and push the update
-		// directly to any parent waiting in WatchForUpdates, otherwise the
-		// parent blocks indefinitely.
-		statusReq := &workflow.UpdateActionStatusRequest{
-			ActionId: actionID,
-			Status: &workflow.ActionStatus{
-				Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-			},
-		}
-		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
-			logger.Warnf(ctx, "Failed to mark trace action %s as succeeded: %v", actionID.Name, err)
-		}
-
 		// Notify SDK runtime informer
 		c.notifySubscribers(ctx, &ActionUpdate{
 			ActionID:         actionID,
