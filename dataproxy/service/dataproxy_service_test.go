@@ -97,7 +97,7 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -218,7 +218,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -296,7 +296,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -355,6 +355,22 @@ func TestUploadInputs(t *testing.T) {
 		},
 	}
 
+	testTaskSpec := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Id:       &core.Identifier{Name: "test-task"},
+			Metadata: &core.TaskMetadata{},
+		},
+	}
+
+	testTaskSpecWithIgnoredVars := &task.TaskSpec{
+		TaskTemplate: &core.TaskTemplate{
+			Id: &core.Identifier{Name: "test-task"},
+			Metadata: &core.TaskMetadata{
+				CacheIgnoreInputVars: []string{"y"},
+			},
+		},
+	}
+
 	tests := []struct {
 		name           string
 		req            *dataproxy.UploadInputsRequest
@@ -363,7 +379,7 @@ func TestUploadInputs(t *testing.T) {
 		validateResult func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse])
 	}{
 		{
-			name: "success with run_id",
+			name: "success with run_id and task_spec",
 			req: &dataproxy.UploadInputsRequest{
 				Id: &dataproxy.UploadInputsRequest_RunId{
 					RunId: &common.RunIdentifier{
@@ -373,6 +389,7 @@ func TestUploadInputs(t *testing.T) {
 						Name:    "test-run",
 					},
 				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
@@ -397,6 +414,7 @@ func TestUploadInputs(t *testing.T) {
 						Domain:       "test-domain",
 					},
 				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}},
@@ -410,22 +428,23 @@ func TestUploadInputs(t *testing.T) {
 			},
 		},
 		{
-			name: "deterministic hash - same inputs produce same hash",
+			name: "cache_ignore_input_vars excludes inputs from hash",
 			req: &dataproxy.UploadInputsRequest{
 				Id: &dataproxy.UploadInputsRequest_RunId{
 					RunId: &common.RunIdentifier{
 						Org: "org", Project: "proj", Domain: "dom", Name: "run1",
 					},
 				},
+				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
-						{Name: "a", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
+						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
+						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 2}}}}}}},
 					},
 				},
 			},
 			wantErr: false,
 			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
-				// Verify the hash is deterministic by computing it again with the same input
 				assert.NotEmpty(t, resp.Msg.OffloadedInputData.InputsHash)
 			},
 		},
@@ -434,13 +453,13 @@ func TestUploadInputs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStoreWithWriteProtobuf(t)
-			service := NewService(cfg, mockStore)
+			svc := NewService(cfg, mockStore, nil, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,
 			}
 
-			resp, err := service.UploadInputs(ctx, req)
+			resp, err := svc.UploadInputs(ctx, req)
 
 			if tt.wantErr {
 				assert.Error(t, err)

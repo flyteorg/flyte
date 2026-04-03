@@ -181,11 +181,15 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 			},
 		}
 
-		key1, err := generateCacheKeyForTask(tmpl, inputs)
+		hash1, err := computeFilteredInputsHash(tmpl, inputs)
+		require.NoError(t, err)
+		key1, err := generateCacheKeyForTask(tmpl, hash1)
 		require.NoError(t, err)
 		assert.NotEmpty(t, key1)
 
-		key2, err := generateCacheKeyForTask(tmpl, inputs)
+		hash2, err := computeFilteredInputsHash(tmpl, inputs)
+		require.NoError(t, err)
+		key2, err := generateCacheKeyForTask(tmpl, hash2)
 		require.NoError(t, err)
 		assert.Equal(t, key1, key2)
 	})
@@ -200,18 +204,22 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 			},
 		}
 
-		key1, err := generateCacheKeyForTask(tmpl, &task.Inputs{
+		hash1, err := computeFilteredInputsHash(tmpl, &task.Inputs{
 			Literals: []*task.NamedLiteral{
 				{Name: "x", Value: newStringLiteral("hello")},
 			},
 		})
 		require.NoError(t, err)
+		key1, err := generateCacheKeyForTask(tmpl, hash1)
+		require.NoError(t, err)
 
-		key2, err := generateCacheKeyForTask(tmpl, &task.Inputs{
+		hash2, err := computeFilteredInputsHash(tmpl, &task.Inputs{
 			Literals: []*task.NamedLiteral{
 				{Name: "x", Value: newStringLiteral("world")},
 			},
 		})
+		require.NoError(t, err)
+		key2, err := generateCacheKeyForTask(tmpl, hash2)
 		require.NoError(t, err)
 
 		assert.NotEqual(t, key1, key2)
@@ -234,7 +242,9 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 			},
 		}
 
-		keyWithIgnored, err := generateCacheKeyForTask(tmpl, inputs)
+		hashWithIgnored, err := computeFilteredInputsHash(tmpl, inputs)
+		require.NoError(t, err)
+		keyWithIgnored, err := generateCacheKeyForTask(tmpl, hashWithIgnored)
 		require.NoError(t, err)
 
 		// Same template without the ignored var should produce same key
@@ -243,7 +253,9 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 				{Name: "x", Value: newStringLiteral("hello")},
 			},
 		}
-		keyWithout, err := generateCacheKeyForTask(tmpl, inputsWithoutY)
+		hashWithout, err := computeFilteredInputsHash(tmpl, inputsWithoutY)
+		require.NoError(t, err)
+		keyWithout, err := generateCacheKeyForTask(tmpl, hashWithout)
 		require.NoError(t, err)
 
 		assert.Equal(t, keyWithIgnored, keyWithout)
@@ -258,7 +270,9 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 				DiscoveryVersion: "1.0",
 			},
 		}
-		key, err := generateCacheKeyForTask(tmpl, nil)
+		hash, err := computeFilteredInputsHash(tmpl, nil)
+		require.NoError(t, err)
+		key, err := generateCacheKeyForTask(tmpl, hash)
 		require.NoError(t, err)
 		assert.NotEmpty(t, key)
 	})

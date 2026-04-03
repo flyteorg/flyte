@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"hash/fnv"
+	"slices"
 	"strings"
 	"time"
 
@@ -20,22 +21,31 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 )
 
 type Service struct {
 	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
-	cfg       config.DataProxyConfig
-	dataStore *storage.DataStore
+	cfg           config.DataProxyConfig
+	dataStore     *storage.DataStore
+	taskClient    taskconnect.TaskServiceClient
+	triggerClient triggerconnect.TriggerServiceClient
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient) *Service {
 	return &Service{
-		cfg:       cfg,
-		dataStore: dataStore,
+		cfg:           cfg,
+		dataStore:     dataStore,
+		taskClient:    taskClient,
+		triggerClient: triggerClient,
 	}
 }
 
@@ -208,8 +218,17 @@ func (s *Service) UploadInputs(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("id is required"))
 	}
 
-	// Deterministically hash the inputs for content-addressable storage.
-	inputsHash, err := hashInputsProto(req.Msg.GetInputs())
+	// Resolve the task template to get cache_ignore_input_vars.
+	taskTemplate, err := s.resolveTaskTemplate(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter out cache-ignored inputs before hashing.
+	filteredInputs := filterInputs(req.Msg.GetInputs(), taskTemplate.GetMetadata().GetCacheIgnoreInputVars())
+
+	// Deterministically hash the filtered inputs for cache key computation.
+	inputsHash, err := hashInputsProto(filteredInputs)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to hash inputs: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to hash inputs: %w", err))
@@ -235,6 +254,7 @@ func (s *Service) UploadInputs(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
 	}
 
+	// Store all inputs (unfiltered) — the hash is over the filtered set for caching.
 	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, req.Msg.GetInputs()); err != nil {
 		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
@@ -248,6 +268,63 @@ func (s *Service) UploadInputs(
 			InputsHash: inputsHash,
 		},
 	}), nil
+}
+
+// resolveTaskTemplate resolves the task template from the request's task oneof.
+func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.UploadInputsRequest) (*flyteIdlCore.TaskTemplate, error) {
+	switch t := req.Task.(type) {
+	case *dataproxy.UploadInputsRequest_TaskSpec:
+		return t.TaskSpec.GetTaskTemplate(), nil
+	case *dataproxy.UploadInputsRequest_TaskId:
+		resp, err := s.taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
+			TaskId: t.TaskId,
+		}))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get task details for %v: %v", t.TaskId, err)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task: %w", err))
+		}
+		return resp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
+	case *dataproxy.UploadInputsRequest_TriggerName:
+		triggerResp, err := s.triggerClient.GetTriggerDetails(ctx, connect.NewRequest(&trigger.GetTriggerDetailsRequest{
+			Name: t.TriggerName,
+		}))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get trigger details for %v: %v", t.TriggerName, err)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get trigger: %w", err))
+		}
+		triggerDetails := triggerResp.Msg.GetTrigger()
+		taskID := &task.TaskIdentifier{
+			Org:     t.TriggerName.GetOrg(),
+			Project: t.TriggerName.GetProject(),
+			Domain:  t.TriggerName.GetDomain(),
+			Name:    t.TriggerName.GetTaskName(),
+			Version: triggerDetails.GetSpec().GetTaskVersion(),
+		}
+		taskResp, err := s.taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
+			TaskId: taskID,
+		}))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get task details for trigger %v: %v", t.TriggerName, err)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task for trigger: %w", err))
+		}
+		return taskResp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
+	default:
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("task is required"))
+	}
+}
+
+// filterInputs returns a new Inputs with cache-ignored variables removed.
+func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
+	if len(ignoreVars) == 0 {
+		return inputs
+	}
+	var filtered []*task.NamedLiteral
+	for _, nl := range inputs.GetLiterals() {
+		if !slices.Contains(ignoreVars, nl.GetName()) {
+			filtered = append(filtered, nl)
+		}
+	}
+	return &task.Inputs{Literals: filtered}
 }
 
 // hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.

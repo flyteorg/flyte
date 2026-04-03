@@ -1473,17 +1473,13 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
-	// Expect ReadProtobuf to be called to read the offloaded inputs
-	store.On("ReadProtobuf", mock.Anything,
-		storage.DataReference(offloadedURI+"/inputs.pb"),
-		mock.AnythingOfType("*task.Inputs"),
-	).Return(nil).Once()
-
-	// Expect WriteProtobuf to be called to write inputs at the run-specific path
-	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
-
-	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
-	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	// No ReadProtobuf or WriteProtobuf expected — offloaded inputs are used directly.
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.MatchedBy(func(inputPrefix string) bool {
+		return inputPrefix == offloadedURI
+	}), mock.AnythingOfType("string")).Return(expectedRun, nil).Once()
+	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.Action.InputUri == offloadedURI
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
 	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
 	require.NoError(t, err)
@@ -1494,8 +1490,6 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
 
 	store.AssertExpectations(t)
-	// ReadProtobuf should have been called once (to read offloaded inputs)
-	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
-	// WriteProtobuf should have been called once (to persist at run-specific path)
-	store.AssertNumberOfCalls(t, "WriteProtobuf", 1)
+	store.AssertNumberOfCalls(t, "ReadProtobuf", 0)
+	store.AssertNumberOfCalls(t, "WriteProtobuf", 0)
 }
