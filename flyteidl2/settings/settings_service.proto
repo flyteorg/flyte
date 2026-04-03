@@ -3,9 +3,9 @@ syntax = "proto3";
 package flyteidl2.org;
 
 import "buf/validate/validate.proto";
-import "flyteidl2/org/settings_definition.proto";
+import "flyteidl2/settings/settings_definition.proto";
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
 
 // SettingsRecord is a single scope level's stored settings paired with its key
 // and version. Used in GetSettingsForEdit responses so the caller can see what
@@ -16,24 +16,12 @@ message SettingsRecord {
   // Partial key identifying this scope level.
   SettingsKey key = 1;
 
-  // All settings fields at this level, with descriptions populated.
+  // All settings fields at this level.
   // Fields not explicitly set appear with no value (INHERIT).
   Settings settings = 2;
 
   // Current version for optimistic locking. Zero when no record exists at
   // this level; use CreateSettings rather than UpdateSettings in that case.
-  uint64 version = 3;
-}
-
-// RawSettingsRecord is the raw-map equivalent of SettingsRecord.
-message RawSettingsRecord {
-  // Partial key identifying this scope level.
-  SettingsKey key = 1;
-
-  // Raw settings as dot-notation field paths mapped to Setting values.
-  map<string, SettingValue> data = 2;
-
-  // Current version for optimistic locking. Zero when no record exists.
   uint64 version = 3;
 }
 
@@ -53,8 +41,8 @@ message GetSettingsResponse {
   SettingsRecord settingsRecord = 1;
 }
 
-// GetSettingsForEditRequest fetches unmerged settings at all scope levels,
-// with descriptions, for display in an edit form.
+// GetSettingsForEditRequest fetches unmerged settings at all scope levels
+// for display in an edit form.
 message GetSettingsForEditRequest {
   SettingsKey key = 1 [(buf.validate.field).required = true];
 }
@@ -67,24 +55,9 @@ message GetSettingsForEditResponse {
   // The original request key.
   SettingsKey requestedKey = 1;
 
-  // One entry per scope level, each with a partial key, full settings schema
-  // (with descriptions), and version for optimistic locking.
-  repeated SettingsRecord levels = 2;
-}
-
-// GetSettingsForEditRawRequest fetches raw settings maps at all scope levels.
-message GetSettingsForEditRawRequest {
-  SettingsKey key = 1 [(buf.validate.field).required = true];
-}
-
-// GetSettingsForEditRawResponse returns one RawSettingsRecord per scope level.
-message GetSettingsForEditRawResponse {
-  // The original request key.
-  SettingsKey requestedKey = 1;
-
-  // One entry per scope level, each with a partial key, dot-notation data map,
+  // One entry per scope level, each with a partial key, full settings schema,
   // and version for optimistic locking.
-  repeated RawSettingsRecord levels = 2;
+  repeated SettingsRecord levels = 2;
 }
 
 // CreateSettingsRequest creates a new settings record at the scope implied
@@ -114,22 +87,6 @@ message UpdateSettingsResponse {
   SettingsRecord settingsRecord = 1;
 }
 
-// UpdateSettingsRawRequest upserts settings via a flat dot-notation map at the
-// scope implied by the key. Intended for clients not up to date with the
-// current settings schema. Version must match the current stored version.
-message UpdateSettingsRawRequest {
-  SettingsKey key = 1 [(buf.validate.field).required = true];
-
-  // Dot-notation field paths mapped to Setting values.
-  map<string, SettingValue> data = 2;
-
-  // Current version of the settings record. Must match the server version.
-  uint64 version = 3;
-}
-
-// UpdateSettingsRawResponse contains the stored raw settings and new version.
-message UpdateSettingsRawResponse {}
-
 service SettingsService {
   // GetSettings returns resolved effective settings at the scope implied by
   // the key, incorporating inherited values from parent scopes.
@@ -137,16 +94,10 @@ service SettingsService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // GetSettingsForEdit returns unmerged settings at all scope levels with
-  // descriptions, for use in an edit form. One SettingsRecord per level,
-  // ordered broadest to most specific.
+  // GetSettingsForEdit returns unmerged settings at all scope levels,
+  // for use in an edit form. One SettingsRecord per level, ordered broadest
+  // to most specific.
   rpc GetSettingsForEdit(GetSettingsForEditRequest) returns (GetSettingsForEditResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-
-  // GetSettingsForEditRaw returns raw dot-notation settings maps at all scope
-  // levels, for clients not up to date with the current settings schema.
-  rpc GetSettingsForEditRaw(GetSettingsForEditRawRequest) returns (GetSettingsForEditRawResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
@@ -157,8 +108,4 @@ service SettingsService {
   // UpdateSettings upserts strongly-typed settings at the scope implied by
   // the key. Uses optimistic locking via the version field.
   rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse) {}
-
-  // UpdateSettingsRaw upserts settings via a flat dot-notation map at the scope
-  // implied by the key. For clients not up to date with the current settings schema.
-  rpc UpdateSettingsRaw(UpdateSettingsRawRequest) returns (UpdateSettingsRawResponse) {}
 }
