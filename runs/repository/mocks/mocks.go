@@ -1040,8 +1040,8 @@ func (_c *ActionRepo_ListPendingAborts_Call) RunAndReturn(run func(ctx context.C
 }
 
 // ListRootActions provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
-	ret := _mock.Called(ctx, org, project, domain, startDate, endDate, limit)
+func (_mock *ActionRepo) ListRootActions(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
+	ret := _mock.Called(ctx, project, domain, startDate, endDate, limit)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListRootActions")
@@ -1049,18 +1049,18 @@ func (_mock *ActionRepo) ListRootActions(ctx context.Context, org string, projec
 
 	var r0 []*models.Action
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
-		return returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
+		return returnFunc(ctx, project, domain, startDate, endDate, limit)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
-		r0 = returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
+		r0 = returnFunc(ctx, project, domain, startDate, endDate, limit)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*models.Action)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, *time.Time, *time.Time, int) error); ok {
-		r1 = returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, *time.Time, *time.Time, int) error); ok {
+		r1 = returnFunc(ctx, project, domain, startDate, endDate, limit)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1074,17 +1074,16 @@ type ActionRepo_ListRootActions_Call struct {
 
 // ListRootActions is a helper method to define mock.On call
 //   - ctx context.Context
-//   - org string
 //   - project string
 //   - domain string
 //   - startDate *time.Time
 //   - endDate *time.Time
 //   - limit int
-func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, org interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
-	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, org, project, domain, startDate, endDate, limit)}
+func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
+	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, project, domain, startDate, endDate, limit)}
 }
 
-func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
+func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1098,21 +1097,17 @@ func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org
 		if args[2] != nil {
 			arg2 = args[2].(string)
 		}
-		var arg3 string
+		var arg3 *time.Time
 		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg3 = args[3].(*time.Time)
 		}
 		var arg4 *time.Time
 		if args[4] != nil {
 			arg4 = args[4].(*time.Time)
 		}
-		var arg5 *time.Time
+		var arg5 int
 		if args[5] != nil {
-			arg5 = args[5].(*time.Time)
-		}
-		var arg6 int
-		if args[6] != nil {
-			arg6 = args[6].(int)
+			arg5 = args[5].(int)
 		}
 		run(
 			arg0,
@@ -1121,7 +1116,6 @@ func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org
 			arg3,
 			arg4,
 			arg5,
-			arg6,
 		)
 	})
 	return _c
@@ -1132,7 +1126,7 @@ func (_c *ActionRepo_ListRootActions_Call) Return(actions []*models.Action, err 
 	return _c
 }
 
-func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
+func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Return(run)
 	return _c
 }

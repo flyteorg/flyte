@@ -9,10 +9,9 @@ import (
 )
 
 // ActionEvent represents a single phase transition event for an action attempt.
-// Composite PK: (org, project, domain, run_name, name, attempt, phase, version).
+// Composite PK: (project, domain, run_name, name, attempt, phase, version).
 type ActionEvent struct {
 	// Composite primary key
-	Org     string `gorm:"not null;primaryKey" db:"org"`
 	Project string `gorm:"not null;primaryKey" db:"project"`
 	Domain  string `gorm:"not null;primaryKey" db:"domain"`
 	RunName string `gorm:"not null;primaryKey" db:"run_name"`
@@ -45,7 +44,6 @@ func (m *ActionEvent) ToActionEvent() (*workflow.ActionEvent, error) {
 // NewActionEventModel builds an ActionEvent model from a proto ActionEvent.
 func NewActionEventModel(event *workflow.ActionEvent) (*ActionEvent, error) {
 	m := &ActionEvent{
-		Org:     event.GetId().GetRun().GetOrg(),
 		Project: event.GetId().GetRun().GetProject(),
 		Domain:  event.GetId().GetRun().GetDomain(),
 		RunName: event.GetId().GetRun().GetName(),

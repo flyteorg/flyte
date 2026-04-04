@@ -256,7 +256,7 @@ func TestConstructStoragePath(t *testing.T) {
 				Filename:     "test-file.txt",
 				FilenameRoot: "test-root",
 			},
-			expectedPath: "s3://test-bucket/uploads/test-org/test-project/test-domain/test-root/test-file.txt",
+			expectedPath: "s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt",
 		},
 		{
 			name: "with content_md5 uses base32 encoding",
@@ -289,7 +289,7 @@ func TestConstructStoragePath(t *testing.T) {
 				Filename:     "test-file.txt",
 				FilenameRoot: "test-root",
 			},
-			expectedPath: "s3://test-bucket/uploads/test-org/test-project/test-domain/test-root/test-file.txt",
+			expectedPath: "s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt",
 		},
 	}
 

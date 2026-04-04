@@ -24,7 +24,6 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	db := setupDB(t)
 
 	err := db.Exec(`CREATE TABLE tasks (
-		org TEXT NOT NULL,
 		project TEXT NOT NULL,
 		domain TEXT NOT NULL,
 		name TEXT NOT NULL,
@@ -42,7 +41,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 		short_description TEXT,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		PRIMARY KEY (org, project, domain, name, version)
+		PRIMARY KEY (project, domain, name, version)
 	)`).Error
 	require.NoError(t, err)
 
@@ -56,7 +55,6 @@ func TestCreateTask(t *testing.T) {
 
 	task := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",
@@ -86,7 +84,6 @@ func TestGetTask_NotFound(t *testing.T) {
 	ctx := context.Background()
 
 	key := models.TaskKey{
-		Org:     "non-existent",
 		Project: "test",
 		Domain:  "test",
 		Name:    "test",
@@ -105,7 +102,6 @@ func TestListTasks(t *testing.T) {
 
 	task1 := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "org1",
 			Project: "proj1",
 			Domain:  "domain1",
 			Name:    "task1",
@@ -117,7 +113,6 @@ func TestListTasks(t *testing.T) {
 
 	task2 := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "org1",
 			Project: "proj1",
 			Domain:  "domain1",
 			Name:    "task2",
@@ -173,7 +168,6 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 
 	task := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",

@@ -163,7 +163,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 
 	// Create root action (represents the run)
 	run := &models.Run{
-		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
 		RunName:          runID.Name,
@@ -171,7 +170,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
-		TaskOrg:          meta.TaskOrg,
 		TaskProject:      meta.TaskProject,
 		TaskDomain:       meta.TaskDomain,
 		TaskName:         meta.TaskName,
@@ -191,8 +189,8 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		return nil, fmt.Errorf("failed to create run: %w", err)
 	}
 
-	logger.Infof(ctx, "Created run: %s/%s/%s/%s (ID: %d)",
-		run.Org, run.Project, run.Domain, run.Name, run.ID)
+	logger.Infof(ctx, "Created run: %s/%s/%s (ID: %d)",
+		run.Project, run.Domain, run.RunName, run.ID)
 
 	// Notify subscribers of run creation
 	r.notifyRunUpdate(ctx, runID)
@@ -204,14 +202,14 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
-			runID.Org, runID.Project, runID.Domain, runID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
+			runID.Project, runID.Domain, runID.Name).
 		First(&run)
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("run not found: %s/%s/%s/%s",
-				runID.Org, runID.Project, runID.Domain, runID.Name)
+			return nil, fmt.Errorf("run not found: %s/%s/%s",
+				runID.Project, runID.Domain, runID.Name)
 		}
 		return nil, fmt.Errorf("failed to get run: %w", result.Error)
 	}
@@ -226,11 +224,9 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 
 	// Apply scope filters
 	switch scope := req.ScopeBy.(type) {
-	case *workflow.ListRunsRequest_Org:
-		query = query.Where("org = ?", scope.Org)
 	case *workflow.ListRunsRequest_ProjectId:
-		query = query.Where("org = ? AND project = ? AND domain = ?",
-			scope.ProjectId.Organization, scope.ProjectId.Name, scope.ProjectId.Domain)
+		query = query.Where("project = ? AND domain = ?",
+			scope.ProjectId.Name, scope.ProjectId.Domain)
 	}
 
 	// Apply pagination according to token and limit from requests.
@@ -282,8 +278,8 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Run{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
-			runID.Org, runID.Project, runID.Domain, runID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
+			runID.Project, runID.Domain, runID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -293,7 +289,7 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 	// Notify run subscribers.
 	r.notifyRunUpdate(ctx, runID)
 
-	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
+	logger.Infof(ctx, "Aborted run: %s/%s/%s", runID.Project, runID.Domain, runID.Name)
 	return nil
 }
 
@@ -313,14 +309,13 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	for _, e := range events {
 		actionID := &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     e.Org,
 				Project: e.Project,
 				Domain:  e.Domain,
 				Name:    e.RunName,
 			},
 			Name: e.Name,
 		}
-		key := e.Org + "/" + e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
+		key := e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
 		if !notified[key] {
 			r.notifyActionUpdate(ctx, actionID)
 			notified[key] = true
@@ -333,8 +328,8 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
 	var events []*models.ActionEvent
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Order("attempt ASC, phase ASC, version ASC").
 		Limit(limit).
 		Find(&events)
@@ -354,8 +349,8 @@ func (r *actionRepo) ListEventsSince(
 ) ([]*models.ActionEvent, error) {
 	var events []*models.ActionEvent
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ? AND updated_at > ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt, since).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ? AND updated_at > ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt, since).
 		Order("updated_at ASC, attempt ASC, phase ASC, version ASC").
 		Offset(offset).
 		Limit(limit).
@@ -371,8 +366,8 @@ func (r *actionRepo) ListEventsSince(
 func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
 	var event models.ActionEvent
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
 		Order("phase DESC, version DESC").
 		First(&event)
 	if result.Error != nil {
@@ -402,7 +397,6 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 	meta := extractActionMetadata(actionSpec)
 
 	action := &models.Action{
-		Org:              actionSpec.ActionId.Run.Org,
 		Project:          actionSpec.ActionId.Run.Project,
 		Domain:           actionSpec.ActionId.Run.Domain,
 		RunName:          actionSpec.ActionId.Run.Name,
@@ -411,7 +405,6 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
 		ActionGroup:      newNullString(actionSpec.GetGroup()),
-		TaskOrg:          meta.TaskOrg,
 		TaskProject:      meta.TaskProject,
 		TaskDomain:       meta.TaskDomain,
 		TaskName:         meta.TaskName,
@@ -454,8 +447,8 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	var action models.Action
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {
@@ -475,8 +468,8 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	}
 
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
-			runID.Org, runID.Project, runID.Domain, runID.Name)
+		Where("project = ? AND domain = ? AND run_name = ?",
+			runID.Project, runID.Domain, runID.Name)
 
 	// Apply pagination token
 	if token != "" {
@@ -542,8 +535,8 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND (phase <= ? OR phase IN ?)",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, retryablePhases).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ? AND (phase <= ? OR phase IN ?)",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, retryablePhases).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -569,8 +562,8 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -603,8 +596,8 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 	result := r.db.WithContext(ctx).
 		Model(&action).
 		Clauses(clause.Returning{Columns: []clause.Column{{Name: "abort_attempt_count"}}}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(map[string]interface{}{
 			"abort_attempt_count": gorm.Expr("abort_attempt_count + 1"),
 			"updated_at":          time.Now(),
@@ -619,8 +612,8 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(map[string]interface{}{
 			"abort_requested_at":  nil,
 			"abort_attempt_count": 0,
@@ -658,8 +651,8 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 	result := r.db.WithContext(ctx).
 		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		Updates(updates)
 
 	if result.Error != nil {
@@ -668,7 +661,7 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("action not found: %s/%s/%s/%s",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name)
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	}
 
 	// Notify subscribers of the update
@@ -682,8 +675,8 @@ func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.Action
 	var action models.Action
 	result := r.db.WithContext(ctx).
 		Select("action_details").
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
+		Where("project = ? AND domain = ? AND run_name = ? AND name = ?",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
 		First(&action)
 
 	if result.Error != nil {
@@ -713,7 +706,7 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
+		runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 		notifCh := make(chan string, 100)
 
 		// Register as subscriber
@@ -803,18 +796,17 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 			case <-ctx.Done():
 				return
 			case notifPayload := <-notifCh:
-				// Parse notification payload: org/project/domain/run
+				// Parse notification payload: project/domain/run
 				parts := strings.Split(notifPayload, "/")
-				if len(parts) != 4 {
+				if len(parts) != 3 {
 					logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
 					continue
 				}
 
 				runID := &common.RunIdentifier{
-					Org:     parts[0],
-					Project: parts[1],
-					Domain:  parts[2],
-					Name:    parts[3],
+					Project: parts[0],
+					Domain:  parts[1],
+					Name:    parts[2],
 				}
 
 				if ctx.Err() != nil {
@@ -870,7 +862,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
 		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
+		runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
 		notifCh := make(chan string, 100)
 
 		// Register as subscriber
@@ -950,8 +942,8 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 				// Query actions updated since last check
 				var actions []*models.Action
 				if err := r.db.WithContext(ctx).
-					Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND updated_at > ?",
-						runID.Org, runID.Project, runID.Domain, runID.Name, lastCheck).
+					Where("project = ? AND domain = ? AND run_name = ? AND updated_at > ?",
+						runID.Project, runID.Domain, runID.Name, lastCheck).
 					Find(&actions).Error; err != nil {
 					errs <- err
 					return
@@ -970,8 +962,8 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 // WatchActionUpdates watches the current action update
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	if r.isPostgres {
-		targetPayload := fmt.Sprintf("%s/%s/%s/%s/%s",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+		targetPayload := fmt.Sprintf("%s/%s/%s/%s",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 		notifCh := make(chan string, 100)
 
 		r.mu.Lock()
@@ -1158,7 +1150,7 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 		return
 	}
 
-	payload := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
+	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 
 	select {
 	case r.runNotifyCh <- payload:
@@ -1168,13 +1160,10 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
-func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
 	query := r.db.WithContext(ctx).Model(&models.Action{}).
 		Where("parent_action_name IS NULL")
 
-	if org != "" {
-		query = query.Where("org = ?", org)
-	}
 	if project != "" {
 		query = query.Where("project = ?", project)
 	}
@@ -1314,8 +1303,8 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 		return
 	}
 
-	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	payload := fmt.Sprintf("%s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
 	select {
 	case r.actionNotifyCh <- payload:
@@ -1327,7 +1316,6 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 // actionMeta holds metadata columns extracted from an ActionSpec.
 type actionMeta struct {
 	ActionType      int32
-	TaskOrg         sql.NullString
 	TaskProject     sql.NullString
 	TaskDomain      sql.NullString
 	TaskName        sql.NullString
@@ -1353,7 +1341,6 @@ func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
 		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
 		// TaskAction.Id takes precedence; fall back to TaskTemplate.Id
 		if id := s.Task.GetId(); id != nil {
-			m.TaskOrg = newNullString(id.GetOrg())
 			m.TaskProject = newNullString(id.GetProject())
 			m.TaskDomain = newNullString(id.GetDomain())
 			m.TaskName = newNullString(id.GetName())
@@ -1361,7 +1348,6 @@ func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
 			m.FunctionName = id.GetName()
 			m.TaskShortName = newNullString(id.GetName())
 		} else if tmplID := s.Task.GetSpec().GetTaskTemplate().GetId(); tmplID != nil {
-			m.TaskOrg = newNullString(tmplID.GetOrg())
 			m.TaskProject = newNullString(tmplID.GetProject())
 			m.TaskDomain = newNullString(tmplID.GetDomain())
 			m.TaskName = newNullString(tmplID.GetName())

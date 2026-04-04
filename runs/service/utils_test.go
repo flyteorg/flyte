@@ -149,7 +149,7 @@ func TestTaskIdFromTaskSpec(t *testing.T) {
 			},
 		}
 		id := taskIdFromTaskSpec(spec)
-		assert.Equal(t, "org1", id.Org)
+		assert.Equal(t, "", id.Org)
 		assert.Equal(t, "proj1", id.Project)
 		assert.Equal(t, "dev", id.Domain)
 		assert.Equal(t, "my-task", id.Name)

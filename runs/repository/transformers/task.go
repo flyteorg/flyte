@@ -16,7 +16,6 @@ import (
 // NewTaskKey creates a models.TaskKey from a task.TaskIdentifier
 func ToTaskKey(taskId *task.TaskIdentifier) models.TaskKey {
 	return models.TaskKey{
-		Org:     taskId.GetOrg(),
 		Project: taskId.GetProject(),
 		Domain:  taskId.GetDomain(),
 		Name:    taskId.GetName(),
@@ -27,7 +26,6 @@ func ToTaskKey(taskId *task.TaskIdentifier) models.TaskKey {
 // ToTaskName creates a models.TaskName from a task.TaskName
 func ToTaskName(taskName *task.TaskName) models.TaskName {
 	return models.TaskName{
-		Org:     taskName.GetOrg(),
 		Project: taskName.GetProject(),
 		Domain:  taskName.GetDomain(),
 		Name:    taskName.GetName(),
@@ -151,7 +149,6 @@ func TaskModelsToTasks(ctx context.Context, taskModels []*models.Task, latestRun
 		// Add latest run if available
 		if latestRuns != nil {
 			taskName := models.TaskName{
-				Org:     m.Org,
 				Project: m.Project,
 				Domain:  m.Domain,
 				Name:    m.Name,
@@ -233,7 +230,6 @@ func VersionModelsToVersionResponses(versionModels []*models.TaskVersion) []*tas
 // Helper function to create a task identifier from a task model
 func taskIdentifier(m *models.Task) *task.TaskIdentifier {
 	return &task.TaskIdentifier{
-		Org:     m.Org,
 		Project: m.Project,
 		Domain:  m.Domain,
 		Name:    m.Name,

@@ -59,7 +59,6 @@ func TestGetTaskDetails(t *testing.T) {
 
 	taskModel := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",
@@ -90,7 +89,7 @@ func TestGetTaskDetails(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, "test-org", resp.Msg.Details.TaskId.Org)
+	assert.Equal(t, "", resp.Msg.Details.TaskId.Org)
 }
 
 func TestListTasks(t *testing.T) {
@@ -101,7 +100,6 @@ func TestListTasks(t *testing.T) {
 	taskModels := []*models.Task{
 		{
 			TaskKey: models.TaskKey{
-				Org:     "test-org",
 				Project: "test-project",
 				Domain:  "test-domain",
 				Name:    "task1",

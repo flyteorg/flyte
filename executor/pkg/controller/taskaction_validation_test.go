@@ -35,7 +35,6 @@ func validTaskAction() *flyteorgv1.TaskAction {
 	return &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       "my-run",
-			Org:           "my-org",
 			Project:       "my-project",
 			Domain:        "my-domain",
 			ActionName:    "my-action",
@@ -68,7 +67,6 @@ func TestValidateTaskAction_MissingFields(t *testing.T) {
 		expectedField string
 	}{
 		{"missing runName", func(ta *flyteorgv1.TaskAction) { ta.Spec.RunName = "" }, "runName"},
-		{"missing org", func(ta *flyteorgv1.TaskAction) { ta.Spec.Org = "" }, "org"},
 		{"missing project", func(ta *flyteorgv1.TaskAction) { ta.Spec.Project = "" }, "project"},
 		{"missing domain", func(ta *flyteorgv1.TaskAction) { ta.Spec.Domain = "" }, "domain"},
 		{"missing actionName", func(ta *flyteorgv1.TaskAction) { ta.Spec.ActionName = "" }, "actionName"},
