@@ -1445,7 +1445,6 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	}
 
 	expectedRun := &models.Run{
-		Org:     "testorg",
 		Project: "testproject",
 		Domain:  "development",
 		RunName: "rtest-offloaded",
@@ -1465,7 +1464,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	require.NoError(t, err)
 
 	run := resp.Msg.Run
-	assert.Equal(t, "testorg", run.Action.Id.Run.Org)
+	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "testproject", run.Action.Id.Run.Project)
 	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
 
