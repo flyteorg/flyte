@@ -78,10 +78,13 @@ func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 }
 
 func GetSecretID(secretKey string, labels map[string]string) (string, error) {
-	return EncodeSecretName(labels[DomainLabel], labels[ProjectLabel], secretKey), nil
+	return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
 }
 
 func validateRequiredFieldsExist(labels map[string]string) error {
+	if labels[OrganizationLabel] == "" {
+		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, OrganizationLabel)
+	}
 	if labels[ProjectLabel] == "" {
 		return stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, ProjectLabel)
 	}
@@ -100,12 +103,13 @@ func deriveSecretNameComponents(secret *core.Secret, pod *corev1.Pod) (*SecretNa
 	return &SecretNameComponents{
 		Project: pod.Labels[ProjectLabel],
 		Domain:  pod.Labels[DomainLabel],
+		Org:     pod.Labels[OrganizationLabel],
 		Name:    secret.Key,
 	}, nil
 }
 
 func encodeSecretName(components *SecretNameComponents) string {
-	return EncodeSecretName(components.Domain, components.Project, components.Name)
+	return EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
 }
 
 func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {

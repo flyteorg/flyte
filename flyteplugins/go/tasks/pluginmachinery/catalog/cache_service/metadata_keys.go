@@ -7,6 +7,7 @@ const (
 	ExecProjectKey     = "exec-project"
 	ExecNodeIDKey      = "exec-node"
 	ExecTaskAttemptKey = "exec-attempt"
+	ExecOrgKey         = "exec-org"
 )
 
 func getMetadataValue(values map[string]string, key, fallback string) string {

@@ -12,8 +12,8 @@ import (
 
 const (
 	// Including -, 0, and 1 to tests encoding and decoding escape functionality in addition to specific names
-	validSecretIDFmt   = "u__org____domain__testdomain__project__testproject__key__%s"                       // #nosec G101
-	longSecretIDPrefix = "u__org____domain__development__project__union-health-monitoring__key__" // #nosec G101
+	validSecretIDFmt   = "u__org__testorg__domain__testdomain__project__testproject__key__%s"                            // #nosec G101
+	longSecretIDPrefix = "u__org__test-org-with-long-name__domain__development__project__union-health-monitoring__key__" // #nosec G101
 )
 
 var azureEncodingDecodingVars = []struct {
@@ -23,33 +23,33 @@ var azureEncodingDecodingVars = []struct {
 }{
 	{
 		name:    "test name without hyphens, escape characters, nor hyphen markers",
-		decoded: "u__org____domain__testdomain__project__testproject__key__testsecret",
-		encoded: "1--testdomain-testproject-ORSXG5DTMVRXEZLU",
+		decoded: "u__org__testorg__domain__testdomain__project__testproject__key__testsecret",
+		encoded: "1-testorg-testdomain-testproject-ORSXG5DTMVRXEZLU",
 	},
 	{
 		name:    "test name with hyphens",
-		decoded: "u__org____domain__test--domain__project__--testproject--__key__test-secret--",
-		encoded: "1--test0101domain-0101testproject0101-ORSXG5BNONSWG4TFOQWS2",
+		decoded: "u__org__test-org__domain__test--domain__project__--testproject--__key__test-secret--",
+		encoded: "1-test01org-test0101domain-0101testproject0101-ORSXG5BNONSWG4TFOQWS2",
 	},
 	{
 		name:    "test name with escape characters",
-		decoded: "u__org____domain__test00domain__project__00testproject00__key__testsecret",
-		encoded: "1--test0000domain-0000testproject0000-ORSXG5DTMVRXEZLU",
+		decoded: "u__org__test0org__domain__test00domain__project__00testproject00__key__testsecret",
+		encoded: "1-test00org-test0000domain-0000testproject0000-ORSXG5DTMVRXEZLU",
 	},
 	{
 		name:    "test name that looks escaped",
-		decoded: "u__org____domain__test0102domain__project__01testproject0101__key__testsecret",
-		encoded: "1--test001002domain-001testproject001001-ORSXG5DTMVRXEZLU",
+		decoded: "u__org__test01org__domain__test0102domain__project__01testproject0101__key__testsecret",
+		encoded: "1-test001org-test001002domain-001testproject001001-ORSXG5DTMVRXEZLU",
 	},
 	{
 		name:    "test secret name that has invalid Azure characters",
-		decoded: "u__org____domain__test0101domain__project__01testproject0101__key__test_secret__",
-		encoded: "1--test001001domain-001testproject001001-ORSXG5C7ONSWG4TFORPV6",
+		decoded: "u__org__test01org__domain__test0101domain__project__01testproject0101__key__test_secret__",
+		encoded: "1-test001org-test001001domain-001testproject001001-ORSXG5C7ONSWG4TFORPV6",
 	},
 	{
 		name:    "test secret name with capital letters",
-		decoded: "u__org____domain__test0101domain__project__01testproject0101__key__TESTSECRET",
-		encoded: "1--test001001domain-001testproject001001-KRCVGVCTIVBVERKU",
+		decoded: "u__org__test01org__domain__test0101domain__project__01testproject0101__key__TESTSECRET",
+		encoded: "1-test001org-test001001domain-001testproject001001-KRCVGVCTIVBVERKU",
 	},
 }
 

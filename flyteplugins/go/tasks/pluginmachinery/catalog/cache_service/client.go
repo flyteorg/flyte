@@ -269,6 +269,7 @@ func newIdentifier(id *corepb.Identifier) *cacheservicev2.Identifier {
 	}
 
 	return &cacheservicev2.Identifier{
+		Org:     id.GetOrg(),
 		Project: id.GetProject(),
 		Domain:  id.GetDomain(),
 	}
@@ -289,6 +290,7 @@ func newCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheservicep
 				ExecNameKey:        metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetName(),
 				ExecNodeIDKey:      metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetNodeId(),
 				ExecTaskAttemptKey: fmt.Sprintf("%d", metadata.TaskExecutionIdentifier.GetRetryAttempt()),
+				ExecOrgKey:         metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
 			},
 		}
 	} else if metadata.NodeExecutionIdentifier != nil {
@@ -298,6 +300,7 @@ func newCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheservicep
 				ExecDomainKey:  metadata.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
 				ExecNameKey:    metadata.NodeExecutionIdentifier.GetExecutionId().GetName(),
 				ExecNodeIDKey:  metadata.NodeExecutionIdentifier.GetNodeId(),
+				ExecOrgKey:     metadata.NodeExecutionIdentifier.GetExecutionId().GetOrg(),
 			},
 		}
 	}
@@ -340,6 +343,7 @@ func getSourceFromMetadata(metadata *cacheservicepb.Metadata) (*corepb.TaskExecu
 			Domain:       metadata.GetSourceIdentifier().GetDomain(),
 			Name:         metadata.GetSourceIdentifier().GetName(),
 			Version:      getMetadataValue(keyMap, TaskVersionKey, "unknown"),
+			Org:          metadata.GetSourceIdentifier().GetOrg(),
 		},
 		RetryAttempt: parseAttempt(getMetadataValue(keyMap, ExecTaskAttemptKey, "0")),
 		NodeExecutionId: &corepb.NodeExecutionIdentifier{
@@ -348,6 +352,7 @@ func getSourceFromMetadata(metadata *cacheservicepb.Metadata) (*corepb.TaskExecu
 				Project: getMetadataValue(keyMap, ExecProjectKey, metadata.GetSourceIdentifier().GetProject()),
 				Domain:  getMetadataValue(keyMap, ExecDomainKey, metadata.GetSourceIdentifier().GetDomain()),
 				Name:    getMetadataValue(keyMap, ExecNameKey, "unknown"),
+				Org:     getMetadataValue(keyMap, ExecOrgKey, metadata.GetSourceIdentifier().GetOrg()),
 			},
 		},
 	}, nil

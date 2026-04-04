@@ -90,6 +90,7 @@ func HashIdentifierExceptVersion(ctx context.Context, id *core.Identifier) (stri
 		Project:      id.GetProject(),
 		Domain:       id.GetDomain(),
 		Name:         id.GetName(),
+		Org:          id.GetOrg(),
 	}
 
 	hash, err := pbhash.ComputeHashString(ctx, idCopy)
