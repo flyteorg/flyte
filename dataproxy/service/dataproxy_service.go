@@ -54,8 +54,8 @@ func (s *Service) CreateUploadLocation(
 	ctx context.Context,
 	req *connect.Request[dataproxy.CreateUploadLocationRequest],
 ) (*connect.Response[dataproxy.CreateUploadLocationResponse], error) {
-	logger.Infof(ctx, "CreateUploadLocation request for project=%s, domain=%s, org=%s, filename=%s",
-		req.Msg.Project, req.Msg.Domain, req.Msg.Org, req.Msg.Filename)
+	logger.Infof(ctx, "CreateUploadLocation request for project=%s, domain=%s, filename=%s",
+		req.Msg.Project, req.Msg.Domain, req.Msg.Filename)
 
 	// Validation on request
 	if err := req.Msg.Validate(); err != nil {
@@ -164,13 +164,13 @@ func (s *Service) checkFileExists(ctx context.Context, storagePath storage.DataR
 
 // constructStoragePath builds the storage path based on the request parameters.
 // Path patterns:
-//   - storage_prefix/org/project/domain/filename_root/filename (if filename_root is provided)
-//   - storage_prefix/org/project/domain/base32_hash/filename (if only content_md5 is provided)
+//   - storage_prefix/project/domain/filename_root/filename (if filename_root is provided)
+//   - storage_prefix/project/domain/base32_hash/filename (if only content_md5 is provided)
 func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.CreateUploadLocationRequest) (storage.DataReference, error) {
 	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
 
-	// Build path components: storage_prefix/org/project/domain/prefix/filename
-	pathComponents := []string{s.cfg.Upload.StoragePrefix, req.GetOrg(), req.GetProject(), req.GetDomain()}
+	// Build path components: storage_prefix/project/domain/prefix/filename
+	pathComponents := []string{s.cfg.Upload.StoragePrefix, req.GetProject(), req.GetDomain()}
 
 	// Set filename_root or base32-encoded content hash as prefix
 	if len(req.GetFilenameRoot()) > 0 {

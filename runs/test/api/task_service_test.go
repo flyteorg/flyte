@@ -69,7 +69,6 @@ func TestDeployTask(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, getTaskDetailsResp)
 	details := getTaskDetailsResp.Msg.GetDetails()
-	assert.Equal(t, taskID.GetOrg(), details.GetTaskId().GetOrg())
 	assert.Equal(t, taskID.GetProject(), details.GetTaskId().GetProject())
 	assert.Equal(t, taskID.GetDomain(), details.GetTaskId().GetDomain())
 	assert.Equal(t, taskID.GetName(), details.GetTaskId().GetName())

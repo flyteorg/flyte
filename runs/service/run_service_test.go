@@ -151,7 +151,6 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	runModel := &models.Run{
-		Org:          runID.Org,
 		Project:      runID.Project,
 		Domain:       runID.Domain,
 		RunName:      runID.Name,
@@ -200,7 +199,6 @@ func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
 	}
 
 	actionModel := &models.Action{
-		Org:     actionID.Run.Org,
 		Project: actionID.Run.Project,
 		Domain:  actionID.Run.Domain,
 		RunName: actionID.Run.Name,
@@ -264,7 +262,6 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 	}
 
 	runningAction := &models.Action{
-		Org:     actionID.Run.Org,
 		Project: actionID.Run.Project,
 		Domain:  actionID.Run.Domain,
 		RunName: actionID.Run.Name,
@@ -272,7 +269,6 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
 	}
 	succeededAction := &models.Action{
-		Org:     actionID.Run.Org,
 		Project: actionID.Run.Project,
 		Domain:  actionID.Run.Domain,
 		RunName: actionID.Run.Name,
@@ -376,7 +372,6 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	require.NoError(t, err)
 
 	runModel := &models.Run{
-		Org:        runID.Org,
 		Project:    runID.Project,
 		Domain:     runID.Domain,
 		RunName:    runID.Name,
@@ -430,7 +425,6 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
 
 	runModel := &models.Run{
-		Org:         runID.Org,
 		Project:     runID.Project,
 		Domain:      runID.Domain,
 		RunName:     runID.Name,
@@ -489,7 +483,6 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	runModel := &models.Run{
-		Org:          runID.Org,
 		Project:      runID.Project,
 		Domain:       runID.Domain,
 		RunName:      runID.Name,
@@ -603,7 +596,6 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{
-			Org:         runID.Org,
 			Project:     runID.Project,
 			Domain:      runID.Domain,
 			Name:        runID.Name,
@@ -746,7 +738,6 @@ func TestListRuns(t *testing.T) {
 			Action: &workflow.Action{
 				Id: &common.ActionIdentifier{
 					Run: &common.RunIdentifier{
-						Org:     "test-org",
 						Project: "test-project",
 						Domain:  "test-domain",
 						Name:    fmt.Sprintf("run-%d", i),
@@ -766,7 +757,6 @@ func TestListRuns(t *testing.T) {
 		})
 		sqlRes = append(sqlRes, &models.Run{
 			ID:         uint(i),
-			Org:        "test-org",
 			Project:    "test-project",
 			Domain:     "test-domain",
 			RunName:    fmt.Sprintf("run-%d", i),
@@ -852,7 +842,6 @@ func TestConvertRunToProto(t *testing.T) {
 	// Define the test cases as a slice of structs.
 	s := &RunService{}
 	name := generateRunName(int64(0))
-	org := "test_org"
 	project := "test_project"
 	domain := "test_domain"
 	startTime := timestamppb.New(time.Date(2026, time.March, 24, 9, 0, 0, 0, time.UTC))
@@ -880,7 +869,6 @@ func TestConvertRunToProto(t *testing.T) {
 			"valid run",
 			&models.Run{
 				ID:            uint(0),
-				Org:           org,
 				Project:       project,
 				Domain:        domain,
 				RunName:       name,
@@ -897,7 +885,6 @@ func TestConvertRunToProto(t *testing.T) {
 				Action: &workflow.Action{
 					Id: &common.ActionIdentifier{
 						Run: &common.RunIdentifier{
-							Org:     org,
 							Project: project,
 							Domain:  domain,
 							Name:    name,
@@ -915,7 +902,6 @@ func TestConvertRunToProto(t *testing.T) {
 			"run with missing details",
 			&models.Run{
 				ID:         uint(0),
-				Org:        org,
 				Project:    project,
 				Domain:     domain,
 				RunName:    name,
@@ -933,7 +919,6 @@ func TestConvertRunToProto(t *testing.T) {
 				Action: &workflow.Action{
 					Id: &common.ActionIdentifier{
 						Run: &common.RunIdentifier{
-							Org:     org,
 							Project: project,
 							Domain:  domain,
 							Name:    name,
@@ -1087,7 +1072,6 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	}
 
 	expectedRun := &models.Run{
-		Org:     "testorg",
 		Project: "testproject",
 		Domain:  "development",
 		Name:    "generated-run",
@@ -1144,7 +1128,6 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	}
 
 	expectedRun := &models.Run{
-		Org:     "myorg",
 		Project: "myproj",
 		Domain:  "production",
 		RunName: "rtest99999",
@@ -1160,7 +1143,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	require.NoError(t, err)
 
 	run := resp.Msg.Run
-	assert.Equal(t, "myorg", run.Action.Id.Run.Org)
+	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
 	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
@@ -1200,7 +1183,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
+		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
 	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
 	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
@@ -1254,7 +1237,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 		},
 	}
 
-	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/org/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
 		inputs, ok := msg.(*task.Inputs)
 		return ok &&
 			len(inputs.Context) == 1 &&
@@ -1264,8 +1247,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	actionRepo.On("CreateRun", mock.Anything, mock.MatchedBy(func(actual *workflow.CreateRunRequest) bool {
 		return actual.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
-	}), "s3://flyte-data/org/proj/dev/rctx-123/inputs", "s3://flyte-data/org/proj/dev/rctx-123/").Return(&models.Run{
-		Org:     "org",
+	}), "s3://flyte-data/proj/dev/rctx-123/inputs", "s3://flyte-data/proj/dev/rctx-123/").Return(&models.Run{
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "rctx-123",
@@ -1314,7 +1296,6 @@ func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -1398,7 +1379,6 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",

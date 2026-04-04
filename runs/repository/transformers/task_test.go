@@ -16,7 +16,6 @@ import (
 
 func TestToTaskKey(t *testing.T) {
 	taskId := &task.TaskIdentifier{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		Name:    "test-task",
@@ -24,7 +23,6 @@ func TestToTaskKey(t *testing.T) {
 	}
 
 	key := ToTaskKey(taskId)
-	assert.Equal(t, "test-org", key.Org)
 	assert.Equal(t, "test-project", key.Project)
 	assert.Equal(t, "test-domain", key.Domain)
 	assert.Equal(t, "test-task", key.Name)
@@ -33,14 +31,12 @@ func TestToTaskKey(t *testing.T) {
 
 func TestToTaskName(t *testing.T) {
 	taskName := &task.TaskName{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		Name:    "test-task",
 	}
 
 	name := ToTaskName(taskName)
-	assert.Equal(t, "test-org", name.Org)
 	assert.Equal(t, "test-project", name.Project)
 	assert.Equal(t, "test-domain", name.Domain)
 	assert.Equal(t, "test-task", name.Name)
@@ -49,7 +45,6 @@ func TestToTaskName(t *testing.T) {
 func TestNewTaskModel(t *testing.T) {
 	ctx := context.Background()
 	taskId := &task.TaskIdentifier{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		Name:    "prod.my_function",
@@ -67,7 +62,6 @@ func TestNewTaskModel(t *testing.T) {
 
 	model, err := NewTaskModel(ctx, taskId, spec)
 	require.NoError(t, err)
-	assert.Equal(t, "test-org", model.Org)
 	assert.Equal(t, "prod", model.Environment)
 	assert.Equal(t, "my_function", model.FunctionName)
 	assert.Equal(t, "mock-subject", model.DeployedBy)
@@ -107,7 +101,6 @@ func TestTaskModelsToTaskDetails(t *testing.T) {
 	taskModels := []*models.Task{
 		{
 			TaskKey: models.TaskKey{
-				Org:     "org1",
 				Project: "proj1",
 				Domain:  "domain1",
 				Name:    "task1",
@@ -125,7 +118,6 @@ func TestTaskModelsToTaskDetails(t *testing.T) {
 	details, err := TaskModelsToTaskDetails(ctx, taskModels)
 	require.NoError(t, err)
 	require.Len(t, details, 1)
-	assert.Equal(t, "org1", details[0].TaskId.Org)
 	assert.Equal(t, "my_func", details[0].Metadata.ShortName)
 	assert.Equal(t, "prod", details[0].Metadata.EnvironmentName)
 	assert.Equal(t, "Test task", details[0].Metadata.ShortDescription)
@@ -137,7 +129,6 @@ func TestTaskModelsToTasks(t *testing.T) {
 	taskModels := []*models.Task{
 		{
 			TaskKey: models.TaskKey{
-				Org:     "org1",
 				Project: "proj1",
 				Domain:  "domain1",
 				Name:    "task1",
@@ -152,7 +143,6 @@ func TestTaskModelsToTasks(t *testing.T) {
 	tasks, err := TaskModelsToTasks(ctx, taskModels, nil)
 	require.NoError(t, err)
 	require.Len(t, tasks, 1)
-	assert.Equal(t, "org1", tasks[0].TaskId.Org)
 	assert.Equal(t, "my_func", tasks[0].Metadata.ShortName)
 	assert.NotNil(t, tasks[0].TaskSummary)
 }
@@ -231,7 +221,6 @@ func TestTaskListResultToTasksAndMetadata(t *testing.T) {
 		Tasks: []*models.Task{
 			{
 				TaskKey: models.TaskKey{
-					Org:     "org1",
 					Project: "proj1",
 					Domain:  "domain1",
 					Name:    "task1",

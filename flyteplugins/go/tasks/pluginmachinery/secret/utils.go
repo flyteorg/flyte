@@ -197,29 +197,28 @@ func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVer
 }
 
 type SecretNameComponents struct {
-	Org     string
 	Domain  string
 	Project string
 	Name    string // Secret name
 }
 
 func (s SecretNameComponents) String() string {
-	return fmt.Sprintf("%s/%s/%s/%s", s.Org, s.Domain, s.Project, s.Name)
+	return fmt.Sprintf("%s/%s/%s", s.Domain, s.Project, s.Name)
 }
 
-func EncodeSecretName(org, domain, project, name string) string {
-	return fmt.Sprintf(secretsStorageFormat, org, domain, project, name)
+func EncodeSecretName(domain, project, name string) string {
+	return fmt.Sprintf(secretsStorageFormat, "", domain, project, name)
 }
 
 // EncodeSecretNamePrefix creates a prefix to search for in the secrets manager
-func EncodeSecretNamePrefix(org, domain, project string) string {
+func EncodeSecretNamePrefix(domain, project string) string {
 	switch {
 	case project != "":
-		return fmt.Sprintf(secretsStorageProjectPrefixFormat, org, domain, project)
+		return fmt.Sprintf(secretsStorageProjectPrefixFormat, "", domain, project)
 	case domain != "":
-		return fmt.Sprintf(secretsStorageDomainPrefixFormat, org, domain)
+		return fmt.Sprintf(secretsStorageDomainPrefixFormat, "", domain)
 	default:
-		return fmt.Sprintf(secretsStorageOrgPrefixFormat, org)
+		return fmt.Sprintf(secretsStorageOrgPrefixFormat, "")
 	}
 }
 
@@ -236,7 +235,6 @@ func DecodeSecretName(encodedSecretName string) (*SecretNameComponents, error) {
 	}
 
 	result := &SecretNameComponents{
-		Org:     parts[2],
 		Domain:  parts[4],
 		Project: parts[6],
 		Name:    strings.Join(parts[8:], secretFieldSeparator),

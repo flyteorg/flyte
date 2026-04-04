@@ -136,7 +136,6 @@ func (s *RunService) CreateRun(
 		runId = request.GetRunId()
 	case *workflow.CreateRunRequest_ProjectId:
 		runId = &common.RunIdentifier{
-			Org:     id.ProjectId.Organization,
 			Project: id.ProjectId.Name,
 			Domain:  id.ProjectId.Domain,
 			Name:    generateRunName(time.Now().UnixNano()),
@@ -177,8 +176,8 @@ func (s *RunService) CreateRun(
 	request.RunSpec = runSpec
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
-	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
-	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
+	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())
+	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
 		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 	}
@@ -258,8 +257,8 @@ func (s *RunService) AbortRun(
 	ctx context.Context,
 	req *connect.Request[workflow.AbortRunRequest],
 ) (*connect.Response[workflow.AbortRunResponse], error) {
-	logger.Infof(ctx, "Received AbortRun request for run: %s/%s/%s/%s",
-		req.Msg.RunId.Org, req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name)
+	logger.Infof(ctx, "Received AbortRun request for run: %s/%s/%s",
+		req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name)
 
 	// Validate request
 	if err := req.Msg.Validate(); err != nil {
@@ -1260,7 +1259,6 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		}
 		if action.TaskName.Valid {
 			taskMeta.Id = &task.TaskIdentifier{
-				Org:     action.TaskOrg.String,
 				Project: action.TaskProject.String,
 				Domain:  action.TaskDomain.String,
 				Name:    action.TaskName.String,
@@ -1327,8 +1325,8 @@ func extractRunSpecFromActionModel(ctx context.Context, action *models.Action) *
 		if err := proto.Unmarshal(action.RunSpec, spec); err == nil {
 			return spec
 		} else {
-			logger.Warnf(ctx, "Failed to unmarshal action.RunSpec for %s/%s/%s/%s/%s, falling back to ActionSpec: %v",
-				action.Org, action.Project, action.Domain, action.RunName, action.Name, err)
+			logger.Warnf(ctx, "Failed to unmarshal action.RunSpec for %s/%s/%s/%s, falling back to ActionSpec: %v",
+				action.Project, action.Domain, action.RunName, action.Name, err)
 		}
 	}
 
@@ -1339,10 +1337,10 @@ func extractRunSpecFromActionModel(ctx context.Context, action *models.Action) *
 // Helper functions
 
 // buildInputPrefix generates the input path prefix for the root action.
-func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
-	return fmt.Sprintf("%s/%s/%s/%s/%s/inputs",
+func buildInputPrefix(storagePrefix, project, domain, name string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/inputs",
 		strings.TrimRight(storagePrefix, "/"),
-		org, project, domain, name)
+		project, domain, name)
 }
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
@@ -1384,10 +1382,10 @@ func literalMapToOutputs(m *core.LiteralMap) *task.Outputs {
 }
 
 // buildRunOutputBase generates the output base path for the run.
-func buildRunOutputBase(storagePrefix, org, project, domain, name string) string {
-	return fmt.Sprintf("%s/%s/%s/%s/%s/",
+func buildRunOutputBase(storagePrefix, project, domain, name string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/",
 		strings.TrimRight(storagePrefix, "/"),
-		org, project, domain, name)
+		project, domain, name)
 }
 
 // convertRunToProto converts a repository Run to a proto Run
@@ -1397,7 +1395,6 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 	}
 
 	runID := &common.RunIdentifier{
-		Org:     run.Org,
 		Project: run.Project,
 		Domain:  run.Domain,
 		Name:    run.RunName,
@@ -1459,7 +1456,6 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     action.Org,
 			Project: action.Project,
 			Domain:  action.Domain,
 			Name:    action.RunName,
@@ -1509,7 +1505,6 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	action := update.Node.Action
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     runID.Org,
 			Project: runID.Project,
 			Domain:  runID.Domain,
 			Name:    runID.Name,
@@ -1550,7 +1545,6 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		metadata.Spec = &workflow.ActionMetadata_Task{
 			Task: &workflow.TaskActionMetadata{
 				Id: &task.TaskIdentifier{
-					Org:     CoalesceNullString(action.TaskOrg),
 					Project: CoalesceNullString(action.TaskProject),
 					Domain:  CoalesceNullString(action.TaskDomain),
 					Name:    CoalesceNullString(action.TaskName),
@@ -1596,9 +1590,8 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 
 // buildTaskGroups queries the DB for root actions and groups them by task name in memory.
 func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGroupsRequest) ([]*workflow.TaskGroup, error) {
-	var org, project, domain string
+	var project, domain string
 	if pid := req.GetProjectId(); pid != nil {
-		org = pid.Organization
 		project = pid.Name
 		domain = pid.Domain
 	}
@@ -1613,7 +1606,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 		endDate = &t
 	}
 
-	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
+	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, project, domain, startDate, endDate, 1000)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
@@ -1785,7 +1778,6 @@ func taskIdFromTaskSpec(taskSpec *task.TaskSpec) *task.TaskIdentifier {
 		return nil
 	}
 	return &task.TaskIdentifier{
-		Org:     taskSpec.GetTaskTemplate().GetId().GetOrg(),
 		Project: taskSpec.GetTaskTemplate().GetId().GetProject(),
 		Domain:  taskSpec.GetTaskTemplate().GetId().GetDomain(),
 		Name:    taskSpec.GetTaskTemplate().GetId().GetName(),
@@ -1802,10 +1794,6 @@ func (s *RunService) convertWatchRequestToListRequest(req *workflow.WatchRunsReq
 	}
 
 	switch target := req.Target.(type) {
-	case *workflow.WatchRunsRequest_Org:
-		listReq.ScopeBy = &workflow.ListRunsRequest_Org{
-			Org: target.Org,
-		}
 	case *workflow.WatchRunsRequest_ProjectId:
 		listReq.ScopeBy = &workflow.ListRunsRequest_ProjectId{
 			ProjectId: target.ProjectId,
@@ -1822,11 +1810,8 @@ func (s *RunService) runMatchesFilter(run *models.Run, req *workflow.WatchRunsRe
 	}
 
 	switch target := req.Target.(type) {
-	case *workflow.WatchRunsRequest_Org:
-		return run.Org == target.Org
 	case *workflow.WatchRunsRequest_ProjectId:
-		return run.Org == target.ProjectId.Organization &&
-			run.Project == target.ProjectId.Name &&
+		return run.Project == target.ProjectId.Name &&
 			run.Domain == target.ProjectId.Domain
 	default:
 		return true

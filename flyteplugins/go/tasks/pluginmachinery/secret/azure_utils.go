@@ -46,7 +46,7 @@ func EncodeAzureSecretName(secretName string) (string, error) {
 	}
 
 	parts := []string{
-		encode(components.Org),
+		encode(""),
 		encode(components.Domain),
 		encode(components.Project),
 		base32Encoding.EncodeToString([]byte(components.Name)),
@@ -93,7 +93,7 @@ func DecodeAzureSecretName(encodedSecretName string) (string, error) {
 		return to.Ptr(result.String()), nil
 	}
 
-	org, err := decode(parts[1])
+	_, err = decode(parts[1])
 	if err != nil {
 		return EmptyString, fmt.Errorf("error decoding org from stored secret %s: %w", encodedSecretName, err)
 	}
@@ -109,7 +109,7 @@ func DecodeAzureSecretName(encodedSecretName string) (string, error) {
 	}
 
 	// Re-encode to Union naming format
-	return EncodeSecretName(*org, *domain, *project, string(nameBytes)), nil
+	return EncodeSecretName(*domain, *project, string(nameBytes)), nil
 }
 
 // Encodes a string value to appropriate Json format for Azure Key Vault storage

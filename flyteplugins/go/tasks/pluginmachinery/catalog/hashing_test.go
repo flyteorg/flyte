@@ -687,7 +687,7 @@ func TestHashIdentifierExceptVersion(t *testing.T) {
 		Org:     "org_1",
 	}
 
-	expectedHashIdentifier := "+UmrGhEwHv3FesdpA4gliBluF3FUXz4tshmuOlw1FSk="
+	expectedHashIdentifier := "/NRT3riFqdNJjy8ZsEgf7xltn0DmLNGcsyM6s6EpRzA="
 
 	hashedIdentifier, err := HashIdentifierExceptVersion(context.TODO(), identifier)
 	assert.NoError(t, err)

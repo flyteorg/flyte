@@ -13,7 +13,6 @@ const (
 )
 
 const (
-	orgLabel        = "union.ai/org"
 	projectLabel    = "union.ai/project"
 	domainLabel     = "union.ai/domain"
 	secretNameLabel = "union.ai/secret-name"
@@ -30,8 +29,7 @@ var (
 // The name includes a consistent hash of the components to ensure uniqueness, be Kubernetes compliant, and avoid collisions.
 func ToImagePullK8sName(components SecretNameComponents) string {
 	// Create a deterministic string representation of the components
-	componentStr := fmt.Sprintf("%s:%s:%s:%s",
-		components.Org,
+	componentStr := fmt.Sprintf("%s:%s:%s",
 		components.Domain,
 		components.Project,
 		components.Name)
@@ -48,7 +46,6 @@ func ToImagePullK8sName(components SecretNameComponents) string {
 func ToImagePullK8sLabels(components SecretNameComponents) map[string]string {
 	return utils.UnionMaps(ImagePullLabels, map[string]string{
 		// TODO Create a function that cleans the values of the labels to be Kubernetes compliant
-		orgLabel:        sanitizeLabelValue(components.Org),
 		projectLabel:    sanitizeLabelValue(components.Project),
 		domainLabel:     sanitizeLabelValue(components.Domain),
 		secretNameLabel: sanitizeLabelValue(components.Name),

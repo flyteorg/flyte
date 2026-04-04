@@ -26,7 +26,7 @@ func setupAzureSecretFetcherTest() (SecretFetcher, *mocks.AzureKeyVaultClient) {
 
 func Test_AzureSecretFetcher_GetSecretValue(t *testing.T) {
 	secretName := "test-secret"
-	validSecretIDFmt := "u__org__test-org__domain__test-domain__project__test-project__key__%s" // #nosec G101
+	validSecretIDFmt := "u__org____domain__test-domain__project__test-project__key__%s" // #nosec G101
 	validSecretID := fmt.Sprintf(validSecretIDFmt, secretName)
 	validEncodedSecretID, _ := EncodeAzureSecretName(validSecretID)
 

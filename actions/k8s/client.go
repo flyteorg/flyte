@@ -99,8 +99,8 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
 func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, runSpec *task.RunSpec) error {
 	actionID := action.ActionId
-	logger.Infof(ctx, "Enqueuing action: %s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+	logger.Infof(ctx, "Enqueuing action: %s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain,
 		actionID.Run.Name, actionID.Name)
 
 	isRoot := action.ParentActionName == nil || *action.ParentActionName == ""
@@ -115,7 +115,6 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			Name:      taskActionName,
 			Namespace: namespace,
 			Labels: map[string]string{
-				"flyte.org/org":         actionID.Run.Org,
 				"flyte.org/project":     actionID.Run.Project,
 				"flyte.org/domain":      actionID.Run.Domain,
 				"flyte.org/run":         actionID.Run.Name,
@@ -253,7 +252,6 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	listOpts := []client.ListOption{
 		client.InNamespace(buildNamespace(runID)),
 		client.MatchingLabels{
-			"flyte.org/org":     runID.Org,
 			"flyte.org/project": runID.Project,
 			"flyte.org/domain":  runID.Domain,
 			"flyte.org/run":     runID.Name,
@@ -278,7 +276,6 @@ func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *co
 	listOpts := []client.ListOption{
 		client.InNamespace(buildNamespace(parentActionID.Run)),
 		client.MatchingLabels{
-			"flyte.org/org":     parentActionID.Run.Org,
 			"flyte.org/project": parentActionID.Run.Project,
 			"flyte.org/domain":  parentActionID.Run.Domain,
 			"flyte.org/run":     parentActionID.Run.Name,
@@ -472,7 +469,6 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	return &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     taskAction.Spec.Org,
 				Project: taskAction.Spec.Project,
 				Domain:  taskAction.Spec.Domain,
 				Name:    taskAction.Spec.RunName,
@@ -534,7 +530,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 			if taskAction.Spec.TaskType != "" {
 				ta := &workflow.TaskAction{
 					Id: &task.TaskIdentifier{
-						Org:     taskAction.Spec.Org,
 						Project: taskAction.Spec.Project,
 						Domain:  taskAction.Spec.Domain,
 					},

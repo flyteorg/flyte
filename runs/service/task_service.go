@@ -106,10 +106,6 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 
 	// Apply scope filters based on request
 	switch scope := request.GetScopeBy().(type) {
-	case *task.ListTasksRequest_Org:
-		// Filter by organization
-		orgFilter := impl.NewOrgFilter(scope.Org)
-		listInput.ScopeByFilter = orgFilter
 	case *task.ListTasksRequest_ProjectId:
 		// Filter by project (org + project + domain)
 		projectFilter := impl.NewProjectIdFilter(scope.ProjectId)

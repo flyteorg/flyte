@@ -240,7 +240,6 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 			Domain:       "domain",
 			Name:         "task-name",
 			Version:      "task-version",
-			Org:          "org",
 		},
 		Type: "python-task",
 		Metadata: &corepb.TaskMetadata{
@@ -270,7 +269,6 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 		},
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       "run-name",
-			Org:           "org",
 			Project:       "project",
 			Domain:        "domain",
 			ActionName:    "action-name",

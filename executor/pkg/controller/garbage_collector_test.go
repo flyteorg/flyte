@@ -22,7 +22,6 @@ func createTaskAction(ctx context.Context, name string, labels map[string]string
 		},
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       "test-run",
-			Org:           "test-org",
 			Project:       "test-project",
 			Domain:        "test-domain",
 			ActionName:    "test-action",

@@ -47,9 +47,9 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 	secretIDKey := "secretID"
 	secretValue := "secretValue"
 
-	projectSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, DomainLabel, ProjectLabel, secretIDKey)
-	domainSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, DomainLabel, EmptySecretScope, secretIDKey)
-	orgSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, EmptySecretScope, EmptySecretScope, secretIDKey)
+	projectSecretID := fmt.Sprintf(secretsStorageFormat, "", DomainLabel, ProjectLabel, secretIDKey)
+	domainSecretID := fmt.Sprintf(secretsStorageFormat, "", DomainLabel, EmptySecretScope, secretIDKey)
+	orgSecretID := fmt.Sprintf(secretsStorageFormat, "", EmptySecretScope, EmptySecretScope, secretIDKey)
 
 	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, projectSecretID),
@@ -83,39 +83,13 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 
 	tests := []test{
 		{
-			name: "empty organization",
-			pod: &corev1.Pod{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{},
-				},
-			},
-			expectedPod: &corev1.Pod{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{},
-				},
-			},
-			expectedK8sSecretName: "",
-			expectedInjected:      false,
-			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, SecretRequirementsErrorFormat, OrganizationLabel),
-		},
-		{
 			name: "empty project",
 			pod: &corev1.Pod{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-					},
-				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{},
 				},
 			},
 			expectedPod: &corev1.Pod{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-					},
-				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{},
 				},
@@ -129,8 +103,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			pod: &corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-						ProjectLabel:      ProjectLabel,
+						ProjectLabel: ProjectLabel,
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -140,8 +113,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			expectedPod: &corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-						ProjectLabel:      ProjectLabel,
+						ProjectLabel: ProjectLabel,
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -157,9 +129,8 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			pod: &corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-						ProjectLabel:      ProjectLabel,
-						DomainLabel:       DomainLabel,
+						ProjectLabel: ProjectLabel,
+						DomainLabel:  DomainLabel,
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -171,9 +142,8 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			expectedPod: &corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						OrganizationLabel: OrganizationLabel,
-						ProjectLabel:      ProjectLabel,
-						DomainLabel:       DomainLabel,
+						ProjectLabel: ProjectLabel,
+						DomainLabel:  DomainLabel,
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -195,7 +165,6 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 				},
 			},
 			expectedK8sSecretName: ToImagePullK8sName(SecretNameComponents{
-				Org:     OrganizationLabel,
 				Domain:  "",
 				Project: "",
 				Name:    secretIDKey,
@@ -264,16 +233,14 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"organization": "organization",
-						"project":      "project",
-						"domain":       "domain",
+						"project": "project",
+						"domain":  "domain",
 					},
 				},
 			}
 
 			mockClient := &mocks.MockableControllerRuntimeClient{}
 			kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
-				Org:     "organization",
 				Domain:  "domain",
 				Project: "project",
 				Name:    "secret1",
@@ -287,7 +254,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 				config.EmbeddedSecretManagerConfig{},
 				[]SecretFetcher{secretFetcherMock{
 					Secrets: map[string]SecretValue{
-						"u__org__organization__domain__domain__project__project__key__secret1": {
+						"u__org____domain__domain__project__project__key__secret1": {
 							BinaryValue: []byte("banana"),
 						},
 					},
@@ -344,16 +311,14 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"organization": "o-apple",
-						"domain":       "d-cherry",
-						"project":      "p-banana",
+						"domain":  "d-cherry",
+						"project": "p-banana",
 					},
 				},
 			}
 
 			mockClient := &mocks.MockableControllerRuntimeClient{}
 			kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
-				Org:     "o-apple",
 				Domain:  "",
 				Project: "",
 				Name:    "secret1",
@@ -367,7 +332,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 				config.EmbeddedSecretManagerConfig{},
 				[]SecretFetcher{secretFetcherMock{
 					Secrets: map[string]SecretValue{
-						"u__org__o-apple__domain____project____key__secret1": {
+						"u__org____domain____project____key__secret1": {
 							StringValue: "fruits",
 						},
 					},
@@ -393,22 +358,19 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"organization": "o-apple",
-				"domain":       "d-cherry",
-				"project":      "p-banana",
+				"domain":  "d-cherry",
+				"project": "p-banana",
 			},
 		},
 	}
 
 	mockClient := &mocks.MockableControllerRuntimeClient{}
 	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
-		Org:     "o-apple",
 		Domain:  "",
 		Project: "",
 		Name:    "secret1",
 	})
 	kubernetesSecretName2 := ToImagePullK8sName(SecretNameComponents{
-		Org:     "o-apple",
 		Domain:  "d-cherry",
 		Project: "",
 		Name:    "secret1",
@@ -425,10 +387,10 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 		config.EmbeddedSecretManagerConfig{},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
-				"u__org__o-apple__domain____project____key__secret1": {
-					StringValue: "fruits @ org",
+				"u__org____domain____project____key__secret1": {
+					StringValue: "fruits @ global",
 				},
-				"u__org__o-apple__domain__d-cherry__project____key__secret1": {
+				"u__org____domain__d-cherry__project____key__secret1": {
 					StringValue: "fruits @ domain",
 				},
 			},
@@ -451,28 +413,24 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"organization": "o-apple",
-				"domain":       "d-cherry",
-				"project":      "p-banana",
+				"domain":  "d-cherry",
+				"project": "p-banana",
 			},
 		},
 	}
 
 	mockClient := &mocks.MockableControllerRuntimeClient{}
 	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
-		Org:     "o-apple",
 		Domain:  "",
 		Project: "",
 		Name:    "secret1",
 	})
 	kubernetesSecretName2 := ToImagePullK8sName(SecretNameComponents{
-		Org:     "o-apple",
 		Domain:  "d-cherry",
 		Project: "",
 		Name:    "secret1",
 	})
 	kubernetesSecretName3 := ToImagePullK8sName(SecretNameComponents{
-		Org:     "o-apple",
 		Domain:  "d-cherry",
 		Project: "p-banana",
 		Name:    "secret1",
@@ -492,13 +450,13 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 		config.EmbeddedSecretManagerConfig{},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
-				"u__org__o-apple__domain____project____key__secret1": {
-					StringValue: "fruits @ org",
+				"u__org____domain____project____key__secret1": {
+					StringValue: "fruits @ global",
 				},
-				"u__org__o-apple__domain__d-cherry__project____key__secret1": {
+				"u__org____domain__d-cherry__project____key__secret1": {
 					StringValue: "fruits @ domain",
 				},
-				"u__org__o-apple__domain__d-cherry__project__p-banana__key__secret1": {
+				"u__org____domain__d-cherry__project__p-banana__key__secret1": {
 					StringValue: "fruits @ project",
 				},
 			},
@@ -513,15 +471,13 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 	ctx = context.Background()
 
-	testOrganization := "test-organization"
 	testDomain := "test-domain"
 	testProject := "test-project"
 	testSecretName := "test-secret"
 	testNamespace := "test-pod-namespace"
 
-	secretName := "u__org__test-organization__domain__test-domain__project__test-project__key__test-secret" //nolint:gosec
+	secretName := "u__org____domain__test-domain__project__test-project__key__test-secret" //nolint:gosec
 	kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
-		Org:     testOrganization,
 		Domain:  testDomain,
 		Project: testProject,
 		Name:    testSecretName,
@@ -549,9 +505,8 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"organization": testOrganization,
-				"domain":       testDomain,
-				"project":      testProject,
+				"domain":  testDomain,
+				"project": testProject,
 			},
 			Namespace: testNamespace,
 		},
@@ -664,9 +619,8 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 	t.Run("image pull secret is not scoped to project or domain", func(t *testing.T) {
 		testPod := pod.DeepCopy()
-		orgBasedSecretName := "u__org__test-organization__domain____project____key__test-secret" //nolint:gosec
+		orgBasedSecretName := "u__org____domain____project____key__test-secret" //nolint:gosec
 		orgBasedKubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
-			Org:     testOrganization,
 			Domain:  "",
 			Project: "",
 			Name:    testSecretName,

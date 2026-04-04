@@ -65,7 +65,6 @@ func TestGetActionDetails_NoDetailedInfo(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionModel := &models.Action{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		RunName: "rtest12345",
@@ -94,7 +93,6 @@ func TestGetActionDetails_WithTaskSpec(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -136,7 +134,6 @@ func TestGetActionDetails_WithTraceSpec(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -172,7 +169,6 @@ func TestGetActionDetails_TaskSpecLookupFails(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -196,7 +192,6 @@ func TestGetActionDetails_FailedActionSetsErrorInfo(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionModel := &models.Action{
-		Org:      "test-org",
 		Project:  "test-project",
 		Domain:   "test-domain",
 		RunName:  "rtest12345",
@@ -235,7 +230,6 @@ func TestGetActionDetails_WithAttempts(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionModel := &models.Action{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		RunName: "rtest12345",
@@ -515,7 +509,6 @@ func TestBuildActionDetails_CanceledContextSuppressesErrors(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -543,7 +536,6 @@ func TestGetActionDetails_SplitIntoGetAndBuild(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionModel := &models.Action{
-		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		RunName: "rtest12345",
