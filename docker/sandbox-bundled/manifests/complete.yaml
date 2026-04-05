@@ -106,11 +106,6 @@ spec:
                 description: Interruptible is the run-scoped interruptibility override
                   projected from RunSpec.
                 type: boolean
-              org:
-                description: Org this action belongs to
-                maxLength: 63
-                minLength: 1
-                type: string
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
                 maxLength: 30
@@ -151,7 +146,6 @@ spec:
             - actionName
             - domain
             - inputUri
-            - org
             - project
             - runName
             - runOutputBase

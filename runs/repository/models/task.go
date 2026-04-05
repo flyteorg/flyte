@@ -10,7 +10,6 @@ import (
 
 // TaskColumns are the allowed columns for task queries
 var TaskColumns = sets.New(
-	"org",
 	"project",
 	"domain",
 	"name",
@@ -35,7 +34,6 @@ var TaskVersionColumns = sets.New(
 
 // TaskName is a composite key representing a task
 type TaskName struct {
-	Org     string
 	Project string
 	Domain  string
 	Name    string
@@ -43,11 +41,10 @@ type TaskName struct {
 
 // TaskKey is a composite key for a task
 type TaskKey struct {
-	Org     string `gorm:"primaryKey;index:idx_tasks_identifier,priority:1" db:"org"`
-	Project string `gorm:"primaryKey;index:idx_tasks_identifier,priority:2" db:"project"`
-	Domain  string `gorm:"primaryKey;index:idx_tasks_identifier,priority:3" db:"domain"`
-	Name    string `gorm:"primaryKey;index:idx_tasks_identifier,priority:4" db:"name"`
-	Version string `gorm:"primaryKey;index:idx_tasks_identifier,priority:5" db:"version"`
+	Project string `gorm:"primaryKey;index:idx_tasks_identifier,priority:1" db:"project"`
+	Domain  string `gorm:"primaryKey;index:idx_tasks_identifier,priority:2" db:"domain"`
+	Name    string `gorm:"primaryKey;index:idx_tasks_identifier,priority:3" db:"name"`
+	Version string `gorm:"primaryKey;index:idx_tasks_identifier,priority:4" db:"version"`
 }
 
 // Tasks models the TaskDetails from the task_definition.proto
@@ -123,7 +120,6 @@ type RecentAction struct {
 }
 
 type TaskGroupNotificationPayload struct {
-	Org             string
 	Project         string
 	Domain          string
 	TaskName        string

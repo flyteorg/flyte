@@ -12,7 +12,6 @@ func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 	interruptible := true
 	taskAction := &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{
-			Org:           "org",
 			Project:       "project",
 			Domain:        "development",
 			RunName:       "run-name",
@@ -32,7 +31,6 @@ func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 func TestNewTaskExecutionMetadata_UserEnvVarsCannotClobberInternal(t *testing.T) {
 	taskAction := &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{
-			Org:           "org",
 			Project:       "project",
 			Domain:        "development",
 			RunName:       "run-name",
@@ -41,7 +39,6 @@ func TestNewTaskExecutionMetadata_UserEnvVarsCannotClobberInternal(t *testing.T)
 			EnvVars: map[string]string{
 				"ACTION_NAME": "malicious-override",
 				"RUN_NAME":    "malicious-override",
-				"_U_ORG_NAME": "malicious-override",
 				"_U_RUN_BASE": "malicious-override",
 				"USER_VAR":    "allowed",
 			},
@@ -54,7 +51,6 @@ func TestNewTaskExecutionMetadata_UserEnvVarsCannotClobberInternal(t *testing.T)
 	env := meta.GetEnvironmentVariables()
 	require.Equal(t, "action-name", env["ACTION_NAME"])
 	require.Equal(t, "run-name", env["RUN_NAME"])
-	require.Equal(t, "org", env["_U_ORG_NAME"])
 	require.Equal(t, "s3://bucket/run", env["_U_RUN_BASE"])
 	require.Equal(t, "allowed", env["USER_VAR"])
 }

@@ -12,12 +12,11 @@ import (
 type Action struct {
 	ID uint `gorm:"primaryKey" db:"id"`
 
-	// Action Identifier (unique across org/project/domain/run_name/name)
-	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_run_lookup,priority:1" db:"org"`
-	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_run_lookup,priority:2" db:"project"`
-	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_run_lookup,priority:3" db:"domain"`
-	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:4;index:idx_actions_run_lookup,priority:4" db:"run_name"`
-	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:5" db:"name"`
+	// Action Identifier (unique across project/domain/run_name/name)
+	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_run_lookup,priority:1" db:"project"`
+	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_run_lookup,priority:2" db:"domain"`
+	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_run_lookup,priority:3" db:"run_name"`
+	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:4" db:"name"`
 
 	// Parent action (NULL for root actions/runs)
 	ParentActionName sql.NullString `gorm:"index:idx_actions_parent" db:"parent_action_name"`
@@ -35,7 +34,6 @@ type Action struct {
 	ActionGroup sql.NullString `db:"action_group"`
 
 	// Task reference columns
-	TaskOrg     sql.NullString `db:"task_org"`
 	TaskProject sql.NullString `db:"task_project"`
 	TaskDomain  sql.NullString `db:"task_domain"`
 	TaskName    sql.NullString `db:"task_name"`

@@ -91,12 +91,6 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=30
 	RunName string `json:"runName"`
 
-	// Org this action belongs to
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=63
-	Org string `json:"org"`
-
 	// Project this action belongs to
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
@@ -171,7 +165,6 @@ func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {
 	spec := &workflow.ActionSpec{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     in.Org,
 				Project: in.Project,
 				Domain:  in.Domain,
 				Name:    in.RunName,
@@ -191,7 +184,6 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	// Populate structured fields from ActionSpec
 	if spec.ActionId != nil {
 		if spec.ActionId.Run != nil {
-			in.Org = spec.ActionId.Run.Org
 			in.Project = spec.ActionId.Run.Project
 			in.Domain = spec.ActionId.Run.Domain
 			in.RunName = spec.ActionId.Run.Name

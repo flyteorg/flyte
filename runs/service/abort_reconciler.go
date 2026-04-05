@@ -44,7 +44,7 @@ func defaultConfig() AbortReconcilerConfig {
 type abortTask struct {
 	actionID *common.ActionIdentifier
 	reason   string
-	key      string // "org/project/domain/run/actionName"
+	key      string // "project/domain/run/actionName"
 }
 
 // dedupeQueue is an in-memory, key-deduplicated work queue backed by a Go channel.
@@ -142,8 +142,8 @@ func NewAbortReconciler(repo interfaces.Repository, actionsClient actionsconnect
 // Push enqueues an abort request for the given action. Safe to call concurrently.
 // No-op if the key is already queued (dedup).
 func (r *AbortReconciler) Push(ctx context.Context, actionID *common.ActionIdentifier, reason string) {
-	key := fmt.Sprintf("%s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	key := fmt.Sprintf("%s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	r.queue.push(ctx, abortTask{actionID: actionID, reason: reason, key: key})
 }
 
@@ -183,14 +183,13 @@ func (r *AbortReconciler) startupScan(ctx context.Context) error {
 		task := abortTask{
 			actionID: &common.ActionIdentifier{
 				Run: &common.RunIdentifier{
-					Org:     a.Org,
 					Project: a.Project,
 					Domain:  a.Domain,
 					Name:    a.RunName,
 				},
 				Name: a.Name,
 			},
-			key: fmt.Sprintf("%s/%s/%s/%s/%s", a.Org, a.Project, a.Domain, a.RunName, a.Name),
+			key: fmt.Sprintf("%s/%s/%s/%s", a.Project, a.Domain, a.RunName, a.Name),
 		}
 		if a.AbortReason != nil {
 			task.reason = *a.AbortReason

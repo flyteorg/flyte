@@ -28,7 +28,6 @@ func setupActionDB(t *testing.T) *gorm.DB {
 	var err error
 	err = db.Exec(`CREATE TABLE actions (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		org TEXT NOT NULL,
 		project TEXT NOT NULL,
 		domain TEXT NOT NULL,
 		run_name TEXT NOT NULL DEFAULT '',
@@ -38,7 +37,6 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		run_source TEXT NOT NULL DEFAULT '',
 		action_type INTEGER NOT NULL DEFAULT 0,
 		action_group TEXT,
-		task_org TEXT,
 		task_project TEXT,
 		task_domain TEXT,
 		task_name TEXT,
@@ -60,10 +58,8 @@ func setupActionDB(t *testing.T) *gorm.DB {
 		duration_ms INTEGER,
 		attempts INTEGER NOT NULL DEFAULT 1,
 		cache_status INTEGER NOT NULL DEFAULT 0,
-		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, run_name, name)
+		CONSTRAINT uq_actions_identifier UNIQUE (project, domain, run_name, name)
 	)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_org ON actions(org)`).Error
 	require.NoError(t, err)
 	err = db.Exec(`CREATE INDEX idx_actions_project ON actions(project)`).Error
 	require.NoError(t, err)
@@ -107,7 +103,6 @@ func TestCreateRun(t *testing.T) {
 	run, err := actionRepo.CreateRun(ctx, req, "s3://input", "s3://output")
 	require.NoError(t, err)
 	require.NotNil(t, run)
-	assert.Equal(t, runID.Org, run.Org)
 	assert.Equal(t, runID.Project, run.Project)
 	assert.Equal(t, runID.Domain, run.Domain)
 	assert.Equal(t, runID.Name, run.RunName)
@@ -450,7 +445,6 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsFiltered, 3)
 	for _, r := range runsFiltered {
-		assert.Equal(t, "org1", r.Org)
 		assert.Equal(t, "proj1", r.Project)
 		assert.Equal(t, "domain1", r.Domain)
 	}
@@ -459,7 +453,6 @@ func TestListRuns(t *testing.T) {
 func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
 	db := setupActionDB(t)
 	err := db.Exec(`CREATE TABLE action_events (
-		org TEXT NOT NULL,
 		project TEXT NOT NULL,
 		domain TEXT NOT NULL,
 		run_name TEXT NOT NULL,
@@ -471,7 +464,7 @@ func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
 		error_kind TEXT,
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		PRIMARY KEY (org, project, domain, run_name, name, attempt, phase, version)
+		PRIMARY KEY (project, domain, run_name, name, attempt, phase, version)
 	)`).Error
 	require.NoError(t, err)
 
@@ -614,7 +607,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	select {
 	case payload := <-r.actionNotifyCh:
-		assert.Equal(t, "org/proj/domain/run'; DROP TABLE actions; --/action", payload)
+		assert.Equal(t, "proj/domain/run'; DROP TABLE actions; --/action", payload)
 	case <-ctx.Done():
 		t.Fatal("timed out waiting for payload on actionNotifyCh")
 	}
@@ -641,7 +634,7 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	select {
 	case payload := <-r.runNotifyCh:
-		assert.Equal(t, "org/proj/domain/run'); SELECT pg_sleep(10); --", payload)
+		assert.Equal(t, "proj/domain/run'); SELECT pg_sleep(10); --", payload)
 	case <-ctx.Done():
 		t.Fatal("timed out waiting for payload on runNotifyCh")
 	}
@@ -702,7 +695,7 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	}
 
 	// Send a notification, then close the channel so the loop exits.
-	r.actionNotifyCh <- "org/proj/domain/run/action"
+	r.actionNotifyCh <- "proj/domain/run/action"
 	close(r.actionNotifyCh)
 
 	// Pass a nil conn — should not panic.

@@ -111,7 +111,6 @@ func testActionWithTask(name string, parent *string, phase common.ActionPhase, c
 		parentNullStr = sql.NullString{String: *parent, Valid: true}
 	}
 	action := &models.Action{
-		Org:              "o",
 		Project:          "p",
 		Domain:           "d",
 		Name:             name,

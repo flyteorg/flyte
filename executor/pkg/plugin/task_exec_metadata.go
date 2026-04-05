@@ -80,7 +80,6 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	envVars := map[string]string{
 		"ACTION_NAME": ta.Spec.ActionName,
 		"RUN_NAME":    ta.Spec.RunName,
-		"_U_ORG_NAME": ta.Spec.Org,
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
 	}
 	for key, value := range ta.Spec.EnvVars {
@@ -105,7 +104,6 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 						Project: ta.Spec.Project,
 						Domain:  ta.Spec.Domain,
 						Name:    ta.Spec.RunName,
-						Org:     ta.Spec.Org,
 					},
 					NodeId: ta.Spec.ActionName,
 				},
