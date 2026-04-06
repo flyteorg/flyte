@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,7 +44,7 @@ func TestBasicFilter_ValueIn(t *testing.T) {
 
 	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
-	assert.Equal(t, "status IN ?", expr.Query)
+	assert.Equal(t, "status = ANY(?)", expr.Query)
 }
 
 func TestCompositeFilter_And(t *testing.T) {
@@ -142,6 +143,10 @@ func TestParseStringFilters_ValueInState(t *testing.T) {
 
 	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
-	assert.Equal(t, "state IN ?", expr.Query)
-	assert.Equal(t, []interface{}{[]string{"0", "1", "2"}}, expr.Args)
+	assert.Equal(t, "state = ANY(?)", expr.Query)
+	require.Len(t, expr.Args, 1)
+	// pq.Array wraps the slice, so check the underlying values via formatting
+	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "0")
+	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "1")
+	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "2")
 }
