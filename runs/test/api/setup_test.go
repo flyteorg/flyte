@@ -8,8 +8,10 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
 	"time"
 
+	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"gorm.io/gorm"
@@ -25,8 +27,7 @@ import (
 )
 
 const (
-	testPort   = 8091                      // Different port to avoid conflicts with main service
-	testDBFile = "/tmp/flyte-runs-test.db" // Temporary database file for tests
+	testPort = 8091 // Different port to avoid conflicts with main service
 )
 
 var (
@@ -51,21 +52,41 @@ func TestMain(m *testing.M) {
 			log.Println("Test server stopped")
 		}
 
-		// Remove test database file
-		if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
-			log.Printf("Warning: Failed to remove test database: %v", err)
-		}
-
 		os.Exit(exitCode)
 	}()
 
-	// Setup: Create SQLite database
-	// NOTE: Using a temp file instead of :memory: to avoid GORM AutoMigrate issues
-	// with index creation on fresh in-memory databases
+	// Setup: Start embedded PostgreSQL
+	const embeddedPGPort = 15435
+	pg := embeddedpostgres.NewDatabase(
+		embeddedpostgres.DefaultConfig().
+			Port(embeddedPGPort).
+			Database("flyte_runs_test").
+			Username("postgres").
+			Password("postgres").
+			RuntimePath(fmt.Sprintf("/tmp/embedded-postgres-%d", embeddedPGPort)),
+	)
+	if err := pg.Start(); err != nil {
+		log.Printf("Failed to start embedded postgres: %v", err)
+		exitCode = 1
+		return
+	}
+	defer func() {
+		if err := pg.Stop(); err != nil {
+			log.Printf("Warning: failed to stop embedded postgres: %v", err)
+		}
+	}()
+
 	dbConfig := &database.DbConfig{
-		SQLite: database.SQLiteConfig{
-			File: testDBFile,
+		Postgres: database.PostgresConfig{
+			Host:         "localhost",
+			Port:         embeddedPGPort,
+			DbName:       "flyte_runs_test",
+			User:         "postgres",
+			Password:     "postgres",
+			ExtraOptions: "sslmode=disable",
 		},
+		MaxIdleConnections: 10,
+		MaxOpenConnections: 100,
 	}
 	logCfg := logger.GetConfig()
 	var err error

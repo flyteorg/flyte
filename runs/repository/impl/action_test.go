@@ -24,60 +24,10 @@ import (
 
 func setupActionDB(t *testing.T) *gorm.DB {
 	db := setupDB(t)
-
-	var err error
-	err = db.Exec(`CREATE TABLE actions (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		project TEXT NOT NULL,
-		domain TEXT NOT NULL,
-		run_name TEXT NOT NULL DEFAULT '',
-		name TEXT NOT NULL,
-		parent_action_name TEXT,
-		phase INTEGER NOT NULL DEFAULT 1,
-		run_source TEXT NOT NULL DEFAULT '',
-		action_type INTEGER NOT NULL DEFAULT 0,
-		action_group TEXT,
-		task_project TEXT,
-		task_domain TEXT,
-		task_name TEXT,
-		task_version TEXT,
-		task_type TEXT NOT NULL DEFAULT '',
-		task_short_name TEXT,
-		function_name TEXT NOT NULL DEFAULT '',
-		environment_name TEXT,
-		action_spec BLOB,
-		action_details BLOB,
-		detailed_info BLOB,
-		run_spec BLOB,
-		abort_requested_at DATETIME,
-		abort_attempt_count INTEGER NOT NULL DEFAULT 0,
-		abort_reason TEXT,
-		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		ended_at DATETIME,
-		duration_ms INTEGER,
-		attempts INTEGER NOT NULL DEFAULT 1,
-		cache_status INTEGER NOT NULL DEFAULT 0,
-		CONSTRAINT uq_actions_identifier UNIQUE (project, domain, run_name, name)
-	)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_project ON actions(project)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_domain ON actions(domain)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_run_name ON actions(run_name)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_parent ON actions(parent_action_name)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_phase ON actions(phase)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_created ON actions(created_at)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_updated ON actions(updated_at)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_ended ON actions(ended_at)`).Error
-	require.NoError(t, err)
-
+	t.Cleanup(func() {
+		db.Exec("DELETE FROM action_events")
+		db.Exec("DELETE FROM actions")
+	})
 	return db
 }
 
@@ -440,22 +390,6 @@ func TestListRuns(t *testing.T) {
 
 func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
 	db := setupActionDB(t)
-	err := db.Exec(`CREATE TABLE action_events (
-		project TEXT NOT NULL,
-		domain TEXT NOT NULL,
-		run_name TEXT NOT NULL,
-		name TEXT NOT NULL,
-		attempt INTEGER NOT NULL,
-		phase INTEGER NOT NULL,
-		version INTEGER NOT NULL,
-		info BLOB,
-		error_kind TEXT,
-		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		PRIMARY KEY (project, domain, run_name, name, attempt, phase, version)
-	)`).Error
-	require.NoError(t, err)
-
 	r, err := NewActionRepo(db, database.DbConfig{})
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
@@ -572,7 +506,7 @@ func TestInsertEvents_Empty(t *testing.T) {
 
 func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -603,7 +537,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -677,7 +611,7 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}

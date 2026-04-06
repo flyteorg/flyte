@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/glebarez/sqlite"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 
@@ -29,14 +28,6 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	var err error
 
 	switch {
-	case !(dbConfig.SQLite.IsEmpty()):
-		if dbConfig.SQLite.File == "" {
-			return nil, fmt.Errorf("illegal sqlite database configuration. `file` is a required parameter and should be a path")
-		}
-		gormDb, err = gorm.Open(sqlite.Open(dbConfig.SQLite.File), gormConfig)
-		if err != nil {
-			return nil, err
-		}
 	case !(dbConfig.Postgres.IsEmpty()):
 		gormDb, err = CreatePostgresDbIfNotExists(ctx, gormConfig, dbConfig.Postgres)
 		if err != nil {
@@ -59,7 +50,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 			return nil, err
 		}
 	default:
-		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfig)
+		return nil, fmt.Errorf("unrecognized database config, %v. Postgres config is required", dbConfig)
 	}
 
 	// Setup connection pool settings

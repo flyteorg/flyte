@@ -5,18 +5,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{TranslateError: true})
-	require.NoError(t, err)
+	db := setupDB(t)
 	require.NoError(t, db.AutoMigrate(&models.Project{}))
+	t.Cleanup(func() { db.Exec("DELETE FROM projects") })
 
 	repo := NewProjectRepo(db)
 	ctx := context.Background()
@@ -28,7 +26,7 @@ func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
 		State:      &state,
 	}))
 
-	err = repo.CreateProject(ctx, &models.Project{
+	err := repo.CreateProject(ctx, &models.Project{
 		Identifier: "flytesnacks",
 		Name:       "flytesnacks",
 		State:      &state,

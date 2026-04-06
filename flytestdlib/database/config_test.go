@@ -37,6 +37,4 @@ func TestParseDatabaseConfig(t *testing.T) {
 	assert.Equal(t, "/etc/secret", GetConfig().Postgres.PasswordPath)
 	assert.Equal(t, true, GetConfig().Postgres.Debug)
 
-	assert.Equal(t, false, GetConfig().SQLite.IsEmpty())
-	assert.Equal(t, "admin.db", GetConfig().SQLite.File)
 }

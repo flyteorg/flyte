@@ -55,12 +55,6 @@ type DbConfig struct {
 	MaxOpenConnections                      int             `json:"maxOpenConnections" pflag:",maxOpenConnections sets the maximum number of open connections to the database."`
 	ConnMaxLifeTime                         config.Duration `json:"connMaxLifeTime" pflag:",sets the maximum amount of time a connection may be reused"`
 	Postgres                                PostgresConfig  `json:"postgres,omitempty"`
-	SQLite                                  SQLiteConfig    `json:"sqlite,omitempty"`
-}
-
-// SQLiteConfig can be used to configure
-type SQLiteConfig struct {
-	File string `json:"file" pflag:",The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be reused, else a new will be created"`
 }
 
 // PostgresConfig includes specific config options for opening a connection to a postgres database.
@@ -77,12 +71,7 @@ type PostgresConfig struct {
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
 }
 
-var emptySQLiteCfg = SQLiteConfig{}
 var emptyPostgresConfig = PostgresConfig{}
-
-func (s SQLiteConfig) IsEmpty() bool {
-	return s == emptySQLiteCfg
-}
 
 func (s PostgresConfig) IsEmpty() bool {
 	return s == emptyPostgresConfig
