@@ -3,6 +3,8 @@ package impl
 import (
 	"fmt"
 
+	"github.com/lib/pq"
+
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -39,7 +41,8 @@ func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error
 		query = fmt.Sprintf("%s LIKE ?", column)
 		f.value = fmt.Sprintf("%%%v%%", f.value)
 	case interfaces.FilterExpressionValueIn:
-		query = fmt.Sprintf("%s IN ?", column)
+		query = fmt.Sprintf("%s = ANY(?)", column)
+		f.value = pq.Array(f.value)
 	case interfaces.FilterExpressionEndsWith:
 		query = fmt.Sprintf("%s LIKE ?", column)
 		f.value = fmt.Sprintf("%%%v", f.value)

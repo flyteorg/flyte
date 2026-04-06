@@ -1824,6 +1824,59 @@ func (_c *Filter_And_Call) RunAndReturn(run func(filter interfaces.Filter) inter
 	return _c
 }
 
+// Or provides a mock function for the type Filter
+func (_mock *Filter) Or(filter interfaces.Filter) interfaces.Filter {
+	ret := _mock.Called(filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Or")
+	}
+
+	var r0 interfaces.Filter
+	if returnFunc, ok := ret.Get(0).(func(interfaces.Filter) interfaces.Filter); ok {
+		r0 = returnFunc(filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interfaces.Filter)
+		}
+	}
+	return r0
+}
+
+// Filter_Or_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Or'
+type Filter_Or_Call struct {
+	*mock.Call
+}
+
+// Or is a helper method to define mock.On call
+//   - filter interfaces.Filter
+func (_e *Filter_Expecter) Or(filter interface{}) *Filter_Or_Call {
+	return &Filter_Or_Call{Call: _e.mock.On("Or", filter)}
+}
+
+func (_c *Filter_Or_Call) Run(run func(filter interfaces.Filter)) *Filter_Or_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 interfaces.Filter
+		if args[0] != nil {
+			arg0 = args[0].(interfaces.Filter)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *Filter_Or_Call) Return(filter1 interfaces.Filter) *Filter_Or_Call {
+	_c.Call.Return(filter1)
+	return _c
+}
+
+func (_c *Filter_Or_Call) RunAndReturn(run func(filter interfaces.Filter) interfaces.Filter) *Filter_Or_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // QueryExpression provides a mock function for the type Filter
 func (_mock *Filter) QueryExpression(table string) (interfaces.QueryExpr, error) {
 	ret := _mock.Called(table)
@@ -1874,65 +1927,12 @@ func (_c *Filter_QueryExpression_Call) Run(run func(table string)) *Filter_Query
 	return _c
 }
 
-func (_c *Filter_QueryExpression_Call) Return(gormQueryExpr interfaces.QueryExpr, err error) *Filter_QueryExpression_Call {
-	_c.Call.Return(gormQueryExpr, err)
+func (_c *Filter_QueryExpression_Call) Return(queryExpr interfaces.QueryExpr, err error) *Filter_QueryExpression_Call {
+	_c.Call.Return(queryExpr, err)
 	return _c
 }
 
 func (_c *Filter_QueryExpression_Call) RunAndReturn(run func(table string) (interfaces.QueryExpr, error)) *Filter_QueryExpression_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Or provides a mock function for the type Filter
-func (_mock *Filter) Or(filter interfaces.Filter) interfaces.Filter {
-	ret := _mock.Called(filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Or")
-	}
-
-	var r0 interfaces.Filter
-	if returnFunc, ok := ret.Get(0).(func(interfaces.Filter) interfaces.Filter); ok {
-		r0 = returnFunc(filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interfaces.Filter)
-		}
-	}
-	return r0
-}
-
-// Filter_Or_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Or'
-type Filter_Or_Call struct {
-	*mock.Call
-}
-
-// Or is a helper method to define mock.On call
-//   - filter interfaces.Filter
-func (_e *Filter_Expecter) Or(filter interface{}) *Filter_Or_Call {
-	return &Filter_Or_Call{Call: _e.mock.On("Or", filter)}
-}
-
-func (_c *Filter_Or_Call) Run(run func(filter interfaces.Filter)) *Filter_Or_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 interfaces.Filter
-		if args[0] != nil {
-			arg0 = args[0].(interfaces.Filter)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *Filter_Or_Call) Return(filter1 interfaces.Filter) *Filter_Or_Call {
-	_c.Call.Return(filter1)
-	return _c
-}
-
-func (_c *Filter_Or_Call) RunAndReturn(run func(filter interfaces.Filter) interfaces.Filter) *Filter_Or_Call {
 	_c.Call.Return(run)
 	return _c
 }
