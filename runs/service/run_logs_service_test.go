@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/gorm"
+	"database/sql"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -299,7 +299,7 @@ func TestTailLogs_EventNotFound(t *testing.T) {
 	streamer := &mockLogStreamer{}
 
 	actionRepo.On("GetLatestEventByAttempt", mock.Anything, mock.Anything, uint32(5)).
-		Return(nil, fmt.Errorf("event not found for attempt 5: %w", gorm.ErrRecordNotFound))
+		Return(nil, fmt.Errorf("event not found for attempt 5: %w", sql.ErrNoRows))
 
 	client := newTailLogsTestClient(t, actionRepo, streamer)
 
