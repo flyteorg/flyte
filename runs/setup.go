@@ -100,7 +100,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(appPath, appHandler)
 	logger.Infof(ctx, "Mounted AppService at %s", appPath)
 
-	triggerSvc := service.NewTriggerService()
+	triggerSvc := service.NewTriggerService(repo)
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)

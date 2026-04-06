@@ -2339,6 +2339,52 @@ func (_c *Repository_TaskRepo_Call) RunAndReturn(run func() interfaces.TaskRepo)
 	return _c
 }
 
+// TriggerRepo provides a mock function for the type Repository
+func (_mock *Repository) TriggerRepo() interfaces.TriggerRepo {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for TriggerRepo")
+	}
+
+	var r0 interfaces.TriggerRepo
+	if returnFunc, ok := ret.Get(0).(func() interfaces.TriggerRepo); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interfaces.TriggerRepo)
+		}
+	}
+	return r0
+}
+
+// Repository_TriggerRepo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TriggerRepo'
+type Repository_TriggerRepo_Call struct {
+	*mock.Call
+}
+
+// TriggerRepo is a helper method to define mock.On call
+func (_e *Repository_Expecter) TriggerRepo() *Repository_TriggerRepo_Call {
+	return &Repository_TriggerRepo_Call{Call: _e.mock.On("TriggerRepo")}
+}
+
+func (_c *Repository_TriggerRepo_Call) Run(run func()) *Repository_TriggerRepo_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Repository_TriggerRepo_Call) Return(triggerRepo interfaces.TriggerRepo) *Repository_TriggerRepo_Call {
+	_c.Call.Return(triggerRepo)
+	return _c
+}
+
+func (_c *Repository_TriggerRepo_Call) RunAndReturn(run func() interfaces.TriggerRepo) *Repository_TriggerRepo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewSortParameter creates a new instance of SortParameter. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewSortParameter(t interface {
@@ -2438,16 +2484,16 @@ func (_m *TaskRepo) EXPECT() *TaskRepo_Expecter {
 }
 
 // CreateTask provides a mock function for the type TaskRepo
-func (_mock *TaskRepo) CreateTask(ctx context.Context, task *models.Task) error {
-	ret := _mock.Called(ctx, task)
+func (_mock *TaskRepo) CreateTask(ctx context.Context, task *models.Task, triggers []*models.Trigger) error {
+	ret := _mock.Called(ctx, task, triggers)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateTask")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Task) error); ok {
-		r0 = returnFunc(ctx, task)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Task, []*models.Trigger) error); ok {
+		r0 = returnFunc(ctx, task, triggers)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -2462,11 +2508,12 @@ type TaskRepo_CreateTask_Call struct {
 // CreateTask is a helper method to define mock.On call
 //   - ctx context.Context
 //   - task *models.Task
-func (_e *TaskRepo_Expecter) CreateTask(ctx interface{}, task interface{}) *TaskRepo_CreateTask_Call {
-	return &TaskRepo_CreateTask_Call{Call: _e.mock.On("CreateTask", ctx, task)}
+//   - triggers []*models.Trigger
+func (_e *TaskRepo_Expecter) CreateTask(ctx interface{}, task interface{}, triggers interface{}) *TaskRepo_CreateTask_Call {
+	return &TaskRepo_CreateTask_Call{Call: _e.mock.On("CreateTask", ctx, task, triggers)}
 }
 
-func (_c *TaskRepo_CreateTask_Call) Run(run func(ctx context.Context, task *models.Task)) *TaskRepo_CreateTask_Call {
+func (_c *TaskRepo_CreateTask_Call) Run(run func(ctx context.Context, task *models.Task, triggers []*models.Trigger)) *TaskRepo_CreateTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -2476,9 +2523,14 @@ func (_c *TaskRepo_CreateTask_Call) Run(run func(ctx context.Context, task *mode
 		if args[1] != nil {
 			arg1 = args[1].(*models.Task)
 		}
+		var arg2 []*models.Trigger
+		if args[2] != nil {
+			arg2 = args[2].([]*models.Trigger)
+		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
@@ -2489,7 +2541,7 @@ func (_c *TaskRepo_CreateTask_Call) Return(err error) *TaskRepo_CreateTask_Call 
 	return _c
 }
 
-func (_c *TaskRepo_CreateTask_Call) RunAndReturn(run func(ctx context.Context, task *models.Task) error) *TaskRepo_CreateTask_Call {
+func (_c *TaskRepo_CreateTask_Call) RunAndReturn(run func(ctx context.Context, task *models.Task, triggers []*models.Trigger) error) *TaskRepo_CreateTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2819,6 +2871,565 @@ func (_c *TaskRepo_ListVersions_Call) Return(taskVersions []*models.TaskVersion,
 }
 
 func (_c *TaskRepo_ListVersions_Call) RunAndReturn(run func(ctx context.Context, input interfaces.ListResourceInput) ([]*models.TaskVersion, error)) *TaskRepo_ListVersions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// NewTriggerRepo creates a new instance of TriggerRepo. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+// The first argument is typically a *testing.T value.
+func NewTriggerRepo(t interface {
+	mock.TestingT
+	Cleanup(func())
+}) *TriggerRepo {
+	mock := &TriggerRepo{}
+	mock.Mock.Test(t)
+
+	t.Cleanup(func() { mock.AssertExpectations(t) })
+
+	return mock
+}
+
+// TriggerRepo is an autogenerated mock type for the TriggerRepo type
+type TriggerRepo struct {
+	mock.Mock
+}
+
+type TriggerRepo_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *TriggerRepo) EXPECT() *TriggerRepo_Expecter {
+	return &TriggerRepo_Expecter{mock: &_m.Mock}
+}
+
+// DeleteTriggers provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) DeleteTriggers(ctx context.Context, keys []interfaces.TriggerNameKey) error {
+	ret := _mock.Called(ctx, keys)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteTriggers")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []interfaces.TriggerNameKey) error); ok {
+		r0 = returnFunc(ctx, keys)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// TriggerRepo_DeleteTriggers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteTriggers'
+type TriggerRepo_DeleteTriggers_Call struct {
+	*mock.Call
+}
+
+// DeleteTriggers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - keys []interfaces.TriggerNameKey
+func (_e *TriggerRepo_Expecter) DeleteTriggers(ctx interface{}, keys interface{}) *TriggerRepo_DeleteTriggers_Call {
+	return &TriggerRepo_DeleteTriggers_Call{Call: _e.mock.On("DeleteTriggers", ctx, keys)}
+}
+
+func (_c *TriggerRepo_DeleteTriggers_Call) Run(run func(ctx context.Context, keys []interfaces.TriggerNameKey)) *TriggerRepo_DeleteTriggers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []interfaces.TriggerNameKey
+		if args[1] != nil {
+			arg1 = args[1].([]interfaces.TriggerNameKey)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_DeleteTriggers_Call) Return(err error) *TriggerRepo_DeleteTriggers_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *TriggerRepo_DeleteTriggers_Call) RunAndReturn(run func(ctx context.Context, keys []interfaces.TriggerNameKey) error) *TriggerRepo_DeleteTriggers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTrigger provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) GetTrigger(ctx context.Context, project string, domain string, taskName string, name string) (*models.Trigger, error) {
+	ret := _mock.Called(ctx, project, domain, taskName, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTrigger")
+	}
+
+	var r0 *models.Trigger
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string) (*models.Trigger, error)); ok {
+		return returnFunc(ctx, project, domain, taskName, name)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string) *models.Trigger); ok {
+		r0 = returnFunc(ctx, project, domain, taskName, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Trigger)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
+		r1 = returnFunc(ctx, project, domain, taskName, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TriggerRepo_GetTrigger_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTrigger'
+type TriggerRepo_GetTrigger_Call struct {
+	*mock.Call
+}
+
+// GetTrigger is a helper method to define mock.On call
+//   - ctx context.Context
+//   - project string
+//   - domain string
+//   - taskName string
+//   - name string
+func (_e *TriggerRepo_Expecter) GetTrigger(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}) *TriggerRepo_GetTrigger_Call {
+	return &TriggerRepo_GetTrigger_Call{Call: _e.mock.On("GetTrigger", ctx, project, domain, taskName, name)}
+}
+
+func (_c *TriggerRepo_GetTrigger_Call) Run(run func(ctx context.Context, project string, domain string, taskName string, name string)) *TriggerRepo_GetTrigger_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_GetTrigger_Call) Return(trigger *models.Trigger, err error) *TriggerRepo_GetTrigger_Call {
+	_c.Call.Return(trigger, err)
+	return _c
+}
+
+func (_c *TriggerRepo_GetTrigger_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, taskName string, name string) (*models.Trigger, error)) *TriggerRepo_GetTrigger_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTriggerRevision provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) GetTriggerRevision(ctx context.Context, project string, domain string, taskName string, name string, revision uint64) (*models.TriggerRevision, error) {
+	ret := _mock.Called(ctx, project, domain, taskName, name, revision)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTriggerRevision")
+	}
+
+	var r0 *models.TriggerRevision
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string, uint64) (*models.TriggerRevision, error)); ok {
+		return returnFunc(ctx, project, domain, taskName, name, revision)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string, uint64) *models.TriggerRevision); ok {
+		r0 = returnFunc(ctx, project, domain, taskName, name, revision)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.TriggerRevision)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, string, uint64) error); ok {
+		r1 = returnFunc(ctx, project, domain, taskName, name, revision)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TriggerRepo_GetTriggerRevision_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTriggerRevision'
+type TriggerRepo_GetTriggerRevision_Call struct {
+	*mock.Call
+}
+
+// GetTriggerRevision is a helper method to define mock.On call
+//   - ctx context.Context
+//   - project string
+//   - domain string
+//   - taskName string
+//   - name string
+//   - revision uint64
+func (_e *TriggerRepo_Expecter) GetTriggerRevision(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}, revision interface{}) *TriggerRepo_GetTriggerRevision_Call {
+	return &TriggerRepo_GetTriggerRevision_Call{Call: _e.mock.On("GetTriggerRevision", ctx, project, domain, taskName, name, revision)}
+}
+
+func (_c *TriggerRepo_GetTriggerRevision_Call) Run(run func(ctx context.Context, project string, domain string, taskName string, name string, revision uint64)) *TriggerRepo_GetTriggerRevision_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 uint64
+		if args[5] != nil {
+			arg5 = args[5].(uint64)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_GetTriggerRevision_Call) Return(triggerRevision *models.TriggerRevision, err error) *TriggerRepo_GetTriggerRevision_Call {
+	_c.Call.Return(triggerRevision, err)
+	return _c
+}
+
+func (_c *TriggerRepo_GetTriggerRevision_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, taskName string, name string, revision uint64) (*models.TriggerRevision, error)) *TriggerRepo_GetTriggerRevision_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListTriggerRevisions provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) ListTriggerRevisions(ctx context.Context, project string, domain string, taskName string, name string, input interfaces.ListResourceInput) ([]*models.TriggerRevision, error) {
+	ret := _mock.Called(ctx, project, domain, taskName, name, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListTriggerRevisions")
+	}
+
+	var r0 []*models.TriggerRevision
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string, interfaces.ListResourceInput) ([]*models.TriggerRevision, error)); ok {
+		return returnFunc(ctx, project, domain, taskName, name, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string, interfaces.ListResourceInput) []*models.TriggerRevision); ok {
+		r0 = returnFunc(ctx, project, domain, taskName, name, input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.TriggerRevision)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, string, interfaces.ListResourceInput) error); ok {
+		r1 = returnFunc(ctx, project, domain, taskName, name, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TriggerRepo_ListTriggerRevisions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTriggerRevisions'
+type TriggerRepo_ListTriggerRevisions_Call struct {
+	*mock.Call
+}
+
+// ListTriggerRevisions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - project string
+//   - domain string
+//   - taskName string
+//   - name string
+//   - input interfaces.ListResourceInput
+func (_e *TriggerRepo_Expecter) ListTriggerRevisions(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}, input interface{}) *TriggerRepo_ListTriggerRevisions_Call {
+	return &TriggerRepo_ListTriggerRevisions_Call{Call: _e.mock.On("ListTriggerRevisions", ctx, project, domain, taskName, name, input)}
+}
+
+func (_c *TriggerRepo_ListTriggerRevisions_Call) Run(run func(ctx context.Context, project string, domain string, taskName string, name string, input interfaces.ListResourceInput)) *TriggerRepo_ListTriggerRevisions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
+		}
+		var arg5 interfaces.ListResourceInput
+		if args[5] != nil {
+			arg5 = args[5].(interfaces.ListResourceInput)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+			arg4,
+			arg5,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_ListTriggerRevisions_Call) Return(triggerRevisions []*models.TriggerRevision, err error) *TriggerRepo_ListTriggerRevisions_Call {
+	_c.Call.Return(triggerRevisions, err)
+	return _c
+}
+
+func (_c *TriggerRepo_ListTriggerRevisions_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, taskName string, name string, input interfaces.ListResourceInput) ([]*models.TriggerRevision, error)) *TriggerRepo_ListTriggerRevisions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListTriggers provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) ListTriggers(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Trigger, error) {
+	ret := _mock.Called(ctx, input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListTriggers")
+	}
+
+	var r0 []*models.Trigger
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.ListResourceInput) ([]*models.Trigger, error)); ok {
+		return returnFunc(ctx, input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.ListResourceInput) []*models.Trigger); ok {
+		r0 = returnFunc(ctx, input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Trigger)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, interfaces.ListResourceInput) error); ok {
+		r1 = returnFunc(ctx, input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TriggerRepo_ListTriggers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTriggers'
+type TriggerRepo_ListTriggers_Call struct {
+	*mock.Call
+}
+
+// ListTriggers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - input interfaces.ListResourceInput
+func (_e *TriggerRepo_Expecter) ListTriggers(ctx interface{}, input interface{}) *TriggerRepo_ListTriggers_Call {
+	return &TriggerRepo_ListTriggers_Call{Call: _e.mock.On("ListTriggers", ctx, input)}
+}
+
+func (_c *TriggerRepo_ListTriggers_Call) Run(run func(ctx context.Context, input interfaces.ListResourceInput)) *TriggerRepo_ListTriggers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 interfaces.ListResourceInput
+		if args[1] != nil {
+			arg1 = args[1].(interfaces.ListResourceInput)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_ListTriggers_Call) Return(triggers []*models.Trigger, err error) *TriggerRepo_ListTriggers_Call {
+	_c.Call.Return(triggers, err)
+	return _c
+}
+
+func (_c *TriggerRepo_ListTriggers_Call) RunAndReturn(run func(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Trigger, error)) *TriggerRepo_ListTriggers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SaveTrigger provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) SaveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error) {
+	ret := _mock.Called(ctx, trigger, expectedRevision)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SaveTrigger")
+	}
+
+	var r0 *models.Trigger
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Trigger, uint64) (*models.Trigger, error)); ok {
+		return returnFunc(ctx, trigger, expectedRevision)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Trigger, uint64) *models.Trigger); ok {
+		r0 = returnFunc(ctx, trigger, expectedRevision)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Trigger)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *models.Trigger, uint64) error); ok {
+		r1 = returnFunc(ctx, trigger, expectedRevision)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// TriggerRepo_SaveTrigger_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SaveTrigger'
+type TriggerRepo_SaveTrigger_Call struct {
+	*mock.Call
+}
+
+// SaveTrigger is a helper method to define mock.On call
+//   - ctx context.Context
+//   - trigger *models.Trigger
+//   - expectedRevision uint64
+func (_e *TriggerRepo_Expecter) SaveTrigger(ctx interface{}, trigger interface{}, expectedRevision interface{}) *TriggerRepo_SaveTrigger_Call {
+	return &TriggerRepo_SaveTrigger_Call{Call: _e.mock.On("SaveTrigger", ctx, trigger, expectedRevision)}
+}
+
+func (_c *TriggerRepo_SaveTrigger_Call) Run(run func(ctx context.Context, trigger *models.Trigger, expectedRevision uint64)) *TriggerRepo_SaveTrigger_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *models.Trigger
+		if args[1] != nil {
+			arg1 = args[1].(*models.Trigger)
+		}
+		var arg2 uint64
+		if args[2] != nil {
+			arg2 = args[2].(uint64)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_SaveTrigger_Call) Return(trigger1 *models.Trigger, err error) *TriggerRepo_SaveTrigger_Call {
+	_c.Call.Return(trigger1, err)
+	return _c
+}
+
+func (_c *TriggerRepo_SaveTrigger_Call) RunAndReturn(run func(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error)) *TriggerRepo_SaveTrigger_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateTriggers provides a mock function for the type TriggerRepo
+func (_mock *TriggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error {
+	ret := _mock.Called(ctx, keys, active)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateTriggers")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []interfaces.TriggerNameKey, bool) error); ok {
+		r0 = returnFunc(ctx, keys, active)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// TriggerRepo_UpdateTriggers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTriggers'
+type TriggerRepo_UpdateTriggers_Call struct {
+	*mock.Call
+}
+
+// UpdateTriggers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - keys []interfaces.TriggerNameKey
+//   - active bool
+func (_e *TriggerRepo_Expecter) UpdateTriggers(ctx interface{}, keys interface{}, active interface{}) *TriggerRepo_UpdateTriggers_Call {
+	return &TriggerRepo_UpdateTriggers_Call{Call: _e.mock.On("UpdateTriggers", ctx, keys, active)}
+}
+
+func (_c *TriggerRepo_UpdateTriggers_Call) Run(run func(ctx context.Context, keys []interfaces.TriggerNameKey, active bool)) *TriggerRepo_UpdateTriggers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []interfaces.TriggerNameKey
+		if args[1] != nil {
+			arg1 = args[1].([]interfaces.TriggerNameKey)
+		}
+		var arg2 bool
+		if args[2] != nil {
+			arg2 = args[2].(bool)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *TriggerRepo_UpdateTriggers_Call) Return(err error) *TriggerRepo_UpdateTriggers_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *TriggerRepo_UpdateTriggers_Call) RunAndReturn(run func(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error) *TriggerRepo_UpdateTriggers_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -22,61 +22,59 @@ func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
 	}
 }
 
-// TODO(nary): add triggers back
-func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error {
-	// Use GORM's Create or Updates based on conflict
-	// ON CONFLICT (project, domain, name, version) DO UPDATE
-	now := time.Now()
-	result := r.db.WithContext(ctx).
-		Exec(`INSERT INTO tasks (
-			project, domain, name, version,
-			environment, function_name, deployed_by,
-			trigger_name, total_triggers, active_triggers,
-			trigger_automation_spec, trigger_types,
-			task_spec, env_description, short_description,
-			created_at, updated_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT (project, domain, name, version) DO UPDATE SET
-			environment = EXCLUDED.environment,
-			function_name = EXCLUDED.function_name,
-			deployed_by = EXCLUDED.deployed_by,
-			trigger_name = EXCLUDED.trigger_name,
-			total_triggers = EXCLUDED.total_triggers,
-			active_triggers = EXCLUDED.active_triggers,
-			trigger_automation_spec = EXCLUDED.trigger_automation_spec,
-			trigger_types = EXCLUDED.trigger_types,
-			task_spec = EXCLUDED.task_spec,
-			env_description = EXCLUDED.env_description,
-			short_description = EXCLUDED.short_description,
-			updated_at = EXCLUDED.updated_at`,
-			newTask.Project,
-			newTask.Domain,
-			newTask.Name,
-			newTask.Version,
-			newTask.Environment,
-			newTask.FunctionName,
-			newTask.DeployedBy,
-			newTask.TriggerName,
-			newTask.TotalTriggers,
-			newTask.ActiveTriggers,
-			newTask.TriggerAutomationSpec,
-			newTask.TriggerTypes,
-			newTask.TaskSpec,
-			newTask.EnvDescription,
-			newTask.ShortDescription,
-			now,
-			now,
+// CreateTask upserts a task and its associated triggers in one transaction.
+// Trigger summary fields (total_triggers, active_triggers, etc.) on the task row
+// are computed from the provided trigger models rather than supplied by the caller,
+// mirroring the close-source pattern where TaskRepo owns the full atomic write.
+func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		now := time.Now()
+		result := tx.Exec(`INSERT INTO tasks (
+				project, domain, name, version,
+				environment, function_name, deployed_by,
+				trigger_name, total_triggers, active_triggers,
+				trigger_automation_spec, trigger_types,
+				task_spec, env_description, short_description,
+				created_at, updated_at
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			ON CONFLICT (project, domain, name, version) DO UPDATE SET
+				environment             = EXCLUDED.environment,
+				function_name           = EXCLUDED.function_name,
+				deployed_by             = EXCLUDED.deployed_by,
+				task_spec               = EXCLUDED.task_spec,
+				env_description         = EXCLUDED.env_description,
+				short_description       = EXCLUDED.short_description,
+				updated_at              = EXCLUDED.updated_at`,
+			newTask.Project, newTask.Domain, newTask.Name, newTask.Version,
+			newTask.Environment, newTask.FunctionName, newTask.DeployedBy,
+			newTask.TriggerName, newTask.TotalTriggers, newTask.ActiveTriggers,
+			newTask.TriggerAutomationSpec, newTask.TriggerTypes,
+			newTask.TaskSpec, newTask.EnvDescription, newTask.ShortDescription,
+			now, now,
 		)
+		if result.Error != nil {
+			logger.Errorf(ctx, "failed to upsert task %v: %v", newTask.TaskKey, result.Error)
+			return fmt.Errorf("failed to upsert task %v: %w", newTask.TaskKey, result.Error)
+		}
+		logger.Infof(ctx, "Upserted task: %s/%s/%s version %s",
+			newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
 
-	if result.Error != nil {
-		logger.Errorf(ctx, "failed to create task %v: %v", newTask.TaskKey, result.Error)
-		return fmt.Errorf("failed to create task %v: %w", newTask.TaskKey, result.Error)
-	}
+		// Upsert each trigger and append a revision snapshot within the same transaction.
+		for _, t := range triggers {
+			if err := upsertTrigger(ctx, tx, t, 0); err != nil {
+				return fmt.Errorf("failed to upsert trigger %q: %w", t.Name, err)
+			}
+		}
 
-	logger.Infof(ctx, "Created/Updated task: %s/%s/%s version %s",
-		newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
+		// Refresh task trigger summary once after all triggers are written.
+		if len(triggers) > 0 {
+			if err := refreshTaskTriggerMeta(ctx, tx, triggers[0]); err != nil {
+				return err
+			}
+		}
 
-	return nil
+		return nil
+	})
 }
 
 func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error) {

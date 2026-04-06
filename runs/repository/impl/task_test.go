@@ -67,7 +67,7 @@ func TestCreateTask(t *testing.T) {
 	}
 
 	startTime := time.Now()
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	assert.NoError(t, err)
 
 	retrieved, err := repo.GetTask(ctx, task.TaskKey)
@@ -122,8 +122,8 @@ func TestListTasks(t *testing.T) {
 		TaskSpec:    []byte("{}"),
 	}
 
-	require.NoError(t, repo.CreateTask(ctx, task1))
-	require.NoError(t, repo.CreateTask(ctx, task2))
+	require.NoError(t, repo.CreateTask(ctx, task1, nil))
+	require.NoError(t, repo.CreateTask(ctx, task2, nil))
 
 	result, err := repo.ListTasks(ctx, interfaces.ListResourceInput{
 		Limit:  10,
@@ -178,7 +178,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 		TaskSpec:     []byte(`{}`),
 	}
 
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	original, err := repo.GetTask(ctx, task.TaskKey)
@@ -187,7 +187,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	task.FunctionName = "updated_function"
-	err = repo.CreateTask(ctx, task)
+	err = repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	updated, err := repo.GetTask(ctx, task.TaskKey)

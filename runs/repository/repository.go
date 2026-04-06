@@ -12,8 +12,9 @@ import (
 
 // repository implements the Repository interface
 type repository struct {
-	actionRepo interfaces.ActionRepo
-	taskRepo   interfaces.TaskRepo
+	actionRepo  interfaces.ActionRepo
+	taskRepo    interfaces.TaskRepo
+	triggerRepo interfaces.TriggerRepo
 }
 
 // NewRepository creates a new Repository instance
@@ -23,8 +24,9 @@ func NewRepository(db *gorm.DB, dbConfig database.DbConfig) (interfaces.Reposito
 		return nil, fmt.Errorf("failed to create action repo: %w", err)
 	}
 	return &repository{
-		actionRepo: actionRepo,
-		taskRepo:   impl.NewTaskRepo(db),
+		actionRepo:  actionRepo,
+		taskRepo:    impl.NewTaskRepo(db),
+		triggerRepo: impl.NewTriggerRepo(db),
 	}, nil
 }
 
@@ -36,4 +38,9 @@ func (r *repository) ActionRepo() interfaces.ActionRepo {
 // TaskRepo returns the task repository
 func (r *repository) TaskRepo() interfaces.TaskRepo {
 	return r.taskRepo
+}
+
+// TriggerRepo returns the trigger repository
+func (r *repository) TriggerRepo() interfaces.TriggerRepo {
+	return r.triggerRepo
 }
