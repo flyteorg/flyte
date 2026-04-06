@@ -1,7 +1,6 @@
 package service
 
 import (
-	"log"
 	"os"
 	"testing"
 
@@ -11,26 +10,10 @@ import (
 	runsmigrations "github.com/flyteorg/flyte/v2/runs/migrations"
 )
 
-const testDBPort = 15433
-
 var testDB *gorm.DB
 
 func TestMain(m *testing.M) {
-	db, stop, err := database.StartEmbeddedPostgres(testDBPort, "flyte_runs_test")
-	if err != nil {
-		log.Fatalf("failed to start embedded postgres: %v", err)
-	}
-
-	if err := db.AutoMigrate(runsmigrations.AllModels...); err != nil {
-		_ = stop()
-		log.Fatalf("failed to run migrations: %v", err)
-	}
-
-	testDB = db
-	code := m.Run()
-
-	if err := stop(); err != nil {
-		log.Printf("warning: failed to stop embedded postgres: %v", err)
-	}
-	os.Exit(code)
+	os.Exit(database.RunTestMain(m, 15433, "flyte_runs_test", &testDB, func(db *gorm.DB) error {
+		return db.AutoMigrate(runsmigrations.AllModels...)
+	}))
 }
