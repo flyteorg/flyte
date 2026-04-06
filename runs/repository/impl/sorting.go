@@ -15,7 +15,7 @@ type sortParameter struct {
 	order interfaces.SortOrder
 }
 
-func (s *sortParameter) GetGormOrderExpr() string {
+func (s *sortParameter) GetOrderExpr() string {
 	orderStr := "DESC"
 	if s.order == interfaces.SortOrderAscending {
 		orderStr = "ASC"

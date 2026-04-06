@@ -13,7 +13,6 @@ import (
 
 func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
 	db := setupDB(t)
-	require.NoError(t, db.AutoMigrate(&models.Project{}))
 	t.Cleanup(func() { db.Exec("DELETE FROM projects") })
 
 	repo := NewProjectRepo(db)
