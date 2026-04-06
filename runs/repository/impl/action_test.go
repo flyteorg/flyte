@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-
 )
 
 func setupActionDB(t *testing.T) *gorm.DB {
@@ -84,7 +83,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: actionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	endTime := time.Now()
@@ -122,9 +121,9 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
 
 	ctx := context.Background()
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: targetActionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID))
 	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: otherActionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID))
 	require.NoError(t, err)
 
 	watchCtx, cancel := context.WithCancel(context.Background())
@@ -177,7 +176,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: actionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to FAILED (terminal state)
@@ -221,7 +220,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		Name: "action-no-backward",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: actionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to RUNNING
@@ -259,7 +258,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		Name: "action-no-backward-succeeded",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: actionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to SUCCEEDED (terminal, non-retryable)
