@@ -81,6 +81,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		"ACTION_NAME": ta.Spec.ActionName,
 		"RUN_NAME":    ta.Spec.RunName,
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
+		"_U_ORG_NAME": "local",
 	}
 	for key, value := range ta.Spec.EnvVars {
 		if _, exists := envVars[key]; !exists {
