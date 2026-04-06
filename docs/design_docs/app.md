@@ -1,9 +1,8 @@
 # App Service Design Doc
 
 **Status:** Draft
-**Author:** Kevin
-**Date:** 2026-04-02
-**Updated:** 2026-04-06
+**Author:** Kevin Su
+**Date:** 2026-04-06
 
 ---
 
@@ -46,7 +45,7 @@ Flyte v2 uses a modular service architecture:
 │  │                   │  │ ├── Watch  (TaskAction)  │  │ CRs        │ │
 │  │                   │  │ ├── Abort  (TaskAction)  │  │            │ │
 │  │ → AppService ─────┼──┤                          │  │            │ │
-│  │   (connect call)  │  │ AppService (NEW)         │  │            │ │
+│  │   (connect call)  │  │ InternalAppService (NEW) │  │            │ │
 │  │                   │  │ ├── AppRepo (DB: spec)   │  │            │ │
 │  │                   │  │ ├── AppK8sClient (K8s)   │  │            │ │
 │  │                   │  │ │   Deploy (KService)    │  │            │ │
@@ -57,8 +56,8 @@ Flyte v2 uses a modular service architecture:
 │             │                        │                       │       │
 │             ▼                        ▼                       ▼       │
 │      ┌────────────┐         ┌──────────────────────────────────┐     │
-│      │ PostgreSQL/ │         │ Kubernetes                       │     │
-│      │ SQLite      │         │ ┌──────────────┐ ┌────────────┐ │     │
+│      │ PostgreSQL  │         │ Kubernetes                       │     │
+│      │             │         │ ┌──────────────┐ ┌────────────┐ │     │
 │      │ (apps table │         │ │ TaskAction CRs│ │ KService   │ │     │
 │      │  spec only) │         │ │ (tasks)       │ │ CRs (apps) │ │     │
 │      └────────────┘         │ └──────────────┘ └────────────┘ │     │
@@ -68,7 +67,7 @@ Flyte v2 uses a modular service architecture:
 
 **Key design simplification:**
 - **DB stores spec only** — no status column. The KService CRD is the single source of truth for app status.
-- **No status watcher/sync loop** — when RunService needs app status, it calls AppService (via connect, co-located in the same pod), which reads directly from the KService CRD via AppK8sClient.
+- **No status watcher/sync loop** — when RunService needs app status, it calls InternalAppService (via connect, co-located in the same pod), which reads directly from the KService CRD via AppK8sClient.
 - **No delete operation** — apps can only be stopped. Stopping deletes the KService CRD. The spec remains in DB for potential restart.
 
 **Key patterns to follow:**
@@ -219,7 +218,7 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 
 ## 5. Service Layer
 
-### 5.1 Architecture: AppService ↔ AppK8sClient
+### 5.1 Architecture: InternalAppService ↔ AppK8sClient
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -228,7 +227,7 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 │  ┌──────────────────────────────────────────────────────────────┐ │
 │  │ Manager (RunService + ActionsService in same pod)            │ │
 │  │                                                              │ │
-│  │  RunService ──connect──> AppService (NEW)                    │ │
+│  │  RunService ──connect──> InternalAppService (NEW)            │ │
 │  │                          ├── AppRepo (DB: spec)              │ │
 │  │                          ├── AppK8sClient (K8s)              │ │
 │  │                          │                                   │ │
@@ -244,8 +243,8 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 │             │                                   │                │
 │             ▼                                   ▼                │
 │      ┌────────────┐                    ┌──────────────┐         │
-│      │ PostgreSQL/ │                    │ Kubernetes    │         │
-│      │ SQLite      │                    │ (KService CRs│         │
+│      │ PostgreSQL  │                    │ Kubernetes    │         │
+│      │             │                    │ (KService CRs│         │
 │      │ (spec only) │                    │  + Pods)     │         │
 │      └────────────┘                    └──────────────┘         │
 └─────────────────────────────────────────────────────────────────┘
@@ -257,12 +256,12 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 - No `AppNotifier` pub/sub — status is always read fresh from the CRD
 - DB is only written on Create and Update (spec changes)
 
-### 5.2 AppService Implementation
+### 5.2 InternalAppService Implementation
 
-Replace the stub in `runs/service/app_service.go`:
+New file in `actions/service/internal_app_service.go`:
 
 ```go
-type AppService struct {
+type InternalAppService struct {
     appconnect.UnimplementedAppServiceHandler
     repo      interfaces.AppRepo
     k8sClient AppK8sClientInterface  // direct K8s access for CRD operations
@@ -288,7 +287,7 @@ User → Create(CreateRequest{app})
 #### Get
 
 ```
-RunService → AppService.Get(GetRequest{app_id | ingress})
+RunService → InternalAppService.Get(GetRequest{app_id | ingress})
   1. If app_id: repo.Get(project, domain, name)          ← get spec from DB
   2. If ingress: repo.GetByHost(host)                    ← get spec from DB
   3. k8sClient.GetStatus(appID)                          ← get status from KService CRD
@@ -354,7 +353,7 @@ User → Watch(WatchRequest{target})
 In single-cluster mode, the Lease RPC is not needed.
 
 ```go
-func (s *AppService) Lease(...) error {
+func (s *InternalAppService) Lease(...) error {
     return connect.NewError(connect.CodeUnimplemented,
         errors.New("Lease is not needed in single-cluster mode"))
 }
@@ -406,13 +405,13 @@ type AppK8sClientInterface interface {
 
 **Key simplification vs. previous design:**
 - No `StartWatching()` / `StopWatching()` — no background watcher syncing status back to DB
-- No `appClient` callback to AppService — status is pulled on demand, not pushed
+- No `appClient` callback to InternalAppService — status is pulled on demand, not pushed
 - `GetStatus()` is the new method: reads KService CRD and maps to App Status proto
 
 ### 6.3 GetStatus(): KService CRD → App Status
 
 ```
-AppService.Get()
+InternalAppService.Get()
     │ calls k8sClient.GetStatus(appID)
     ▼
 AppK8sClient.GetStatus(appID):
@@ -437,7 +436,7 @@ AppK8sClient.GetStatus(appID):
 ### 6.4 Deploy(): App Proto → KService
 
 ```
-AppService.Create() / Update()
+InternalAppService.Create() / Update()
     │ persists spec to DB
     │ calls k8sClient.Deploy(app)
     ▼
@@ -484,7 +483,7 @@ AppK8sClient.Deploy(app):
 User calls Stop(app_id)
     │
     ▼
-AppService.Stop()
+InternalAppService.Stop()
     │ calls k8sClient.Stop(appID)
     ▼
 AppK8sClient.Stop()
@@ -538,7 +537,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
         )
         // No background watcher needed — status is read on demand
 
-        // Make appK8sClient available to AppService via SetupContext
+        // Make appK8sClient available to InternalAppService via SetupContext
     }
 }
 ```
@@ -579,7 +578,7 @@ runs/
 │   └── migrations.go           # Add App model + migration
 ├── service/
 │   └── app_service.go          # Replace stub with full implementation
-├── setup.go                    # Wire real AppService with repo + appK8sClient
+├── setup.go                    # Wire real InternalAppService with repo + appK8sClient
 
 actions/
 ├── setup.go                    # Register AppK8sClient
@@ -594,11 +593,11 @@ Replace the current stub:
 
 ```go
 // Before (stub):
-appSvc := service.NewAppService()
+appSvc := service.NewInternalAppService()
 
 // After (real):
 appRepo := impl.NewAppRepo(sc.DB)
-appSvc := service.NewAppService(appRepo, appK8sClient, &service.AppConfig{
+appSvc := service.NewInternalAppService(appRepo, appK8sClient, &service.AppConfig{
     PublicURLPattern: cfg.Apps.PublicURLPattern,
 })
 ```
@@ -609,7 +608,7 @@ appSvc := service.NewAppService(appRepo, appK8sClient, &service.AppConfig{
 // Add to existing Setup():
 if cfg.Apps.Enabled {
     appK8sClient := actionsk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg.Apps.Namespace)
-    // No background watcher — expose appK8sClient for AppService to use
+    // No background watcher — expose appK8sClient for InternalAppService to use
 }
 ```
 
@@ -657,7 +656,7 @@ type AppConfig struct {
 ### 9.1 Happy Path: Create and Deploy
 
 ```
-SDK/CLI              RunService             AppService             AppK8sClient
+SDK/CLI              RunService             InternalAppService     AppK8sClient
    │                    │                       │                       │
    │  Create(app_spec)  │                       │                       │
    │───────────────────>│  Create(app_spec)     │                       │
@@ -694,7 +693,7 @@ SDK/CLI              RunService             AppService             AppK8sClient
 ### 9.2 Update (Spec Change)
 
 ```
-SDK/CLI              RunService             AppService             AppK8sClient
+SDK/CLI              RunService             InternalAppService     AppK8sClient
    │                    │                       │                       │
    │  Update(new_spec)  │                       │                       │
    │───────────────────>│  Update(new_spec)     │                       │
@@ -716,7 +715,7 @@ SDK/CLI              RunService             AppService             AppK8sClient
 ### 9.3 Stop
 
 ```
-SDK/CLI              RunService             AppService             AppK8sClient
+SDK/CLI              RunService             InternalAppService     AppK8sClient
    │                    │                       │                       │
    │  Stop(app_id)      │                       │                       │
    │───────────────────>│  Stop(app_id)         │                       │
@@ -748,7 +747,7 @@ SDK/CLI              RunService             AppService             AppK8sClient
 2. Add migration to `runs/migrations/migrations.go`
 3. Create `AppRepo` interface and GORM implementation
 4. Create `AppK8sClient` in `actions/k8s/app_client.go` (Deploy, Stop, GetStatus)
-5. Implement `AppService` RPCs: Create, Get, Update, Stop, List
+5. Implement `InternalAppService` RPCs: Create, Get, Update, Stop, List
 6. Wire in `runs/setup.go`, `runs/repository/repository.go`, `actions/setup.go`
 7. **Unit tests** for repo + service (mock AppK8sClient)
 8. **Integration tests** with envtest + Knative CRDs
@@ -774,8 +773,8 @@ SDK/CLI              RunService             AppService             AppK8sClient
 
 | Layer | Test Type | Tool |
 |-------|-----------|------|
-| Repository | Unit | GORM + SQLite in-memory |
-| AppService | Unit | Mock repo + mock AppK8sClient (mockery) |
+| Repository | Unit | GORM + PostgreSQL |
+| InternalAppService | Unit | Mock repo + mock AppK8sClient (mockery) |
 | AppK8sClient | Integration | envtest (controller-runtime) + Knative CRDs |
 | E2E | Integration | kind + Knative + flyte-sandbox |
 
