@@ -14,5 +14,5 @@ var migrationFS embed.FS
 
 // RunMigrations applies all pending cache service migrations.
 func RunMigrations(ctx context.Context, db *sqlx.DB) error {
-	return database.Migrate(ctx, db, migrationFS)
+	return database.Migrate(ctx, db, "cache_service", migrationFS)
 }

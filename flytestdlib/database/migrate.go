@@ -16,14 +16,18 @@ import (
 const schemaMigrationsTable = `
 CREATE TABLE IF NOT EXISTS schema_migrations (
 	version    TEXT PRIMARY KEY,
-	applied_at TIMESTAMP NOT NULL DEFAULT NOW()
+	applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )`
 
 // Migrate applies all unapplied SQL migration files from the provided fs.FS.
 // Migration files are expected to be located under "sql/" and follow the naming
 // convention "NNNN_description.sql". Files ending with "_down.sql" are skipped.
 // Migrations are applied in lexicographic order, each within its own transaction.
-func Migrate(ctx context.Context, db *sqlx.DB, migrations fs.FS) error {
+//
+// The prefix parameter namespaces versions in the shared schema_migrations table
+// so that multiple services sharing the same database do not collide
+// (e.g. prefix "runs" records version "runs/001_init_schema").
+func Migrate(ctx context.Context, db *sqlx.DB, prefix string, migrations fs.FS) error {
 	if _, err := db.ExecContext(ctx, schemaMigrationsTable); err != nil {
 		return fmt.Errorf("failed to create schema_migrations table: %w", err)
 	}
@@ -34,7 +38,7 @@ func Migrate(ctx context.Context, db *sqlx.DB, migrations fs.FS) error {
 	}
 
 	for _, f := range files {
-		version := migrationVersion(f)
+		version := prefix + "/" + migrationVersion(f)
 
 		var count int
 		if err := db.GetContext(ctx, &count, "SELECT COUNT(*) FROM schema_migrations WHERE version = $1", version); err != nil {
@@ -75,15 +79,15 @@ func Migrate(ctx context.Context, db *sqlx.DB, migrations fs.FS) error {
 	return nil
 }
 
-// Rollback rolls back the most recently applied migration by executing its corresponding
-// _down.sql file from the provided fs.FS.
-func Rollback(ctx context.Context, db *sqlx.DB, migrations fs.FS) error {
+// Rollback rolls back the most recently applied migration for the given prefix
+// by executing its corresponding _down.sql file from the provided fs.FS.
+func Rollback(ctx context.Context, db *sqlx.DB, prefix string, migrations fs.FS) error {
 	if _, err := db.ExecContext(ctx, schemaMigrationsTable); err != nil {
 		return fmt.Errorf("failed to create schema_migrations table: %w", err)
 	}
 
 	var version string
-	err := db.GetContext(ctx, &version, "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1")
+	err := db.GetContext(ctx, &version, "SELECT version FROM schema_migrations WHERE version LIKE $1 ORDER BY version DESC LIMIT 1", prefix+"/%")
 	if err != nil {
 		return fmt.Errorf("failed to get latest migration: %w", err)
 	}
@@ -160,9 +164,14 @@ func migrationVersion(path string) string {
 	return strings.TrimSuffix(base, ".sql")
 }
 
-// findDownMigration locates the _down.sql file for a given version.
+// findDownMigration locates the _down.sql file for a given prefixed version.
+// The version has the format "prefix/001_init_schema"; the file is "sql/001_init_schema_down.sql".
 func findDownMigration(migrations fs.FS, version string) (string, error) {
-	downFile := "sql/" + version + "_down.sql"
+	bare := version
+	if idx := strings.Index(version, "/"); idx >= 0 {
+		bare = version[idx+1:]
+	}
+	downFile := "sql/" + bare + "_down.sql"
 	if _, err := fs.Stat(migrations, downFile); err != nil {
 		return "", fmt.Errorf("down migration file not found for version %s: %w", version, err)
 	}

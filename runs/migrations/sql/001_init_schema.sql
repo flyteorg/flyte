@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS projects (
     description VARCHAR(300) NOT NULL DEFAULT '',
     labels      BYTEA,
     state       INTEGER DEFAULT 0,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_projects_state ON projects (state);
 
@@ -34,12 +34,12 @@ CREATE TABLE IF NOT EXISTS actions (
     action_details      BYTEA,
     detailed_info       BYTEA,
     run_spec            BYTEA,
-    abort_requested_at  TIMESTAMP,
+    abort_requested_at  TIMESTAMPTZ,
     abort_attempt_count INTEGER NOT NULL DEFAULT 0,
     abort_reason        TEXT,
-    created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    ended_at            TIMESTAMP,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    ended_at            TIMESTAMPTZ,
     duration_ms         BIGINT,
     attempts            INTEGER NOT NULL DEFAULT 0,
     cache_status        INTEGER NOT NULL DEFAULT 0
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS action_events (
     version     INTEGER NOT NULL,
     info        BYTEA,
     error_kind  TEXT,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
     PRIMARY KEY (project, domain, run_name, name, attempt, phase, version)
 );
 CREATE INDEX IF NOT EXISTS idx_action_events_error_kind ON action_events (error_kind);
@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS tasks (
     version                 TEXT NOT NULL,
     environment             TEXT NOT NULL DEFAULT '',
     function_name           TEXT NOT NULL DEFAULT '',
-    created_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
     deployed_by             TEXT NOT NULL DEFAULT '',
     trigger_name            TEXT,
     total_triggers          INTEGER NOT NULL DEFAULT 0,
@@ -92,6 +92,6 @@ CREATE INDEX IF NOT EXISTS idx_tasks_identifier ON tasks (project, domain, name,
 CREATE TABLE IF NOT EXISTS task_specs (
     digest      TEXT PRIMARY KEY,
     spec        BYTEA NOT NULL,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMPTZ
 );
