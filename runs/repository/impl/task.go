@@ -2,10 +2,13 @@ package impl
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -13,10 +16,10 @@ import (
 )
 
 type tasksRepo struct {
-	db *gorm.DB
+	db *sqlx.DB
 }
 
-func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
+func NewTaskRepo(db *sqlx.DB) interfaces.TaskRepo {
 	return &tasksRepo{
 		db: db,
 	}
@@ -24,18 +27,16 @@ func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
 
 // TODO(nary): add triggers back
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error {
-	// Use GORM's Create or Updates based on conflict
-	// ON CONFLICT (project, domain, name, version) DO UPDATE
 	now := time.Now()
-	result := r.db.WithContext(ctx).
-		Exec(`INSERT INTO tasks (
+	_, err := r.db.ExecContext(ctx,
+		`INSERT INTO tasks (
 			project, domain, name, version,
 			environment, function_name, deployed_by,
 			trigger_name, total_triggers, active_triggers,
 			trigger_automation_spec, trigger_types,
 			task_spec, env_description, short_description,
 			created_at, updated_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
 		ON CONFLICT (project, domain, name, version) DO UPDATE SET
 			environment = EXCLUDED.environment,
 			function_name = EXCLUDED.function_name,
@@ -49,28 +50,28 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			env_description = EXCLUDED.env_description,
 			short_description = EXCLUDED.short_description,
 			updated_at = EXCLUDED.updated_at`,
-			newTask.Project,
-			newTask.Domain,
-			newTask.Name,
-			newTask.Version,
-			newTask.Environment,
-			newTask.FunctionName,
-			newTask.DeployedBy,
-			newTask.TriggerName,
-			newTask.TotalTriggers,
-			newTask.ActiveTriggers,
-			newTask.TriggerAutomationSpec,
-			newTask.TriggerTypes,
-			newTask.TaskSpec,
-			newTask.EnvDescription,
-			newTask.ShortDescription,
-			now,
-			now,
-		)
+		newTask.Project,
+		newTask.Domain,
+		newTask.Name,
+		newTask.Version,
+		newTask.Environment,
+		newTask.FunctionName,
+		newTask.DeployedBy,
+		newTask.TriggerName,
+		newTask.TotalTriggers,
+		newTask.ActiveTriggers,
+		newTask.TriggerAutomationSpec,
+		newTask.TriggerTypes,
+		newTask.TaskSpec,
+		newTask.EnvDescription,
+		newTask.ShortDescription,
+		now,
+		now,
+	)
 
-	if result.Error != nil {
-		logger.Errorf(ctx, "failed to create task %v: %v", newTask.TaskKey, result.Error)
-		return fmt.Errorf("failed to create task %v: %w", newTask.TaskKey, result.Error)
+	if err != nil {
+		logger.Errorf(ctx, "failed to create task %v: %v", newTask.TaskKey, err)
+		return fmt.Errorf("failed to create task %v: %w", newTask.TaskKey, err)
 	}
 
 	logger.Infof(ctx, "Created/Updated task: %s/%s/%s version %s",
@@ -81,31 +82,29 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 
 func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error) {
 	var task models.Task
-	result := r.db.WithContext(ctx).
-		Where("project = ? AND domain = ? AND name = ? AND version = ?",
-			key.Project, key.Domain, key.Name, key.Version).
-		First(&task)
+	err := sqlx.GetContext(ctx, r.db, &task,
+		"SELECT * FROM tasks WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4",
+		key.Project, key.Domain, key.Name, key.Version)
 
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("task not found: %v", key)
 		}
-		logger.Errorf(ctx, "failed to get task %v: %v", key, result.Error)
-		return nil, fmt.Errorf("failed to get task %v: %w", key, result.Error)
+		logger.Errorf(ctx, "failed to get task %v: %v", key, err)
+		return nil, fmt.Errorf("failed to get task %v: %w", key, err)
 	}
 
 	return &task, nil
 }
 
 func (r *tasksRepo) CreateTaskSpec(ctx context.Context, taskSpec *models.TaskSpec) error {
-	// Insert task spec (ignore conflicts since specs are immutable by digest)
-	result := r.db.WithContext(ctx).
-		Exec(`INSERT INTO task_specs (digest, spec) VALUES (?, ?) ON CONFLICT (digest) DO NOTHING`,
-			taskSpec.Digest, taskSpec.Spec)
+	_, err := r.db.ExecContext(ctx,
+		`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
+		taskSpec.Digest, taskSpec.Spec)
 
-	if result.Error != nil {
-		logger.Errorf(ctx, "failed to create task spec %v: %v", taskSpec.Digest, result.Error)
-		return fmt.Errorf("failed to create task spec %v: %w", taskSpec.Digest, result.Error)
+	if err != nil {
+		logger.Errorf(ctx, "failed to create task spec %v: %v", taskSpec.Digest, err)
+		return fmt.Errorf("failed to create task spec %v: %w", taskSpec.Digest, err)
 	}
 
 	return nil
@@ -113,86 +112,138 @@ func (r *tasksRepo) CreateTaskSpec(ctx context.Context, taskSpec *models.TaskSpe
 
 func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.TaskSpec, error) {
 	var taskSpec models.TaskSpec
-	result := r.db.WithContext(ctx).
-		Where("digest = ?", digest).
-		First(&taskSpec)
+	err := sqlx.GetContext(ctx, r.db, &taskSpec,
+		"SELECT * FROM task_specs WHERE digest = $1", digest)
 
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("task spec not found: %s", digest)
 		}
-		logger.Errorf(ctx, "failed to get task spec %v: %v", digest, result.Error)
-		return nil, fmt.Errorf("failed to get task spec %v: %w", digest, result.Error)
+		logger.Errorf(ctx, "failed to get task spec %v: %v", digest, err)
+		return nil, fmt.Errorf("failed to get task spec %v: %w", digest, err)
 	}
 
 	return &taskSpec, nil
 }
 
 func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResourceInput) (*models.TaskListResult, error) {
-	// TODO(nary): This is a simplified version without following features:
-	// - Selecting latest version per task name using ROW_NUMBER() window function
-	// - Filtered and unfiltered counts
-	// - Custom filter expressions
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
 
-	var tasks []*models.Task
-	query := r.db.WithContext(ctx).Model(&models.Task{})
+	queryBuilder.WriteString("SELECT * FROM tasks")
 
-	// Apply filters if provided
+	// Build WHERE clause from filters
+	var whereClauses []string
+
 	if input.Filter != nil {
-		expr, err := input.Filter.GormQueryExpression("")
+		expr, err := input.Filter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build filter: %w", err)
 		}
-		query = query.Where(expr.Query, expr.Args...)
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		whereClauses = append(whereClauses, rewritten)
+		args = append(args, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
 	}
 
 	if input.ScopeByFilter != nil {
-		expr, err := input.ScopeByFilter.GormQueryExpression("")
+		expr, err := input.ScopeByFilter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build scope filter: %w", err)
 		}
-		query = query.Where(expr.Query, expr.Args...)
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		whereClauses = append(whereClauses, rewritten)
+		args = append(args, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
+	}
+
+	if len(whereClauses) > 0 {
+		queryBuilder.WriteString(" WHERE ")
+		queryBuilder.WriteString(strings.Join(whereClauses, " AND "))
 	}
 
 	// Apply sorting
 	if len(input.SortParameters) > 0 {
-		for _, sp := range input.SortParameters {
-			query = query.Order(sp.GetGormOrderExpr())
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range input.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
+			}
+			queryBuilder.WriteString(sp.GetOrderExpr())
 		}
 	} else {
-		query = query.Order("created_at DESC")
+		queryBuilder.WriteString(" ORDER BY created_at DESC")
 	}
 
 	// Apply pagination
-	query = query.Limit(input.Limit).Offset(input.Offset)
+	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
+	args = append(args, input.Limit, input.Offset)
+	argIdx += 2
 
-	result := query.Find(&tasks)
-	if result.Error != nil {
-		logger.Errorf(ctx, "failed to list tasks: %v", result.Error)
-		return nil, fmt.Errorf("failed to list tasks: %w", result.Error)
+	var tasks []*models.Task
+	if err := sqlx.SelectContext(ctx, r.db, &tasks, queryBuilder.String(), args...); err != nil {
+		logger.Errorf(ctx, "failed to list tasks: %v", err)
+		return nil, fmt.Errorf("failed to list tasks: %w", err)
 	}
 
 	// Get total counts
 	var filteredTotal int64
 	var total int64
 
-	countQuery := r.db.WithContext(ctx).Model(&models.Task{})
-	if input.Filter != nil {
-		expr, _ := input.Filter.GormQueryExpression("")
-		countQuery = countQuery.Where(expr.Query, expr.Args...)
-	}
-	if input.ScopeByFilter != nil {
-		expr, _ := input.ScopeByFilter.GormQueryExpression("")
-		countQuery = countQuery.Where(expr.Query, expr.Args...)
-	}
-	countQuery.Count(&filteredTotal)
+	// Filtered count query
+	{
+		var countBuilder strings.Builder
+		var countArgs []interface{}
+		countIdx := 1
 
-	totalQuery := r.db.WithContext(ctx).Model(&models.Task{})
-	if input.ScopeByFilter != nil {
-		expr, _ := input.ScopeByFilter.GormQueryExpression("")
-		totalQuery = totalQuery.Where(expr.Query, expr.Args...)
+		countBuilder.WriteString("SELECT COUNT(*) FROM tasks")
+
+		var countWhere []string
+		if input.Filter != nil {
+			expr, _ := input.Filter.QueryExpression("")
+			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
+			countWhere = append(countWhere, rewritten)
+			countArgs = append(countArgs, rewrittenArgs...)
+			countIdx += len(rewrittenArgs)
+		}
+		if input.ScopeByFilter != nil {
+			expr, _ := input.ScopeByFilter.QueryExpression("")
+			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
+			countWhere = append(countWhere, rewritten)
+			countArgs = append(countArgs, rewrittenArgs...)
+			countIdx += len(rewrittenArgs)
+		}
+		if len(countWhere) > 0 {
+			countBuilder.WriteString(" WHERE ")
+			countBuilder.WriteString(strings.Join(countWhere, " AND "))
+		}
+
+		if err := r.db.QueryRowContext(ctx, countBuilder.String(), countArgs...).Scan(&filteredTotal); err != nil {
+			logger.Errorf(ctx, "failed to count filtered tasks: %v", err)
+		}
 	}
-	totalQuery.Count(&total)
+
+	// Total count query (only scoped, no filter)
+	{
+		var totalBuilder strings.Builder
+		var totalArgs []interface{}
+		totalIdx := 1
+
+		totalBuilder.WriteString("SELECT COUNT(*) FROM tasks")
+
+		if input.ScopeByFilter != nil {
+			expr, _ := input.ScopeByFilter.QueryExpression("")
+			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, totalIdx)
+			totalBuilder.WriteString(" WHERE ")
+			totalBuilder.WriteString(rewritten)
+			totalArgs = append(totalArgs, rewrittenArgs...)
+		}
+
+		if err := r.db.QueryRowContext(ctx, totalBuilder.String(), totalArgs...).Scan(&total); err != nil {
+			logger.Errorf(ctx, "failed to count total tasks: %v", err)
+		}
+	}
 
 	return &models.TaskListResult{
 		Tasks:         tasks,
@@ -202,36 +253,46 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 }
 
 func (r *tasksRepo) ListVersions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.TaskVersion, error) {
-	var versions []*models.TaskVersion
-	query := r.db.WithContext(ctx).
-		Model(&models.Task{}).
-		Select("version, created_at")
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
+
+	queryBuilder.WriteString("SELECT version, created_at FROM tasks")
 
 	// Apply filters
 	if input.Filter != nil {
-		expr, err := input.Filter.GormQueryExpression("")
+		expr, err := input.Filter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build filter: %w", err)
 		}
-		query = query.Where(expr.Query, expr.Args...)
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		queryBuilder.WriteString(" WHERE ")
+		queryBuilder.WriteString(rewritten)
+		args = append(args, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
 	}
 
 	// Apply sorting
 	if len(input.SortParameters) > 0 {
-		for _, sp := range input.SortParameters {
-			query = query.Order(sp.GetGormOrderExpr())
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range input.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
+			}
+			queryBuilder.WriteString(sp.GetOrderExpr())
 		}
 	} else {
-		query = query.Order("created_at DESC")
+		queryBuilder.WriteString(" ORDER BY created_at DESC")
 	}
 
 	// Apply pagination
-	query = query.Limit(input.Limit).Offset(input.Offset)
+	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
+	args = append(args, input.Limit, input.Offset)
 
-	result := query.Find(&versions)
-	if result.Error != nil {
-		logger.Errorf(ctx, "failed to list versions: %v", result.Error)
-		return nil, fmt.Errorf("failed to list versions: %w", result.Error)
+	var versions []*models.TaskVersion
+	if err := sqlx.SelectContext(ctx, r.db, &versions, queryBuilder.String(), args...); err != nil {
+		logger.Errorf(ctx, "failed to list versions: %v", err)
+		return nil, fmt.Errorf("failed to list versions: %w", err)
 	}
 
 	return versions, nil

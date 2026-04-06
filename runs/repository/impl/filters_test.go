@@ -15,7 +15,7 @@ import (
 func TestNewEqualFilter(t *testing.T) {
 	filter := NewEqualFilter("org", "test-org")
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Equal(t, "org = ?", expr.Query)
 	assert.Equal(t, []interface{}{"test-org"}, expr.Args)
@@ -28,7 +28,7 @@ func TestBasicFilter_Contains(t *testing.T) {
 		value:      "test",
 	}
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Equal(t, "name LIKE ?", expr.Query)
 	assert.Equal(t, []interface{}{"%test%"}, expr.Args)
@@ -41,7 +41,7 @@ func TestBasicFilter_ValueIn(t *testing.T) {
 		value:      []string{"active", "pending"},
 	}
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Equal(t, "status IN ?", expr.Query)
 }
@@ -51,7 +51,7 @@ func TestCompositeFilter_And(t *testing.T) {
 	f2 := NewEqualFilter("project", "test-project")
 
 	combined := f1.And(f2)
-	expr, err := combined.GormQueryExpression("")
+	expr, err := combined.QueryExpression("")
 	require.NoError(t, err)
 	assert.Contains(t, expr.Query, "AND")
 	assert.Len(t, expr.Args, 2)
@@ -62,7 +62,7 @@ func TestCompositeFilter_Or(t *testing.T) {
 	f2 := NewEqualFilter("status", "pending")
 
 	combined := f1.Or(f2)
-	expr, err := combined.GormQueryExpression("")
+	expr, err := combined.QueryExpression("")
 	require.NoError(t, err)
 	assert.Contains(t, expr.Query, "OR")
 }
@@ -75,7 +75,7 @@ func TestNewProjectIdFilter(t *testing.T) {
 	}
 
 	filter := NewProjectIdFilter(projectId)
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Contains(t, expr.Query, "project = ?")
 	assert.Contains(t, expr.Query, "domain = ?")
@@ -91,12 +91,12 @@ func TestNewTaskNameFilter(t *testing.T) {
 	}
 
 	filter := NewTaskNameFilter(taskName)
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Contains(t, expr.Query, "name = ?")
 }
 
-func TestConvertProtoFiltersToGormFilters(t *testing.T) {
+func TestConvertProtoFilters(t *testing.T) {
 	protoFilters := []*common.Filter{
 		{
 			Field:    "org",
@@ -110,18 +110,18 @@ func TestConvertProtoFiltersToGormFilters(t *testing.T) {
 		},
 	}
 
-	filter, err := ConvertProtoFiltersToGormFilters(protoFilters)
+	filter, err := ConvertProtoFilters(protoFilters)
 	require.NoError(t, err)
 	assert.NotNil(t, filter)
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Contains(t, expr.Query, "org = ?")
 	assert.Contains(t, expr.Query, "name LIKE ?")
 }
 
 func TestConvertProtoFilters_EmptyList(t *testing.T) {
-	filter, err := ConvertProtoFiltersToGormFilters([]*common.Filter{})
+	filter, err := ConvertProtoFilters([]*common.Filter{})
 	require.NoError(t, err)
 	assert.Nil(t, filter)
 }
@@ -130,7 +130,7 @@ func TestParseStringFilters_StateNumericString(t *testing.T) {
 	filter, err := ParseStringFilters("eq(state,1)", models.ProjectColumns)
 	require.NoError(t, err)
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Equal(t, "state = ?", expr.Query)
 	assert.Equal(t, []interface{}{"1"}, expr.Args)
@@ -140,7 +140,7 @@ func TestParseStringFilters_ValueInState(t *testing.T) {
 	filter, err := ParseStringFilters("value_in(state,0;1;2)", models.ProjectColumns)
 	require.NoError(t, err)
 
-	expr, err := filter.GormQueryExpression("")
+	expr, err := filter.QueryExpression("")
 	require.NoError(t, err)
 	assert.Equal(t, "state IN ?", expr.Query)
 	assert.Equal(t, []interface{}{[]string{"0", "1", "2"}}, expr.Args)

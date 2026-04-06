@@ -15,7 +15,7 @@ type basicFilter struct {
 	value      interface{}
 }
 
-func (f *basicFilter) GormQueryExpression(table string) (interfaces.GormQueryExpr, error) {
+func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error) {
 	var query string
 	column := f.field
 	if table != "" {
@@ -50,10 +50,10 @@ func (f *basicFilter) GormQueryExpression(table string) (interfaces.GormQueryExp
 		query = fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", column)
 		f.value = fmt.Sprintf("%%%v%%", f.value)
 	default:
-		return interfaces.GormQueryExpr{}, fmt.Errorf("unsupported filter expression: %d", f.expression)
+		return interfaces.QueryExpr{}, fmt.Errorf("unsupported filter expression: %d", f.expression)
 	}
 
-	return interfaces.GormQueryExpr{
+	return interfaces.QueryExpr{
 		Query: query,
 		Args:  []interface{}{f.value},
 	}, nil
@@ -82,21 +82,21 @@ type compositeFilter struct {
 	operator string // "AND" or "OR"
 }
 
-func (f *compositeFilter) GormQueryExpression(table string) (interfaces.GormQueryExpr, error) {
-	leftExpr, err := f.left.GormQueryExpression(table)
+func (f *compositeFilter) QueryExpression(table string) (interfaces.QueryExpr, error) {
+	leftExpr, err := f.left.QueryExpression(table)
 	if err != nil {
-		return interfaces.GormQueryExpr{}, err
+		return interfaces.QueryExpr{}, err
 	}
 
-	rightExpr, err := f.right.GormQueryExpression(table)
+	rightExpr, err := f.right.QueryExpression(table)
 	if err != nil {
-		return interfaces.GormQueryExpr{}, err
+		return interfaces.QueryExpr{}, err
 	}
 
 	query := fmt.Sprintf("(%s) %s (%s)", leftExpr.Query, f.operator, rightExpr.Query)
 	args := append(leftExpr.Args, rightExpr.Args...)
 
-	return interfaces.GormQueryExpr{
+	return interfaces.QueryExpr{
 		Query: query,
 		Args:  args,
 	}, nil
@@ -160,8 +160,8 @@ func NewDeployedByFilter(deployedBy string) interfaces.Filter {
 	return NewEqualFilter("deployed_by", deployedBy)
 }
 
-// ConvertProtoFiltersToGormFilters converts proto filters to our Filter interfaces
-func ConvertProtoFiltersToGormFilters(protoFilters []*common.Filter) (interfaces.Filter, error) {
+// ConvertProtoFilters converts proto filters to our Filter interfaces
+func ConvertProtoFilters(protoFilters []*common.Filter) (interfaces.Filter, error) {
 	if len(protoFilters) == 0 {
 		return nil, nil
 	}
