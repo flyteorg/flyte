@@ -33,41 +33,42 @@ This document specifies the design for implementing the **App Service** in OSS F
 Flyte v2 uses a modular service architecture:
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│  Manager (unified binary)                                             │
-│                                                                       │
-│  ┌───────────────────┐  ┌─────────────────────────┐  ┌────────────┐ │
-│  │ RunService         │  │ ActionsService           │  │ Executor   │ │
-│  │ (port 8090)       │  │ (K8s watch + bridge)     │  │ (operator) │ │
-│  │                   │  │                          │  │            │ │
-│  │ TaskService       │  │ ActionsClient            │  │ Reconcile  │ │
-│  │ TriggerSvc        │  │ ├── Enqueue (TaskAction) │  │ TaskAction │ │
-│  │                   │  │ ├── Watch  (TaskAction)  │  │ CRs        │ │
-│  │                   │  │ ├── Abort  (TaskAction)  │  │            │ │
-│  │ → AppService ─────┼──┤                          │  │            │ │
-│  │   (connect call)  │  │ InternalAppService (NEW) │  │            │ │
-│  │                   │  │ ├── AppRepo (DB: spec)   │  │            │ │
-│  │                   │  │ ├── AppK8sClient (K8s)   │  │            │ │
-│  │                   │  │ │   Deploy (KService)    │  │            │ │
-│  │                   │  │ │   GetStatus (KService) │  │            │ │
-│  │                   │  │ │   Stop (del KService)  │  │            │ │
-│  │                   │  │ └── Replicas (Pods)      │  │            │ │
-│  └──────────┬────────┘  └────────────┬─────────────┘  └──────┬─────┘ │
-│             │                        │                       │       │
-│             ▼                        ▼                       ▼       │
-│      ┌────────────┐         ┌──────────────────────────────────┐     │
-│      │ PostgreSQL  │         │ Kubernetes                       │     │
-│      │             │         │ ┌──────────────┐ ┌────────────┐ │     │
-│      │ (apps table │         │ │ TaskAction CRs│ │ KService   │ │     │
-│      │  spec only) │         │ │ (tasks)       │ │ CRs (apps) │ │     │
-│      └────────────┘         │ └──────────────┘ └────────────┘ │     │
-│                              └──────────────────────────────────┘     │
-└──────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────┐      ┌─────────────────────────────────┐
+│  Control Plane               │      │  Data Plane                      │
+│                              │      │                                  │
+│  ┌─────────────────────┐    │      │  ┌─────────────────────────┐    │
+│  │ RunService           │    │      │  │ ActionsService           │    │
+│  │ TaskService          │    │      │  │ ├── ActionsClient (K8s)  │    │
+│  │ TriggerSvc           │    │      │  │ ├── Enqueue (TaskAction) │    │
+│  │                      │    │      │  │ ├── Watch  (TaskAction)  │    │
+│  │ AppService ──connect─┼────┼─────>│  │ ├── Abort  (TaskAction)  │    │
+│  │ (CRUD facade)        │    │      │  │                          │    │
+│  │                      │    │      │  │ InternalAppService (NEW) │    │
+│  └──────────┬───────────┘    │      │  │ ├── AppRepo (DB: spec)   │    │
+│             │                │      │  │ ├── AppK8sClient (K8s)   │    │
+│             ▼                │      │  │ │   Deploy (KService)    │    │
+│      ┌────────────┐         │      │  │ │   GetStatus (KService) │    │
+│      │ PostgreSQL  │         │      │  │ │   Stop (del KService)  │    │
+│      │ (apps table │         │      │  │ └── Replicas (Pods)      │    │
+│      │  spec only) │         │      │  └────────────┬─────────────┘    │
+│      └────────────┘         │      │               │                  │
+│                              │      │               ▼                  │
+│                              │      │  ┌──────────────────────────┐   │
+│                              │      │  │ Kubernetes                │   │
+│                              │      │  │ ┌──────────────┐         │   │
+│                              │      │  │ │ TaskAction CRs│         │   │
+│                              │      │  │ ├──────────────┤         │   │
+│                              │      │  │ │ KService CRs │         │   │
+│                              │      │  │ │ (apps)       │         │   │
+│                              │      │  │ └──────────────┘         │   │
+│                              │      │  └──────────────────────────┘   │
+└─────────────────────────────┘      └─────────────────────────────────┘
 ```
 
 **Key design simplification:**
 - **DB stores spec only** — no status column. The KService CRD is the single source of truth for app status.
-- **No status watcher/sync loop** — when RunService needs app status, it calls InternalAppService (via connect, co-located in the same pod), which reads directly from the KService CRD via AppK8sClient.
+- **Control plane / data plane split** — AppService (control plane) forwards requests to InternalAppService (data plane) via connect. InternalAppService has direct K8s access to read KService CRD status.
+- **No status watcher/sync loop** — when AppService needs app status, it calls InternalAppService, which reads directly from the KService CRD via AppK8sClient.
 - **No delete operation** — apps can only be stopped. Stopping deletes the KService CRD. The spec remains in DB for potential restart.
 
 **Key patterns to follow:**
@@ -221,33 +222,24 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 ### 5.1 Architecture: InternalAppService ↔ AppK8sClient
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  Manager (unified binary)                                        │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────────┐ │
-│  │ Manager (RunService + ActionsService in same pod)            │ │
-│  │                                                              │ │
-│  │  RunService ──connect──> InternalAppService (NEW)            │ │
-│  │                          ├── AppRepo (DB: spec)              │ │
-│  │                          ├── AppK8sClient (K8s)              │ │
-│  │                          │                                   │ │
-│  │                          │ Create: DB + KService             │ │
-│  │                          │ Update: DB + KService             │ │
-│  │                          │ Get:    DB + KService             │ │
-│  │                          │ Stop:   del KService              │ │
-│  │                          │ List:   DB + KServices            │ │
-│  │                                                              │ │
-│  │  ActionsService (tasks)                                      │ │
-│  │  ├── ActionsClient (K8s)                                     │ │
-│  └──────────────────────────────────────────────────────────────┘ │
-│             │                                   │                │
-│             ▼                                   ▼                │
-│      ┌────────────┐                    ┌──────────────┐         │
-│      │ PostgreSQL  │                    │ Kubernetes    │         │
-│      │             │                    │ (KService CRs│         │
-│      │ (spec only) │                    │  + Pods)     │         │
-│      └────────────┘                    └──────────────┘         │
-└─────────────────────────────────────────────────────────────────┘
+┌───────────────────────────┐         ┌───────────────────────────────┐
+│  Control Plane             │         │  Data Plane                    │
+│                            │         │                                │
+│  RunService                │         │  ActionsService (tasks)        │
+│  TaskService               │         │  ├── ActionsClient (K8s)       │
+│  AppService ───connect────┼────────>│                                │
+│  (CRUD facade)            │         │  InternalAppService (NEW)      │
+│                            │         │  ├── AppRepo (DB: spec)        │
+│  ┌────────────┐           │         │  ├── AppK8sClient (K8s)        │
+│  │ PostgreSQL  │           │         │  │                             │
+│  │ (spec only) │           │         │  │ Create: DB + KService       │
+│  └────────────┘           │         │  │ Update: DB + KService       │
+│                            │         │  │ Get:    DB + KService       │
+│                            │         │  │ Stop:   del KService        │
+│                            │         │  │ List:   DB + KServices      │
+│                            │         │  │                             │
+│                            │         │  └── Kubernetes (KService CRs) │
+└───────────────────────────┘         └───────────────────────────────┘
 ```
 
 **Key simplification vs. previous design:**
@@ -255,6 +247,7 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 - No `UpdateStatus` RPC or background reconciliation loop
 - No `AppNotifier` pub/sub — status is always read fresh from the CRD
 - DB is only written on Create and Update (spec changes)
+- **Control plane / data plane split** — AppService is a thin facade in the control plane; InternalAppService in the data plane has K8s access
 
 ### 5.2 InternalAppService Implementation
 
@@ -348,16 +341,6 @@ User → Watch(WatchRequest{target})
 > Watch is backed by K8s watch on KService CRDs, not an in-memory pub/sub.
 > No AppNotifier needed.
 
-#### Lease (server-streaming) — optional, for future multi-cluster
-
-In single-cluster mode, the Lease RPC is not needed.
-
-```go
-func (s *InternalAppService) Lease(...) error {
-    return connect.NewError(connect.CodeUnimplemented,
-        errors.New("Lease is not needed in single-cluster mode"))
-}
-```
 
 ---
 
@@ -656,7 +639,7 @@ type AppConfig struct {
 ### 9.1 Happy Path: Create and Deploy
 
 ```
-SDK/CLI              RunService             InternalAppService     AppK8sClient
+SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │                    │                       │                       │
    │  Create(app_spec)  │                       │                       │
    │───────────────────>│  Create(app_spec)     │                       │
@@ -693,7 +676,7 @@ SDK/CLI              RunService             InternalAppService     AppK8sClient
 ### 9.2 Update (Spec Change)
 
 ```
-SDK/CLI              RunService             InternalAppService     AppK8sClient
+SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │                    │                       │                       │
    │  Update(new_spec)  │                       │                       │
    │───────────────────>│  Update(new_spec)     │                       │
@@ -715,7 +698,7 @@ SDK/CLI              RunService             InternalAppService     AppK8sClient
 ### 9.3 Stop
 
 ```
-SDK/CLI              RunService             InternalAppService     AppK8sClient
+SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │                    │                       │                       │
    │  Stop(app_id)      │                       │                       │
    │───────────────────>│  Stop(app_id)         │                       │
@@ -755,7 +738,6 @@ SDK/CLI              RunService             InternalAppService     AppK8sClient
 ### Phase 2: Streaming RPCs
 
 1. Implement `Watch` RPC (backed by K8s watch on KService CRDs)
-2. Implement `Lease` RPC stub (for future multi-cluster)
 3. **End-to-end tests** with Knative in kind/minikube
 
 ### Phase 3: Polish
