@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
