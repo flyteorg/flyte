@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
+
 	"time"
 
+	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"gorm.io/gorm"
@@ -54,14 +55,34 @@ func TestMain(m *testing.M) {
 		os.Exit(exitCode)
 	}()
 
-	// Setup: Connect to PostgreSQL database
+	// Setup: Start embedded PostgreSQL
+	const embeddedPGPort = 15435
+	pg := embeddedpostgres.NewDatabase(
+		embeddedpostgres.DefaultConfig().
+			Port(embeddedPGPort).
+			Database("flyte_runs_test").
+			Username("postgres").
+			Password("postgres").
+			RuntimePath(fmt.Sprintf("/tmp/embedded-postgres-%d", embeddedPGPort)),
+	)
+	if err := pg.Start(); err != nil {
+		log.Printf("Failed to start embedded postgres: %v", err)
+		exitCode = 1
+		return
+	}
+	defer func() {
+		if err := pg.Stop(); err != nil {
+			log.Printf("Warning: failed to stop embedded postgres: %v", err)
+		}
+	}()
+
 	dbConfig := &database.DbConfig{
 		Postgres: database.PostgresConfig{
-			Host:         getEnvOrDefault("TEST_POSTGRES_HOST", "localhost"),
-			Port:         getEnvOrDefaultInt("TEST_POSTGRES_PORT", 5433),
-			DbName:       getEnvOrDefault("TEST_POSTGRES_DB", "flyte_runs"),
-			User:         getEnvOrDefault("TEST_POSTGRES_USER", "postgres"),
-			Password:     getEnvOrDefault("TEST_POSTGRES_PASSWORD", "postgres"),
+			Host:         "localhost",
+			Port:         embeddedPGPort,
+			DbName:       "flyte_runs_test",
+			User:         "postgres",
+			Password:     "postgres",
 			ExtraOptions: "sslmode=disable",
 		},
 		MaxIdleConnections: 10,
@@ -153,22 +174,6 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
-}
-
-func getEnvOrDefault(key, defaultVal string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return defaultVal
-}
-
-func getEnvOrDefaultInt(key string, defaultVal int) int {
-	if v := os.Getenv(key); v != "" {
-		if i, err := strconv.Atoi(v); err == nil {
-			return i
-		}
-	}
-	return defaultVal
 }
 
 // waitForServer waits for the server to be ready

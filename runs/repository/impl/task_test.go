@@ -2,57 +2,24 @@ package impl
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func getTestPostgresDSN() string {
-	if dsn := os.Getenv("TEST_POSTGRES_DSN"); dsn != "" {
-		return dsn
-	}
-	host := os.Getenv("TEST_POSTGRES_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-	port := os.Getenv("TEST_POSTGRES_PORT")
-	if port == "" {
-		port = "5433"
-	}
-	user := os.Getenv("TEST_POSTGRES_USER")
-	if user == "" {
-		user = "postgres"
-	}
-	password := os.Getenv("TEST_POSTGRES_PASSWORD")
-	if password == "" {
-		password = "postgres"
-	}
-	dbname := os.Getenv("TEST_POSTGRES_DB")
-	if dbname == "" {
-		dbname = "flyte_runs"
-	}
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-}
-
 func setupDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(postgres.Open(getTestPostgresDSN()), &gorm.Config{})
-	require.NoError(t, err)
-	return db
+	t.Helper()
+	return testDB
 }
 
 func setupTestDB(t *testing.T) *gorm.DB {
 	db := setupDB(t)
-	err := db.AutoMigrate(&models.Task{}, &models.TaskSpec{})
-	require.NoError(t, err)
 	t.Cleanup(func() {
 		db.Exec("DELETE FROM task_specs")
 		db.Exec("DELETE FROM tasks")

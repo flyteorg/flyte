@@ -21,13 +21,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 
-	runsmigrations "github.com/flyteorg/flyte/v2/runs/migrations"
 )
 
 func setupActionDB(t *testing.T) *gorm.DB {
 	db := setupDB(t)
-	err := db.AutoMigrate(runsmigrations.AllModels...)
-	require.NoError(t, err)
 	t.Cleanup(func() {
 		db.Exec("DELETE FROM action_events")
 		db.Exec("DELETE FROM actions")
@@ -510,7 +507,7 @@ func TestInsertEvents_Empty(t *testing.T) {
 
 func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -541,7 +538,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -615,7 +612,7 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}

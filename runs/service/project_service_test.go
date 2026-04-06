@@ -2,53 +2,19 @@ package service
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"testing"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
-	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func setupProjectServiceDB(t *testing.T) *gorm.DB {
-	host := os.Getenv("TEST_POSTGRES_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-	port := os.Getenv("TEST_POSTGRES_PORT")
-	if port == "" {
-		port = "5433"
-	}
-	user := os.Getenv("TEST_POSTGRES_USER")
-	if user == "" {
-		user = "postgres"
-	}
-	password := os.Getenv("TEST_POSTGRES_PASSWORD")
-	if password == "" {
-		password = "postgres"
-	}
-	dbname := os.Getenv("TEST_POSTGRES_DB")
-	if dbname == "" {
-		dbname = "flyte_runs"
-	}
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{TranslateError: true})
-	require.NoError(t, err)
-	require.NoError(t, db.AutoMigrate(&models.Project{}))
-	t.Cleanup(func() { db.Exec("DELETE FROM projects") })
-	return db
-}
-
 func setupProjectService(t *testing.T) *ProjectService {
-	db := setupProjectServiceDB(t)
-	return NewProjectService(impl.NewProjectRepo(db), []*project.Domain{
+	t.Cleanup(func() { testDB.Exec("DELETE FROM projects") })
+	return NewProjectService(impl.NewProjectRepo(testDB), []*project.Domain{
 		{Id: "development", Name: "Development"},
 		{Id: "production", Name: "Production"},
 	})

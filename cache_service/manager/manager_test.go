@@ -2,58 +2,30 @@ package manager
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"testing"
 	"time"
 
-	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/stretchr/testify/require"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 
 	cacheconfig "github.com/flyteorg/flyte/v2/cache_service/config"
-	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/repository"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 )
 
 func newTestManager(t *testing.T) *Manager {
 	t.Helper()
-
-	host := os.Getenv("TEST_POSTGRES_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-	port := os.Getenv("TEST_POSTGRES_PORT")
-	if port == "" {
-		port = "5433"
-	}
-	user := os.Getenv("TEST_POSTGRES_USER")
-	if user == "" {
-		user = "postgres"
-	}
-	password := os.Getenv("TEST_POSTGRES_PASSWORD")
-	if password == "" {
-		password = "postgres"
-	}
-	dbname := os.Getenv("TEST_POSTGRES_DB")
-	if dbname == "" {
-		dbname = "flyte_runs"
-	}
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	require.NoError(t, err)
-	m := gormigrate.New(db, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
-	require.NoError(t, m.Migrate())
+	t.Cleanup(func() {
+		testDB.Exec("DELETE FROM cached_outputs")
+		testDB.Exec("DELETE FROM reservations")
+	})
 
 	cfg := &cacheconfig.Config{
 		HeartbeatGracePeriodMultiplier: 3,
 	}
 	cfg.MaxReservationHeartbeat.Duration = 10 * time.Second
 
-	repos := repository.NewRepository(db)
+	repos := repository.NewRepository(testDB)
 	return New(cfg, repos.CachedOutputRepo(), repos.ReservationRepo())
 }
 
