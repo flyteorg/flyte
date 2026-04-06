@@ -25,18 +25,18 @@ func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
 // TODO(nary): add triggers back
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error {
 	// Use GORM's Create or Updates based on conflict
-	// ON CONFLICT (org, project, domain, name, version) DO UPDATE
+	// ON CONFLICT (project, domain, name, version) DO UPDATE
 	now := time.Now()
 	result := r.db.WithContext(ctx).
 		Exec(`INSERT INTO tasks (
-			org, project, domain, name, version,
+			project, domain, name, version,
 			environment, function_name, deployed_by,
 			trigger_name, total_triggers, active_triggers,
 			trigger_automation_spec, trigger_types,
 			task_spec, env_description, short_description,
 			created_at, updated_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT (org, project, domain, name, version) DO UPDATE SET
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT (project, domain, name, version) DO UPDATE SET
 			environment = EXCLUDED.environment,
 			function_name = EXCLUDED.function_name,
 			deployed_by = EXCLUDED.deployed_by,
@@ -49,7 +49,6 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 			env_description = EXCLUDED.env_description,
 			short_description = EXCLUDED.short_description,
 			updated_at = EXCLUDED.updated_at`,
-			newTask.Org,
 			newTask.Project,
 			newTask.Domain,
 			newTask.Name,
@@ -74,8 +73,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 		return fmt.Errorf("failed to create task %v: %w", newTask.TaskKey, result.Error)
 	}
 
-	logger.Infof(ctx, "Created/Updated task: %s/%s/%s/%s version %s",
-		newTask.Org, newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
+	logger.Infof(ctx, "Created/Updated task: %s/%s/%s version %s",
+		newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
 
 	return nil
 }
@@ -83,8 +82,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task) error 
 func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error) {
 	var task models.Task
 	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND name = ? AND version = ?",
-			key.Org, key.Project, key.Domain, key.Name, key.Version).
+		Where("project = ? AND domain = ? AND name = ? AND version = ?",
+			key.Project, key.Domain, key.Name, key.Version).
 		First(&task)
 
 	if result.Error != nil {

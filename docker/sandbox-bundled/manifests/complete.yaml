@@ -106,11 +106,6 @@ spec:
                 description: Interruptible is the run-scoped interruptibility override
                   projected from RunSpec.
                 type: boolean
-              org:
-                description: Org this action belongs to
-                maxLength: 63
-                minLength: 1
-                type: string
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
                 maxLength: 30
@@ -151,7 +146,6 @@ spec:
             - actionName
             - domain
             - inputUri
-            - org
             - project
             - runName
             - runOutputBase
@@ -321,6 +315,71 @@ metadata:
 secrets:
 - name: flyte-sandbox-minio
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-key-holder
+  - kubernetes-dashboard-certs
+  - kubernetes-dashboard-csrf
+  resources:
+  - secrets
+  verbs:
+  - get
+  - update
+  - delete
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-settings
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - dashboard-metrics-scraper
+  resources:
+  - services
+  verbs:
+  - proxy
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - 'http:heapster:'
+  - 'https:heapster:'
+  - dashboard-metrics-scraper
+  - http:dashboard-metrics-scraper
+  resources:
+  - services/proxy
+  verbs:
+  - get
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -392,6 +451,46 @@ rules:
   - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-metrics
+rules:
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyte-sandbox-kubernetes-dashboard
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kubernetes-dashboard
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
@@ -408,6 +507,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flyte-sandbox
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-metrics
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-sandbox-kubernetes-dashboard-metrics
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 ---
 apiVersion: v1
@@ -607,6 +725,18 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
+data: null
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: kubernetes-dashboard-settings
+---
+apiVersion: v1
 kind: Secret
 metadata:
   labels:
@@ -658,6 +788,42 @@ metadata:
     helm.sh/chart: minio-12.6.7
   name: flyte-sandbox-minio
   namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard-certs
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: kubernetes-dashboard-csrf
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: kubernetes-dashboard-key-holder
 type: Opaque
 ---
 apiVersion: v1
@@ -800,6 +966,29 @@ spec:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+    kubernetes.io/cluster-service: "true"
+  name: flyte-sandbox-kubernetes-dashboard
+spec:
+  ports:
+  - name: https
+    port: 443
+    targetPort: https
+  selector:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: kubernetes-dashboard
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -1183,6 +1372,87 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: flyte-sandbox-minio-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kubernetes-dashboard
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/version: 2.7.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
+  name: flyte-sandbox-kubernetes-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kubernetes-dashboard
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: kubernetes-dashboard
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app.kubernetes.io/component: kubernetes-dashboard
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kubernetes-dashboard
+        app.kubernetes.io/version: 2.7.0
+        helm.sh/chart: kubernetes-dashboard-6.0.0
+    spec:
+      containers:
+      - args:
+        - --namespace=flyte
+        - --auto-generate-certificates
+        - --metrics-provider=none
+        image: kubernetesui/dashboard:v2.7.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        name: kubernetes-dashboard
+        ports:
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /certs
+          name: kubernetes-dashboard-certs
+        - mountPath: /tmp
+          name: tmp-volume
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: flyte-sandbox-kubernetes-dashboard
+      volumes:
+      - name: kubernetes-dashboard-certs
+        secret:
+          secretName: flyte-sandbox-kubernetes-dashboard-certs
+      - emptyDir: {}
+        name: tmp-volume
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig

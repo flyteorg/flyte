@@ -27,14 +27,12 @@ import (
 
 func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpdate) {
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "run1",
 	}
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        runID.Org,
 			Project:    runID.Project,
 			Domain:     runID.Domain,
 			RunName:    runID.Name,
@@ -165,7 +163,6 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "project",
 		Domain:  "development",
 		Name:    "rabc123",
@@ -355,7 +352,6 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	}
 
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "run1",
@@ -363,7 +359,6 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        runID.Org,
 			Project:    runID.Project,
 			Domain:     runID.Domain,
 			RunName:    runID.Name,
@@ -410,7 +405,6 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	// Create a terminal TaskAction CRD (SUCCEEDED)
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        "org",
 			Project:    "proj",
 			Domain:     "dev",
 			RunName:    "run1",
@@ -424,7 +418,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	}
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
 			Name: "completed-action",
 		},
 		Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
@@ -467,7 +461,6 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	// Create a non-terminal TaskAction CRD (QUEUED)
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        "org",
 			Project:    "proj",
 			Domain:     "dev",
 			RunName:    "run1",
@@ -481,7 +474,7 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	}
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
 			Name: "queued-action",
 		},
 		Phase: common.ActionPhase_ACTION_PHASE_QUEUED,

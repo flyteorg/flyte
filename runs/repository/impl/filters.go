@@ -138,28 +138,21 @@ func NewNotEqualFilter(field string, value interface{}) interfaces.Filter {
 	}
 }
 
-// NewOrgFilter creates a filter for org = value
-func NewOrgFilter(org string) interfaces.Filter {
-	return NewEqualFilter("org", org)
-}
-
-// NewProjectIdFilter creates a filter for project identifier (org, project, domain)
+// NewProjectIdFilter creates a filter for project identifier (project, domain)
 func NewProjectIdFilter(projectId *common.ProjectIdentifier) interfaces.Filter {
-	orgFilter := NewOrgFilter(projectId.GetOrganization())
 	projectFilter := NewEqualFilter("project", projectId.GetName())
 	domainFilter := NewEqualFilter("domain", projectId.GetDomain())
 
-	return orgFilter.And(projectFilter).And(domainFilter)
+	return projectFilter.And(domainFilter)
 }
 
-// NewTaskNameFilter creates a filter for task name (org, project, domain, name)
+// NewTaskNameFilter creates a filter for task name (project, domain, name)
 func NewTaskNameFilter(taskName *task.TaskName) interfaces.Filter {
-	orgFilter := NewOrgFilter(taskName.GetOrg())
 	projectFilter := NewEqualFilter("project", taskName.GetProject())
 	domainFilter := NewEqualFilter("domain", taskName.GetDomain())
 	nameFilter := NewEqualFilter("name", taskName.GetName())
 
-	return orgFilter.And(projectFilter).And(domainFilter).And(nameFilter)
+	return projectFilter.And(domainFilter).And(nameFilter)
 }
 
 // NewDeployedByFilter creates a filter for deployed_by = value

@@ -98,7 +98,6 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 
 		taskID := taskAction.GetId()
 		if taskID != nil {
-			action.TaskOrg = sql.NullString{String: taskID.GetOrg(), Valid: taskID.GetOrg() != ""}
 			action.TaskProject = sql.NullString{String: taskID.GetProject(), Valid: taskID.GetProject() != ""}
 			action.TaskDomain = sql.NullString{String: taskID.GetDomain(), Valid: taskID.GetDomain() != ""}
 			action.TaskName = sql.NullString{String: taskID.GetName(), Valid: taskID.GetName() != ""}

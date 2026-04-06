@@ -172,5 +172,5 @@ func validateOwnerID(ownerID string) error {
 }
 
 func scopedKey(key string, id *cacheservicev2.Identifier) string {
-	return fmt.Sprintf("%s-%s-%s-%s", id.GetOrg(), id.GetProject(), id.GetDomain(), key)
+	return fmt.Sprintf("%s-%s-%s", id.GetProject(), id.GetDomain(), key)
 }

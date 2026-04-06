@@ -417,7 +417,6 @@ func (r *TaskActionReconciler) buildActionEvent(
 ) *workflow.ActionEvent {
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     taskAction.Spec.Org,
 			Project: taskAction.Spec.Project,
 			Domain:  taskAction.Spec.Domain,
 			Name:    taskAction.Spec.RunName,
@@ -737,9 +736,6 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	var missing []string
 	if taskAction.Spec.RunName == "" {
 		missing = append(missing, "runName")
-	}
-	if taskAction.Spec.Org == "" {
-		missing = append(missing, "org")
 	}
 	if taskAction.Spec.Project == "" {
 		missing = append(missing, "project")

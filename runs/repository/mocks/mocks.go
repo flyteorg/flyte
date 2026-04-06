@@ -239,8 +239,8 @@ func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(ctx context.C
 }
 
 // CreateAction provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
-	ret := _mock.Called(ctx, actionSpec, detailedInfo)
+func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
+	ret := _mock.Called(ctx, action)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateAction")
@@ -248,18 +248,18 @@ func (_mock *ActionRepo) CreateAction(ctx context.Context, actionSpec *workflow.
 
 	var r0 *models.Action
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *workflow.ActionSpec, []byte) (*models.Action, error)); ok {
-		return returnFunc(ctx, actionSpec, detailedInfo)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action) (*models.Action, error)); ok {
+		return returnFunc(ctx, action)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *workflow.ActionSpec, []byte) *models.Action); ok {
-		r0 = returnFunc(ctx, actionSpec, detailedInfo)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action) *models.Action); ok {
+		r0 = returnFunc(ctx, action)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Action)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *workflow.ActionSpec, []byte) error); ok {
-		r1 = returnFunc(ctx, actionSpec, detailedInfo)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *models.Action) error); ok {
+		r1 = returnFunc(ctx, action)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -273,41 +273,35 @@ type ActionRepo_CreateAction_Call struct {
 
 // CreateAction is a helper method to define mock.On call
 //   - ctx context.Context
-//   - actionSpec *workflow.ActionSpec
-//   - detailedInfo []byte
-func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, actionSpec interface{}, detailedInfo interface{}) *ActionRepo_CreateAction_Call {
-	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, actionSpec, detailedInfo)}
+//   - action *models.Action
+func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, action interface{}) *ActionRepo_CreateAction_Call {
+	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, action)}
 }
 
-func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, action *models.Action)) *ActionRepo_CreateAction_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *workflow.ActionSpec
+		var arg1 *models.Action
 		if args[1] != nil {
-			arg1 = args[1].(*workflow.ActionSpec)
-		}
-		var arg2 []byte
-		if args[2] != nil {
-			arg2 = args[2].([]byte)
+			arg1 = args[1].(*models.Action)
 		}
 		run(
 			arg0,
 			arg1,
-			arg2,
 		)
 	})
 	return _c
 }
 
-func (_c *ActionRepo_CreateAction_Call) Return(action *models.Action, err error) *ActionRepo_CreateAction_Call {
-	_c.Call.Return(action, err)
+func (_c *ActionRepo_CreateAction_Call) Return(action1 *models.Action, err error) *ActionRepo_CreateAction_Call {
+	_c.Call.Return(action1, err)
 	return _c
 }
 
-func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(ctx context.Context, action *models.Action) (*models.Action, error)) *ActionRepo_CreateAction_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1040,8 +1034,8 @@ func (_c *ActionRepo_ListPendingAborts_Call) RunAndReturn(run func(ctx context.C
 }
 
 // ListRootActions provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) ListRootActions(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
-	ret := _mock.Called(ctx, org, project, domain, startDate, endDate, limit)
+func (_mock *ActionRepo) ListRootActions(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error) {
+	ret := _mock.Called(ctx, project, domain, startDate, endDate, limit)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListRootActions")
@@ -1049,18 +1043,18 @@ func (_mock *ActionRepo) ListRootActions(ctx context.Context, org string, projec
 
 	var r0 []*models.Action
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
-		return returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, *time.Time, *time.Time, int) ([]*models.Action, error)); ok {
+		return returnFunc(ctx, project, domain, startDate, endDate, limit)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
-		r0 = returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, *time.Time, *time.Time, int) []*models.Action); ok {
+		r0 = returnFunc(ctx, project, domain, startDate, endDate, limit)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*models.Action)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, *time.Time, *time.Time, int) error); ok {
-		r1 = returnFunc(ctx, org, project, domain, startDate, endDate, limit)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, *time.Time, *time.Time, int) error); ok {
+		r1 = returnFunc(ctx, project, domain, startDate, endDate, limit)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1074,17 +1068,16 @@ type ActionRepo_ListRootActions_Call struct {
 
 // ListRootActions is a helper method to define mock.On call
 //   - ctx context.Context
-//   - org string
 //   - project string
 //   - domain string
 //   - startDate *time.Time
 //   - endDate *time.Time
 //   - limit int
-func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, org interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
-	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, org, project, domain, startDate, endDate, limit)}
+func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
+	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, project, domain, startDate, endDate, limit)}
 }
 
-func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
+func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1098,21 +1091,17 @@ func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org
 		if args[2] != nil {
 			arg2 = args[2].(string)
 		}
-		var arg3 string
+		var arg3 *time.Time
 		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg3 = args[3].(*time.Time)
 		}
 		var arg4 *time.Time
 		if args[4] != nil {
 			arg4 = args[4].(*time.Time)
 		}
-		var arg5 *time.Time
+		var arg5 int
 		if args[5] != nil {
-			arg5 = args[5].(*time.Time)
-		}
-		var arg6 int
-		if args[6] != nil {
-			arg6 = args[6].(int)
+			arg5 = args[5].(int)
 		}
 		run(
 			arg0,
@@ -1121,7 +1110,6 @@ func (_c *ActionRepo_ListRootActions_Call) Run(run func(ctx context.Context, org
 			arg3,
 			arg4,
 			arg5,
-			arg6,
 		)
 	})
 	return _c
@@ -1132,7 +1120,7 @@ func (_c *ActionRepo_ListRootActions_Call) Return(actions []*models.Action, err 
 	return _c
 }
 
-func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(ctx context.Context, org string, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
+func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
 	_c.Call.Return(run)
 	return _c
 }

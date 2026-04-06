@@ -37,27 +37,8 @@ func CoalesceNullString(s sql.NullString) string {
 	return ""
 }
 
-// GenerateCacheKeyForTask generates a cache key for a task matching the cache key generation logic in the sdk
-func generateCacheKeyForTask(taskTemplate *flyteIdlCore.TaskTemplate, inputs *task.Inputs) (string, error) {
-	ignoredInputsVars := taskTemplate.GetMetadata().GetCacheIgnoreInputVars()
-	if ignoredInputsVars == nil {
-		ignoredInputsVars = []string{}
-	}
-
-	var filteredInputs []*task.NamedLiteral
-	for _, namedLiteral := range inputs.GetLiterals() {
-		if !slices.Contains(ignoredInputsVars, namedLiteral.GetName()) {
-			filteredInputs = append(filteredInputs, namedLiteral)
-		}
-	}
-
-	inputsHash, err := hashInputs(&task.Inputs{
-		Literals: filteredInputs,
-	})
-	if err != nil {
-		return "", errors.Wrap(err, "failed to hash inputs")
-	}
-
+// generateCacheKeyForTask generates a cache key for a task using a precomputed inputs hash.
+func generateCacheKeyForTask(taskTemplate *flyteIdlCore.TaskTemplate, inputsHash string) (string, error) {
 	taskInterface := taskTemplate.GetInterface()
 	interfaceHash, err := hashInterface(taskInterface)
 	if err != nil {
@@ -70,6 +51,23 @@ func generateCacheKeyForTask(taskTemplate *flyteIdlCore.TaskTemplate, inputs *ta
 	data := fmt.Sprintf("%s%s%s%s", inputsHash, taskName, interfaceHash, cacheVersion)
 	hash := sha256.Sum256([]byte(data))
 	return base64.StdEncoding.EncodeToString(hash[:]), nil
+}
+
+// computeFilteredInputsHash filters out cache-ignored inputs and returns the hash.
+func computeFilteredInputsHash(taskTemplate *flyteIdlCore.TaskTemplate, inputs *task.Inputs) (string, error) {
+	ignoredInputsVars := taskTemplate.GetMetadata().GetCacheIgnoreInputVars()
+	if ignoredInputsVars == nil {
+		ignoredInputsVars = []string{}
+	}
+
+	var filteredInputs []*task.NamedLiteral
+	for _, namedLiteral := range inputs.GetLiterals() {
+		if !slices.Contains(ignoredInputsVars, namedLiteral.GetName()) {
+			filteredInputs = append(filteredInputs, namedLiteral)
+		}
+	}
+
+	return hashInputs(&task.Inputs{Literals: filteredInputs})
 }
 
 // hashInterface computes a SHA-256 hash of the given TypedInterface matching the hashing logic in the sdk

@@ -77,9 +77,9 @@ func TestNewProjectIdFilter(t *testing.T) {
 	filter := NewProjectIdFilter(projectId)
 	expr, err := filter.GormQueryExpression("")
 	require.NoError(t, err)
-	assert.Contains(t, expr.Query, "org = ?")
 	assert.Contains(t, expr.Query, "project = ?")
 	assert.Contains(t, expr.Query, "domain = ?")
+	assert.NotContains(t, expr.Query, "org = ?")
 }
 
 func TestNewTaskNameFilter(t *testing.T) {
