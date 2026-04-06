@@ -65,7 +65,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.postgres.passwordPath"), defaultConfig.Database.Postgres.PasswordPath, "Points to the file containing the database password.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.postgres.options"), defaultConfig.Database.Postgres.ExtraOptions, "See http://gorm.io/docs/connecting_to_the_database.html for available options passed,  in addition to the above.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "database.postgres.debug"), defaultConfig.Database.Postgres.Debug, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.sqlite.file"), defaultConfig.Database.SQLite.File, "The path to the file (existing or new) where the DB should be created / stored. If existing,  then this will be reused,  else a new will be created")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchBufferSize"), defaultConfig.WatchBufferSize, "Buffer size for watch streams")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsServiceUrl"), defaultConfig.ActionsServiceURL, "URL of the actions service")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storagePrefix"), defaultConfig.StoragePrefix, "Base URI prefix for storing run inputs and outputs")

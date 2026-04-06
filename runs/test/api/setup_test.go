@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -25,8 +26,7 @@ import (
 )
 
 const (
-	testPort   = 8091                      // Different port to avoid conflicts with main service
-	testDBFile = "/tmp/flyte-runs-test.db" // Temporary database file for tests
+	testPort = 8091 // Different port to avoid conflicts with main service
 )
 
 var (
@@ -51,21 +51,21 @@ func TestMain(m *testing.M) {
 			log.Println("Test server stopped")
 		}
 
-		// Remove test database file
-		if err := os.Remove(testDBFile); err != nil && !os.IsNotExist(err) {
-			log.Printf("Warning: Failed to remove test database: %v", err)
-		}
-
 		os.Exit(exitCode)
 	}()
 
-	// Setup: Create SQLite database
-	// NOTE: Using a temp file instead of :memory: to avoid GORM AutoMigrate issues
-	// with index creation on fresh in-memory databases
+	// Setup: Connect to PostgreSQL database
 	dbConfig := &database.DbConfig{
-		SQLite: database.SQLiteConfig{
-			File: testDBFile,
+		Postgres: database.PostgresConfig{
+			Host:         getEnvOrDefault("TEST_POSTGRES_HOST", "localhost"),
+			Port:         getEnvOrDefaultInt("TEST_POSTGRES_PORT", 5433),
+			DbName:       getEnvOrDefault("TEST_POSTGRES_DB", "flyte_runs"),
+			User:         getEnvOrDefault("TEST_POSTGRES_USER", "postgres"),
+			Password:     getEnvOrDefault("TEST_POSTGRES_PASSWORD", "postgres"),
+			ExtraOptions: "sslmode=disable",
 		},
+		MaxIdleConnections: 10,
+		MaxOpenConnections: 100,
 	}
 	logCfg := logger.GetConfig()
 	var err error
@@ -153,6 +153,22 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
+}
+
+func getEnvOrDefault(key, defaultVal string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return defaultVal
+}
+
+func getEnvOrDefaultInt(key string, defaultVal int) int {
+	if v := os.Getenv(key); v != "" {
+		if i, err := strconv.Atoi(v); err == nil {
+			return i
+		}
+	}
+	return defaultVal
 }
 
 // waitForServer waits for the server to be ready

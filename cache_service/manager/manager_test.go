@@ -2,13 +2,15 @@ package manager
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
-	"github.com/glebarez/sqlite"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/stretchr/testify/require"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	cacheconfig "github.com/flyteorg/flyte/v2/cache_service/config"
@@ -20,7 +22,28 @@ import (
 func newTestManager(t *testing.T) *Manager {
 	t.Helper()
 
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	host := os.Getenv("TEST_POSTGRES_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("TEST_POSTGRES_PORT")
+	if port == "" {
+		port = "5433"
+	}
+	user := os.Getenv("TEST_POSTGRES_USER")
+	if user == "" {
+		user = "postgres"
+	}
+	password := os.Getenv("TEST_POSTGRES_PASSWORD")
+	if password == "" {
+		password = "postgres"
+	}
+	dbname := os.Getenv("TEST_POSTGRES_DB")
+	if dbname == "" {
+		dbname = "flyte_runs"
+	}
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	require.NoError(t, err)
 	m := gormigrate.New(db, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
 	require.NoError(t, m.Migrate())
