@@ -171,9 +171,9 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
 
 	ctx := context.Background()
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: targetActionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID))
 	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{ActionId: otherActionID}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID))
 	require.NoError(t, err)
 
 	watchCtx, cancel := context.WithCancel(context.Background())
