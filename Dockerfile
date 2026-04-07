@@ -9,7 +9,6 @@ ENV CGO_ENABLED=0
 
 WORKDIR /flyteorg/build
 
-COPY app app
 COPY dataproxy dataproxy
 COPY executor executor
 COPY flytecopilot flytecopilot
