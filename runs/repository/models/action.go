@@ -29,9 +29,12 @@ type Action struct {
 	// Who initiated this run(web, CLI, scheduler, etc.)
 	RunSource string `db:"run_source" json:"run_source,omitempty"`
 
-	// TriggerName is the name of the trigger that initiated this run, if any.
-	// Only set for runs created via RUN_SOURCE_SCHEDULE_TRIGGER.
-	TriggerName sql.NullString `db:"trigger_name"`
+	// Trigger fields — only set for runs created via RUN_SOURCE_SCHEDULE_TRIGGER.
+	TriggerTaskName sql.NullString `db:"trigger_task_name"`
+	TriggerName     sql.NullString `db:"trigger_name"`
+	TriggerRevision sql.NullInt64  `db:"trigger_revision"`
+	// TriggerType stores the automation type string (e.g. "TYPE_SCHEDULE").
+	TriggerType sql.NullString `db:"trigger_type"`
 
 	// Action type (task, trace, condition). Stores workflow.ActionType enum value.
 	ActionType int32 `db:"action_type"`

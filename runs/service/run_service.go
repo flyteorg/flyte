@@ -156,7 +156,8 @@ func (s *RunService) CreateRun(
 	// Get the task template and taskID
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
-	var triggerName string
+	var triggerName, triggerTaskName, triggerType string
+	var triggerRevision int64
 	var err error
 	runSpec := request.GetRunSpec()
 	switch request.GetTask().(type) {
@@ -176,6 +177,9 @@ func (s *RunService) CreateRun(
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
 		}
 		triggerName = tn.GetName()
+		triggerTaskName = triggerModel.TaskName
+		triggerRevision = int64(triggerModel.LatestRevision)
+		triggerType = triggerModel.AutomationType
 		taskID = &task.TaskIdentifier{
 			Project: triggerModel.Project,
 			Domain:  triggerModel.Domain,
@@ -238,7 +242,7 @@ func (s *RunService) CreateRun(
 	}
 
 	// Persist task spec and create run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, triggerName)
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -280,7 +284,10 @@ func (s *RunService) persistRunModel(
 	taskSpec *task.TaskSpec,
 	inputPrefix, runOutputBase string,
 	runSpec *task.RunSpec,
-	triggerName string,
+	source workflow.RunSource,
+	triggerName, triggerTaskName string,
+	triggerRevision int64,
+	triggerType string,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
 	info := &workflow.RunInfo{InputsUri: inputPrefix}
@@ -351,7 +358,11 @@ func (s *RunService) persistRunModel(
 		DetailedInfo:    detailedInfo,
 		RunSpec:         runSpecBytes,
 		Attempts:        1,
+		RunSource:       source.String(),
+		TriggerTaskName: nullStr(triggerTaskName),
 		TriggerName:     nullStr(triggerName),
+		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
+		TriggerType:     nullStr(triggerType),
 	}
 
 	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
@@ -1357,6 +1368,27 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		metadata.EnvironmentName = action.EnvironmentName.String
 	}
 
+	if action.RunSource != "" {
+		if v, ok := workflow.RunSource_value[action.RunSource]; ok {
+			metadata.Source = workflow.RunSource(v)
+		}
+	}
+
+	if action.TriggerName.Valid {
+		metadata.TriggerName = action.TriggerName.String
+		metadata.TriggerId = &common.TriggerIdentifier{
+			Name: &common.TriggerName{
+				Project:  action.Project,
+				Domain:   action.Domain,
+				Name:     action.TriggerName.String,
+				TaskName: action.TriggerTaskName.String,
+			},
+		}
+		if action.TriggerRevision.Valid {
+			metadata.TriggerId.Revision = uint64(action.TriggerRevision.Int64)
+		}
+	}
+
 	switch workflow.ActionType(action.ActionType) {
 	case workflow.ActionType_ACTION_TYPE_TASK:
 		taskMeta := &workflow.TaskActionMetadata{
@@ -1673,9 +1705,22 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	}
 
 	metadata.FuntionName = action.FunctionName
-	// TODO: Add ExecutedBy, TriggerTaskName, TriggerId
-
 	metadata.Source = workflow.RunSource(workflow.RunSource_value[action.RunSource])
+
+	if action.TriggerName.Valid {
+		metadata.TriggerName = action.TriggerName.String
+		metadata.TriggerId = &common.TriggerIdentifier{
+			Name: &common.TriggerName{
+				Project:  action.Project,
+				Domain:   action.Domain,
+				Name:     action.TriggerName.String,
+				TaskName: action.TriggerTaskName.String,
+			},
+		}
+		if action.TriggerRevision.Valid {
+			metadata.TriggerId.Revision = uint64(action.TriggerRevision.Int64)
+		}
+	}
 
 	childrenPhaseCounts := make(map[int32]int32, len(update.Node.ChildPhaseCounts))
 	for phase, count := range update.Node.ChildPhaseCounts {
