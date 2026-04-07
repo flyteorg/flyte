@@ -12,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/lib/pq"
@@ -44,13 +43,15 @@ func TestCreateRun(t *testing.T) {
 		Domain:  "domain1",
 		Name:    "run1",
 	}
-	req := &workflow.CreateRunRequest{
-		Id:      &workflow.CreateRunRequest_RunId{RunId: runID},
-		RunSpec: nil,
-		Task:    &workflow.CreateRunRequest_TaskId{TaskId: &task.TaskIdentifier{Name: "task1"}},
+	runModel := &models.Run{
+		Project: runID.Project,
+		Domain:  runID.Domain,
+		RunName: runID.Name,
+		Name:    "a0",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
-	run, err := actionRepo.CreateRun(ctx, req, "s3://input", "s3://output")
+	run, err := actionRepo.CreateAction(ctx, runModel)
 	require.NoError(t, err)
 	require.NotNil(t, run)
 	assert.Equal(t, runID.Project, run.Project)
@@ -59,11 +60,11 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
 	require.NotZero(t, run.ID)
-	require.NotEmpty(t, run.ActionSpec)
 
-	// Attempt duplicate run create with same run name should fail unique constraint
-	_, err = actionRepo.CreateRun(ctx, req, "s3://input2", "s3://output2")
-	require.Error(t, err)
+	// Attempt duplicate run create with same run name should return existing (idempotent)
+	run2, err := actionRepo.CreateAction(ctx, runModel)
+	require.NoError(t, err)
+	assert.Equal(t, run.ID, run2.ID)
 }
 
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
@@ -289,16 +290,13 @@ func TestListRuns(t *testing.T) {
 
 	runsToCreate := []string{"run-1", "run-2", "run-3"}
 	for _, runName := range runsToCreate {
-		req := &workflow.CreateRunRequest{
-			Id: &workflow.CreateRunRequest_RunId{RunId: &common.RunIdentifier{
-				Org:     "org1",
-				Project: "proj1",
-				Domain:  "domain1",
-				Name:    runName,
-			}},
-			RunSpec: nil,
-		}
-		_, err := actionRepo.CreateRun(ctx, req, "in://uri", "out://base")
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: runName,
+			Name:    "a0",
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		})
 		require.NoError(t, err)
 	}
 
@@ -363,14 +361,13 @@ func TestListRuns(t *testing.T) {
 	assert.Empty(t, token2)
 
 	// Test project scope filtering doesn't include other org/project/domain
-	_, err = actionRepo.CreateRun(ctx, &workflow.CreateRunRequest{
-		Id: &workflow.CreateRunRequest_RunId{RunId: &common.RunIdentifier{
-			Org:     "other-org",
-			Project: "other-proj",
-			Domain:  "domain1",
-			Name:    "run-other",
-		}},
-	}, "in://x", "out://x")
+	_, err = actionRepo.CreateAction(ctx, &models.Run{
+		Project: "other-proj",
+		Domain:  "domain1",
+		RunName: "run-other",
+		Name:    "a0",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	})
 	require.NoError(t, err)
 
 	runsFiltered, _, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{

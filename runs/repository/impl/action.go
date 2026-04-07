@@ -18,8 +18,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -44,8 +42,6 @@ type actionRepo struct {
 	runNotifyCh    chan string
 }
 
-const rootActionName = "a0"
-
 // NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
 	repo := &actionRepo{
@@ -67,126 +63,6 @@ func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 	return repo, nil
 }
 
-// CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error) {
-	// Determine run ID
-	var runID *common.RunIdentifier
-	switch id := req.Id.(type) {
-	case *workflow.CreateRunRequest_RunId:
-		runID = id.RunId
-	default:
-		return nil, fmt.Errorf("invalid run ID type")
-	}
-
-	// Build ActionSpec from CreateRunRequest
-	actionSpec := &workflow.ActionSpec{
-		ActionId: &common.ActionIdentifier{
-			Run:  runID,
-			Name: rootActionName,
-		},
-		ParentActionName: nil, // NULL for root actions
-		RunSpec:          req.RunSpec,
-		InputUri:         inputUri + "/inputs.pb",
-		RunOutputBase:    runOutputBase,
-	}
-
-	// Set the task spec based on the request
-	switch taskSpec := req.Task.(type) {
-	case *workflow.CreateRunRequest_TaskSpec:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Spec: taskSpec.TaskSpec,
-			},
-		}
-	case *workflow.CreateRunRequest_TaskId:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Id: taskSpec.TaskId,
-			},
-		}
-	}
-
-	// Serialize the ActionSpec to binary protobuf
-	actionSpecBytes, err := proto.Marshal(actionSpec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
-	}
-
-	// Build RunInfo with storage URIs and task spec digest
-	info := &workflow.RunInfo{
-		InputsUri: inputUri,
-	}
-
-	// Store task spec separately and record its digest
-	if taskSpec := actionSpec.GetTask().GetSpec(); taskSpec != nil {
-		taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create task spec model: %w", err)
-		}
-		if taskSpecModel != nil {
-			if err := r.db.WithContext(ctx).
-				Clauses(clause.OnConflict{DoNothing: true}).
-				Create(taskSpecModel).Error; err != nil {
-				logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", err)
-			} else {
-				info.TaskSpecDigest = taskSpecModel.Digest
-			}
-		}
-	}
-
-	detailedInfo, err := proto.Marshal(info)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal run info: %w", err)
-	}
-
-	// Marshal RunSpec if present
-	var runSpecBytes []byte
-	if req.RunSpec != nil {
-		runSpecBytes, err = proto.Marshal(req.RunSpec)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal run spec: %w", err)
-		}
-	}
-
-	// Extract metadata columns from action spec
-	meta := extractActionMetadata(actionSpec)
-
-	// Create root action (represents the run)
-	run := &models.Run{
-		Project:          runID.Project,
-		Domain:           runID.Domain,
-		RunName:          runID.Name,
-		Name:             rootActionName,
-		ParentActionName: newNullString(""), // NULL for root actions/runs
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:       meta.ActionType,
-		TaskProject:      meta.TaskProject,
-		TaskDomain:       meta.TaskDomain,
-		TaskName:         meta.TaskName,
-		TaskVersion:      meta.TaskVersion,
-		TaskType:         meta.TaskType,
-		TaskShortName:    meta.TaskShortName,
-		FunctionName:     meta.FunctionName,
-		EnvironmentName:  meta.EnvironmentName,
-		ActionSpec:       actionSpecBytes,
-		ActionDetails:    []byte("{}"), // Empty details initially
-		DetailedInfo:     detailedInfo,
-		RunSpec:          runSpecBytes,
-		Attempts:         1,
-	}
-
-	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
-		return nil, fmt.Errorf("failed to create run: %w", err)
-	}
-
-	logger.Infof(ctx, "Created run: %s/%s/%s (ID: %d)",
-		run.Project, run.Domain, run.RunName, run.ID)
-
-	// Notify subscribers of run creation
-	r.notifyRunUpdate(ctx, runID)
-
-	return run, nil
-}
 
 // GetRun retrieves a run by identifier
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
@@ -1117,60 +993,3 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	}
 }
 
-// actionMeta holds metadata columns extracted from an ActionSpec.
-type actionMeta struct {
-	ActionType      int32
-	TaskProject     sql.NullString
-	TaskDomain      sql.NullString
-	TaskName        sql.NullString
-	TaskVersion     sql.NullString
-	TaskType        string
-	TaskShortName   sql.NullString
-	FunctionName    string
-	EnvironmentName sql.NullString
-}
-
-func newNullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
-
-// extractActionMetadata extracts metadata columns from an ActionSpec proto.
-func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
-	var m actionMeta
-	switch s := spec.GetSpec().(type) {
-	case *workflow.ActionSpec_Task:
-		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
-		// TaskAction.Id takes precedence; fall back to TaskTemplate.Id
-		if id := s.Task.GetId(); id != nil {
-			m.TaskProject = newNullString(id.GetProject())
-			m.TaskDomain = newNullString(id.GetDomain())
-			m.TaskName = newNullString(id.GetName())
-			m.TaskVersion = newNullString(id.GetVersion())
-			m.FunctionName = id.GetName()
-			m.TaskShortName = newNullString(id.GetName())
-		} else if tmplID := s.Task.GetSpec().GetTaskTemplate().GetId(); tmplID != nil {
-			m.TaskProject = newNullString(tmplID.GetProject())
-			m.TaskDomain = newNullString(tmplID.GetDomain())
-			m.TaskName = newNullString(tmplID.GetName())
-			m.TaskVersion = newNullString(tmplID.GetVersion())
-			m.FunctionName = tmplID.GetName()
-			m.TaskShortName = newNullString(tmplID.GetName())
-		}
-		if taskSpec := s.Task.GetSpec(); taskSpec != nil {
-			m.TaskType = taskSpec.GetTaskTemplate().GetType()
-			if taskSpec.GetShortName() != "" {
-				m.TaskShortName = newNullString(taskSpec.GetShortName())
-			}
-			if env := taskSpec.GetEnvironment(); env != nil && env.GetName() != "" {
-				m.EnvironmentName = newNullString(env.GetName())
-			}
-		}
-	case *workflow.ActionSpec_Trace:
-		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
-		m.FunctionName = s.Trace.GetName()
-	}
-	return m
-}

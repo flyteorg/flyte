@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -234,8 +235,8 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Create a run in a database with storage URIs
-	run, err := s.repo.ActionRepo().CreateRun(ctx, request, inputPrefix, runOutputBase)
+	// Persist task spec and create run model
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -265,6 +266,89 @@ func (s *RunService) CreateRun(
 	return connect.NewResponse(&workflow.CreateRunResponse{
 		Run: s.convertRunToProto(run),
 	}), nil
+}
+
+// persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
+func (s *RunService) persistRunModel(
+	ctx context.Context,
+	runId *common.RunIdentifier,
+	taskID *task.TaskIdentifier,
+	taskSpec *task.TaskSpec,
+	inputPrefix, runOutputBase string,
+	runSpec *task.RunSpec,
+) (*models.Run, error) {
+	// Store task spec and compute digest
+	info := &workflow.RunInfo{InputsUri: inputPrefix}
+	taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create task spec model: %w", err)
+	}
+	if taskSpecModel != nil {
+		if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
+			logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", err)
+		} else {
+			info.TaskSpecDigest = taskSpecModel.Digest
+		}
+	}
+	detailedInfo, err := proto.Marshal(info)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal run info: %w", err)
+	}
+
+	// Build ActionSpec
+	actionSpec := &workflow.ActionSpec{
+		ActionId:         &common.ActionIdentifier{Run: runId, Name: RootActionName},
+		ParentActionName: nil,
+		RunSpec:          runSpec,
+		InputUri:         inputPrefix + "/inputs.pb",
+		RunOutputBase:    runOutputBase,
+		Spec: &workflow.ActionSpec_Task{
+			Task: &workflow.TaskAction{
+				Id:   taskID,
+				Spec: taskSpec,
+			},
+		},
+	}
+	actionSpecBytes, err := proto.Marshal(actionSpec)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
+	}
+
+	var runSpecBytes []byte
+	if runSpec != nil {
+		runSpecBytes, err = proto.Marshal(runSpec)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal run spec: %w", err)
+		}
+	}
+
+	nullStr := func(s string) sql.NullString {
+		return sql.NullString{String: s, Valid: s != ""}
+	}
+
+	runModel := &models.Run{
+		Project:         runId.GetProject(),
+		Domain:          runId.GetDomain(),
+		RunName:         runId.GetName(),
+		Name:            RootActionName,
+		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:      int32(workflow.ActionType_ACTION_TYPE_TASK),
+		TaskProject:     nullStr(taskID.GetProject()),
+		TaskDomain:      nullStr(taskID.GetDomain()),
+		TaskName:        nullStr(taskID.GetName()),
+		TaskVersion:     nullStr(taskID.GetVersion()),
+		TaskType:        taskSpec.GetTaskTemplate().GetType(),
+		TaskShortName:   nullStr(taskSpec.GetShortName()),
+		FunctionName:    taskID.GetName(),
+		EnvironmentName: nullStr(taskSpec.GetEnvironment().GetName()),
+		ActionSpec:      actionSpecBytes,
+		ActionDetails:   []byte("{}"),
+		DetailedInfo:    detailedInfo,
+		RunSpec:         runSpecBytes,
+		Attempts:        1,
+	}
+
+	return s.repo.ActionRepo().CreateAction(ctx, runModel)
 }
 
 // AbortRun aborts a run
