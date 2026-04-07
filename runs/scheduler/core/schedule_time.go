@@ -12,84 +12,131 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// CronSchedule returns the cron expression for the trigger's automation spec.
-// Returns ("", false) if the trigger has no schedule automation.
-func CronSchedule(t *models.Trigger) (string, bool) {
+// ParseSchedule returns a cron.Schedule for the trigger's automation spec.
+// Supports both cron expressions and fixed-rate schedules.
+// Returns (nil, nil) if the trigger has no schedule automation.
+func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 	if t.AutomationSpec == nil {
-		return "", false
+		return nil, nil
 	}
 	spec := &task.TriggerAutomationSpec{}
 	if err := proto.Unmarshal(t.AutomationSpec, spec); err != nil {
-		return "", false
+		return nil, err
 	}
 	if spec.GetType() != task.TriggerAutomationSpecType_TYPE_SCHEDULE {
-		return "", false
+		return nil, nil
 	}
 	sched := spec.GetSchedule()
 	if sched == nil {
-		return "", false
+		return nil, nil
 	}
+
 	// Prefer the structured Cron object; fall back to legacy CronExpression string.
 	if c := sched.GetCron(); c != nil && c.GetExpression() != "" {
-		return c.GetExpression(), true
+		expr := c.GetExpression()
+		parsed, err := cron.ParseStandard(expr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
+		}
+		return parsed, nil
 	}
 	if expr := sched.GetCronExpression(); expr != "" { //nolint:staticcheck // legacy field
-		return expr, true
+		parsed, err := cron.ParseStandard(expr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
+		}
+		return parsed, nil
 	}
-	return "", false
+
+	// Fixed-rate schedule.
+	if rate := sched.GetRate(); rate != nil {
+		d, err := fixedRateDuration(rate)
+		if err != nil {
+			return nil, err
+		}
+		return cron.ConstantDelaySchedule{Delay: d}, nil
+	}
+
+	return nil, nil
 }
 
-// parseCron parses a standard 5-field cron expression (minute-granularity).
-// Supports descriptors like @hourly and timezone prefix CRON_TZ=UTC.
-func parseCron(expr string) (cron.Schedule, error) {
-	sched, err := cron.ParseStandard(expr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
+// fixedRateDuration converts a FixedRate proto to a time.Duration.
+func fixedRateDuration(rate *task.FixedRate) (time.Duration, error) {
+	d := time.Duration(rate.GetValue())
+	switch rate.GetUnit() {
+	case task.FixedRateUnit_FIXED_RATE_UNIT_MINUTE:
+		return d * time.Minute, nil
+	case task.FixedRateUnit_FIXED_RATE_UNIT_HOUR:
+		return d * time.Hour, nil
+	case task.FixedRateUnit_FIXED_RATE_UNIT_DAY:
+		return d * 24 * time.Hour, nil
+	default:
+		return 0, fmt.Errorf("unsupported fixed rate unit %v", rate.GetUnit())
 	}
-	return sched, nil
-}
-
-// NextTime returns the next scheduled time after after for the given cron expression.
-func NextTime(cronExpr string, after time.Time) (time.Time, error) {
-	sched, err := parseCron(cronExpr)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return sched.Next(after), nil
 }
 
 // StartTime returns the earliest point from which to start scheduling.
-// If the trigger has a valid TriggeredAt, we start from there; otherwise from DeployedAt.
-func StartTime(t *models.Trigger) time.Time {
+// For fixed-rate schedules with a start_time, returns that start_time advanced
+// past the last execution time. Otherwise falls back to TriggeredAt or DeployedAt.
+func StartTime(t *models.Trigger) (time.Time, error) {
+	if t.AutomationSpec == nil {
+		return startTimeFallback(t), nil
+	}
+	spec := &task.TriggerAutomationSpec{}
+	if err := proto.Unmarshal(t.AutomationSpec, spec); err != nil {
+		return time.Time{}, err
+	}
+
+	rate := spec.GetSchedule().GetRate()
+	if rate == nil || rate.GetStartTime() == nil {
+		return startTimeFallback(t), nil
+	}
+
+	// Advance start_time past the last execution so we don't re-fire already-run slots.
+	sched, err := fixedRateDuration(rate)
+	if err != nil {
+		return time.Time{}, err
+	}
+	cs := cron.ConstantDelaySchedule{Delay: sched}
+	lastExec := startTimeFallback(t)
+	st := rate.GetStartTime().AsTime()
+	for !st.After(lastExec) {
+		st = cs.Next(st)
+	}
+	return st, nil
+}
+
+// startTimeFallback returns TriggeredAt if set, otherwise DeployedAt.
+func startTimeFallback(t *models.Trigger) time.Time {
 	if t.TriggeredAt.Valid && !t.TriggeredAt.Time.IsZero() {
 		return t.TriggeredAt.Time
 	}
 	return t.DeployedAt
 }
 
-// GetCatchUpTimes returns all scheduled times in (lastExecTime, to) for a trigger.
-// It iterates from catchUpFrom (exclusive) and skips times <= lastExecTime.
+// GetCatchUpTimes returns all scheduled times in (lastExecTime, to] for a trigger.
 func GetCatchUpTimes(t *models.Trigger, to time.Time) ([]time.Time, error) {
-	cronExpr, ok := CronSchedule(t)
-	if !ok {
-		return nil, nil
+	sched, err := ParseSchedule(t)
+	if err != nil || sched == nil {
+		return nil, err
 	}
-	sched, err := parseCron(cronExpr)
+
+	lastExecTime := startTimeFallback(t)
+	currTime, err := StartTime(t)
 	if err != nil {
 		return nil, err
 	}
 
-	lastExecTime := StartTime(t)
-	currTime := lastExecTime
 	var times []time.Time
 	for currTime.Before(to) {
 		if currTime.After(lastExecTime) {
 			times = append(times, currTime)
 		}
-		currTime = sched.Next(currTime)
-		if currTime.IsZero() {
+		next := sched.Next(currTime)
+		if next.IsZero() {
 			break
 		}
+		currTime = next
 	}
 	return times, nil
 }

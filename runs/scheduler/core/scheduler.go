@@ -43,12 +43,16 @@ func (s *GoCronScheduler) Stop() context.Context {
 
 // UpdateSchedules reconciles the set of running cron jobs with the supplied
 // active triggers. New triggers are added; triggers no longer present are removed;
-// triggers whose cron expression changed are replaced.
+// triggers whose spec changed are replaced.
 func (s *GoCronScheduler) UpdateSchedules(ctx context.Context, triggers []*models.Trigger) {
 	desired := make(map[string]*models.Trigger, len(triggers))
 	for _, t := range triggers {
-		expr, ok := CronSchedule(t)
-		if !ok || expr == "" {
+		sched, err := ParseSchedule(t)
+		if err != nil {
+			logger.Errorf(ctx, "scheduler: invalid schedule for trigger %s: %v", TriggerKey(t), err)
+			continue
+		}
+		if sched == nil {
 			continue
 		}
 		desired[TriggerKey(t)] = t
@@ -77,16 +81,16 @@ func (s *GoCronScheduler) UpdateSchedules(ctx context.Context, triggers []*model
 			delete(s.jobs, key)
 		}
 
-		expr, _ := CronSchedule(t)
-		job := NewGoCronJob(ctx, t, s.executor)
-		id, err := s.cron.AddTimedJob(expr, job)
+		sched, _ := ParseSchedule(t)
+		startTime, err := StartTime(t)
 		if err != nil {
-			logger.Errorf(ctx, "scheduler: failed to add job %s (expr=%q): %v", key, expr, err)
+			logger.Errorf(ctx, "scheduler: failed to compute start time for %s: %v", key, err)
 			continue
 		}
-		job.entryID = id
+		job := NewGoCronJob(ctx, t, s.executor)
+		job.entryID = s.cron.ScheduleTimedJob(sched, job, startTime)
 		s.jobs[key] = job
-		logger.Debugf(ctx, "scheduler: registered job %s (expr=%q)", key, expr)
+		logger.Debugf(ctx, "scheduler: registered job %s", key)
 	}
 }
 
