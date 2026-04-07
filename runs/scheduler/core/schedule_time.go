@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"hash/fnv"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -141,10 +140,3 @@ func GetCatchUpTimes(t *models.Trigger, to time.Time) ([]time.Time, error) {
 	return times, nil
 }
 
-// NameHash returns a deterministic run name for a scheduled trigger execution.
-// Format: "trg-<10-hex-char-fnv32>", e.g. "trg-1a2b3c4d5e".
-func NameHash(project, domain, taskName, triggerName string, scheduledAt time.Time) string {
-	h := fnv.New64a()
-	_, _ = fmt.Fprintf(h, "%s:%s:%s:%s:%d", project, domain, taskName, triggerName, scheduledAt.UnixNano())
-	return fmt.Sprintf("trg-%016x", h.Sum64())[:14] // "trg-" + 10 hex chars
-}

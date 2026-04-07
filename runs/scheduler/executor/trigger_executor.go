@@ -2,6 +2,8 @@ package executor
 
 import (
 	"context"
+	"fmt"
+	"hash/fnv"
 	"net/http"
 	"time"
 
@@ -17,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	"github.com/flyteorg/flyte/v2/runs/scheduler/core"
 )
 
 // TriggerExecutor fires a CreateRun call for a scheduled trigger execution.
@@ -51,7 +52,7 @@ func (e *TriggerExecutor) Execute(ctx context.Context, t *models.Trigger, schedu
 		return err
 	}
 
-	runName := core.NameHash(t.Project, t.Domain, t.TaskName, t.Name, scheduledAt)
+	runName := runName(t, scheduledAt)
 
 	createReq := &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
@@ -107,6 +108,16 @@ func kickoffTimeInputArg(t *models.Trigger) string {
 		return ""
 	}
 	return spec.GetSchedule().GetKickoffTimeInputArg()
+}
+
+// runName returns a deterministic run name for a scheduled trigger execution.
+func runName(t *models.Trigger, scheduledAt time.Time) string {
+	h := fnv.New64()
+	_, _ = fmt.Fprintf(h, "%s:%s:%s:%s:%d:%d:%d:%d:%d:%d",
+		t.Project, t.Domain, t.TaskName, t.Name,
+		scheduledAt.Year(), scheduledAt.Month(), scheduledAt.Day(),
+		scheduledAt.Hour(), scheduledAt.Minute(), scheduledAt.Second())
+	return fmt.Sprintf("r%x", h.Sum64())
 }
 
 // appendKickoffTimeInput adds a datetime literal for the kickoff time to the inputs.
