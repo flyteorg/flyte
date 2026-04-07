@@ -15,7 +15,7 @@ This document specifies the design for implementing the **App Service** in OSS F
 - Deploy long-running containerized apps (FastAPI, Flask, vLLM, Streamlit, etc.) via the Flyte control plane
 - Autoscale apps based on request rate or concurrency
 - Provide ingress (public URLs) for deployed apps
-- Manage app lifecycle: create, update, stop
+- Manage app lifecycle: create, update, stop, delete
 - Expose replica-level observability (logs, status, pod info)
 - Fit naturally into the existing v2 architecture (buf connect, GORM, SetupContext pattern)
 
@@ -33,42 +33,44 @@ This document specifies the design for implementing the **App Service** in OSS F
 Flyte v2 uses a modular service architecture:
 
 ```
-┌─────────────────────────────┐      ┌─────────────────────────────────┐
-│  Control Plane               │      │  Data Plane                      │
-│                              │      │                                  │
-│  ┌─────────────────────┐    │      │  ┌─────────────────────────┐    │
-│  │ RunService           │    │      │  │ ActionsService           │    │
-│  │ TaskService          │    │      │  │ ├── ActionsClient (K8s)  │    │
-│  │ TriggerSvc           │    │      │  │ ├── Enqueue (TaskAction) │    │
-│  │                      │    │      │  │ ├── Watch  (TaskAction)  │    │
-│  │ AppService ──connect─┼────┼─────>│  │ ├── Abort  (TaskAction)  │    │
-│  │ (passthrough)        │    │      │  │                          │    │
-│  │                      │    │      │  │ InternalAppService (NEW) │    │
-│  └──────────────────────┘    │      │  │ ├── AppK8sClient (K8s)   │    │
-│                              │      │  │ │   Deploy (KService)    │    │
-│  No DB for apps              │      │  │ │   GetStatus (KService) │    │
-│                              │      │  │ │   Stop (del KService)  │    │
-│                              │      │  │ └── Replicas (Pods)      │    │
-│                              │      │  └────────────┬─────────────┘    │
-│                              │      │               │                  │
-│                              │      │               ▼                  │
-│                              │      │  ┌──────────────────────────┐   │
-│                              │      │  │ Kubernetes                │   │
-│                              │      │  │ ┌──────────────┐         │   │
-│                              │      │  │ │ TaskAction CRs│         │   │
-│                              │      │  │ ├──────────────┤         │   │
-│                              │      │  │ │ KService CRs │         │   │
-│                              │      │  │ │ (apps)       │         │   │
-│                              │      │  │ └──────────────┘         │   │
-│                              │      │  └──────────────────────────┘   │
-└─────────────────────────────┘      └─────────────────────────────────┘
+┌──────────────────────────────┐      ┌──────────────────────────────────┐
+│  Control Plane                │      │  Data Plane                       │
+│                               │      │                                   │
+│  ┌──────────────────────┐    │      │  ┌──────────────────────────┐    │
+│  │ RunService            │    │      │  │ ActionsService            │    │
+│  │ TaskService           │    │      │  │ ├── ActionsClient (K8s)   │    │
+│  │ TriggerSvc            │    │      │  │ ├── Enqueue (TaskAction)  │    │
+│  │                       │    │      │  │ ├── Watch  (TaskAction)   │    │
+│  │ AppService ──connect──┼────┼─────>│  │ ├── Abort  (TaskAction)   │    │
+│  │ ├── In-memory cache   │    │      │  │                           │    │
+│  │ └── TTL-based eviction│    │      │  │ InternalAppService (NEW)  │    │
+│  │                       │    │      │  │ ├── AppK8sClient (K8s)    │    │
+│  └───────────────────────┘    │      │  │ │   Deploy (KService)     │    │
+│                               │      │  │ │   GetStatus (KService)  │    │
+│  No DB for apps               │      │  │ │   Stop (scale-to-zero)  │    │
+│                               │      │  │ │   Delete (del KService) │    │
+│                               │      │  │ └── Replicas (Pods)       │    │
+│                               │      │  └────────────┬──────────────┘    │
+│                               │      │               │                   │
+│                               │      │               ▼                   │
+│                               │      │  ┌───────────────────────────┐   │
+│                               │      │  │ Kubernetes                 │   │
+│                               │      │  │ ┌───────────────┐         │   │
+│                               │      │  │ │ TaskAction CRs │         │   │
+│                               │      │  │ ├───────────────┤         │   │
+│                               │      │  │ │ KService CRs  │         │   │
+│                               │      │  │ │ (apps)        │         │   │
+│                               │      │  │ └───────────────┘         │   │
+│                               │      │  └───────────────────────────┘   │
+└──────────────────────────────┘      └──────────────────────────────────┘
 ```
 
 **Key design simplification:**
 - **No database for apps** — the KService CRD is the single source of truth for both app spec and status. No `apps` table, no repository layer, no migrations.
-- **Control plane / data plane split** — AppService (control plane) forwards requests directly to InternalAppService (data plane) via connect. InternalAppService has direct K8s access to manage KService CRDs.
-- **No status watcher/sync loop** — when AppService needs app status, it calls InternalAppService, which reads directly from the KService CRD via AppK8sClient.
-- **No delete operation** — apps can only be stopped. Stopping deletes the KService CRD. A subsequent Create can re-deploy the app.
+- **Control plane / data plane split** — AppService (control plane) forwards requests to InternalAppService (data plane) via connect. AppService maintains an in-memory cache to avoid redundant calls.
+- **In-memory cache in AppService** — Get/List responses are cached with a short TTL. Mutating operations (Create, Update, Stop, Delete) invalidate the relevant cache entries. This reduces cross-plane RPC calls without introducing stale-state risk.
+- **No status watcher/sync loop** — when a cache miss occurs, AppService calls InternalAppService, which reads directly from the KService CRD via AppK8sClient.
+- **Stop vs Delete** — Stop scales the app to zero by setting `max-scale=0` on the KService (app can be resumed). Delete removes the KService CRD entirely.
 
 **Key patterns to follow:**
 - **SetupContext**: Services register handlers on `sc.Mux`, background workers via `sc.AddWorker`
@@ -96,10 +98,11 @@ The proto definitions are already complete. Key messages:
 
 **DeploymentStatus (derived from KService CRD at read time):**
 ```
-KService not found        → STOPPED
-LatestCreated != Ready    → DEPLOYING
-Ready=True                → ACTIVE
-Ready=False with error    → FAILED
+KService not found            → NOT_FOUND (deleted)
+max-scale=0                   → STOPPED
+LatestCreated != LatestReady  → DEPLOYING
+Ready=True                    → ACTIVE
+Ready=False with error        → FAILED
 ```
 
 ### 3.2 No Database — KService CRD as Single Source of Truth
@@ -121,35 +124,65 @@ There is **no `apps` table** in the database. The KService CRD in Kubernetes is 
 ### 5.1 Architecture: InternalAppService ↔ AppK8sClient
 
 ```
-┌───────────────────────────┐         ┌───────────────────────────────┐
-│  Control Plane             │         │  Data Plane                    │
-│                            │         │                                │
-│  RunService                │         │  ActionsService (tasks)        │
-│  TaskService               │         │  ├── ActionsClient (K8s)       │
-│  AppService ───connect────┼────────>│                                │
-│  (passthrough)            │         │  InternalAppService (NEW)      │
-│                            │         │  ├── AppK8sClient (K8s)        │
-│                            │         │  │                             │
-│  No DB for apps            │         │  │ Create: KService            │
-│                            │         │  │ Update: KService            │
-│                            │         │  │ Get:    KService            │
-│                            │         │  │ Stop:   del KService        │
-│                            │         │  │ List:   KServices           │
-│                            │         │  │                             │
-│                            │         │  └── Kubernetes (KService CRs) │
-└───────────────────────────┘         └───────────────────────────────┘
+┌───────────────────────────────────┐  ┌───────────────────────────────────┐
+│  Control Plane                    │  │  Data Plane                       │
+│                                   │  │                                   │
+│  RunService                       │  │  ActionsService (tasks)           │
+│  TaskService                      │  │  ├── ActionsClient (K8s)          │
+│  AppService ────────connect──────┼─>│                                   │
+│  ├── In-memory cache (TTL)       │  │  InternalAppService (NEW)         │
+│  │   cache hit → return          │  │  ├── AppK8sClient (K8s)           │
+│  │   cache miss → call internal  │  │  │                                │
+│  │   mutate → invalidate cache   │  │  │  Create: KService              │
+│  │                                │  │  │  Update: KService              │
+│  │                                │  │  │  Get:    KService              │
+│  No DB for apps                   │  │  │  Stop:   scale-to-zero         │
+│                                   │  │  │  Delete: del KService          │
+│                                   │  │  │  List:   KServices             │
+│                                   │  │  │                                │
+│                                   │  │  └── Kubernetes (KService CRs)    │
+└───────────────────────────────────┘  └───────────────────────────────────┘
 ```
 
 **Key simplification:**
 - **No database operations for apps** — all state lives in KService CRDs
+- **In-memory cache in AppService** — avoids redundant connect calls to InternalAppService for repeated Get/List requests. Cache is invalidated on Create, Update, Stop, and Delete.
 - No status watcher syncing CRD status back to DB
 - No `UpdateStatus` RPC or background reconciliation loop
-- No `AppNotifier` pub/sub — status is always read fresh from the CRD
-- **Control plane / data plane split** — AppService is a thin passthrough in the control plane; InternalAppService in the data plane has K8s access
+- No `AppNotifier` pub/sub — status is always read fresh from the CRD (on cache miss)
+- **Control plane / data plane split** — AppService caches and forwards in the control plane; InternalAppService in the data plane has K8s access
 
-### 5.2 InternalAppService Implementation
+### 5.2 AppService Cache (Control Plane)
 
-New file in `actions/service/internal_app_service.go`:
+AppService maintains an in-memory TTL cache to reduce cross-plane RPC calls to InternalAppService.
+
+```go
+type AppService struct {
+    appconnect.UnimplementedAppServiceHandler
+    internalClient appconnect.AppServiceClient  // connect client to InternalAppService (data plane pod)
+    cache          *AppCache
+}
+
+type AppCache struct {
+    mu    sync.RWMutex
+    items map[string]*cacheEntry  // key: "project/domain/name"
+    ttl   time.Duration           // default: 30s
+}
+```
+
+**Cache behavior:**
+- **Get**: Check cache first. On hit, return cached App. On miss, call InternalAppService, cache the result.
+- **List**: Not cached (results vary by filter/pagination). Always forwarded to InternalAppService.
+- **Create, Update, Stop, Delete**: Forward to InternalAppService, then invalidate the cache entry for that app.
+- **TTL eviction**: Cached entries expire after a configurable TTL (default 30s). This bounds staleness for status changes driven by Knative (e.g., scaling events).
+
+> The cache is per-instance (not shared across replicas). This is acceptable because
+> app status changes are infrequent relative to read frequency, and the TTL ensures
+> eventual consistency.
+
+### 5.3 InternalAppService Implementation
+
+New file in `app/internal/service/internal_app_service.go`:
 
 ```go
 type InternalAppService struct {
@@ -159,7 +192,7 @@ type InternalAppService struct {
 }
 ```
 
-### 5.3 RPC Implementations
+### 5.4 RPC Implementations (InternalAppService)
 
 #### Create
 
@@ -192,12 +225,24 @@ User → Update(UpdateRequest{app, reason})
 
 ```
 User → Stop(StopRequest{app_id})
-  1. k8sClient.Stop(appID)                     ← delete KService CRD
+  1. k8sClient.Stop(appID)                     ← set max-scale=0 on KService
   2. Return success
 ```
 
-> A subsequent Create with the same identifier can re-deploy the app
-> by creating a new KService CRD.
+> Stop scales the app to zero replicas by patching `max-scale=0` on the
+> KService. The KService CRD remains — the app can be resumed by updating
+> it with a new spec or by restoring the original scaling config.
+
+#### Delete
+
+```
+User → Delete(DeleteRequest{app_id})
+  1. k8sClient.Delete(appID)                   ← delete KService CRD
+  2. Return success
+```
+
+> Delete removes the KService CRD entirely. The app is gone and must be
+> re-created from scratch.
 
 #### List
 
@@ -244,7 +289,7 @@ Apps are deployed as **Knative Services** (KServices), which provide:
 
 ### 6.2 AppK8sClient — KService Lifecycle Manager
 
-New file: `actions/k8s/app_client.go`
+New file: `app/internal/k8s/app_client.go`
 
 ```go
 type AppK8sClient struct {
@@ -258,8 +303,11 @@ type AppK8sClientInterface interface {
     // Deploy creates or updates a KService for the given app
     Deploy(ctx context.Context, app *flyteapp.App) error
 
-    // Stop deletes the KService for the given app
+    // Stop scales the KService to zero (sets max-scale=0)
     Stop(ctx context.Context, appID *flyteapp.Identifier) error
+
+    // Delete removes the KService CRD entirely
+    Delete(ctx context.Context, appID *flyteapp.Identifier) error
 
     // GetStatus reads the current status from the KService CRD
     GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
@@ -345,7 +393,7 @@ AppK8sClient.Deploy(app):
     └── Done
 ```
 
-### 6.5 Stop(): Delete KService CRD
+### 6.5 Stop(): Scale to Zero
 
 ```
 User calls Stop(app_id)
@@ -355,14 +403,31 @@ InternalAppService.Stop()
     │ calls k8sClient.Stop(appID)
     ▼
 AppK8sClient.Stop()
-    │ Deletes KService from cluster
+    │ Patches KService: set annotation autoscaling.knative.dev/max-scale=0
     ▼
-Done — subsequent Get() will see STOPPED (KService not found)
+Done — Knative scales to zero pods. KService CRD remains.
+       Subsequent Get() returns status=STOPPED (0 replicas).
+       App can be resumed via Update().
 ```
 
-### 6.6 Replica Server (Phase 4 — optional)
+### 6.6 Delete(): Remove KService CRD
 
-New file: `actions/k8s/app_replica.go`
+```
+User calls Delete(app_id)
+    │
+    ▼
+InternalAppService.Delete()
+    │ calls k8sClient.Delete(appID)
+    ▼
+AppK8sClient.Delete()
+    │ Deletes KService from cluster
+    ▼
+Done — subsequent Get() returns not found.
+```
+
+### 6.7 Replica Server (Phase 4 — optional)
+
+New file: `app/internal/k8s/app_replica.go`
 
 **What it is:** A pod-level observability and management layer that lets users
 inspect individual pods backing an app, without requiring direct `kubectl` access.
@@ -387,92 +452,92 @@ func (c *AppK8sClient) DeleteReplica(ctx, replicaID) error {
 }
 ```
 
-### 6.7 Registration in ActionsService Setup
+### 6.8 Registration
 
-Modified: `actions/setup.go`
+- **Control plane pod:** `app/setup.go` registers AppService (see section 7.3)
+- **Data plane pod:** `internalapp/setup.go` registers InternalAppService with AppK8sClient (see section 7.4)
 
-```go
-func Setup(ctx context.Context, sc *app.SetupContext) error {
-    // ... existing TaskAction setup ...
-
-    // NEW: App K8s client (KService lifecycle)
-    if cfg.Apps.Enabled {
-        appK8sClient := actionsk8s.NewAppK8sClient(
-            sc.K8sClient,
-            sc.K8sCache,
-            cfg.Apps.Namespace,  // default: "flyte-apps"
-        )
-        // No background watcher needed — status is read on demand
-
-        // Create InternalAppService with K8s client (no DB dependency)
-        internalAppSvc := service.NewInternalAppService(appK8sClient, &cfg.Apps)
-    }
-}
-```
+Both are called from the manager. No modifications to `actions/setup.go` are needed.
 
 ---
 
 ## 7. Integration into Existing v2 Codebase
 
-### 7.1 Files to Create
+### 7.1 New Top-Level Directory: `app/`
+
+A new `app/` top-level directory (replacing the existing framework files, alongside `actions/`, `runs/`, `manager/`) to house all app service code:
 
 ```
-actions/
-├── k8s/
-│   ├── app_client.go           # AppK8sClient — KService CRUD + status read
-│   └── app_replica.go          # Replica queries (pod list/delete)
+app/                              # NEW top-level directory
+├── setup.go                       # Control plane setup (AppService + connect client)
+├── config/
+│   └── config.go                  # AppConfig (TTL, InternalAppService URL)
 ├── service/
-│   └── internal_app_service.go # InternalAppService — K8s-only app management
+│   └── app_service.go             # AppService (control plane, cache + connect client)
+├── internal/                      # Data plane (separate pod in production)
+│   ├── setup.go                   # Data plane setup (InternalAppService + K8s client)
+│   ├── config/
+│   │   └── config.go              # InternalAppConfig (namespace, timeouts, URL pattern)
+│   ├── service/
+│   │   └── internal_app_service.go # InternalAppService (K8s-only app management)
+│   └── k8s/
+│       ├── app_client.go          # AppK8sClient — KService CRUD + status read
+│       └── app_replica.go         # Replica queries (pod list/delete)
 ```
 
 ### 7.2 Files to Modify
 
 ```
-runs/
-├── service/
-│   └── app_service.go          # Replace stub with passthrough to InternalAppService
-├── setup.go                    # Wire AppService with connect client to InternalAppService
-
-actions/
-├── setup.go                    # Register AppK8sClient + InternalAppService
-├── config/config.go            # Add Apps config section
+manager/
+│   └── ...                     # Wire app/ service into the unified binary
 ```
 
-**No changes to repository/, migrations/, or executor/** — apps have no DB operations.
+**No changes to actions/, runs/, repository/, migrations/, or executor/**.
 
-### 7.3 Setup Registration (runs/setup.go)
-
-Replace the current stub:
+### 7.3 Control Plane Setup (app/setup.go)
 
 ```go
-// Before (stub):
-appSvc := service.NewInternalAppService()
+func Setup(ctx context.Context, sc *app.SetupContext) error {
+    cfg := config.GetConfig()
 
-// After (real):
-// AppService is a passthrough — connects to InternalAppService via connect client
-appSvc := service.NewAppService(internalAppServiceClient)
-```
+    // Connect client to InternalAppService (running in data plane pod)
+    internalClient := appconnect.NewAppServiceClient(
+        sc.HTTPClient,
+        cfg.InternalAppServiceURL,
+    )
 
-### 7.4 ActionsService Setup (actions/setup.go)
-
-```go
-// Add to existing Setup():
-if cfg.Apps.Enabled {
-    appK8sClient := actionsk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg.Apps.Namespace)
-    internalAppSvc := service.NewInternalAppService(appK8sClient, &service.AppConfig{
-        PublicURLPattern: cfg.Apps.PublicURLPattern,
-    })
-    // Register InternalAppService on the mux
+    // AppService with cache
+    appSvc := service.NewAppService(internalClient, cfg)
+    appconnect.RegisterAppServiceHandler(sc.Mux, appSvc)
+    return nil
 }
 ```
+
+### 7.4 Data Plane Setup (internalapp/setup.go)
+
+```go
+func Setup(ctx context.Context, sc *app.SetupContext) error {
+    cfg := config.GetConfig()
+
+    // K8s client for KService lifecycle
+    appK8sClient := k8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg.Namespace)
+
+    // InternalAppService with direct K8s access
+    internalAppSvc := service.NewInternalAppService(appK8sClient, cfg)
+    appconnect.RegisterInternalAppServiceHandler(sc.Mux, internalAppSvc)
+    return nil
+}
+```
+
+Both are wired into the manager. In production, the control plane pod runs `apps.Setup()` and the data plane pod runs `internalapp.Setup()`. In dev/sandbox mode, both can run in the same process.
 
 ---
 
 ## 8. Configuration
 
-### 8.1 ActionsService Config
+### 8.1 Apps Config
 
-Add to `actions/config/config.go`:
+New file: `app/config/config.go`:
 
 ```go
 type AppConfig struct {
@@ -492,6 +557,10 @@ type AppConfig struct {
     // Variables: {{.Name}}, {{.Project}}, {{.Domain}}
     // Example: "https://{{.Name}}-{{.Project}}.apps.flyte.example.com"
     PublicURLPattern string `json:"publicUrlPattern" pflag:",URL pattern for app ingress"`
+
+    // CacheTTL is the TTL for the AppService in-memory cache.
+    // Controls how long Get responses are cached in the control plane.
+    CacheTTL time.Duration `json:"cacheTTL" default:"30s"`
 }
 ```
 
@@ -552,7 +621,7 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │<───────────────────│                       │                       │
 ```
 
-### 9.3 Stop
+### 9.3 Stop (Scale to Zero)
 
 ```
 SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
@@ -562,7 +631,7 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │                    │──────────────────────>│                       │
    │                    │                       │ Stop(appID)           │
    │                    │                       │──────────────────────>│
-   │                    │                       │                       │ Delete KService
+   │                    │                       │                       │ Patch max-scale=0
    │                    │  StopResponse         │                       │
    │  StopResponse      │<──────────────────────│                       │
    │<───────────────────│                       │                       │
@@ -570,9 +639,28 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │  Get(app_id)       │                       │                       │
    │───────────────────>│  Get(app_id)          │                       │
    │                    │──────────────────────>│                       │
-   │                    │                       │ Get → KService not found
-   │                    │  App not found (STOPPED)                      │
-   │  Not found         │<──────────────────────│                       │
+   │                    │                       │ Get(appID)            │
+   │                    │                       │──────────────────────>│
+   │                    │                       │                       │ Read KService CRD
+   │                    │                       │  App{spec + STOPPED}  │
+   │                    │  App{spec + STOPPED}  │<──────────────────────│
+   │  App{spec+STOPPED} │<──────────────────────│                       │
+   │<───────────────────│                       │                       │
+```
+
+### 9.4 Delete
+
+```
+SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
+   │                    │                       │                       │
+   │  Delete(app_id)    │                       │                       │
+   │───────────────────>│  Delete(app_id)       │                       │
+   │                    │──────────────────────>│                       │
+   │                    │                       │ Delete(appID)         │
+   │                    │                       │──────────────────────>│
+   │                    │                       │                       │ Delete KService
+   │                    │  DeleteResponse       │                       │
+   │  DeleteResponse    │<──────────────────────│                       │
    │<───────────────────│                       │                       │
 ```
 
@@ -617,20 +705,9 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 
 ## 12. Open Questions
 
-1. **Knative dependency** — Should we support a non-Knative fallback (raw Deployment + HPA + Ingress) for clusters without Knative? This adds complexity but broadens adoption.
+1. **Ingress controller** — Knative typically uses Kourier or Istio. Should we prescribe one, or be agnostic?
 
-2. **Namespace strategy** — One namespace per app vs. shared namespace (`flyte-apps`)? Another option is `project-domain` namespaces for isolation.
-
-3. **Ingress controller** — Knative typically uses Kourier or Istio. Should we prescribe one, or be agnostic?
-
-4. **Auth for app endpoints** — How should app endpoints be authenticated? Knative doesn't provide auth out of the box. Options: Istio auth policy, app-level API keys, or proxy sidecar.
-
-5. **Scale-to-zero** — Knative supports scale-to-zero. Should we expose `min_replicas: 0` as a valid option, or require at least 1?
-
-6. **Resource quotas** — Should apps share the same resource pool as workflow executions, or have a separate quota?
-
-7. **List performance** — For `List` with many apps, K8s list with label selectors should be efficient, but at very large scale, should we add an informer cache?
-
+2. **Auth for app endpoints** — How should app endpoints be authenticated? Knative doesn't provide auth out of the box. Options: Istio auth policy, app-level API keys, or proxy sidecar.
 ---
 
 ## 13. Appendix: Key Reference Files
@@ -644,10 +721,10 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 | Proto service | `flyteidl2/app/app_service.proto` |
 | Proto replicas | `flyteidl2/app/replica_definition.proto` |
 | Proto logs | `flyteidl2/app/app_logs_service.proto` |
-| App stub (to replace) | `runs/service/app_service.go` |
-| Setup — runs (to modify) | `flyte2/runs/setup.go` |
-| Setup — actions (to modify) | `flyte2/actions/setup.go` |
-| ActionsService (pattern ref) | `flyte2/actions/service/actions_service.go` |
-| ActionsClient (pattern ref) | `flyte2/actions/k8s/` |
-| App framework | `flyte2/app/context.go` |
-| Manager (unified binary) | `flyte2/manager/` |
+| App stub (to remove) | `runs/service/app_service.go` |
+| Apps service — control plane (NEW) | `app/` |
+| InternalApp service — data plane (NEW) | `internalapp/` |
+| ActionsService (pattern ref) | `actions/service/actions_service.go` |
+| ActionsClient (pattern ref) | `actions/k8s/` |
+| App framework (to be removed) | `app/context.go` |
+| Manager (to modify) | `manager/` |
