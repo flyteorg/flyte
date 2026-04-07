@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"strings"
 
+	"google.golang.org/protobuf/proto"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8swatch "k8s.io/apimachinery/pkg/watch"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-	"google.golang.org/protobuf/proto"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -53,6 +54,20 @@ type AppK8sClientInterface interface {
 
 	// List returns all apps (spec + live status) for the given project/domain scope.
 	List(ctx context.Context, project, domain string) ([]*flyteapp.App, error)
+
+	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
+	// Use Stop to scale to zero while preserving the KService.
+	Delete(ctx context.Context, appID *flyteapp.Identifier) error
+
+	// GetReplicas lists the pods (replicas) currently backing the given app.
+	GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error)
+
+	// DeleteReplica force-deletes a specific pod. Knative will replace it automatically.
+	DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error
+
+	// Watch returns a channel of WatchResponse events for KServices matching the
+	// given project/domain scope. The channel is closed when ctx is cancelled.
+	Watch(ctx context.Context, project, domain string) (<-chan *flyteapp.WatchResponse, error)
 }
 
 // AppK8sClient implements AppK8sClientInterface using controller-runtime.
@@ -128,6 +143,105 @@ func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) err
 	}
 	logger.Infof(ctx, "Stopped KService %s/%s (max-scale=0)", c.namespace, name)
 	return nil
+}
+
+// Delete removes the KService CRD for the given app entirely.
+func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
+	name := kserviceName(appID)
+	ksvc := &servingv1.Service{}
+	ksvc.Name = name
+	ksvc.Namespace = c.namespace
+	if err := c.k8sClient.Delete(ctx, ksvc); err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil
+		}
+		return fmt.Errorf("failed to delete KService %s: %w", name, err)
+	}
+	logger.Infof(ctx, "Deleted KService %s/%s", c.namespace, name)
+	return nil
+}
+
+// Watch returns a channel of WatchResponse events for KServices in the given
+// project/domain scope. Pass empty strings to watch all managed KServices.
+// The channel is closed when ctx is cancelled or the underlying watch terminates.
+func (c *AppK8sClient) Watch(ctx context.Context, project, domain string) (<-chan *flyteapp.WatchResponse, error) {
+	labels := client.MatchingLabels{labelAppManaged: "true"}
+	if project != "" {
+		labels[labelProject] = project
+	}
+	if domain != "" {
+		labels[labelDomain] = domain
+	}
+
+	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{},
+		client.InNamespace(c.namespace),
+		labels,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start KService watch for %s/%s: %w", project, domain, err)
+	}
+
+	ch := make(chan *flyteapp.WatchResponse, 64)
+	go func() {
+		defer close(ch)
+		defer watcher.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case event, ok := <-watcher.ResultChan():
+				if !ok {
+					return
+				}
+				resp := kserviceEventToWatchResponse(event)
+				if resp == nil {
+					continue
+				}
+				select {
+				case ch <- resp:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return ch, nil
+}
+
+// kserviceEventToWatchResponse maps a K8s watch event to a flyteapp.WatchResponse.
+// Returns nil for event types that should not be forwarded (Error, Bookmark).
+func kserviceEventToWatchResponse(event k8swatch.Event) *flyteapp.WatchResponse {
+	ksvc, ok := event.Object.(*servingv1.Service)
+	if !ok {
+		return nil
+	}
+	app, err := kserviceToApp(ksvc)
+	if err != nil {
+		// KService is not managed by us — skip it.
+		return nil
+	}
+	switch event.Type {
+	case k8swatch.Added:
+		return &flyteapp.WatchResponse{
+			Event: &flyteapp.WatchResponse_CreateEvent{
+				CreateEvent: &flyteapp.CreateEvent{App: app},
+			},
+		}
+	case k8swatch.Modified:
+		return &flyteapp.WatchResponse{
+			Event: &flyteapp.WatchResponse_UpdateEvent{
+				UpdateEvent: &flyteapp.UpdateEvent{UpdatedApp: app},
+			},
+		}
+	case k8swatch.Deleted:
+		return &flyteapp.WatchResponse{
+			Event: &flyteapp.WatchResponse_DeleteEvent{
+				DeleteEvent: &flyteapp.DeleteEvent{App: app},
+			},
+		}
+	default:
+		return nil
+	}
 }
 
 // GetStatus reads the KService and maps its conditions to a flyteapp.Status proto.
@@ -367,6 +481,96 @@ func kserviceToStatus(ksvc *servingv1.Service) *flyteapp.Status {
 	}
 
 	return status
+}
+
+// GetReplicas lists the pods currently backing the given app by matching
+// the flyte.org/project, flyte.org/domain, and flyte.org/app-name labels.
+func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
+	podList := &corev1.PodList{}
+	if err := c.k8sClient.List(ctx, podList,
+		client.InNamespace(c.namespace),
+		client.MatchingLabels{
+			labelProject: appID.GetProject(),
+			labelDomain:  appID.GetDomain(),
+			labelAppName: appID.GetName(),
+		},
+	); err != nil {
+		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
+			appID.GetProject(), appID.GetDomain(), appID.GetName(), err)
+	}
+
+	replicas := make([]*flyteapp.Replica, 0, len(podList.Items))
+	for i := range podList.Items {
+		replicas = append(replicas, podToReplica(appID, &podList.Items[i]))
+	}
+	return replicas, nil
+}
+
+// DeleteReplica force-deletes a specific pod. Knative will schedule a replacement automatically.
+func (c *AppK8sClient) DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error {
+	pod := &corev1.Pod{}
+	pod.Name = replicaID.GetName()
+	pod.Namespace = c.namespace
+	if err := c.k8sClient.Delete(ctx, pod); err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil
+		}
+		return fmt.Errorf("failed to delete pod %s/%s: %w", c.namespace, replicaID.GetName(), err)
+	}
+	logger.Infof(ctx, "Deleted replica pod %s/%s", c.namespace, replicaID.GetName())
+	return nil
+}
+
+// podToReplica maps a corev1.Pod to a flyteapp.Replica proto.
+func podToReplica(appID *flyteapp.Identifier, pod *corev1.Pod) *flyteapp.Replica {
+	status, reason := podDeploymentStatus(pod)
+	return &flyteapp.Replica{
+		Metadata: &flyteapp.ReplicaMeta{
+			Id: &flyteapp.ReplicaIdentifier{
+				AppId: appID,
+				Name:  pod.Name,
+			},
+		},
+		Status: &flyteapp.ReplicaStatus{
+			DeploymentStatus: status,
+			Reason:           reason,
+		},
+	}
+}
+
+// podDeploymentStatus maps a pod's phase and conditions to a status string and reason.
+func podDeploymentStatus(pod *corev1.Pod) (string, string) {
+	switch pod.Status.Phase {
+	case corev1.PodRunning:
+		for _, cs := range pod.Status.ContainerStatuses {
+			if !cs.Ready {
+				if cs.State.Waiting != nil {
+					return "DEPLOYING", cs.State.Waiting.Reason
+				}
+				return "DEPLOYING", "container not ready"
+			}
+		}
+		return "ACTIVE", ""
+	case corev1.PodPending:
+		for _, cs := range pod.Status.ContainerStatuses {
+			if cs.State.Waiting != nil && cs.State.Waiting.Reason != "" {
+				return "PENDING", cs.State.Waiting.Reason
+			}
+		}
+		return "PENDING", string(pod.Status.Phase)
+	case corev1.PodFailed:
+		reason := pod.Status.Reason
+		if reason == "" && len(pod.Status.ContainerStatuses) > 0 {
+			if t := pod.Status.ContainerStatuses[0].State.Terminated; t != nil {
+				reason = t.Reason
+			}
+		}
+		return "FAILED", reason
+	case corev1.PodSucceeded:
+		return "STOPPED", "pod completed"
+	default:
+		return "PENDING", string(pod.Status.Phase)
+	}
 }
 
 // kserviceToApp reconstructs a flyteapp.App from a KService by reading the
