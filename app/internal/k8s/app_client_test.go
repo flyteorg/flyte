@@ -2,8 +2,6 @@ package k8s
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"testing"
 	"time"
 
@@ -18,31 +16,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/actions/config"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-// testScheme builds a runtime.Scheme with Knative and core types registered.
+// testScheme builds a runtime.Scheme with Knative types registered.
 func testScheme(t *testing.T) *runtime.Scheme {
 	t.Helper()
 	s := runtime.NewScheme()
 	require.NoError(t, corev1.AddToScheme(s))
 	require.NoError(t, servingv1.AddToScheme(s))
 	return s
-}
-
-// testRevision builds a Knative Revision object with a given ActualReplicas count.
-func testRevision(name, namespace string, actualReplicas int32) *servingv1.Revision {
-	return &servingv1.Revision{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Status: servingv1.RevisionStatus{
-			ActualReplicas: &actualReplicas,
-		},
-	}
 }
 
 // testClient builds an AppK8sClient backed by a fake K8s client.
@@ -53,12 +38,15 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		WithScheme(s).
 		WithObjects(objs...).
 		Build()
+	cfg := &config.AppConfig{
+		Namespace:             "flyte-apps",
+		DefaultRequestTimeout: 5 * time.Minute,
+		MaxRequestTimeout:     time.Hour,
+	}
 	return &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
-			DefaultRequestTimeout: 5 * time.Minute,
-			MaxRequestTimeout:     time.Hour,
-		},
+		namespace: cfg.Namespace,
+		cfg:       cfg,
 	}
 }
 
@@ -91,7 +79,7 @@ func TestDeploy_Create(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err = c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc)
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc)
 	require.NoError(t, err)
 	assert.Equal(t, "proj", ksvc.Labels[labelProject])
 	assert.Equal(t, "dev", ksvc.Labels[labelDomain])
@@ -111,7 +99,7 @@ func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc))
 	assert.Equal(t, "nginx:2.0", ksvc.Spec.Template.Spec.Containers[0].Image)
 }
 
@@ -123,14 +111,14 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	// Get initial resource version.
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc))
 	initialRV := ksvc.ResourceVersion
 
 	// Deploy same spec — should be a no-op.
 	require.NoError(t, c.Deploy(context.Background(), app))
 
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc))
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
@@ -144,7 +132,7 @@ func TestStop(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc))
 	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"])
 }
 
@@ -165,7 +153,7 @@ func TestDelete(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err := c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc)
+		client.ObjectKey{Name: "proj-dev-myapp", Namespace: "flyte-apps"}, ksvc)
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -179,9 +167,9 @@ func TestGetStatus_NotFound(t *testing.T) {
 	c := testClient(t)
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "missing"}
 	status, err := c.GetStatus(context.Background(), id)
-	require.Error(t, err)
-	assert.True(t, k8serrors.IsNotFound(err))
-	assert.Nil(t, status)
+	require.NoError(t, err)
+	require.Len(t, status.Conditions, 1)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, status.Conditions[0].DeploymentStatus)
 }
 
 func TestGetStatus_Stopped(t *testing.T) {
@@ -198,57 +186,17 @@ func TestGetStatus_Stopped(t *testing.T) {
 	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, status.Conditions[0].DeploymentStatus)
 }
 
-func TestGetStatus_CurrentReplicas(t *testing.T) {
-	s := testScheme(t)
-	// Pre-populate a KService with LatestReadyRevisionName already set in status,
-	// and the corresponding Revision with ActualReplicas=4.
-	ksvc := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "myapp",
-			},
-			Annotations: map[string]string{
-				annotationAppID: "proj/dev/myapp",
-			},
-		},
-	}
-	ksvc.Status.LatestReadyRevisionName = "myapp-00001"
-
-	rev := testRevision("myapp-00001", "proj-dev", 4)
-
-	fc := fake.NewClientBuilder().
-		WithScheme(s).
-		WithObjects(ksvc, rev).
-		WithStatusSubresource(ksvc).
-		Build()
-	c := &AppK8sClient{
-		k8sClient: fc,
-		cfg:       &config.AppConfig{},
-	}
-
-	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
-	status, err := c.GetStatus(context.Background(), id)
-	require.NoError(t, err)
-	assert.Equal(t, uint32(4), status.CurrentReplicas)
-}
-
 func TestList(t *testing.T) {
 	s := testScheme(t)
 	// Pre-populate two KServices with different project labels.
 	ksvc1 := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app1",
-			Namespace: "proj-dev",
+			Name:      "proj-dev-app1",
+			Namespace: "flyte-apps",
 			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app1",
+				labelProject: "proj",
+				labelDomain:  "dev",
+				labelAppName: "app1",
 			},
 			Annotations: map[string]string{
 				annotationAppID: "proj/dev/app1",
@@ -257,13 +205,12 @@ func TestList(t *testing.T) {
 	}
 	ksvc2 := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app2",
-			Namespace: "other-dev",
+			Name:      "other-dev-app2",
+			Namespace: "flyte-apps",
 			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "other",
-				labelDomain:     "dev",
-				labelAppName:    "app2",
+				labelProject: "other",
+				labelDomain:  "dev",
+				labelAppName: "app2",
 			},
 			Annotations: map[string]string{
 				annotationAppID: "other/dev/app2",
@@ -277,54 +224,18 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: "flyte-apps",
 		cfg: &config.AppConfig{
+			Namespace:             "flyte-apps",
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
 	}
 
-	apps, nextToken, err := c.List(context.Background(), "proj", "dev", "", 0, "")
+	apps, err := c.List(context.Background(), "proj", "dev")
 	require.NoError(t, err)
-	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
-	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
-}
-
-func TestList_ByAppName(t *testing.T) {
-	s := testScheme(t)
-	ksvc1 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app1",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app1",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app1"},
-		},
-	}
-	ksvc2 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app2",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app2",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app2"},
-		},
-	}
-	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc1, ksvc2).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.AppConfig{}}
-
-	apps, _, err := c.List(context.Background(), "proj", "dev", "app1", 0, "")
-	require.NoError(t, err)
-	require.Len(t, apps, 1)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
 }
 
@@ -332,9 +243,11 @@ func TestGetReplicas(t *testing.T) {
 	s := testScheme(t)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp-abc",
-			Namespace: "proj-dev",
+			Name:      "proj-dev-myapp-abc",
+			Namespace: "flyte-apps",
 			Labels: map[string]string{
+				labelProject: "proj",
+				labelDomain:  "dev",
 				labelAppName: "myapp",
 			},
 		},
@@ -348,14 +261,15 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		namespace: "flyte-apps",
+		cfg:       &config.AppConfig{Namespace: "flyte-apps"},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	replicas, err := c.GetReplicas(context.Background(), id)
 	require.NoError(t, err)
 	require.Len(t, replicas, 1)
-	assert.Equal(t, "myapp-abc", replicas[0].Metadata.Id.Name)
+	assert.Equal(t, "proj-dev-myapp-abc", replicas[0].Metadata.Id.Name)
 	assert.Equal(t, "ACTIVE", replicas[0].Status.DeploymentStatus)
 }
 
@@ -363,32 +277,33 @@ func TestDeleteReplica(t *testing.T) {
 	s := testScheme(t)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp-abc",
-			Namespace: "proj-dev",
+			Name:      "proj-dev-myapp-abc",
+			Namespace: "flyte-apps",
 		},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		namespace: "flyte-apps",
+		cfg:       &config.AppConfig{Namespace: "flyte-apps"},
 	}
 
 	replicaID := &flyteapp.ReplicaIdentifier{
 		AppId: &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"},
-		Name:  "myapp-abc",
+		Name:  "proj-dev-myapp-abc",
 	}
 	require.NoError(t, c.DeleteReplica(context.Background(), replicaID))
 
 	err := fc.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-abc", Namespace: "proj-dev"}, &corev1.Pod{})
+		client.ObjectKey{Name: "proj-dev-myapp-abc", Namespace: "flyte-apps"}, &corev1.Pod{})
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
 func TestKserviceEventToWatchResponse(t *testing.T) {
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp",
-			Namespace: "proj-dev",
+			Name:      "proj-dev-myapp",
+			Namespace: "flyte-apps",
 			Annotations: map[string]string{
 				annotationAppID: "proj/dev/myapp",
 			},
@@ -407,10 +322,9 @@ func TestKserviceEventToWatchResponse(t *testing.T) {
 		{k8swatch.Bookmark, true, ""},
 	}
 
-	c := testClient(t)
 	for _, tt := range tests {
 		t.Run(string(tt.eventType), func(t *testing.T) {
-			resp := c.kserviceEventToWatchResponse(context.Background(), k8swatch.Event{
+			resp := kserviceEventToWatchResponse(k8swatch.Event{
 				Type:   tt.eventType,
 				Object: ksvc,
 			})
@@ -435,29 +349,22 @@ func TestKserviceEventToWatchResponse(t *testing.T) {
 
 func TestKserviceName(t *testing.T) {
 	tests := []struct {
-		name string
-		want string
+		project, domain, name string
+		want                  string
 	}{
-		{"myapp", "myapp"},
-		{"MyApp", "myapp"},
-		// v1 and v2 variants stay distinct — no truncation collision.
-		{"my-long-service-name-v1", "my-long-service-name-v1"},
-		{"my-long-service-name-v2", "my-long-service-name-v2"},
-		// Names over 63 chars get a hash suffix instead of blind truncation.
+		{"proj", "dev", "myapp", "proj-dev-myapp"},
+		{"P", "D", "N", "p-d-n"},
+		// Long name should be truncated to 63 chars.
 		{
-			"this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit",
-			func() string {
-				name := "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"
-				sum := sha256.Sum256([]byte(name))
-				return name[:54] + "-" + hex.EncodeToString(sum[:4])
-			}(),
+			"verylongprojectname",
+			"verylongdomainname",
+			"verylongappnamethatexceedslimit",
+			"verylongprojectname-verylongdomainname-verylongappnamethatexcee"[:63],
 		},
 	}
 	for _, tt := range tests {
-		id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: tt.name}
-		got := kserviceName(id)
-		assert.Equal(t, tt.want, got)
-		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
+		id := &flyteapp.Identifier{Project: tt.project, Domain: tt.domain, Name: tt.name}
+		assert.Equal(t, tt.want, kserviceName(id))
 	}
 }
 
