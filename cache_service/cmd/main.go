@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	cacheserviceconfig "github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"

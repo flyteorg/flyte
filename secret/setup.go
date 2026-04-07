@@ -3,7 +3,7 @@ package secret
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret/secretconnect"
 	"github.com/flyteorg/flyte/v2/secret/service"

@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/v2/actions/config"
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"

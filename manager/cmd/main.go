@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/flyteorg/flyte/v2/actions"
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"

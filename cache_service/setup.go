@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-gormigrate/gormigrate/v2"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/service"
