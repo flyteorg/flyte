@@ -51,7 +51,7 @@ func TestCreateRun(t *testing.T) {
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
-	run, err := actionRepo.CreateAction(ctx, runModel)
+	run, err := actionRepo.CreateAction(ctx, runModel, false)
 	require.NoError(t, err)
 	require.NotNil(t, run)
 	assert.Equal(t, runID.Project, run.Project)
@@ -62,7 +62,7 @@ func TestCreateRun(t *testing.T) {
 	require.NotZero(t, run.ID)
 
 	// Attempt duplicate run create with same run name should return existing (idempotent)
-	run2, err := actionRepo.CreateAction(ctx, runModel)
+	run2, err := actionRepo.CreateAction(ctx, runModel, false)
 	require.NoError(t, err)
 	assert.Equal(t, run.ID, run2.ID)
 }
@@ -84,7 +84,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	endTime := time.Now()
@@ -122,9 +122,9 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
 
 	ctx := context.Background()
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
 	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
 	require.NoError(t, err)
 
 	watchCtx, cancel := context.WithCancel(context.Background())
@@ -177,7 +177,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to FAILED (terminal state)
@@ -221,7 +221,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		Name: "action-no-backward",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to RUNNING
@@ -259,7 +259,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		Name: "action-no-backward-succeeded",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to SUCCEEDED (terminal, non-retryable)
@@ -296,7 +296,7 @@ func TestListRuns(t *testing.T) {
 			RunName: runName,
 			Name:    "a0",
 			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		})
+		}, false)
 		require.NoError(t, err)
 	}
 
@@ -367,7 +367,7 @@ func TestListRuns(t *testing.T) {
 		RunName: "run-other",
 		Name:    "a0",
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-	})
+	}, false)
 	require.NoError(t, err)
 
 	runsFiltered, _, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{

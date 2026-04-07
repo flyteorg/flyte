@@ -24,8 +24,7 @@ func NewTaskRepo(db *gorm.DB) interfaces.TaskRepo {
 
 // CreateTask upserts a task and its associated triggers in one transaction.
 // Trigger summary fields (total_triggers, active_triggers, etc.) on the task row
-// are computed from the provided trigger models rather than supplied by the caller,
-// mirroring the close-source pattern where TaskRepo owns the full atomic write.
+// are computed from the provided trigger models.
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		now := time.Now()

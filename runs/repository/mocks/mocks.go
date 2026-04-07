@@ -239,8 +239,8 @@ func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(ctx context.C
 }
 
 // CreateAction provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
-	ret := _mock.Called(ctx, action)
+func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
+	ret := _mock.Called(ctx, action, updateTriggeredAt)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateAction")
@@ -248,18 +248,18 @@ func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action
 
 	var r0 *models.Action
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action) (*models.Action, error)); ok {
-		return returnFunc(ctx, action)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action, bool) (*models.Action, error)); ok {
+		return returnFunc(ctx, action, updateTriggeredAt)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action) *models.Action); ok {
-		r0 = returnFunc(ctx, action)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Action, bool) *models.Action); ok {
+		r0 = returnFunc(ctx, action, updateTriggeredAt)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Action)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *models.Action) error); ok {
-		r1 = returnFunc(ctx, action)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *models.Action, bool) error); ok {
+		r1 = returnFunc(ctx, action, updateTriggeredAt)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -274,11 +274,12 @@ type ActionRepo_CreateAction_Call struct {
 // CreateAction is a helper method to define mock.On call
 //   - ctx context.Context
 //   - action *models.Action
-func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, action interface{}) *ActionRepo_CreateAction_Call {
-	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, action)}
+//   - updateTriggeredAt bool
+func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, action interface{}, updateTriggeredAt interface{}) *ActionRepo_CreateAction_Call {
+	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, action, updateTriggeredAt)}
 }
 
-func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, action *models.Action)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, action *models.Action, updateTriggeredAt bool)) *ActionRepo_CreateAction_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -288,9 +289,14 @@ func (_c *ActionRepo_CreateAction_Call) Run(run func(ctx context.Context, action
 		if args[1] != nil {
 			arg1 = args[1].(*models.Action)
 		}
+		var arg2 bool
+		if args[2] != nil {
+			arg2 = args[2].(bool)
+		}
 		run(
 			arg0,
 			arg1,
+			arg2,
 		)
 	})
 	return _c
@@ -301,7 +307,7 @@ func (_c *ActionRepo_CreateAction_Call) Return(action1 *models.Action, err error
 	return _c
 }
 
-func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(ctx context.Context, action *models.Action) (*models.Action, error)) *ActionRepo_CreateAction_Call {
+func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error)) *ActionRepo_CreateAction_Call {
 	_c.Call.Return(run)
 	return _c
 }

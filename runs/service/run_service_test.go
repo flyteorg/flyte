@@ -595,7 +595,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, storage.Options{}, mock.Anything).Return(nil).Once()
 
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateAction", mock.Anything, mock.Anything).
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{
 			Project:     runID.Project,
 			Domain:      runID.Domain,
@@ -1086,7 +1086,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	})).Return(nil).Once()
 
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateAction", mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
@@ -1142,7 +1142,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateAction", mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
 	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
@@ -1191,7 +1191,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateAction", mock.Anything, mock.Anything).
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
 	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
@@ -1261,7 +1261,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 		var rs task.RunSpec
 		_ = proto.Unmarshal(m.RunSpec, &rs)
 		return rs.GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
-	})).Return(&models.Run{
+	}), mock.Anything).Return(&models.Run{
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "rctx-123",
@@ -1474,7 +1474,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 		var info workflow.RunInfo
 		_ = proto.Unmarshal(m.DetailedInfo, &info)
 		return info.InputsUri == offloadedURI
-	})).Return(expectedRun, nil).Once()
+	}), mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
 		return req.Msg.Action.InputUri == offloadedURI
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()

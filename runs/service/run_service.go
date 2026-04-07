@@ -156,6 +156,7 @@ func (s *RunService) CreateRun(
 	// Get the task template and taskID
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
+	var triggerName string
 	var err error
 	runSpec := request.GetRunSpec()
 	switch request.GetTask().(type) {
@@ -174,6 +175,7 @@ func (s *RunService) CreateRun(
 		if triggerErr != nil {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
 		}
+		triggerName = tn.GetName()
 		taskID = &task.TaskIdentifier{
 			Project: triggerModel.Project,
 			Domain:  triggerModel.Domain,
@@ -236,7 +238,7 @@ func (s *RunService) CreateRun(
 	}
 
 	// Persist task spec and create run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec)
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, triggerName)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -269,6 +271,8 @@ func (s *RunService) CreateRun(
 }
 
 // persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
+// triggerName should be non-empty when the run originates from a scheduled trigger; it is stored on
+// the run model and triggers a triggered_at update on the trigger row.
 func (s *RunService) persistRunModel(
 	ctx context.Context,
 	runId *common.RunIdentifier,
@@ -276,6 +280,7 @@ func (s *RunService) persistRunModel(
 	taskSpec *task.TaskSpec,
 	inputPrefix, runOutputBase string,
 	runSpec *task.RunSpec,
+	triggerName string,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
 	info := &workflow.RunInfo{InputsUri: inputPrefix}
@@ -346,9 +351,10 @@ func (s *RunService) persistRunModel(
 		DetailedInfo:    detailedInfo,
 		RunSpec:         runSpecBytes,
 		Attempts:        1,
+		TriggerName:     nullStr(triggerName),
 	}
 
-	return s.repo.ActionRepo().CreateAction(ctx, runModel)
+	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
 }
 
 // AbortRun aborts a run

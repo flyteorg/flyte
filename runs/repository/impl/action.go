@@ -246,12 +246,27 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 }
 
 // CreateAction inserts an Action model into the database.
-func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
-	result := r.db.WithContext(ctx).
-		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(action)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to create action: %w", result.Error)
+// When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
+// corresponding trigger row is updated to now() in the same transaction
+func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
+	var result *gorm.DB
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		result = tx.Clauses(clause.OnConflict{DoNothing: true}).Create(action)
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected > 0 && updateTriggeredAt && action.TriggerName.Valid {
+			if err := tx.Exec(
+				"UPDATE triggers SET triggered_at = NOW() WHERE project = ? AND domain = ? AND name = ?",
+				action.Project, action.Domain, action.TriggerName.String,
+			).Error; err != nil {
+				return fmt.Errorf("failed to update triggered_at: %w", err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
 
 	actionID := &common.ActionIdentifier{
