@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -130,6 +131,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
+	}
+
+	if cfg.TriggerScheduler.Enabled {
+		runsURL := cfg.ActionsServiceURL
+		if sc.BaseURL != "" {
+			runsURL = sc.BaseURL
+		}
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL)
+		sc.AddWorker("trigger-scheduler", worker)
+		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
 
 	sc.AddReadyCheck(func(r *http.Request) error {
