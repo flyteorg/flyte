@@ -555,7 +555,7 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string, shouldBindDef
 
 func loadPackage(pkg string) (*types.Package, error) {
 	config := &packages.Config{
-		Mode: packages.NeedTypes | packages.NeedTypesInfo,
+		Mode: packages.NeedTypes | packages.NeedTypesInfo | packages.NeedDeps | packages.NeedImports,
 		Logf: logger.InfofNoCtx,
 	}
 
