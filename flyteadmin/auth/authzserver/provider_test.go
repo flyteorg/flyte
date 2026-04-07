@@ -37,7 +37,7 @@ func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
 	sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
 	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
-	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope(), []string{"sub"})
 	assert.NoError(t, err)
 	return p, secrets
 }
@@ -59,7 +59,7 @@ func newInvalidMockProvider(ctx context.Context, t *testing.T, secrets auth.Secr
 	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
 	invalidFunc()
-	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope(), []string{"sub"})
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, errorContains)
 	assert.Equal(t, Provider{}, p)
@@ -295,7 +295,7 @@ func TestProvider_ValidateAccessToken(t *testing.T) {
 		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
 		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
-		p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
+		p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope(), []string{"sub"})
 		assert.NoError(t, err)
 
 		// create a signer for rsa 256

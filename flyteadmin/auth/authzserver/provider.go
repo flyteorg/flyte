@@ -43,10 +43,11 @@ type providerMetrics struct {
 // Provider implements OAuth2 Authorization Server.
 type Provider struct {
 	fosite.OAuth2Provider
-	cfg       config.AuthorizationServer
-	publicKey []rsa.PublicKey
-	keySet    jwk.Set
-	metrics   providerMetrics
+	cfg               config.AuthorizationServer
+	publicKey         []rsa.PublicKey
+	keySet            jwk.Set
+	metrics           providerMetrics
+	subjectClaimNames []string
 }
 
 func (p Provider) PublicKeys() []rsa.PublicKey {
@@ -135,7 +136,7 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 	}
 
 	claimsRaw := parsedToken.Claims.(jwtgo.MapClaims)
-	identityCtx, err := verifyClaims(sets.NewString(expectedAudience), claimsRaw)
+	identityCtx, err := verifyClaims(sets.NewString(expectedAudience), claimsRaw, p.subjectClaimNames)
 	if err != nil {
 		logger.Infof(ctx, "failed to verify claims for audience: '%s'. Error: %v", expectedAudience, err)
 		return nil, err
@@ -148,7 +149,7 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 // sign and generate hashes for tokens. The RSA Private key is expected to be in PEM format with the public key embedded.
 // Use auth.GetInitSecretsCommand() to generate new valid secrets that will be accepted by this provider.
 // The config.SecretNameClaimSymmetricKey must be a 32-bytes long key in Base64Encoding.
-func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.SecretManager, scope promutils.Scope) (Provider, error) {
+func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.SecretManager, scope promutils.Scope, subjectClaimNames []string) (Provider, error) {
 	// fosite requires four parameters for the server to get up and running:
 	// 1. config - for any enforcement you may desire, you can do this using `compose.Config`. You like PKCE, enforce it!
 	// 2. store - no auth service is generally useful unless it can remember clients and users.
@@ -248,9 +249,10 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	}
 
 	return Provider{
-		OAuth2Provider: oauth2Provider,
-		publicKey:      publicKeys,
-		keySet:         keysSet,
+		OAuth2Provider:    oauth2Provider,
+		publicKey:         publicKeys,
+		keySet:            keysSet,
+		subjectClaimNames: subjectClaimNames,
 		metrics: providerMetrics{
 			ExpiredTokens: scope.MustNewCounter("expired_token", "The number of expired tokens"),
 			InvalidTokens: scope.MustNewCounter("invalid_tokens", "The number of invalid tokens"),

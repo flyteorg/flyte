@@ -229,6 +229,16 @@ type OAuth2Options struct {
 
 	// ThirdParty defines settings for the public client flyte-clients (e.g. flytectl, flytecli) should use.
 	ThirdParty ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Defines settings to instruct flyte cli tools (and optionally others) on what config to use to setup their client."`
+
+	// SubjectClaimNames is an ordered list of JWT claim names to try when resolving the
+	// caller's subject identity from access tokens. When configured, this is the authoritative
+	// claim list — the first non-empty value wins and is used as the subject for all downstream
+	// identity resolution. When empty (default), the standard JWT "sub" claim is used.
+	//
+	// Configure this for IdPs that omit "sub" from client credentials tokens or use a
+	// different claim for the client identity. Example:
+	//   subjectClaimNames: ["sub", "client_id"]
+	SubjectClaimNames []string `json:"subjectClaimNames" pflag:",Ordered list of JWT claim names to try for subject identity resolution from access tokens. When empty the standard sub claim is used."`
 }
 
 type UserAuthConfig struct {

@@ -575,6 +575,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_appAuth.subjectClaimNames", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(DefaultConfig.AppAuth.SubjectClaimNames, ",")
+
+			cmdFlags.Set("appAuth.subjectClaimNames", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("appAuth.subjectClaimNames"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AppAuth.SubjectClaimNames)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_tokenEndpointProxyPath", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

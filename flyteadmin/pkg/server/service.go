@@ -502,8 +502,9 @@ func newAuthContext(ctx context.Context, sm secretmanager.FileEnvSecretManager, 
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		authCfg := authConfig.GetConfig()
+		subjectClaimNames := authCfg.AppAuth.SubjectClaimNames
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"), subjectClaimNames)
 			if err != nil {
 				logger.Errorf(ctx, "Error creating authorization server %s", err)
 				return nil, err
@@ -511,7 +512,7 @@ func newAuthContext(ctx context.Context, sm secretmanager.FileEnvSecretManager, 
 
 			oauth2ResourceServer = oauth2Provider
 		} else {
-			oauth2ResourceServer, err = authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, authCfg.UserAuth.OpenID.BaseURL)
+			oauth2ResourceServer, err = authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, authCfg.UserAuth.OpenID.BaseURL, subjectClaimNames)
 			if err != nil {
 				logger.Errorf(ctx, "Error creating resource server %s", err)
 				return nil, err

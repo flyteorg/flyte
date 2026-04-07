@@ -27,6 +27,7 @@ import (
 type ResourceServer struct {
 	signatureVerifier oidc.KeySet
 	allowedAudience   []string
+	subjectClaimNames []string
 }
 
 func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudience, tokenStr string) (interfaces.IdentityContext, error) {
@@ -44,7 +45,7 @@ func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudienc
 		return nil, fmt.Errorf("failed to validate token: %v", err)
 	}
 
-	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), t.Claims.(jwtgo.MapClaims))
+	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), t.Claims.(jwtgo.MapClaims), r.subjectClaimNames)
 }
 
 func doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
@@ -120,7 +121,7 @@ func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, cfg authConfig
 }
 
 // NewOAuth2ResourceServer initializes a new OAuth2ResourceServer.
-func NewOAuth2ResourceServer(ctx context.Context, cfg authConfig.ExternalAuthorizationServer, fallbackBaseURL config.URL) (ResourceServer, error) {
+func NewOAuth2ResourceServer(ctx context.Context, cfg authConfig.ExternalAuthorizationServer, fallbackBaseURL config.URL, subjectClaimNames []string) (ResourceServer, error) {
 	u := cfg.BaseURL
 	if len(u.String()) == 0 {
 		u = fallbackBaseURL
@@ -134,5 +135,6 @@ func NewOAuth2ResourceServer(ctx context.Context, cfg authConfig.ExternalAuthori
 	return ResourceServer{
 		signatureVerifier: verifier,
 		allowedAudience:   cfg.AllowedAudience,
+		subjectClaimNames: subjectClaimNames,
 	}, nil
 }

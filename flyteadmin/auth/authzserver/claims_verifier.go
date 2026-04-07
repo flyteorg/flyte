@@ -12,7 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
+func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}, subjectClaimNames []string) (interfaces.IdentityContext, error) {
 	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
 
 	foundAudIndex := -1
@@ -25,6 +25,28 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 
 	if foundAudIndex < 0 {
 		return nil, fmt.Errorf("invalid audience [%v], wanted [%v]", claims, expectedAudience)
+	}
+
+	subject := claims.Subject // Default
+	// Resolve subject from configurable claim names.
+	// When subjectClaimNames is configured, it is the authoritative ordered list of JWT claims
+	// to try for subject resolution. The first non-empty value wins and is normalized back into
+	// claimsRaw["sub"] so all downstream consumers reading IdentityContext.Claims()["sub"]
+	// get the correct value.
+	//
+	// When subjectClaimNames is empty, fall back to the standard "sub" claim (default behavior).
+	if len(subjectClaimNames) > 0 {
+		for _, claim := range subjectClaimNames {
+			if v, ok := claimsRaw[claim]; ok {
+				if s, ok := v.(string); ok && len(s) > 0 {
+					subject = s
+					break
+				}
+			}
+		}
+		if len(subject) > 0 {
+			claimsRaw["sub"] = subject
+		}
 	}
 
 	userInfo := &service.UserInfoResponse{}
@@ -71,5 +93,5 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		scopes.Insert(auth.ScopeAll)
 	}
 
-	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw)
+	return auth.NewIdentityContext(claims.Audience[foundAudIndex], subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw)
 }
