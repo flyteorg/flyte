@@ -58,12 +58,10 @@ func TestGetTaskDetails(t *testing.T) {
 	specBytes, _ := proto.Marshal(spec)
 
 	taskModel := &models.Task{
-		TaskKey: models.TaskKey{
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "test-task",
-			Version: "v1",
-		},
+		Project:      "test-project",
+		Domain:       "test-domain",
+		Name:         "test-task",
+		Version:      "v1",
 		Environment:  "prod",
 		FunctionName: "test_func",
 		TaskSpec:     specBytes,
@@ -99,12 +97,10 @@ func TestListTasks(t *testing.T) {
 
 	taskModels := []*models.Task{
 		{
-			TaskKey: models.TaskKey{
-				Project: "test-project",
-				Domain:  "test-domain",
-				Name:    "task1",
-				Version: "v1",
-			},
+			Project:      "test-project",
+			Domain:       "test-domain",
+			Name:         "task1",
+			Version:      "v1",
 			FunctionName: "func1",
 			CreatedAt:    time.Now(),
 		},

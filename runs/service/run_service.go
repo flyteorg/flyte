@@ -157,7 +157,6 @@ func (s *RunService) CreateRun(
 	var taskSpec *task.TaskSpec
 	var err error
 	runSpec := request.GetRunSpec()
-	// TODO: Add trigger
 	switch request.GetTask().(type) {
 	case *workflow.CreateRunRequest_TaskId:
 		taskID = request.GetTaskId()
@@ -168,6 +167,22 @@ func (s *RunService) CreateRun(
 	case *workflow.CreateRunRequest_TaskSpec:
 		taskSpec = request.GetTaskSpec()
 		taskID = taskIdFromTaskSpec(taskSpec)
+	case *workflow.CreateRunRequest_TriggerName:
+		tn := request.GetTriggerName()
+		triggerModel, triggerErr := s.repo.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(tn))
+		if triggerErr != nil {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
+		}
+		taskID = &task.TaskIdentifier{
+			Project: triggerModel.Project,
+			Domain:  triggerModel.Domain,
+			Name:    triggerModel.TaskName,
+			Version: triggerModel.TaskVersion,
+		}
+		taskSpec, err = fetchTaskSpecByID(ctx, s.repo.TaskRepo(), taskID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if runSpec == nil {
@@ -1738,6 +1753,7 @@ func extractShortName(name string) string {
 	}
 	return name
 }
+
 
 func fetchTaskSpecByID(ctx context.Context, taskRepo interfaces.TaskRepo, taskID *task.TaskIdentifier) (*task.TaskSpec, error) {
 	taskModel, err := taskRepo.GetTask(ctx, transformers.ToTaskKey(taskID))

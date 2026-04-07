@@ -69,7 +69,7 @@ func (s *triggerService) GetTriggerDetails(
 	req *connect.Request[triggerpb.GetTriggerDetailsRequest],
 ) (*connect.Response[triggerpb.GetTriggerDetailsResponse], error) {
 	n := req.Msg.GetName()
-	m, err := s.db.TriggerRepo().GetTrigger(ctx, n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName())
+	m, err := s.db.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(n))
 	if err != nil {
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}

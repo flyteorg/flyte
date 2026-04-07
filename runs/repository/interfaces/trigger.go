@@ -14,8 +14,8 @@ type TriggerRepo interface {
 	// Pass 0 when creating a brand-new trigger.
 	SaveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error)
 
-	// GetTrigger returns the latest (non-deleted) trigger row.
-	GetTrigger(ctx context.Context, project, domain, taskName, name string) (*models.Trigger, error)
+	// GetTrigger returns the latest (non-deleted) trigger row by composite key.
+	GetTrigger(ctx context.Context, key TriggerNameKey) (*models.Trigger, error)
 
 	// GetTriggerRevision returns a specific immutable revision row.
 	GetTriggerRevision(ctx context.Context, project, domain, taskName, name string, revision uint64) (*models.TriggerRevision, error)

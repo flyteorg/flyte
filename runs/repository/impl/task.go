@@ -53,8 +53,8 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 			now, now,
 		)
 		if result.Error != nil {
-			logger.Errorf(ctx, "failed to upsert task %v: %v", newTask.TaskKey, result.Error)
-			return fmt.Errorf("failed to upsert task %v: %w", newTask.TaskKey, result.Error)
+			logger.Errorf(ctx, "failed to upsert task %v: %v", newTask.Key(), result.Error)
+			return fmt.Errorf("failed to upsert task %v: %w", newTask.Key(), result.Error)
 		}
 		logger.Infof(ctx, "Upserted task: %s/%s/%s version %s",
 			newTask.Project, newTask.Domain, newTask.Name, newTask.Version)

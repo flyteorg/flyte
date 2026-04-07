@@ -49,7 +49,13 @@ type TaskKey struct {
 
 // Tasks models the TaskDetails from the task_definition.proto
 type Task struct {
-	TaskKey `gorm:"embedded"`
+	// Composite primary key — declared directly (not via embedded struct) so that
+	// GORM AutoMigrate creates the actual PRIMARY KEY constraint in PostgreSQL,
+	// which is required for ON CONFLICT (project, domain, name, version) upserts.
+	Project string `gorm:"primaryKey" db:"project"`
+	Domain  string `gorm:"primaryKey" db:"domain"`
+	Name    string `gorm:"primaryKey" db:"name"`
+	Version string `gorm:"primaryKey" db:"version"`
 
 	// Extracted from Name
 	Environment  string `gorm:"column:environment" db:"environment"`
@@ -75,6 +81,11 @@ type Task struct {
 
 // TableName specifies the table name
 func (Task) TableName() string { return "tasks" }
+
+// Key returns the TaskKey for this task.
+func (t Task) Key() TaskKey {
+	return TaskKey{Project: t.Project, Domain: t.Domain, Name: t.Name, Version: t.Version}
+}
 
 type TaskCounts struct {
 	// FilteredTotal is the number of tasks matching the applied filter

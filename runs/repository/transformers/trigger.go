@@ -12,8 +12,19 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+// ToTriggerKey creates an interfaces.TriggerNameKey from a common.TriggerName proto.
+func ToTriggerKey(name *common.TriggerName) interfaces.TriggerNameKey {
+	return interfaces.TriggerNameKey{
+		Project:  name.GetProject(),
+		Domain:   name.GetDomain(),
+		TaskName: name.GetTaskName(),
+		Name:     name.GetName(),
+	}
+}
 
 // NewTriggerModel builds a models.Trigger from a deploy request.
 // The caller supplies the TriggerIdentifier (including the expected revision for optimistic locking).

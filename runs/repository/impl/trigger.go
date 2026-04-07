@@ -95,15 +95,20 @@ func upsertTrigger(ctx context.Context, tx *gorm.DB, trigger *models.Trigger, ex
 	return insertTriggerRevision(ctx, tx, trigger, triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DEPLOY)
 }
 
-func (r *triggerRepo) GetTrigger(ctx context.Context, project, domain, taskName, name string) (*models.Trigger, error) {
+func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error) {
 	var t models.Trigger
-	result := r.db.WithContext(ctx).
-		Where("project = ? AND domain = ? AND task_name = ? AND name = ? AND deleted_at IS NULL",
-			project, domain, taskName, name).
-		First(&t)
+	q := r.db.WithContext(ctx).Where("deleted_at IS NULL")
+	if key.TaskName != "" {
+		q = q.Where("project = ? AND domain = ? AND task_name = ? AND name = ?",
+			key.Project, key.Domain, key.TaskName, key.Name)
+	} else {
+		q = q.Where("project = ? AND domain = ? AND name = ?",
+			key.Project, key.Domain, key.Name)
+	}
+	result := q.First(&t)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s", project, domain, taskName, name)
+			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s", key.Project, key.Domain, key.TaskName, key.Name)
 		}
 		return nil, fmt.Errorf("failed to get trigger: %w", result.Error)
 	}

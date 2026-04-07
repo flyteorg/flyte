@@ -2960,8 +2960,8 @@ func (_c *TriggerRepo_DeleteTriggers_Call) RunAndReturn(run func(ctx context.Con
 }
 
 // GetTrigger provides a mock function for the type TriggerRepo
-func (_mock *TriggerRepo) GetTrigger(ctx context.Context, project string, domain string, taskName string, name string) (*models.Trigger, error) {
-	ret := _mock.Called(ctx, project, domain, taskName, name)
+func (_mock *TriggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error) {
+	ret := _mock.Called(ctx, key)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetTrigger")
@@ -2969,18 +2969,18 @@ func (_mock *TriggerRepo) GetTrigger(ctx context.Context, project string, domain
 
 	var r0 *models.Trigger
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string) (*models.Trigger, error)); ok {
-		return returnFunc(ctx, project, domain, taskName, name)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.TriggerNameKey) (*models.Trigger, error)); ok {
+		return returnFunc(ctx, key)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, string, string) *models.Trigger); ok {
-		r0 = returnFunc(ctx, project, domain, taskName, name)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.TriggerNameKey) *models.Trigger); ok {
+		r0 = returnFunc(ctx, key)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Trigger)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
-		r1 = returnFunc(ctx, project, domain, taskName, name)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, interfaces.TriggerNameKey) error); ok {
+		r1 = returnFunc(ctx, key)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -2994,43 +2994,22 @@ type TriggerRepo_GetTrigger_Call struct {
 
 // GetTrigger is a helper method to define mock.On call
 //   - ctx context.Context
-//   - project string
-//   - domain string
-//   - taskName string
-//   - name string
-func (_e *TriggerRepo_Expecter) GetTrigger(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}) *TriggerRepo_GetTrigger_Call {
-	return &TriggerRepo_GetTrigger_Call{Call: _e.mock.On("GetTrigger", ctx, project, domain, taskName, name)}
+//   - key interfaces.TriggerNameKey
+func (_e *TriggerRepo_Expecter) GetTrigger(ctx interface{}, key interface{}) *TriggerRepo_GetTrigger_Call {
+	return &TriggerRepo_GetTrigger_Call{Call: _e.mock.On("GetTrigger", ctx, key)}
 }
 
-func (_c *TriggerRepo_GetTrigger_Call) Run(run func(ctx context.Context, project string, domain string, taskName string, name string)) *TriggerRepo_GetTrigger_Call {
+func (_c *TriggerRepo_GetTrigger_Call) Run(run func(ctx context.Context, key interfaces.TriggerNameKey)) *TriggerRepo_GetTrigger_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 string
+		var arg1 interfaces.TriggerNameKey
 		if args[1] != nil {
-			arg1 = args[1].(string)
+			arg1 = args[1].(interfaces.TriggerNameKey)
 		}
-		var arg2 string
-		if args[2] != nil {
-			arg2 = args[2].(string)
-		}
-		var arg3 string
-		if args[3] != nil {
-			arg3 = args[3].(string)
-		}
-		var arg4 string
-		if args[4] != nil {
-			arg4 = args[4].(string)
-		}
-		run(
-			arg0,
-			arg1,
-			arg2,
-			arg3,
-			arg4,
-		)
+		run(arg0, arg1)
 	})
 	return _c
 }
@@ -3040,7 +3019,7 @@ func (_c *TriggerRepo_GetTrigger_Call) Return(trigger *models.Trigger, err error
 	return _c
 }
 
-func (_c *TriggerRepo_GetTrigger_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, taskName string, name string) (*models.Trigger, error)) *TriggerRepo_GetTrigger_Call {
+func (_c *TriggerRepo_GetTrigger_Call) RunAndReturn(run func(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error)) *TriggerRepo_GetTrigger_Call {
 	_c.Call.Return(run)
 	return _c
 }

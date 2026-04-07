@@ -19,6 +19,7 @@ var AllModels = []interface{}{
 	&models.Task{},
 	&models.TaskSpec{},
 	&models.Trigger{},
+	&models.TriggerRevision{},
 }
 
 const MigrationIDInitSchema = "20260327_runs_init_schema"
