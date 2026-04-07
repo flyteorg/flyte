@@ -306,7 +306,6 @@ func (_c *ActionRepo_CreateAction_Call) RunAndReturn(run func(ctx context.Contex
 	return _c
 }
 
-
 // GetAction provides a mock function for the type ActionRepo
 func (_mock *ActionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	ret := _mock.Called(ctx, actionID)
@@ -2924,7 +2923,10 @@ func (_c *TriggerRepo_GetTrigger_Call) Run(run func(ctx context.Context, key int
 		if args[1] != nil {
 			arg1 = args[1].(interfaces.TriggerNameKey)
 		}
-		run(arg0, arg1)
+		run(
+			arg0,
+			arg1,
+		)
 	})
 	return _c
 }
