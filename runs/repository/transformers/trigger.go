@@ -34,8 +34,8 @@ func NewTriggerModel(
 	spec *triggerpb.TriggerSpec,
 	automationSpec *taskpb.TriggerAutomationSpec,
 ) (*models.Trigger, error) {
-	// TODO(auth): replace with real caller identity after adding auth
-	deployedBy := sql.NullString{String: "mock-subject", Valid: true}
+	// TODO(nary): populate with real caller identity after adding auth
+	deployedBy := sql.NullString{}
 
 	specBytes, err := proto.Marshal(spec)
 	if err != nil {

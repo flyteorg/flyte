@@ -64,7 +64,7 @@ func TestNewTaskModel(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "prod", model.Environment)
 	assert.Equal(t, "my_function", model.FunctionName)
-	assert.Equal(t, "mock-subject", model.DeployedBy)
+	assert.Equal(t, "", model.DeployedBy)
 	assert.True(t, model.EnvDescription.Valid)
 	assert.Equal(t, "Production environment", model.EnvDescription.String)
 	assert.True(t, model.ShortDescription.Valid)

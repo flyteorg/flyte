@@ -33,14 +33,8 @@ func ToTaskName(taskName *task.TaskName) models.TaskName {
 }
 
 func NewTaskModel(ctx context.Context, taskId *task.TaskIdentifier, spec *task.TaskSpec) (*models.Task, error) {
+	// TODO(nary): populate with real caller identity after adding auth
 	var deployedBy string
-	// TODO(nary): Get real identity subject after adding auth
-	deployedBy = "mock-subject"
-	// if subject, err := authorization.GetCallerIdentitySubject(ctx); err != nil {
-	// 	logger.Warnf(ctx, "Failed to get caller identity subject. Error: %v", err)
-	// } else {
-	// 	deployedBy = subject
-	// }
 
 	specBytes, err := proto.Marshal(spec)
 	if err != nil {
