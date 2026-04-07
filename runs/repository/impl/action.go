@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -28,12 +29,10 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// actionRepo implements actionRepo interface using PostgreSQL/SQLite
+// actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
-	db         *gorm.DB
-	isPostgres bool
-	pgConfig   database.PostgresConfig
-	listener   *pq.Listener
+	db       *gorm.DB
+	listener *pq.Listener
 
 	// Subscriber management for LISTEN/NOTIFY
 	runSubscribers    map[chan string]bool
@@ -47,31 +46,22 @@ type actionRepo struct {
 
 const rootActionName = "a0"
 
-// NewActionRepo creates a new PostgreSQL/SQLite repository
+// NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
-	// Detect database type
-	dbName := db.Name()
-	isPostgres := dbName == "postgres"
-
 	repo := &actionRepo{
 		db:                db,
-		isPostgres:        isPostgres,
-		pgConfig:          dbConfig.Postgres,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	// Start LISTEN/NOTIFY for PostgreSQL
-	if isPostgres {
-		repo.actionNotifyCh = make(chan string, 256)
-		repo.runNotifyCh = make(chan string, 256)
+	repo.actionNotifyCh = make(chan string, 256)
+	repo.runNotifyCh = make(chan string, 256)
 
-		if err := repo.startPostgresListener(); err != nil {
-			return nil, fmt.Errorf("failed to start postgres listener: %w", err)
-		}
-		if err := repo.startNotifyLoop(); err != nil {
-			return nil, fmt.Errorf("failed to start notify loop: %w", err)
-		}
+	if err := repo.startPostgresListener(); err != nil {
+		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
+	}
+	if err := repo.startNotifyLoop(); err != nil {
+		return nil, fmt.Errorf("failed to start notify loop: %w", err)
 	}
 
 	return repo, nil
@@ -379,46 +369,8 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	return &event, nil
 }
 
-// CreateAction creates a new action
-func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
-	// Serialize action spec
-	actionSpecBytes, err := proto.Marshal(actionSpec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
-	}
-
-	// Determine parent action name
-	var parentActionName string
-	if actionSpec.ParentActionName != nil {
-		parentActionName = *actionSpec.ParentActionName
-	}
-
-	// Extract metadata columns from action spec
-	meta := extractActionMetadata(actionSpec)
-
-	action := &models.Action{
-		Project:          actionSpec.ActionId.Run.Project,
-		Domain:           actionSpec.ActionId.Run.Domain,
-		RunName:          actionSpec.ActionId.Run.Name,
-		Name:             actionSpec.ActionId.Name,
-		ParentActionName: newNullString(parentActionName),
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:       meta.ActionType,
-		ActionGroup:      newNullString(actionSpec.GetGroup()),
-		TaskProject:      meta.TaskProject,
-		TaskDomain:       meta.TaskDomain,
-		TaskName:         meta.TaskName,
-		TaskVersion:      meta.TaskVersion,
-		TaskType:         meta.TaskType,
-		TaskShortName:    meta.TaskShortName,
-		FunctionName:     meta.FunctionName,
-		EnvironmentName:  meta.EnvironmentName,
-		ActionSpec:       actionSpecBytes,
-		ActionDetails:    []byte("{}"), // Empty details initially
-		DetailedInfo:     detailedInfo,
-		Attempts:         1,
-	}
-
+// CreateAction inserts an Action model into the database.
+func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
 	result := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true}).
 		Create(action)
@@ -426,9 +378,18 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 		return nil, fmt.Errorf("failed to create action: %w", result.Error)
 	}
 
+	actionID := &common.ActionIdentifier{
+		Name: action.Name,
+		Run: &common.RunIdentifier{
+			Project: action.Project,
+			Domain:  action.Domain,
+			Name:    action.RunName,
+		},
+	}
+
 	// If no rows were affected, the action already exists — fetch and return it.
 	if result.RowsAffected == 0 {
-		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+		existing, err := r.GetAction(ctx, actionID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get existing action: %w", err)
 		}
@@ -438,7 +399,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.Acti
 	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
 
 	// Notify subscribers of action creation
-	r.notifyActionUpdate(ctx, actionSpec.ActionId)
+	r.notifyActionUpdate(ctx, actionID)
 
 	return action, nil
 }
@@ -471,14 +432,16 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 		Where("project = ? AND domain = ? AND run_name = ?",
 			runID.Project, runID.Domain, runID.Name)
 
-	// Apply pagination token
+	// Apply pagination token (encoded as RFC3339Nano created_at cursor)
 	if token != "" {
-		query = query.Where("id > ?", token)
+		if t, err := time.Parse(time.RFC3339Nano, token); err == nil {
+			query = query.Where("created_at > ?", t)
+		}
 	}
 
 	var actions []*models.Action
 	result := query.
-		Order("id ASC").
+		Order("created_at ASC").
 		Limit(limit + 1).
 		Find(&actions)
 
@@ -490,7 +453,7 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 	var nextToken string
 	if len(actions) > limit {
 		actions = actions[:limit]
-		nextToken = fmt.Sprintf("%d", actions[len(actions)-1].ID)
+		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
 	}
 
 	return actions, nextToken, nil
@@ -514,17 +477,10 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 
 	if endTime != nil {
-		if r.isPostgres {
-			// Only set ended_at if not already set, clamped to at least created_at.
-			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
-			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
-		} else {
-			// SQLite: only set ended_at if not already set.
-			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
-			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
-		}
+		// Only set ended_at if not already set, clamped to at least created_at.
+		updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
+		updates["duration_ms"] = gorm.Expr(
+			"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
 	}
 
 	// Allow forward phase transitions (phase <= new) and retries from
@@ -702,123 +658,35 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 	<-ctx.Done()
 }
 
-// WatchRunUpdates watches for run updates (simplified polling implementation)
+// WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 100)
+	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
+	notifCh := make(chan string, 100)
 
-		// Register as subscriber
+	r.mu.Lock()
+	r.runSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
 		r.mu.Lock()
-		r.runSubscribers[notifCh] = true
+		delete(r.runSubscribers, notifCh)
+		close(notifCh)
 		r.mu.Unlock()
+	}()
 
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.runSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Check if this notification is for the run we're watching
-				if notifPayload == runKey {
-					run, err := r.GetRun(ctx, runID)
-					if err != nil {
-						if ctx.Err() != nil {
-							return
-						}
-						errs <- err
-						return
-					}
-					select {
-					case updates <- run:
-					case <-ctx.Done():
-						return
-					}
-				}
-			}
-		}
-	} else {
-		// SQLite: Use polling
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-
-		var lastUpdated time.Time
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				run, err := r.GetRun(ctx, runID)
-				if err != nil {
-					errs <- err
-					return
-				}
-
-				if run.UpdatedAt.After(lastUpdated) {
-					lastUpdated = run.UpdatedAt
-					updates <- run
-				}
-			}
-		}
-	}
-}
-
-// WatchAllRunUpdates watches for all run updates (not filtered by runID)
-func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		notifCh := make(chan string, 100)
-
-		// Register as subscriber
-		r.mu.Lock()
-		r.runSubscribers[notifCh] = true
-		r.mu.Unlock()
-
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.runSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Parse notification payload: project/domain/run
-				parts := strings.Split(notifPayload, "/")
-				if len(parts) != 3 {
-					logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
-					continue
-				}
-
-				runID := &common.RunIdentifier{
-					Project: parts[0],
-					Domain:  parts[1],
-					Name:    parts[2],
-				}
-
-				if ctx.Err() != nil {
-					return
-				}
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			if notifPayload == runKey {
 				run, err := r.GetRun(ctx, runID)
 				if err != nil {
 					if ctx.Err() != nil {
 						return
 					}
-					logger.Errorf(ctx, "Failed to get run from notification: %v", err)
-					continue
+					errs <- err
+					return
 				}
 				select {
 				case updates <- run:
@@ -827,178 +695,110 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 				}
 			}
 		}
-	} else {
-		// SQLite: Use polling for all runs
-		ticker := time.NewTicker(2 * time.Second)
-		defer ticker.Stop()
+	}
+}
 
-		lastCheck := time.Now()
+// WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
+func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
+	notifCh := make(chan string, 100)
 
-		for {
-			select {
-			case <-ctx.Done():
+	r.mu.Lock()
+	r.runSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
+		r.mu.Lock()
+		delete(r.runSubscribers, notifCh)
+		close(notifCh)
+		r.mu.Unlock()
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			parts := strings.Split(notifPayload, "/")
+			if len(parts) != 3 {
+				logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
+				continue
+			}
+
+			runID := &common.RunIdentifier{
+				Project: parts[0],
+				Domain:  parts[1],
+				Name:    parts[2],
+			}
+
+			if ctx.Err() != nil {
 				return
-			case <-ticker.C:
-				// Query runs updated since last check
-				var runs []*models.Run
-				if err := r.db.WithContext(ctx).
-					Where("updated_at > ? AND parent_action_name IS NULL", lastCheck).
-					Find(&runs).Error; err != nil {
-					errs <- err
+			}
+			run, err := r.GetRun(ctx, runID)
+			if err != nil {
+				if ctx.Err() != nil {
 					return
 				}
-
-				for _, run := range runs {
-					updates <- run
-				}
-
-				lastCheck = time.Now()
+				logger.Errorf(ctx, "Failed to get run from notification: %v", err)
+				continue
+			}
+			select {
+			case updates <- run:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}
 }
 
-// WatchAllActionUpdates watches for all action updates for a run
+// WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 100)
+	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
+	notifCh := make(chan string, 100)
 
-		// Register as subscriber
+	r.mu.Lock()
+	r.actionSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
 		r.mu.Lock()
-		r.actionSubscribers[notifCh] = true
+		delete(r.actionSubscribers, notifCh)
+		close(notifCh)
 		r.mu.Unlock()
+	}()
 
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.actionSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Collect this notification plus any others already queued,
-				// deduplicating by action name so we only query the DB once
-				// per action during a burst of updates.
-				pending := make(map[string]bool)
-				if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
-					pending[notifPayload[len(runPrefix):]] = true
-				}
-				// Drain buffered notifications without blocking.
-			drain:
-				for {
-					select {
-					case extra := <-notifCh:
-						if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
-							pending[extra[len(runPrefix):]] = true
-						}
-					default:
-						break drain
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			// Collect this notification plus any others already queued,
+			// deduplicating by action name so we only query the DB once
+			// per action during a burst of updates.
+			pending := make(map[string]bool)
+			if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
+				pending[notifPayload[len(runPrefix):]] = true
+			}
+			// Drain buffered notifications without blocking.
+		drain:
+			for {
+				select {
+				case extra := <-notifCh:
+					if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
+						pending[extra[len(runPrefix):]] = true
 					}
-				}
-
-				for actionName := range pending {
-					actionID := &common.ActionIdentifier{
-						Run:  runID,
-						Name: actionName,
-					}
-					if ctx.Err() != nil {
-						return
-					}
-					action, err := r.GetAction(ctx, actionID)
-					if err != nil {
-						if ctx.Err() != nil {
-							return
-						}
-						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-						continue
-					}
-					select {
-					case updates <- action:
-					case <-ctx.Done():
-						return
-					}
+				default:
+					break drain
 				}
 			}
-		}
-	} else {
-		// SQLite: Use polling
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
 
-		lastCheck := time.Now()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				// Query actions updated since last check
-				var actions []*models.Action
-				if err := r.db.WithContext(ctx).
-					Where("project = ? AND domain = ? AND run_name = ? AND updated_at > ?",
-						runID.Project, runID.Domain, runID.Name, lastCheck).
-					Find(&actions).Error; err != nil {
-					errs <- err
+			for actionName := range pending {
+				actionID := &common.ActionIdentifier{
+					Run:  runID,
+					Name: actionName,
+				}
+				if ctx.Err() != nil {
 					return
 				}
-
-				for _, action := range actions {
-					updates <- action
-				}
-
-				lastCheck = time.Now()
-			}
-		}
-	}
-}
-
-// WatchActionUpdates watches the current action update
-func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
-	if r.isPostgres {
-		targetPayload := fmt.Sprintf("%s/%s/%s/%s",
-			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-		notifCh := make(chan string, 100)
-
-		r.mu.Lock()
-		r.actionSubscribers[notifCh] = true
-		r.mu.Unlock()
-
-		defer func() {
-			r.mu.Lock()
-			delete(r.actionSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				if notifPayload != targetPayload {
-					continue
-				}
-
-			drain:
-				for {
-					// Prevent continuous update from the action
-					select {
-					case extra := <-notifCh:
-						if extra != targetPayload {
-							continue
-						}
-					default:
-						break drain
-					}
-				}
-
 				action, err := r.GetAction(ctx, actionID)
 				if err != nil {
 					if ctx.Err() != nil {
@@ -1007,7 +807,6 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 					logger.Errorf(ctx, "Failed to get action from notification: %v", err)
 					continue
 				}
-
 				select {
 				case updates <- action:
 				case <-ctx.Done():
@@ -1015,37 +814,61 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 				}
 			}
 		}
-	} else {
-		ticker := time.NewTicker(250 * time.Millisecond)
-		defer ticker.Stop()
+	}
+}
 
-		lastCheck := time.Now()
+// WatchActionUpdates watches the current action update via LISTEN/NOTIFY
+func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	notifCh := make(chan string, 100)
 
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				action, err := r.GetAction(ctx, actionID)
-				if err != nil {
-					if ctx.Err() != nil {
-						return
+	r.mu.Lock()
+	r.actionSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
+		r.mu.Lock()
+		delete(r.actionSubscribers, notifCh)
+		close(notifCh)
+		r.mu.Unlock()
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			if notifPayload != targetPayload {
+				continue
+			}
+
+		drain:
+			for {
+				// Prevent continuous update from the action
+				select {
+				case extra := <-notifCh:
+					if extra != targetPayload {
+						continue
 					}
-					errs <- err
+				default:
+					break drain
+				}
+			}
+
+			action, err := r.GetAction(ctx, actionID)
+			if err != nil {
+				if ctx.Err() != nil {
 					return
 				}
+				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+				continue
+			}
 
-				if action.UpdatedAt.After(lastCheck) {
-					select {
-					case updates <- action:
-					case <-ctx.Done():
-						return
-					}
-					lastCheck = action.UpdatedAt
-					continue
-				}
-
-				lastCheck = time.Now()
+			select {
+			case updates <- action:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}
@@ -1054,23 +877,12 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 // startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener.
 // Returns an error if the connection or LISTEN setup fails.
 func (r *actionRepo) startPostgresListener() error {
-	// Get the underlying SQL DB
-	sqlDB, err := r.db.DB()
-	if err != nil {
-		return fmt.Errorf("get SQL DB: %w", err)
+	// Extract DSN directly from gorm's postgres dialector
+	dialector, ok := r.db.Dialector.(*postgres.Dialector)
+	if !ok {
+		return fmt.Errorf("expected postgres dialector, got %T", r.db.Dialector)
 	}
-
-	// Get the connection string
-	row := sqlDB.QueryRow("SELECT current_database()")
-	var dbName string
-	if err := row.Scan(&dbName); err != nil {
-		return fmt.Errorf("get database name: %w", err)
-	}
-
-	// Build connection string from the database config
-	pgCfg := r.pgConfig
-	pgCfg.DbName = dbName
-	connStr := database.GetPostgresDsn(context.Background(), pgCfg)
+	connStr := dialector.Config.DSN
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
@@ -1146,10 +958,6 @@ func (r *actionRepo) processNotifications() {
 // notifyRunUpdate sends a notification about a run update via the
 // dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
-	if !r.isPostgres {
-		return
-	}
-
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 
 	select {
@@ -1299,10 +1107,6 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 // notifyActionUpdate sends a notification about an action update via the
 // dedicated notify channel, avoiding GORM connection pool contention.
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
-	if !r.isPostgres {
-		return
-	}
-
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 

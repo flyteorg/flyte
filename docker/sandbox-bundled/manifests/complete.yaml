@@ -496,8 +496,12 @@ data:
             stackdriver-enabled: false
   002-database.yaml: |
     database:
-      sqlite:
-        file: "/var/lib/flyte/flyte.db"
+      postgres:
+        username: postgres
+        host: flyte-sandbox-postgresql
+        port: 5432
+        dbname: flyte
+        options: "sslmode=disable"
   003-storage.yaml: |
     storage:
       type: stow
@@ -857,7 +861,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 9e7747a143204b8a4db43d430408bd50a0a6238dfb085fd00d9c5fd40cc8241f
+        checksum/configuration: 81ae69b3a9ef93e793e7ee11db1e215b1ab6d873c60f9c8bf7895af85a3b2a04
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
