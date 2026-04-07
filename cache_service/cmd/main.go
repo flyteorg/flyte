@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	cacheserviceconfig "github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -24,7 +25,7 @@ func main() {
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
 
-			db, err := app.InitDB(ctx, database.GetConfig())
+			db, err := database.GetDB(ctx, database.GetConfig(), logger.GetConfig())
 			if err != nil {
 				return fmt.Errorf("failed to initialize database: %w", err)
 			}

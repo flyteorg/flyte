@@ -23,6 +23,9 @@ var defaultConfig = &Config{
 		{ID: "production", Name: "Production"},
 		{ID: "staging", Name: "Staging"},
 	},
+	Apps: AppsConfig{
+		InternalAppServiceURL: "http://localhost:8091",
+	},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -50,6 +53,9 @@ type Config struct {
 
 	// Domains are injected into project responses (not stored per project row).
 	Domains []DomainConfig `json:"domains"`
+
+	// Apps holds configuration for the App service.
+	Apps AppsConfig `json:"apps"`
 }
 
 // ServerConfig holds HTTP server configuration
@@ -62,6 +68,18 @@ type ServerConfig struct {
 type DomainConfig struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// AppsConfig holds configuration for the App service in the runs (control plane).
+type AppsConfig struct {
+	// PublicURLPattern is a Go template for generating public ingress URLs.
+	// Available variables: {{.Name}}, {{.Project}}, {{.Domain}}
+	// Example: "https://{{.Name}}-{{.Project}}.apps.flyte.example.com"
+	PublicURLPattern string `json:"publicUrlPattern" pflag:",URL pattern for app ingress"`
+
+	// InternalAppServiceURL is the base URL of the InternalAppService (actions data plane).
+	// In unified mode this is overridden by sc.BaseURL.
+	InternalAppServiceURL string `json:"internalAppServiceUrl" pflag:",URL of the internal app service"`
 }
 
 // GetConfig returns the parsed runs configuration
