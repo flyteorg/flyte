@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/events"
 	eventsconfig "github.com/flyteorg/flyte/v2/events/config"
 )
