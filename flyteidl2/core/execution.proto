@@ -78,6 +78,16 @@ message ExecutionError {
   google.protobuf.Timestamp timestamp = 5;
   // Worker that generated the error
   string worker = 6;
+
+  // Defines the retry behavior for this error.
+  // This is supposed to mirror the Kind enum in ContainerError
+  enum RetryBehavior {
+    NON_RETRYABLE = 0;
+    RETRYABLE = 1;
+  }
+
+  // Retry behavior for this error. Defaults to NON_RETRYABLE if not specified.
+  RetryBehavior retry_behavior = 7;
 }
 
 // Log information for the task that is specific to a log sink
