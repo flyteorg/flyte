@@ -60,14 +60,18 @@ func (s *ScheduleSyncer) sync(ctx context.Context) {
 	s.scheduler.UpdateSchedules(ctx, triggers)
 }
 
-// listActiveScheduleTriggers returns all non-deleted, active triggers with
-// automation_type = TYPE_SCHEDULE.
 func (s *ScheduleSyncer) listActiveScheduleTriggers(ctx context.Context) ([]*models.Trigger, error) {
+	return ListActiveScheduleTriggers(ctx, s.triggerRepo)
+}
+
+// ListActiveScheduleTriggers returns all non-deleted, active triggers with
+// automation_type = TYPE_SCHEDULE.
+func ListActiveScheduleTriggers(ctx context.Context, repo interfaces.TriggerRepo) ([]*models.Trigger, error) {
 	activeFilter := impl.NewEqualFilter("active", true)
 	scheduleFilter := impl.NewEqualFilter("automation_type", "TYPE_SCHEDULE")
 	filter := activeFilter.And(scheduleFilter)
 
-	return s.triggerRepo.ListTriggers(ctx, interfaces.ListResourceInput{
+	return repo.ListTriggers(ctx, interfaces.ListResourceInput{
 		Limit:  10000, // fetch all; cron jobs are cheap in-memory
 		Filter: filter,
 	})

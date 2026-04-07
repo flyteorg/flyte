@@ -36,7 +36,7 @@ func Start(
 
 		// Bootstrap: load all active triggers and catch up missed runs before
 		// starting the cron scheduler's steady-state loop.
-		triggers, err := triggerRepo.ListTriggers(ctx, interfaces.ListResourceInput{Limit: 10000})
+		triggers, err := core.ListActiveScheduleTriggers(ctx, triggerRepo)
 		if err != nil {
 			return err
 		}
