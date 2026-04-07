@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+message ProjectIdentifier {
+  string organization = 1 [(buf.validate.field).string.min_len = 1];
+  string domain = 2 [(buf.validate.field).string.min_len = 1];
+  string name = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message ClusterIdentifier {
+  string organization = 1;
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message ClusterPoolIdentifier {
+  string organization = 1;
+  string name = 2;
+}
+
+message ClusterConfigIdentifier {
+  string organization = 1 [(buf.validate.field).string.min_len = 1];
+  string id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message ClusterNodepoolIdentifier {
+  string organization = 1;
+  string cluster_name = 2 [(buf.validate.field).string.min_len = 1];
+  string name = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message UserIdentifier {
+  string subject = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message ApplicationIdentifier {
+  string subject = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message RoleIdentifier {
+  string organization = 1;
+
+  // Unique name for this role within the organization
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message OrgIdentifier {
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+    pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+  }];
+}
+
+message ManagedClusterIdentifier {
+  reserved 1;
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+  OrgIdentifier org = 3 [(buf.validate.field).required = true];
+}
+
+message PolicyIdentifier {
+  string organization = 1;
+
+  // Unique name for this policy within the organization
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// Unique identifier of a run.
+message RunIdentifier {
+  // Org this run belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this run belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this run belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Name of the run. Must be unique across all runs in this org, project, and domain pairing.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 30
+  ];
+}
+
+// Unique identifier of an action.
+message ActionIdentifier {
+  // Identifier for the run.
+  RunIdentifier run = 1 [(buf.validate.field).required = true];
+
+  // Name of the action. Must be unique within the run.
+  string name = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 30
+  ];
+}
+
+// Unique identifier of a single action attempt
+message ActionAttemptIdentifier {
+  ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Identifies trigger within an org, project and domain
+message TriggerName {
+  // Org this trigger belongs to.
+  string org = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Project this trigger belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Domain this trigger belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+
+  // Unique name of the trigger.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  string task_name = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// Identifies a trigger revision within an org, project and domain
+message TriggerIdentifier {
+  TriggerName name = 1 [(buf.validate.field).required = true];
+
+  // Revision of the trigger.
+  uint64 revision = 2 [(buf.validate.field).uint64.gt = 0];
+}

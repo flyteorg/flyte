@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/authorization.proto";
+import "flyteidl2/common/identifier.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// A policy is a collection of roles bound to a resource.
+message Policy {
+  PolicyIdentifier id = 1 [(buf.validate.field).required = true];
+
+  repeated PolicyBinding bindings = 2;
+
+  // Optional: human readable description
+  string description = 3;
+}
+
+// A policy binding represents a role (a set of actions) defined on a resource.
+message PolicyBinding {
+  // The role designates the permitted set of actions which can be applied to the resource.
+  RoleIdentifier role_id = 1 [(buf.validate.field).required = true];
+
+  common.Resource resource = 2 [(buf.validate.field).required = true];
+}

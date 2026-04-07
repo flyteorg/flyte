@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "flyteidl2/app/app_payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+// AppService defines the service for managing apps.
+service AppService {
+  // Create creates a new app.
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+
+  // Get retrieves an app by its identifier.
+  rpc Get(GetRequest) returns (GetResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Update updates an existing app.
+  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+
+  // UpdateStatus updates the status of an existing app.
+  rpc UpdateStatus(UpdateStatusRequest) returns (UpdateStatusResponse) {}
+
+  // Delete deletes an app by its identifier.
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+
+  // List lists all apps with optional filtering.
+  rpc List(ListRequest) returns (ListResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Watch watches for app events.
+  rpc Watch(WatchRequest) returns (stream WatchResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lease leases apps.
+  rpc Lease(LeaseRequest) returns (stream LeaseResponse) {}
+}

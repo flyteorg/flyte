@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
+import "flyteidl2/app/replica_definition.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+message TailLogsRequest {
+  oneof target {
+    option (buf.validate.oneof).required = true;
+
+    // Identifier of the application to get logs for.
+    Identifier app_id = 1;
+
+    // Identifier of the replica to get logs for.
+    ReplicaIdentifier replica_id = 2;
+  }
+}
+
+message ReplicaIdentifierList {
+  repeated ReplicaIdentifier replicas = 1;
+}
+
+message LogLines {
+  repeated string lines = 1 [deprecated = true];
+
+  ReplicaIdentifier replica_id = 2 [(buf.validate.field).required = true];
+
+  repeated flyteidl2.logs.dataplane.LogLine structured_lines = 3;
+}
+
+message LogLinesBatch {
+  repeated LogLines logs = 1;
+}
+
+message TailLogsResponse {
+  oneof resp {
+    option (buf.validate.oneof).required = true;
+
+    // Replicas lists the replicas that the logs are being tailed for. This is expected to be the first
+    // message to be sent in the stream but also can be sent at any later time to update the list of
+    // replicas being tailed.
+    ReplicaIdentifierList replicas = 1;
+
+    // The latest log lines for the application.
+    // Deprecated, use batches instead.
+    flyteidl2.logs.dataplane.LogLines log_lines = 2 [deprecated = true];
+
+    // The latest log lines for the application.
+    LogLinesBatch batches = 3;
+  }
+}

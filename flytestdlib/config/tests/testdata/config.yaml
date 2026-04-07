@@ -1,0 +1,13 @@
+my-component:
+  str: Hello World
+other-component:
+  duration-value: 20s
+  int-val: 4
+  string-value: Hey there!
+  strings:
+    - hello
+    - world
+    - '!'
+  url-value: http://something.com
+  myByteArray: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2
+  namedType: B

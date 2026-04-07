@@ -1,0 +1,53 @@
+# Sample plugins config
+plugins:
+  # All k8s plugins default configuration
+  k8s:
+    scheduler-name: flyte-scheduler
+    default-cpus: 1024m
+    default-memory: 1024Mi
+    default-annotations:
+      - annotationKey1: annotationValue1
+      - annotationKey2: annotationValue2
+    default-labels:
+      - label1: labelValue1
+      - label2: labelValue2
+    resource-tolerations:
+      nvidia.com/gpu:
+        key: flyte/gpu
+        value: dedicated
+        operator: Equal
+        effect: NoSchedule
+      storage:
+        - key: storage
+          value: special
+          operator: Equal
+          effect: PreferNoSchedule
+    interruptible-node-selector:
+      - x/interruptible: "true"
+    interruptible-tolerations:
+      - key: x/flyte
+        value: interruptible
+        operator: Equal
+        effect: NoSchedule
+    interruptible-node-selector-requirement:
+      key:  x/interruptible
+      operator: In
+      values:
+        - "true"
+    non-interruptible-node-selector-requirement:
+      key:  x/interruptible
+      operator: DoesNotExist
+    default-env-vars:
+      - AWS_METADATA_SERVICE_TIMEOUT: 5
+      - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
+      - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    default-node-selector:
+      user: 'default'
+    default-pod-security-context:
+      runAsUser: 1000
+      runAsGroup: 3000
+      fsGroup: 2000
+    default-security-context:
+      allowPrivilegeEscalation: false

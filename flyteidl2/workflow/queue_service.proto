@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/workflow/run_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// provides an interface for managing execution of runs over a collection of workers.
+service QueueService {
+  // queue a new action for execution.
+  rpc EnqueueAction(EnqueueActionRequest) returns (EnqueueActionResponse) {}
+
+  // abort a queued run.
+  rpc AbortQueuedRun(AbortQueuedRunRequest) returns (AbortQueuedRunResponse) {}
+
+  // AbortAction aborts a single action that was previously queued or is currently being processed by a worker.
+  rpc AbortQueuedAction(AbortQueuedActionRequest) returns (AbortQueuedActionResponse) {}
+}
+
+// request message for queuing an action.
+message EnqueueActionRequest {
+  // the unique identifier for the action.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
+  // project, domain) will be the same as the action_id defined above.
+  optional string parent_action_name = 2;
+
+  // Optional run spec passed in by the root action to be utilized by all downstream actions in the run.
+  task.RunSpec run_spec = 3;
+
+  // the path to the input data for this action.
+  string input_uri = 6 [(buf.validate.field).string.min_len = 1];
+
+  // the run base path this action should write its output to.
+  string run_output_base = 7 [(buf.validate.field).string.min_len = 1];
+
+  // group this action belongs to, if applicable.
+  string group = 8;
+
+  // subject that created the run, if known.
+  string subject = 9;
+
+  oneof spec {
+    option (buf.validate.oneof).required = true;
+    TaskAction task = 10;
+    TraceAction trace = 11;
+    ConditionAction condition = 12;
+  }
+}
+
+// response message for queuing an action.
+message EnqueueActionResponse {}
+
+// request message for aborting a run.
+message AbortQueuedRunRequest {
+  // the unique identifier for the run to be aborted.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+
+  // Reason for aborting the run, if applicable.
+  optional string reason = 2;
+}
+
+// response message for aborting a run.
+message AbortQueuedRunResponse {}
+
+message AbortQueuedActionRequest {
+  // ActionId is the unique identifier for the action to be aborted
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Reason for aborting the action, if applicable.
+  optional string reason = 2;
+}
+
+message AbortQueuedActionResponse {}

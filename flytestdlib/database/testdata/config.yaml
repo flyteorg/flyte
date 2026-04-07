@@ -1,0 +1,14 @@
+port: 5432
+username: postgres
+host: postgres
+dbname: postgres
+options: "sslmode=disable"
+password: "password"
+passwordPath: "/etc/secret"
+debug: true
+postgres:
+  port: 5432
+  username: postgres
+  host: postgres
+  dbname: postgres
+  options: "sslmode=disable"

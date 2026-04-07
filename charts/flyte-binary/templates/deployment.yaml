@@ -1,0 +1,222 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-binary.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.deployment.labels }}
+    {{- tpl ( .Values.deployment.labels | toYaml ) . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.deployment.annotations }}
+    {{- tpl ( .Values.deployment.annotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {{- include "flyte-binary.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
+        {{- if .Values.commonLabels }}
+        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.deployment.podLabels }}
+        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
+        checksum/configuration: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/configuration-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.commonAnnotations }}
+        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.deployment.podAnnotations }}
+        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.deployment.extraPodSpec }}
+      {{- tpl ( .Values.deployment.extraPodSpec | toYaml ) . | nindent 6 }}
+      {{- end }}
+      {{- if .Values.deployment.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.deployment.podSecurityContext "enabled" | toYaml | nindent 12 }}
+      {{- end }}
+      serviceAccountName: {{ include "flyte-binary.serviceAccountName" . }}
+      {{- if or .Values.deployment.initContainers (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
+      initContainers:
+        {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
+        {{- if .Values.deployment.preInitContainers }}
+        {{- tpl ( .Values.deployment.preInitContainers | toYaml ) . | nindent 8 }}
+        {{- end }}
+        - name: wait-for-db
+          {{- with .Values.deployment.waitForDB.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          command:
+            {{- if .Values.deployment.waitForDB.command }}
+            {{- tpl ( .Values.deployment.waitForDB.command | toYaml ) . | nindent 12 }}
+            {{- else }}
+            - sh
+            - -ec
+            {{- end }}
+          args:
+            {{- if .Values.deployment.waitForDB.args }}
+            {{- tpl ( .Values.deployment.waitForDB.args | toYaml ) . | nindent 12 }}
+            {{- else }}
+            {{- with .Values.configuration.database }}
+            - |
+              until pg_isready \
+                -h {{ tpl .host $ }} \
+                -p {{ .port }} \
+                -U {{ .username }}
+              do
+                echo waiting for database
+                sleep 0.1
+              done
+            {{- end }}
+            {{- end }}
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.waitForDB.securityContext }}
+          securityContext: {{- toYaml .Values.deployment.waitForDB.securityContext | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- if .Values.deployment.initContainers }}
+        {{- tpl ( .Values.deployment.initContainers | toYaml ) . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: flyte
+          {{- with .Values.deployment.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          {{- if .Values.deployment.command }}
+          command: {{- tpl ( .Values.deployment.command | toYaml ) . | nindent 12 }}
+          {{- end }}
+          args:
+            {{- if .Values.deployment.args }}
+            {{- tpl ( .Values.deployment.args | toYaml ) . | nindent 12 }}
+            {{- else }}
+            - --config
+            - /etc/flyte/config.d/*.yaml
+            {{- end }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- if .Values.deployment.extraEnvVars }}
+            {{- tpl ( .Values.deployment.extraEnvVars | toYaml ) . | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.deployment.extraEnvVarsConfigMap .Values.deployment.extraEnvVarsSecret }}
+          envFrom:
+            {{- if .Values.deployment.extraEnvVarsConfigMap }}
+            - configMapRef:
+                name: {{ .Values.deployment.extraEnvVarsConfigMap }}
+            {{- end }}
+            {{- if .Values.deployment.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.deployment.extraEnvVarsSecret }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8090
+            - name: webhook
+              containerPort: 9443
+          {{- if .Values.deployment.startupProbe }}
+          startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+          {{- if .Values.deployment.livenessProbe }}
+          {{- tpl ( .Values.deployment.livenessProbe | toYaml ) . | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          {{- end }}
+          readinessProbe:
+          {{- if .Values.deployment.readinessProbe }}
+          {{- tpl ( .Values.deployment.readinessProbe | toYaml ) . | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          {{- end }}
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.lifecycleHooks }}
+          lifecycle: {{- tpl ( .Values.deployment.lifecycleHooks | toYaml ) . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- if .Values.configuration.auth.enabled }}
+            - name: auth
+              mountPath: /etc/secrets
+            {{- end }}
+            - name: config
+              mountPath: /etc/flyte/config.d
+            - name: webhook-certs
+              mountPath: /var/run/flyte/certs
+              readOnly: false
+            {{- if .Values.deployment.extraVolumeMounts }}
+            {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.deployment.securityContext }}
+          securityContext: {{- toYaml .Values.deployment.securityContext | nindent 12 }}
+          {{- end }}
+        {{- if .Values.deployment.sidecars }}
+        {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: config
+          {{- if (include "flyte-binary.configuration.externalConfiguration" .) }}
+          projected:
+            sources:
+            {{- if .Values.configuration.externalConfigMap }}
+            - configMap:
+                name: {{ tpl .Values.configuration.externalConfigMap . }}
+            {{- end }}
+            {{- if .Values.configuration.externalSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.externalSecretRef . }}
+            {{- end }}
+          {{- else }}
+          projected:
+            sources:
+            - configMap:
+                name: {{ include "flyte-binary.configuration.configMapName" . }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.configSecretName" . }}
+            {{- if .Values.configuration.inlineConfigMap }}
+            - configMap:
+                name: {{ tpl .Values.configuration.inlineConfigMap . }}
+            {{- end }}
+            {{- if .Values.configuration.inlineSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.inlineSecretRef . }}
+            {{- end }}
+          {{- end }}
+        - name: webhook-certs
+          emptyDir: {}
+        {{- if .Values.deployment.extraVolumes }}
+        {{- tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
+        {{- end }}

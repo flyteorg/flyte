@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package flyteidl2.app;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
+
+message ReplicaIdentifier {
+  // ID of the app.
+  Identifier app_id = 1 [(buf.validate.field).required = true];
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message ReplicaMeta {
+  // ID of the replica.
+  ReplicaIdentifier id = 1 [(buf.validate.field).required = true];
+
+  // Revision of the replica object.
+  uint64 revision = 2;
+}
+
+message ReplicaList {
+  // List of replicas.
+  repeated Replica items = 1;
+}
+
+// Represents a replica of an app with its specification and status.
+message Replica {
+  // Metadata of the app.
+  ReplicaMeta metadata = 1 [(buf.validate.field).required = true];
+  // Status of the app.
+  ReplicaStatus status = 2;
+}
+
+// Represents the status of the replica.
+message ReplicaStatus {
+  // Current deployment status of the replica.
+  string deployment_status = 1;
+
+  string reason = 2;
+}

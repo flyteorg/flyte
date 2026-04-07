@@ -1,0 +1,400 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+            "flyte.flyte.net/deployment": "production",
+            "iam.amazonaws.com/role": "role",
+            "flyte.net/iamwait-inject": "injected"
+        },
+        "creationTimestamp": "2020-04-06T21:15:03Z",
+        "labels": {
+            "app": "flyte-user-service",
+            "environment": "staging",
+            "execution-id": "fdf98e4ed2b524dc3bf7",
+            "interruptible": "false",
+            "flyte.net/iamwait-gojson-tag": "8a3b1cb9dbb132b1d973b7a8ce9da8220429e8c0",
+            "node-id": "get-flyte-id-task",
+            "task-name": "common-library-utils-get-flyte-id",
+            "version": "flyte-version",
+            "workflow-name": "compositionworkflow"
+        },
+        "name": "fdf98e4ed2b524dc3bf7-get-flyte-id-task-0",
+        "namespace": "project",
+        "ownerReferences": [
+            {
+                "apiVersion": "flyte.flyte.com/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "flyteworkflow",
+                "name": "fdf98e4ed2b524dc3bf7",
+                "uid": "ae02751f-784b-11ea-96a3-0e75025c25bf"
+            }
+        ],
+        "resourceVersion": "185246404",
+        "selfLink": "/api/v1/namespaces/project/pods/fdf98e4ed2b524dc3bf7-get-flyte-id-task-0",
+        "uid": "ae7a8c54-784b-11ea-92a3-1298c81fec7f"
+    },
+    "spec": {
+        "containers": [
+            {
+                "args": [
+                    "service_venv",
+                    "pyflyte-execute",
+                    "--task-module",
+                    "common.library.utils",
+                    "--task-name",
+                    "get_flyte_id",
+                    "--inputs",
+                    "s3://flyte/metadata/propeller/production/project-fdf98e4ed2b524dc3bf7/get-flyte-id-task/data/inputs.pb",
+                    "--output-prefix",
+                    "s3://flyte/metadata/propeller/production/project-fdf98e4ed2b524dc3bf7/get-flyte-id-task/data/0"
+                ],
+                "env": [
+                    {
+                        "name": "ENABLE_FLYTE2",
+                        "value": "1"
+                    },
+                    {
+                        "name": "FLYTE_AWS_S3_SHARD_FORMATTER",
+                        "value": "s3://project/{}/development"
+                    },
+                    {
+                        "name": "FLYTE_AWS_S3_SHARD_STRING_LENGTH",
+                        "value": "2"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_DOMAIN",
+                        "value": "development"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_PROJECT",
+                        "value": "project"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_VERSION",
+                        "value": "3c6869db7101c619908f2b568fa851a9df0016c2"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_IMAGE",
+                        "value": "image"
+                    },
+                    {
+                        "name": "FLYTE_PLATFORM_URL",
+                        "value": "flyte.flyte.net"
+                    },
+                    {
+                        "name": "FLYTE_SDK_PYTHON_VENV",
+                        "value": "service_venv"
+                    },
+                    {
+                        "name": "FLYTE_SDK_EXECUTION_ENGINE",
+                        "value": "flyte"
+                    },
+                    {
+                        "name": "FLYTE_SDK_TYPE_ENGINES",
+                        "value": "flyte_modelbuilder.api.internal.flyte2_shims.type_engine.Flyte1to2TypeEngine"
+                    },
+                    {
+                        "name": "FLYTE_SDK_LOCAL_SANDBOX",
+                        "value": "/tmp/modelbuilder/"
+                    },
+                    {
+                        "name": "FLYTE_SDK_WORKFLOW_PACKAGES",
+                        "value": "common.workflows,fare.workflows,multimode.workflows,multimode.workflows.disco,pisco.workflows,pisco.workflows.anchor,pisco.workflows.csv_report,pisco.workflows.elasticity,primetime.workflows,tolls.workflows"
+                    },
+                    {
+                        "name": "FLYTE_SDK_NAME_FORMAT",
+                        "value": "{name}"
+                    },
+                    {
+                        "name": "FLYTE_SDK_TASK_NAME_FORMAT",
+                        "value": "{module}.{name}"
+                    },
+                    {
+                        "name": "PYTHONPATH",
+                        "value": ":/srv/service/current:/srv/service/current:/srv/service/current"
+                    },
+                    {
+                        "name": "SERVICE_NAME",
+                        "value": "project"
+                    },
+                    {
+                        "name": "SERVICE_REPO_NAME",
+                        "value": "project"
+                    },
+                    {
+                        "name": "SERVICE_INSTANCE",
+                        "value": "development"
+                    },
+                    {
+                        "name": "APPLICATION_ENV",
+                        "value": "development"
+                    },
+                    {
+                        "name": "IMAGE_VERSION",
+                        "value": "3c6869db7101c619908f2b568fa851a9df0016c2"
+                    },
+                    {
+                        "name": "FLYTE_SPARK_EXECUTION_ENGINE",
+                        "value": "kubernetes"
+                    },
+                    {
+                        "name": "FLYTE_PLATFORM",
+                        "value": "production"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+                        "value": "flytekit.config"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_NAME"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_EXECUTION_WORKFLOW",
+                        "value": "project:development:CompositionWorkflow"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_EXECUTION_ID",
+                        "value": "fdf98e4ed2b524dc3bf7"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_EXECUTION_PROJECT",
+                        "value": "project"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_EXECUTION_DOMAIN",
+                        "value": "development"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_TASK_PROJECT",
+                        "value": "project"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_TASK_DOMAIN",
+                        "value": "development"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_TASK_NAME",
+                        "value": "common.library.utils.get_flyte_id"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_TASK_VERSION",
+                        "value": "3c6869db7101c619908f2b568fa851a9df0016c2"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_PROJECT",
+                        "value": "project"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_DOMAIN",
+                        "value": "development"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_NAME",
+                        "value": "common.library.utils.get_flyte_id"
+                    },
+                    {
+                        "name": "FLYTE_INTERNAL_VERSION",
+                        "value": "3c6869db7101c619908f2b568fa851a9df0016c2"
+                    },
+                    {
+                        "name": "AWS_RETRY_MODE",
+                        "value": "standard"
+                    },
+                    {
+                        "name": "AWS_METADATA_SERVICE_TIMEOUT",
+                        "value": "5"
+                    },
+                    {
+                        "name": "AWS_METADATA_SERVICE_NUM_ATTEMPTS",
+                        "value": "20"
+                    },
+                    {
+                        "name": "EMIT_CONTAINER_METRICS",
+                        "value": "true"
+                    },
+                    {
+                        "name": "FLYTE_STATSD_HOST",
+                        "value": "stats.statsagent"
+                    },
+                    {
+                        "name": "FLYTE_CREDENTIALS_AUTH_MODE",
+                        "value": "basic"
+                    },
+                    {
+                        "name": "FLYTE_CREDENTIALS_AUTHORIZATION_METADATA_KEY",
+                        "value": "flyte-authorization"
+                    },
+                    {
+                        "name": "FLYTE_CREDENTIALS_SCOPE",
+                        "value": "svc"
+                    }
+                ],
+                "image": "image",
+                "imagePullPolicy": "IfNotPresent",
+                "lifecycle": {
+                    "preStop": {
+                        "exec": {
+                            "command": [
+                                "k8s-shutdown"
+                            ]
+                        }
+                    }
+                },
+                "name": "fdf98e4ed2b524dc3bf7-get-flyte-id-task-0",
+                "resources": {
+                    "limits": {
+                        "cpu": "2",
+                        "memory": "2Gi"
+                    },
+                    "requests": {
+                        "cpu": "2",
+                        "memory": "2Gi"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "name": "default-token-rr2ws",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "imagePullSecrets": [
+        ],
+        "initContainers": [
+            {
+                "command": [
+                    "iamwait",
+                    "-timeout=120s"
+                ],
+                "image": "iamwait:8a3b1cb9dbb132b1d973b7a8ce9da8220429e8c0",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "iamwait-gojson",
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                    },
+                    "requests": {
+                        "cpu": "20m",
+                        "memory": "10Mi"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File"
+            }
+        ],
+        "nodeName": "ip-10-44-170-4.ec2.internal",
+        "priority": 0,
+        "restartPolicy": "Never",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 64,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "default-token-rr2ws",
+                "secret": {
+                    "defaultMode": 420,
+                    "secretName": "default-token-rr2ws"
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2020-04-06T21:15:07Z",
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2020-04-06T21:15:03Z",
+                "message": "containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]",
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2020-04-06T21:15:03Z",
+                "message": "containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]",
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2020-04-06T21:15:03Z",
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "image": "image",
+                "imageID": "",
+                "lastState": {},
+                "name": "fdf98e4ed2b524dc3bf7-get-flyte-id-task-0",
+                "ready": false,
+                "restartCount": 0,
+                "state": {
+                    "waiting": {
+                        "message": "Back-off pulling image \"image\"",
+                        "reason": "ImagePullBackOff"
+                    }
+                }
+            }
+        ],
+        "hostIP": "10.44.170.4",
+        "initContainerStatuses": [
+            {
+                "containerID": "x",
+                "image": "image",
+                "imageID": "image1",
+                "lastState": {},
+                "name": "iamwait-gojson",
+                "ready": true,
+                "restartCount": 0,
+                "state": {
+                    "terminated": {
+                        "containerID": "x",
+                        "exitCode": 0,
+                        "finishedAt": "2020-04-06T21:15:06Z",
+                        "reason": "Completed",
+                        "startedAt": "2020-04-06T21:15:06Z"
+                    }
+                }
+            }
+        ],
+        "phase": "Pending",
+        "podIP": "10.44.137.175",
+        "qosClass": "Guaranteed",
+        "startTime": "2020-04-06T21:15:03Z"
+    }
+}

@@ -1,2 +1,0 @@
-buf
-flyteidl2

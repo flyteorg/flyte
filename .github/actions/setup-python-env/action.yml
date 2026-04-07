@@ -1,0 +1,47 @@
+name: "Setup Python Environment"
+description: "Set up Python environment for the given Python version"
+
+inputs:
+  python-version:
+    description: "Python version to use"
+    required: true
+    default: "3.12"
+  uv-version:
+    description: "uv version to use"
+    required: true
+    default: "0.8.4"
+  working-directory:
+    description: "Default working directory for all steps"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      id: setup-uv
+      with:
+        version: ${{ inputs.uv-version }}
+        enable-cache: 'true'
+        cache-suffix: ${{ inputs.python-version }}
+        cache-dependency-glob: |
+          pyproject.toml
+          uv.lock
+        working-directory: ${{ inputs.working-directory }}
+
+    - name: Install Python dependencies
+      if: steps.setup-uv.outputs.cache-hit == 'false'
+      working-directory: ${{ inputs.working-directory }}
+      run: uv sync --all-groups --frozen
+      shell: bash
+
+    - name: List Python dependencies
+      if: steps.setup-uv.outputs.cache-hit == 'true'
+      working-directory: ${{ inputs.working-directory }}
+      run: uv pip list
+      shell: bash

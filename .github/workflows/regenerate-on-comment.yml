@@ -1,0 +1,74 @@
+name: Regenerate and Push
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  regenerate:
+    if: github.event.issue.pull_request && (contains(github.event.comment.body, '/regen') || contains(github.event.comment.body, ':repeat:'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            core.setOutput('number', pr.data.number);
+            core.setOutput('head_ref', pr.data.head.ref);
+            core.setOutput('head_sha', pr.data.head.sha);
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Determine Docker image
+        id: docker-image
+        run: |
+          # Check if gen.Dockerfile was modified
+          git fetch origin ${{ github.event.repository.default_branch }}
+          if git diff --name-only origin/${{ github.event.repository.default_branch }}...HEAD | grep -E '^(gen\.Dockerfile|\.github/workflows/build-ci-image\.yml)$'; then
+            echo "image=ghcr.io/flyteorg/flyte/ci:pr-${{ steps.pr.outputs.number }}" >> $GITHUB_OUTPUT
+            echo "📦 Using PR-specific image"
+          else
+            echo "image=ghcr.io/flyteorg/flyte/ci:v2" >> $GITHUB_OUTPUT
+            echo "📦 Using default v2 image"
+          fi
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        run: docker pull ${{ steps.docker-image.outputs.image }}
+
+      - name: Run generate in container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
+            -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv \
+            ${{ steps.docker-image.outputs.image }} \
+            bash -c "git config --global --add safe.directory /workspace && cd gen/python && uv sync --all-groups --frozen && cd ../.. && make gen-local"
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: regenerate files via workflow"
+            git push origin HEAD:${{ steps.pr.outputs.head_ref }}
+          fi
+

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "flyteidl"
+version = "0.1.0"
+description = "Rust protos for Flyte"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Rust",
+]
+
+[tool.maturin]
+python-source = "src"
+module-name = "flyte_mod"

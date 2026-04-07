@@ -1,0 +1,17 @@
+version: v2
+managed:
+  enabled: true
+  # Use managed mode: https://buf.build/docs/generate/managed-mode/#managed-mode
+  disable:
+    - module: buf.build/bufbuild/protovalidate
+plugins:
+  - remote: buf.build/community/neoeinstein-prost:v0.4.0
+    out: gen/rust/src
+    opt:
+      - file_descriptor_set
+      - type_attribute=.=#[pyo3::pyclass(dict\, get_all\, set_all)]
+      - compile_well_known_types
+  - remote: buf.build/community/neoeinstein-tonic:v0.4.1
+    out: gen/rust/src
+    opt:
+      - compile_well_known_types

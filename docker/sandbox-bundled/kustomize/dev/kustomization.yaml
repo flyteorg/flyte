@@ -1,0 +1,22 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-sandbox
+  releaseName: flyte-sandbox
+  namespace: flyte
+  valuesInline:
+    flyte-binary:
+      enabled: false
+    # Disabled: PostgreSQL runs as an embedded process on the host via
+    # the fergusstrange/embedded-postgres library instead of a pod.
+    postgresql:
+      enabled: false
+    sandbox:
+      dev: true
+namespace: flyte
+resources:
+- ../namespace.yaml
+- ../../../../charts/flyte-binary/templates/crds/flyte.org_taskactions.yaml
+- ../embedded-postgres-service.yaml
+patches:
+- path: ../minio-patch.yaml

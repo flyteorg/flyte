@@ -42,16 +42,15 @@ Flyte v2 uses a modular service architecture:
 │  │ TriggerSvc           │    │      │  │ ├── Enqueue (TaskAction) │    │
 │  │                      │    │      │  │ ├── Watch  (TaskAction)  │    │
 │  │ AppService ──connect─┼────┼─────>│  │ ├── Abort  (TaskAction)  │    │
-│  │ (CRUD facade)        │    │      │  │                          │    │
+│  │ (passthrough)        │    │      │  │                          │    │
 │  │                      │    │      │  │ InternalAppService (NEW) │    │
-│  └──────────┬───────────┘    │      │  │ ├── AppRepo (DB: spec)   │    │
-│             │                │      │  │ ├── AppK8sClient (K8s)   │    │
-│             ▼                │      │  │ │   Deploy (KService)    │    │
-│      ┌────────────┐         │      │  │ │   GetStatus (KService) │    │
-│      │ PostgreSQL  │         │      │  │ │   Stop (del KService)  │    │
-│      │ (apps table │         │      │  │ └── Replicas (Pods)      │    │
-│      │  spec only) │         │      │  └────────────┬─────────────┘    │
-│      └────────────┘         │      │               │                  │
+│  └──────────────────────┘    │      │  │ ├── AppK8sClient (K8s)   │    │
+│                              │      │  │ │   Deploy (KService)    │    │
+│  No DB for apps              │      │  │ │   GetStatus (KService) │    │
+│                              │      │  │ │   Stop (del KService)  │    │
+│                              │      │  │ └── Replicas (Pods)      │    │
+│                              │      │  └────────────┬─────────────┘    │
+│                              │      │               │                  │
 │                              │      │               ▼                  │
 │                              │      │  ┌──────────────────────────┐   │
 │                              │      │  │ Kubernetes                │   │
@@ -66,16 +65,14 @@ Flyte v2 uses a modular service architecture:
 ```
 
 **Key design simplification:**
-- **DB stores spec only** — no status column. The KService CRD is the single source of truth for app status.
-- **Control plane / data plane split** — AppService (control plane) forwards requests to InternalAppService (data plane) via connect. InternalAppService has direct K8s access to read KService CRD status.
+- **No database for apps** — the KService CRD is the single source of truth for both app spec and status. No `apps` table, no repository layer, no migrations.
+- **Control plane / data plane split** — AppService (control plane) forwards requests directly to InternalAppService (data plane) via connect. InternalAppService has direct K8s access to manage KService CRDs.
 - **No status watcher/sync loop** — when AppService needs app status, it calls InternalAppService, which reads directly from the KService CRD via AppK8sClient.
-- **No delete operation** — apps can only be stopped. Stopping deletes the KService CRD. The spec remains in DB for potential restart.
+- **No delete operation** — apps can only be stopped. Stopping deletes the KService CRD. A subsequent Create can re-deploy the app.
 
 **Key patterns to follow:**
 - **SetupContext**: Services register handlers on `sc.Mux`, background workers via `sc.AddWorker`
 - **buf connect**: gRPC handlers generated from proto definitions
-- **GORM + gormigrate**: Database models with migration framework
-- **Repository pattern**: `interfaces/` → `impl/` → `models/` → `transformers/`
 
 **Current state:** `runs/service/app_service.go` is a stub returning `CodeUnimplemented` for `Create` and empty responses for other RPCs.
 
@@ -105,115 +102,17 @@ Ready=True                → ACTIVE
 Ready=False with error    → FAILED
 ```
 
-> Status is never stored in DB. It is read from the KService CRD on every Get request.
+### 3.2 No Database — KService CRD as Single Source of Truth
 
-### 3.2 Database Model
-
-New file: `runs/repository/models/app.go`
-
-```go
-package models
-
-import (
-    "time"
-)
-
-type App struct {
-    ID uint `gorm:"primaryKey"`
-
-    // App Identifier (unique composite key)
-    Project string `gorm:"not null;uniqueIndex:idx_apps_identifier,priority:1"`
-    Domain  string `gorm:"not null;uniqueIndex:idx_apps_identifier,priority:2"`
-    Name    string `gorm:"not null;uniqueIndex:idx_apps_identifier,priority:3"`
-
-    // Serialized protobuf (flyteidl2.app.Spec)
-    Spec []byte `gorm:"type:bytea;not null"`
-
-    // For optimistic locking and change detection
-    Revision   uint64 `gorm:"not null;default:1"`
-    SpecDigest []byte `gorm:"type:bytea"`
-
-    // Denormalized for ingress lookups
-    PublicHost string `gorm:"uniqueIndex:idx_apps_public_host"`
-
-    // Metadata
-    CreatedBy string
-    CreatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_apps_created"`
-    UpdatedAt time.Time    `gorm:"not null;default:CURRENT_TIMESTAMP"`
-}
-
-func (App) TableName() string { return "apps" }
-```
+There is **no `apps` table** in the database. The KService CRD in Kubernetes is the single source of truth for both app spec and status.
 
 **Design decisions:**
-- **No `Status` column** — status is read from the KService CRD at query time
-- **No `Phase`, `DesiredState`, `CurrentReplicas` columns** — these are all derived from the CRD
-- **No `Org` column** — identifier is project + domain + name
-- Spec stored as serialized protobuf bytes (same pattern as `Action.ActionSpec`)
-- `SpecDigest` enables change detection without deserializing the full spec
-- `Revision` for optimistic concurrency control
-- `PublicHost` unique index for ingress-based lookups
-
-### 3.3 Migration
-
-New migration added to `runs/migrations/migrations.go`:
-
-```go
-{
-    ID: "20260402_apps_init",
-    Migrate: func(tx *gorm.DB) error {
-        return tx.AutoMigrate(&models.App{})
-    },
-}
-```
-
----
-
-## 4. Repository Layer
-
-### 4.1 Interface
-
-New file: `runs/repository/interfaces/app.go`
-
-```go
-package interfaces
-
-import (
-    "context"
-    "github.com/flyteorg/flyte/v2/runs/repository/models"
-)
-
-type AppRepo interface {
-    Create(ctx context.Context, app *models.App) error
-    Get(ctx context.Context, project, domain, name string) (*models.App, error)
-    GetByHost(ctx context.Context, host string) (*models.App, error)
-    Update(ctx context.Context, oldRevision uint64, app *models.App) (*models.App, error)
-    List(ctx context.Context, filters ListFilters, limit int, token string) ([]*models.App, string, error)
-}
-```
-
-### 4.2 Add to Repository interface
-
-```go
-// runs/repository/interfaces/repository.go
-type Repository interface {
-    ActionRepo() ActionRepo
-    TaskRepo() TaskRepo
-    AppRepo() AppRepo  // NEW
-}
-```
-
-### 4.3 Implementation
-
-New file: `runs/repository/impl/app.go`
-
-Key behaviors:
-- **Create**: INSERT with initial revision=1
-- **Update**: `UPDATE ... WHERE revision = ? AND spec_digest = ?` (optimistic lock)
-- **Get**: Lookup by composite key or by `PublicHost`
-- **List**: Filter by project; paginate by `updated_at` cursor
-
-No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
+- **No DB model, no repository layer, no migrations** — all app state lives in the KService CRD
+- **Spec is stored as annotations/labels on the KService** — the app spec (container image, autoscaling config, etc.) is encoded into the KService manifest itself
+- **Status is derived from KService conditions** — no need to persist or sync status
+- **Listing apps** uses K8s label selectors (`flyte.org/app-managed=true`) to find all managed KServices
+- **Identifier lookups** use KService naming convention: `{project}-{domain}-{name}`
+- This eliminates the need for optimistic locking, migrations, and DB-level change detection
 
 ---
 
@@ -228,26 +127,25 @@ No `Delete`, `UpdateStatus`, or `ListByPhase` — these are no longer needed.
 │  RunService                │         │  ActionsService (tasks)        │
 │  TaskService               │         │  ├── ActionsClient (K8s)       │
 │  AppService ───connect────┼────────>│                                │
-│  (CRUD facade)            │         │  InternalAppService (NEW)      │
-│                            │         │  ├── AppRepo (DB: spec)        │
-│  ┌────────────┐           │         │  ├── AppK8sClient (K8s)        │
-│  │ PostgreSQL  │           │         │  │                             │
-│  │ (spec only) │           │         │  │ Create: DB + KService       │
-│  └────────────┘           │         │  │ Update: DB + KService       │
-│                            │         │  │ Get:    DB + KService       │
+│  (passthrough)            │         │  InternalAppService (NEW)      │
+│                            │         │  ├── AppK8sClient (K8s)        │
+│                            │         │  │                             │
+│  No DB for apps            │         │  │ Create: KService            │
+│                            │         │  │ Update: KService            │
+│                            │         │  │ Get:    KService            │
 │                            │         │  │ Stop:   del KService        │
-│                            │         │  │ List:   DB + KServices      │
+│                            │         │  │ List:   KServices           │
 │                            │         │  │                             │
 │                            │         │  └── Kubernetes (KService CRs) │
 └───────────────────────────┘         └───────────────────────────────┘
 ```
 
-**Key simplification vs. previous design:**
+**Key simplification:**
+- **No database operations for apps** — all state lives in KService CRDs
 - No status watcher syncing CRD status back to DB
 - No `UpdateStatus` RPC or background reconciliation loop
 - No `AppNotifier` pub/sub — status is always read fresh from the CRD
-- DB is only written on Create and Update (spec changes)
-- **Control plane / data plane split** — AppService is a thin facade in the control plane; InternalAppService in the data plane has K8s access
+- **Control plane / data plane split** — AppService is a thin passthrough in the control plane; InternalAppService in the data plane has K8s access
 
 ### 5.2 InternalAppService Implementation
 
@@ -256,7 +154,6 @@ New file in `actions/service/internal_app_service.go`:
 ```go
 type InternalAppService struct {
     appconnect.UnimplementedAppServiceHandler
-    repo      interfaces.AppRepo
     k8sClient AppK8sClientInterface  // direct K8s access for CRD operations
     cfg       *AppConfig
 }
@@ -270,34 +167,25 @@ type InternalAppService struct {
 User → Create(CreateRequest{app})
   1. Validate spec (container or pod payload required)
   2. Generate public host from subdomain pattern: "{name}-{project}-{domain}.{base_domain}"
-  3. Compute spec_digest = SHA256(spec)
-  4. Serialize spec to protobuf bytes
-  5. repo.Create(app)                          ← write spec to DB
-  6. k8sClient.Deploy(app)                     ← create KService CRD
-  7. Return created app (status=PENDING, from CRD absence/initial state)
+  3. k8sClient.Deploy(app)                     ← create KService CRD
+  4. Return created app (status=PENDING, from CRD initial state)
 ```
 
 #### Get
 
 ```
 RunService → InternalAppService.Get(GetRequest{app_id | ingress})
-  1. If app_id: repo.Get(project, domain, name)          ← get spec from DB
-  2. If ingress: repo.GetByHost(host)                    ← get spec from DB
-  3. k8sClient.GetStatus(appID)                          ← get status from KService CRD
-  4. Combine spec (DB) + status (CRD) into App proto
-  5. Return app
+  1. k8sClient.Get(appID or host)              ← get KService CRD (spec + status)
+  2. Map KService → App proto (spec + status)
+  3. Return app
 ```
 
 #### Update
 
 ```
 User → Update(UpdateRequest{app, reason})
-  1. Compute new spec_digest
-  2. If spec changed (digest differs):
-     a. Increment revision
-     b. repo.Update(oldRevision, app)          ← update spec in DB
-     c. k8sClient.Deploy(updated_app)          ← update KService CRD
-  3. Return updated app
+  1. k8sClient.Deploy(updated_app)             ← update KService CRD
+  2. Return updated app
 ```
 
 #### Stop
@@ -305,24 +193,23 @@ User → Update(UpdateRequest{app, reason})
 ```
 User → Stop(StopRequest{app_id})
   1. k8sClient.Stop(appID)                     ← delete KService CRD
-  2. No DB update needed
-  3. Return success
+  2. Return success
 ```
 
-> The spec remains in DB. A subsequent Create or Update with the same identifier
-> can re-deploy the app by creating a new KService CRD.
+> A subsequent Create with the same identifier can re-deploy the app
+> by creating a new KService CRD.
 
 #### List
 
 ```
 User → List(ListRequest{filter_by, limit, token})
-  1. repo.List(filters, limit, token)          ← get specs from DB
-  2. For each app: k8sClient.GetStatus(appID)  ← get status from CRD
-  3. Return apps (spec + status) + next_page_token
+  1. k8sClient.List(filters)                   ← list KServices with label selector
+  2. Map each KService → App proto (spec + status)
+  3. Return apps + next_page_token
 ```
 
-> For List, status lookups can be batched by listing all KServices with
-> label `flyte.org/app-managed=true` and matching by app identifier.
+> List uses label selectors (`flyte.org/app-managed=true`, project/domain labels)
+> to find all managed KServices. Pagination uses K8s continue tokens.
 
 #### Watch (server-streaming)
 
@@ -332,9 +219,8 @@ User → Watch(WatchRequest{target})
   2. Send initial state (current apps matching target)
   3. Loop:
      a. Wait for KService event from K8s watch
-     b. Look up spec from DB
-     c. Combine spec + status from KService event
-     d. Send WatchResponse
+     b. Map KService → App proto
+     c. Send WatchResponse
   4. Close watch on context cancel
 ```
 
@@ -420,7 +306,6 @@ AppK8sClient.GetStatus(appID):
 
 ```
 InternalAppService.Create() / Update()
-    │ persists spec to DB
     │ calls k8sClient.Deploy(app)
     ▼
 AppK8sClient.Deploy(app):
@@ -471,7 +356,6 @@ InternalAppService.Stop()
     ▼
 AppK8sClient.Stop()
     │ Deletes KService from cluster
-    │ (no DB update)
     ▼
 Done — subsequent Get() will see STOPPED (KService not found)
 ```
@@ -520,7 +404,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
         )
         // No background watcher needed — status is read on demand
 
-        // Make appK8sClient available to InternalAppService via SetupContext
+        // Create InternalAppService with K8s client (no DB dependency)
+        internalAppSvc := service.NewInternalAppService(appK8sClient, &cfg.Apps)
     }
 }
 ```
@@ -532,43 +417,28 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 ### 7.1 Files to Create
 
 ```
-runs/
-├── repository/
-│   ├── interfaces/
-│   │   └── app.go              # AppRepo interface
-│   ├── impl/
-│   │   └── app.go              # GORM implementation
-│   ├── models/
-│   │   └── app.go              # App DB model (spec only, no status)
-│   └── transformers/
-│       └── app.go              # Proto ↔ Model conversion
-
 actions/
 ├── k8s/
 │   ├── app_client.go           # AppK8sClient — KService CRUD + status read
 │   └── app_replica.go          # Replica queries (pod list/delete)
+├── service/
+│   └── internal_app_service.go # InternalAppService — K8s-only app management
 ```
 
 ### 7.2 Files to Modify
 
 ```
 runs/
-├── repository/
-│   ├── interfaces/
-│   │   └── repository.go       # Add AppRepo() to Repository interface
-│   └── repository.go           # Wire AppRepo in NewRepository()
-├── migrations/
-│   └── migrations.go           # Add App model + migration
 ├── service/
-│   └── app_service.go          # Replace stub with full implementation
-├── setup.go                    # Wire real InternalAppService with repo + appK8sClient
+│   └── app_service.go          # Replace stub with passthrough to InternalAppService
+├── setup.go                    # Wire AppService with connect client to InternalAppService
 
 actions/
-├── setup.go                    # Register AppK8sClient
+├── setup.go                    # Register AppK8sClient + InternalAppService
 ├── config/config.go            # Add Apps config section
 ```
 
-**No changes to executor/** — the executor only handles TaskAction CRs.
+**No changes to repository/, migrations/, or executor/** — apps have no DB operations.
 
 ### 7.3 Setup Registration (runs/setup.go)
 
@@ -579,10 +449,8 @@ Replace the current stub:
 appSvc := service.NewInternalAppService()
 
 // After (real):
-appRepo := impl.NewAppRepo(sc.DB)
-appSvc := service.NewInternalAppService(appRepo, appK8sClient, &service.AppConfig{
-    PublicURLPattern: cfg.Apps.PublicURLPattern,
-})
+// AppService is a passthrough — connects to InternalAppService via connect client
+appSvc := service.NewAppService(internalAppServiceClient)
 ```
 
 ### 7.4 ActionsService Setup (actions/setup.go)
@@ -591,7 +459,10 @@ appSvc := service.NewInternalAppService(appRepo, appK8sClient, &service.AppConfi
 // Add to existing Setup():
 if cfg.Apps.Enabled {
     appK8sClient := actionsk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg.Apps.Namespace)
-    // No background watcher — expose appK8sClient for InternalAppService to use
+    internalAppSvc := service.NewInternalAppService(appK8sClient, &service.AppConfig{
+        PublicURLPattern: cfg.Apps.PublicURLPattern,
+    })
+    // Register InternalAppService on the mux
 }
 ```
 
@@ -599,20 +470,7 @@ if cfg.Apps.Enabled {
 
 ## 8. Configuration
 
-### 8.1 Runs Service Config
-
-Add to `runs/config/config.go`:
-
-```go
-type AppsConfig struct {
-    // PublicURLPattern is a Go template for generating public URLs.
-    // Variables: {{.Name}}, {{.Project}}, {{.Domain}}
-    // Example: "https://{{.Name}}-{{.Project}}.apps.flyte.example.com"
-    PublicURLPattern string `json:"publicUrlPattern" pflag:",URL pattern for app ingress"`
-}
-```
-
-### 8.2 ActionsService Config
+### 8.1 ActionsService Config
 
 Add to `actions/config/config.go`:
 
@@ -629,6 +487,11 @@ type AppConfig struct {
 
     // MaxRequestTimeout is the hard cap on request timeout.
     MaxRequestTimeout time.Duration `json:"maxRequestTimeout" default:"1h"`
+
+    // PublicURLPattern is a Go template for generating public URLs.
+    // Variables: {{.Name}}, {{.Project}}, {{.Domain}}
+    // Example: "https://{{.Name}}-{{.Project}}.apps.flyte.example.com"
+    PublicURLPattern string `json:"publicUrlPattern" pflag:",URL pattern for app ingress"`
 }
 ```
 
@@ -645,8 +508,6 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │───────────────────>│  Create(app_spec)     │                       │
    │                    │──────────────────────>│                       │
    │                    │                       │ Validate spec         │
-   │                    │                       │ Generate public host  │
-   │                    │                       │ INSERT spec to DB     │
    │                    │                       │ Deploy(app)           │
    │                    │                       │──────────────────────>│
    │                    │                       │                       │ Build PodSpec
@@ -659,11 +520,10 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │  Get(app_id)       │                       │                       │
    │───────────────────>│  Get(app_id)          │                       │
    │                    │──────────────────────>│                       │
-   │                    │                       │ Get spec from DB      │
-   │                    │                       │ GetStatus(appID)      │
+   │                    │                       │ Get(appID)            │
    │                    │                       │──────────────────────>│
    │                    │                       │                       │ Read KService CRD
-   │                    │                       │  Status{ACTIVE}       │
+   │                    │                       │  App{spec + ACTIVE}   │
    │                    │                       │<──────────────────────│
    │                    │  App{spec + ACTIVE}   │                       │
    │  App{spec+ACTIVE}  │<──────────────────────│                       │
@@ -681,9 +541,6 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │  Update(new_spec)  │                       │                       │
    │───────────────────>│  Update(new_spec)     │                       │
    │                    │──────────────────────>│                       │
-   │                    │                       │ Compute new spec_digest│
-   │                    │                       │ Increment revision     │
-   │                    │                       │ UPDATE spec in DB      │
    │                    │                       │ Deploy(updated_app)    │
    │                    │                       │──────────────────────>│
    │                    │                       │                       │ Compare spec-sha
@@ -713,10 +570,9 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
    │  Get(app_id)       │                       │                       │
    │───────────────────>│  Get(app_id)          │                       │
    │                    │──────────────────────>│                       │
-   │                    │                       │ Get spec from DB      │
-   │                    │                       │ GetStatus → not found │
-   │                    │  App{spec + STOPPED}  │                       │
-   │  App{spec+STOPPED} │<──────────────────────│                       │
+   │                    │                       │ Get → KService not found
+   │                    │  App not found (STOPPED)                      │
+   │  Not found         │<──────────────────────│                       │
    │<───────────────────│                       │                       │
 ```
 
@@ -724,16 +580,14 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 
 ## 10. Phased Implementation Plan
 
-### Phase 1: Control Plane (CRUD + DB) + K8s Integration
+### Phase 1: K8s Integration + Service Layer
 
-1. Add `App` model to `runs/repository/models/app.go` (spec only, no status)
-2. Add migration to `runs/migrations/migrations.go`
-3. Create `AppRepo` interface and GORM implementation
-4. Create `AppK8sClient` in `actions/k8s/app_client.go` (Deploy, Stop, GetStatus)
-5. Implement `InternalAppService` RPCs: Create, Get, Update, Stop, List
-6. Wire in `runs/setup.go`, `runs/repository/repository.go`, `actions/setup.go`
-7. **Unit tests** for repo + service (mock AppK8sClient)
-8. **Integration tests** with envtest + Knative CRDs
+1. Create `AppK8sClient` in `actions/k8s/app_client.go` (Deploy, Stop, Get, List, GetStatus)
+2. Implement `InternalAppService` RPCs: Create, Get, Update, Stop, List
+3. Wire `AppService` (passthrough) in `runs/setup.go`
+4. Wire `InternalAppService` + `AppK8sClient` in `actions/setup.go`
+5. **Unit tests** for service (mock AppK8sClient)
+6. **Integration tests** with envtest + Knative CRDs
 
 ### Phase 2: Streaming RPCs
 
@@ -755,8 +609,7 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 
 | Layer | Test Type | Tool |
 |-------|-----------|------|
-| Repository | Unit | GORM + PostgreSQL |
-| InternalAppService | Unit | Mock repo + mock AppK8sClient (mockery) |
+| InternalAppService | Unit | Mock AppK8sClient (mockery) |
 | AppK8sClient | Integration | envtest (controller-runtime) + Knative CRDs |
 | E2E | Integration | kind + Knative + flyte-sandbox |
 
@@ -776,7 +629,7 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 
 6. **Resource quotas** — Should apps share the same resource pool as workflow executions, or have a separate quota?
 
-7. **List performance** — For `List` with many apps, reading status from individual KService CRDs could be slow. Should we batch via label-selector list, or add a cache?
+7. **List performance** — For `List` with many apps, K8s list with label selectors should be efficient, but at very large scale, should we add an informer cache?
 
 ---
 
@@ -796,7 +649,5 @@ SDK/CLI          AppService (ctrl)    InternalAppService (data)   AppK8sClient
 | Setup — actions (to modify) | `flyte2/actions/setup.go` |
 | ActionsService (pattern ref) | `flyte2/actions/service/actions_service.go` |
 | ActionsClient (pattern ref) | `flyte2/actions/k8s/` |
-| Repository pattern ref | `flyte2/runs/repository/` |
-| Migration pattern ref | `flyte2/runs/migrations/migrations.go` |
 | App framework | `flyte2/app/context.go` |
 | Manager (unified binary) | `flyte2/manager/` |

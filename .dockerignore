@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# Generated files
+gen/python/
+gen/rust/
+gen/ts/
+
+# Dependencies
+node_modules/
+target/
+**/Cargo.lock
+*.pyc
+__pycache__/
+.kube/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+*.coverage
+.pytest_cache/

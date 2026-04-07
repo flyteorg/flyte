@@ -1,0 +1,74 @@
+name: Go Tests
+
+on:
+  push:
+    branches: [v2, main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: flyteplugins
+          - component: flytestdlib
+          - component: runs
+            # Exclude runs/test/ which contains integration tests
+            test-args: $(go list ./runs/... | grep -v /test)
+          - component: executor
+            # Controller tests require envtest binaries (etcd + kube-apiserver)
+            needs-envtest: true
+          - component: flytecopilot
+          - component: dataproxy
+          - component: flyteidl2
+          - component: actions
+          - component: manager
+    name: test (${{ matrix.component }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: true
+
+      - name: Cache embedded postgres
+        uses: actions/cache@v4
+        with:
+          path: ~/.embedded-postgres-go
+          key: embedded-postgres-v16
+
+      - name: Set up envtest
+        if: matrix.needs-envtest
+        run: |
+          ENVTEST_VERSION=$(go list -m -f "{{ .Version }}" sigs.k8s.io/controller-runtime | awk -F'[v.]' '{printf "release-%d.%d", $2, $3}')
+          go install sigs.k8s.io/controller-runtime/tools/setup-envtest@${ENVTEST_VERSION}
+          ENVTEST_K8S_VERSION=$(go list -m -f "{{ .Version }}" k8s.io/api | awk -F'[v.]' '{printf "1.%d", $3}')
+          echo "KUBEBUILDER_ASSETS=$(setup-envtest use ${ENVTEST_K8S_VERSION} --bin-dir /tmp/envtest -p path)" >> "$GITHUB_ENV"
+
+      - name: Run tests
+        run: |
+          TEST_ARGS="${{ matrix.test-args }}"
+          if [ -z "$TEST_ARGS" ]; then
+            TEST_ARGS="./${{ matrix.component }}/..."
+          fi
+          go test -race -coverprofile=coverage.out -covermode=atomic $TEST_ARGS
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.component }}
+          path: coverage.out
+          retention-days: 7

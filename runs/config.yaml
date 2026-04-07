@@ -1,0 +1,49 @@
+# Runs Service Configuration
+
+runs:
+  server:
+    host: "0.0.0.0"
+    port: 8090
+  watchBufferSize: 100
+  queueServiceUrl: "http://localhost:8089"
+  storagePrefix: "s3://flyte-data"
+  seedProjects:
+    - "flytesnacks"
+  domains:
+    - id: "development"
+      name: "Development"
+    - id: "production"
+      name: "Production"
+    - id: "staging"
+      name: "Staging"
+
+database:
+  postgres:
+    host: "localhost"
+    port: 5432
+    dbname: "flyte_runs"
+    username: "postgres"
+    password: "postgres"
+    options: "sslmode=disable"
+  maxIdleConnections: 10
+  maxOpenConnections: 100
+  connMaxLifeTime: 1h
+
+logger:
+  level: 4  # Info level
+  show-source: true
+
+# Storage Configuration (for local dev, using RustFS — run: bash start-rustfs.sh)
+storage:
+  type: minio
+  container: "flyte-data"
+  enable-multicontainer: false
+  stow:
+    kind: "s3"
+    config:
+      auth_type: "accesskey"
+      access_key_id: "minioadmin"
+      secret_key: "minioadmin"
+      region: "us-east-1"
+      endpoint: "http://localhost:9000"
+      disable_ssl: "true"
