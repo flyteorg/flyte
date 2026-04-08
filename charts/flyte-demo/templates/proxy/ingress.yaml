@@ -1,7 +1,7 @@
 {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
 {{- $backendService := "" }}
 {{- if index .Values "flyte-binary" "enabled" }}
-{{- $backendService = include "flyte-binary.service.http.name" . }}
+{{- $backendService = printf "%s-http" ( index .Values "flyte-binary" "fullnameOverride" | default "flyte-binary" ) }}
 {{- else }}
 {{- $backendService = include "flyte-demo.localHeadlessService" . }}
 {{- end }}
