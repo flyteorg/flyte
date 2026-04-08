@@ -1246,21 +1246,21 @@ spec:
       paths:
       - backend:
           service:
-            name: flyte-demo-http
+            name: flyte-binary-http
             port:
               number: 8090
         path: /healthz
         pathType: Exact
       - backend:
           service:
-            name: flyte-demo-http
+            name: flyte-binary-http
             port:
               number: 8090
         path: /readyz
         pathType: Exact
       - backend:
           service:
-            name: flyte-demo-http
+            name: flyte-binary-http
             port:
               number: 8090
         path: /flyteidl2.
