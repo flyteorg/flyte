@@ -92,23 +92,49 @@ jobs:
           echo "📦 Pulling image: $IMAGE"
           docker pull "$IMAGE"
 
+      - name: Cache cargo artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo-cache/registry
+            ~/.cargo-cache/git
+            ~/cargo-target
+          key: check-gen-cargo-${{ hashFiles('gen/rust/Cargo.lock') }}
+          restore-keys: |
+            check-gen-cargo-
+
+      - name: Cache uv virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/uv-venv
+          key: check-gen-uv-${{ hashFiles('gen/python/uv.lock') }}
+          restore-keys: |
+            check-gen-uv-
+
       - name: Run checks in container
         run: |
           IMAGE="${{ steps.docker-image.outputs.image }}"
           echo "Using image: $IMAGE"
 
+          mkdir -p ~/.cargo-cache ~/cargo-target ~/uv-venv
+
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
+            -v $HOME/.cargo-cache:/cargo-cache \
+            -v $HOME/cargo-target:/cargo-target \
+            -v $HOME/uv-venv:/uv-venv \
             -w /workspace \
             -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
-            -e UV_PROJECT_ENVIRONMENT=/tmp/flyte-venv \
+            -e UV_PROJECT_ENVIRONMENT=/uv-venv \
+            -e CARGO_HOME=/cargo-cache \
+            -e CARGO_TARGET_DIR=/cargo-target \
             "$IMAGE" \
             bash -c "
               git config --global --add safe.directory /workspace &&
               cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
               make gen-local &&
               git diff --exit-code -- ':!gen/rust/Cargo.lock' || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
-              make build-crate
+              make check-crate
             "
 
 
