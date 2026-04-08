@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
@@ -16,31 +17,38 @@ import (
 )
 
 type triggerRepo struct {
-	db *gorm.DB
+	db *sqlx.DB
 }
 
-func NewTriggerRepo(db *gorm.DB) interfaces.TriggerRepo {
+func NewTriggerRepo(db *sqlx.DB) interfaces.TriggerRepo {
 	return &triggerRepo{db: db}
 }
 
 func (r *triggerRepo) SaveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error) {
-	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := upsertTrigger(ctx, tx, trigger, expectedRevision); err != nil {
-			return err
-		}
-		return refreshTaskTriggerMeta(ctx, tx, trigger)
-	})
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
+		return nil, fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if err := upsertTrigger(ctx, tx, trigger, expectedRevision); err != nil {
 		logger.Errorf(ctx, "SaveTrigger failed for %s/%s/%s/%s: %v",
 			trigger.Project, trigger.Domain, trigger.TaskName, trigger.Name, err)
 		return nil, err
+	}
+	if err := refreshTaskTriggerMeta(ctx, tx, trigger); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit tx: %w", err)
 	}
 	return trigger, nil
 }
 
 // upsertTrigger upserts a trigger row and appends an immutable revision snapshot.
 // Pass expectedRevision=0 to skip optimistic locking (e.g. when called from CreateTask).
-func upsertTrigger(ctx context.Context, tx *gorm.DB, trigger *models.Trigger, expectedRevision uint64) error {
+func upsertTrigger(ctx context.Context, tx *sqlx.Tx, trigger *models.Trigger, expectedRevision uint64) error {
 	now := time.Now()
 
 	// ON CONFLICT: bump revision, update mutable fields.
@@ -67,7 +75,7 @@ func upsertTrigger(ctx context.Context, tx *gorm.DB, trigger *models.Trigger, ex
 	}
 	suffix += " RETURNING *"
 
-	result := tx.Raw(`
+	query := `
 		INSERT INTO triggers (
 			project, domain, task_name, name,
 			latest_revision,
@@ -76,20 +84,22 @@ func upsertTrigger(ctx context.Context, tx *gorm.DB, trigger *models.Trigger, ex
 			deployed_by, updated_by,
 			deployed_at, updated_at,
 			description
-		) VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `+suffix,
+		) VALUES ($1, $2, $3, $4, 1, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ` + suffix
+
+	err := tx.QueryRowxContext(ctx, query,
 		trigger.Project, trigger.Domain, trigger.TaskName, trigger.Name,
 		trigger.Spec, trigger.AutomationSpec,
 		trigger.TaskVersion, trigger.Active, trigger.AutomationType,
 		trigger.DeployedBy, trigger.UpdatedBy,
 		now, now,
 		trigger.Description,
-	).Scan(trigger)
+	).StructScan(trigger)
 
-	if result.Error != nil {
-		return fmt.Errorf("failed to upsert trigger: %w", result.Error)
-	}
-	if result.RowsAffected == 0 {
+	if errors.Is(err, sql.ErrNoRows) {
 		return errors.New("optimistic lock failure: trigger was modified concurrently, please fetch latest and retry")
+	}
+	if err != nil {
+		return fmt.Errorf("failed to upsert trigger: %w", err)
 	}
 
 	return insertTriggerRevision(ctx, tx, trigger, triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DEPLOY)
@@ -97,66 +107,89 @@ func upsertTrigger(ctx context.Context, tx *gorm.DB, trigger *models.Trigger, ex
 
 func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error) {
 	var t models.Trigger
-	q := r.db.WithContext(ctx).Where("deleted_at IS NULL")
+	var err error
 	if key.TaskName != "" {
-		q = q.Where("project = ? AND domain = ? AND task_name = ? AND name = ?",
+		err = sqlx.GetContext(ctx, r.db, &t,
+			`SELECT * FROM triggers WHERE deleted_at IS NULL
+			   AND project = $1 AND domain = $2 AND task_name = $3 AND name = $4`,
 			key.Project, key.Domain, key.TaskName, key.Name)
 	} else {
-		q = q.Where("project = ? AND domain = ? AND name = ?",
+		err = sqlx.GetContext(ctx, r.db, &t,
+			`SELECT * FROM triggers WHERE deleted_at IS NULL
+			   AND project = $1 AND domain = $2 AND name = $3`,
 			key.Project, key.Domain, key.Name)
 	}
-	result := q.First(&t)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s", key.Project, key.Domain, key.TaskName, key.Name)
 		}
-		return nil, fmt.Errorf("failed to get trigger: %w", result.Error)
+		return nil, fmt.Errorf("failed to get trigger: %w", err)
 	}
 	return &t, nil
 }
 
 func (r *triggerRepo) GetTriggerRevision(ctx context.Context, project, domain, taskName, name string, revision uint64) (*models.TriggerRevision, error) {
 	var rev models.TriggerRevision
-	result := r.db.WithContext(ctx).
-		Where("project = ? AND domain = ? AND task_name = ? AND name = ? AND revision = ?",
-			project, domain, taskName, name, revision).
-		First(&rev)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	err := sqlx.GetContext(ctx, r.db, &rev,
+		`SELECT * FROM trigger_revisions
+		 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4 AND revision = $5`,
+		project, domain, taskName, name, revision)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("trigger revision not found: %s/%s/%s/%s@%d", project, domain, taskName, name, revision)
 		}
-		return nil, fmt.Errorf("failed to get trigger revision: %w", result.Error)
+		return nil, fmt.Errorf("failed to get trigger revision: %w", err)
 	}
 	return &rev, nil
 }
 
 func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Trigger, error) {
-	var triggers []*models.Trigger
-	query := r.db.WithContext(ctx).Model(&models.Trigger{}).Where("deleted_at IS NULL")
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
+
+	queryBuilder.WriteString("SELECT * FROM triggers WHERE deleted_at IS NULL")
 
 	if input.Filter != nil {
-		expr, err := input.Filter.GormQueryExpression("")
+		expr, err := input.Filter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build filter: %w", err)
 		}
-		query = query.Where(expr.Query, expr.Args...)
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		queryBuilder.WriteString(" AND ")
+		queryBuilder.WriteString(rewritten)
+		args = append(args, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
 	}
 	if input.ScopeByFilter != nil {
-		expr, err := input.ScopeByFilter.GormQueryExpression("")
+		expr, err := input.ScopeByFilter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build scope filter: %w", err)
 		}
-		query = query.Where(expr.Query, expr.Args...)
-	}
-	if len(input.SortParameters) > 0 {
-		for _, sp := range input.SortParameters {
-			query = query.Order(sp.GetGormOrderExpr())
-		}
-	} else {
-		query = query.Order("active DESC, updated_at DESC")
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		queryBuilder.WriteString(" AND ")
+		queryBuilder.WriteString(rewritten)
+		args = append(args, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
 	}
 
-	if err := query.Limit(input.Limit).Offset(input.Offset).Find(&triggers).Error; err != nil {
+	if len(input.SortParameters) > 0 {
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range input.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
+			}
+			queryBuilder.WriteString(sp.GetOrderExpr())
+		}
+	} else {
+		queryBuilder.WriteString(" ORDER BY active DESC, updated_at DESC")
+	}
+
+	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
+	args = append(args, input.Limit, input.Offset)
+
+	var triggers []*models.Trigger
+	if err := sqlx.SelectContext(ctx, r.db, &triggers, queryBuilder.String(), args...); err != nil {
 		return nil, fmt.Errorf("failed to list triggers: %w", err)
 	}
 	return triggers, nil
@@ -164,115 +197,124 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 
 func (r *triggerRepo) ListTriggerRevisions(ctx context.Context, project, domain, taskName, name string, input interfaces.ListResourceInput) ([]*models.TriggerRevision, error) {
 	var revisions []*models.TriggerRevision
-	query := r.db.WithContext(ctx).Model(&models.TriggerRevision{}).
-		Where("project = ? AND domain = ? AND task_name = ? AND name = ?",
-			project, domain, taskName, name).
-		Order("revision DESC").
-		Limit(input.Limit).
-		Offset(input.Offset)
-
-	if err := query.Find(&revisions).Error; err != nil {
+	err := sqlx.SelectContext(ctx, r.db, &revisions,
+		`SELECT * FROM trigger_revisions
+		 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4
+		 ORDER BY revision DESC
+		 LIMIT $5 OFFSET $6`,
+		project, domain, taskName, name, input.Limit, input.Offset)
+	if err != nil {
 		return nil, fmt.Errorf("failed to list trigger revisions: %w", err)
 	}
 	return revisions, nil
 }
 
 func (r *triggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, key := range keys {
-			var t models.Trigger
-			result := tx.Raw(`
-				UPDATE triggers SET
-					active          = ?,
-					updated_at      = NOW(),
-					latest_revision = latest_revision + 1
-				WHERE project = ? AND domain = ? AND task_name = ? AND name = ?
-				  AND deleted_at IS NULL
-				  AND active != ?
-				RETURNING *`,
-				active,
-				key.Project, key.Domain, key.TaskName, key.Name,
-				active,
-			).Scan(&t)
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
 
-			if result.Error != nil {
-				return fmt.Errorf("failed to update trigger %+v: %w", key, result.Error)
-			}
-			if result.RowsAffected == 0 {
-				continue // already in desired state or not found
-			}
+	for _, key := range keys {
+		var t models.Trigger
+		err := tx.QueryRowxContext(ctx, `
+			UPDATE triggers SET
+				active          = $1,
+				updated_at      = NOW(),
+				latest_revision = latest_revision + 1
+			WHERE project = $2 AND domain = $3 AND task_name = $4 AND name = $5
+			  AND deleted_at IS NULL
+			  AND active != $1
+			RETURNING *`,
+			active, key.Project, key.Domain, key.TaskName, key.Name,
+		).StructScan(&t)
 
-			action := triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DEACTIVATE
-			if active {
-				action = triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_ACTIVATE
-			}
-			if err := insertTriggerRevision(ctx, tx, &t, action); err != nil {
-				return err
-			}
-			if err := refreshTaskTriggerMeta(ctx, tx, &t); err != nil {
-				return err
-			}
+		if errors.Is(err, sql.ErrNoRows) {
+			continue // already in desired state or not found
 		}
-		return nil
-	})
+		if err != nil {
+			return fmt.Errorf("failed to update trigger %+v: %w", key, err)
+		}
+
+		action := triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DEACTIVATE
+		if active {
+			action = triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_ACTIVATE
+		}
+		if err := insertTriggerRevision(ctx, tx, &t, action); err != nil {
+			return err
+		}
+		if err := refreshTaskTriggerMeta(ctx, tx, &t); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit tx: %w", err)
+	}
+	return nil
 }
 
 func (r *triggerRepo) DeleteTriggers(ctx context.Context, keys []interfaces.TriggerNameKey) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, key := range keys {
-			var t models.Trigger
-			result := tx.Raw(`
-				UPDATE triggers SET
-					deleted_at      = NOW(),
-					active          = FALSE,
-					latest_revision = latest_revision + 1
-				WHERE project = ? AND domain = ? AND task_name = ? AND name = ?
-				  AND deleted_at IS NULL
-				RETURNING *`,
-				key.Project, key.Domain, key.TaskName, key.Name,
-			).Scan(&t)
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
 
-			if result.Error != nil {
-				return fmt.Errorf("failed to delete trigger %+v: %w", key, result.Error)
-			}
-			if result.RowsAffected == 0 {
-				continue // already deleted or not found
-			}
+	for _, key := range keys {
+		var t models.Trigger
+		err := tx.QueryRowxContext(ctx, `
+			UPDATE triggers SET
+				deleted_at      = NOW(),
+				active          = FALSE,
+				latest_revision = latest_revision + 1
+			WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4
+			  AND deleted_at IS NULL
+			RETURNING *`,
+			key.Project, key.Domain, key.TaskName, key.Name,
+		).StructScan(&t)
 
-			if err := insertTriggerRevision(ctx, tx, &t, triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DELETE); err != nil {
-				return err
-			}
-			if err := refreshTaskTriggerMeta(ctx, tx, &t); err != nil {
-				return err
-			}
+		if errors.Is(err, sql.ErrNoRows) {
+			continue // already deleted or not found
 		}
-		return nil
-	})
+		if err != nil {
+			return fmt.Errorf("failed to delete trigger %+v: %w", key, err)
+		}
+
+		if err := insertTriggerRevision(ctx, tx, &t, triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DELETE); err != nil {
+			return err
+		}
+		if err := refreshTaskTriggerMeta(ctx, tx, &t); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit tx: %w", err)
+	}
+	return nil
 }
 
-
 // insertTriggerRevision appends an immutable snapshot to trigger_revisions.
-func insertTriggerRevision(ctx context.Context, tx *gorm.DB, t *models.Trigger, action triggerpb.TriggerRevisionAction) error {
-	rev := &models.TriggerRevision{
-		Project:        t.Project,
-		Domain:         t.Domain,
-		TaskName:       t.TaskName,
-		Name:           t.Name,
-		Revision:       t.LatestRevision,
-		Spec:           t.Spec,
-		AutomationSpec: t.AutomationSpec,
-		TaskVersion:    t.TaskVersion,
-		Active:         t.Active,
-		AutomationType: t.AutomationType,
-		DeployedBy:     t.DeployedBy,
-		UpdatedBy:      t.UpdatedBy,
-		DeployedAt:     t.DeployedAt,
-		UpdatedAt:      t.UpdatedAt,
-		TriggeredAt:    t.TriggeredAt,
-		DeletedAt:      t.DeletedAt,
-		Action:         action.String(),
-	}
-	if err := tx.WithContext(ctx).Create(rev).Error; err != nil {
+func insertTriggerRevision(ctx context.Context, tx *sqlx.Tx, t *models.Trigger, action triggerpb.TriggerRevisionAction) error {
+	_, err := tx.ExecContext(ctx, `
+		INSERT INTO trigger_revisions (
+			project, domain, task_name, name, revision,
+			spec, automation_spec,
+			task_version, active, automation_type,
+			deployed_by, updated_by,
+			deployed_at, updated_at, triggered_at, deleted_at,
+			action, created_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW())`,
+		t.Project, t.Domain, t.TaskName, t.Name, t.LatestRevision,
+		t.Spec, t.AutomationSpec,
+		t.TaskVersion, t.Active, t.AutomationType,
+		t.DeployedBy, t.UpdatedBy,
+		t.DeployedAt, t.UpdatedAt, t.TriggeredAt, t.DeletedAt,
+		action.String(),
+	)
+	if err != nil {
 		return fmt.Errorf("failed to insert trigger revision: %w", err)
 	}
 	return nil
@@ -280,25 +322,25 @@ func insertTriggerRevision(ctx context.Context, tx *gorm.DB, t *models.Trigger, 
 
 // refreshTaskTriggerMeta recomputes and updates denormalized trigger summary fields on the tasks row.
 // Package-level so it can be reused by tasksRepo within the same transaction.
-func refreshTaskTriggerMeta(ctx context.Context, tx *gorm.DB, t *models.Trigger) error {
+func refreshTaskTriggerMeta(ctx context.Context, tx *sqlx.Tx, t *models.Trigger) error {
 	type statRow struct {
-		Active         bool           `gorm:"column:active"`
-		Count          int            `gorm:"column:count"`
-		TriggerName    sql.NullString `gorm:"column:trigger_name"`
-		AutomationSpec []byte         `gorm:"column:automation_spec"`
+		Active         bool           `db:"active"`
+		Count          int            `db:"count"`
+		TriggerName    sql.NullString `db:"trigger_name"`
+		AutomationSpec []byte         `db:"automation_spec"`
 	}
 
 	var rows []statRow
-	err := tx.WithContext(ctx).Raw(`
+	err := sqlx.SelectContext(ctx, tx, &rows, `
 		SELECT active, COUNT(*) AS count,
 		       STRING_AGG(name, ',') AS trigger_name,
 		       STRING_AGG(encode(automation_spec, 'escape'), ',') AS automation_spec
 		FROM triggers
-		WHERE project = ? AND domain = ? AND task_name = ? AND task_version = ?
+		WHERE project = $1 AND domain = $2 AND task_name = $3 AND task_version = $4
 		  AND deleted_at IS NULL
 		GROUP BY active`,
 		t.Project, t.Domain, t.TaskName, t.TaskVersion,
-	).Scan(&rows).Error
+	)
 	if err != nil {
 		return fmt.Errorf("failed to compute task trigger stats: %w", err)
 	}
@@ -325,20 +367,20 @@ func refreshTaskTriggerMeta(ctx context.Context, tx *gorm.DB, t *models.Trigger)
 		triggerName = sql.NullString{}
 	}
 
-	result := tx.WithContext(ctx).Exec(`
+	result, err := tx.ExecContext(ctx, `
 		UPDATE tasks SET
-			trigger_name            = ?,
-			total_triggers          = ?,
-			active_triggers         = ?,
-			trigger_automation_spec = ?
-		WHERE project = ? AND domain = ? AND name = ? AND version = ?`,
+			trigger_name            = $1,
+			total_triggers          = $2,
+			active_triggers         = $3,
+			trigger_automation_spec = $4
+		WHERE project = $5 AND domain = $6 AND name = $7 AND version = $8`,
 		triggerName, totalTriggers, activeTriggers, automationSpec,
 		t.Project, t.Domain, t.TaskName, t.TaskVersion,
 	)
-	if result.Error != nil {
-		return fmt.Errorf("failed to update task trigger meta: %w", result.Error)
+	if err != nil {
+		return fmt.Errorf("failed to update task trigger meta: %w", err)
 	}
-	if result.RowsAffected == 0 {
+	if rowsAffected, _ := result.RowsAffected(); rowsAffected == 0 {
 		logger.Warnf(ctx, "task %s/%s/%s@%s not found when refreshing trigger meta",
 			t.Project, t.Domain, t.TaskName, t.TaskVersion)
 	}
