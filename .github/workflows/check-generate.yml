@@ -137,4 +137,9 @@ jobs:
               make check-crate
             "
 
+      - name: Fix cache permissions
+        if: always()
+        run: |
+          sudo chown -R $(id -u):$(id -g) ~/.cargo-cache ~/cargo-target ~/uv-venv
+
 
