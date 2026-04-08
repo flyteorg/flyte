@@ -11,10 +11,11 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
 from flyteidl2.core import tasks_pb2 as flyteidl2_dot_core_dot_tasks__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/plugins/ray.proto\x12\x11\x66lyteidl2.plugins\x1a\x1a\x66lyteidl2/core/tasks.proto\"\x93\x02\n\x06RayJob\x12>\n\x0bray_cluster\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.plugins.RayClusterR\nrayCluster\x12#\n\x0bruntime_env\x18\x02 \x01(\tB\x02\x18\x01R\nruntimeEnv\x12=\n\x1bshutdown_after_job_finishes\x18\x03 \x01(\x08R\x18shutdownAfterJobFinishes\x12;\n\x1attl_seconds_after_finished\x18\x04 \x01(\x05R\x17ttlSecondsAfterFinished\x12(\n\x10runtime_env_yaml\x18\x05 \x01(\tR\x0eruntimeEnvYaml\"\xd5\x01\n\nRayCluster\x12H\n\x0fhead_group_spec\x18\x01 \x01(\x0b\x32 .flyteidl2.plugins.HeadGroupSpecR\rheadGroupSpec\x12N\n\x11worker_group_spec\x18\x02 \x03(\x0b\x32\".flyteidl2.plugins.WorkerGroupSpecR\x0fworkerGroupSpec\x12-\n\x12\x65nable_autoscaling\x18\x03 \x01(\x08R\x11\x65nableAutoscaling\"\xe3\x01\n\rHeadGroupSpec\x12^\n\x10ray_start_params\x18\x01 \x03(\x0b\x32\x34.flyteidl2.plugins.HeadGroupSpec.RayStartParamsEntryR\x0erayStartParams\x12/\n\x07k8s_pod\x18\x02 \x01(\x0b\x32\x16.flyteidl2.core.K8sPodR\x06k8sPod\x1a\x41\n\x13RayStartParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xe8\x02\n\x0fWorkerGroupSpec\x12\x1d\n\ngroup_name\x18\x01 \x01(\tR\tgroupName\x12\x1a\n\x08replicas\x18\x02 \x01(\x05R\x08replicas\x12!\n\x0cmin_replicas\x18\x03 \x01(\x05R\x0bminReplicas\x12!\n\x0cmax_replicas\x18\x04 \x01(\x05R\x0bmaxReplicas\x12`\n\x10ray_start_params\x18\x05 \x03(\x0b\x32\x36.flyteidl2.plugins.WorkerGroupSpec.RayStartParamsEntryR\x0erayStartParams\x12/\n\x07k8s_pod\x18\x06 \x01(\x0b\x32\x16.flyteidl2.core.K8sPodR\x06k8sPod\x1a\x41\n\x13RayStartParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\xbf\x01\n\x15\x63om.flyteidl2.pluginsB\x08RayProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins\xa2\x02\x03\x46PX\xaa\x02\x11\x46lyteidl2.Plugins\xca\x02\x11\x46lyteidl2\\Plugins\xe2\x02\x1d\x46lyteidl2\\Plugins\\GPBMetadata\xea\x02\x12\x46lyteidl2::Pluginsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/plugins/ray.proto\x12\x11\x66lyteidl2.plugins\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1a\x66lyteidl2/core/tasks.proto\"\x93\x02\n\x06RayJob\x12>\n\x0bray_cluster\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.plugins.RayClusterR\nrayCluster\x12#\n\x0bruntime_env\x18\x02 \x01(\tB\x02\x18\x01R\nruntimeEnv\x12=\n\x1bshutdown_after_job_finishes\x18\x03 \x01(\x08R\x18shutdownAfterJobFinishes\x12;\n\x1attl_seconds_after_finished\x18\x04 \x01(\x05R\x17ttlSecondsAfterFinished\x12(\n\x10runtime_env_yaml\x18\x05 \x01(\tR\x0eruntimeEnvYaml\"\xad\x03\n\x11\x41utoscalerOptions\x12Y\n\x0eupscaling_mode\x18\x01 \x01(\x0e\x32\x32.flyteidl2.plugins.AutoscalerOptions.UpscalingModeR\rupscalingMode\x12\x30\n\x14idle_timeout_seconds\x18\x02 \x01(\x05R\x12idleTimeoutSeconds\x12.\n\x03\x65nv\x18\x03 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x03\x65nv\x12\x14\n\x05image\x18\x04 \x01(\tR\x05image\x12\x37\n\tresources\x18\x05 \x01(\x0b\x32\x19.flyteidl2.core.ResourcesR\tresources\"\x8b\x01\n\rUpscalingMode\x12\x1e\n\x1aUPSCALING_MODE_UNSPECIFIED\x10\x00\x12\x1a\n\x16UPSCALING_MODE_DEFAULT\x10\x01\x12\x1d\n\x19UPSCALING_MODE_AGGRESSIVE\x10\x02\x12\x1f\n\x1bUPSCALING_MODE_CONSERVATIVE\x10\x03\"\xaa\x02\n\nRayCluster\x12H\n\x0fhead_group_spec\x18\x01 \x01(\x0b\x32 .flyteidl2.plugins.HeadGroupSpecR\rheadGroupSpec\x12N\n\x11worker_group_spec\x18\x02 \x03(\x0b\x32\".flyteidl2.plugins.WorkerGroupSpecR\x0fworkerGroupSpec\x12-\n\x12\x65nable_autoscaling\x18\x03 \x01(\x08R\x11\x65nableAutoscaling\x12S\n\x12\x61utoscaler_options\x18\x04 \x01(\x0b\x32$.flyteidl2.plugins.AutoscalerOptionsR\x11\x61utoscalerOptions\"\xe3\x01\n\rHeadGroupSpec\x12^\n\x10ray_start_params\x18\x01 \x03(\x0b\x32\x34.flyteidl2.plugins.HeadGroupSpec.RayStartParamsEntryR\x0erayStartParams\x12/\n\x07k8s_pod\x18\x02 \x01(\x0b\x32\x16.flyteidl2.core.K8sPodR\x06k8sPod\x1a\x41\n\x13RayStartParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xe8\x02\n\x0fWorkerGroupSpec\x12\x1d\n\ngroup_name\x18\x01 \x01(\tR\tgroupName\x12\x1a\n\x08replicas\x18\x02 \x01(\x05R\x08replicas\x12!\n\x0cmin_replicas\x18\x03 \x01(\x05R\x0bminReplicas\x12!\n\x0cmax_replicas\x18\x04 \x01(\x05R\x0bmaxReplicas\x12`\n\x10ray_start_params\x18\x05 \x03(\x0b\x32\x36.flyteidl2.plugins.WorkerGroupSpec.RayStartParamsEntryR\x0erayStartParams\x12/\n\x07k8s_pod\x18\x06 \x01(\x0b\x32\x16.flyteidl2.core.K8sPodR\x06k8sPod\x1a\x41\n\x13RayStartParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\xbf\x01\n\x15\x63om.flyteidl2.pluginsB\x08RayProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins\xa2\x02\x03\x46PX\xaa\x02\x11\x46lyteidl2.Plugins\xca\x02\x11\x46lyteidl2\\Plugins\xe2\x02\x1d\x46lyteidl2\\Plugins\\GPBMetadata\xea\x02\x12\x46lyteidl2::Pluginsb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,16 +29,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _HEADGROUPSPEC_RAYSTARTPARAMSENTRY._serialized_options = b'8\001'
   _WORKERGROUPSPEC_RAYSTARTPARAMSENTRY._options = None
   _WORKERGROUPSPEC_RAYSTARTPARAMSENTRY._serialized_options = b'8\001'
-  _globals['_RAYJOB']._serialized_start=79
-  _globals['_RAYJOB']._serialized_end=354
-  _globals['_RAYCLUSTER']._serialized_start=357
-  _globals['_RAYCLUSTER']._serialized_end=570
-  _globals['_HEADGROUPSPEC']._serialized_start=573
-  _globals['_HEADGROUPSPEC']._serialized_end=800
-  _globals['_HEADGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_start=735
-  _globals['_HEADGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_end=800
-  _globals['_WORKERGROUPSPEC']._serialized_start=803
-  _globals['_WORKERGROUPSPEC']._serialized_end=1163
-  _globals['_WORKERGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_start=735
-  _globals['_WORKERGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_end=800
+  _globals['_RAYJOB']._serialized_start=110
+  _globals['_RAYJOB']._serialized_end=385
+  _globals['_AUTOSCALEROPTIONS']._serialized_start=388
+  _globals['_AUTOSCALEROPTIONS']._serialized_end=817
+  _globals['_AUTOSCALEROPTIONS_UPSCALINGMODE']._serialized_start=678
+  _globals['_AUTOSCALEROPTIONS_UPSCALINGMODE']._serialized_end=817
+  _globals['_RAYCLUSTER']._serialized_start=820
+  _globals['_RAYCLUSTER']._serialized_end=1118
+  _globals['_HEADGROUPSPEC']._serialized_start=1121
+  _globals['_HEADGROUPSPEC']._serialized_end=1348
+  _globals['_HEADGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_start=1283
+  _globals['_HEADGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_end=1348
+  _globals['_WORKERGROUPSPEC']._serialized_start=1351
+  _globals['_WORKERGROUPSPEC']._serialized_end=1711
+  _globals['_WORKERGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_start=1283
+  _globals['_WORKERGROUPSPEC_RAYSTARTPARAMSENTRY']._serialized_end=1348
 # @@protoc_insertion_point(module_scope)
