@@ -201,14 +201,20 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 
 		var countWhere []string
 		if input.Filter != nil {
-			expr, _ := input.Filter.QueryExpression("")
+			expr, err := input.Filter.QueryExpression("")
+			if err != nil {
+				return nil, fmt.Errorf("failed to build filter expression: %w", err)
+			}
 			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
 			countWhere = append(countWhere, rewritten)
 			countArgs = append(countArgs, rewrittenArgs...)
 			countIdx += len(rewrittenArgs)
 		}
 		if input.ScopeByFilter != nil {
-			expr, _ := input.ScopeByFilter.QueryExpression("")
+			expr, err := input.ScopeByFilter.QueryExpression("")
+			if err != nil {
+				return nil, fmt.Errorf("failed to build scope filter expression: %w", err)
+			}
 			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
 			countWhere = append(countWhere, rewritten)
 			countArgs = append(countArgs, rewrittenArgs...)
@@ -233,7 +239,10 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 		totalBuilder.WriteString("SELECT COUNT(*) FROM tasks")
 
 		if input.ScopeByFilter != nil {
-			expr, _ := input.ScopeByFilter.QueryExpression("")
+			expr, err := input.ScopeByFilter.QueryExpression("")
+			if err != nil {
+				return nil, fmt.Errorf("failed to build scope filter expression: %w", err)
+			}
 			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, totalIdx)
 			totalBuilder.WriteString(" WHERE ")
 			totalBuilder.WriteString(rewritten)

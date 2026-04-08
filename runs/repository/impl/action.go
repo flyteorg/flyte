@@ -524,13 +524,19 @@ func (r *actionRepo) UpdateActionPhase(
 		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
 	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
 
-	_, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
+	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
 	if err != nil {
 		return err
 	}
 
-	// Notify subscribers of the action update
-	r.notifyActionUpdate(ctx, actionID)
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected > 0 {
+		// Notify subscribers of the action update
+		r.notifyActionUpdate(ctx, actionID)
+	}
 
 	return nil
 }
