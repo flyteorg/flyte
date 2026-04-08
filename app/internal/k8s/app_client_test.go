@@ -283,8 +283,9 @@ func TestList(t *testing.T) {
 		},
 	}
 
-	apps, err := c.List(context.Background(), "proj", "dev")
+	apps, nextToken, err := c.List(context.Background(), "proj", "dev", 0, "")
 	require.NoError(t, err)
+	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
