@@ -84,6 +84,8 @@ jobs:
   check-generate:
     needs: setup
     runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.image }}
     permissions:
       contents: read
       packages: read
@@ -91,24 +93,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull Docker image
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "📦 Pulling image: $IMAGE"
-          docker pull "$IMAGE"
-
       - name: Cache cargo artifacts
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo-cache/registry
-            ~/.cargo-cache/git
-            ~/cargo-target
+            ~/.cargo/registry
+            ~/.cargo/git
+            /cargo-target
           key: check-gen-cargo-${{ needs.setup.outputs.image }}-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
             check-gen-cargo-${{ needs.setup.outputs.image }}-
@@ -116,49 +107,30 @@ jobs:
       - name: Cache uv virtualenv
         uses: actions/cache@v4
         with:
-          path: ~/uv-venv
+          path: /uv-venv
           key: check-gen-uv-${{ needs.setup.outputs.image }}-${{ hashFiles('gen/python/uv.lock') }}
           restore-keys: |
             check-gen-uv-${{ needs.setup.outputs.image }}-
 
       - name: Run buf generation and checks
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
+          UV_PROJECT_ENVIRONMENT: /uv-venv
+          CARGO_TARGET_DIR: /cargo-target
         run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "Using image: $IMAGE"
-
-          mkdir -p ~/.cargo-cache ~/cargo-target ~/uv-venv
-
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -v $HOME/.cargo-cache:/cargo-cache \
-            -v $HOME/cargo-target:/cargo-target \
-            -v $HOME/uv-venv:/uv-venv \
-            -w /workspace \
-            -e SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
-            -e UV_PROJECT_ENVIRONMENT=/uv-venv \
-            -e CARGO_HOME=/cargo-cache \
-            -e CARGO_TARGET_DIR=/cargo-target \
-            "$IMAGE" \
-            bash -c '
-              set -euo pipefail
-              git config --global --add safe.directory /workspace
-              cd gen/python && uv sync --all-groups --frozen && cd ../..
-              make buf
-              # Restore mock files deleted by buf generate --clean (checked separately in check-mocks job)
-              git checkout -- "*/mocks/*" "*/gocachemocks/*" 2>/dev/null || true
-              git diff --exit-code -- ":!gen/rust/Cargo.lock" ":!*/mocks/*" ":!*/gocachemocks/*" ":!go.mod" ":!go.sum" || \
-                (echo "Generated files are out of date. Run \`make gen\` and commit changes." && exit 1)
-              make check-crate
-            '
-
-      - name: Fix cache permissions
-        if: always()
-        run: |
-          sudo chown -R $(id -u):$(id -g) ~/.cargo-cache ~/cargo-target ~/uv-venv
+          cd gen/python && uv sync --all-groups --frozen && cd ../..
+          make buf
+          # Restore mock files deleted by buf generate --clean (checked separately in check-mocks job)
+          git checkout -- '*/mocks/*' '*/gocachemocks/*' 2>/dev/null || true
+          git diff --exit-code -- ':!gen/rust/Cargo.lock' ':!*/mocks/*' ':!*/gocachemocks/*' ':!go.mod' ':!go.sum' || \
+            (echo 'Generated files are out of date. Run `make gen` and commit changes.' && exit 1)
+          make check-crate
 
   check-go-tidy:
     needs: setup
     runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.image }}
     permissions:
       contents: read
       packages: read
@@ -166,37 +138,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull Docker image
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "📦 Pulling image: $IMAGE"
-          docker pull "$IMAGE"
-
       - name: Run go mod tidy and check
         run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "Using image: $IMAGE"
-
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            "$IMAGE" \
-            bash -c '
-              set -euo pipefail
-              git config --global --add safe.directory /workspace
-              make go-tidy
-              git diff --exit-code -- go.mod go.sum || \
-                (echo "go.mod/go.sum are out of date. Run \`go mod tidy\` and commit changes." && exit 1)
-            '
+          make go-tidy
+          git diff --exit-code -- go.mod go.sum || \
+            (echo 'go.mod/go.sum are out of date. Run `go mod tidy` and commit changes.' && exit 1)
 
   check-mocks:
     needs: setup
     runs-on: ubuntu-latest
+    container:
+      image: ${{ needs.setup.outputs.image }}
     permissions:
       contents: read
       packages: read
@@ -204,30 +156,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull Docker image
-        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
-        run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "📦 Pulling image: $IMAGE"
-          docker pull "$IMAGE"
-
       - name: Run mockery and check
         run: |
-          IMAGE="${{ needs.setup.outputs.image }}"
-          echo "Using image: $IMAGE"
-
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            "$IMAGE" \
-            bash -c '
-              set -euo pipefail
-              git config --global --add safe.directory /workspace
-              make mocks
-              git diff --exit-code -- "*/mocks/*" "*/gocachemocks/*" || \
-                (echo "Mock files are out of date. Run \`make mocks\` and commit changes." && exit 1)
-            '
+          make mocks
+          git diff --exit-code -- '*/mocks/*' '*/gocachemocks/*' || \
+            (echo 'Mock files are out of date. Run `make mocks` and commit changes.' && exit 1)
