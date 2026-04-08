@@ -26,7 +26,7 @@ var defaultConfig = &Config{
 		{ID: "staging", Name: "Staging"},
 	},
 	TriggerScheduler: TriggerSchedulerConfig{
-		Enabled:               false,
+		Enabled:               true,
 		ResyncInterval:        30 * time.Second,
 		MaxCatchupRunsPerLoop: 100,
 		ExecutionQPS:          10.0,

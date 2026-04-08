@@ -31,8 +31,6 @@ executor:
 # Runs service configuration
 runs:
   storagePrefix: "s3://flyte-data"
-  triggerScheduler:
-    enabled: true
   database:
     postgres:
       host: "localhost"
