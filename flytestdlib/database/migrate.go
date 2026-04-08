@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 	applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )`
 
+// migrationAdvisoryLockID is a fixed key for pg_advisory_lock to prevent
+// concurrent replicas from racing on migration application.
+const migrationAdvisoryLockID = 5432
+
 // Migrate applies all unapplied SQL migration files from the provided fs.FS.
 // Migration files are expected to be located under "sql/" and follow the naming
 // convention "NNNN_description.sql". Files ending with "_down.sql" are skipped.
@@ -28,6 +32,16 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 // so that multiple services sharing the same database do not collide
 // (e.g. prefix "runs" records version "runs/001_init_schema").
 func Migrate(ctx context.Context, db *sqlx.DB, prefix string, migrations fs.FS) error {
+	// Acquire an advisory lock so that concurrent replicas do not race on migrations.
+	if _, err := db.ExecContext(ctx, "SELECT pg_advisory_lock($1)", migrationAdvisoryLockID); err != nil {
+		return fmt.Errorf("failed to acquire migration advisory lock: %w", err)
+	}
+	defer func() {
+		if _, err := db.ExecContext(ctx, "SELECT pg_advisory_unlock($1)", migrationAdvisoryLockID); err != nil {
+			logger.Errorf(ctx, "failed to release migration advisory lock: %v", err)
+		}
+	}()
+
 	if _, err := db.ExecContext(ctx, schemaMigrationsTable); err != nil {
 		return fmt.Errorf("failed to create schema_migrations table: %w", err)
 	}

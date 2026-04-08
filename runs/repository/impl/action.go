@@ -180,17 +180,17 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 	err = r.db.QueryRowxContext(ctx,
 		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
-		 RETURNING id, created_at, updated_at`,
+		 RETURNING created_at, updated_at`,
 		run.Project, run.Domain, run.RunName, run.Name, run.ParentActionName, run.Phase, run.RunSource, run.ActionType, run.ActionGroup,
 		run.TaskProject, run.TaskDomain, run.TaskName, run.TaskVersion, run.TaskType, run.TaskShortName, run.FunctionName, run.EnvironmentName,
 		run.ActionSpec, run.ActionDetails, run.DetailedInfo, run.RunSpec, run.Attempts, run.CacheStatus,
-	).Scan(&run.ID, &run.CreatedAt, &run.UpdatedAt)
+	).Scan(&run.CreatedAt, &run.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create run: %w", err)
 	}
 
-	logger.Infof(ctx, "Created run: %s/%s/%s (ID: %d)",
-		run.Project, run.Domain, run.RunName, run.ID)
+	logger.Infof(ctx, "Created run: %s/%s/%s",
+		run.Project, run.Domain, run.RunName)
 
 	// Notify subscribers of run creation
 	r.notifyRunUpdate(ctx, runID)
@@ -234,15 +234,14 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 
 	// Apply pagination according to token and limit from requests.
 	limit := 50
+	offset := 0
 	if req.Request != nil {
 		if req.Request.Token != "" {
-			tokenID, err := strconv.ParseUint(req.Request.Token, 10, 64)
+			parsedOffset, err := strconv.Atoi(req.Request.Token)
 			if err != nil {
 				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
 			}
-			queryBuilder.WriteString(fmt.Sprintf(" AND id < $%d", argIdx))
-			args = append(args, tokenID)
-			argIdx++
+			offset = parsedOffset
 		}
 
 		if req.Request.Limit > 0 {
@@ -250,9 +249,9 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 		}
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d", argIdx))
-	args = append(args, limit+1) // Fetch one extra to determine if there are more
-	argIdx++
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
+	args = append(args, limit+1, offset) // Fetch one extra to determine if there are more
+	argIdx += 2
 
 	var runs []*models.Run
 	if err := sqlx.SelectContext(ctx, r.db, &runs, queryBuilder.String(), args...); err != nil {
@@ -263,7 +262,7 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 	var nextToken string
 	if len(runs) > limit {
 		runs = runs[:limit]
-		nextToken = fmt.Sprintf("%d", runs[len(runs)-1].ID)
+		nextToken = fmt.Sprintf("%d", offset+limit)
 	}
 
 	return runs, nextToken, nil
@@ -421,7 +420,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*
 		return nil, fmt.Errorf("failed to fetch created action: %w", err)
 	}
 
-	logger.Infof(ctx, "Created action: %s (ID: %d)", created.Name, created.ID)
+	logger.Infof(ctx, "Created action: %s", created.Name)
 
 	// Notify subscribers of action creation
 	r.notifyActionUpdate(ctx, actionID)

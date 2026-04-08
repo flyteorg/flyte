@@ -137,6 +137,12 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 	if err != nil {
 		return nil, err
 	}
+
+	if err = db.PingContext(ctx); err != nil {
+		db.Close()
+		return nil, err
+	}
+
 	return db, nil
 }
 

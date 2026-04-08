@@ -11,8 +11,6 @@ import (
 // Action represents a workflow action in the database
 // Root actions (where ParentActionName is NULL) represent runs
 type Action struct {
-	ID uint `db:"id"`
-
 	// Action Identifier (unique across project/domain/run_name/name)
 	Project string `db:"project"`
 	Domain  string `db:"domain"`

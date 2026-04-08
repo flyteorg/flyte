@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS projects (
 CREATE INDEX IF NOT EXISTS idx_projects_state ON projects (state);
 
 CREATE TABLE IF NOT EXISTS actions (
-    id                  BIGSERIAL PRIMARY KEY,
     project             TEXT NOT NULL,
     domain              TEXT NOT NULL,
     run_name            TEXT NOT NULL DEFAULT '',
@@ -42,9 +41,9 @@ CREATE TABLE IF NOT EXISTS actions (
     ended_at            TIMESTAMPTZ,
     duration_ms         BIGINT,
     attempts            INTEGER NOT NULL DEFAULT 0,
-    cache_status        INTEGER NOT NULL DEFAULT 0
+    cache_status        INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (project, domain, run_name, name)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS idx_actions_identifier ON actions (project, domain, run_name, name);
 CREATE INDEX IF NOT EXISTS idx_actions_run_lookup ON actions (project, domain, run_name);
 CREATE INDEX IF NOT EXISTS idx_actions_parent ON actions (parent_action_name);
 CREATE INDEX IF NOT EXISTS idx_actions_phase ON actions (phase);
