@@ -835,7 +835,7 @@ func (s *RunService) ListRuns(
 	ctx context.Context,
 	req *connect.Request[workflow.ListRunsRequest],
 ) (*connect.Response[workflow.ListRunsResponse], error) {
-	logger.Infof(ctx, "Received ListRuns request")
+	logger.Debugf(ctx, "Received ListRuns request")
 
 	// Validate request
 	if err := req.Msg.Validate(); err != nil {
@@ -860,7 +860,7 @@ func (s *RunService) ListRuns(
 		Token: nextToken,
 	}
 
-	logger.Infof(ctx, "Listed %d runs", len(runs))
+	logger.Debugf(ctx, "Listed %d runs", len(runs))
 	return connect.NewResponse(resp), nil
 }
 
