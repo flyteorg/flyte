@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lib/pq"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -163,8 +164,9 @@ func NewDeployedByFilter(deployedBy string) interfaces.Filter {
 	return NewEqualFilter("deployed_by", deployedBy)
 }
 
-// ConvertProtoFilters converts proto filters to our Filter interfaces
-func ConvertProtoFilters(protoFilters []*common.Filter) (interfaces.Filter, error) {
+// ConvertProtoFilters converts proto filters to our Filter interfaces.
+// allowedColumns is checked to prevent SQL injection via user-supplied field names.
+func ConvertProtoFilters(protoFilters []*common.Filter, allowedColumns sets.Set[string]) (interfaces.Filter, error) {
 	if len(protoFilters) == 0 {
 		return nil, nil
 	}
@@ -172,6 +174,9 @@ func ConvertProtoFilters(protoFilters []*common.Filter) (interfaces.Filter, erro
 	filters := make([]interfaces.Filter, 0, len(protoFilters))
 
 	for _, protoFilter := range protoFilters {
+		if !allowedColumns.Has(protoFilter.Field) {
+			return nil, fmt.Errorf("invalid filter field: %s", protoFilter.Field)
+		}
 		// Convert filter function to expression
 		var expression interfaces.FilterExpression
 		switch protoFilter.Function {

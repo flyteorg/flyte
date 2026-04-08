@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -111,7 +112,8 @@ func TestConvertProtoFilters(t *testing.T) {
 		},
 	}
 
-	filter, err := ConvertProtoFilters(protoFilters)
+	allowedColumns := sets.New("org", "name")
+	filter, err := ConvertProtoFilters(protoFilters, allowedColumns)
 	require.NoError(t, err)
 	assert.NotNil(t, filter)
 
@@ -121,8 +123,23 @@ func TestConvertProtoFilters(t *testing.T) {
 	assert.Contains(t, expr.Query, "name LIKE ?")
 }
 
+func TestConvertProtoFilters_DisallowedColumn(t *testing.T) {
+	protoFilters := []*common.Filter{
+		{
+			Field:    "malicious_field",
+			Function: common.Filter_EQUAL,
+			Values:   []string{"value"},
+		},
+	}
+
+	allowedColumns := sets.New("org", "name")
+	_, err := ConvertProtoFilters(protoFilters, allowedColumns)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid filter field")
+}
+
 func TestConvertProtoFilters_EmptyList(t *testing.T) {
-	filter, err := ConvertProtoFilters([]*common.Filter{})
+	filter, err := ConvertProtoFilters([]*common.Filter{}, sets.New[string]())
 	require.NoError(t, err)
 	assert.Nil(t, filter)
 }

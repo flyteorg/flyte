@@ -49,7 +49,7 @@ func NewListResourceInputFromProto(request *common.ListRequest, allowedColumns s
 		return interfaces.ListResourceInput{}, err
 	}
 
-	combinedFilter, err := ConvertProtoFilters(request.GetFilters())
+	combinedFilter, err := ConvertProtoFilters(request.GetFilters(), allowedColumns)
 	if err != nil {
 		return interfaces.ListResourceInput{}, fmt.Errorf("failed to convert filters: %w", err)
 	}
