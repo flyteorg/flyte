@@ -502,6 +502,12 @@ func (r *actionRepo) UpdateActionPhase(
 	// Notify subscribers of the action update
 	r.notifyActionUpdate(ctx, actionID)
 
+	// If this is the root action (the run itself), also notify run subscribers
+	// so that WatchRuns streams reflect phase transitions (e.g. RUNNING → SUCCEEDED).
+	if actionID.Name == rootActionName {
+		r.notifyRunUpdate(ctx, actionID.Run)
+	}
+
 	return nil
 }
 
