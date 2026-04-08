@@ -153,6 +153,11 @@ gen-local: buf mocks go-tidy ## Generate everything using local tools (requires 
 	@echo '⚡  Finished generating everything in the gen directory (local)'
 	@$(MAKE) sep
 
+.PHONY: check-crate
+check-crate: ## Verify Rust crate compiles using local cargo (faster, no artifacts)
+	@echo 'Cargo check the generated rust code (local)'
+	cd gen/rust && cargo check
+
 .PHONY: build-crate
 build-crate: ## Build Rust crate using local cargo
 	@echo 'Cargo build the generated rust code (local)'
