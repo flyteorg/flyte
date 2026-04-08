@@ -7,9 +7,6 @@ type AppConfig struct {
 	// Enabled controls whether the app deployment controller is started.
 	Enabled bool `json:"enabled" pflag:",Enable app deployment controller"`
 
-	// Namespace is the K8s namespace where KService CRDs are created.
-	Namespace string `json:"namespace" pflag:",Namespace for app KServices"`
-
 	// DefaultRequestTimeout is the request timeout applied to apps that don't specify one.
 	DefaultRequestTimeout time.Duration `json:"defaultRequestTimeout" pflag:",Default request timeout for apps"`
 

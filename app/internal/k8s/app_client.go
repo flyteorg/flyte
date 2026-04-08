@@ -49,7 +49,7 @@ type AppK8sClientInterface interface {
 	Stop(ctx context.Context, appID *flyteapp.Identifier) error
 
 	// GetStatus reads the KService and maps its conditions to a DeploymentStatus.
-	// Returns a Status with STOPPED if the KService does not exist.
+	// Returns a not-found error (checkable with k8serrors.IsNotFound) if the KService does not exist.
 	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
 
 	// List returns all apps (spec + live status) for the given project/domain scope.
@@ -74,7 +74,6 @@ type AppK8sClientInterface interface {
 type AppK8sClient struct {
 	k8sClient client.WithWatch
 	cache     ctrlcache.Cache
-	namespace string
 	cfg       *config.AppConfig
 }
 
@@ -83,14 +82,20 @@ func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *con
 	return &AppK8sClient{
 		k8sClient: k8sClient,
 		cache:     cache,
-		namespace: cfg.Namespace,
 		cfg:       cfg,
 	}
+}
+
+// appNamespace returns the K8s namespace for a given project/domain pair.
+// Follows the same convention as the Actions and Secret services: "{project}-{domain}".
+func appNamespace(project, domain string) string {
+	return fmt.Sprintf("%s-%s", project, domain)
 }
 
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	appID := app.GetMetadata().GetId()
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 
 	ksvc, err := c.buildKService(app)
@@ -99,12 +104,12 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	}
 
 	existing := &servingv1.Service{}
-	err = c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, existing)
+	err = c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, existing)
 	if k8serrors.IsNotFound(err) {
 		if err := c.k8sClient.Create(ctx, ksvc); err != nil {
 			return fmt.Errorf("failed to create KService %s: %w", name, err)
 		}
-		logger.Infof(ctx, "Created KService %s/%s", c.namespace, name)
+		logger.Infof(ctx, "Created KService %s/%s", ns, name)
 		return nil
 	}
 	if err != nil {
@@ -113,7 +118,7 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 
 	// Skip update if spec has not changed.
 	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
-		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", c.namespace, name)
+		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
 		return nil
 	}
 
@@ -123,17 +128,18 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	if err := c.k8sClient.Update(ctx, existing); err != nil {
 		return fmt.Errorf("failed to update KService %s: %w", name, err)
 	}
-	logger.Infof(ctx, "Updated KService %s/%s", c.namespace, name)
+	logger.Infof(ctx, "Updated KService %s/%s", ns, name)
 	return nil
 }
 
 // Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 	patch := []byte(`{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/max-scale":"0"}}}}}`)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
-	ksvc.Namespace = c.namespace
+	ksvc.Namespace = ns
 	if err := c.k8sClient.Patch(ctx, ksvc, client.RawPatch(types.MergePatchType, patch)); err != nil {
 		if k8serrors.IsNotFound(err) {
 			// Already stopped/deleted — treat as success.
@@ -141,44 +147,38 @@ func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) err
 		}
 		return fmt.Errorf("failed to patch KService %s to stop: %w", name, err)
 	}
-	logger.Infof(ctx, "Stopped KService %s/%s (max-scale=0)", c.namespace, name)
+	logger.Infof(ctx, "Stopped KService %s/%s (max-scale=0)", ns, name)
 	return nil
 }
 
 // Delete removes the KService CRD for the given app entirely.
 func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
-	ksvc.Namespace = c.namespace
+	ksvc.Namespace = ns
 	if err := c.k8sClient.Delete(ctx, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil
 		}
 		return fmt.Errorf("failed to delete KService %s: %w", name, err)
 	}
-	logger.Infof(ctx, "Deleted KService %s/%s", c.namespace, name)
+	logger.Infof(ctx, "Deleted KService %s/%s", ns, name)
 	return nil
 }
 
 // Watch returns a channel of WatchResponse events for KServices in the given
-// project/domain scope. Pass empty strings to watch all managed KServices.
-// The channel is closed when ctx is cancelled or the underlying watch terminates.
+// project/domain scope. The channel is closed when ctx is cancelled or the
+// underlying watch terminates.
 func (c *AppK8sClient) Watch(ctx context.Context, project, domain string) (<-chan *flyteapp.WatchResponse, error) {
-	labels := client.MatchingLabels{labelAppManaged: "true"}
-	if project != "" {
-		labels[labelProject] = project
-	}
-	if domain != "" {
-		labels[labelDomain] = domain
-	}
-
+	ns := appNamespace(project, domain)
 	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{},
-		client.InNamespace(c.namespace),
-		labels,
+		client.InNamespace(ns),
+		client.MatchingLabels{labelAppManaged: "true"},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to start KService watch for %s/%s: %w", project, domain, err)
+		return nil, fmt.Errorf("failed to start KService watch in namespace %s: %w", ns, err)
 	}
 
 	ch := make(chan *flyteapp.WatchResponse, 64)
@@ -193,7 +193,7 @@ func (c *AppK8sClient) Watch(ctx context.Context, project, domain string) (<-cha
 				if !ok {
 					return
 				}
-				resp := kserviceEventToWatchResponse(event)
+				resp := c.kserviceEventToWatchResponse(ctx, event)
 				if resp == nil {
 					continue
 				}
@@ -210,12 +210,12 @@ func (c *AppK8sClient) Watch(ctx context.Context, project, domain string) (<-cha
 
 // kserviceEventToWatchResponse maps a K8s watch event to a flyteapp.WatchResponse.
 // Returns nil for event types that should not be forwarded (Error, Bookmark).
-func kserviceEventToWatchResponse(event k8swatch.Event) *flyteapp.WatchResponse {
+func (c *AppK8sClient) kserviceEventToWatchResponse(ctx context.Context, event k8swatch.Event) *flyteapp.WatchResponse {
 	ksvc, ok := event.Object.(*servingv1.Service)
 	if !ok {
 		return nil
 	}
-	app, err := kserviceToApp(ksvc)
+	app, err := c.kserviceToApp(ctx, ksvc)
 	if err != nil {
 		// KService is not managed by us — skip it.
 		return nil
@@ -246,33 +246,33 @@ func kserviceEventToWatchResponse(event k8swatch.Event) *flyteapp.WatchResponse 
 
 // GetStatus reads the KService and maps its conditions to a flyteapp.Status proto.
 func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error) {
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 	ksvc := &servingv1.Service{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, ksvc); err != nil {
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
-			return statusWithPhase(flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, "KService not found"), nil
+			return nil, fmt.Errorf("KService %s not found: %w", name, err)
 		}
 		return nil, fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
-	return kserviceToStatus(ksvc), nil
+	return c.kserviceToStatus(ctx, ksvc), nil
 }
 
-// List returns all apps for the given project/domain by listing KServices with label selectors.
+// List returns all apps for the given project/domain by listing KServices in the
+// project/domain namespace.
 func (c *AppK8sClient) List(ctx context.Context, project, domain string) ([]*flyteapp.App, error) {
+	ns := appNamespace(project, domain)
 	list := &servingv1.ServiceList{}
 	if err := c.k8sClient.List(ctx, list,
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			labelProject: project,
-			labelDomain:  domain,
-		},
+		client.InNamespace(ns),
+		client.MatchingLabels{labelAppManaged: "true"},
 	); err != nil {
 		return nil, fmt.Errorf("failed to list KServices for %s/%s: %w", project, domain, err)
 	}
 
 	apps := make([]*flyteapp.App, 0, len(list.Items))
 	for i := range list.Items {
-		a, err := kserviceToApp(&list.Items[i])
+		a, err := c.kserviceToApp(ctx, &list.Items[i])
 		if err != nil {
 			logger.Warnf(ctx, "Skipping KService %s: failed to convert to app: %v", list.Items[i].Name, err)
 			continue
@@ -284,14 +284,20 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string) ([]*fly
 
 // --- Helpers ---
 
-// kserviceName builds the KService name from an app identifier.
-// Format: "{project}-{domain}-{name}", truncated to 63 chars.
+// kserviceName returns the KService name for an app. Since each app is deployed
+// to its own project/domain namespace, the name only needs to be unique within
+// that namespace — the app name alone suffices.
+// Names are lower-cased and capped at 63 chars (K8s DNS label limit). For names
+// that exceed 63 chars, the first 54 chars are kept and an 8-char SHA256 suffix
+// is appended to avoid collisions between names with a long common prefix.
 func kserviceName(id *flyteapp.Identifier) string {
-	name := fmt.Sprintf("%s-%s-%s", id.GetProject(), id.GetDomain(), id.GetName())
-	if len(name) > maxKServiceNameLen {
-		name = name[:maxKServiceNameLen]
+	name := strings.ToLower(id.GetName())
+	if len(name) <= maxKServiceNameLen {
+		return name
 	}
-	return strings.ToLower(name)
+	sum := sha256.Sum256([]byte(name))
+	suffix := hex.EncodeToString(sum[:4]) // 4 bytes = 8 hex chars
+	return name[:maxKServiceNameLen-9] + "-" + suffix
 }
 
 // specSHA computes a SHA256 digest of the serialized App Spec proto.
@@ -309,6 +315,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	appID := app.GetMetadata().GetId()
 	spec := app.GetSpec()
 	name := kserviceName(appID)
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 
 	sha, err := specSHA(spec)
 	if err != nil {
@@ -334,7 +341,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: c.namespace,
+			Namespace: ns,
 			Labels: map[string]string{
 				labelAppManaged: "true",
 				labelProject:    appID.GetProject(),
@@ -437,7 +444,8 @@ func statusWithPhase(phase flyteapp.Status_DeploymentStatus, message string) *fl
 }
 
 // kserviceToStatus maps a KService's conditions to a flyteapp.Status proto.
-func kserviceToStatus(ksvc *servingv1.Service) *flyteapp.Status {
+// It fetches the latest ready Revision to read the accurate ActualReplicas count.
+func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Service) *flyteapp.Status {
 	var phase flyteapp.Status_DeploymentStatus
 	var message string
 
@@ -474,8 +482,15 @@ func kserviceToStatus(ksvc *servingv1.Service) *flyteapp.Status {
 		}
 	}
 
-	// Populate current replica count and K8s namespace metadata.
-	status.CurrentReplicas = uint32(len(ksvc.Status.Traffic))
+	// Populate current replica count from the latest ready Revision.
+	if revName := ksvc.Status.LatestReadyRevisionName; revName != "" {
+		rev := &servingv1.Revision{}
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: revName, Namespace: ksvc.Namespace}, rev); err == nil {
+			if rev.Status.ActualReplicas != nil {
+				status.CurrentReplicas = uint32(*rev.Status.ActualReplicas)
+			}
+		}
+	}
 	status.K8SMetadata = &flyteapp.K8SMetadata{
 		Namespace: ksvc.Namespace,
 	}
@@ -483,17 +498,13 @@ func kserviceToStatus(ksvc *servingv1.Service) *flyteapp.Status {
 	return status
 }
 
-// GetReplicas lists the pods currently backing the given app by matching
-// the flyte.org/project, flyte.org/domain, and flyte.org/app-name labels.
+// GetReplicas lists the pods currently backing the given app.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	podList := &corev1.PodList{}
 	if err := c.k8sClient.List(ctx, podList,
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			labelProject: appID.GetProject(),
-			labelDomain:  appID.GetDomain(),
-			labelAppName: appID.GetName(),
-		},
+		client.InNamespace(ns),
+		client.MatchingLabels{labelAppName: appID.GetName()},
 	); err != nil {
 		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
 			appID.GetProject(), appID.GetDomain(), appID.GetName(), err)
@@ -508,16 +519,18 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 
 // DeleteReplica force-deletes a specific pod. Knative will schedule a replacement automatically.
 func (c *AppK8sClient) DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error {
+	appID := replicaID.GetAppId()
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	pod := &corev1.Pod{}
 	pod.Name = replicaID.GetName()
-	pod.Namespace = c.namespace
+	pod.Namespace = ns
 	if err := c.k8sClient.Delete(ctx, pod); err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil
 		}
-		return fmt.Errorf("failed to delete pod %s/%s: %w", c.namespace, replicaID.GetName(), err)
+		return fmt.Errorf("failed to delete pod %s/%s: %w", ns, replicaID.GetName(), err)
 	}
-	logger.Infof(ctx, "Deleted replica pod %s/%s", c.namespace, replicaID.GetName())
+	logger.Infof(ctx, "Deleted replica pod %s/%s", ns, replicaID.GetName())
 	return nil
 }
 
@@ -575,7 +588,7 @@ func podDeploymentStatus(pod *corev1.Pod) (string, string) {
 
 // kserviceToApp reconstructs a flyteapp.App from a KService by reading the
 // app identifier from annotations and the live status from KService conditions.
-func kserviceToApp(ksvc *servingv1.Service) (*flyteapp.App, error) {
+func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Service) (*flyteapp.App, error) {
 	appIDStr, ok := ksvc.Annotations[annotationAppID]
 	if !ok {
 		return nil, fmt.Errorf("KService %s missing %s annotation", ksvc.Name, annotationAppID)
@@ -597,6 +610,6 @@ func kserviceToApp(ksvc *servingv1.Service) (*flyteapp.App, error) {
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
-		Status: kserviceToStatus(ksvc),
+		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }
