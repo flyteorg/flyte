@@ -77,7 +77,7 @@ class StructuredDatasetType(_message.Message):
     def __init__(self, columns: _Optional[_Iterable[_Union[StructuredDatasetType.DatasetColumn, _Mapping]]] = ..., format: _Optional[str] = ..., external_schema_type: _Optional[str] = ..., external_schema_bytes: _Optional[bytes] = ...) -> None: ...
 
 class BlobType(_message.Message):
-    __slots__ = ["format", "dimensionality", "file_extension", "enable_legacy_filename"]
+    __slots__ = ["format", "dimensionality", "file_extension"]
     class BlobDimensionality(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         SINGLE: _ClassVar[BlobType.BlobDimensionality]
@@ -87,12 +87,10 @@ class BlobType(_message.Message):
     FORMAT_FIELD_NUMBER: _ClassVar[int]
     DIMENSIONALITY_FIELD_NUMBER: _ClassVar[int]
     FILE_EXTENSION_FIELD_NUMBER: _ClassVar[int]
-    ENABLE_LEGACY_FILENAME_FIELD_NUMBER: _ClassVar[int]
     format: str
     dimensionality: BlobType.BlobDimensionality
     file_extension: str
-    enable_legacy_filename: bool
-    def __init__(self, format: _Optional[str] = ..., dimensionality: _Optional[_Union[BlobType.BlobDimensionality, str]] = ..., file_extension: _Optional[str] = ..., enable_legacy_filename: bool = ...) -> None: ...
+    def __init__(self, format: _Optional[str] = ..., dimensionality: _Optional[_Union[BlobType.BlobDimensionality, str]] = ..., file_extension: _Optional[str] = ...) -> None: ...
 
 class EnumType(_message.Message):
     __slots__ = ["values"]

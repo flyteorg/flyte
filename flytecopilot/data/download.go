@@ -33,34 +33,28 @@ type Downloader struct {
 	mode core.IOStrategy_DownloadMode
 }
 
-// By default, blobs (FlyteFiles) were not and still are not written with a file extension.
-// For example, a data: FlyteFile["csv"] blob should be written to "data", even though
-// Format="csv".
+// By default, blobs (FlyteFiles) were not and still are not written with a
+// file extension. For example, a data: FlyteFile["csv"] blob is written
+// to "inputs/data", even though Format="csv".
 //
 // When FileExtension="" (the default), this old behavior is preserved.
 //
-// However, a data: Annotated[FlyteFile["csv"], FileDownloadConfig(file_extension="csv")]
-// blob should be written to "data.csv" - both Format="csv" and FileExtension="csv" (new behavior).
-//
-// So when e.g. FileExtension="csv", the file is written to "data.csv".
-// Also, when e.g. FileExtension="csv" and EnableLegacyFilename=true, the file is written to
-// "data" and "data.csv" (partially new behavior, bridges the gap of backward compatibility).
-func resolveVarFilenames(vars *core.VariableMap) map[string][]string {
-	varFilenames := make(map[string][]string, len(vars.GetVariables()))
+// However, an input blob
+// `data: Annotated[FlyteFile["csv"], FileDownloadConfig(file_extension="csv")]`
+// should be written to "inputs/data.csv" (when FileExtension="csv" - new behavior).
+func resolveVarFilenames(vars *core.VariableMap) map[string]string {
+	varFilenames := make(map[string]string, len(vars.GetVariables()))
 	for varName, variable := range vars.GetVariables() {
 		varType := variable.GetType()
 		switch varType.GetType().(type) {
 		case *core.LiteralType_Blob:
 			if varType.GetBlob().GetFileExtension() == "" {
-				varFilenames[varName] = append(varFilenames[varName], varName)
+				varFilenames[varName] = varName
 			} else {
-				varFilenames[varName] = append(varFilenames[varName], varName+"."+varType.GetBlob().GetFileExtension())
-				if varType.GetBlob().GetEnableLegacyFilename() {
-					varFilenames[varName] = append(varFilenames[varName], varName)
-				}
+				varFilenames[varName] = varName + "." + varType.GetBlob().GetFileExtension()
 			}
 		default:
-			varFilenames[varName] = append(varFilenames[varName], varName)
+			varFilenames[varName] = varName
 		}
 	}
 	return varFilenames
@@ -465,7 +459,7 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", filePath)
 		}
-		v, m, err := d.RecursiveDownload(ctx, lit.GetMap(), filePath, make(map[string][]string), writeToFile)
+		v, m, err := d.RecursiveDownload(ctx, lit.GetMap(), filePath, make(map[string]string), writeToFile)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -501,7 +495,7 @@ type downloadedResult struct {
 	v   interface{}
 }
 
-func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralMap, dir string, varFilenames map[string][]string, writePrimitiveToFile bool) (VarMap, *core.LiteralMap, error) {
+func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralMap, dir string, varFilenames map[string]string, writePrimitiveToFile bool) (VarMap, *core.LiteralMap, error) {
 	childCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if inputs == nil || len(inputs.GetLiterals()) == 0 {
@@ -519,26 +513,18 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 			}
 			logger.Infof(ctx, "read object at location [%s]", offloadedMetadataURI)
 		}
+		filename := variable
+		if varFilename, ok := varFilenames[variable]; ok {
+			filename = varFilename
+		}
+		varPath := path.Join(dir, filename)
 		lit := literal
 		f[variable] = futures.NewAsyncFuture(childCtx, func(ctx2 context.Context) (interface{}, error) {
-			var filenames []string
-			var resultLit *core.Literal
-			var resultV interface{}
-			var err error
-			if len(varFilenames[variable]) == 0 {
-				filenames = []string{variable}
-			} else {
-				filenames = varFilenames[variable]
+			v, lit, err := d.handleLiteral(ctx2, lit, varPath, writePrimitiveToFile)
+			if err != nil {
+				return nil, err
 			}
-			for _, filename := range filenames {
-				varPath := path.Join(dir, filename)
-				// TODO: Refactor handleLiteral to accept a list of file paths and return a list of downloaded results
-				resultV, resultLit, err = d.handleLiteral(ctx2, lit, varPath, writePrimitiveToFile)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return downloadedResult{lit: resultLit, v: resultV}, nil
+			return downloadedResult{lit: lit, v: v}, nil
 		})
 	}
 

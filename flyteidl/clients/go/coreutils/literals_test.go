@@ -388,11 +388,10 @@ func TestMakeLiteralForSimpleType(t *testing.T) {
 
 func TestMakeLiteralForBlob(t *testing.T) {
 	type args struct {
-		path                 storage.DataReference
-		isDir                bool
-		format               string
-		fileExtension        string
-		enableLegacyFilename bool
+		path          storage.DataReference
+		isDir         bool
+		format        string
+		fileExtension string
 	}
 	tests := []struct {
 		name string
@@ -401,12 +400,11 @@ func TestMakeLiteralForBlob(t *testing.T) {
 	}{
 		{"simple-key", args{path: "/key", isDir: false, format: "xyz"}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_SINGLE}}}},
 		{"simple-dir", args{path: "/key", isDir: true, format: "xyz"}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_MULTIPART}}}},
-		{"simple-key-with-extension", args{path: "/key", isDir: false, format: "xyz", fileExtension: "xyz", enableLegacyFilename: false}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_SINGLE, FileExtension: "xyz", EnableLegacyFilename: false}}}},
-		{"simple-key-with-extension-and-legacy-filename", args{path: "/key", isDir: false, format: "xyz", fileExtension: "xyz", enableLegacyFilename: true}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_SINGLE, FileExtension: "xyz", EnableLegacyFilename: true}}}},
+		{"simple-key-with-extension", args{path: "/key", isDir: false, format: "xyz", fileExtension: "xyz"}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_SINGLE, FileExtension: "xyz"}}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := MakeLiteralForBlob(tt.args.path, tt.args.isDir, tt.args.format, tt.args.fileExtension, tt.args.enableLegacyFilename); !reflect.DeepEqual(got.GetScalar().GetBlob(), tt.want) {
+			if got := MakeLiteralForBlob(tt.args.path, tt.args.isDir, tt.args.format, tt.args.fileExtension); !reflect.DeepEqual(got.GetScalar().GetBlob(), tt.want) {
 				t.Errorf("MakeLiteralForBlob() = %v, want %v", got, tt.want)
 			}
 		})

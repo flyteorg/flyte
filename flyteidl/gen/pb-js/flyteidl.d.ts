@@ -2177,9 +2177,6 @@ export namespace flyteidl {
 
             /** BlobType fileExtension */
             fileExtension?: (string|null);
-
-            /** BlobType enableLegacyFilename */
-            enableLegacyFilename?: (boolean|null);
         }
 
         /** Represents a BlobType. */
@@ -2199,9 +2196,6 @@ export namespace flyteidl {
 
             /** BlobType fileExtension. */
             public fileExtension: string;
-
-            /** BlobType enableLegacyFilename. */
-            public enableLegacyFilename: boolean;
 
             /**
              * Creates a new BlobType instance using the specified properties.

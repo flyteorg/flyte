@@ -86,14 +86,8 @@ message BlobType {
     // Differences from "format":
     //   1. "format" is used for type validation in flytekit, "file_extension" is not.
     //   2. "file_extension" controls the file extension of the blob when materializing
-    //    to local disk during copilot download, unlike "format".
+    //    to local disk during e.g. flytecopilot download, unlike "format".
     string file_extension = 3;
-
-    // When true and file_extension is non-empty, the copilot download phase
-    // writes the blob to both the full path (with extension) and the
-    // old path (without extension), preserving backward compatibility for
-    // workflows with tasks that may read from both. Default is false.
-    bool enable_legacy_filename = 4;
 }
 
 // Enables declaring enum types, with predefined string values

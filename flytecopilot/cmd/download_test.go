@@ -157,10 +157,10 @@ func TestDownloadOptions_Download(t *testing.T) {
 		iface := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"blob": {
-					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "xyz", EnableLegacyFilename: false}}},
+					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "xyz"}}},
 				},
-				"legacy_blob": {
-					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "xyz", EnableLegacyFilename: true}}},
+				"csv_blob": {
+					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "csv", FileExtension: "csv"}}},
 				},
 			},
 		}
@@ -182,27 +182,25 @@ func TestDownloadOptions_Download(t *testing.T) {
 								Uri: blobLoc.String(),
 								Metadata: &core.BlobMetadata{
 									Type: &core.BlobType{
-										Dimensionality:       core.BlobType_SINGLE,
-										Format:               "xyz",
-										FileExtension:        "xyz",
-										EnableLegacyFilename: false,
+										Dimensionality: core.BlobType_SINGLE,
+										Format:         "xyz",
+										FileExtension:  "xyz",
 									},
 								},
 							},
 						},
 					},
 				}},
-				"legacy_blob": {Value: &core.Literal_Scalar{
+				"csv_blob": {Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Blob{
 							Blob: &core.Blob{
 								Uri: blobLoc.String(),
 								Metadata: &core.BlobMetadata{
 									Type: &core.BlobType{
-										Dimensionality:       core.BlobType_SINGLE,
-										Format:               "xyz",
-										FileExtension:        "xyz",
-										EnableLegacyFilename: true,
+										Dimensionality: core.BlobType_SINGLE,
+										Format:         "xyz",
+										FileExtension:  "xyz",
 									},
 								},
 							},
@@ -212,7 +210,7 @@ func TestDownloadOptions_Download(t *testing.T) {
 			},
 		}))
 		assert.NoError(t, dopts.Download(ctx), "Download Operation failed")
-		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob.xyz", "legacy_blob", "legacy_blob.xyz"}, collectFile(tmpDir))
+		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob.xyz", "csv_blob.csv"}, collectFile(tmpDir))
 	})
 
 	t.Run("primitiveAndMissingBlobInputs", func(t *testing.T) {

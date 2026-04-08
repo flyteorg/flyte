@@ -485,7 +485,7 @@ func MakeLiteralForStructuredDataSet(path storage.DataReference, columns []*core
 	}
 }
 
-func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string, fileExtension string, enableLegacyFilename bool) *core.Literal {
+func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string, fileExtension string) *core.Literal {
 	dim := core.BlobType_SINGLE
 	if isDir {
 		dim = core.BlobType_MULTIPART
@@ -498,10 +498,9 @@ func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string, f
 						Uri: path.String(),
 						Metadata: &core.BlobMetadata{
 							Type: &core.BlobType{
-								Dimensionality:       dim,
-								Format:               format,
-								FileExtension:        fileExtension,
-								EnableLegacyFilename: enableLegacyFilename,
+								Dimensionality: dim,
+								Format:         format,
+								FileExtension:  fileExtension,
 							},
 						},
 					},
@@ -603,7 +602,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 
 	case *core.LiteralType_Blob:
 		isDir := newT.Blob.GetDimensionality() == core.BlobType_MULTIPART
-		lv := MakeLiteralForBlob(storage.DataReference(fmt.Sprintf("%v", v)), isDir, newT.Blob.GetFormat(), newT.Blob.GetFileExtension(), newT.Blob.GetEnableLegacyFilename())
+		lv := MakeLiteralForBlob(storage.DataReference(fmt.Sprintf("%v", v)), isDir, newT.Blob.GetFormat(), newT.Blob.GetFileExtension())
 		return lv, nil
 
 	case *core.LiteralType_Schema:
