@@ -99,17 +99,17 @@ jobs:
             ~/.cargo-cache/registry
             ~/.cargo-cache/git
             ~/cargo-target
-          key: check-gen-cargo-${{ hashFiles('gen/rust/Cargo.lock') }}
+          key: check-gen-cargo-${{ steps.docker-image.outputs.image }}-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
-            check-gen-cargo-
+            check-gen-cargo-${{ steps.docker-image.outputs.image }}-
 
       - name: Cache uv virtualenv
         uses: actions/cache@v4
         with:
           path: ~/uv-venv
-          key: check-gen-uv-${{ hashFiles('gen/python/uv.lock') }}
+          key: check-gen-uv-${{ steps.docker-image.outputs.image }}-${{ hashFiles('gen/python/uv.lock') }}
           restore-keys: |
-            check-gen-uv-
+            check-gen-uv-${{ steps.docker-image.outputs.image }}-
 
       - name: Run checks in container
         run: |
