@@ -47,11 +47,7 @@ func (m *mockInternalClient) Update(ctx context.Context, req *connect.Request[fl
 }
 
 func (m *mockInternalClient) UpdateStatus(ctx context.Context, req *connect.Request[flyteapp.UpdateStatusRequest]) (*connect.Response[flyteapp.UpdateStatusResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[flyteapp.UpdateStatusResponse]), args.Error(1)
+	return nil, connect.NewError(connect.CodeUnimplemented, nil)
 }
 
 func (m *mockInternalClient) Delete(ctx context.Context, req *connect.Request[flyteapp.DeleteRequest]) (*connect.Response[flyteapp.DeleteResponse], error) {

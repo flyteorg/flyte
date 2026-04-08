@@ -121,14 +121,6 @@ func (s *AppService) Watch(
 	return clientStream.Err()
 }
 
-// UpdateStatus forwards directly to InternalAppService (no cache interaction).
-func (s *AppService) UpdateStatus(
-	ctx context.Context,
-	req *connect.Request[flyteapp.UpdateStatusRequest],
-) (*connect.Response[flyteapp.UpdateStatusResponse], error) {
-	return s.internalClient.UpdateStatus(ctx, req)
-}
-
 // --- Cache ---
 
 type cacheEntry struct {
