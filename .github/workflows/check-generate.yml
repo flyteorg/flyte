@@ -5,24 +5,24 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  check-generate:
+  setup:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       actions: read
       packages: read
+    outputs:
+      image: ${{ steps.docker-image.outputs.image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Determine Docker image
         id: docker-image
         run: |
           # Check if gen.Dockerfile or build workflow was modified
-          git fetch origin ${{ github.base_ref }}
-          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^(gen\.Dockerfile|Dockerfile\.ci|\.github/workflows/build-ci-image\.yml)$'; then
+          git fetch --depth=1 origin ${{ github.base_ref }}
+          if git diff --name-only FETCH_HEAD..HEAD | grep -E '^(gen\.Dockerfile|Dockerfile\.ci|\.github/workflows/build-ci-image\.yml)$'; then
             echo "modified=true" >> $GITHUB_OUTPUT
             echo "image=ghcr.io/flyteorg/flyte/ci:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
             echo "📦 gen.Dockerfile modified - will use PR-specific image"
@@ -81,14 +81,24 @@ jobs:
 
             core.setFailed('❌ Timeout waiting for Docker image build to complete');
 
+  check-generate:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Login to GHCR
-        if: steps.docker-image.outputs.modified == 'true'
+        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        if: steps.docker-image.outputs.modified == 'true'
+        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
         run: |
-          IMAGE="${{ steps.docker-image.outputs.image }}"
+          IMAGE="${{ needs.setup.outputs.image }}"
           echo "📦 Pulling image: $IMAGE"
           docker pull "$IMAGE"
 
@@ -99,21 +109,21 @@ jobs:
             ~/.cargo-cache/registry
             ~/.cargo-cache/git
             ~/cargo-target
-          key: check-gen-cargo-${{ steps.docker-image.outputs.image }}-${{ hashFiles('gen/rust/Cargo.lock') }}
+          key: check-gen-cargo-${{ needs.setup.outputs.image }}-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
-            check-gen-cargo-${{ steps.docker-image.outputs.image }}-
+            check-gen-cargo-${{ needs.setup.outputs.image }}-
 
       - name: Cache uv virtualenv
         uses: actions/cache@v4
         with:
           path: ~/uv-venv
-          key: check-gen-uv-${{ steps.docker-image.outputs.image }}-${{ hashFiles('gen/python/uv.lock') }}
+          key: check-gen-uv-${{ needs.setup.outputs.image }}-${{ hashFiles('gen/python/uv.lock') }}
           restore-keys: |
-            check-gen-uv-${{ steps.docker-image.outputs.image }}-
+            check-gen-uv-${{ needs.setup.outputs.image }}-
 
-      - name: Run checks in container
+      - name: Run buf generation and checks
         run: |
-          IMAGE="${{ steps.docker-image.outputs.image }}"
+          IMAGE="${{ needs.setup.outputs.image }}"
           echo "Using image: $IMAGE"
 
           mkdir -p ~/.cargo-cache ~/cargo-target ~/uv-venv
@@ -129,17 +139,56 @@ jobs:
             -e CARGO_HOME=/cargo-cache \
             -e CARGO_TARGET_DIR=/cargo-target \
             "$IMAGE" \
-            bash -c "
-              git config --global --add safe.directory /workspace &&
-              cd gen/python && uv sync --all-groups --frozen && cd ../.. &&
-              make gen-local &&
-              git diff --exit-code -- ':!gen/rust/Cargo.lock' || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1) &&
+            bash -c '
+              set -euo pipefail
+              git config --global --add safe.directory /workspace
+              cd gen/python && uv sync --all-groups --frozen && cd ../..
+              make buf
+              make go-tidy
+              git diff --exit-code -- ":!gen/rust/Cargo.lock" ":!**/mocks/" ":!**/gocachemocks/" || \
+                (echo "Generated files are out of date. Run \`make gen\` and commit changes." && exit 1)
               make check-crate
-            "
+            '
 
       - name: Fix cache permissions
         if: always()
         run: |
           sudo chown -R $(id -u):$(id -g) ~/.cargo-cache ~/cargo-target ~/uv-venv
 
+  check-mocks:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Login to GHCR
+        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        if: needs.setup.outputs.image != 'ghcr.io/flyteorg/flyte/ci:v2'
+        run: |
+          IMAGE="${{ needs.setup.outputs.image }}"
+          echo "📦 Pulling image: $IMAGE"
+          docker pull "$IMAGE"
+
+      - name: Run mockery and check
+        run: |
+          IMAGE="${{ needs.setup.outputs.image }}"
+          echo "Using image: $IMAGE"
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            "$IMAGE" \
+            bash -c '
+              set -euo pipefail
+              git config --global --add safe.directory /workspace
+              make mocks
+              git diff --exit-code -- "**/mocks/" "**/gocachemocks/" || \
+                (echo "Mock files are out of date. Run \`make mocks\` and commit changes." && exit 1)
+            '
