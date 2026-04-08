@@ -3,14 +3,14 @@
 {{- if index .Values "flyte-binary" "enabled" }}
 {{- $backendService = include "flyte-binary.service.http.name" . }}
 {{- else }}
-{{- $backendService = include "flyte-sandbox.localHeadlessService" . }}
+{{- $backendService = include "flyte-demo.localHeadlessService" . }}
 {{- end }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}-api
+  name: {{ include "flyte-demo.fullname" . }}-api
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   rules:
     - http:
@@ -37,9 +37,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}-console
+  name: flyte-console
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   rules:
     - http:
@@ -48,7 +48,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "flyte-sandbox.fullname" . }}-console
+                name: flyte-console
                 port:
                   number: 80
 {{- end }}
@@ -57,9 +57,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}-minio
+  name: {{ include "flyte-demo.fullname" . }}-minio
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-strip-minio@kubernetescrd
 spec:
@@ -70,7 +70,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}-minio
+                name: minio
                 port:
                   number: 9001
 ---
@@ -79,7 +79,7 @@ kind: Middleware
 metadata:
   name: strip-minio
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   stripPrefix:
     prefixes:

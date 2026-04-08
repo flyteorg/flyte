@@ -1,8 +1,8 @@
 helmGlobals:
   chartHome: ../../../../charts
 helmCharts:
-- name: flyte-sandbox
-  releaseName: flyte-sandbox
+- name: flyte-demo
+  releaseName: flyte-demo
   namespace: flyte
   valuesInline:
     flyte-binary:

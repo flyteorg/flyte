@@ -14,8 +14,8 @@ import (
 
 const (
 	configDirPath              = "/var/lib/flyte/config"
-	configurationConfigMapName = "flyte-sandbox-extra-config"
-	deploymentName             = "flyte-sandbox"
+	configurationConfigMapName = "flyte-demo-extra-config"
+	deploymentName             = "flyte-binary"
 	devModeEnvVar              = "FLYTE_DEV"
 	dockerHost                 = "host.docker.internal"
 	namespace                  = "flyte"

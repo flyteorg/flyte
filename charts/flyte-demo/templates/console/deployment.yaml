@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}-console
+  name: flyte-console
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
-    matchLabels: {{- include "flyte-sandbox.consoleSelectorLabels" . | nindent 6 }}
+    matchLabels: {{- include "flyte-demo.consoleSelectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels: {{- include "flyte-sandbox.consoleSelectorLabels" . | nindent 8 }}
+      labels: {{- include "flyte-demo.consoleSelectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: console

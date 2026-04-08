@@ -295,14 +295,14 @@ automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-  name: flyte-sandbox-minio
+  name: minio
   namespace: flyte
 secrets:
-- name: flyte-sandbox-minio
+- name: minio
 ---
 apiVersion: v1
 data:
@@ -335,8 +335,8 @@ metadata:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
-    release: flyte-sandbox
-  name: flyte-sandbox-docker-registry-config
+    release: flyte-demo
+  name: docker-registry-config
   namespace: flyte
 ---
 apiVersion: v1
@@ -350,8 +350,8 @@ metadata:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
-    release: flyte-sandbox
-  name: flyte-sandbox-docker-registry-secret
+    release: flyte-demo
+  name: docker-registry-secret
   namespace: flyte
 type: Opaque
 ---
@@ -362,11 +362,11 @@ data:
 kind: Secret
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-  name: flyte-sandbox-minio
+  name: minio
   namespace: flyte
 type: Opaque
 ---
@@ -374,12 +374,12 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-local
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-local
   namespace: flyte
 subsets:
 - addresses:
@@ -397,7 +397,7 @@ kind: Endpoints
 metadata:
   labels:
     app.kubernetes.io/name: embedded-postgresql
-  name: flyte-sandbox-postgresql
+  name: postgresql
   namespace: flyte
 subsets:
 - addresses:
@@ -410,33 +410,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-console
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: console
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
-    release: flyte-sandbox
-  name: flyte-sandbox-docker-registry
+    release: flyte-demo
+  name: docker-registry
   namespace: flyte
 spec:
   ports:
@@ -447,19 +425,41 @@ spec:
     targetPort: 5000
   selector:
     app: docker-registry
-    release: flyte-sandbox
+    release: flyte-demo
   type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-local
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/name: flyte-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-local
   namespace: flyte
 spec:
   clusterIP: None
@@ -475,11 +475,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-  name: flyte-sandbox-minio
+  name: minio
   namespace: flyte
 spec:
   externalTrafficPolicy: Cluster
@@ -492,7 +492,7 @@ spec:
     port: 9001
     targetPort: minio-console
   selector:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/name: minio
   type: NodePort
 ---
@@ -501,7 +501,7 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/name: embedded-postgresql
-  name: flyte-sandbox-postgresql
+  name: postgresql
   namespace: flyte
 spec:
   ports:
@@ -515,12 +515,12 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-minio-storage
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-minio-storage
   namespace: flyte
 spec:
   accessModes:
@@ -535,12 +535,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-minio-storage
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-minio-storage
   namespace: flyte
 spec:
   accessModes:
@@ -549,32 +549,100 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: manual
-  volumeName: flyte-sandbox-minio-storage
+  volumeName: flyte-demo-minio-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app: docker-registry
+    chart: docker-registry-2.2.2
+    heritage: Helm
+    release: flyte-demo
+  name: docker-registry
+  namespace: flyte
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-registry
+      release: flyte-demo
+  template:
+    metadata:
+      annotations:
+        checksum/config: 2cb0adc9177b7c3b9677313b445701d8b4406e274b237c51fc71ee46ab96041f
+        checksum/secret: 45f39b1784cf14be20440fb8059d730c1d00e2d1c34e9329b76f021c0be8cfdd
+      labels:
+        app: docker-registry
+        release: flyte-demo
+    spec:
+      containers:
+      - command:
+        - /bin/registry
+        - serve
+        - /etc/docker/registry/config.yml
+        env:
+        - name: REGISTRY_HTTP_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: haSharedSecret
+              name: docker-registry-secret
+        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+          value: /var/lib/registry
+        image: registry:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        name: docker-registry
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/docker/registry
+          name: docker-registry-config
+        - mountPath: /var/lib/registry/
+          name: data
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      volumes:
+      - configMap:
+          name: docker-registry-config
+        name: docker-registry-config
+      - emptyDir: {}
+        name: data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-console
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-console
   namespace: flyte
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/component: console
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: flyte-sandbox
+      app.kubernetes.io/instance: flyte-demo
+      app.kubernetes.io/name: flyte-demo
   template:
     metadata:
       labels:
         app.kubernetes.io/component: console
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/name: flyte-sandbox
+        app.kubernetes.io/instance: flyte-demo
+        app.kubernetes.io/name: flyte-demo
     spec:
       containers:
       - image: ghcr.io/flyteorg/flyte-client-v2:latest
@@ -601,93 +669,25 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: docker-registry
-    chart: docker-registry-2.2.2
-    heritage: Helm
-    release: flyte-sandbox
-  name: flyte-sandbox-docker-registry
-  namespace: flyte
-spec:
-  minReadySeconds: 5
-  replicas: 1
-  selector:
-    matchLabels:
-      app: docker-registry
-      release: flyte-sandbox
-  template:
-    metadata:
-      annotations:
-        checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 829c19e3c86dcb9b7d4c44e6a73463c6a6467d824200e87e2d7999f70dc0f5f9
-      labels:
-        app: docker-registry
-        release: flyte-sandbox
-    spec:
-      containers:
-      - command:
-        - /bin/registry
-        - serve
-        - /etc/docker/registry/config.yml
-        env:
-        - name: REGISTRY_HTTP_SECRET
-          valueFrom:
-            secretKeyRef:
-              key: haSharedSecret
-              name: flyte-sandbox-docker-registry-secret
-        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
-          value: /var/lib/registry
-        image: registry:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 5000
-        name: docker-registry
-        ports:
-        - containerPort: 5000
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 5000
-        resources: {}
-        volumeMounts:
-        - mountPath: /etc/docker/registry
-          name: flyte-sandbox-docker-registry-config
-        - mountPath: /var/lib/registry/
-          name: data
-      securityContext:
-        fsGroup: 1000
-        runAsUser: 1000
-      volumes:
-      - configMap:
-          name: flyte-sandbox-docker-registry-config
-        name: flyte-sandbox-docker-registry-config
-      - emptyDir: {}
-        name: data
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
     helm.sh/chart: minio-12.6.7
-  name: flyte-sandbox-minio
+  name: minio
   namespace: flyte
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/instance: flyte-demo
       app.kubernetes.io/name: minio
   strategy:
     type: Recreate
   template:
     metadata:
       annotations:
-        checksum/credentials-secret: ecce809e3af19025d134846a9a81e163dd41df7e26abf2c6657895d9d13607a9
+        checksum/credentials-secret: 70a50b2590b643d9455442f95a5505c0dc0931c95f5a5593efed8afd4035aa2a
       labels:
-        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/instance: flyte-demo
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: minio
         helm.sh/chart: minio-12.6.7
@@ -698,7 +698,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app.kubernetes.io/instance: flyte-sandbox
+                  app.kubernetes.io/instance: flyte-demo
                   app.kubernetes.io/name: minio
               topologyKey: kubernetes.io/hostname
             weight: 1
@@ -720,12 +720,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: root-user
-              name: flyte-sandbox-minio
+              name: minio
         - name: MINIO_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               key: root-password
-              name: flyte-sandbox-minio
+              name: minio
         - name: MINIO_DEFAULT_BUCKETS
           value: flyte-data
         - name: MINIO_BROWSER
@@ -794,21 +794,21 @@ spec:
           name: data
       securityContext:
         fsGroup: 1001
-      serviceAccountName: flyte-sandbox-minio
+      serviceAccountName: minio
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: flyte-sandbox-minio-storage
+          claimName: flyte-demo-minio-storage
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
+    helm.sh/chart: flyte-demo-0.1.0
   name: traefik
   namespace: kube-system
 spec:
@@ -828,12 +828,12 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-api
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-console
   namespace: flyte
 spec:
   rules:
@@ -841,44 +841,7 @@ spec:
       paths:
       - backend:
           service:
-            name: flyte-sandbox-local
-            port:
-              number: 8090
-        path: /healthz
-        pathType: Exact
-      - backend:
-          service:
-            name: flyte-sandbox-local
-            port:
-              number: 8090
-        path: /readyz
-        pathType: Exact
-      - backend:
-          service:
-            name: flyte-sandbox-local
-            port:
-              number: 8090
-        path: /flyteidl2.
-        pathType: Prefix
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-console
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: flyte-sandbox-console
+            name: flyte-console
             port:
               number: 80
         path: /v2
@@ -887,15 +850,13 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-minio
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-api
   namespace: flyte
 spec:
   rules:
@@ -903,7 +864,46 @@ spec:
       paths:
       - backend:
           service:
-            name: flyte-sandbox-minio
+            name: flyte-demo-local
+            port:
+              number: 8090
+        path: /healthz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-demo-local
+            port:
+              number: 8090
+        path: /readyz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-demo-local
+            port:
+              number: 8090
+        path: /flyteidl2.
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-demo-0.1.0
+  name: flyte-demo-minio
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: minio
             port:
               number: 9001
         path: /minio
@@ -913,11 +913,11 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
+    helm.sh/chart: flyte-demo-0.1.0
   name: strip-minio
   namespace: flyte
 spec:

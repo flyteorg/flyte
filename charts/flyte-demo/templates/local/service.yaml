@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "flyte-sandbox.localHeadlessService" . }}
+  name: {{ include "flyte-demo.localHeadlessService" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "flyte-sandbox.labels" . | nindent 4 }}
+    {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   clusterIP: None
   ports:

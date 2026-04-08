@@ -3,7 +3,7 @@ kind: HelmChartConfig
 metadata:
   name: traefik
   namespace: kube-system
-  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  labels: {{- include "flyte-demo.labels" . | nindent 4 }}
 spec:
   valuesContent: |
     service:

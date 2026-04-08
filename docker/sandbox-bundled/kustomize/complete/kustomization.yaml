@@ -1,8 +1,8 @@
 helmGlobals:
   chartHome: ../../../../charts
 helmCharts:
-- name: flyte-sandbox
-  releaseName: flyte-sandbox
+- name: flyte-demo
+  releaseName: flyte-demo
   namespace: flyte
   valuesInline:
     # Disabled: PostgreSQL runs as an embedded process on the host via
@@ -20,7 +20,7 @@ helmCharts:
             - -ec
           args:
             - |
-              until nc -z flyte-sandbox-postgresql.flyte 5432; do
+              until nc -z postgresql.flyte 5432; do
                 echo waiting for database
                 sleep 0.5
               done

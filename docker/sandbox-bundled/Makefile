@@ -3,7 +3,7 @@ mkdir -p images/tar/$(1)
 
 docker buildx build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
-	--builder flyte-sandbox \
+	--builder flyte-demo \
 	--platform linux/$(1) \
 	--tag flyte-binary-v2:sandbox \
 	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
@@ -13,8 +13,8 @@ endef
 
 .PHONY: create_builder
 create_builder:
-	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
-		docker buildx create --name flyte-sandbox \
+	[ -n "$(shell docker buildx ls | awk '/^flyte-demo / {print $$1}')" ] || \
+		docker buildx create --name flyte-demo \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
 		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
 		--platform linux/arm64,linux/amd64
@@ -35,7 +35,7 @@ dep_build: helm-repos
 	cd $(SANDBOX_CHART_DIR) && helm dependency build
 
 .PHONY: dep_update
-dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-sandbox
+dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-demo
 dep_update: dep_build
 	cd $(SANDBOX_CHART_DIR)/charts && for f in *.tgz; do tar xzf "$$f"; done
 
@@ -68,8 +68,8 @@ sync-crds:
 
 .PHONY: build
 build: sync-crds flyte console dep_update manifests
-	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
-		--tag flyte-sandbox-v2:latest .
+	docker buildx build --builder flyte-demo --allow security.insecure --load \
+		--tag flyte-demo:latest .
 
 # Port map
 # 6443 - k8s API server
@@ -78,19 +78,19 @@ build: sync-crds flyte console dep_update manifests
 # 30002 - Minio
 # 30080 - Flyte Proxy
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-sandbox-v2:latest
+start: FLYTE_SANDBOX_IMAGE := flyte-demo:latest
 start: FLYTE_DEV := False
 start:
-	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
-		docker volume create flyte-sandbox
-	@if [ -z "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ]; then \
+	[ -n "$(shell docker volume ls --filter name=^flyte-demo$$ --format {{.Name}})" ] || \
+		docker volume create flyte-demo
+	@if [ -z "$(shell docker ps --filter name=^flyte-demo$$ --format {{.Names}})" ]; then \
 		rm -f $(PWD)/.kube/kubeconfig; \
-		docker run --detach --rm --privileged --name flyte-sandbox \
+		docker run --detach --rm --privileged --name flyte-demo \
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
-				--volume flyte-sandbox:/var/lib/flyte/storage \
+				--volume flyte-demo:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
 			--publish "30000:30000" \
 			--publish "30001:5432" \
@@ -101,7 +101,7 @@ start:
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
 	@# On WSL, the bind-mounted kubeconfig may be root-owned, which makes the host-side cp fail with permission denied.
-	@docker exec flyte-sandbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
+	@docker exec flyte-demo chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
 	@mkdir -p $(HOME)/.kube
 	@if [ -f $(HOME)/.kube/config ]; then \
 		KUBECONFIG=$(PWD)/.kube/kubeconfig:$(HOME)/.kube/config kubectl config view --flatten > /tmp/kubeconfig-merged && \
@@ -113,12 +113,12 @@ start:
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:
-	sed -i -e "/server:/ s/: .*/: https:\/\/127.0.0.1:$(shell docker port flyte-sandbox | grep ^6443 | awk '{print $$3}' | awk -F: '{print $$2}')/" .kube/kubeconfig
+	sed -i -e "/server:/ s/: .*/: https:\/\/127.0.0.1:$(shell docker port flyte-demo | grep ^6443 | awk '{print $$3}' | awk -F: '{print $$2}')/" .kube/kubeconfig
 	echo "export KUBECONFIG=$(PWD)/.kube/kubeconfig"
 
 .PHONY: stop
 stop:
-	docker stop flyte-sandbox
+	docker stop flyte-demo
 
 .venv:
 	python -m venv .venv

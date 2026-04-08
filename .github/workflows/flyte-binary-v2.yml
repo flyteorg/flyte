@@ -138,13 +138,13 @@ jobs:
       - name: Set version
         id: set_version
         run: |
-          echo "FLYTE_SANDBOX_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "FLYTE_DEMO_VERSION=${{ github.sha }}" >> $GITHUB_ENV
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
+            ghcr.io/${{ github.repository_owner }}/flyte-demo
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,
@@ -169,5 +169,5 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
+          build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
           push: true

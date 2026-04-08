@@ -22,7 +22,7 @@ COPY bootstrap/go.mod bootstrap/go.sum ./
 RUN go mod download
 COPY bootstrap/ ./
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
-    go build -o dist/flyte-sandbox-bootstrap cmd/bootstrap/main.go && \
+    go build -o dist/flyte-demo-bootstrap cmd/bootstrap/main.go && \
     go build -o dist/embedded-postgres cmd/embedded-postgres/main.go
 
 
@@ -64,8 +64,8 @@ FROM rancher/k3s:v1.29.0-k3s1
 
 ARG TARGETARCH
 
-ARG FLYTE_SANDBOX_VERSION
-ENV FLYTE_SANDBOX_VERSION "${FLYTE_SANDBOX_VERSION}"
+ARG FLYTE_DEMO_VERSION
+ENV FLYTE_DEMO_VERSION "${FLYTE_DEMO_VERSION}"
 
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
@@ -73,7 +73,7 @@ COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
 COPY bin/ /bin/
 
 # Install bootstrap and embedded postgres
-COPY --from=bootstrap /flyteorg/build/dist/flyte-sandbox-bootstrap /bin/
+COPY --from=bootstrap /flyteorg/build/dist/flyte-demo-bootstrap /bin/
 COPY --from=bootstrap /flyteorg/build/dist/embedded-postgres /bin/
 
 # Install pre-cached PostgreSQL binaries and glibc libraries
