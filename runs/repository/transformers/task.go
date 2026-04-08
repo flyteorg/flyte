@@ -52,12 +52,8 @@ func NewTaskModel(ctx context.Context, taskId *task.TaskIdentifier, spec *task.T
 		shortDescription = documentation.GetShortDescription()
 	}
 
-	key := ToTaskKey(taskId)
 	m := &models.Task{
-		Project:          key.Project,
-		Domain:           key.Domain,
-		Name:             key.Name,
-		Version:          key.Version,
+		TaskKey:          ToTaskKey(taskId),
 		Environment:      environment,
 		FunctionName:     ExtractFunctionName(ctx, taskId.GetName(), environment),
 		DeployedBy:       deployedBy,
@@ -105,7 +101,7 @@ func TaskModelsToTaskDetails(ctx context.Context, taskModels []*models.Task) ([]
 		var spec task.TaskSpec
 		err := proto.Unmarshal(m.TaskSpec, &spec)
 		if err != nil {
-			logger.Errorf(ctx, "failed to unmarshal task spec for task %v: %v", m.Key(), err)
+			logger.Errorf(ctx, "failed to unmarshal task spec for task %v: %v", m.TaskKey, err)
 			return nil, err
 		}
 		taskIdl.Spec = &spec

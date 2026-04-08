@@ -100,10 +100,12 @@ func TestTaskModelsToTaskDetails(t *testing.T) {
 
 	taskModels := []*models.Task{
 		{
-			Project:          "proj1",
-			Domain:           "domain1",
-			Name:             "task1",
-			Version:          "v1",
+			TaskKey: models.TaskKey{
+				Project: "proj1",
+				Domain:  "domain1",
+				Name:    "task1",
+				Version: "v1",
+			},
 			Environment:      "prod",
 			FunctionName:     "my_func",
 			DeployedBy:       "user@example.com",
@@ -126,10 +128,12 @@ func TestTaskModelsToTasks(t *testing.T) {
 	ctx := context.Background()
 	taskModels := []*models.Task{
 		{
-			Project:      "proj1",
-			Domain:       "domain1",
-			Name:         "task1",
-			Version:      "v1",
+			TaskKey: models.TaskKey{
+				Project: "proj1",
+				Domain:  "domain1",
+				Name:    "task1",
+				Version: "v1",
+			},
 			Environment:  "prod",
 			FunctionName: "my_func",
 			CreatedAt:    time.Now(),
@@ -216,10 +220,12 @@ func TestTaskListResultToTasksAndMetadata(t *testing.T) {
 	result := &models.TaskListResult{
 		Tasks: []*models.Task{
 			{
-				Project:      "proj1",
-				Domain:       "domain1",
-				Name:         "task1",
-				Version:      "v1",
+				TaskKey: models.TaskKey{
+					Project: "proj1",
+					Domain:  "domain1",
+					Name:    "task1",
+					Version: "v1",
+				},
 				FunctionName: "func1",
 				CreatedAt:    time.Now(),
 			},

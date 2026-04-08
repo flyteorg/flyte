@@ -33,10 +33,12 @@ func TestCreateTask(t *testing.T) {
 	ctx := context.Background()
 
 	task := &models.Task{
-		Project:      "test-project",
-		Domain:       "test-domain",
-		Name:         "test-task",
-		Version:      "v1",
+		TaskKey: models.TaskKey{
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "test-task",
+			Version: "v1",
+		},
 		Environment:  "production",
 		FunctionName: "my_function",
 		DeployedBy:   "user@example.com",
@@ -47,7 +49,7 @@ func TestCreateTask(t *testing.T) {
 	err := repo.CreateTask(ctx, task, nil)
 	assert.NoError(t, err)
 
-	retrieved, err := repo.GetTask(ctx, task.Key())
+	retrieved, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 	assert.Equal(t, task.Environment, retrieved.Environment)
 	assert.Equal(t, task.FunctionName, retrieved.FunctionName)
@@ -78,19 +80,23 @@ func TestListTasks(t *testing.T) {
 	ctx := context.Background()
 
 	task1 := &models.Task{
-		Project:     "proj1",
-		Domain:      "domain1",
-		Name:        "task1",
-		Version:     "v1",
+		TaskKey: models.TaskKey{
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "task1",
+			Version: "v1",
+		},
 		Environment: "prod",
 		TaskSpec:    []byte("{}"),
 	}
 
 	task2 := &models.Task{
-		Project:     "proj1",
-		Domain:      "domain1",
-		Name:        "task2",
-		Version:     "v1",
+		TaskKey: models.TaskKey{
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "task2",
+			Version: "v1",
+		},
 		Environment: "dev",
 		TaskSpec:    []byte("{}"),
 	}
@@ -133,10 +139,12 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	ctx := context.Background()
 
 	task := &models.Task{
-		Project:      "test-project",
-		Domain:       "test-domain",
-		Name:         "test-task",
-		Version:      "v1",
+		TaskKey: models.TaskKey{
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "test-task",
+			Version: "v1",
+		},
 		Environment:  "production",
 		FunctionName: "original_function",
 		TaskSpec:     []byte(`{}`),
@@ -145,7 +153,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	err := repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
-	original, err := repo.GetTask(ctx, task.Key())
+	original, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 
 	time.Sleep(100 * time.Millisecond)
@@ -154,7 +162,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	err = repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
-	updated, err := repo.GetTask(ctx, task.Key())
+	updated, err := repo.GetTask(ctx, task.TaskKey)
 	require.NoError(t, err)
 
 	assert.Equal(t, original.CreatedAt, updated.CreatedAt, "create time shouldn't change")
