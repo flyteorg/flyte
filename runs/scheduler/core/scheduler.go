@@ -118,7 +118,7 @@ func (s *GoCronScheduler) CatchupAll(
 			if fired >= maxRunsPerLoop {
 				break
 			}
-			if err := s.executor.Execute(ctx, t, scheduledAt); err != nil {
+			if err := s.executor.Execute(ctx, t, scheduledAt.UTC()); err != nil {
 				logger.Errorf(ctx, "scheduler: catchup execute failed for %s at %s: %v",
 					TriggerKey(t), scheduledAt.Format(time.RFC3339), err)
 			}
