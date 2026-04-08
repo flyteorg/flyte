@@ -52,8 +52,10 @@ type AppK8sClientInterface interface {
 	// Returns a not-found error (checkable with k8serrors.IsNotFound) if the KService does not exist.
 	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
 
-	// List returns all apps (spec + live status) for the given project/domain scope.
-	List(ctx context.Context, project, domain string) ([]*flyteapp.App, error)
+	// List returns apps for the given project/domain scope with optional pagination.
+	// limit=0 means no limit. token is the K8s continue token from a previous call.
+	// Returns the apps, the continue token for the next page (empty if last page), and any error.
+	List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error)
 
 	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
 	// Use Stop to scale to zero while preserving the KService.
@@ -66,8 +68,9 @@ type AppK8sClientInterface interface {
 	DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error
 
 	// Watch returns a channel of WatchResponse events for KServices matching the
-	// given project/domain scope. The channel is closed when ctx is cancelled.
-	Watch(ctx context.Context, project, domain string) (<-chan *flyteapp.WatchResponse, error)
+	// given project/domain scope. If appName is non-empty, only events for that
+	// specific app are returned. The channel is closed when ctx is cancelled.
+	Watch(ctx context.Context, project, domain, appName string) (<-chan *flyteapp.WatchResponse, error)
 }
 
 // AppK8sClient implements AppK8sClientInterface using controller-runtime.
@@ -169,13 +172,20 @@ func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) e
 }
 
 // Watch returns a channel of WatchResponse events for KServices in the given
-// project/domain scope. The channel is closed when ctx is cancelled or the
+// project/domain scope. If appName is non-empty, only events for that specific
+// app are returned. The channel is closed when ctx is cancelled or the
 // underlying watch terminates.
-func (c *AppK8sClient) Watch(ctx context.Context, project, domain string) (<-chan *flyteapp.WatchResponse, error) {
+func (c *AppK8sClient) Watch(ctx context.Context, project, domain, appName string) (<-chan *flyteapp.WatchResponse, error) {
 	ns := appNamespace(project, domain)
+
+	labels := map[string]string{labelAppManaged: "true"}
+	if appName != "" {
+		labels[labelAppName] = strings.ToLower(appName)
+	}
+
 	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{},
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppManaged: "true"},
+		client.MatchingLabels(labels),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start KService watch in namespace %s: %w", ns, err)
@@ -258,16 +268,24 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 	return c.kserviceToStatus(ctx, ksvc), nil
 }
 
-// List returns all apps for the given project/domain by listing KServices in the
-// project/domain namespace.
-func (c *AppK8sClient) List(ctx context.Context, project, domain string) ([]*flyteapp.App, error) {
+// List returns apps for the given project/domain scope with optional pagination.
+func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace(project, domain)
-	list := &servingv1.ServiceList{}
-	if err := c.k8sClient.List(ctx, list,
+
+	listOpts := []client.ListOption{
 		client.InNamespace(ns),
 		client.MatchingLabels{labelAppManaged: "true"},
-	); err != nil {
-		return nil, fmt.Errorf("failed to list KServices for %s/%s: %w", project, domain, err)
+	}
+	if limit > 0 {
+		listOpts = append(listOpts, client.Limit(int64(limit)))
+	}
+	if token != "" {
+		listOpts = append(listOpts, client.Continue(token))
+	}
+
+	list := &servingv1.ServiceList{}
+	if err := c.k8sClient.List(ctx, list, listOpts...); err != nil {
+		return nil, "", fmt.Errorf("failed to list KServices for %s/%s: %w", project, domain, err)
 	}
 
 	apps := make([]*flyteapp.App, 0, len(list.Items))
@@ -279,7 +297,7 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string) ([]*fly
 		}
 		apps = append(apps, a)
 	}
-	return apps, nil
+	return apps, list.Continue, nil
 }
 
 // --- Helpers ---
