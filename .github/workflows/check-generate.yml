@@ -124,8 +124,6 @@ jobs:
           git config --global --add safe.directory $GITHUB_WORKSPACE
           cd gen/python && uv sync --all-groups --frozen && cd ../..
           make buf
-          # Restore mock files deleted by buf generate --clean (checked separately in check-mocks job)
-          git checkout -- '*/mocks/*' '*/gocachemocks/*' 2>/dev/null || true
           git diff --exit-code -- ':!gen/rust/Cargo.lock' ':!*/mocks/*' ':!*/gocachemocks/*' ':!go.mod' ':!go.sum' || \
             (echo 'Generated files are out of date. Run `make gen` and commit changes.' && exit 1)
           make check-crate
