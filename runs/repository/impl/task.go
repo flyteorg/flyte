@@ -26,36 +26,34 @@ func NewTaskRepo(db *sqlx.DB) interfaces.TaskRepo {
 }
 
 // CreateTask upserts a task and its associated triggers in one transaction.
-// Trigger summary fields (total_triggers, active_triggers, etc.) on the task row
-// are computed from the provided trigger models.
-//
-// TODO(nary): trigger upserts are temporarily disabled during the gorm→sqlx
-// migration. The triggers parameter is accepted but ignored; re-enable once
-// trigger.go has been ported to sqlx.
+// Trigger summary fields (total_triggers, active_triggers, trigger_name,
+// trigger_automation_spec) on the task row are recomputed from the current
+// set of triggers via refreshTaskTriggerMeta, so they are intentionally NOT
+// set by the task upsert itself.
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
 	now := time.Now()
-	_, err := r.db.ExecContext(ctx,
+	_, err = tx.ExecContext(ctx,
 		`INSERT INTO tasks (
 			project, domain, name, version,
 			environment, function_name, deployed_by,
-			trigger_name, total_triggers, active_triggers,
-			trigger_automation_spec, trigger_types,
+			trigger_types,
 			task_spec, env_description, short_description,
 			created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		ON CONFLICT (project, domain, name, version) DO UPDATE SET
-			environment = EXCLUDED.environment,
-			function_name = EXCLUDED.function_name,
-			deployed_by = EXCLUDED.deployed_by,
-			trigger_name = EXCLUDED.trigger_name,
-			total_triggers = EXCLUDED.total_triggers,
-			active_triggers = EXCLUDED.active_triggers,
-			trigger_automation_spec = EXCLUDED.trigger_automation_spec,
-			trigger_types = EXCLUDED.trigger_types,
-			task_spec = EXCLUDED.task_spec,
-			env_description = EXCLUDED.env_description,
+			environment       = EXCLUDED.environment,
+			function_name     = EXCLUDED.function_name,
+			deployed_by       = EXCLUDED.deployed_by,
+			task_spec         = EXCLUDED.task_spec,
+			env_description   = EXCLUDED.env_description,
 			short_description = EXCLUDED.short_description,
-			updated_at = EXCLUDED.updated_at`,
+			updated_at        = EXCLUDED.updated_at`,
 		newTask.Project,
 		newTask.Domain,
 		newTask.Name,
@@ -63,10 +61,6 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 		newTask.Environment,
 		newTask.FunctionName,
 		newTask.DeployedBy,
-		newTask.TriggerName,
-		newTask.TotalTriggers,
-		newTask.ActiveTriggers,
-		newTask.TriggerAutomationSpec,
 		newTask.TriggerTypes,
 		newTask.TaskSpec,
 		newTask.EnvDescription,
@@ -74,12 +68,30 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 		now,
 		now,
 	)
-
 	if err != nil {
-		logger.Errorf(ctx, "failed to create task %v: %v", newTask.TaskKey, err)
-		return fmt.Errorf("failed to create task %v: %w", newTask.TaskKey, err)
+		logger.Errorf(ctx, "failed to upsert task %v: %v", newTask.TaskKey, err)
+		return fmt.Errorf("failed to upsert task %v: %w", newTask.TaskKey, err)
 	}
-	_ = triggers // TODO(nary): wire back trigger upserts after trigger.go port
+	logger.Infof(ctx, "Upserted task: %s/%s/%s version %s",
+		newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
+
+	// Upsert each trigger and append a revision snapshot within the same transaction.
+	for _, t := range triggers {
+		if err := upsertTrigger(ctx, tx, t, 0); err != nil {
+			return fmt.Errorf("failed to upsert trigger %q: %w", t.Name, err)
+		}
+	}
+
+	// Refresh task trigger summary once after all triggers are written.
+	if len(triggers) > 0 {
+		if err := refreshTaskTriggerMeta(ctx, tx, triggers[0]); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit tx: %w", err)
+	}
 	return nil
 }
 

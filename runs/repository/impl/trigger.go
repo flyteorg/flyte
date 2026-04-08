@@ -320,8 +320,18 @@ func insertTriggerRevision(ctx context.Context, tx *sqlx.Tx, t *models.Trigger, 
 	return nil
 }
 
-// refreshTaskTriggerMeta recomputes and updates denormalized trigger summary fields on the tasks row.
-// Package-level so it can be reused by tasksRepo within the same transaction.
+// refreshTaskTriggerMeta is the single source of truth for the denormalized
+// trigger summary columns on the tasks row. It recomputes them from the current
+// set of (non-deleted) rows in the triggers table and writes:
+//
+//	tasks.trigger_name            — name of the sole attached trigger, or NULL
+//	tasks.total_triggers          — count of attached triggers
+//	tasks.active_triggers         — count of attached triggers with active = true
+//	tasks.trigger_automation_spec — automation_spec of the sole attached trigger, or NULL
+//
+// Callers that modify the triggers table (upsert/update/delete) MUST invoke this
+// within the same transaction so the task summary stays consistent. Do not write
+// these columns from any other code path — they will be overwritten here.
 func refreshTaskTriggerMeta(ctx context.Context, tx *sqlx.Tx, t *models.Trigger) error {
 	type statRow struct {
 		Active         bool           `db:"active"`
