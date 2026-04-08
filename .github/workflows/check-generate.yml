@@ -125,7 +125,7 @@ jobs:
           cd gen/python && uv sync --all-groups --frozen && cd ../..
           make buf
           git diff --exit-code -- ':!gen/rust/Cargo.lock' ':!*/mocks/*' ':!*/gocachemocks/*' ':!go.mod' ':!go.sum' || \
-            (echo 'Generated files are out of date. Run `make gen` and commit changes.' && exit 1)
+            (echo 'Generated files are out of date. Run `make buf` and commit changes.' && exit 1)
           make check-crate
 
   check-go-tidy:
