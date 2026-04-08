@@ -144,8 +144,10 @@ jobs:
               git config --global --add safe.directory /workspace
               cd gen/python && uv sync --all-groups --frozen && cd ../..
               make buf
+              # Restore mock files deleted by buf generate --clean (checked separately in check-mocks job)
+              git checkout -- "*/mocks/*" "*/gocachemocks/*" 2>/dev/null || true
               make go-tidy
-              git diff --exit-code -- ":!gen/rust/Cargo.lock" ":!**/mocks/" ":!**/gocachemocks/" || \
+              git diff --exit-code -- ":!gen/rust/Cargo.lock" ":!*/mocks/*" ":!*/gocachemocks/*" || \
                 (echo "Generated files are out of date. Run \`make gen\` and commit changes." && exit 1)
               make check-crate
             '
@@ -189,6 +191,6 @@ jobs:
               set -euo pipefail
               git config --global --add safe.directory /workspace
               make mocks
-              git diff --exit-code -- "**/mocks/" "**/gocachemocks/" || \
+              git diff --exit-code -- "*/mocks/*" "*/gocachemocks/*" || \
                 (echo "Mock files are out of date. Run \`make mocks\` and commit changes." && exit 1)
             '
