@@ -86,6 +86,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ${{ needs.setup.outputs.image }}
+      env:
+        CARGO_HOME: /root/.cargo
+        RUSTUP_HOME: /root/.rustup
     permissions:
       contents: read
       packages: read
@@ -97,8 +100,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            /root/.cargo/registry
+            /root/.cargo/git
             /cargo-target
           key: check-gen-cargo-${{ needs.setup.outputs.image }}-${{ hashFiles('gen/rust/Cargo.lock') }}
           restore-keys: |
