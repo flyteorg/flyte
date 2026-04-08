@@ -118,6 +118,7 @@ jobs:
           UV_PROJECT_ENVIRONMENT: /uv-venv
           CARGO_TARGET_DIR: /cargo-target
         run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           cd gen/python && uv sync --all-groups --frozen && cd ../..
           make buf
           # Restore mock files deleted by buf generate --clean (checked separately in check-mocks job)
@@ -140,6 +141,7 @@ jobs:
 
       - name: Run go mod tidy and check
         run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           make go-tidy
           git diff --exit-code -- go.mod go.sum || \
             (echo 'go.mod/go.sum are out of date. Run `go mod tidy` and commit changes.' && exit 1)
@@ -158,6 +160,7 @@ jobs:
 
       - name: Run mockery and check
         run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           make mocks
           git diff --exit-code -- '*/mocks/*' '*/gocachemocks/*' || \
             (echo 'Mock files are out of date. Run `make mocks` and commit changes.' && exit 1)
