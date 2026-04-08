@@ -14,7 +14,6 @@ import (
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -45,7 +44,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Initialize database
 	dbCfg := &runsconfig.GetConfig().Database
-	db, err := database.GetDB(ctx, dbCfg, logger.GetConfig())
+	db, err := database.GetDB(ctx, dbCfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}

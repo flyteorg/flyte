@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/cache_service/repository/impl"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/interfaces"
@@ -12,7 +12,7 @@ type repository struct {
 	reservationRepo  interfaces.ReservationRepo
 }
 
-func NewRepository(db *gorm.DB) interfaces.Repository {
+func NewRepository(db *sqlx.DB) interfaces.Repository {
 	return &repository{
 		cachedOutputRepo: impl.NewCachedOutputRepo(db),
 		reservationRepo:  impl.NewReservationRepo(db),

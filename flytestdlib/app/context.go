@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -36,7 +36,7 @@ type SetupContext struct {
 	Mux *http.ServeMux
 
 	// DB is the shared database connection (may be nil if service doesn't need it).
-	DB *gorm.DB
+	DB *sqlx.DB
 
 	// K8sClient is the Kubernetes client with watch support (may be nil).
 	K8sClient client.WithWatch

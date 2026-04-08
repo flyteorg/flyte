@@ -6,20 +6,20 @@ import (
 	"testing"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 // RunTestMain starts an embedded PostgreSQL instance, runs migrate, executes m.Run(),
-// and returns an exit code suitable for os.Exit. The connected *gorm.DB is written to db.
+// and returns an exit code suitable for os.Exit. The connected *sqlx.DB is written to db.
 // Intended for use in TestMain functions:
 //
 //	func TestMain(m *testing.M) {
-//	    os.Exit(database.RunTestMain(m, 15432, "mydb", &testDB, func(db *gorm.DB) error {
-//	        return db.AutoMigrate(...)
+//	    os.Exit(database.RunTestMain(m, 15432, "mydb", &testDB, func(db *sqlx.DB) error {
+//	        return db.Exec(...)
 //	    }))
 //	}
-func RunTestMain(m *testing.M, port uint32, dbName string, db **gorm.DB, migrate func(*gorm.DB) error) int {
+func RunTestMain(m *testing.M, port uint32, dbName string, db **sqlx.DB, migrate func(*sqlx.DB) error) int {
 	pg := embeddedpostgres.NewDatabase(
 		embeddedpostgres.DefaultConfig().
 			Port(port).
@@ -37,7 +37,7 @@ func RunTestMain(m *testing.M, port uint32, dbName string, db **gorm.DB, migrate
 		"host=localhost port=%d user=postgres password=postgres dbname=%s sslmode=disable",
 		port, dbName,
 	)
-	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{TranslateError: true})
+	conn, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		_ = pg.Stop()
 		log.Printf("failed to connect to embedded postgres: %v", err)

@@ -1824,66 +1824,6 @@ func (_c *Filter_And_Call) RunAndReturn(run func(filter interfaces.Filter) inter
 	return _c
 }
 
-// GormQueryExpression provides a mock function for the type Filter
-func (_mock *Filter) GormQueryExpression(table string) (interfaces.GormQueryExpr, error) {
-	ret := _mock.Called(table)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GormQueryExpression")
-	}
-
-	var r0 interfaces.GormQueryExpr
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(string) (interfaces.GormQueryExpr, error)); ok {
-		return returnFunc(table)
-	}
-	if returnFunc, ok := ret.Get(0).(func(string) interfaces.GormQueryExpr); ok {
-		r0 = returnFunc(table)
-	} else {
-		r0 = ret.Get(0).(interfaces.GormQueryExpr)
-	}
-	if returnFunc, ok := ret.Get(1).(func(string) error); ok {
-		r1 = returnFunc(table)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// Filter_GormQueryExpression_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GormQueryExpression'
-type Filter_GormQueryExpression_Call struct {
-	*mock.Call
-}
-
-// GormQueryExpression is a helper method to define mock.On call
-//   - table string
-func (_e *Filter_Expecter) GormQueryExpression(table interface{}) *Filter_GormQueryExpression_Call {
-	return &Filter_GormQueryExpression_Call{Call: _e.mock.On("GormQueryExpression", table)}
-}
-
-func (_c *Filter_GormQueryExpression_Call) Run(run func(table string)) *Filter_GormQueryExpression_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 string
-		if args[0] != nil {
-			arg0 = args[0].(string)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *Filter_GormQueryExpression_Call) Return(gormQueryExpr interfaces.GormQueryExpr, err error) *Filter_GormQueryExpression_Call {
-	_c.Call.Return(gormQueryExpr, err)
-	return _c
-}
-
-func (_c *Filter_GormQueryExpression_Call) RunAndReturn(run func(table string) (interfaces.GormQueryExpr, error)) *Filter_GormQueryExpression_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Or provides a mock function for the type Filter
 func (_mock *Filter) Or(filter interfaces.Filter) interfaces.Filter {
 	ret := _mock.Called(filter)
@@ -1933,6 +1873,66 @@ func (_c *Filter_Or_Call) Return(filter1 interfaces.Filter) *Filter_Or_Call {
 }
 
 func (_c *Filter_Or_Call) RunAndReturn(run func(filter interfaces.Filter) interfaces.Filter) *Filter_Or_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// QueryExpression provides a mock function for the type Filter
+func (_mock *Filter) QueryExpression(table string) (interfaces.QueryExpr, error) {
+	ret := _mock.Called(table)
+
+	if len(ret) == 0 {
+		panic("no return value specified for QueryExpression")
+	}
+
+	var r0 interfaces.QueryExpr
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(string) (interfaces.QueryExpr, error)); ok {
+		return returnFunc(table)
+	}
+	if returnFunc, ok := ret.Get(0).(func(string) interfaces.QueryExpr); ok {
+		r0 = returnFunc(table)
+	} else {
+		r0 = ret.Get(0).(interfaces.QueryExpr)
+	}
+	if returnFunc, ok := ret.Get(1).(func(string) error); ok {
+		r1 = returnFunc(table)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// Filter_QueryExpression_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'QueryExpression'
+type Filter_QueryExpression_Call struct {
+	*mock.Call
+}
+
+// QueryExpression is a helper method to define mock.On call
+//   - table string
+func (_e *Filter_Expecter) QueryExpression(table interface{}) *Filter_QueryExpression_Call {
+	return &Filter_QueryExpression_Call{Call: _e.mock.On("QueryExpression", table)}
+}
+
+func (_c *Filter_QueryExpression_Call) Run(run func(table string)) *Filter_QueryExpression_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *Filter_QueryExpression_Call) Return(queryExpr interfaces.QueryExpr, err error) *Filter_QueryExpression_Call {
+	_c.Call.Return(queryExpr, err)
+	return _c
+}
+
+func (_c *Filter_QueryExpression_Call) RunAndReturn(run func(table string) (interfaces.QueryExpr, error)) *Filter_QueryExpression_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2360,12 +2360,12 @@ func (_m *SortParameter) EXPECT() *SortParameter_Expecter {
 	return &SortParameter_Expecter{mock: &_m.Mock}
 }
 
-// GetGormOrderExpr provides a mock function for the type SortParameter
-func (_mock *SortParameter) GetGormOrderExpr() string {
+// GetOrderExpr provides a mock function for the type SortParameter
+func (_mock *SortParameter) GetOrderExpr() string {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetGormOrderExpr")
+		panic("no return value specified for GetOrderExpr")
 	}
 
 	var r0 string
@@ -2377,29 +2377,29 @@ func (_mock *SortParameter) GetGormOrderExpr() string {
 	return r0
 }
 
-// SortParameter_GetGormOrderExpr_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetGormOrderExpr'
-type SortParameter_GetGormOrderExpr_Call struct {
+// SortParameter_GetOrderExpr_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrderExpr'
+type SortParameter_GetOrderExpr_Call struct {
 	*mock.Call
 }
 
-// GetGormOrderExpr is a helper method to define mock.On call
-func (_e *SortParameter_Expecter) GetGormOrderExpr() *SortParameter_GetGormOrderExpr_Call {
-	return &SortParameter_GetGormOrderExpr_Call{Call: _e.mock.On("GetGormOrderExpr")}
+// GetOrderExpr is a helper method to define mock.On call
+func (_e *SortParameter_Expecter) GetOrderExpr() *SortParameter_GetOrderExpr_Call {
+	return &SortParameter_GetOrderExpr_Call{Call: _e.mock.On("GetOrderExpr")}
 }
 
-func (_c *SortParameter_GetGormOrderExpr_Call) Run(run func()) *SortParameter_GetGormOrderExpr_Call {
+func (_c *SortParameter_GetOrderExpr_Call) Run(run func()) *SortParameter_GetOrderExpr_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *SortParameter_GetGormOrderExpr_Call) Return(s string) *SortParameter_GetGormOrderExpr_Call {
+func (_c *SortParameter_GetOrderExpr_Call) Return(s string) *SortParameter_GetOrderExpr_Call {
 	_c.Call.Return(s)
 	return _c
 }
 
-func (_c *SortParameter_GetGormOrderExpr_Call) RunAndReturn(run func() string) *SortParameter_GetGormOrderExpr_Call {
+func (_c *SortParameter_GetOrderExpr_Call) RunAndReturn(run func() string) *SortParameter_GetOrderExpr_Call {
 	_c.Call.Return(run)
 	return _c
 }
