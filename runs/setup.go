@@ -9,8 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
-	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -22,7 +21,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -93,12 +91,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
-	appSvc := service.NewAppService()
-	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
-	sc.Mux.Handle(appPath, appHandler)
-	logger.Infof(ctx, "Mounted AppService at %s", appPath)
-
-	triggerSvc := service.NewTriggerService(repo)
+triggerSvc := service.NewTriggerService()
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
@@ -128,16 +121,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
-	}
-
-	if cfg.TriggerScheduler.Enabled {
-		runsURL := cfg.ActionsServiceURL
-		if sc.BaseURL != "" {
-			runsURL = sc.BaseURL
-		}
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL)
-		sc.AddWorker("trigger-scheduler", worker)
-		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
 
 	sc.AddReadyCheck(func(r *http.Request) error {
