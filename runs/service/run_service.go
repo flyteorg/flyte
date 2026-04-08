@@ -942,7 +942,13 @@ func (s *RunService) WatchRuns(
 ) error {
 	logger.Infof(ctx, "Received WatchRuns request")
 
-	// Step 1: Send existing runs that match filter
+	// Step 1: Subscribe to updates first to avoid missing events that arrive
+	// between the initial list and the subscription (same pattern as WatchActions).
+	updatesCh := make(chan *models.Run, 50)
+	errsCh := make(chan error, 1)
+	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
+
+	// Step 2: Send existing runs that match filter
 	listReq := s.convertWatchRequestToListRequest(req.Msg)
 
 	runs, _, err := s.repo.ActionRepo().ListRuns(ctx, listReq)
@@ -961,11 +967,6 @@ func (s *RunService) WatchRuns(
 			return err
 		}
 	}
-
-	// Step 2: Watch for run updates from DB
-	updatesCh := make(chan *models.Run, 50)
-	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	for {
 		select {
