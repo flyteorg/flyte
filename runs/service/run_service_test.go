@@ -757,7 +757,6 @@ func TestListRuns(t *testing.T) {
 			},
 		})
 		sqlRes = append(sqlRes, &models.Run{
-			ID:         uint(i),
 			Project:    "test-project",
 			Domain:     "test-domain",
 			RunName:    fmt.Sprintf("run-%d", i),
@@ -869,7 +868,6 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"valid run",
 			&models.Run{
-				ID:            uint(0),
 				Project:       project,
 				Domain:        domain,
 				RunName:       name,
@@ -902,7 +900,6 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"run with missing details",
 			&models.Run{
-				ID:         uint(0),
 				Project:    project,
 				Domain:     domain,
 				RunName:    name,

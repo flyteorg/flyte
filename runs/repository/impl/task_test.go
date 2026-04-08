@@ -5,20 +5,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func setupDB(t *testing.T) *gorm.DB {
+func setupDB(t *testing.T) *sqlx.DB {
 	t.Helper()
 	return testDB
 }
 
-func setupTestDB(t *testing.T) *gorm.DB {
+func setupTestDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
 	t.Cleanup(func() {
 		db.Exec("DELETE FROM task_specs")

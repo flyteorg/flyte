@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/secret"
 	secretconfig "github.com/flyteorg/flyte/v2/secret/config"
 )

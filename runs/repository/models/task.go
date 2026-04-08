@@ -41,50 +41,36 @@ type TaskName struct {
 
 // TaskKey is a composite key for a task
 type TaskKey struct {
-	Project string `gorm:"primaryKey;index:idx_tasks_identifier,priority:1" db:"project"`
-	Domain  string `gorm:"primaryKey;index:idx_tasks_identifier,priority:2" db:"domain"`
-	Name    string `gorm:"primaryKey;index:idx_tasks_identifier,priority:3" db:"name"`
-	Version string `gorm:"primaryKey;index:idx_tasks_identifier,priority:4" db:"version"`
+	Project string `db:"project"`
+	Domain  string `db:"domain"`
+	Name    string `db:"name"`
+	Version string `db:"version"`
 }
 
 // Tasks models the TaskDetails from the task_definition.proto
 type Task struct {
-	// Composite primary key — declared directly (not via embedded struct) so that
-	// GORM AutoMigrate creates the actual PRIMARY KEY constraint in PostgreSQL,
-	// which is required for ON CONFLICT (project, domain, name, version) upserts.
-	Project string `gorm:"primaryKey" db:"project"`
-	Domain  string `gorm:"primaryKey" db:"domain"`
-	Name    string `gorm:"primaryKey" db:"name"`
-	Version string `gorm:"primaryKey" db:"version"`
+	TaskKey
 
 	// Extracted from Name
-	Environment  string `gorm:"column:environment" db:"environment"`
-	FunctionName string `gorm:"column:function_name" db:"function_name"`
+	Environment  string `db:"environment"`
+	FunctionName string `db:"function_name"`
 
 	// Base fields
-	CreatedAt time.Time `gorm:"column:created_at" db:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at" db:"updated_at"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 
 	// Metadata
-	DeployedBy            string         `gorm:"column:deployed_by" db:"deployed_by"`
-	TriggerName           sql.NullString `gorm:"column:trigger_name" db:"trigger_name"`
-	TotalTriggers         uint32         `gorm:"column:total_triggers" db:"total_triggers"`
-	ActiveTriggers        uint32         `gorm:"column:active_triggers" db:"active_triggers"`
-	TriggerAutomationSpec []byte         `gorm:"column:trigger_automation_spec" db:"trigger_automation_spec"`
-	TriggerTypes          pgtype.Bits    `gorm:"column:trigger_types;type:bit(10)" db:"trigger_types"`
-	EnvDescription        sql.NullString `gorm:"column:env_description" db:"env_description" json:"env_description,omitempty"`
-	ShortDescription      sql.NullString `gorm:"column:short_description" db:"short_description" json:"short_description,omitempty"`
+	DeployedBy            string         `db:"deployed_by"`
+	TriggerName           sql.NullString `db:"trigger_name"`
+	TotalTriggers         uint32         `db:"total_triggers"`
+	ActiveTriggers        uint32         `db:"active_triggers"`
+	TriggerAutomationSpec []byte         `db:"trigger_automation_spec"`
+	TriggerTypes          pgtype.Bits    `db:"trigger_types"`
+	EnvDescription        sql.NullString `db:"env_description" json:"env_description,omitempty"`
+	ShortDescription      sql.NullString `db:"short_description" json:"short_description,omitempty"`
 
 	// Spec
-	TaskSpec []byte `gorm:"column:task_spec" db:"task_spec"`
-}
-
-// TableName specifies the table name
-func (Task) TableName() string { return "tasks" }
-
-// Key returns the TaskKey for this task.
-func (t Task) Key() TaskKey {
-	return TaskKey{Project: t.Project, Domain: t.Domain, Name: t.Name, Version: t.Version}
+	TaskSpec []byte `db:"task_spec"`
 }
 
 type TaskCounts struct {

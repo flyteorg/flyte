@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -25,7 +25,7 @@ func main() {
 			sc.Port = cfg.Server.Port
 			sc.Namespace = "flyte" // TODO: make configurable
 
-			db, err := app.InitDB(ctx, database.GetConfig())
+			db, err := database.GetDB(ctx, database.GetConfig())
 			if err != nil {
 				return fmt.Errorf("failed to initialize database: %w", err)
 			}

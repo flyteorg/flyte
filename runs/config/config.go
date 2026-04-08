@@ -32,6 +32,9 @@ var defaultConfig = &Config{
 		ExecutionQPS:          10.0,
 		ExecutionBurst:        20,
 	},
+	Apps: AppsConfig{
+		InternalAppServiceURL: "http://localhost:8091",
+	},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -62,6 +65,9 @@ type Config struct {
 
 	// TriggerScheduler configures the cron-based trigger scheduler worker.
 	TriggerScheduler TriggerSchedulerConfig `json:"triggerScheduler"`
+
+	// Apps holds configuration for the App service.
+	Apps AppsConfig `json:"apps"`
 }
 
 // ServerConfig holds HTTP server configuration
@@ -92,6 +98,18 @@ type TriggerSchedulerConfig struct {
 
 	// ExecutionBurst is the token-bucket burst size.
 	ExecutionBurst int `json:"executionBurst" pflag:",Burst size for CreateRun rate limiter"`
+}
+
+// AppsConfig holds configuration for the App service in the runs (control plane).
+type AppsConfig struct {
+	// PublicURLPattern is a Go template for generating public ingress URLs.
+	// Available variables: {{.Name}}, {{.Project}}, {{.Domain}}
+	// Example: "https://{{.Name}}-{{.Project}}.apps.flyte.example.com"
+	PublicURLPattern string `json:"publicUrlPattern" pflag:",URL pattern for app ingress"`
+
+	// InternalAppServiceURL is the base URL of the InternalAppService (actions data plane).
+	// In unified mode this is overridden by sc.BaseURL.
+	InternalAppServiceURL string `json:"internalAppServiceUrl" pflag:",URL of the internal app service"`
 }
 
 // GetConfig returns the parsed runs configuration

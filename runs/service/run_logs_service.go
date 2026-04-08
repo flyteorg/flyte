@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"database/sql"
+
 	"connectrpc.com/connect"
 	"golang.org/x/sync/semaphore"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -64,7 +65,7 @@ func (s *RunLogsService) TailLogs(ctx context.Context, req *connect.Request[work
 func getLogContextForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, error) {
 	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
 		}
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))

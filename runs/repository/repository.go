@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
@@ -18,7 +18,7 @@ type repository struct {
 }
 
 // NewRepository creates a new Repository instance
-func NewRepository(db *gorm.DB, dbConfig database.DbConfig) (interfaces.Repository, error) {
+func NewRepository(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.Repository, error) {
 	actionRepo, err := impl.NewActionRepo(db, dbConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action repo: %w", err)

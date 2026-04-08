@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-gormigrate/gormigrate/v2"
-
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/service"
@@ -19,8 +17,7 @@ import (
 // Requires sc.DB and sc.DataStore to be set by the standalone binary.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-	m := gormigrate.New(sc.DB, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
-	if err := m.Migrate(); err != nil {
+	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("cache_service: failed to run migrations: %w", err)
 	}
 
@@ -29,11 +26,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted CacheService at %s", path)
 
 	sc.AddReadyCheck(func(r *http.Request) error {
-		sqlDB, err := sc.DB.DB()
-		if err != nil {
-			return fmt.Errorf("database connection error: %w", err)
-		}
-		if err := sqlDB.Ping(); err != nil {
+		if err := sc.DB.PingContext(r.Context()); err != nil {
 			return fmt.Errorf("database ping failed: %w", err)
 		}
 		if sc.DataStore.GetBaseContainerFQN(r.Context()) == "" {

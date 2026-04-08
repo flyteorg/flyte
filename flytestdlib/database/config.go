@@ -50,6 +50,7 @@ type DbConfig struct {
 	// deprecated: Please use Postgres.Debug
 	DeprecatedDebug bool `json:"debug" pflag:"-,deprecated"`
 
+	// Deprecated: was GORM-specific, retained for config compatibility.
 	EnableForeignKeyConstraintWhenMigrating bool            `json:"enableForeignKeyConstraintWhenMigrating" pflag:",Whether to enable gorm foreign keys when migrating the db"`
 	MaxIdleConnections                      int             `json:"maxIdleConnections" pflag:",maxIdleConnections sets the maximum number of connections in the idle connection pool."`
 	MaxOpenConnections                      int             `json:"maxOpenConnections" pflag:",maxOpenConnections sets the maximum number of open connections to the database."`

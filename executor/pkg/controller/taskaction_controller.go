@@ -50,7 +50,7 @@ import (
 )
 
 const (
-	TaskActionDefaultRequeueDuration = 5 * time.Second
+	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
