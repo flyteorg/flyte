@@ -9,7 +9,7 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	appconfig "github.com/flyteorg/flyte/v2/app/config"
+	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -22,11 +22,11 @@ import (
 type InternalAppService struct {
 	appconnect.UnimplementedAppServiceHandler
 	k8s appk8s.AppK8sClientInterface
-	cfg *appconfig.AppConfig
+	cfg *appconfig.InternalAppConfig
 }
 
 // NewInternalAppService creates a new InternalAppService.
-func NewInternalAppService(k8s appk8s.AppK8sClientInterface, cfg *appconfig.AppConfig) *InternalAppService {
+func NewInternalAppService(k8s appk8s.AppK8sClientInterface, cfg *appconfig.InternalAppConfig) *InternalAppService {
 	return &InternalAppService{k8s: k8s, cfg: cfg}
 }
 

@@ -18,7 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/app/internal/config"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -55,7 +55,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		Build()
 	return &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
@@ -228,7 +228,7 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
@@ -277,7 +277,7 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
@@ -311,7 +311,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
@@ -333,7 +333,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	replicaID := &flyteapp.ReplicaIdentifier{
