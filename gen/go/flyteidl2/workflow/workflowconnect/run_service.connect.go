@@ -65,6 +65,9 @@ const (
 	RunServiceWatchClusterEventsProcedure = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	// RunServiceAbortActionProcedure is the fully-qualified name of the RunService's AbortAction RPC.
 	RunServiceAbortActionProcedure = "/flyteidl2.workflow.RunService/AbortAction"
+	// RunServiceGetActionDataURIsProcedure is the fully-qualified name of the RunService's
+	// GetActionDataURIs RPC.
+	RunServiceGetActionDataURIsProcedure = "/flyteidl2.workflow.RunService/GetActionDataURIs"
 	// RunServiceWatchGroupsProcedure is the fully-qualified name of the RunService's WatchGroups RPC.
 	RunServiceWatchGroupsProcedure = "/flyteidl2.workflow.RunService/WatchGroups"
 )
@@ -85,6 +88,7 @@ var (
 	runServiceWatchActionsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("WatchActions")
 	runServiceWatchClusterEventsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
 	runServiceAbortActionMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("AbortAction")
+	runServiceGetActionDataURIsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
 	runServiceWatchGroupsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
 )
 
@@ -102,7 +106,9 @@ type RunServiceClient interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
-	// Get input and output for an action.
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
@@ -118,6 +124,8 @@ type RunServiceClient interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
 }
@@ -215,6 +223,13 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceAbortActionMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getActionDataURIs: connect.NewClient[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse](
+			httpClient,
+			baseURL+RunServiceGetActionDataURIsProcedure,
+			connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 		watchGroups: connect.NewClient[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse](
 			httpClient,
 			baseURL+RunServiceWatchGroupsProcedure,
@@ -239,6 +254,7 @@ type runServiceClient struct {
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
 	watchClusterEvents *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
 	abortAction        *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
+	getActionDataURIs  *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
 	watchGroups        *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
 }
 
@@ -273,6 +289,8 @@ func (c *runServiceClient) WatchActionDetails(ctx context.Context, req *connect.
 }
 
 // GetActionData calls flyteidl2.workflow.RunService.GetActionData.
+//
+// Deprecated: do not use.
 func (c *runServiceClient) GetActionData(ctx context.Context, req *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
 	return c.getActionData.CallUnary(ctx, req)
 }
@@ -307,6 +325,11 @@ func (c *runServiceClient) AbortAction(ctx context.Context, req *connect.Request
 	return c.abortAction.CallUnary(ctx, req)
 }
 
+// GetActionDataURIs calls flyteidl2.workflow.RunService.GetActionDataURIs.
+func (c *runServiceClient) GetActionDataURIs(ctx context.Context, req *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return c.getActionDataURIs.CallUnary(ctx, req)
+}
+
 // WatchGroups calls flyteidl2.workflow.RunService.WatchGroups.
 func (c *runServiceClient) WatchGroups(ctx context.Context, req *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error) {
 	return c.watchGroups.CallServerStream(ctx, req)
@@ -326,7 +349,9 @@ type RunServiceHandler interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
-	// Get input and output for an action.
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
@@ -342,6 +367,8 @@ type RunServiceHandler interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
 }
@@ -435,6 +462,13 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceAbortActionMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceGetActionDataURIsHandler := connect.NewUnaryHandler(
+		RunServiceGetActionDataURIsProcedure,
+		svc.GetActionDataURIs,
+		connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	runServiceWatchGroupsHandler := connect.NewServerStreamHandler(
 		RunServiceWatchGroupsProcedure,
 		svc.WatchGroups,
@@ -469,6 +503,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
 		case RunServiceAbortActionProcedure:
 			runServiceAbortActionHandler.ServeHTTP(w, r)
+		case RunServiceGetActionDataURIsProcedure:
+			runServiceGetActionDataURIsHandler.ServeHTTP(w, r)
 		case RunServiceWatchGroupsProcedure:
 			runServiceWatchGroupsHandler.ServeHTTP(w, r)
 		default:
@@ -530,6 +566,10 @@ func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *conne
 
 func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.AbortAction is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionDataURIs is not implemented"))
 }
 
 func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error {

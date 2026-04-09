@@ -595,6 +595,13 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 }
 
 // GetActionData gets input and output data for an action by reading from storage.
+func (s *RunService) GetActionDataURIs(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionDataURIsRequest],
+) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("GetActionDataURIs is not implemented in operator RunService"))
+}
+
 func (s *RunService) GetActionData(
 	ctx context.Context,
 	req *connect.Request[workflow.GetActionDataRequest],

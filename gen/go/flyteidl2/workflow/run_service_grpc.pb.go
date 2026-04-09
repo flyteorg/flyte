@@ -32,6 +32,7 @@ const (
 	RunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.RunService/WatchActions"
 	RunService_WatchClusterEvents_FullMethodName = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	RunService_AbortAction_FullMethodName        = "/flyteidl2.workflow.RunService/AbortAction"
+	RunService_GetActionDataURIs_FullMethodName  = "/flyteidl2.workflow.RunService/GetActionDataURIs"
 	RunService_WatchGroups_FullMethodName        = "/flyteidl2.workflow.RunService/WatchGroups"
 )
 
@@ -51,7 +52,8 @@ type RunServiceClient interface {
 	GetActionDetails(ctx context.Context, in *GetActionDetailsRequest, opts ...grpc.CallOption) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(ctx context.Context, in *WatchActionDetailsRequest, opts ...grpc.CallOption) (RunService_WatchActionDetailsClient, error)
-	// Get input and output for an action.
+	// Deprecated: Do not use.
+	// Deprecated: Use DataProxyService.GetActionData instead.
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error)
@@ -67,6 +69,8 @@ type RunServiceClient interface {
 	WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error)
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(ctx context.Context, in *GetActionDataURIsRequest, opts ...grpc.CallOption) (*GetActionDataURIsResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error)
 }
@@ -179,6 +183,7 @@ func (x *runServiceWatchActionDetailsClient) Recv() (*WatchActionDetailsResponse
 	return m, nil
 }
 
+// Deprecated: Do not use.
 func (c *runServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
 	out := new(GetActionDataResponse)
 	err := c.cc.Invoke(ctx, RunService_GetActionData_FullMethodName, in, out, opts...)
@@ -311,6 +316,15 @@ func (c *runServiceClient) AbortAction(ctx context.Context, in *AbortActionReque
 	return out, nil
 }
 
+func (c *runServiceClient) GetActionDataURIs(ctx context.Context, in *GetActionDataURIsRequest, opts ...grpc.CallOption) (*GetActionDataURIsResponse, error) {
+	out := new(GetActionDataURIsResponse)
+	err := c.cc.Invoke(ctx, RunService_GetActionDataURIs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *runServiceClient) WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[5], RunService_WatchGroups_FullMethodName, opts...)
 	if err != nil {
@@ -359,7 +373,8 @@ type RunServiceServer interface {
 	GetActionDetails(context.Context, *GetActionDetailsRequest) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(*WatchActionDetailsRequest, RunService_WatchActionDetailsServer) error
-	// Get input and output for an action.
+	// Deprecated: Do not use.
+	// Deprecated: Use DataProxyService.GetActionData instead.
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error)
@@ -375,6 +390,8 @@ type RunServiceServer interface {
 	WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error)
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(context.Context, *GetActionDataURIsRequest) (*GetActionDataURIsResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error
 }
@@ -421,6 +438,9 @@ func (UnimplementedRunServiceServer) WatchClusterEvents(*WatchClusterEventsReque
 }
 func (UnimplementedRunServiceServer) AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbortAction not implemented")
+}
+func (UnimplementedRunServiceServer) GetActionDataURIs(context.Context, *GetActionDataURIsRequest) (*GetActionDataURIsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActionDataURIs not implemented")
 }
 func (UnimplementedRunServiceServer) WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchGroups not implemented")
@@ -686,6 +706,24 @@ func _RunService_AbortAction_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RunService_GetActionDataURIs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetActionDataURIsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunServiceServer).GetActionDataURIs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RunService_GetActionDataURIs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunServiceServer).GetActionDataURIs(ctx, req.(*GetActionDataURIsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RunService_WatchGroups_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchGroupsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -745,6 +783,10 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AbortAction",
 			Handler:    _RunService_AbortAction_Handler,
+		},
+		{
+			MethodName: "GetActionDataURIs",
+			Handler:    _RunService_GetActionDataURIs_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

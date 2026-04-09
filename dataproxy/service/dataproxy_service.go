@@ -5,47 +5,44 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
-	"hash/fnv"
-	"slices"
-	"strings"
+	"sort"
 	"time"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/stow"
 	"github.com/samber/lo"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"golang.org/x/sync/errgroup"
 
+	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
 
 type Service struct {
-	dataproxyconnect.UnimplementedDataProxyServiceHandler
+	dataproxy.UnimplementedDataProxyServiceServer
 
-	cfg           config.DataProxyConfig
-	dataStore     *storage.DataStore
-	taskClient    taskconnect.TaskServiceClient
-	triggerClient triggerconnect.TriggerServiceClient
+	cfg       config.DataProxyConfig
+	dataStore *storage.DataStore
+	repo      interfaces.Repository
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, repo interfaces.Repository) *Service {
 	return &Service{
-		cfg:           cfg,
-		dataStore:     dataStore,
-		taskClient:    taskClient,
-		triggerClient: triggerClient,
+		cfg:       cfg,
+		dataStore: dataStore,
+		repo:      repo,
 	}
 }
 
@@ -54,8 +51,8 @@ func (s *Service) CreateUploadLocation(
 	ctx context.Context,
 	req *connect.Request[dataproxy.CreateUploadLocationRequest],
 ) (*connect.Response[dataproxy.CreateUploadLocationResponse], error) {
-	logger.Infof(ctx, "CreateUploadLocation request for project=%s, domain=%s, filename=%s",
-		req.Msg.Project, req.Msg.Domain, req.Msg.Filename)
+	logger.Infof(ctx, "CreateUploadLocation request for project=%s, domain=%s, org=%s, filename=%s",
+		req.Msg.Project, req.Msg.Domain, req.Msg.Org, req.Msg.Filename)
 
 	// Validation on request
 	if err := req.Msg.Validate(); err != nil {
@@ -164,13 +161,13 @@ func (s *Service) checkFileExists(ctx context.Context, storagePath storage.DataR
 
 // constructStoragePath builds the storage path based on the request parameters.
 // Path patterns:
-//   - storage_prefix/project/domain/filename_root/filename (if filename_root is provided)
-//   - storage_prefix/project/domain/base32_hash/filename (if only content_md5 is provided)
+//   - storage_prefix/org/project/domain/filename_root/filename (if filename_root is provided)
+//   - storage_prefix/org/project/domain/base32_hash/filename (if only content_md5 is provided)
 func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.CreateUploadLocationRequest) (storage.DataReference, error) {
 	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
 
-	// Build path components: storage_prefix/project/domain/prefix/filename
-	pathComponents := []string{s.cfg.Upload.StoragePrefix, req.GetProject(), req.GetDomain()}
+	// Build path components: storage_prefix/org/project/domain/prefix/filename
+	pathComponents := []string{s.cfg.Upload.StoragePrefix, req.GetOrg(), req.GetProject(), req.GetDomain()}
 
 	// Set filename_root or base32-encoded content hash as prefix
 	if len(req.GetFilenameRoot()) > 0 {
@@ -190,151 +187,179 @@ func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.Creat
 	return s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
 }
 
-// UploadInputs persists the given inputs to storage and returns a URI and hash
-// that can be passed to CreateRun via OffloadedInputData.
-func (s *Service) UploadInputs(
+// GetActionData gets input and output data for an action by reading from storage.
+func (s *Service) GetActionData(
 	ctx context.Context,
-	req *connect.Request[dataproxy.UploadInputsRequest],
-) (*connect.Response[dataproxy.UploadInputsResponse], error) {
-	logger.Infof(ctx, "UploadInputs request received")
+	req *connect.Request[workflow.GetActionDataRequest],
+) (*connect.Response[workflow.GetActionDataResponse], error) {
+	logger.Infof(ctx, "Received GetActionData request for: %s/%s",
+		req.Msg.ActionId.Run.Name, req.Msg.ActionId.Name)
 
 	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid UploadInputs request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Resolve org/project/domain from the identifier.
-	var org, project, domain string
-	switch id := req.Msg.Id.(type) {
-	case *dataproxy.UploadInputsRequest_RunId:
-		org = id.RunId.GetOrg()
-		project = id.RunId.GetProject()
-		domain = id.RunId.GetDomain()
-	case *dataproxy.UploadInputsRequest_ProjectId:
-		org = id.ProjectId.GetOrganization()
-		project = id.ProjectId.GetName()
-		domain = id.ProjectId.GetDomain()
-	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("id is required"))
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get action: %v", err)
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
 
-	// Resolve the task template to get cache_ignore_input_vars.
-	taskTemplate, err := s.resolveTaskTemplate(ctx, req.Msg)
+	inputURI, _ := extractStorageURIs(action.ActionSpec)
+
+	info := &workflow.RunInfo{}
+	if err := proto.Unmarshal(action.DetailedInfo, info); err != nil {
+		return nil, err
+	}
+
+	resp := &workflow.GetActionDataResponse{
+		Inputs:  &task.Inputs{},
+		Outputs: &task.Outputs{},
+	}
+
+	group, groupCtx := errgroup.WithContext(ctx)
+	if inputURI != "" {
+		group.Go(func() error {
+			inputRef := storage.DataReference(inputURI)
+			logger.Debugf(groupCtx, "Reading inputs from: %s", inputRef)
+			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "Failed to read inputs from %s: %v", inputRef, err)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
+				}
+				logger.Debugf(groupCtx, "Inputs not found at %s", inputRef)
+			} else {
+				logger.Debugf(groupCtx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
+			}
+			return nil
+		})
+	} else {
+		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
+	}
+
+	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
+		group.Go(func() error {
+			if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
+				if info.GetOutputsUri() == "" {
+					return nil
+				}
+				logger.Debugf(groupCtx, "Reading outputs from: %s", info.GetOutputsUri())
+
+				outputMap := &core.LiteralMap{}
+				if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(info.GetOutputsUri()), outputMap); err != nil {
+					if !storage.IsNotFound(err) {
+						logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", info.GetOutputsUri(), err)
+						return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
+					}
+					logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", info.GetOutputsUri())
+				} else {
+					resp.Outputs = literalMapToOutputs(outputMap)
+					logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
+				}
+				return nil
+			}
+
+			attempts, err := s.getAttempts(groupCtx, req.Msg.GetActionId())
+			if err != nil {
+				return err
+			}
+
+			if len(attempts) == 0 {
+				return app.NewServerError(codes.NotFound, "outputs not available, no attempts for action")
+			}
+
+			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
+			if outputUri == "" {
+				return app.NewServerError(codes.NotFound, "outputs not available")
+			}
+
+			logger.Debugf(groupCtx, "Reading outputs from: %s", outputUri)
+			outputMap := &core.LiteralMap{}
+			if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(outputUri), outputMap); err != nil {
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", outputUri, err)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
+				}
+				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", outputUri)
+			} else {
+				resp.Outputs = literalMapToOutputs(outputMap)
+				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
+			}
+
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
+	}
+
+	logger.Infof(ctx, "Retrieved action data for: %s (inputs=%d, outputs=%d)",
+		req.Msg.ActionId.Name, len(resp.Inputs.Literals), len(resp.Outputs.Literals))
+	return connect.NewResponse(resp), nil
+}
+
+// getAttempts looks up all events for an action and builds a list of attempts.
+func (s *Service) getAttempts(ctx context.Context, actionId *common.ActionIdentifier) ([]*workflow.ActionAttempt, error) {
+	eventModels, err := s.repo.ActionRepo().ListEvents(ctx, actionId, 500)
 	if err != nil {
 		return nil, err
 	}
 
-	// Filter out cache-ignored inputs before hashing.
-	filteredInputs := filterInputs(req.Msg.GetInputs(), taskTemplate.GetMetadata().GetCacheIgnoreInputVars())
-
-	// Deterministically hash the filtered inputs for cache key computation.
-	inputsHash, err := hashInputsProto(filteredInputs)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to hash inputs: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to hash inputs: %w", err))
+	events := make([]*workflow.ActionEvent, 0, len(eventModels))
+	for _, m := range eventModels {
+		event, err := m.ToActionEvent()
+		if err != nil {
+			logger.Warnf(ctx, "failed to convert action event model for action %v: %v", actionId, err)
+			return nil, err
+		}
+		events = append(events, event)
 	}
 
-	// Build the storage path: storagePrefix/org/project/domain/offloaded-inputs/<hash>/inputs.pb
-	storagePrefix := strings.TrimRight(s.cfg.Upload.StoragePrefix, "/")
-	pathComponents := []string{storagePrefix, org, project, domain, "offloaded-inputs", inputsHash}
-	pathComponents = lo.Filter(pathComponents, func(key string, _ int) bool {
-		return key != ""
+	attemptToEvents := map[uint32][]*workflow.ActionEvent{}
+	for _, event := range events {
+		attemptToEvents[event.GetAttempt()] = append(attemptToEvents[event.GetAttempt()], event)
+	}
+
+	attempts := make([]*workflow.ActionAttempt, 0, len(attemptToEvents))
+	for attempt, evts := range attemptToEvents {
+		merged := &workflow.ActionAttempt{Attempt: attempt}
+		if len(evts) > 0 {
+			lastEvent := evts[len(evts)-1]
+			if lastEvent.GetOutputs() != nil {
+				merged.Outputs = lastEvent.GetOutputs()
+			}
+		}
+		attempts = append(attempts, merged)
+	}
+	sort.SliceStable(attempts, func(i, j int) bool {
+		return attempts[i].GetAttempt() < attempts[j].GetAttempt()
 	})
 
-	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
-	dirRef, err := s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to construct storage path: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct storage path: %w", err))
-	}
-
-	inputRef, err := s.dataStore.ConstructReference(ctx, dirRef, "inputs.pb")
-	if err != nil {
-		logger.Errorf(ctx, "Failed to construct input ref: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
-	}
-
-	// Store all inputs (unfiltered) — the hash is over the filtered set for caching.
-	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, req.Msg.GetInputs()); err != nil {
-		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-	}
-
-	logger.Infof(ctx, "Successfully uploaded inputs to %s (hash=%s)", inputRef, inputsHash)
-
-	return connect.NewResponse(&dataproxy.UploadInputsResponse{
-		OffloadedInputData: &common.OffloadedInputData{
-			Uri:        string(dirRef),
-			InputsHash: inputsHash,
-		},
-	}), nil
+	return attempts, nil
 }
 
-// resolveTaskTemplate resolves the task template from the request's task oneof.
-func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.UploadInputsRequest) (*flyteIdlCore.TaskTemplate, error) {
-	switch t := req.Task.(type) {
-	case *dataproxy.UploadInputsRequest_TaskSpec:
-		return t.TaskSpec.GetTaskTemplate(), nil
-	case *dataproxy.UploadInputsRequest_TaskId:
-		resp, err := s.taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
-			TaskId: t.TaskId,
-		}))
-		if err != nil {
-			logger.Errorf(ctx, "Failed to get task details for %v: %v", t.TaskId, err)
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task: %w", err))
-		}
-		return resp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
-	case *dataproxy.UploadInputsRequest_TriggerName:
-		triggerResp, err := s.triggerClient.GetTriggerDetails(ctx, connect.NewRequest(&trigger.GetTriggerDetailsRequest{
-			Name: t.TriggerName,
-		}))
-		if err != nil {
-			logger.Errorf(ctx, "Failed to get trigger details for %v: %v", t.TriggerName, err)
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get trigger: %w", err))
-		}
-		triggerDetails := triggerResp.Msg.GetTrigger()
-		taskID := &task.TaskIdentifier{
-			Org:     t.TriggerName.GetOrg(),
-			Project: t.TriggerName.GetProject(),
-			Domain:  t.TriggerName.GetDomain(),
-			Name:    t.TriggerName.GetTaskName(),
-			Version: triggerDetails.GetSpec().GetTaskVersion(),
-		}
-		taskResp, err := s.taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
-			TaskId: taskID,
-		}))
-		if err != nil {
-			logger.Errorf(ctx, "Failed to get task details for trigger %v: %v", t.TriggerName, err)
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task for trigger: %w", err))
-		}
-		return taskResp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
-	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("task is required"))
+// extractStorageURIs parses ActionSpec protobuf to extract InputUri and RunOutputBase.
+func extractStorageURIs(specBytes []byte) (inputURI, runOutputBase string) {
+	if len(specBytes) == 0 {
+		return
 	}
+	var spec workflow.ActionSpec
+	if err := proto.Unmarshal(specBytes, &spec); err != nil {
+		return
+	}
+	return spec.GetInputUri(), spec.GetRunOutputBase()
 }
 
-// filterInputs returns a new Inputs with cache-ignored variables removed.
-func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
-	if len(ignoreVars) == 0 {
-		return inputs
+// literalMapToOutputs converts a LiteralMap to task.Outputs.
+func literalMapToOutputs(m *core.LiteralMap) *task.Outputs {
+	if m == nil || len(m.Literals) == 0 {
+		return &task.Outputs{}
 	}
-	var filtered []*task.NamedLiteral
-	for _, nl := range inputs.GetLiterals() {
-		if !slices.Contains(ignoreVars, nl.GetName()) {
-			filtered = append(filtered, nl)
-		}
+	literals := make([]*task.NamedLiteral, 0, len(m.Literals))
+	for name, val := range m.Literals {
+		literals = append(literals, &task.NamedLiteral{Name: name, Value: val})
 	}
-	return &task.Inputs{Literals: filtered}
-}
-
-// hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.
-func hashInputsProto(inputs proto.Message) (string, error) {
-	marshaller := proto.MarshalOptions{Deterministic: true}
-	data, err := marshaller.Marshal(inputs)
-	if err != nil {
-		return "", fmt.Errorf("failed to marshal inputs: %w", err)
-	}
-	h := fnv.New64a()
-	_, _ = h.Write(data)
-	return base64.RawURLEncoding.EncodeToString(h.Sum(nil)), nil
+	sort.Slice(literals, func(i, j int) bool { return literals[i].Name < literals[j].Name })
+	return &task.Outputs{Literals: literals}
 }

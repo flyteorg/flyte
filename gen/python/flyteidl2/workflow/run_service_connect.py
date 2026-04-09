@@ -56,6 +56,9 @@ class RunService(Protocol):
     async def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def get_action_data_u_r_is(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -194,6 +197,16 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.abort_action,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionDataURIs": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetActionDataURIs",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_action_data_u_r_is,
                 ),
                 "/flyteidl2.workflow.RunService/WatchGroups": Endpoint.server_stream(
                     method=MethodInfo(
@@ -488,6 +501,28 @@ class RunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def get_action_data_u_r_is(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionDataURIs",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
     def watch_groups(
         self,
         request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest,
@@ -535,6 +570,8 @@ class RunServiceSync(Protocol):
     def watch_cluster_events(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_action_data_u_r_is(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -673,6 +710,16 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.abort_action,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionDataURIs": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetActionDataURIs",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_action_data_u_r_is,
                 ),
                 "/flyteidl2.workflow.RunService/WatchGroups": EndpointSync.server_stream(
                     method=MethodInfo(
@@ -965,6 +1012,28 @@ class RunServiceClientSync(ConnectClientSync):
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+        )
+
+    def get_action_data_u_r_is(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionDataURIs",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def watch_groups(

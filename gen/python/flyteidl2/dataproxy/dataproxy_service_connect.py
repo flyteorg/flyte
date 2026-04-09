@@ -14,13 +14,14 @@ from connectrpc.method import IdempotencyLevel, MethodInfo
 from connectrpc.request import Headers, RequestContext
 from connectrpc.server import ConnectASGIApplication, ConnectWSGIApplication, Endpoint, EndpointSync
 import flyteidl2.dataproxy.dataproxy_service_pb2 as flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2
+import flyteidl2.workflow.run_service_pb2 as flyteidl2_dot_workflow_dot_run__service__pb2
 
 
 class DataProxyService(Protocol):
     async def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def upload_inputs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
+    async def get_action_data(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -39,15 +40,15 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                     ),
                     function=svc.create_upload_location,
                 ),
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs": Endpoint.unary(
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": Endpoint.unary(
                     method=MethodInfo(
-                        name="UploadInputs",
+                        name="GetActionData",
                         service_name="flyteidl2.dataproxy.DataProxyService",
-                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
-                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
-                    function=svc.upload_inputs,
+                    function=svc.get_action_data,
                 ),
             },
             interceptors=interceptors,
@@ -82,31 +83,33 @@ class DataProxyServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
-    async def upload_inputs(
+    async def get_action_data(
         self,
-        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
         return await self.execute_unary(
             request=request,
             method=MethodInfo(
-                name="UploadInputs",
+                name="GetActionData",
                 service_name="flyteidl2.dataproxy.DataProxyService",
-                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
-                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
 
 class DataProxyServiceSync(Protocol):
     def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-    def upload_inputs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
+    def get_action_data(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -124,15 +127,15 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                     ),
                     function=service.create_upload_location,
                 ),
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs": EndpointSync.unary(
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": EndpointSync.unary(
                     method=MethodInfo(
-                        name="UploadInputs",
+                        name="GetActionData",
                         service_name="flyteidl2.dataproxy.DataProxyService",
-                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
-                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
-                    function=service.upload_inputs,
+                    function=service.get_action_data,
                 ),
             },
             interceptors=interceptors,
@@ -167,22 +170,24 @@ class DataProxyServiceClientSync(ConnectClientSync):
             timeout_ms=timeout_ms,
         )
 
-    def upload_inputs(
+    def get_action_data(
         self,
-        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
         return self.execute_unary(
             request=request,
             method=MethodInfo(
-                name="UploadInputs",
+                name="GetActionData",
                 service_name="flyteidl2.dataproxy.DataProxyService",
-                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest,
-                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )

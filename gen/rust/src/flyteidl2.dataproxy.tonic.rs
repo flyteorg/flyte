@@ -114,11 +114,13 @@ pub mod data_proxy_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn upload_inputs(
+        pub async fn get_action_data(
             &mut self,
-            request: impl tonic::IntoRequest<super::UploadInputsRequest>,
+            request: impl tonic::IntoRequest<
+                super::super::workflow::GetActionDataRequest,
+            >,
         ) -> std::result::Result<
-            tonic::Response<super::UploadInputsResponse>,
+            tonic::Response<super::super::workflow::GetActionDataResponse>,
             tonic::Status,
         > {
             self.inner
@@ -132,14 +134,14 @@ pub mod data_proxy_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs",
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl2.dataproxy.DataProxyService",
-                        "UploadInputs",
+                        "GetActionData",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -160,11 +162,11 @@ pub mod data_proxy_service_server {
             tonic::Response<super::CreateUploadLocationResponse>,
             tonic::Status,
         >;
-        async fn upload_inputs(
+        async fn get_action_data(
             &self,
-            request: tonic::Request<super::UploadInputsRequest>,
+            request: tonic::Request<super::super::workflow::GetActionDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::UploadInputsResponse>,
+            tonic::Response<super::super::workflow::GetActionDataResponse>,
             tonic::Status,
         >;
     }
@@ -293,25 +295,28 @@ pub mod data_proxy_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs" => {
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData" => {
                     #[allow(non_camel_case_types)]
-                    struct UploadInputsSvc<T: DataProxyService>(pub Arc<T>);
+                    struct GetActionDataSvc<T: DataProxyService>(pub Arc<T>);
                     impl<
                         T: DataProxyService,
-                    > tonic::server::UnaryService<super::UploadInputsRequest>
-                    for UploadInputsSvc<T> {
-                        type Response = super::UploadInputsResponse;
+                    > tonic::server::UnaryService<
+                        super::super::workflow::GetActionDataRequest,
+                    > for GetActionDataSvc<T> {
+                        type Response = super::super::workflow::GetActionDataResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::UploadInputsRequest>,
+                            request: tonic::Request<
+                                super::super::workflow::GetActionDataRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DataProxyService>::upload_inputs(&inner, request)
+                                <T as DataProxyService>::get_action_data(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -323,7 +328,7 @@ pub mod data_proxy_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = UploadInputsSvc(inner);
+                        let method = GetActionDataSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

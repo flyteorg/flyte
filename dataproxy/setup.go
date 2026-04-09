@@ -5,26 +5,27 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/dataproxy/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository"
+	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 // Setup registers the DataProxy service handler on the SetupContext mux.
-// Requires sc.DataStore to be set.
+// Requires sc.DataStore and sc.DB to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
-	baseURL := sc.BaseURL
-	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL)
-	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
+	repo, err := repository.NewRepository(sc.DB, runsconfig.GetConfig().Database)
+	if err != nil {
+		return fmt.Errorf("dataproxy: failed to create repository: %w", err)
+	}
 
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient)
+	svc := service.NewService(*cfg, sc.DataStore, repo)
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
 	sc.Mux.Handle(path, handler)
