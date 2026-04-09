@@ -275,8 +275,8 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected > 0 && updateTriggeredAt && action.TriggerName.Valid {
 		if _, err := tx.ExecContext(ctx,
-			`UPDATE triggers SET triggered_at = NOW() WHERE project = $1 AND domain = $2 AND name = $3`,
-			action.Project, action.Domain, action.TriggerName.String,
+			`UPDATE triggers SET triggered_at = NOW() WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4`,
+			action.Project, action.Domain, action.TriggerTaskName.String, action.TriggerName.String,
 		); err != nil {
 			return nil, fmt.Errorf("failed to update triggered_at: %w", err)
 		}
