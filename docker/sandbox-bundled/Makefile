@@ -96,7 +96,11 @@ start:
 			--publish "30001:5432" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
-			$(FLYTE_SANDBOX_IMAGE); \
+			$(FLYTE_SANDBOX_IMAGE) \
+			server --disable=servicelb \
+			--flannel-backend=host-gw \
+			--kubelet-arg=node-status-update-frequency=2s \
+			--kube-controller-manager-arg=node-monitor-period=2s; \
 	fi
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done

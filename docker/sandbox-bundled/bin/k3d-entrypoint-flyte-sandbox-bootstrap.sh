@@ -4,6 +4,8 @@
 # (e.g., old bitnami PostgreSQL used uid 1001, embedded-postgres uses uid 999).
 if [ -d /var/lib/flyte/storage/db ]; then
   chown -R 999:999 /var/lib/flyte/storage/db
+  # Remove stale PID file from unclean shutdown
+  rm -f /var/lib/flyte/storage/db/postmaster.pid
 fi
 
 # Start embedded PostgreSQL in the background (must be running before k3s
