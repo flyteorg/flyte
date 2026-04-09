@@ -80,6 +80,7 @@ build: sync-crds flyte console dep_update manifests
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox-v2:latest
 start: FLYTE_DEV := False
+start: FLYTE_SANDBOX_GPU ?= false
 start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
 		docker volume create flyte-sandbox
@@ -88,7 +89,9 @@ start:
 		docker run --detach --rm --privileged --name flyte-sandbox \
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
+			--env FLYTE_SANDBOX_GPU=$(FLYTE_SANDBOX_GPU) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
+			$(if $(filter true,$(FLYTE_SANDBOX_GPU)),--gpus all,) \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
