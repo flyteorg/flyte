@@ -105,12 +105,9 @@ pub struct BlobType {
     pub format: ::prost::alloc::string::String,
     #[prost(enumeration="blob_type::BlobDimensionality", tag="2")]
     pub dimensionality: i32,
-    /// Optional file extension (e.g. "csv", "parquet") to use during copilot download.
-    /// Default is "", which means no extension is appended.
-    /// Differences from "format":
-    ///    1. "format" is used for type validation in flytekit, "file_extension" is not.
-    ///    2. "file_extension" controls the file extension of the blob when materializing
-    ///     to local disk during e.g. flytecopilot download, unlike "format".
+    /// Optional file extension (e.g. "csv", "parquet") appended to the blob filename during flytecopilot download.
+    /// Unlike "format", this field is not used for type validation in SDK.
+    /// It only controls the local filename when materializing to disk.
     #[prost(string, tag="3")]
     pub file_extension: ::prost::alloc::string::String,
 }

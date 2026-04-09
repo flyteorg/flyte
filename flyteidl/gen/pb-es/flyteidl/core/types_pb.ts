@@ -342,12 +342,9 @@ export class BlobType extends Message<BlobType> {
   dimensionality = BlobType_BlobDimensionality.SINGLE;
 
   /**
-   * Optional file extension (e.g. "csv", "parquet") to use during copilot download.
-   * Default is "", which means no extension is appended.
-   * Differences from "format":
-   *   1. "format" is used for type validation in flytekit, "file_extension" is not.
-   *   2. "file_extension" controls the file extension of the blob when materializing
-   *    to local disk during e.g. flytecopilot download, unlike "format".
+   * Optional file extension (e.g. "csv", "parquet") appended to the blob filename during flytecopilot download.
+   * Unlike "format", this field is not used for type validation in SDK.
+   * It only controls the local filename when materializing to disk.
    *
    * @generated from field: string file_extension = 3;
    */

@@ -325,7 +325,7 @@
         },
         "file_extension": {
           "type": "string",
-          "description": "Optional file extension (e.g. \"csv\", \"parquet\") to use during copilot download.\nDefault is \"\", which means no extension is appended.\nDifferences from \"format\":\n  1. \"format\" is used for type validation in flytekit, \"file_extension\" is not.\n  2. \"file_extension\" controls the file extension of the blob when materializing\n   to local disk during e.g. flytecopilot download, unlike \"format\"."
+          "description": "Optional file extension (e.g. \"csv\", \"parquet\") appended to the blob filename during flytecopilot download.\nUnlike \"format\", this field is not used for type validation in SDK.\nIt only controls the local filename when materializing to disk."
         }
       },
       "title": "Defines type behavior for blob objects"

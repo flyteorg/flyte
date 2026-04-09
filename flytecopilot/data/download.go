@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -26,6 +27,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+var validFileExtensionRe = regexp.MustCompile(`^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$`)
+
 type Downloader struct {
 	format core.DataLoadingConfig_LiteralMapFormat
 	store  *storage.DataStore
@@ -42,16 +45,20 @@ type Downloader struct {
 // However, an input blob
 // `data: Annotated[FlyteFile["csv"], FileDownloadConfig(file_extension="csv")]`
 // should be written to "inputs/data.csv" (when FileExtension="csv" - new behavior).
-func resolveVarFilenames(vars *core.VariableMap) map[string]string {
+func resolveVarFilenames(ctx context.Context, vars *core.VariableMap) map[string]string {
 	varFilenames := make(map[string]string, len(vars.GetVariables()))
 	for varName, variable := range vars.GetVariables() {
 		varType := variable.GetType()
 		switch varType.GetType().(type) {
 		case *core.LiteralType_Blob:
-			if varType.GetBlob().GetFileExtension() == "" {
+			ext := varType.GetBlob().GetFileExtension()
+			if ext == "" {
+				varFilenames[varName] = varName
+			} else if !validFileExtensionRe.MatchString(ext) {
+				logger.Warnf(ctx, "invalid file extension for variable %q [%q], ignoring...", varName, ext)
 				varFilenames[varName] = varName
 			} else {
-				varFilenames[varName] = varName + "." + varType.GetBlob().GetFileExtension()
+				varFilenames[varName] = varName + "." + ext
 			}
 		default:
 			varFilenames[varName] = varName
@@ -565,7 +572,7 @@ func (d Downloader) DownloadInputs(ctx context.Context, vars *core.VariableMap, 
 		return errors.Wrapf(err, "failed to download input metadata message from remote store")
 	}
 
-	varFilenames := resolveVarFilenames(vars)
+	varFilenames := resolveVarFilenames(ctx, vars)
 	varMap, lMap, err := d.RecursiveDownload(ctx, inputs, outputDir, varFilenames, true)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download input variable from remote store")

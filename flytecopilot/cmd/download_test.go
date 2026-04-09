@@ -162,6 +162,9 @@ func TestDownloadOptions_Download(t *testing.T) {
 				"csv_blob": {
 					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "csv", FileExtension: "csv"}}},
 				},
+				"invalid_extension_blob": {
+					Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_SINGLE, Format: "xyz", FileExtension: "/../../../invalid"}}},
+				},
 			},
 		}
 		d, err := proto.Marshal(iface)
@@ -207,10 +210,26 @@ func TestDownloadOptions_Download(t *testing.T) {
 						},
 					},
 				}},
+				"invalid_extension_blob": {Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{
+							Blob: &core.Blob{
+								Uri: blobLoc.String(),
+								Metadata: &core.BlobMetadata{
+									Type: &core.BlobType{
+										Dimensionality: core.BlobType_SINGLE,
+										Format:         "xyz",
+										FileExtension:  "/../../../invalid",
+									},
+								},
+							},
+						},
+					},
+				}},
 			},
 		}))
 		assert.NoError(t, dopts.Download(ctx), "Download Operation failed")
-		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob.xyz", "csv_blob.csv"}, collectFile(tmpDir))
+		assert.ElementsMatch(t, []string{"inputs.json", "inputs.pb", "x", "y", "blob.xyz", "csv_blob.csv", "invalid_extension_blob"}, collectFile(tmpDir))
 	})
 
 	t.Run("primitiveAndMissingBlobInputs", func(t *testing.T) {
