@@ -19,12 +19,11 @@ COPY --from=nvidia-toolkit /usr/bin/nvidia-container-runtime-hook /usr/bin/
 COPY --from=nvidia-toolkit /usr/bin/nvidia-container-cli /usr/bin/
 COPY --from=nvidia-toolkit /usr/bin/nvidia-ctk /usr/bin/
 
-# Copy NVIDIA container library and dependencies
-COPY --from=nvidia-toolkit /usr/lib/x86_64-linux-gnu/libnvidia-container.so* /usr/lib/
-COPY --from=nvidia-toolkit /usr/lib/x86_64-linux-gnu/libnvidia-container-go.so* /usr/lib/
-
-# Ensure libraries are discoverable
-RUN ldconfig 2>/dev/null || true
+# Copy NVIDIA container libraries (path varies by arch)
+RUN --mount=from=nvidia-toolkit,src=/usr/lib,dst=/nvidia-lib \
+    cp /nvidia-lib/x86_64-linux-gnu/libnvidia-container*.so* /usr/lib/ 2>/dev/null || \
+    cp /nvidia-lib/aarch64-linux-gnu/libnvidia-container*.so* /usr/lib/ 2>/dev/null || true; \
+    ldconfig 2>/dev/null || true
 
 # Pre-set GPU env so the entrypoint auto-configures K3s for NVIDIA
 ENV FLYTE_SANDBOX_GPU=true
