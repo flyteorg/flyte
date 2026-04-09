@@ -64,14 +64,11 @@ spec:
           name: rustfs-console
           protocol: TCP
         livenessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: rustfs-api
-            scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 10
           failureThreshold: 5
-          timeoutSeconds: 5
         readinessProbe:
           tcpSocket:
             port: rustfs-api
