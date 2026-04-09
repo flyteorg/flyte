@@ -119,7 +119,7 @@ kubeconfig:
 
 .PHONY: stop
 stop:
-	docker stop flyte-demo
+	docker stop --time 5 flyte-demo
 
 .venv:
 	python -m venv .venv

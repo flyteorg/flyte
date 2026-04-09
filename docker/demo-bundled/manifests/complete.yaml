@@ -955,7 +955,6 @@ spec:
           httpGet:
             path: /healthz
             port: http
-          initialDelaySeconds: 5
         name: flyte
         ports:
         - containerPort: 8090
@@ -966,8 +965,13 @@ spec:
           httpGet:
             path: /readyz
             port: http
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          periodSeconds: 1
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 1
         volumeMounts:
         - mountPath: /etc/flyte/config.d
           name: config
@@ -979,7 +983,7 @@ spec:
         - |
           until nc -z postgresql.flyte 5432; do
             echo waiting for database
-            sleep 0.5
+            sleep 0.1
           done
         command:
         - sh
