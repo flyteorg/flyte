@@ -43,7 +43,11 @@ message TaskAction {
 
   // the specific cluster that this action should be executed on. if not set, the cluster from the
   // `RunSpec` will be used.
-  string cluster = 4;
+  // Deprecated, use 'queue' instead.
+  string cluster = 4 [deprecated = true];
+
+  // Queue on which this action should be scheduled.
+  string queue = 5;
 }
 
 // TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
