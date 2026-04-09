@@ -116,11 +116,9 @@ pub mod data_proxy_service_client {
         }
         pub async fn get_action_data(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::workflow::GetActionDataRequest,
-            >,
+            request: impl tonic::IntoRequest<super::GetActionDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::workflow::GetActionDataResponse>,
+            tonic::Response<super::GetActionDataResponse>,
             tonic::Status,
         > {
             self.inner
@@ -164,9 +162,9 @@ pub mod data_proxy_service_server {
         >;
         async fn get_action_data(
             &self,
-            request: tonic::Request<super::super::workflow::GetActionDataRequest>,
+            request: tonic::Request<super::GetActionDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::workflow::GetActionDataResponse>,
+            tonic::Response<super::GetActionDataResponse>,
             tonic::Status,
         >;
     }
@@ -300,19 +298,16 @@ pub mod data_proxy_service_server {
                     struct GetActionDataSvc<T: DataProxyService>(pub Arc<T>);
                     impl<
                         T: DataProxyService,
-                    > tonic::server::UnaryService<
-                        super::super::workflow::GetActionDataRequest,
-                    > for GetActionDataSvc<T> {
-                        type Response = super::super::workflow::GetActionDataResponse;
+                    > tonic::server::UnaryService<super::GetActionDataRequest>
+                    for GetActionDataSvc<T> {
+                        type Response = super::GetActionDataResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::workflow::GetActionDataRequest,
-                            >,
+                            request: tonic::Request<super::GetActionDataRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {

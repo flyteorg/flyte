@@ -3,7 +3,6 @@
 import grpc
 
 from flyteidl2.dataproxy import dataproxy_service_pb2 as flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2
-from flyteidl2.workflow import run_service_pb2 as flyteidl2_dot_workflow_dot_run__service__pb2
 
 
 class DataProxyServiceStub(object):
@@ -23,8 +22,8 @@ class DataProxyServiceStub(object):
                 )
         self.GetActionData = channel.unary_unary(
                 '/flyteidl2.dataproxy.DataProxyService/GetActionData',
-                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
                 )
 
 
@@ -56,8 +55,8 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
             ),
             'GetActionData': grpc.unary_unary_rpc_method_handler(
                     servicer.GetActionData,
-                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -99,7 +98,7 @@ class DataProxyService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetActionData',
-            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

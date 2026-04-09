@@ -190,8 +190,8 @@ func (s *Service) constructStoragePath(ctx context.Context, req *dataproxy.Creat
 // GetActionData gets input and output data for an action by reading from storage.
 func (s *Service) GetActionData(
 	ctx context.Context,
-	req *connect.Request[workflow.GetActionDataRequest],
-) (*connect.Response[workflow.GetActionDataResponse], error) {
+	req *connect.Request[dataproxy.GetActionDataRequest],
+) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	logger.Infof(ctx, "Received GetActionData request for: %s/%s",
 		req.Msg.ActionId.Run.Name, req.Msg.ActionId.Name)
 
@@ -212,7 +212,7 @@ func (s *Service) GetActionData(
 		return nil, err
 	}
 
-	resp := &workflow.GetActionDataResponse{
+	resp := &dataproxy.GetActionDataResponse{
 		Inputs:  &task.Inputs{},
 		Outputs: &task.Outputs{},
 	}

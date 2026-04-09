@@ -9,7 +9,6 @@ import (
 	context "context"
 	errors "errors"
 	dataproxy "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -54,7 +53,7 @@ type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
 	// Get input and output data for an action.
-	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -73,7 +72,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dataProxyServiceCreateUploadLocationMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getActionData: connect.NewClient[workflow.GetActionDataRequest, workflow.GetActionDataResponse](
+		getActionData: connect.NewClient[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse](
 			httpClient,
 			baseURL+DataProxyServiceGetActionDataProcedure,
 			connect.WithSchema(dataProxyServiceGetActionDataMethodDescriptor),
@@ -86,7 +85,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 // dataProxyServiceClient implements DataProxyServiceClient.
 type dataProxyServiceClient struct {
 	createUploadLocation *connect.Client[dataproxy.CreateUploadLocationRequest, dataproxy.CreateUploadLocationResponse]
-	getActionData        *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
+	getActionData        *connect.Client[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -95,7 +94,7 @@ func (c *dataProxyServiceClient) CreateUploadLocation(ctx context.Context, req *
 }
 
 // GetActionData calls flyteidl2.dataproxy.DataProxyService.GetActionData.
-func (c *dataProxyServiceClient) GetActionData(ctx context.Context, req *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
+func (c *dataProxyServiceClient) GetActionData(ctx context.Context, req *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	return c.getActionData.CallUnary(ctx, req)
 }
 
@@ -104,7 +103,7 @@ type DataProxyServiceHandler interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
 	// Get input and output data for an action.
-	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -145,6 +144,6 @@ func (UnimplementedDataProxyServiceHandler) CreateUploadLocation(context.Context
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.CreateUploadLocation is not implemented"))
 }
 
-func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
+func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.GetActionData is not implemented"))
 }

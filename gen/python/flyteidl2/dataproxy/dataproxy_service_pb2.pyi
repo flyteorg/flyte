@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
-from flyteidl2.workflow import run_service_pb2 as _run_service_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.task import common_pb2 as _common_pb2
 from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -51,3 +52,19 @@ class CreateUploadLocationResponse(_message.Message):
     expires_at: _timestamp_pb2.Timestamp
     headers: _containers.ScalarMap[str, str]
     def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class GetActionDataRequest(_message.Message):
+    __slots__ = ["action_id", "inputs_uri"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    INPUTS_URI_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    inputs_uri: str
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., inputs_uri: _Optional[str] = ...) -> None: ...
+
+class GetActionDataResponse(_message.Message):
+    __slots__ = ["inputs", "outputs"]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    inputs: _common_pb2.Inputs
+    outputs: _common_pb2.Outputs
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...

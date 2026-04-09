@@ -8,7 +8,6 @@ package dataproxy
 
 import (
 	context "context"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -31,7 +30,7 @@ type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(ctx context.Context, in *CreateUploadLocationRequest, opts ...grpc.CallOption) (*CreateUploadLocationResponse, error)
 	// Get input and output data for an action.
-	GetActionData(ctx context.Context, in *workflow.GetActionDataRequest, opts ...grpc.CallOption) (*workflow.GetActionDataResponse, error)
+	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 }
 
 type dataProxyServiceClient struct {
@@ -51,8 +50,8 @@ func (c *dataProxyServiceClient) CreateUploadLocation(ctx context.Context, in *C
 	return out, nil
 }
 
-func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *workflow.GetActionDataRequest, opts ...grpc.CallOption) (*workflow.GetActionDataResponse, error) {
-	out := new(workflow.GetActionDataResponse)
+func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
+	out := new(GetActionDataResponse)
 	err := c.cc.Invoke(ctx, DataProxyService_GetActionData_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ type DataProxyServiceServer interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error)
 	// Get input and output data for an action.
-	GetActionData(context.Context, *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error)
+	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 }
 
 // UnimplementedDataProxyServiceServer should be embedded to have forward compatible implementations.
@@ -77,7 +76,7 @@ type UnimplementedDataProxyServiceServer struct {
 func (UnimplementedDataProxyServiceServer) CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUploadLocation not implemented")
 }
-func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error) {
+func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActionData not implemented")
 }
 
@@ -111,7 +110,7 @@ func _DataProxyService_CreateUploadLocation_Handler(srv interface{}, ctx context
 }
 
 func _DataProxyService_GetActionData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(workflow.GetActionDataRequest)
+	in := new(GetActionDataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -123,7 +122,7 @@ func _DataProxyService_GetActionData_Handler(srv interface{}, ctx context.Contex
 		FullMethod: DataProxyService_GetActionData_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataProxyServiceServer).GetActionData(ctx, req.(*workflow.GetActionDataRequest))
+		return srv.(DataProxyServiceServer).GetActionData(ctx, req.(*GetActionDataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

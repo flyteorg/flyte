@@ -321,22 +321,155 @@ var _ interface {
 	ErrorName() string
 } = CreateUploadLocationResponseValidationError{}
 
-// Validate checks the field values on UploadInputsRequest with the rules
+// Validate checks the field values on GetActionDataRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UploadInputsRequest) Validate() error {
+func (m *GetActionDataRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UploadInputsRequest with the rules
+// ValidateAll checks the field values on GetActionDataRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UploadInputsRequestMultiError, or nil if none found.
-func (m *UploadInputsRequest) ValidateAll() error {
+// GetActionDataRequestMultiError, or nil if none found.
+func (m *GetActionDataRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UploadInputsRequest) validate(all bool) error {
+func (m *GetActionDataRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionDataRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for InputsUri
+
+	if len(errors) > 0 {
+		return GetActionDataRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetActionDataRequestMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetActionDataRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetActionDataRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetActionDataRequestMultiError) AllErrors() []error { return m }
+
+// GetActionDataRequestValidationError is the validation error returned by
+// GetActionDataRequest.Validate if the designated constraints aren't met.
+type GetActionDataRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetActionDataRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetActionDataRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetActionDataRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetActionDataRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetActionDataRequestValidationError) ErrorName() string {
+	return "GetActionDataRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetActionDataRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetActionDataRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetActionDataRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetActionDataRequestValidationError{}
+
+// Validate checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetActionDataResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetActionDataResponseMultiError, or nil if none found.
+func (m *GetActionDataResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetActionDataResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -347,7 +480,7 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		switch v := interface{}(m.GetInputs()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UploadInputsRequestValidationError{
+				errors = append(errors, GetActionDataResponseValidationError{
 					field:  "Inputs",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -355,7 +488,7 @@ func (m *UploadInputsRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UploadInputsRequestValidationError{
+				errors = append(errors, GetActionDataResponseValidationError{
 					field:  "Inputs",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -364,7 +497,7 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UploadInputsRequestValidationError{
+			return GetActionDataResponseValidationError{
 				field:  "Inputs",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -372,345 +505,29 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		}
 	}
 
-	switch v := m.Id.(type) {
-	case *UploadInputsRequest_RunId:
-		if v == nil {
-			err := UploadInputsRequestValidationError{
-				field:  "Id",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetRunId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "RunId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "RunId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetRunId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UploadInputsRequestValidationError{
-					field:  "RunId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *UploadInputsRequest_ProjectId:
-		if v == nil {
-			err := UploadInputsRequestValidationError{
-				field:  "Id",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetProjectId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "ProjectId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "ProjectId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UploadInputsRequestValidationError{
-					field:  "ProjectId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-	switch v := m.Task.(type) {
-	case *UploadInputsRequest_TaskId:
-		if v == nil {
-			err := UploadInputsRequestValidationError{
-				field:  "Task",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetTaskId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TaskId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TaskId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UploadInputsRequestValidationError{
-					field:  "TaskId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *UploadInputsRequest_TaskSpec:
-		if v == nil {
-			err := UploadInputsRequestValidationError{
-				field:  "Task",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetTaskSpec()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TaskSpec",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TaskSpec",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetTaskSpec()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UploadInputsRequestValidationError{
-					field:  "TaskSpec",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *UploadInputsRequest_TriggerName:
-		if v == nil {
-			err := UploadInputsRequestValidationError{
-				field:  "Task",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetTriggerName()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TriggerName",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, UploadInputsRequestValidationError{
-						field:  "TriggerName",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetTriggerName()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UploadInputsRequestValidationError{
-					field:  "TriggerName",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
-	if len(errors) > 0 {
-		return UploadInputsRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// UploadInputsRequestMultiError is an error wrapping multiple validation
-// errors returned by UploadInputsRequest.ValidateAll() if the designated
-// constraints aren't met.
-type UploadInputsRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UploadInputsRequestMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UploadInputsRequestMultiError) AllErrors() []error { return m }
-
-// UploadInputsRequestValidationError is the validation error returned by
-// UploadInputsRequest.Validate if the designated constraints aren't met.
-type UploadInputsRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UploadInputsRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UploadInputsRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UploadInputsRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UploadInputsRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UploadInputsRequestValidationError) ErrorName() string {
-	return "UploadInputsRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e UploadInputsRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUploadInputsRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UploadInputsRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UploadInputsRequestValidationError{}
-
-// Validate checks the field values on UploadInputsResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UploadInputsResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on UploadInputsResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// UploadInputsResponseMultiError, or nil if none found.
-func (m *UploadInputsResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *UploadInputsResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
 	if all {
-		switch v := interface{}(m.GetOffloadedInputData()).(type) {
+		switch v := interface{}(m.GetOutputs()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UploadInputsResponseValidationError{
-					field:  "OffloadedInputData",
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UploadInputsResponseValidationError{
-					field:  "OffloadedInputData",
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetOffloadedInputData()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetOutputs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UploadInputsResponseValidationError{
-				field:  "OffloadedInputData",
+			return GetActionDataResponseValidationError{
+				field:  "Outputs",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -718,19 +535,19 @@ func (m *UploadInputsResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UploadInputsResponseMultiError(errors)
+		return GetActionDataResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// UploadInputsResponseMultiError is an error wrapping multiple validation
-// errors returned by UploadInputsResponse.ValidateAll() if the designated
+// GetActionDataResponseMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataResponse.ValidateAll() if the designated
 // constraints aren't met.
-type UploadInputsResponseMultiError []error
+type GetActionDataResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UploadInputsResponseMultiError) Error() string {
+func (m GetActionDataResponseMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -739,11 +556,11 @@ func (m UploadInputsResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UploadInputsResponseMultiError) AllErrors() []error { return m }
+func (m GetActionDataResponseMultiError) AllErrors() []error { return m }
 
-// UploadInputsResponseValidationError is the validation error returned by
-// UploadInputsResponse.Validate if the designated constraints aren't met.
-type UploadInputsResponseValidationError struct {
+// GetActionDataResponseValidationError is the validation error returned by
+// GetActionDataResponse.Validate if the designated constraints aren't met.
+type GetActionDataResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -751,24 +568,24 @@ type UploadInputsResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e UploadInputsResponseValidationError) Field() string { return e.field }
+func (e GetActionDataResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UploadInputsResponseValidationError) Reason() string { return e.reason }
+func (e GetActionDataResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UploadInputsResponseValidationError) Cause() error { return e.cause }
+func (e GetActionDataResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UploadInputsResponseValidationError) Key() bool { return e.key }
+func (e GetActionDataResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UploadInputsResponseValidationError) ErrorName() string {
-	return "UploadInputsResponseValidationError"
+func (e GetActionDataResponseValidationError) ErrorName() string {
+	return "GetActionDataResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e UploadInputsResponseValidationError) Error() string {
+func (e GetActionDataResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -780,14 +597,14 @@ func (e UploadInputsResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUploadInputsResponse.%s: %s%s",
+		"invalid %sGetActionDataResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UploadInputsResponseValidationError{}
+var _ error = GetActionDataResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -795,4 +612,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UploadInputsResponseValidationError{}
+} = GetActionDataResponseValidationError{}

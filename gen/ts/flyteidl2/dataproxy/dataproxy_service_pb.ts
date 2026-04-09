@@ -5,8 +5,10 @@
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { GetActionDataRequestSchema, GetActionDataResponseSchema } from "../workflow/run_service_pb.ts";
-import { file_flyteidl2_workflow_run_service } from "../workflow/run_service_pb.ts";
+import type { ActionIdentifier } from "../common/identifier_pb.ts";
+import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
+import type { Inputs, Outputs } from "../task/common_pb.ts";
+import { file_flyteidl2_task_common } from "../task/common_pb.ts";
 import { file_google_api_annotations } from "../../google/api/annotations_pb.ts";
 import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
@@ -17,7 +19,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/dataproxy/dataproxy_service.proto.
  */
 export const file_flyteidl2_dataproxy_dataproxy_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5Io0CChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMi9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBMqADChBEYXRhUHJveHlTZXJ2aWNlEqACChRDcmVhdGVVcGxvYWRMb2NhdGlvbhIwLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXF1ZXN0GjEuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlIqIBkkFNGktDcmVhdGVzIGEgd3JpdGUtb25seSBodHRwIGxvY2F0aW9uIHRoYXQgaXMgYWNjZXNzaWJsZSBmb3IgdGFza3MgYXQgcnVudGltZS6C0+STAkw6ASpaJzoBKiIiL2FwaS92MS9vcmcvZGF0YXByb3h5L2FydGlmYWN0X3VybiIeL2FwaS92MS9kYXRhcHJveHkvYXJ0aWZhY3RfdXJuEmkKDUdldEFjdGlvbkRhdGESKC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVJlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgOQAgFC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_workflow_run_service, file_google_api_annotations, file_google_protobuf_duration, file_google_protobuf_timestamp, file_protoc_gen_openapiv2_options_annotations]);
+  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5Io0CChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMi9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBImkKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhIKCmlucHV0c191cmkYAiABKAkiaQoVR2V0QWN0aW9uRGF0YVJlc3BvbnNlEiYKBmlucHV0cxgBIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0cxIoCgdvdXRwdXRzGAIgASgLMhcuZmx5dGVpZGwyLnRhc2suT3V0cHV0czKiAwoQRGF0YVByb3h5U2VydmljZRKgAgoUQ3JlYXRlVXBsb2FkTG9jYXRpb24SMC5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVxdWVzdBoxLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZSKiAZJBTRpLQ3JlYXRlcyBhIHdyaXRlLW9ubHkgaHR0cCBsb2NhdGlvbiB0aGF0IGlzIGFjY2Vzc2libGUgZm9yIHRhc2tzIGF0IHJ1bnRpbWUugtPkkwJMOgEqWic6ASoiIi9hcGkvdjEvb3JnL2RhdGFwcm94eS9hcnRpZmFjdF91cm4iHi9hcGkvdjEvZGF0YXByb3h5L2FydGlmYWN0X3VybhJrCg1HZXRBY3Rpb25EYXRhEikuZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVxdWVzdBoqLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgOQAgFC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_task_common, file_google_api_annotations, file_google_protobuf_duration, file_google_protobuf_timestamp, file_protoc_gen_openapiv2_options_annotations]);
 
 /**
  * CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -157,6 +159,62 @@ export type CreateUploadLocationResponse = Message<"flyteidl2.dataproxy.CreateUp
  */
 export const CreateUploadLocationResponseSchema: GenMessage<CreateUploadLocationResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 1);
+
+/**
+ * Request message for querying action data.
+ *
+ * @generated from message flyteidl2.dataproxy.GetActionDataRequest
+ */
+export type GetActionDataRequest = Message<"flyteidl2.dataproxy.GetActionDataRequest"> & {
+  /**
+   * Action to query.
+   *
+   * @generated from field: flyteidl2.common.ActionIdentifier action_id = 1;
+   */
+  actionId?: ActionIdentifier;
+
+  /**
+   * URI for pre-uploaded inputs data.
+   *
+   * @generated from field: string inputs_uri = 2;
+   */
+  inputsUri: string;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.GetActionDataRequest.
+ * Use `create(GetActionDataRequestSchema)` to create a new message.
+ */
+export const GetActionDataRequestSchema: GenMessage<GetActionDataRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 2);
+
+/**
+ * Response message for querying action data.
+ *
+ * @generated from message flyteidl2.dataproxy.GetActionDataResponse
+ */
+export type GetActionDataResponse = Message<"flyteidl2.dataproxy.GetActionDataResponse"> & {
+  /**
+   * Inputs for the action.
+   *
+   * @generated from field: flyteidl2.task.Inputs inputs = 1;
+   */
+  inputs?: Inputs;
+
+  /**
+   * Outputs for the action.
+   *
+   * @generated from field: flyteidl2.task.Outputs outputs = 2;
+   */
+  outputs?: Outputs;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.GetActionDataResponse.
+ * Use `create(GetActionDataResponseSchema)` to create a new message.
+ */
+export const GetActionDataResponseSchema: GenMessage<GetActionDataResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 3);
 
 /**
  * DataProxyService provides an interface for managing data uploads and downloads.
