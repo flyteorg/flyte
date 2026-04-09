@@ -141,138 +141,115 @@ func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.Tas
 	return &taskSpec, nil
 }
 
+// ListTasks returns the latest version of each unique (project, domain, name) task.
+// A CTE with ROW_NUMBER() partitioned by (project, domain, name) and ordered by
+// created_at DESC is used so that only rn=1 rows (the latest version) are returned.
 func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResourceInput) (*models.TaskListResult, error) {
-	var queryBuilder strings.Builder
-	var args []interface{}
+	// allArgs accumulates all bind parameters in the order they appear in the query.
+	var allArgs []interface{}
 	argIdx := 1
 
-	queryBuilder.WriteString("SELECT * FROM tasks")
-
-	// Build WHERE clause from filters
-	var whereClauses []string
-
+	// filtered_tasks WHERE: filter + scope (used for paginated result and filtered_total).
+	var filteredWhereClauses []string
 	if input.Filter != nil {
 		expr, err := input.Filter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build filter: %w", err)
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
-		whereClauses = append(whereClauses, rewritten)
-		args = append(args, rewrittenArgs...)
+		filteredWhereClauses = append(filteredWhereClauses, rewritten)
+		allArgs = append(allArgs, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
-
 	if input.ScopeByFilter != nil {
 		expr, err := input.ScopeByFilter.QueryExpression("")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build scope filter: %w", err)
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
-		whereClauses = append(whereClauses, rewritten)
-		args = append(args, rewrittenArgs...)
+		filteredWhereClauses = append(filteredWhereClauses, rewritten)
+		allArgs = append(allArgs, rewrittenArgs...)
+		argIdx += len(rewrittenArgs)
+	}
+	filteredWhere := ""
+	if len(filteredWhereClauses) > 0 {
+		filteredWhere = "WHERE " + strings.Join(filteredWhereClauses, " AND ")
+	}
+
+	// unfiltered_tasks WHERE: scope only (for the total count).
+	unfilteredWhere := ""
+	if input.ScopeByFilter != nil {
+		expr, err := input.ScopeByFilter.QueryExpression("")
+		if err != nil {
+			return nil, fmt.Errorf("failed to build scope filter: %w", err)
+		}
+		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		unfilteredWhere = "WHERE " + rewritten
+		allArgs = append(allArgs, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
 
-	if len(whereClauses) > 0 {
-		queryBuilder.WriteString(" WHERE ")
-		queryBuilder.WriteString(strings.Join(whereClauses, " AND "))
-	}
-
-	// Apply sorting
+	// Build ORDER BY for the outer query.
+	orderBy := "created_at DESC"
 	if len(input.SortParameters) > 0 {
-		queryBuilder.WriteString(" ORDER BY ")
-		for i, sp := range input.SortParameters {
-			if i > 0 {
-				queryBuilder.WriteString(", ")
-			}
-			queryBuilder.WriteString(sp.GetOrderExpr())
+		parts := make([]string, 0, len(input.SortParameters))
+		for _, sp := range input.SortParameters {
+			parts = append(parts, sp.GetOrderExpr())
 		}
-	} else {
-		queryBuilder.WriteString(" ORDER BY created_at DESC")
+		orderBy = strings.Join(parts, ", ")
 	}
 
-	// Apply pagination
-	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
-	args = append(args, input.Limit, input.Offset)
-	argIdx += 2
+	allArgs = append(allArgs, input.Limit, input.Offset)
 
-	var tasks []*models.Task
-	if err := sqlx.SelectContext(ctx, r.db, &tasks, queryBuilder.String(), args...); err != nil {
+	// CTE: rank all rows within each (project, domain, name) by created_at DESC,
+	// then select only rn=1 (latest version per task name).
+	cte := fmt.Sprintf(`
+WITH filtered_tasks AS (
+	SELECT *, ROW_NUMBER() OVER (PARTITION BY project, domain, name ORDER BY created_at DESC) AS rn
+	FROM tasks %s
+),
+unfiltered_tasks AS (
+	SELECT *, ROW_NUMBER() OVER (PARTITION BY project, domain, name ORDER BY created_at DESC) AS rn
+	FROM tasks %s
+),
+total_counts AS (
+	SELECT
+		(SELECT COUNT(*) FROM filtered_tasks   WHERE rn = 1) AS filtered_total,
+		(SELECT COUNT(*) FROM unfiltered_tasks WHERE rn = 1) AS total
+)
+SELECT filtered_tasks.*, total_counts.filtered_total, total_counts.total
+FROM filtered_tasks, total_counts
+WHERE filtered_tasks.rn = 1
+ORDER BY %s
+LIMIT $%d OFFSET $%d`, filteredWhere, unfilteredWhere, orderBy, argIdx, argIdx+1)
+
+	type taskWithCounts struct {
+		models.Task
+		Rn            uint32 `db:"rn"`
+		FilteredTotal uint32 `db:"filtered_total"`
+		Total         uint32 `db:"total"`
+	}
+	var rows []taskWithCounts
+	if err := sqlx.SelectContext(ctx, r.db, &rows, cte, allArgs...); err != nil {
 		logger.Errorf(ctx, "failed to list tasks: %v", err)
 		return nil, fmt.Errorf("failed to list tasks: %w", err)
 	}
 
-	// Get total counts
-	var filteredTotal int64
-	var total int64
-
-	// Filtered count query
-	{
-		var countBuilder strings.Builder
-		var countArgs []interface{}
-		countIdx := 1
-
-		countBuilder.WriteString("SELECT COUNT(*) FROM tasks")
-
-		var countWhere []string
-		if input.Filter != nil {
-			expr, err := input.Filter.QueryExpression("")
-			if err != nil {
-				return nil, fmt.Errorf("failed to build filter expression: %w", err)
-			}
-			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
-			countWhere = append(countWhere, rewritten)
-			countArgs = append(countArgs, rewrittenArgs...)
-			countIdx += len(rewrittenArgs)
-		}
-		if input.ScopeByFilter != nil {
-			expr, err := input.ScopeByFilter.QueryExpression("")
-			if err != nil {
-				return nil, fmt.Errorf("failed to build scope filter expression: %w", err)
-			}
-			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, countIdx)
-			countWhere = append(countWhere, rewritten)
-			countArgs = append(countArgs, rewrittenArgs...)
-			countIdx += len(rewrittenArgs)
-		}
-		if len(countWhere) > 0 {
-			countBuilder.WriteString(" WHERE ")
-			countBuilder.WriteString(strings.Join(countWhere, " AND "))
-		}
-
-		if err := r.db.QueryRowContext(ctx, countBuilder.String(), countArgs...).Scan(&filteredTotal); err != nil {
-			logger.Errorf(ctx, "failed to count filtered tasks: %v", err)
-		}
-	}
-
-	// Total count query (only scoped, no filter)
-	{
-		var totalBuilder strings.Builder
-		var totalArgs []interface{}
-		totalIdx := 1
-
-		totalBuilder.WriteString("SELECT COUNT(*) FROM tasks")
-
-		if input.ScopeByFilter != nil {
-			expr, err := input.ScopeByFilter.QueryExpression("")
-			if err != nil {
-				return nil, fmt.Errorf("failed to build scope filter expression: %w", err)
-			}
-			rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, totalIdx)
-			totalBuilder.WriteString(" WHERE ")
-			totalBuilder.WriteString(rewritten)
-			totalArgs = append(totalArgs, rewrittenArgs...)
-		}
-
-		if err := r.db.QueryRowContext(ctx, totalBuilder.String(), totalArgs...).Scan(&total); err != nil {
-			logger.Errorf(ctx, "failed to count total tasks: %v", err)
+	tasks := make([]*models.Task, 0, len(rows))
+	var filteredTotal, total uint32
+	for i, row := range rows {
+		t := row.Task
+		tasks = append(tasks, &t)
+		if i == 0 {
+			filteredTotal = row.FilteredTotal
+			total = row.Total
 		}
 	}
 
 	return &models.TaskListResult{
 		Tasks:         tasks,
-		FilteredTotal: uint32(filteredTotal),
-		Total:         uint32(total),
+		FilteredTotal: filteredTotal,
+		Total:         total,
 	}, nil
 }
 
