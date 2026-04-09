@@ -22,6 +22,8 @@ var AllModels = []interface{}{
 
 const MigrationIDInitSchema = "20260327_runs_init_schema"
 
+const MigrationIDDropActionsOrg = "20260409_drop_actions_org_column"
+
 var RunsMigrations = []*gormigrate.Migration{
 	{
 		ID: MigrationIDInitSchema,
@@ -30,6 +32,22 @@ var RunsMigrations = []*gormigrate.Migration{
 		},
 		Rollback: func(tx *gorm.DB) error {
 			// Intentionally no-op for now; this migration can contain destructive steps.
+			return nil
+		},
+	},
+	{
+		ID: MigrationIDDropActionsOrg,
+		Migrate: func(tx *gorm.DB) error {
+			for _, table := range []string{"actions", "action_events", "tasks"} {
+				if tx.Migrator().HasTable(table) {
+					if err := tx.Exec(fmt.Sprintf("ALTER TABLE %s DROP COLUMN IF EXISTS org", table)).Error; err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
 			return nil
 		},
 	},
