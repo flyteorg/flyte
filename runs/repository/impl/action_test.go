@@ -59,7 +59,7 @@ func TestCreateRun(t *testing.T) {
 		Project: runID.Project,
 		Domain:  runID.Domain,
 		RunName: runID.Name,
-		Name:    "a0",
+		Name:    rootActionName,
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
@@ -305,7 +305,7 @@ func TestListRuns(t *testing.T) {
 			Project: "proj1",
 			Domain:  "domain1",
 			RunName: runName,
-			Name:    "a0",
+			Name:    rootActionName,
 			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		}, false)
 		require.NoError(t, err)
@@ -376,7 +376,7 @@ func TestListRuns(t *testing.T) {
 		Project: "other-proj",
 		Domain:  "domain1",
 		RunName: "run-other",
-		Name:    "a0",
+		Name:    rootActionName,
 		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}, false)
 	require.NoError(t, err)
