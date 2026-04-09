@@ -384,13 +384,20 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 
 // CreateAction inserts an Action model into the database.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
+	// Use the model's CreatedAt if set (e.g. trace actions use start_time so parents
+	// sort before children), otherwise fall back to the current time.
+	createdAt := action.CreatedAt
+	if createdAt.IsZero() {
+		createdAt = time.Now()
+	}
+
 	result, err := r.db.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, created_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
-		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus)
+		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus, createdAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
