@@ -195,8 +195,15 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Set base image
+        id: base-image
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=sha-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=nightly" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build and push GPU sandbox image
-        # if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/sandbox-bundled
@@ -204,5 +211,5 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: |
-            BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2:sha-${{ github.sha }}
-          push: true
+            BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2:${{ steps.base-image.outputs.tag }}
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
