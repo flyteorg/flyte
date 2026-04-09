@@ -145,6 +145,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-demo
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,
