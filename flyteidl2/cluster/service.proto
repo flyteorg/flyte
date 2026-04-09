@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package flyteidl2.cluster;
+
+import "flyteidl2/cluster/payload.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster";
+
+service ClusterService {
+  rpc SelectCluster(SelectClusterRequest) returns (SelectClusterResponse) {
+    option (google.api.http) = {
+      post: "/cluster/api/v1/select"
+      body: "*"
+    };
+  }
+}
