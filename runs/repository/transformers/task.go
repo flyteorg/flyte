@@ -165,20 +165,19 @@ func taskTriggersSummaryFromModel(taskModel *models.Task) *task.TaskTriggersSumm
 		return nil
 	}
 
-	// TODO(nary): Add back trigger automation spec unmarshaling after adding trigger support
 	if taskModel.TotalTriggers == 1 {
-		// automationSpec, err := UnmarshalAutomationSpec(taskModel.TriggerAutomationSpec, "")
-		// if err != nil {
-		// 	logger.Errorf(context.Background(), "failed to unmarshal trigger automation spec: %v", err)
-		// 	return nil
-		// }
+		automationSpec, err := UnmarshalAutomationSpec(taskModel.TriggerAutomationSpec, "")
+		if err != nil {
+			logger.Errorf(context.Background(), "failed to unmarshal trigger automation spec: %v", err)
+			return nil
+		}
 
 		return &task.TaskTriggersSummary{
 			Summary: &task.TaskTriggersSummary_Details{
 				Details: &task.TaskTriggersSummary_TriggerDetails{
-					Name:   taskModel.TriggerName.String,
-					Active: taskModel.ActiveTriggers > 0,
-					// AutomationSpec: automationSpec,
+					Name:           taskModel.TriggerName.String,
+					Active:         taskModel.ActiveTriggers > 0,
+					AutomationSpec: automationSpec,
 				},
 			},
 		}
