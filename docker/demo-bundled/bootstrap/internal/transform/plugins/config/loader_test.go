@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
+	"github.com/flyteorg/flyte/docker/demo-bundled/bootstrap/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

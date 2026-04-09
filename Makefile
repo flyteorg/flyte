@@ -36,17 +36,33 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: sandbox-build
-sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
-	$(MAKE) -C docker/sandbox-bundled build
+sandbox-build: ## Build and start the flyte sandbox (docker/demo-bundled)
+	$(MAKE) -C docker/demo-bundled build
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: sandbox-run
 sandbox-run: ## Start the flyte sandbox without rebuilding the image
-	$(MAKE) -C docker/sandbox-bundled start
+	$(MAKE) -C docker/demo-bundled start
 
 .PHONY: sandbox-stop
 sandbox-stop: ## Stop the flyte sandbox
-	$(MAKE) -C docker/sandbox-bundled stop
+	$(MAKE) -C docker/demo-bundled stop
+
+# =============================================================================
+# Demo Commands
+# =============================================================================
+
+.PHONY: demo-build
+demo-build: ## Build and start the flyte demo cluster (docker/demo-bundled)
+	$(MAKE) -C docker/demo-bundled build
+
+.PHONY: demo-run
+demo-run: ## Start the flyte demo cluster without rebuilding the image
+	$(MAKE) -C docker/demo-bundled start
+
+.PHONY: demo-stop
+demo-stop: ## Stop the flyte demo cluster
+	$(MAKE) -C docker/demo-bundled stop
 
 .PHONY: help
 help: ## Show this help message

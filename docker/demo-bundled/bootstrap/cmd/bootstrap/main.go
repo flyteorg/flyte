@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/transform"
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/transform/plugins/config"
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/transform/plugins/vars"
+	"github.com/flyteorg/flyte/docker/demo-bundled/bootstrap/internal/transform"
+	"github.com/flyteorg/flyte/docker/demo-bundled/bootstrap/internal/transform/plugins/config"
+	"github.com/flyteorg/flyte/docker/demo-bundled/bootstrap/internal/transform/plugins/vars"
 )
 
 const (

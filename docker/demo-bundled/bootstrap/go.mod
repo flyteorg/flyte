@@ -1,4 +1,4 @@
-module github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap
+module github.com/flyteorg/flyte/docker/demo-bundled/bootstrap
 
 go 1.24.0
 
