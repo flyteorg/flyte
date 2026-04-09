@@ -36,7 +36,7 @@ type TestObj struct {
 }
 
 func init() {
-	if err := configureGlobalHTTPHandler(nil); err != nil {
+	if err := configureGlobalHTTPHandler(&Config{}, nil); err != nil {
 		panic(err)
 	}
 }
@@ -76,6 +76,9 @@ func TestConfigHandler(t *testing.T) {
 			"formatter": map[string]interface{}{
 				"type": "json",
 			},
+		},
+		"prof": map[string]interface{}{
+			"DisableConfigEndpoint": false,
 		},
 	}, m)
 }

@@ -315,6 +315,7 @@ func TestExtractAccessTokenFromCookies(t *testing.T) {
 		t.Logf("Cookie 1 raw decoded (first 50 bytes): %s", string(decoded[:50]))
 	}
 	s := securecookie.New(hashKey, blockKey)
+	s.MaxAge(0) // Disable timestamp validation so hardcoded cookies don't expire
 	var firstHalf string
 	err = s.Decode("flyte_at_1", cookieValue1, &firstHalf)
 	if err != nil {
@@ -323,6 +324,7 @@ func TestExtractAccessTokenFromCookies(t *testing.T) {
 		err2 := s2.Decode("flyte_at_1", cookieValue1, &firstHalf)
 		t.Logf("Error with validation enabled: %v", err2)
 	}
+
 	require.NoError(t, err)
 	t.Logf("First half of access token: %s", firstHalf)
 

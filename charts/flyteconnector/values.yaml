@@ -55,6 +55,20 @@ serviceAccount:
   # -- ImagePullSecrets to automatically assign to the service account
   imagePullSecrets: []
 # -- Security context for pod
+# -- RBAC configuration for flyteconnector
+# Enable to allow the connector to read secrets across namespaces
+# (required for per-project Databricks token authentication)
+rbac:
+  # -- Should RBAC resources (ClusterRole/ClusterRoleBinding) be created for flyteconnector
+  enabled: false
+  # -- Rules for the ClusterRole created for flyteconnector
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - secrets
+      verbs:
+        - get
 podSecurityContext: {}
 # -- Readiness probe for flyteconnector. Use readinessProbe: {} if connector doesn't implement grpc-health-checking service.
 # -- https://kubernetes.io/blog/2022/05/13/grpc-probes-now-in-beta/#trying-the-feature-out

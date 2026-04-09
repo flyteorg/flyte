@@ -42,3 +42,4 @@ empty-config.yaml
 .claude/
 flyteidl2/
 gen/
+.kube/

@@ -6649,6 +6649,10 @@
             "type": "string"
           },
           "description": "+optional. Specifies input bindings that are not mapped over for the node."
+        },
+        "run_all_sub_nodes": {
+          "type": "boolean",
+          "description": "+optional. If set to true, the ArrayNode will continue to run all sub-nodes even after the\nfailure threshold has been met (i.e. it is no longer possible to meet min_successes or\nmin_success_ratio). This is useful when you want to ensure all sub-nodes complete execution\neven if the overall array node will fail."
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
