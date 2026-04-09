@@ -1,0 +1,5 @@
+# Mark generated protobuf code so GitHub hides it in diffs by default
+gen/** linguist-generated=true
+
+# Mark generated mocks so GitHub hides them in diffs by default
+**/mocks/mocks.go linguist-generated=true
