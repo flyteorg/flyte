@@ -67,6 +67,9 @@ const (
 	RunServiceAbortActionProcedure = "/flyteidl2.workflow.RunService/AbortAction"
 	// RunServiceWatchGroupsProcedure is the fully-qualified name of the RunService's WatchGroups RPC.
 	RunServiceWatchGroupsProcedure = "/flyteidl2.workflow.RunService/WatchGroups"
+	// RunServiceGetActionDataURIsProcedure is the fully-qualified name of the RunService's
+	// GetActionDataURIs RPC.
+	RunServiceGetActionDataURIsProcedure = "/flyteidl2.workflow.RunService/GetActionDataURIs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -86,6 +89,7 @@ var (
 	runServiceWatchClusterEventsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
 	runServiceAbortActionMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("AbortAction")
 	runServiceWatchGroupsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
+	runServiceGetActionDataURIsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
@@ -120,6 +124,8 @@ type RunServiceClient interface {
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 }
 
 // NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. By
@@ -221,6 +227,13 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getActionDataURIs: connect.NewClient[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse](
+			httpClient,
+			baseURL+RunServiceGetActionDataURIsProcedure,
+			connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -240,6 +253,7 @@ type runServiceClient struct {
 	watchClusterEvents *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
 	abortAction        *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
 	watchGroups        *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
+	getActionDataURIs  *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.RunService.CreateRun.
@@ -312,6 +326,11 @@ func (c *runServiceClient) WatchGroups(ctx context.Context, req *connect.Request
 	return c.watchGroups.CallServerStream(ctx, req)
 }
 
+// GetActionDataURIs calls flyteidl2.workflow.RunService.GetActionDataURIs.
+func (c *runServiceClient) GetActionDataURIs(ctx context.Context, req *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return c.getActionDataURIs.CallUnary(ctx, req)
+}
+
 // RunServiceHandler is an implementation of the flyteidl2.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
@@ -344,6 +363,8 @@ type RunServiceHandler interface {
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
+	// Get the storage URIs for an action's input and output data.
+	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 }
 
 // NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -441,6 +462,13 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceGetActionDataURIsHandler := connect.NewUnaryHandler(
+		RunServiceGetActionDataURIsProcedure,
+		svc.GetActionDataURIs,
+		connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunServiceCreateRunProcedure:
@@ -471,6 +499,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceAbortActionHandler.ServeHTTP(w, r)
 		case RunServiceWatchGroupsProcedure:
 			runServiceWatchGroupsHandler.ServeHTTP(w, r)
+		case RunServiceGetActionDataURIsProcedure:
+			runServiceGetActionDataURIsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -534,4 +564,8 @@ func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Requ
 
 func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchGroups is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionDataURIs is not implemented"))
 }

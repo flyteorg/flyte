@@ -788,6 +788,13 @@ func (s *RunService) ListActions(
 	return connect.NewResponse(resp), nil
 }
 
+func (s *RunService) GetActionDataURIs(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionDataURIsRequest],
+) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("GetActionDataURIs is not implemented in operator RunService"))
+}
+
 // AbortAction aborts a specific action
 func (s *RunService) AbortAction(
 	ctx context.Context,
