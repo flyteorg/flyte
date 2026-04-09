@@ -78,7 +78,7 @@ build: sync-crds flyte console dep_update manifests
 # 30002 - Minio
 # 30080 - Flyte Proxy
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-demo:latest
+start: FLYTE_DEMO_IMAGE := flyte-demo:latest
 start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-demo$$ --format {{.Name}})" ] || \
@@ -96,7 +96,7 @@ start:
 			--publish "30001:5432" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
-			$(FLYTE_SANDBOX_IMAGE); \
+			$(FLYTE_DEMO_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
 	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
