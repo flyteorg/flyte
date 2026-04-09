@@ -13,9 +13,6 @@ spec:
     nodePort: 30002
     port: 9000
     targetPort: rustfs-api
-  - name: rustfs-console
-    port: 9001
-    targetPort: rustfs-console
   selector:
     app.kubernetes.io/name: rustfs
     app.kubernetes.io/instance: {{ .Release.Name }}

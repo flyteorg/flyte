@@ -929,9 +929,6 @@ spec:
     nodePort: 30002
     port: 9000
     targetPort: rustfs-api
-  - name: rustfs-console
-    port: 9001
-    targetPort: rustfs-console
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: rustfs
@@ -1283,9 +1280,6 @@ spec:
         ports:
         - containerPort: 9000
           name: rustfs-api
-          protocol: TCP
-        - containerPort: 9001
-          name: rustfs-console
           protocol: TCP
         readinessProbe:
           failureThreshold: 5

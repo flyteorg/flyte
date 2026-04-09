@@ -42,8 +42,6 @@ spec:
         env:
         - name: RUSTFS_ADDRESS
           value: "0.0.0.0:9000"
-        - name: RUSTFS_CONSOLE_ADDRESS
-          value: "0.0.0.0:9001"
         - name: RUSTFS_VOLUMES
           value: "/data"
         - name: RUSTFS_ACCESS_KEY
@@ -59,9 +57,6 @@ spec:
         ports:
         - containerPort: 9000
           name: rustfs-api
-          protocol: TCP
-        - containerPort: 9001
-          name: rustfs-console
           protocol: TCP
         livenessProbe:
           tcpSocket:

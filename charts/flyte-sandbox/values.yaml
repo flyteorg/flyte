@@ -104,9 +104,6 @@ flyte-binary:
         verbs:
         - '*'
 
-minio:
-  enabled: false
-
 rustfs:
   enabled: true
   accessKey: minio
