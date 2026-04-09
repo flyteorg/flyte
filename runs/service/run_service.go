@@ -818,9 +818,14 @@ func (s *RunService) GetActionDataURIs(
 			if err != nil {
 				return nil, err
 			}
-			if len(attempts) > 0 {
-				resp.OutputsUri = attempts[len(attempts)-1].GetOutputs().GetOutputUri()
+			if len(attempts) == 0 {
+				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available, no attempts for action"))
 			}
+			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
+			if outputUri == "" {
+				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available"))
+			}
+			resp.OutputsUri = outputUri
 		}
 	}
 
