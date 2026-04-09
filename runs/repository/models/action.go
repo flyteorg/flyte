@@ -4,8 +4,29 @@ import (
 	"database/sql"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+)
+
+// ActionColumnsSet is the allowlist of columns that can be used in filters/sort for the actions table.
+// This prevents SQL injection via user-supplied field names.
+var ActionColumnsSet = sets.New(
+	"project",
+	"domain",
+	"run_name",
+	"phase",
+	"run_source",
+	"task_project",
+	"task_domain",
+	"task_name",
+	"task_version",
+	"function_name",
+	"created_at",
+	"updated_at",
+	"ended_at",
+	"duration_ms",
 )
 
 // Action represents a workflow action in the database

@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -216,45 +215,79 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 	return &run, nil
 }
 
-// ListRuns lists runs with pagination
+// ListRuns lists runs with pagination and optional filters.
 func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
-	var queryBuilder strings.Builder
-	var args []interface{}
-	argIdx := 1
+	// Build scope filter: always restrict to root actions (runs).
+	scopeFilter := interfaces.Filter(NewIsRootActionFilter())
 
-	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
-
-	// Apply scope filters
 	switch scope := req.ScopeBy.(type) {
 	case *workflow.ListRunsRequest_ProjectId:
-		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d AND domain = $%d", argIdx, argIdx+1))
-		args = append(args, scope.ProjectId.Name, scope.ProjectId.Domain)
-		argIdx += 2
+		scopeFilter = scopeFilter.And(NewProjectIdFilter(scope.ProjectId))
+	case *workflow.ListRunsRequest_TaskName:
+		scopeFilter = scopeFilter.And(NewRunTaskNameFilter(scope.TaskName))
+	case *workflow.ListRunsRequest_TaskId:
+		scopeFilter = scopeFilter.And(NewRunTaskIdFilter(scope.TaskId))
 	}
 
-	// Apply pagination according to token and limit from requests.
-	limit := 50
-	offset := 0
-	if req.Request != nil {
-		if req.Request.Token != "" {
-			parsedOffset, err := strconv.Atoi(req.Request.Token)
-			if err != nil {
-				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
+	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
+	listInput, err := NewListResourceInputFromProto(req.Request, models.ActionColumnsSet)
+	if err != nil {
+		return nil, "", fmt.Errorf("invalid list request: %w", err)
+	}
+
+	// Merge: scope filter always takes precedence, user filters are ANDed on top.
+	if listInput.Filter == nil {
+		listInput.Filter = scopeFilter
+	} else {
+		listInput.Filter = scopeFilter.And(listInput.Filter)
+	}
+
+	return r.listRunsByInput(ctx, listInput)
+}
+
+// listRunsByInput executes the query described by listInput against the actions table.
+func (r *actionRepo) listRunsByInput(ctx context.Context, listInput interfaces.ListResourceInput) ([]*models.Run, string, error) {
+	var queryBuilder strings.Builder
+	var args []interface{}
+
+	queryBuilder.WriteString("SELECT * FROM actions")
+
+	// Apply filters — QueryExpression emits ? placeholders; Rebind converts to $N for PostgreSQL.
+	if listInput.Filter != nil {
+		expr, err := listInput.Filter.QueryExpression("")
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to build filter expression: %w", err)
+		}
+		queryBuilder.WriteString(" WHERE ")
+		queryBuilder.WriteString(expr.Query)
+		args = append(args, expr.Args...)
+	}
+
+	// Apply sort parameters; default to created_at DESC.
+	if len(listInput.SortParameters) > 0 {
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range listInput.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
 			}
-			offset = parsedOffset
+			queryBuilder.WriteString(sp.GetOrderExpr())
 		}
-
-		if req.Request.Limit > 0 {
-			limit = int(req.Request.Limit)
-		}
+	} else {
+		queryBuilder.WriteString(" ORDER BY created_at DESC")
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
-	args = append(args, limit+1, offset) // Fetch one extra to determine if there are more
-	argIdx += 2
+	// Append LIMIT/OFFSET as ? placeholders, then rebind the entire query at once.
+	limit := listInput.Limit
+	if limit <= 0 {
+		limit = 50
+	}
+	queryBuilder.WriteString(" LIMIT ? OFFSET ?")
+	args = append(args, limit+1, listInput.Offset) // fetch one extra to detect next page
+
+	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 
 	var runs []*models.Run
-	if err := sqlx.SelectContext(ctx, r.db, &runs, queryBuilder.String(), args...); err != nil {
+	if err := sqlx.SelectContext(ctx, r.db, &runs, query, args...); err != nil {
 		return nil, "", fmt.Errorf("failed to list runs: %w", err)
 	}
 
@@ -262,7 +295,7 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 	var nextToken string
 	if len(runs) > limit {
 		runs = runs[:limit]
-		nextToken = fmt.Sprintf("%d", offset+limit)
+		nextToken = fmt.Sprintf("%d", listInput.Offset+limit)
 	}
 
 	return runs, nextToken, nil
