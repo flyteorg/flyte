@@ -105,12 +105,16 @@ func StartTime(t *models.Trigger) (time.Time, error) {
 	return st, nil
 }
 
-// startTimeFallback returns TriggeredAt if set, otherwise DeployedAt.
+// startTimeFallback returns the latest of TriggeredAt and UpdatedAt.
+// UpdatedAt is updated when a trigger is activated/deactivated, so using it as
+// the baseline ensures that re-activating a trigger does not catchup runs that
+// occurred while the trigger was inactive.
 func startTimeFallback(t *models.Trigger) time.Time {
-	if t.TriggeredAt.Valid && !t.TriggeredAt.Time.IsZero() {
-		return t.TriggeredAt.Time
+	last := t.UpdatedAt
+	if t.TriggeredAt.Valid && t.TriggeredAt.Time.After(last) {
+		last = t.TriggeredAt.Time
 	}
-	return t.DeployedAt
+	return last
 }
 
 // GetCatchUpTimes returns all scheduled times in (lastExecTime, to] for a trigger.
