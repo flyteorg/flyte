@@ -106,7 +106,9 @@ type RunServiceClient interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
-	// Get input and output for an action.
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
@@ -287,6 +289,8 @@ func (c *runServiceClient) WatchActionDetails(ctx context.Context, req *connect.
 }
 
 // GetActionData calls flyteidl2.workflow.RunService.GetActionData.
+//
+// Deprecated: do not use.
 func (c *runServiceClient) GetActionData(ctx context.Context, req *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
 	return c.getActionData.CallUnary(ctx, req)
 }
@@ -345,7 +349,9 @@ type RunServiceHandler interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
-	// Get input and output for an action.
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
 	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)

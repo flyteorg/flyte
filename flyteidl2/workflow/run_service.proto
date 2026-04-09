@@ -38,8 +38,9 @@ service RunService {
   // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
   rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
 
-  // Get input and output for an action.
+  // Deprecated: Use DataProxyService.GetActionData instead.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option deprecated = true;
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 

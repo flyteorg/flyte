@@ -139,7 +139,7 @@ class RunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetActionData(self, request, context):
-        """Get input and output for an action.
+        """Deprecated: Use DataProxyService.GetActionData instead.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

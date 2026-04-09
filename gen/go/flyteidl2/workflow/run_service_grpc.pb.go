@@ -52,7 +52,8 @@ type RunServiceClient interface {
 	GetActionDetails(ctx context.Context, in *GetActionDetailsRequest, opts ...grpc.CallOption) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(ctx context.Context, in *WatchActionDetailsRequest, opts ...grpc.CallOption) (RunService_WatchActionDetailsClient, error)
-	// Get input and output for an action.
+	// Deprecated: Do not use.
+	// Deprecated: Use DataProxyService.GetActionData instead.
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error)
@@ -182,6 +183,7 @@ func (x *runServiceWatchActionDetailsClient) Recv() (*WatchActionDetailsResponse
 	return m, nil
 }
 
+// Deprecated: Do not use.
 func (c *runServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
 	out := new(GetActionDataResponse)
 	err := c.cc.Invoke(ctx, RunService_GetActionData_FullMethodName, in, out, opts...)
@@ -371,7 +373,8 @@ type RunServiceServer interface {
 	GetActionDetails(context.Context, *GetActionDetailsRequest) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(*WatchActionDetailsRequest, RunService_WatchActionDetailsServer) error
-	// Get input and output for an action.
+	// Deprecated: Do not use.
+	// Deprecated: Use DataProxyService.GetActionData instead.
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error)
