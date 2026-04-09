@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: flyte
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: volume-permissions
+        command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
+      containers:
+      - name: minio
+        command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
