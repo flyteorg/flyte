@@ -109,6 +109,7 @@ start:
 	else \
 		cp $(PWD)/.kube/kubeconfig $(HOME)/.kube/config; \
 	fi
+	@kubectl config use-context flyte-demo >/dev/null 2>&1 || true
 	@echo "Kubeconfig merged into ~/.kube/config"
 .PHONY: kubeconfig
 .SILENT: kubeconfig

@@ -17,8 +17,16 @@ done
 
 flyte-demo-bootstrap
 
-KUBECONFIG_PATH="${K3S_KUBECONFIG_OUTPUT:-/etc/rancher/k3s/k3s.yaml}"
+# Wait for K3s to write kubeconfig to the staging path, rename the default
+# context, add a flyte-demo alias, then copy to the host-mounted output.
+STAGING="${K3S_KUBECONFIG_OUTPUT:-/etc/rancher/k3s/k3s.yaml}"
 (
-  while ! [ -s "$KUBECONFIG_PATH" ]; do sleep 1; done
-  sed -i 's/: default/: flytev2-sandbox/g' "$KUBECONFIG_PATH"
+  while ! [ -s "$STAGING" ]; do sleep 0.5; done
+  # TODO: Remove flytev2-sandbox after all users have upgraded flyte-sdk.
+  sed -i 's/: default/: flytev2-sandbox/g' "$STAGING"
+  KUBECONFIG="$STAGING" kubectl config set-context flyte-demo \
+    --cluster=flytev2-sandbox --user=flytev2-sandbox 2>/dev/null || true
+  if [ -n "${KUBECONFIG_FINAL:-}" ] && [ "$KUBECONFIG_FINAL" != "$STAGING" ]; then
+    cp "$STAGING" "$KUBECONFIG_FINAL"
+  fi
 ) &
