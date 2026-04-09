@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -24,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -99,6 +102,23 @@ func matchActionID(expected *common.ActionIdentifier) interface{} {
 	})
 }
 
+func matchRunID(expected *common.RunIdentifier) interface{} {
+	return mock.MatchedBy(func(actual *common.RunIdentifier) bool {
+		return proto.Equal(actual, expected)
+	})
+}
+
+func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunServiceClient {
+	path, handler := workflowconnect.NewRunServiceHandler(svc)
+
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+
+	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
+}
+
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -131,7 +151,6 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	runModel := &models.Run{
-		Org:          runID.Org,
 		Project:      runID.Project,
 		Domain:       runID.Domain,
 		RunName:      runID.Name,
@@ -163,6 +182,158 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	require.NotNil(t, resp.Msg.Details.Action)
 	require.NotNil(t, resp.Msg.Details.Action.GetTask())
 	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+}
+
+func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	actionModel := &models.Action{
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	}
+
+	clusterEvent := &workflow.ClusterEvent{
+		OccurredAt: timestamppb.New(time.Unix(100, 0)),
+		Message:    "Pod scheduled on node-a",
+	}
+	eventModel, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:            actionID,
+		Attempt:       0,
+		Phase:         common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:       1,
+		UpdatedTime:   timestamppb.New(time.Unix(101, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{clusterEvent},
+	})
+	require.NoError(t, err)
+	eventModel.UpdatedAt = time.Unix(101, 0)
+
+	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(actionModel, nil).Once()
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			errs := args.Get(3).(chan<- error)
+			close(updates)
+			close(errs)
+		}).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
+		Return([]*models.ActionEvent{eventModel}, nil).Once()
+
+	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+		Id:      actionID,
+		Attempt: 0,
+	}))
+	require.NoError(t, err)
+	require.True(t, stream.Receive())
+
+	resp := stream.Msg()
+	require.Len(t, resp.GetClusterEvents(), 1)
+	assert.Equal(t, "Pod scheduled on node-a", resp.GetClusterEvents()[0].GetMessage())
+
+	assert.False(t, stream.Receive())
+	assert.NoError(t, stream.Err())
+}
+
+func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "test-org",
+			Project: "test-project",
+			Domain:  "test-domain",
+			Name:    "rtest12345",
+		},
+		Name: "action-1",
+	}
+
+	runningAction := &models.Action{
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}
+	succeededAction := &models.Action{
+		Project: actionID.Run.Project,
+		Domain:  actionID.Run.Domain,
+		RunName: actionID.Run.Name,
+		Name:    actionID.Name,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	}
+
+	event1, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+		Version:     1,
+		UpdatedTime: timestamppb.New(time.Unix(101, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{{
+			OccurredAt: timestamppb.New(time.Unix(100, 0)),
+			Message:    "Pod created",
+		}},
+	})
+	require.NoError(t, err)
+	event1.UpdatedAt = time.Unix(101, 0)
+
+	event2, err := models.NewActionEventModel(&workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     0,
+		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		Version:     2,
+		UpdatedTime: timestamppb.New(time.Unix(103, 0)),
+		ClusterEvents: []*workflow.ClusterEvent{{
+			OccurredAt: timestamppb.New(time.Unix(102, 0)),
+			Message:    "Pulled container image",
+		}},
+	})
+	require.NoError(t, err)
+	event2.UpdatedAt = time.Unix(103, 0)
+
+	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(runningAction, nil).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
+		Return([]*models.ActionEvent{event1}, nil).Once()
+	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			updates <- succeededAction
+			close(updates)
+		}).Once()
+	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), event1.UpdatedAt, 0, 500).
+		Return([]*models.ActionEvent{event2}, nil).Once()
+
+	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+		Id:      actionID,
+		Attempt: 0,
+	}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	first := stream.Msg()
+	require.Len(t, first.GetClusterEvents(), 1)
+	assert.Equal(t, "Pod created", first.GetClusterEvents()[0].GetMessage())
+
+	require.True(t, stream.Receive())
+	second := stream.Msg()
+	require.Len(t, second.GetClusterEvents(), 1)
+	assert.Equal(t, "Pulled container image", second.GetClusterEvents()[0].GetMessage())
+
+	assert.False(t, stream.Receive())
+	assert.NoError(t, stream.Err())
 }
 
 func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
@@ -201,7 +372,6 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	require.NoError(t, err)
 
 	runModel := &models.Run{
-		Org:        runID.Org,
 		Project:    runID.Project,
 		Domain:     runID.Domain,
 		RunName:    runID.Name,
@@ -255,7 +425,6 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
 
 	runModel := &models.Run{
-		Org:         runID.Org,
 		Project:     runID.Project,
 		Domain:      runID.Domain,
 		RunName:     runID.Name,
@@ -314,7 +483,6 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	runModel := &models.Run{
-		Org:          runID.Org,
 		Project:      runID.Project,
 		Domain:       runID.Domain,
 		RunName:      runID.Name,
@@ -428,7 +596,6 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{
-			Org:         runID.Org,
 			Project:     runID.Project,
 			Domain:      runID.Domain,
 			Name:        runID.Name,
@@ -571,7 +738,6 @@ func TestListRuns(t *testing.T) {
 			Action: &workflow.Action{
 				Id: &common.ActionIdentifier{
 					Run: &common.RunIdentifier{
-						Org:     "test-org",
 						Project: "test-project",
 						Domain:  "test-domain",
 						Name:    fmt.Sprintf("run-%d", i),
@@ -590,8 +756,6 @@ func TestListRuns(t *testing.T) {
 			},
 		})
 		sqlRes = append(sqlRes, &models.Run{
-			ID:         uint(i),
-			Org:        "test-org",
 			Project:    "test-project",
 			Domain:     "test-domain",
 			RunName:    fmt.Sprintf("run-%d", i),
@@ -677,7 +841,6 @@ func TestConvertRunToProto(t *testing.T) {
 	// Define the test cases as a slice of structs.
 	s := &RunService{}
 	name := generateRunName(int64(0))
-	org := "test_org"
 	project := "test_project"
 	domain := "test_domain"
 	startTime := timestamppb.New(time.Date(2026, time.March, 24, 9, 0, 0, 0, time.UTC))
@@ -704,8 +867,6 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"valid run",
 			&models.Run{
-				ID:            uint(0),
-				Org:           org,
 				Project:       project,
 				Domain:        domain,
 				RunName:       name,
@@ -722,7 +883,6 @@ func TestConvertRunToProto(t *testing.T) {
 				Action: &workflow.Action{
 					Id: &common.ActionIdentifier{
 						Run: &common.RunIdentifier{
-							Org:     org,
 							Project: project,
 							Domain:  domain,
 							Name:    name,
@@ -739,8 +899,6 @@ func TestConvertRunToProto(t *testing.T) {
 		{
 			"run with missing details",
 			&models.Run{
-				ID:         uint(0),
-				Org:        org,
 				Project:    project,
 				Domain:     domain,
 				RunName:    name,
@@ -758,7 +916,6 @@ func TestConvertRunToProto(t *testing.T) {
 				Action: &workflow.Action{
 					Id: &common.ActionIdentifier{
 						Run: &common.RunIdentifier{
-							Org:     org,
 							Project: project,
 							Domain:  domain,
 							Name:    name,
@@ -912,7 +1069,6 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	}
 
 	expectedRun := &models.Run{
-		Org:     "testorg",
 		Project: "testproject",
 		Domain:  "development",
 		Name:    "generated-run",
@@ -969,7 +1125,6 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	}
 
 	expectedRun := &models.Run{
-		Org:     "myorg",
 		Project: "myproj",
 		Domain:  "production",
 		RunName: "rtest99999",
@@ -985,7 +1140,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	require.NoError(t, err)
 
 	run := resp.Msg.Run
-	assert.Equal(t, "myorg", run.Action.Id.Run.Org)
+	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
 	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
@@ -1025,7 +1180,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(&models.Run{Org: "org", Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
+		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
 	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
 	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
@@ -1064,9 +1219,11 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 				Name:    "rctx-123",
 			},
 		},
-		Inputs: &task.Inputs{
-			Context: []*core.KeyValuePair{
-				{Key: "trace_id", Value: "root-abc"},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{
+			&task.Inputs{
+				Context: []*core.KeyValuePair{
+					{Key: "trace_id", Value: "root-abc"},
+				},
 			},
 		},
 		RunSpec: &task.RunSpec{
@@ -1077,7 +1234,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 		},
 	}
 
-	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/org/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
+	store.On("WriteProtobuf", mock.Anything, storage.DataReference("s3://flyte-data/proj/dev/rctx-123/inputs/inputs.pb"), storage.Options{}, mock.MatchedBy(func(msg proto.Message) bool {
 		inputs, ok := msg.(*task.Inputs)
 		return ok &&
 			len(inputs.Context) == 1 &&
@@ -1087,8 +1244,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	actionRepo.On("CreateRun", mock.Anything, mock.MatchedBy(func(actual *workflow.CreateRunRequest) bool {
 		return actual.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
-	}), "s3://flyte-data/org/proj/dev/rctx-123/inputs", "s3://flyte-data/org/proj/dev/rctx-123/").Return(&models.Run{
-		Org:     "org",
+	}), "s3://flyte-data/proj/dev/rctx-123/inputs", "s3://flyte-data/proj/dev/rctx-123/").Return(&models.Run{
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "rctx-123",
@@ -1137,7 +1293,6 @@ func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -1221,7 +1376,6 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	runInfoBytes, _ := proto.Marshal(runInfo)
 
 	actionModel := &models.Action{
-		Org:          "test-org",
 		Project:      "test-project",
 		Domain:       "test-domain",
 		RunName:      "rtest12345",
@@ -1247,4 +1401,71 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 	store.AssertExpectations(t)
 	// Verify ReadProtobuf was only called once (for inputs, not outputs)
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 1)
+}
+
+func TestCreateRun_WithOffloadedInputData(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := &mockActionsClient{}
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	offloadedURI := "s3://test-bucket/uploads/testorg/testproject/development/offloaded-inputs/somehash"
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "testorg",
+				Project: "testproject",
+				Domain:  "development",
+				Name:    "rtest-offloaded",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+		InputWrapper: &workflow.CreateRunRequest_OffloadedInputData{
+			OffloadedInputData: &common.OffloadedInputData{
+				Uri:        offloadedURI,
+				InputsHash: "testhash123",
+			},
+		},
+	}
+
+	expectedRun := &models.Run{
+		Project: "testproject",
+		Domain:  "development",
+		RunName: "rtest-offloaded",
+		Name:    "a0",
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}
+
+	// No ReadProtobuf or WriteProtobuf expected — offloaded inputs are used directly.
+	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.MatchedBy(func(inputPrefix string) bool {
+		return inputPrefix == offloadedURI
+	}), mock.AnythingOfType("string")).Return(expectedRun, nil).Once()
+	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.Action.InputUri == offloadedURI
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+
+	run := resp.Msg.Run
+	assert.Equal(t, "", run.Action.Id.Run.Org)
+	assert.Equal(t, "testproject", run.Action.Id.Run.Project)
+	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
+
+	store.AssertExpectations(t)
+	store.AssertNumberOfCalls(t, "ReadProtobuf", 0)
+	store.AssertNumberOfCalls(t, "WriteProtobuf", 0)
 }

@@ -81,16 +81,55 @@ message EmailRecipient {
   string address = 2;
 }
 
-message EmailDeliveryTemplate {
+// InlineEmailTemplate contains subject and body content rendered by the
+// notification system using Go templates.
+message InlineEmailTemplate {
   string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated EmailRecipient to = 2 [(buf.validate.field).repeated.min_items = 1];
+  string html_template = 2 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated EmailRecipient cc = 3;
+  string text_template = 3; // this is a Go template that may contain placeholders
+}
 
-  repeated EmailRecipient bcc = 4;
+// ProviderEmailTemplate references an externally managed email template owned
+// by an email provider.
+message ProviderEmailTemplate {
+  // Template ID is interpreted by the configured email provider.
+  string template_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
 
-  string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+  // Template data contains provider-defined key/value pairs used when rendering
+  // an externally managed email template, for example dynamic template
+  // variables referenced by the provider template's subject or body.
+  map<string, string> template_data = 2 [(buf.validate.field).map = {
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 100
+      }
+    }
+    values: {
+      string: {max_len: 4000}
+    }
+    max_pairs: 100
+  }];
+}
 
-  string text_template = 6; // this is a Go template that may contain placeholders
+message EmailDeliveryTemplate {
+  repeated EmailRecipient to = 1 [(buf.validate.field).repeated.min_items = 1];
+
+  repeated EmailRecipient cc = 2;
+
+  repeated EmailRecipient bcc = 3;
+
+  // Content may be provided either inline or via an external provider template.
+  oneof content {
+    option (buf.validate.oneof).required = true;
+
+    InlineEmailTemplate inline = 4;
+
+    ProviderEmailTemplate provider_template = 5;
+  }
 }

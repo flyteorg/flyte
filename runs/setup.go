@@ -7,9 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-gormigrate/gormigrate/v2"
-
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -34,8 +32,7 @@ import (
 // RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-	m := gormigrate.New(sc.DB, gormigrate.DefaultOptions, migrations.RunsMigrations)
-	if err := m.Migrate(); err != nil {
+	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
@@ -90,6 +87,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
+	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL)
+	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
+	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
+	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
+
 	appSvc := service.NewAppService()
 	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
 	sc.Mux.Handle(appPath, appHandler)
@@ -128,11 +130,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	sc.AddReadyCheck(func(r *http.Request) error {
-		sqlDB, err := sc.DB.DB()
-		if err != nil {
-			return fmt.Errorf("database connection error: %w", err)
-		}
-		if err := sqlDB.Ping(); err != nil {
+		if err := sc.DB.PingContext(r.Context()); err != nil {
 			return fmt.Errorf("database ping failed: %w", err)
 		}
 		return nil

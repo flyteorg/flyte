@@ -52,7 +52,6 @@ func abortTestAction(actionID *common.ActionIdentifier) *models.Action {
 	now := time.Now()
 	reason := "User requested abort"
 	return &models.Action{
-		Org:              actionID.Run.Org,
 		Project:          actionID.Run.Project,
 		Domain:           actionID.Run.Domain,
 		RunName:          actionID.Run.Name,
@@ -181,8 +180,8 @@ func TestAbortReconciler_StartupScanPicksUpPending(t *testing.T) {
 	now := time.Now()
 	reason := "abort"
 	pending := []*models.Action{
-		{Org: "o", Project: "p", Domain: "d", RunName: "run1", Name: "run1", AbortRequestedAt: &now, AbortReason: &reason},
-		{Org: "o", Project: "p", Domain: "d", RunName: "run2", Name: "run2", AbortRequestedAt: &now, AbortReason: &reason},
+		{Project: "p", Domain: "d", RunName: "run1", Name: "run1", AbortRequestedAt: &now, AbortReason: &reason},
+		{Project: "p", Domain: "d", RunName: "run2", Name: "run2", AbortRequestedAt: &now, AbortReason: &reason},
 	}
 	actionRepo.On("ListPendingAborts", mock.Anything).Return(pending, nil).Once()
 	actionRepo.On("GetAction", mock.Anything, mock.Anything).Return(abortTestAction(action1ID), nil).Maybe()

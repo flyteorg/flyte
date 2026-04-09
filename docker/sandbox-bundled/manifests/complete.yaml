@@ -94,6 +94,10 @@ spec:
                 description: EnvVars are run-scoped environment variables projected
                   from RunSpec for executor runtime use.
                 type: object
+              group:
+                description: Group is the group this action belongs to, if applicable.
+                maxLength: 256
+                type: string
               inputUri:
                 description: InputURI is the path to the input data for this action
                 minLength: 1
@@ -102,11 +106,6 @@ spec:
                 description: Interruptible is the run-scoped interruptibility override
                   projected from RunSpec.
                 type: boolean
-              org:
-                description: Org this action belongs to
-                maxLength: 63
-                minLength: 1
-                type: string
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
                 maxLength: 30
@@ -147,7 +146,6 @@ spec:
             - actionName
             - domain
             - inputUri
-            - org
             - project
             - runName
             - runOutputBase
@@ -304,18 +302,6 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
----
-apiVersion: v1
 automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
@@ -328,94 +314,6 @@ metadata:
   namespace: flyte
 secrets:
 - name: flyte-sandbox-minio
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-key-holder
-  - kubernetes-dashboard-certs
-  - kubernetes-dashboard-csrf
-  resources:
-  - secrets
-  verbs:
-  - get
-  - update
-  - delete
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-settings
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - update
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - dashboard-metrics-scraper
-  resources:
-  - services
-  verbs:
-  - proxy
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - 'http:heapster:'
-  - 'https:heapster:'
-  - dashboard-metrics-scraper
-  - http:dashboard-metrics-scraper
-  resources:
-  - services/proxy
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: kubernetes-dashboard
-  namespace: flyte
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-csrf
-  - kubernetes-dashboard-key-holder
-  resources:
-  - secrets
-  verbs:
-  - get
-  - update
-  - delete
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-settings
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -488,176 +386,6 @@ rules:
   - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard-readonly
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  - endpoints
-  - persistentvolumeclaims
-  - pods
-  - replicationcontrollers
-  - replicationcontrollers/scale
-  - serviceaccounts
-  - services
-  - nodes
-  - persistentvolumeclaims
-  - persistentvolumes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - bindings
-  - events
-  - limitranges
-  - namespaces/status
-  - pods/log
-  - pods/status
-  - replicationcontrollers/status
-  - resourcequotas
-  - resourcequotas/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - deployments/scale
-  - replicasets
-  - replicasets/scale
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - daemonsets
-  - deployments
-  - deployments/scale
-  - ingresses
-  - networkpolicies
-  - replicasets
-  - replicasets/scale
-  - replicationcontrollers/scale
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - networkpolicies
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - storageclasses
-  - volumeattachments
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterrolebindings
-  - clusterroles
-  - roles
-  - rolebindings
-  verbs:
-  - get
-  - list
-  - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: flyte-sandbox-kubernetes-dashboard
-subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: kubernetes-dashboard
-  namespace: flyte
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubernetes-dashboard
-subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
@@ -674,25 +402,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flyte-sandbox
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard-readonly
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-sandbox-kubernetes-dashboard-readonly
-subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 ---
 apiVersion: v1
@@ -773,8 +482,7 @@ data:
         - echo
     plugins:
       logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        kubernetes-enabled: false
         cloudwatch-enabled: false
         stackdriver-enabled: false
       k8s:
@@ -783,14 +491,17 @@ data:
       k8s-array:
         logs:
           config:
-            kubernetes-enabled: true
-            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+            kubernetes-enabled: false
             cloudwatch-enabled: false
             stackdriver-enabled: false
   002-database.yaml: |
     database:
-      sqlite:
-        file: "/var/lib/flyte/flyte.db"
+      postgres:
+        username: postgres
+        host: flyte-sandbox-postgresql
+        port: 5432
+        dbname: flyte
+        options: "sslmode=disable"
   003-storage.yaml: |
     storage:
       type: stow
@@ -800,14 +511,14 @@ data:
           region: us-east-1
           disable_ssl: true
           v2_signing: true
-          endpoint: http://flyte-sandbox-rustfs.flyte:9000
+          endpoint: http://flyte-sandbox-minio.flyte:9000
           auth_type: accesskey
       container: flyte-data
   100-inline-config.yaml: |
     plugins:
       k8s:
         default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-rustfs.flyte:9000
+        - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         - _U_EP_OVERRIDE: 'flyte-sandbox-http.flyte:8090'
@@ -894,200 +605,6 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
-data:
-  envoy.yaml: |
-    admin:
-        access_log_path: /dev/stdout
-    static_resources:
-        listeners:
-            - address:
-                  socket_address:
-                      address: 0.0.0.0
-                      port_value: 8000
-              filter_chains:
-                  - filters:
-                        - name: envoy.filters.network.http_connection_manager
-                          typed_config:
-                              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-                              stat_prefix: ingress_http
-                              codec_type: AUTO
-                              upgrade_configs:
-                                  - upgrade_type: websocket
-                              route_config:
-                                  name: local_route
-                                  virtual_hosts:
-                                      - name: backend
-                                        domains:
-                                            - "*"
-                                        routes:
-                                            - match:
-                                                  prefix: "/healthz"
-                                              route:
-                                                  cluster: flyte
-                                            - match:
-                                                  prefix: "/readyz"
-                                              route:
-                                                  cluster: flyte
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.RunService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.task.TaskService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.TranslatorService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.project.ProjectService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.actions.ActionsService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.dataproxy.DataProxyService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.secret.SecretService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.RunLogsService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.app.AppService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.trigger.TriggerService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/flyteidl2.workflow.RunLogsService"
-                                              route:
-                                                  cluster: flyte
-                                                  timeout: 0s
-                                            - match:
-                                                  prefix: "/v2"
-                                              route:
-                                                  cluster: console
-                                            - match:
-                                                  path: "/kubernetes-dashboard"
-                                              redirect:
-                                                  path_redirect: "/kubernetes-dashboard/"
-                                            - match:
-                                                  prefix: "/kubernetes-dashboard/"
-                                              route:
-                                                  cluster: kubernetes-dashboard
-                                                  prefix_rewrite: /
-                                            - match:
-                                                  path: "/rustfs"
-                                              redirect:
-                                                  path_redirect: "/rustfs/"
-                                            - match:
-                                                  prefix: "/rustfs/"
-                                              route:
-                                                  cluster: rustfs
-                                                  prefix_rewrite: /
-                              http_filters:
-                                  - name: envoy.filters.http.router
-                                    typed_config:
-                                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
-        clusters:
-            - name: flyte
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              http2_protocol_options: {}
-              load_assignment:
-                  cluster_name: flyte
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: flyte-sandbox-http
-                                          port_value: 8090
-            - name: console
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: console
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: flyte-sandbox-console
-                                          port_value: 80
-            - name: kubernetes-dashboard
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: kubernetes-dashboard
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: flyte-sandbox-kubernetes-dashboard
-                                          port_value: 80
-            - name: rustfs
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: rustfs
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: flyte-sandbox-rustfs
-                                          port_value: 9001
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-proxy-config
-  namespace: flyte
----
-apiVersion: v1
-data: null
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: kubernetes-dashboard-settings
-  namespace: flyte
----
-apiVersion: v1
 kind: Secret
 metadata:
   labels:
@@ -1127,22 +644,9 @@ metadata:
 type: Opaque
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard-certs
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
 data:
-  root-password: bTRJVndkUnFocQ==
-  root-user: YWRtaW4=
+  root-password: bWluaW9zdG9yYWdl
+  root-user: bWluaW8=
 kind: Secret
 metadata:
   labels:
@@ -1155,60 +659,18 @@ metadata:
 type: Opaque
 ---
 apiVersion: v1
-data:
-  postgres-password: cG9zdGdyZXM=
-kind: Secret
+kind: Endpoints
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
+    app.kubernetes.io/name: embedded-postgresql
   name: flyte-sandbox-postgresql
   namespace: flyte
-type: Opaque
----
-apiVersion: v1
-data:
-  access-key: bWluaW8=
-  secret-key: bWluaW9zdG9yYWdl
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-rustfs
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: kubernetes-dashboard-csrf
-  namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: kubernetes-dashboard-key-holder
-  namespace: flyte
-type: Opaque
+subsets:
+- addresses:
+  - ip: '%{NODE_IP}%'
+  ports:
+  - name: tcp-postgresql
+    port: 5432
 ---
 apiVersion: v1
 kind: Service
@@ -1280,30 +742,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-    kubernetes.io/cluster-service: "true"
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: kubernetes-dashboard
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
@@ -1311,116 +749,33 @@ metadata:
   name: flyte-sandbox-minio
   namespace: flyte
 spec:
+  externalTrafficPolicy: Cluster
   ports:
   - name: minio-api
-    nodePort: null
+    nodePort: 30002
     port: 9000
     targetPort: minio-api
   - name: minio-console
-    nodePort: null
     port: 9001
     targetPort: minio-console
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: minio
-  type: ClusterIP
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
+    app.kubernetes.io/name: embedded-postgresql
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - name: tcp-postgresql
     nodePort: 30001
     port: 5432
-    targetPort: tcp-postgresql
-  selector:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: postgresql
-  sessionAffinity: None
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: flyte-sandbox-postgresql-hl
-  namespace: flyte
-spec:
-  clusterIP: None
-  ports:
-  - name: tcp-postgresql
-    port: 5432
-    targetPort: tcp-postgresql
-  publishNotReadyAddresses: true
-  selector:
-    app.kubernetes.io/component: primary
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: postgresql
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-proxy
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: 30080
-    port: 8000
-    protocol: TCP
-  selector:
-    app.kubernetes.io/component: proxy
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-rustfs
-  namespace: flyte
-spec:
-  ports:
-  - name: rustfs-api
-    nodePort: 30002
-    port: 9000
-    targetPort: rustfs-api
-  - name: rustfs-console
-    port: 9001
-    targetPort: rustfs-console
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: rustfs
+    targetPort: 5432
   type: NodePort
 ---
 apiVersion: v1
@@ -1453,7 +808,7 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-db-storage
+  name: flyte-sandbox-minio-storage
   namespace: flyte
 spec:
   accessModes:
@@ -1461,27 +816,7 @@ spec:
   capacity:
     storage: 1Gi
   hostPath:
-    path: /var/lib/flyte/storage/db
-  storageClassName: manual
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-rustfs-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: /var/lib/flyte/storage/rustfs
+    path: /var/lib/flyte/storage/minio
   storageClassName: manual
 ---
 apiVersion: v1
@@ -1493,7 +828,7 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-db-storage
+  name: flyte-sandbox-minio-storage
   namespace: flyte
 spec:
   accessModes:
@@ -1502,44 +837,7 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: manual
-  volumeName: flyte-sandbox-db-storage
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-  name: flyte-sandbox-minio
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 8Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-rustfs-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: manual
-  volumeName: flyte-sandbox-rustfs-storage
+  volumeName: flyte-sandbox-minio-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1563,7 +861,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 70f71bc74e732c3d8cb85c6026c59f17ab10f81571327d9e74863f5146fea83a
+        checksum/configuration: 81ae69b3a9ef93e793e7ee11db1e215b1ab6d873c60f9c8bf7895af85a3b2a04
         checksum/configuration-secret: 588da2ac84d45dd5285521c58bc6c9969924887acb9674d75802055c3a97d9bb
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1611,18 +909,14 @@ spec:
       initContainers:
       - args:
         - |
-          until pg_isready \
-            -h flyte-sandbox-postgresql \
-            -p 5432 \
-            -U postgres
-          do
+          until nc -z flyte-sandbox-postgresql.flyte 5432; do
             echo waiting for database
-            sleep 0.1
+            sleep 0.5
           done
         command:
         - sh
         - -ec
-        image: bitnami/postgresql:sandbox
+        image: rancher/mirrored-library-busybox:1.34.1
         imagePullPolicy: Never
         name: wait-for-db
       serviceAccountName: flyte-sandbox
@@ -1638,65 +932,6 @@ spec:
               name: flyte-sandbox-extra-config
       - emptyDir: {}
         name: webhook-certs
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-buildkit
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: buildkit
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: flyte-sandbox
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: buildkit
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/name: flyte-sandbox
-    spec:
-      containers:
-      - args:
-        - --addr
-        - unix:///run/buildkit/buildkitd.sock
-        - --addr
-        - tcp://0.0.0.0:30003
-        image: moby/buildkit:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          exec:
-            command:
-            - buildctl
-            - debug
-            - workers
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        name: buildkit
-        ports:
-        - containerPort: 30003
-          name: tcp
-          protocol: TCP
-        readinessProbe:
-          exec:
-            command:
-            - buildctl
-            - debug
-            - workers
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        securityContext:
-          privileged: true
-      dnsPolicy: ClusterFirstWithHostNet
-      hostNetwork: true
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1816,89 +1051,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/component: kubernetes-dashboard
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kubernetes-dashboard
-    app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-6.0.0
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: kubernetes-dashboard
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: kubernetes-dashboard
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations: null
-      labels:
-        app.kubernetes.io/component: kubernetes-dashboard
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: kubernetes-dashboard
-        app.kubernetes.io/version: 2.7.0
-        helm.sh/chart: kubernetes-dashboard-6.0.0
-    spec:
-      containers:
-      - args:
-        - --namespace=flyte
-        - --metrics-provider=none
-        - --enable-insecure-login
-        - --enable-skip-login
-        image: kubernetesui/dashboard:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 9090
-            scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        name: kubernetes-dashboard
-        ports:
-        - containerPort: 9090
-          name: http
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 2
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /certs
-          name: kubernetes-dashboard-certs
-        - mountPath: /tmp
-          name: tmp-volume
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      serviceAccountName: flyte-sandbox-kubernetes-dashboard
-      volumes:
-      - name: kubernetes-dashboard-certs
-        secret:
-          secretName: flyte-sandbox-kubernetes-dashboard-certs
-      - emptyDir: {}
-        name: tmp-volume
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
@@ -1915,7 +1067,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/credentials-secret: b63a9d5aa61c4e652c028a21bb3e9ab39a68cb28a5edd2a1429eb7efedc482e6
+        checksum/credentials-secret: ecce809e3af19025d134846a9a81e163dd41df7e26abf2c6657895d9d13607a9
       labels:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
@@ -1923,8 +1075,6 @@ spec:
         helm.sh/chart: minio-12.6.7
     spec:
       affinity:
-        nodeAffinity: null
-        podAffinity: null
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
           - podAffinityTerm:
@@ -1935,7 +1085,13 @@ spec:
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
-      - env:
+      - command:
+        - minio
+        - server
+        - /data
+        - --console-address
+        - :9001
+        env:
         - name: BITNAMI_DEBUG
           value: "false"
         - name: MINIO_SCHEME
@@ -1952,15 +1108,18 @@ spec:
             secretKeyRef:
               key: root-password
               name: flyte-sandbox-minio
+        - name: MINIO_DEFAULT_BUCKETS
+          value: flyte-data
         - name: MINIO_BROWSER
           value: "on"
         - name: MINIO_PROMETHEUS_AUTH_TYPE
           value: public
         - name: MINIO_CONSOLE_PORT_NUMBER
           value: "9001"
-        envFrom: null
-        image: docker.io/bitnami/minio:2023.7.11-debian-11-r0
-        imagePullPolicy: IfNotPresent
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: http://localhost:30080/minio
+        image: docker.io/bitnami/minio:sandbox
+        imagePullPolicy: Never
         livenessProbe:
           failureThreshold: 5
           httpGet:
@@ -1996,16 +1155,35 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+      initContainers:
+      - command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 1001:1001 /data
+          mkdir -p /data/flyte-data
+          chown 1001:1001 /data/flyte-data
+        image: docker.io/bitnami/os-shell:sandbox
+        imagePullPolicy: Never
+        name: volume-permissions
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
       securityContext:
         fsGroup: 1001
       serviceAccountName: flyte-sandbox-minio
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: flyte-sandbox-minio
+          claimName: flyte-sandbox-minio-storage
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
 metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
@@ -2013,48 +1191,23 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-proxy
-  namespace: flyte
+  name: traefik
+  namespace: kube-system
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: proxy
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: flyte-sandbox
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: proxy
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/name: flyte-sandbox
-    spec:
-      containers:
-      - image: envoyproxy/envoy:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          failureThreshold: 10
-          initialDelaySeconds: 15
-          tcpSocket:
-            port: http
-        name: proxy
-        ports:
-        - containerPort: 8000
-          name: http
-        readinessProbe:
-          initialDelaySeconds: 5
-          tcpSocket:
-            port: http
-        volumeMounts:
-        - mountPath: /etc/envoy
-          name: config
-      volumes:
-      - configMap:
-          name: flyte-sandbox-proxy-config
-        name: config
+  valuesContent: |
+    service:
+      type: NodePort
+    ports:
+      web:
+        nodePort: 30080
+        transport:
+          respondingTimeouts:
+            readTimeout: 0
+      websecure:
+        expose: false
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
@@ -2062,247 +1215,94 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: flyte-sandbox-rustfs
+  name: flyte-sandbox-api
   namespace: flyte
 spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: rustfs
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/name: rustfs
-    spec:
-      containers:
-      - env:
-        - name: RUSTFS_ADDRESS
-          value: 0.0.0.0:9000
-        - name: RUSTFS_CONSOLE_ADDRESS
-          value: 0.0.0.0:9001
-        - name: RUSTFS_VOLUMES
-          value: /data
-        - name: RUSTFS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              key: access-key
-              name: flyte-sandbox-rustfs
-        - name: RUSTFS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              key: secret-key
-              name: flyte-sandbox-rustfs
-        image: rustfs/rustfs:latest
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          failureThreshold: 5
-          httpGet:
-            path: /
-            port: rustfs-api
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-        name: rustfs
-        ports:
-        - containerPort: 9000
-          name: rustfs-api
-          protocol: TCP
-        - containerPort: 9001
-          name: rustfs-console
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 5
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          tcpSocket:
-            port: rustfs-api
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 10001
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      initContainers:
-      - command:
-        - /bin/sh
-        - -ec
-        - |
-          chown -R 10001:10001 /data
-        image: busybox:latest
-        imagePullPolicy: IfNotPresent
-        name: volume-permissions
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      securityContext:
-        fsGroup: 10001
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-sandbox-rustfs-storage
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /healthz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /readyz
+        pathType: Exact
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8090
+        path: /flyteidl2.
+        pathType: Prefix
 ---
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   labels:
-    app.kubernetes.io/component: primary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.8.1
-  name: flyte-sandbox-postgresql
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-console
   namespace: flyte
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: primary
-      app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: postgresql
-  serviceName: flyte-sandbox-postgresql-hl
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: primary
-        app.kubernetes.io/instance: flyte-sandbox
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-12.8.1
-      name: flyte-sandbox-postgresql
-    spec:
-      affinity:
-        nodeAffinity: null
-        podAffinity: null
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/component: primary
-                  app.kubernetes.io/instance: flyte-sandbox
-                  app.kubernetes.io/name: postgresql
-              topologyKey: kubernetes.io/hostname
-            weight: 1
-      containers:
-      - env:
-        - name: BITNAMI_DEBUG
-          value: "false"
-        - name: POSTGRESQL_PORT_NUMBER
-          value: "5432"
-        - name: POSTGRESQL_VOLUME_DIR
-          value: /bitnami/postgresql
-        - name: PGDATA
-          value: /bitnami/postgresql/data
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: postgres-password
-              name: flyte-sandbox-postgresql
-        - name: POSTGRESQL_ENABLE_LDAP
-          value: "no"
-        - name: POSTGRESQL_ENABLE_TLS
-          value: "no"
-        - name: POSTGRESQL_LOG_HOSTNAME
-          value: "false"
-        - name: POSTGRESQL_LOG_CONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_LOG_DISCONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
-          value: "off"
-        - name: POSTGRESQL_CLIENT_MIN_MESSAGES
-          value: error
-        - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
-          value: pgaudit
-        image: docker.io/bitnami/postgresql:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-          failureThreshold: 6
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: postgresql
-        ports:
-        - containerPort: 5432
-          name: tcp-postgresql
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - -e
-            - |
-              exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-              [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
-          failureThreshold: 6
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        resources:
-          limits: {}
-          requests:
-            cpu: 250m
-            memory: 256Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          runAsGroup: 0
-          runAsNonRoot: true
-          runAsUser: 1001
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
-      hostIPC: false
-      hostNetwork: false
-      initContainers:
-      - command:
-        - /bin/sh
-        - -ec
-        - |
-          chown 1001:1001 /bitnami/postgresql
-          mkdir -p /bitnami/postgresql/data
-          chmod 700 /bitnami/postgresql/data
-          find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
-            xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/os-shell:sandbox
-        imagePullPolicy: Never
-        name: init-chmod-data
-        resources:
-          limits: {}
-          requests: {}
-        securityContext:
-          runAsGroup: 0
-          runAsNonRoot: false
-          runAsUser: 0
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
-      securityContext:
-        fsGroup: 1001
-      serviceAccountName: default
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-sandbox-db-storage
-  updateStrategy:
-    rollingUpdate: {}
-    type: RollingUpdate
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-console
+            port:
+              number: 80
+        path: /v2
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-minio
+            port:
+              number: 9001
+        path: /minio
+        pathType: Prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: strip-minio
+  namespace: flyte
+spec:
+  stripPrefix:
+    prefixes:
+    - /minio

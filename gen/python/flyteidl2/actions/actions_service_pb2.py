@@ -18,7 +18,7 @@ from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_
 from flyteidl2.workflow import state_service_pb2 as flyteidl2_dot_workflow_dot_state__service__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/actions/actions_service.proto\x12\x11\x66lyteidl2.actions\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xe5\x03\n\x06\x41\x63tion\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12$\n\tinput_uri\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x34\n\x04task\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\t \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_name\"\x7f\n\x0e\x45nqueueRequest\x12\x39\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x19.flyteidl2.actions.ActionB\x06\xbaH\x03\xc8\x01\x01R\x06\x61\x63tion\x12\x32\n\x08run_spec\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\"\x11\n\x0f\x45nqueueResponse\"\xdc\x01\n\rUpdateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\x12\x1d\n\x05state\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x02R\x05state\"\x10\n\x0eUpdateResponse\"\x83\x01\n\x15GetLatestStateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"7\n\x16GetLatestStateResponse\x12\x1d\n\x05state\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x05state\"y\n\x16WatchForUpdatesRequest\x12N\n\x10parent_action_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x0eparentActionIdB\x0f\n\x06\x66ilter\x12\x05\xbaH\x02\x08\x01\"\xbc\x01\n\x17WatchForUpdatesResponse\x12G\n\raction_update\x18\x01 \x01(\x0b\x32 .flyteidl2.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12M\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\"\x7f\n\x0c\x41\x62ortRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x0f\n\rAbortResponse2\xda\x03\n\x0e\x41\x63tionsService\x12R\n\x07\x45nqueue\x12!.flyteidl2.actions.EnqueueRequest\x1a\".flyteidl2.actions.EnqueueResponse\"\x00\x12g\n\x0eGetLatestState\x12(.flyteidl2.actions.GetLatestStateRequest\x1a).flyteidl2.actions.GetLatestStateResponse\"\x00\x12l\n\x0fWatchForUpdates\x12).flyteidl2.actions.WatchForUpdatesRequest\x1a*.flyteidl2.actions.WatchForUpdatesResponse\"\x00\x30\x01\x12O\n\x06Update\x12 .flyteidl2.actions.UpdateRequest\x1a!.flyteidl2.actions.UpdateResponse\"\x00\x12L\n\x05\x41\x62ort\x12\x1f.flyteidl2.actions.AbortRequest\x1a .flyteidl2.actions.AbortResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.actionsB\x13\x41\x63tionsServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions\xa2\x02\x03\x46\x41X\xaa\x02\x11\x46lyteidl2.Actions\xca\x02\x11\x46lyteidl2\\Actions\xe2\x02\x1d\x46lyteidl2\\Actions\\GPBMetadata\xea\x02\x12\x46lyteidl2::Actionsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/actions/actions_service.proto\x12\x11\x66lyteidl2.actions\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xe5\x03\n\x06\x41\x63tion\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12$\n\tinput_uri\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x34\n\x04task\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\t \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_name\"\x7f\n\x0e\x45nqueueRequest\x12\x39\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x19.flyteidl2.actions.ActionB\x06\xbaH\x03\xc8\x01\x01R\x06\x61\x63tion\x12\x32\n\x08run_spec\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\"\x11\n\x0f\x45nqueueResponse\"\xd3\x01\n\rUpdateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\x12\x14\n\x05state\x18\x04 \x01(\tR\x05state\"\x10\n\x0eUpdateResponse\"\x83\x01\n\x15GetLatestStateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"7\n\x16GetLatestStateResponse\x12\x1d\n\x05state\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x05state\"y\n\x16WatchForUpdatesRequest\x12N\n\x10parent_action_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x0eparentActionIdB\x0f\n\x06\x66ilter\x12\x05\xbaH\x02\x08\x01\"\xbc\x01\n\x17WatchForUpdatesResponse\x12G\n\raction_update\x18\x01 \x01(\x0b\x32 .flyteidl2.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12M\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\"\x7f\n\x0c\x41\x62ortRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x0f\n\rAbortResponse2\xda\x03\n\x0e\x41\x63tionsService\x12R\n\x07\x45nqueue\x12!.flyteidl2.actions.EnqueueRequest\x1a\".flyteidl2.actions.EnqueueResponse\"\x00\x12g\n\x0eGetLatestState\x12(.flyteidl2.actions.GetLatestStateRequest\x1a).flyteidl2.actions.GetLatestStateResponse\"\x00\x12l\n\x0fWatchForUpdates\x12).flyteidl2.actions.WatchForUpdatesRequest\x1a*.flyteidl2.actions.WatchForUpdatesResponse\"\x00\x30\x01\x12O\n\x06Update\x12 .flyteidl2.actions.UpdateRequest\x1a!.flyteidl2.actions.UpdateResponse\"\x00\x12L\n\x05\x41\x62ort\x12\x1f.flyteidl2.actions.AbortRequest\x1a .flyteidl2.actions.AbortResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.actionsB\x13\x41\x63tionsServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions\xa2\x02\x03\x46\x41X\xaa\x02\x11\x46lyteidl2.Actions\xca\x02\x11\x46lyteidl2\\Actions\xe2\x02\x1d\x46lyteidl2\\Actions\\GPBMetadata\xea\x02\x12\x46lyteidl2::Actionsb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -42,8 +42,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _UPDATEREQUEST.fields_by_name['attempt']._serialized_options = b'\272H\004*\002 \000'
   _UPDATEREQUEST.fields_by_name['status']._options = None
   _UPDATEREQUEST.fields_by_name['status']._serialized_options = b'\272H\003\310\001\001'
-  _UPDATEREQUEST.fields_by_name['state']._options = None
-  _UPDATEREQUEST.fields_by_name['state']._serialized_options = b'\272H\004r\002\020\002'
   _GETLATESTSTATEREQUEST.fields_by_name['action_id']._options = None
   _GETLATESTSTATEREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
   _GETLATESTSTATEREQUEST.fields_by_name['attempt']._options = None
@@ -61,21 +59,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_ENQUEUERESPONSE']._serialized_start=850
   _globals['_ENQUEUERESPONSE']._serialized_end=867
   _globals['_UPDATEREQUEST']._serialized_start=870
-  _globals['_UPDATEREQUEST']._serialized_end=1090
-  _globals['_UPDATERESPONSE']._serialized_start=1092
-  _globals['_UPDATERESPONSE']._serialized_end=1108
-  _globals['_GETLATESTSTATEREQUEST']._serialized_start=1111
-  _globals['_GETLATESTSTATEREQUEST']._serialized_end=1242
-  _globals['_GETLATESTSTATERESPONSE']._serialized_start=1244
-  _globals['_GETLATESTSTATERESPONSE']._serialized_end=1299
-  _globals['_WATCHFORUPDATESREQUEST']._serialized_start=1301
-  _globals['_WATCHFORUPDATESREQUEST']._serialized_end=1422
-  _globals['_WATCHFORUPDATESRESPONSE']._serialized_start=1425
-  _globals['_WATCHFORUPDATESRESPONSE']._serialized_end=1613
-  _globals['_ABORTREQUEST']._serialized_start=1615
-  _globals['_ABORTREQUEST']._serialized_end=1742
-  _globals['_ABORTRESPONSE']._serialized_start=1744
-  _globals['_ABORTRESPONSE']._serialized_end=1759
-  _globals['_ACTIONSSERVICE']._serialized_start=1762
-  _globals['_ACTIONSSERVICE']._serialized_end=2236
+  _globals['_UPDATEREQUEST']._serialized_end=1081
+  _globals['_UPDATERESPONSE']._serialized_start=1083
+  _globals['_UPDATERESPONSE']._serialized_end=1099
+  _globals['_GETLATESTSTATEREQUEST']._serialized_start=1102
+  _globals['_GETLATESTSTATEREQUEST']._serialized_end=1233
+  _globals['_GETLATESTSTATERESPONSE']._serialized_start=1235
+  _globals['_GETLATESTSTATERESPONSE']._serialized_end=1290
+  _globals['_WATCHFORUPDATESREQUEST']._serialized_start=1292
+  _globals['_WATCHFORUPDATESREQUEST']._serialized_end=1413
+  _globals['_WATCHFORUPDATESRESPONSE']._serialized_start=1416
+  _globals['_WATCHFORUPDATESRESPONSE']._serialized_end=1604
+  _globals['_ABORTREQUEST']._serialized_start=1606
+  _globals['_ABORTREQUEST']._serialized_end=1733
+  _globals['_ABORTRESPONSE']._serialized_start=1735
+  _globals['_ABORTRESPONSE']._serialized_end=1750
+  _globals['_ACTIONSSERVICE']._serialized_start=1753
+  _globals['_ACTIONSSERVICE']._serialized_end=2227
 # @@protoc_insertion_point(module_scope)

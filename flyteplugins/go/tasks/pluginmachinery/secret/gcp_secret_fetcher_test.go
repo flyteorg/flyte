@@ -34,7 +34,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 		gcpSecretsFetcher := NewGCPSecretFetcher(config.GCPConfig{
 			Project: gcpProject,
 		}, gcpClient)
-		gcpClient.OnAccessSecretVersionMatch(ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		gcpClient.EXPECT().AccessSecretVersion(ctx, &secretmanagerpb.AccessSecretVersionRequest{
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(&secretmanagerpb.AccessSecretVersionResponse{
 			Payload: &secretmanagerpb.SecretPayload{
@@ -52,7 +52,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Project: gcpProject,
 		}, gcpClient)
 		cause := status.Errorf(codes.NotFound, "secret not found")
-		gcpClient.OnAccessSecretVersionMatch(ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		gcpClient.EXPECT().AccessSecretVersion(ctx, &secretmanagerpb.AccessSecretVersionRequest{
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 
@@ -66,7 +66,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Project: gcpProject,
 		}, gcpClient)
 		cause := fmt.Errorf("some error")
-		gcpClient.OnAccessSecretVersionMatch(ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		gcpClient.EXPECT().AccessSecretVersion(ctx, &secretmanagerpb.AccessSecretVersionRequest{
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 

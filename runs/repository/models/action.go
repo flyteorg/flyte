@@ -4,27 +4,25 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // Action represents a workflow action in the database
 // Root actions (where ParentActionName is NULL) represent runs
 type Action struct {
-	ID uint `gorm:"primaryKey" db:"id"`
-
-	// Action Identifier (unique across org/project/domain/name)
-	Org     string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:1;index:idx_actions_org" db:"org"`
-	Project string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:2;index:idx_actions_project" db:"project"`
-	Domain  string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:3;index:idx_actions_domain" db:"domain"`
-	RunName string `gorm:"not null;default:'';uniqueIndex:idx_actions_identifier,priority:4;index:idx_actions_run_name" db:"run_name"`
-	Name    string `gorm:"not null;uniqueIndex:idx_actions_identifier,priority:5" db:"name"`
+	// Action Identifier (unique across project/domain/run_name/name)
+	Project string `db:"project"`
+	Domain  string `db:"domain"`
+	RunName string `db:"run_name"`
+	Name    string `db:"name"`
 
 	// Parent action (NULL for root actions/runs)
-	ParentActionName sql.NullString `gorm:"index:idx_actions_parent" db:"parent_action_name"`
+	ParentActionName sql.NullString `db:"parent_action_name"`
 
 	// High-level status for quick queries/filtering.
 	// Stores the proto ActionPhase enum integer value directly (e.g. 1 = QUEUED).
-	Phase int32 `gorm:"not null;default:1;index:idx_actions_phase" db:"phase"`
+	Phase int32 `db:"phase"`
 
 	// Who initiated this run(web, CLI, scheduler, etc.)
 	RunSource string `db:"run_source" json:"run_source,omitempty"`
@@ -35,7 +33,6 @@ type Action struct {
 	ActionGroup sql.NullString `db:"action_group"`
 
 	// Task reference columns
-	TaskOrg     sql.NullString `db:"task_org"`
 	TaskProject sql.NullString `db:"task_project"`
 	TaskDomain  sql.NullString `db:"task_domain"`
 	TaskName    sql.NullString `db:"task_name"`
@@ -49,40 +46,37 @@ type Action struct {
 
 	// Serialized protobuf messages
 	// ActionSpec contains the full action specification proto
-	ActionSpec []byte `gorm:"type:bytea" db:"action_spec"`
+	ActionSpec []byte `db:"action_spec"`
 
 	// ActionDetails contains the full action details proto:
 	// - ActionStatus (phase, timestamps, error, cache status, etc.)
 	// - ActionAttempts array (all attempts with their phase transitions, cluster events, logs, etc.)
 	// - Any other runtime state
-	ActionDetails []byte `gorm:"type:bytea" db:"action_details"`
+	ActionDetails []byte `db:"action_details"`
 
 	// DetailedInfo stores a serialized RunInfo proto containing metadata such as
 	// the task spec digest (for looking up the resolved spec) and storage URIs.
-	DetailedInfo []byte `gorm:"type:bytea" db:"detailed_info"`
+	DetailedInfo []byte `db:"detailed_info"`
 
 	// RunSpec stores a serialized task.RunSpec proto (labels, annotations, envs,
 	// interruptible, cluster, etc.) for this action's run.
-	RunSpec []byte `gorm:"type:bytea" db:"run_spec"`
+	RunSpec []byte `db:"run_spec"`
 
 	// Abort tracking — set when a user requests abort; cleared once the pod is confirmed terminated.
-	AbortRequestedAt  *time.Time `gorm:"index:idx_actions_abort_pending" db:"abort_requested_at"`
-	AbortAttemptCount int        `gorm:"not null;default:0" db:"abort_attempt_count"`
+	AbortRequestedAt  *time.Time `db:"abort_requested_at"`
+	AbortAttemptCount int        `db:"abort_attempt_count"`
 	AbortReason       *string    `db:"abort_reason"`
 
 	// Timestamps
 	// CreatedAt is set by the DB (NOW()) on insert — represents when the action was queued.
-	CreatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_created" db:"created_at"`
-	UpdatedAt time.Time `gorm:"not null;default:CURRENT_TIMESTAMP;index:idx_actions_updated" db:"updated_at"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 	// EndedAt is set when the action reaches a terminal phase.
-	EndedAt     sql.NullTime            `gorm:"index:idx_actions_ended" db:"ended_at"`
+	EndedAt     sql.NullTime            `db:"ended_at"`
 	DurationMs  sql.NullInt64           `db:"duration_ms"`
 	Attempts    uint32                  `db:"attempts" json:"attempts,omitempty"`
 	CacheStatus core.CatalogCacheStatus `db:"cache_status" json:"cache_status,omitempty"`
 }
-
-// TableName specifies the table name
-func (Action) TableName() string { return "actions" }
 
 // Clone returns an independent copy of the action, including pointer and JSON fields.
 func (a *Action) Clone() *Action {
@@ -121,6 +115,16 @@ func (a *Action) GetRunName() string {
 		return a.Name
 	}
 	return ""
+}
+
+func NewActionModel(actionID *common.ActionIdentifier) *Action {
+	return &Action{
+		Project: actionID.GetRun().GetProject(),
+		Domain:  actionID.GetRun().GetDomain(),
+		RunName: actionID.GetRun().GetName(),
+		Name:    actionID.GetName(),
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}
 }
 
 // Run is a type alias for Action (runs are just actions with ParentActionName == nil)

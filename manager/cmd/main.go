@@ -7,12 +7,13 @@ import (
 	"os"
 
 	"github.com/flyteorg/flyte/v2/actions"
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -43,7 +44,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Initialize database
 	dbCfg := &runsconfig.GetConfig().Database
-	db, err := app.InitDB(ctx, dbCfg)
+	db, err := database.GetDB(ctx, dbCfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
@@ -81,9 +82,6 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err
 	}
-	if err := actions.Setup(ctx, sc); err != nil {
-		return err
-	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
 		return err
 	}
@@ -94,6 +92,9 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	if err := executor.Setup(ctx, sc); err != nil {
+		return err
+	}
+	if err := actions.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := secret.Setup(ctx, sc); err != nil {

@@ -50,7 +50,7 @@ import (
 )
 
 const (
-	TaskActionDefaultRequeueDuration = 5 * time.Second
+	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
@@ -417,7 +417,6 @@ func (r *TaskActionReconciler) buildActionEvent(
 ) *workflow.ActionEvent {
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     taskAction.Spec.Org,
 			Project: taskAction.Spec.Project,
 			Domain:  taskAction.Spec.Domain,
 			Name:    taskAction.Spec.RunName,
@@ -437,7 +436,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
 		Cluster:       r.cluster,
 		Outputs:       outputRefs(ctx, taskAction),
-		ClusterEvents: toClusterEvents(info, updatedTime),
+		ClusterEvents: toClusterEvents(phaseInfo, updatedTime),
 		ReportedTime:  timestamppb.New(time.Now()),
 	}
 
@@ -524,11 +523,29 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	return out
 }
 
-func toClusterEvents(info *pluginsCore.TaskInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
-	if info == nil || len(info.AdditionalReasons) == 0 {
+func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
+	info := phaseInfo.Info()
+	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
 		return nil
 	}
-	out := make([]*workflow.ClusterEvent, 0, len(info.AdditionalReasons))
+
+	out := []*workflow.ClusterEvent{}
+	if phaseInfo.Reason() != "" {
+		e := &workflow.ClusterEvent{
+			Message: phaseInfo.Reason(),
+		}
+		if info != nil && info.OccurredAt != nil {
+			e.OccurredAt = timestamppb.New(*info.OccurredAt)
+		} else {
+			e.OccurredAt = fallbackTime
+		}
+		out = append(out, e)
+	}
+
+	if info == nil {
+		return out
+	}
+
 	for _, reason := range info.AdditionalReasons {
 		e := &workflow.ClusterEvent{
 			Message: reason.Reason,
@@ -719,9 +736,6 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	var missing []string
 	if taskAction.Spec.RunName == "" {
 		missing = append(missing, "runName")
-	}
-	if taskAction.Spec.Org == "" {
-		missing = append(missing, "org")
 	}
 	if taskAction.Spec.Project == "" {
 		missing = append(missing, "project")

@@ -3,15 +3,17 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"strings"
 	"sync"
-	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
+	toolscache "k8s.io/client-go/tools/cache"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -40,12 +42,15 @@ type ActionUpdate struct {
 	ShortName        string
 }
 
+const labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient  client.WithWatch
-	namespace  string
-	bufferSize int
-	runClient  workflowconnect.InternalRunServiceClient
+	k8sClient   client.WithWatch
+	sharedCache ctrlcache.Cache
+	namespace   string
+	bufferSize  int
+	runClient   workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -57,14 +62,24 @@ type ActionsClient struct {
 	subscribers map[string]map[chan *ActionUpdate]struct{}
 	stopCh      chan struct{}
 	watching    bool
+
+	// Worker pool: numWorkers goroutines each own one channel.
+	// Events are sharded by TaskAction name so per-resource ordering is preserved.
+	numWorkers int
+	workerChs  []chan watch.Event
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+	if numWorkers <= 0 {
+		numWorkers = 1
+	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
+		sharedCache: sharedCache,
 		namespace:   namespace,
 		bufferSize:  bufferSize,
+		numWorkers:  numWorkers,
 		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
@@ -84,83 +99,110 @@ func NewActionsClient(k8sClient client.WithWatch, namespace string, bufferSize i
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
 func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, runSpec *task.RunSpec) error {
 	actionID := action.ActionId
-	logger.Infof(ctx, "Enqueuing action: %s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain,
+	logger.Infof(ctx, "Enqueuing action: %s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain,
 		actionID.Run.Name, actionID.Name)
 
 	isRoot := action.ParentActionName == nil || *action.ParentActionName == ""
 
-	taskActionName := buildTaskActionName(actionID)
-	namespace := buildNamespace(actionID.Run)
-	if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
-		return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
-	}
-	taskAction := &executorv1.TaskAction{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      taskActionName,
-			Namespace: namespace,
-			Labels: map[string]string{
-				"flyte.org/org":         actionID.Run.Org,
-				"flyte.org/project":     actionID.Run.Project,
-				"flyte.org/domain":      actionID.Run.Domain,
-				"flyte.org/run":         actionID.Run.Name,
-				"flyte.org/action":      actionID.Name,
-				"flyte.org/action-type": "task", // TODO: derive from action.Spec
-				"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+	switch action.GetSpec().(type) {
+	case *actions.Action_Task:
+		taskActionName := buildTaskActionName(actionID)
+		namespace := buildNamespace(actionID.Run)
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
+		}
+		taskAction := &executorv1.TaskAction{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      taskActionName,
+				Namespace: namespace,
+				Labels: map[string]string{
+					"flyte.org/project":     actionID.Run.Project,
+					"flyte.org/domain":      actionID.Run.Domain,
+					"flyte.org/run":         actionID.Run.Name,
+					"flyte.org/action":      actionID.Name,
+					"flyte.org/action-type": "task", // TODO: derive from action.Spec
+					"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+				},
 			},
-		},
-		Spec: executorv1.TaskActionSpec{},
-	}
-	var parentTaskAction *executorv1.TaskAction
-
-	// Set OwnerReference to parent so K8s cascades deletion to children.
-	if !isRoot {
-		parentID := &common.ActionIdentifier{
-			Run:  actionID.Run,
-			Name: *action.ParentActionName,
+			Spec: executorv1.TaskActionSpec{},
 		}
-		parentName := buildTaskActionName(parentID)
+		var parentTaskAction *executorv1.TaskAction
+		// Set OwnerReference to parent so K8s cascades deletion to children.
+		if !isRoot {
+			parentID := &common.ActionIdentifier{
+				Run:  actionID.Run,
+				Name: *action.ParentActionName,
+			}
+			parentName := buildTaskActionName(parentID)
 
-		parent := &executorv1.TaskAction{}
-		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
-			return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+			parent := &executorv1.TaskAction{}
+			if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: namespace}, parent); err != nil {
+				return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+			}
+			parentTaskAction = parent
+
+			blockOwnerDeletion := true
+			taskAction.OwnerReferences = []metav1.OwnerReference{
+				{
+					APIVersion:         "flyte.org/v1",
+					Kind:               "TaskAction",
+					Name:               parent.Name,
+					UID:                parent.UID,
+					BlockOwnerDeletion: &blockOwnerDeletion,
+				},
+			}
+			// For child actions, inherit parent's run context
+			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
+		} else {
+			// For root action, apply the RunSpec to TaskAction
+			applyRunSpecToTaskAction(taskAction, runSpec)
 		}
-		parentTaskAction = parent
 
-		blockOwnerDeletion := true
-		taskAction.OwnerReferences = []metav1.OwnerReference{
-			{
-				APIVersion:         "flyte.org/v1",
-				Kind:               "TaskAction",
-				Name:               parent.Name,
-				UID:                parent.UID,
-				BlockOwnerDeletion: &blockOwnerDeletion,
+		// Build and set the ActionSpec for the executor.
+		actionSpec := buildActionSpec(action, runSpec)
+		if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
+			return fmt.Errorf("failed to set action spec: %w", err)
+		}
+		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
+
+		// Embed the inline TaskTemplate if present.
+		if err := embedTaskTemplate(action, taskAction); err != nil {
+			return fmt.Errorf("failed to embed task template: %w", err)
+		}
+
+		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
+		}
+
+		logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
+	case *actions.Action_Trace:
+		// For trace action, we only need to record result in RunService as it is already computed in SDK runtime
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: actionID,
+			Parent:   action.GetParentActionName(),
+			InputUri: action.GetInputUri(),
+			Group:    action.GetGroup(),
+			Subject:  action.GetSubject(),
+			Spec: &workflow.RecordActionRequest_Trace{
+				Trace: action.GetTrace(),
 			},
 		}
-		// For child actions, inherit parent's run context
-		inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
-	} else {
-		// For root action, apply the RunSpec to TaskAction
-		applyRunSpecToTaskAction(taskAction, runSpec)
+		_, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
+		if err != nil {
+			return err
+		}
+
+		// Notify SDK runtime informer
+		c.notifySubscribers(ctx, &ActionUpdate{
+			ActionID:         actionID,
+			ParentActionName: action.GetParentActionName(),
+			Phase:            common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			OutputUri:        action.GetTrace().GetOutputs().GetOutputUri(),
+			TaskType:         "trace",
+		})
 	}
 
-	// Build and set the ActionSpec for the executor.
-	actionSpec := buildActionSpec(action, runSpec)
-	if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
-		return fmt.Errorf("failed to set action spec: %w", err)
-	}
-	taskAction.Spec.CacheKey = extractTaskCacheKey(action)
-
-	// Embed the inline TaskTemplate if present.
-	if err := embedTaskTemplate(action, taskAction); err != nil {
-		return fmt.Errorf("failed to embed task template: %w", err)
-	}
-
-	if err := c.k8sClient.Create(ctx, taskAction); err != nil {
-		return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
-	}
-
-	logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
 	return nil
 }
 
@@ -238,7 +280,6 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	listOpts := []client.ListOption{
 		client.InNamespace(buildNamespace(runID)),
 		client.MatchingLabels{
-			"flyte.org/org":     runID.Org,
 			"flyte.org/project": runID.Project,
 			"flyte.org/domain":  runID.Domain,
 			"flyte.org/run":     runID.Name,
@@ -263,7 +304,6 @@ func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *co
 	listOpts := []client.ListOption{
 		client.InNamespace(buildNamespace(parentActionID.Run)),
 		client.MatchingLabels{
-			"flyte.org/org":     parentActionID.Run.Org,
 			"flyte.org/project": parentActionID.Run.Project,
 			"flyte.org/domain":  parentActionID.Run.Domain,
 			"flyte.org/run":     parentActionID.Run.Name,
@@ -334,7 +374,8 @@ func (c *ActionsClient) Unsubscribe(parentActionName string, ch chan *ActionUpda
 	}
 }
 
-// StartWatching starts watching TaskAction resources and notifies all subscribers
+// StartWatching starts watching TaskAction resources and notifies all subscribers.
+// It requires a shared controller-runtime cache.
 func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.mu.Lock()
 	if c.watching {
@@ -343,69 +384,105 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.watching = true
 	c.stopCh = make(chan struct{})
+	stopCh := c.stopCh // capture before releasing so workers reference the right channel
+	c.workerChs = make([]chan watch.Event, c.numWorkers)
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
+		go c.worker(ctx, c.workerChs[i], stopCh)
+	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s", c.namespace)
+	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
-	go c.watchLoop(ctx)
+	if c.sharedCache == nil {
+		return fmt.Errorf("shared cache is required for TaskAction informer")
+	}
+
+	return c.setupInformer(ctx)
+}
+
+func (c *ActionsClient) setupInformer(ctx context.Context) error {
+	informer, err := c.sharedCache.GetInformer(ctx, &executorv1.TaskAction{})
+	if err != nil {
+		return fmt.Errorf("failed to get TaskAction informer: %w", err)
+	}
+
+	_, err = informer.AddEventHandler(toolscache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			taskAction, ok := obj.(*executorv1.TaskAction)
+			if !ok || c.shouldSkipTaskAction(taskAction) {
+				return
+			}
+			c.dispatchEvent(taskAction, watch.Added)
+		},
+		UpdateFunc: func(_, newObj interface{}) {
+			taskAction, ok := newObj.(*executorv1.TaskAction)
+			if !ok || c.shouldSkipTaskAction(taskAction) {
+				return
+			}
+			c.dispatchEvent(taskAction, watch.Modified)
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to add TaskAction informer handler: %w", err)
+	}
 
 	return nil
 }
 
-// watchLoop continuously watches TaskAction resources
-func (c *ActionsClient) watchLoop(ctx context.Context) {
+// worker drains its event channel and handles each event inline.
+// Each worker owns a disjoint shard of TaskAction names, so per-resource
+// event ordering is preserved across the pool.
+func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopCh <-chan struct{}) {
 	for {
 		select {
-		case <-c.stopCh:
-			logger.Infof(ctx, "TaskAction watcher stopped")
+		case <-stopCh:
 			return
 		case <-ctx.Done():
-			logger.Infof(ctx, "TaskAction watcher context cancelled")
 			return
-		default:
-			if err := c.doWatch(ctx); err != nil {
-				time.Sleep(5 * time.Second)
-			}
-		}
-	}
-}
-
-// doWatch performs a single watch operation
-func (c *ActionsClient) doWatch(ctx context.Context) error {
-	taskActionList := &executorv1.TaskActionList{}
-
-	timeout := int64(300) // 5 minutes
-	watcher, err := c.k8sClient.Watch(ctx, taskActionList, &client.ListOptions{
-		Raw: &metav1.ListOptions{TimeoutSeconds: &timeout},
-	})
-	if err != nil {
-		return fmt.Errorf("failed to start watch: %w", err)
-	}
-	defer watcher.Stop()
-
-	for {
-		select {
-		case <-c.stopCh:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		case event, ok := <-watcher.ResultChan():
+		case event, ok := <-ch:
 			if !ok {
-				return fmt.Errorf("watch channel closed")
+				return
 			}
 			c.handleWatchEvent(ctx, event)
 		}
 	}
 }
 
-// handleWatchEvent processes a watch event
-func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
-	taskAction, ok := event.Object.(*executorv1.TaskAction)
-	if !ok {
-		logger.Warnf(ctx, "Received non-TaskAction object in watch event")
+// dispatchEvent routes an informer event to the worker responsible for the
+// TaskAction, using FNV-32a hashing for consistent sharding.
+func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventType watch.EventType) {
+	if taskAction == nil {
 		return
 	}
 
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
+	shard := h.Sum32() % uint32(c.numWorkers)
+	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
+}
+
+func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event) {
+	taskAction, ok := event.Object.(*executorv1.TaskAction)
+	if !ok {
+		logger.Warnf(ctx, "received non-TaskAction object in watch event: %T", event.Object)
+		return
+	}
+
+	c.handleTaskActionEvent(ctx, taskAction, event.Type)
+}
+
+func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) {
+	update := buildActionUpdate(ctx, taskAction, eventType)
+	if update == nil {
+		return
+	}
+
+	c.notifySubscribers(ctx, update)
+	c.notifyRunService(ctx, taskAction, update, eventType)
+}
+
+func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) *ActionUpdate {
 	var parentName string
 	if taskAction.Spec.ParentActionName != nil {
 		parentName = *taskAction.Spec.ParentActionName
@@ -417,10 +494,9 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
 	}
 
-	update := &ActionUpdate{
+	return &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     taskAction.Spec.Org,
 				Project: taskAction.Spec.Project,
 				Domain:  taskAction.Spec.Domain,
 				Name:    taskAction.Spec.RunName,
@@ -431,13 +507,17 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            GetPhaseFromConditions(taskAction),
 		OutputUri:        buildOutputUri(ctx, taskAction),
-		IsDeleted:        event.Type == watch.Deleted,
+		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
 	}
+}
 
-	c.notifySubscribers(ctx, update)
-	go c.notifyRunService(ctx, taskAction, update, event.Type)
+func (c *ActionsClient) shouldSkipTaskAction(taskAction *executorv1.TaskAction) bool {
+	if taskAction == nil {
+		return true
+	}
+	return taskAction.GetLabels()[labelTerminalStatusRecorded] == "true"
 }
 
 // notifySubscribers sends an update to all subscribers
@@ -473,11 +553,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				ActionId: update.ActionID,
 				Parent:   update.ParentActionName,
 				InputUri: taskAction.Spec.InputURI,
+				Group:    taskAction.Spec.Group,
 			}
 			if taskAction.Spec.TaskType != "" {
 				ta := &workflow.TaskAction{
 					Id: &task.TaskIdentifier{
-						Org:     taskAction.Spec.Org,
 						Project: taskAction.Spec.Project,
 						Domain:  taskAction.Spec.Domain,
 					},
@@ -534,10 +614,14 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase:       update.Phase,
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
-				},
+			},
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
+		} else if isTerminalPhase(update.Phase) {
+			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
+				logger.Warnf(ctx, "Failed to mark terminal status recorded for %s: %v", update.ActionID.Name, err)
+			}
 		}
 	}
 }
@@ -579,6 +663,33 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 		}
 	}
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+}
+
+func isTerminalPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
+		phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
+func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskAction *executorv1.TaskAction) error {
+	if c.k8sClient == nil || taskAction == nil || c.shouldSkipTaskAction(taskAction) {
+		return nil
+	}
+
+	original := taskAction.DeepCopy()
+	patched := taskAction.DeepCopy()
+	labels := patched.GetLabels()
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+	labels[labelTerminalStatusRecorded] = "true"
+	patched.SetLabels(labels)
+
+	if err := c.k8sClient.Patch(ctx, patched, client.MergeFrom(original)); err != nil {
+		return err
+	}
+	return nil
 }
 
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.

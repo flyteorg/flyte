@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
@@ -33,11 +33,11 @@ import (
 
 // RunService implements the RunServiceHandler interface
 type RunService struct {
-	repo             interfaces.Repository
-	actionsClient    actionsconnect.ActionsServiceClient
-	storagePrefix    string
-	dataStore        *storage.DataStore
-	abortReconciler  *AbortReconciler
+	repo            interfaces.Repository
+	actionsClient   actionsconnect.ActionsServiceClient
+	storagePrefix   string
+	dataStore       *storage.DataStore
+	abortReconciler *AbortReconciler
 }
 
 const (
@@ -136,7 +136,6 @@ func (s *RunService) CreateRun(
 		runId = request.GetRunId()
 	case *workflow.CreateRunRequest_ProjectId:
 		runId = &common.RunIdentifier{
-			Org:     id.ProjectId.Organization,
 			Project: id.ProjectId.Name,
 			Domain:  id.ProjectId.Domain,
 			Name:    generateRunName(time.Now().UnixNano()),
@@ -157,7 +156,6 @@ func (s *RunService) CreateRun(
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
 	var err error
-	inputs := request.GetInputs()
 	runSpec := request.GetRunSpec()
 	// TODO: Add trigger
 	switch request.GetTask().(type) {
@@ -177,29 +175,47 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
-	inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
-	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
-	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetOrg(), runId.GetProject(), runId.GetDomain(), runId.GetName())
+	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())
+	runOutputBase := buildRunOutputBase(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
 		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
 	}
 
-	// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
-	inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
-	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
-		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
-	}
-	logger.Infof(ctx, "Wrote inputs to %s", inputRef)
-
 	cacheKey := ""
-	// Generate cache key for the root action if its task is discoverable
-	// Executor determines if an action is cacheable on the setting of the cache key
-	if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
-		cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputs)
-		if err != nil {
-			logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+	switch iw := request.GetInputWrapper().(type) {
+	case *workflow.CreateRunRequest_OffloadedInputData:
+		// Inputs are already persisted by UploadInputs. Use the offloaded URI directly.
+		inputPrefix = iw.OffloadedInputData.GetUri()
+
+		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
+			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), iw.OffloadedInputData.GetInputsHash())
+			if err != nil {
+				logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+			}
+		}
+	default:
+		inputs := request.GetInputs()
+		inputs = fillDefaultInputs(inputs, taskSpec.GetDefaultInputs())
+
+		// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
+		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
+		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
+			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+		}
+		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
+
+		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
+			inputsHash, hashErr := computeFilteredInputsHash(taskSpec.GetTaskTemplate(), inputs)
+			if hashErr != nil {
+				logger.Warnf(ctx, "Failed to hash inputs for root action %v: %v", actionID, hashErr)
+			} else {
+				cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputsHash)
+				if err != nil {
+					logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
+				}
+			}
 		}
 	}
 
@@ -241,8 +257,8 @@ func (s *RunService) AbortRun(
 	ctx context.Context,
 	req *connect.Request[workflow.AbortRunRequest],
 ) (*connect.Response[workflow.AbortRunResponse], error) {
-	logger.Infof(ctx, "Received AbortRun request for run: %s/%s/%s/%s",
-		req.Msg.RunId.Org, req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name)
+	logger.Infof(ctx, "Received AbortRun request for run: %s/%s/%s",
+		req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name)
 
 	// Validate request
 	if err := req.Msg.Validate(); err != nil {
@@ -884,7 +900,7 @@ func (s *RunService) WatchActionDetails(
 	// Step 2: Watch DB for updates
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updates, errs)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	for {
 		select {
@@ -895,10 +911,6 @@ func (s *RunService) WatchActionDetails(
 		case updated, ok := <-updates:
 			if !ok {
 				return nil
-			}
-			// Filter to this specific action
-			if updated.Name != actionID.Name {
-				continue
 			}
 			// Reuse the already-fetched action model from WatchActionUpdates
 			details, err := s.buildActionDetails(ctx, updated, actionID)
@@ -930,7 +942,13 @@ func (s *RunService) WatchRuns(
 ) error {
 	logger.Infof(ctx, "Received WatchRuns request")
 
-	// Step 1: Send existing runs that match filter
+	// Step 1: Subscribe to updates first to avoid missing events that arrive
+	// between the initial list and the subscription (same pattern as WatchActions).
+	updatesCh := make(chan *models.Run, 50)
+	errsCh := make(chan error, 1)
+	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
+
+	// Step 2: Send existing runs that match filter
 	listReq := s.convertWatchRequestToListRequest(req.Msg)
 
 	runs, _, err := s.repo.ActionRepo().ListRuns(ctx, listReq)
@@ -949,11 +967,6 @@ func (s *RunService) WatchRuns(
 			return err
 		}
 	}
-
-	// Step 2: Watch for run updates from DB
-	updatesCh := make(chan *models.Run, 50)
-	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	for {
 		select {
@@ -991,7 +1004,7 @@ func (s *RunService) WatchActions(
 	// Start watching for updates from DB first to prevent event miss
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, runID, updatesCh, errsCh)
+	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, runID, updatesCh, errsCh)
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
 	if err != nil {
@@ -1076,41 +1089,61 @@ func (s *RunService) sendChangedActions(
 	})
 }
 
-// WatchClusterEvents streams cluster events from the DB action updates.
+// WatchClusterEvents streams Kubernetes cluster events recorded in action_events.
 func (s *RunService) WatchClusterEvents(
 	ctx context.Context,
 	req *connect.Request[workflow.WatchClusterEventsRequest],
 	stream *connect.ServerStream[workflow.WatchClusterEventsResponse],
 ) error {
 	actionID := req.Msg.Id
+	attempt := req.Msg.GetAttempt()
 	logger.Infof(ctx, "Received WatchClusterEvents request for: %s/%s", actionID.Run.Name, actionID.Name)
 
-	// Step 1: Send existing events from current DB state
+	// Start watching first to reduce the chance of missing action updates
+	// between initial state fetch and subscription setup.
+	updatesCh := make(chan *models.Action, 50)
+	errsCh := make(chan error, 1)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updatesCh, errsCh)
+
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
 	}
 
-	events := actionModelToClusterEvents(action)
-	if len(events) > 0 {
-		if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: events}); err != nil {
-			return err
-		}
-	}
-
-	// If the action is already in a terminal phase, no further events are expected.
-	if IsTerminalPhase(common.ActionPhase(action.Phase)) {
-		return nil
-	}
-
-	// Step 2: Watch for updates from DB
-	updatesCh := make(chan *models.Action, 50)
-	errsCh := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID.Run, updatesCh, errsCh)
-
-	lastPhase := action.Phase
+	const maxEvents = 500
+	var lastUpdatedAt time.Time
 
 	for {
+		offset := 0
+		isTerminal := IsTerminalPhase(common.ActionPhase(action.Phase))
+
+		// Drain all available cluster events for current action since lastUpdatedAt
+		for {
+			info, err := s.getClusterEventsInfo(ctx, actionID, attempt, lastUpdatedAt, offset, maxEvents)
+			if err != nil {
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			isTerminal = isTerminal || info.isTerminal
+
+			if len(info.events) > 0 {
+				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: info.events}); err != nil {
+					return err
+				}
+			}
+
+			if info.lastUpdatedAt.After(lastUpdatedAt) {
+				lastUpdatedAt = info.lastUpdatedAt
+			}
+
+			if len(info.events) < maxEvents {
+				break
+			}
+			offset += maxEvents
+		}
+		if isTerminal {
+			return nil
+		}
+
 		select {
 		case <-ctx.Done():
 			return nil
@@ -1120,40 +1153,45 @@ func (s *RunService) WatchClusterEvents(
 			if !ok {
 				return nil
 			}
-			// Filter to this specific action
-			if updated.Name != actionID.Name {
-				continue
-			}
-			// Only emit an event when phase changes
-			if updated.Phase == lastPhase {
-				continue
-			}
-			lastPhase = updated.Phase
-
-			newEvents := actionModelToClusterEvents(updated)
-			if len(newEvents) > 0 {
-				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: newEvents}); err != nil {
-					return err
-				}
-			}
-			// Close the stream once the action reaches a terminal phase.
-			if IsTerminalPhase(common.ActionPhase(updated.Phase)) {
-				return nil
-			}
+			action = updated
 		}
 	}
 }
 
-// actionModelToClusterEvents derives cluster events from an Action model's phase.
-func actionModelToClusterEvents(action *models.Action) []*workflow.ClusterEvent {
-	phase := common.ActionPhase(action.Phase)
-	if phase == common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
-		return nil
+type clusterEventsInfo struct {
+	events        []*workflow.ClusterEvent
+	lastUpdatedAt time.Time
+	isTerminal    bool
+}
+
+func (s *RunService) getClusterEventsInfo(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	attempt uint32,
+	since time.Time,
+	offset, limit int,
+) (clusterEventsInfo, error) {
+	eventModels, err := s.repo.ActionRepo().ListEventsSince(ctx, actionID, attempt, since, offset, limit)
+	if err != nil {
+		return clusterEventsInfo{}, fmt.Errorf("failed to list action events since %s: %w", since.Format(time.RFC3339Nano), err)
 	}
-	return []*workflow.ClusterEvent{{
-		OccurredAt: timestamppb.New(action.UpdatedAt),
-		Message:    phase.String(),
-	}}
+
+	var info clusterEventsInfo
+	for _, model := range eventModels {
+		event, err := model.ToActionEvent()
+		if err != nil {
+			return clusterEventsInfo{}, fmt.Errorf("failed to convert action event: %w", err)
+		}
+		if model.UpdatedAt.After(info.lastUpdatedAt) {
+			info.lastUpdatedAt = model.UpdatedAt
+		}
+		info.events = append(info.events, event.GetClusterEvents()...)
+		if IsTerminalPhase(event.GetPhase()) {
+			info.isTerminal = true
+		}
+	}
+
+	return info, nil
 }
 
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
@@ -1222,7 +1260,6 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		}
 		if action.TaskName.Valid {
 			taskMeta.Id = &task.TaskIdentifier{
-				Org:     action.TaskOrg.String,
 				Project: action.TaskProject.String,
 				Domain:  action.TaskDomain.String,
 				Name:    action.TaskName.String,
@@ -1289,8 +1326,8 @@ func extractRunSpecFromActionModel(ctx context.Context, action *models.Action) *
 		if err := proto.Unmarshal(action.RunSpec, spec); err == nil {
 			return spec
 		} else {
-			logger.Warnf(ctx, "Failed to unmarshal action.RunSpec for %s/%s/%s/%s/%s, falling back to ActionSpec: %v",
-				action.Org, action.Project, action.Domain, action.RunName, action.Name, err)
+			logger.Warnf(ctx, "Failed to unmarshal action.RunSpec for %s/%s/%s/%s, falling back to ActionSpec: %v",
+				action.Project, action.Domain, action.RunName, action.Name, err)
 		}
 	}
 
@@ -1301,10 +1338,10 @@ func extractRunSpecFromActionModel(ctx context.Context, action *models.Action) *
 // Helper functions
 
 // buildInputPrefix generates the input path prefix for the root action.
-func buildInputPrefix(storagePrefix, org, project, domain, name string) string {
-	return fmt.Sprintf("%s/%s/%s/%s/%s/inputs",
+func buildInputPrefix(storagePrefix, project, domain, name string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/inputs",
 		strings.TrimRight(storagePrefix, "/"),
-		org, project, domain, name)
+		project, domain, name)
 }
 
 // inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
@@ -1346,10 +1383,10 @@ func literalMapToOutputs(m *core.LiteralMap) *task.Outputs {
 }
 
 // buildRunOutputBase generates the output base path for the run.
-func buildRunOutputBase(storagePrefix, org, project, domain, name string) string {
-	return fmt.Sprintf("%s/%s/%s/%s/%s/",
+func buildRunOutputBase(storagePrefix, project, domain, name string) string {
+	return fmt.Sprintf("%s/%s/%s/%s/",
 		strings.TrimRight(storagePrefix, "/"),
-		org, project, domain, name)
+		project, domain, name)
 }
 
 // convertRunToProto converts a repository Run to a proto Run
@@ -1359,7 +1396,6 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 	}
 
 	runID := &common.RunIdentifier{
-		Org:     run.Org,
 		Project: run.Project,
 		Domain:  run.Domain,
 		Name:    run.RunName,
@@ -1421,7 +1457,6 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     action.Org,
 			Project: action.Project,
 			Domain:  action.Domain,
 			Name:    action.RunName,
@@ -1445,11 +1480,9 @@ func (s *RunService) convertActionToEnrichedProto(action *models.Action) *workfl
 		actionStatus.DurationMs = &durationMs
 	}
 
-	var metadata *workflow.ActionMetadata
-	if action.ParentActionName.Valid {
-		metadata = &workflow.ActionMetadata{
-			Parent: action.ParentActionName.String,
-		}
+	metadata := &workflow.ActionMetadata{
+		Parent: CoalesceNullString(action.ParentActionName),
+		Group:  CoalesceNullString(action.ActionGroup),
 	}
 
 	return &workflow.EnrichedAction{
@@ -1473,7 +1506,6 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	action := update.Node.Action
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     runID.Org,
 			Project: runID.Project,
 			Domain:  runID.Domain,
 			Name:    runID.Name,
@@ -1514,7 +1546,6 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		metadata.Spec = &workflow.ActionMetadata_Task{
 			Task: &workflow.TaskActionMetadata{
 				Id: &task.TaskIdentifier{
-					Org:     CoalesceNullString(action.TaskOrg),
 					Project: CoalesceNullString(action.TaskProject),
 					Domain:  CoalesceNullString(action.TaskDomain),
 					Name:    CoalesceNullString(action.TaskName),
@@ -1560,9 +1591,8 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 
 // buildTaskGroups queries the DB for root actions and groups them by task name in memory.
 func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGroupsRequest) ([]*workflow.TaskGroup, error) {
-	var org, project, domain string
+	var project, domain string
 	if pid := req.GetProjectId(); pid != nil {
-		org = pid.Organization
 		project = pid.Name
 		domain = pid.Domain
 	}
@@ -1577,7 +1607,7 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 		endDate = &t
 	}
 
-	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, org, project, domain, startDate, endDate, 1000)
+	rootActions, err := s.repo.ActionRepo().ListRootActions(ctx, project, domain, startDate, endDate, 1000)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
@@ -1749,7 +1779,6 @@ func taskIdFromTaskSpec(taskSpec *task.TaskSpec) *task.TaskIdentifier {
 		return nil
 	}
 	return &task.TaskIdentifier{
-		Org:     taskSpec.GetTaskTemplate().GetId().GetOrg(),
 		Project: taskSpec.GetTaskTemplate().GetId().GetProject(),
 		Domain:  taskSpec.GetTaskTemplate().GetId().GetDomain(),
 		Name:    taskSpec.GetTaskTemplate().GetId().GetName(),
@@ -1766,10 +1795,6 @@ func (s *RunService) convertWatchRequestToListRequest(req *workflow.WatchRunsReq
 	}
 
 	switch target := req.Target.(type) {
-	case *workflow.WatchRunsRequest_Org:
-		listReq.ScopeBy = &workflow.ListRunsRequest_Org{
-			Org: target.Org,
-		}
 	case *workflow.WatchRunsRequest_ProjectId:
 		listReq.ScopeBy = &workflow.ListRunsRequest_ProjectId{
 			ProjectId: target.ProjectId,
@@ -1786,11 +1811,8 @@ func (s *RunService) runMatchesFilter(run *models.Run, req *workflow.WatchRunsRe
 	}
 
 	switch target := req.Target.(type) {
-	case *workflow.WatchRunsRequest_Org:
-		return run.Org == target.Org
 	case *workflow.WatchRunsRequest_ProjectId:
-		return run.Org == target.ProjectId.Organization &&
-			run.Project == target.ProjectId.Name &&
+		return run.Project == target.ProjectId.Name &&
 			run.Domain == target.ProjectId.Domain
 	default:
 		return true

@@ -46,10 +46,6 @@ data:
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:
-      {{- if .sqlite.file }}
-      sqlite:
-        file: {{ .sqlite.file | quote }}
-      {{- else }}
       postgres:
         username: {{ .username }}
         host: {{ tpl .host $ }}
@@ -59,7 +55,6 @@ data:
         {{- if .passwordPath }}
         passwordPath: {{ .passwordPath }}
         {{- end }}
-      {{- end }}
     {{- end }}
   003-storage.yaml: |
     {{- with .Values.configuration.storage }}

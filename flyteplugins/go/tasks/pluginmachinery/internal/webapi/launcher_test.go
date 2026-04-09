@@ -29,11 +29,11 @@ func Test_launch(t *testing.T) {
 			Phase:        PhaseResourcesCreated,
 			PhaseVersion: 2,
 		}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
-		plgn.OnCreate(ctx, tCtx).Return("abc", nil, nil)
-		plgn.OnStatus(ctx, newPluginContext("abc", nil, "", tCtx)).Return(core.PhaseInfoSuccess(nil), nil)
+		plgn.EXPECT().Create(ctx, tCtx).Return("abc", nil, nil)
+		plgn.EXPECT().Status(ctx, newPluginContext("abc", nil, "", tCtx)).Return(core.PhaseInfoSuccess(nil), nil)
 		newS, phaseInfo, err := launch(ctx, plgn, tCtx, c, &s)
 		assert.NoError(t, err)
 		assert.NotNil(t, newS)
@@ -57,8 +57,8 @@ func Test_launch(t *testing.T) {
 		}
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
-		plgn.OnCreate(ctx, tCtx).Return("abc", "abc-r", nil)
-		plgn.OnStatus(ctx, newPluginContext("abc", "abc-r", "", tCtx)).Return(core.PhaseInfoSuccess(nil), nil)
+		plgn.EXPECT().Create(ctx, tCtx).Return("abc", "abc-r", nil)
+		plgn.EXPECT().Status(ctx, newPluginContext("abc", "abc-r", "", tCtx)).Return(core.PhaseInfoSuccess(nil), nil)
 		newS, phaseInfo, err := launch(ctx, plgn, tCtx, c, &s)
 		assert.NoError(t, err)
 		assert.NotNil(t, newS)
@@ -77,10 +77,10 @@ func Test_launch(t *testing.T) {
 
 		c := &mocks2.AutoRefresh{}
 		s := State{}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
-		plgn.OnCreate(ctx, tCtx).Return("", nil, fmt.Errorf("error creating"))
+		plgn.EXPECT().Create(ctx, tCtx).Return("", nil, fmt.Errorf("error creating"))
 		_, phase, err := launch(ctx, plgn, tCtx, c, &s)
 		assert.Nil(t, err)
 		assert.Equal(t, core.PhaseRetryableFailure, phase.Phase())
@@ -101,11 +101,11 @@ func Test_launch(t *testing.T) {
 			PhaseVersion: 2,
 			ResourceMeta: "my-id",
 		}
-		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, fmt.Errorf("failed to cache"))
+		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, fmt.Errorf("failed to cache"))
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
-		plgn.OnCreate(ctx, tCtx).Return("my-id", nil, nil)
-		plgn.OnStatus(ctx, newPluginContext("my-id", nil, "", tCtx)).Return(core.PhaseInfoRunning(0, nil), nil)
+		plgn.EXPECT().Create(ctx, tCtx).Return("my-id", nil, nil)
+		plgn.EXPECT().Status(ctx, newPluginContext("my-id", nil, "", tCtx)).Return(core.PhaseInfoRunning(0, nil), nil)
 		_, _, err := launch(ctx, plgn, tCtx, c, &s)
 		assert.Error(t, err)
 	})

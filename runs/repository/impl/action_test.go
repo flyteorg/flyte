@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
@@ -15,80 +16,37 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/gorm"
 )
 
-func setupActionDB(t *testing.T) *gorm.DB {
+var testDbConfig = database.DbConfig{
+	Postgres: database.PostgresConfig{
+		Host:         "localhost",
+		Port:         15432,
+		DbName:       "flyte_runs_test",
+		User:         "postgres",
+		Password:     "postgres",
+		ExtraOptions: "sslmode=disable",
+	},
+}
+
+func setupActionDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
-
-	var err error
-	err = db.Exec(`CREATE TABLE actions (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		org TEXT NOT NULL,
-		project TEXT NOT NULL,
-		domain TEXT NOT NULL,
-		run_name TEXT NOT NULL DEFAULT '',
-		name TEXT NOT NULL,
-		parent_action_name TEXT,
-		phase INTEGER NOT NULL DEFAULT 1,
-		run_source TEXT NOT NULL DEFAULT '',
-		action_type INTEGER NOT NULL DEFAULT 0,
-		action_group TEXT,
-		task_org TEXT,
-		task_project TEXT,
-		task_domain TEXT,
-		task_name TEXT,
-		task_version TEXT,
-		task_type TEXT NOT NULL DEFAULT '',
-		task_short_name TEXT,
-		function_name TEXT NOT NULL DEFAULT '',
-		environment_name TEXT,
-		action_spec BLOB,
-		action_details BLOB,
-		detailed_info BLOB,
-		run_spec BLOB,
-		abort_requested_at DATETIME,
-		abort_attempt_count INTEGER NOT NULL DEFAULT 0,
-		abort_reason TEXT,
-		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		ended_at DATETIME,
-		duration_ms INTEGER,
-		attempts INTEGER NOT NULL DEFAULT 1,
-		cache_status INTEGER NOT NULL DEFAULT 0,
-		CONSTRAINT uq_actions_identifier UNIQUE (org, project, domain, run_name, name)
-	)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_org ON actions(org)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_project ON actions(project)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_domain ON actions(domain)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_run_name ON actions(run_name)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_parent ON actions(parent_action_name)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_phase ON actions(phase)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_created ON actions(created_at)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_updated ON actions(updated_at)`).Error
-	require.NoError(t, err)
-	err = db.Exec(`CREATE INDEX idx_actions_ended ON actions(ended_at)`).Error
-	require.NoError(t, err)
-
+	t.Cleanup(func() {
+		db.Exec("DELETE FROM action_events")
+		db.Exec("DELETE FROM actions")
+	})
 	return db
 }
 
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -107,13 +65,11 @@ func TestCreateRun(t *testing.T) {
 	run, err := actionRepo.CreateRun(ctx, req, "s3://input", "s3://output")
 	require.NoError(t, err)
 	require.NotNil(t, run)
-	assert.Equal(t, runID.Org, run.Org)
 	assert.Equal(t, runID.Project, run.Project)
 	assert.Equal(t, runID.Domain, run.Domain)
 	assert.Equal(t, runID.Name, run.RunName)
 	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
-	require.NotZero(t, run.ID)
 	require.NotEmpty(t, run.ActionSpec)
 
 	// Attempt duplicate run create with same run name should fail unique constraint
@@ -123,8 +79,8 @@ func TestCreateRun(t *testing.T) {
 
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -138,10 +94,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	endTime := time.Now()
@@ -163,10 +116,64 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
+func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+
+	runID := &common.RunIdentifier{
+		Org:     "org1",
+		Project: "proj1",
+		Domain:  "domain1",
+		Name:    "run1",
+	}
+	targetActionID := &common.ActionIdentifier{Run: runID, Name: "target"}
+	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
+
+	ctx := context.Background()
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID))
+	require.NoError(t, err)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID))
+	require.NoError(t, err)
+
+	watchCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	updates := make(chan *models.Action, 2)
+	errs := make(chan error, 1)
+	go actionRepo.WatchActionUpdates(watchCtx, targetActionID, updates, errs)
+
+	time.Sleep(1100 * time.Millisecond)
+
+	err = actionRepo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	select {
+	case action := <-updates:
+		t.Fatalf("unexpected update for action %s", action.Name)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(1200 * time.Millisecond):
+	}
+
+	err = actionRepo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	require.NoError(t, err)
+
+	select {
+	case action := <-updates:
+		require.Equal(t, targetActionID.Name, action.Name)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for target action update")
+	}
+}
+
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -180,10 +187,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to FAILED (terminal state)
@@ -212,8 +216,8 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -227,10 +231,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		Name: "action-no-backward",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to RUNNING
@@ -253,8 +254,8 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 
 func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -268,10 +269,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		Name: "action-no-backward-succeeded",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, &workflow.ActionSpec{
-		ActionId: actionID,
-		InputUri: "s3://bucket/input",
-	}, nil)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
 	require.NoError(t, err)
 
 	// Move to SUCCEEDED (terminal, non-retryable)
@@ -295,8 +293,8 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -396,32 +394,14 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsFiltered, 3)
 	for _, r := range runsFiltered {
-		assert.Equal(t, "org1", r.Org)
 		assert.Equal(t, "proj1", r.Project)
 		assert.Equal(t, "domain1", r.Domain)
 	}
 }
 
-func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
+func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
-	err := db.Exec(`CREATE TABLE action_events (
-		org TEXT NOT NULL,
-		project TEXT NOT NULL,
-		domain TEXT NOT NULL,
-		run_name TEXT NOT NULL,
-		name TEXT NOT NULL,
-		attempt INTEGER NOT NULL,
-		phase INTEGER NOT NULL,
-		version INTEGER NOT NULL,
-		info BLOB,
-		error_kind TEXT,
-		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		PRIMARY KEY (org, project, domain, run_name, name, attempt, phase, version)
-	)`).Error
-	require.NoError(t, err)
-
-	r, err := NewActionRepo(db, database.DbConfig{})
+	r, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
 	return db, repo
@@ -471,7 +451,7 @@ func TestGetLatestEventByAttempt_NotFound(t *testing.T) {
 
 	_, err := repo.GetLatestEventByAttempt(ctx, testActionID, 99)
 	require.Error(t, err)
-	assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 func TestGetLatestEventByAttempt_DifferentAttempts(t *testing.T) {
@@ -537,7 +517,7 @@ func TestInsertEvents_Empty(t *testing.T) {
 
 func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -560,7 +540,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	select {
 	case payload := <-r.actionNotifyCh:
-		assert.Equal(t, "org/proj/domain/run'; DROP TABLE actions; --/action", payload)
+		assert.Equal(t, "proj/domain/run'; DROP TABLE actions; --/action", payload)
 	case <-ctx.Done():
 		t.Fatal("timed out waiting for payload on actionNotifyCh")
 	}
@@ -568,7 +548,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
@@ -587,7 +567,7 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	select {
 	case payload := <-r.runNotifyCh:
-		assert.Equal(t, "org/proj/domain/run'); SELECT pg_sleep(10); --", payload)
+		assert.Equal(t, "proj/domain/run'); SELECT pg_sleep(10); --", payload)
 	case <-ctx.Done():
 		t.Fatal("timed out waiting for payload on runNotifyCh")
 	}
@@ -642,13 +622,13 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
 	r := &actionRepo{
-		isPostgres:     true,
+
 		actionNotifyCh: make(chan string, 256),
 		runNotifyCh:    make(chan string, 256),
 	}
 
 	// Send a notification, then close the channel so the loop exits.
-	r.actionNotifyCh <- "org/proj/domain/run/action"
+	r.actionNotifyCh <- "proj/domain/run/action"
 	close(r.actionNotifyCh)
 
 	// Pass a nil conn — should not panic.

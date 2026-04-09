@@ -309,20 +309,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_database.sqlite.file", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("database.sqlite.file", testValue)
-			if vString, err := cmdFlags.GetString("database.sqlite.file"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Database.SQLite.File)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_watchBufferSize", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

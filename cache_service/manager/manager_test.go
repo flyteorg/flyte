@@ -5,32 +5,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/glebarez/sqlite"
-	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/stretchr/testify/require"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
-	"gorm.io/gorm"
 
 	cacheconfig "github.com/flyteorg/flyte/v2/cache_service/config"
-	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/repository"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 )
 
 func newTestManager(t *testing.T) *Manager {
 	t.Helper()
-
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	require.NoError(t, err)
-	m := gormigrate.New(db, gormigrate.DefaultOptions, migrations.CacheServiceMigrations)
-	require.NoError(t, m.Migrate())
+	t.Cleanup(func() {
+		testDB.Exec("DELETE FROM cached_outputs")
+		testDB.Exec("DELETE FROM reservations")
+	})
 
 	cfg := &cacheconfig.Config{
 		HeartbeatGracePeriodMultiplier: 3,
 	}
 	cfg.MaxReservationHeartbeat.Duration = 10 * time.Second
 
-	repos := repository.NewRepository(db)
+	repos := repository.NewRepository(testDB)
 	return New(cfg, repos.CachedOutputRepo(), repos.ReservationRepo())
 }
 

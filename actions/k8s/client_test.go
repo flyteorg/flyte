@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -26,14 +27,12 @@ import (
 
 func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpdate) {
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "run1",
 	}
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        runID.Org,
 			Project:    runID.Project,
 			Domain:     runID.Domain,
 			RunName:    runID.Name,
@@ -164,7 +163,6 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "project",
 		Domain:  "development",
 		Name:    "rabc123",
@@ -354,7 +352,6 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	}
 
 	runID := &common.RunIdentifier{
-		Org:     "org",
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "run1",
@@ -362,7 +359,6 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        runID.Org,
 			Project:    runID.Project,
 			Domain:     runID.Domain,
 			RunName:    runID.Name,
@@ -409,7 +405,6 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	// Create a terminal TaskAction CRD (SUCCEEDED)
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        "org",
 			Project:    "proj",
 			Domain:     "dev",
 			RunName:    "run1",
@@ -423,7 +418,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	}
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
 			Name: "completed-action",
 		},
 		Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
@@ -466,7 +461,6 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	// Create a non-terminal TaskAction CRD (QUEUED)
 	ta := &executorv1.TaskAction{
 		Spec: executorv1.TaskActionSpec{
-			Org:        "org",
 			Project:    "proj",
 			Domain:     "dev",
 			RunName:    "run1",
@@ -480,7 +474,7 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	}
 	update := &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run1"},
+			Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
 			Name: "queued-action",
 		},
 		Phase: common.ActionPhase_ACTION_PHASE_QUEUED,
@@ -579,4 +573,148 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	// No UpdateActionStatus should be called for root (no parent to promote)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 0)
+}
+
+func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
+	c := &ActionsClient{
+		numWorkers: numWorkers,
+		workerChs:  make([]chan watch.Event, numWorkers),
+	}
+	for i := range c.workerChs {
+		c.workerChs[i] = make(chan watch.Event, bufSize)
+	}
+	return c
+}
+
+func newTaskActionEvent(name string, eventType watch.EventType) watch.Event {
+	ta := &executorv1.TaskAction{}
+	ta.Name = name
+	return watch.Event{Type: eventType, Object: ta}
+}
+
+func newTaskAction(name string) *executorv1.TaskAction {
+	ta := &executorv1.TaskAction{}
+	ta.Name = name
+	return ta
+}
+
+func TestDispatchEvent_ConsistentSharding(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+	taskAction := newTaskAction("run1-action1")
+
+	c.dispatchEvent(taskAction, watch.Modified)
+	c.dispatchEvent(taskAction, watch.Modified)
+
+	// Both events must land in exactly one shard (the same one each time)
+	var total int
+	for _, ch := range c.workerChs {
+		total += len(ch)
+	}
+	assert.Equal(t, 2, total)
+}
+
+func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
+	c := newWorkerTestClient(4, 10)
+
+	// Send many differently-named events and confirm they spread across shards
+	names := []string{"run1-a", "run1-b", "run1-c", "run1-d", "run1-e", "run1-f", "run1-g", "run1-h"}
+	for _, name := range names {
+		c.dispatchEvent(newTaskAction(name), watch.Modified)
+	}
+
+	var nonEmpty int
+	for _, ch := range c.workerChs {
+		if len(ch) > 0 {
+			nonEmpty++
+		}
+	}
+	assert.Greater(t, nonEmpty, 1, "expected events to spread across more than one shard")
+}
+
+func TestDispatchEvent_NilTaskActionIsIgnored(t *testing.T) {
+	c := newWorkerTestClient(2, 10)
+
+	c.dispatchEvent(nil, watch.Modified)
+
+	for i, ch := range c.workerChs {
+		assert.Equal(t, 0, len(ch), "worker %d should have received nothing", i)
+	}
+}
+
+func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
+	c := newWorkerTestClient(1, 1) // single worker, capacity 1
+	taskAction := newTaskAction("run1-action1")
+
+	c.dispatchEvent(taskAction, watch.Modified) // fills the channel
+
+	// Second dispatch must block because the channel is full.
+	// Run it in a goroutine and verify it unblocks once the channel is drained.
+	done := make(chan struct{})
+	go func() {
+		c.dispatchEvent(taskAction, watch.Modified)
+		close(done)
+	}()
+
+	// Drain the channel to unblock the sender.
+	<-c.workerChs[0]
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("dispatchEvent did not unblock after channel was drained")
+	}
+}
+
+func TestDispatchEvent_DeepCopiesTaskAction(t *testing.T) {
+	c := newWorkerTestClient(1, 10)
+	taskAction := newTaskAction("run1-action1")
+
+	c.dispatchEvent(taskAction, watch.Modified)
+	taskAction.Name = "mutated-after-dispatch"
+
+	event := <-c.workerChs[0]
+	dispatched, ok := event.Object.(*executorv1.TaskAction)
+	require.True(t, ok)
+	assert.Equal(t, "run1-action1", dispatched.Name)
+}
+
+func TestWorker_ExitsOnStopCh(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(context.Background(), ch, stopCh)
+		close(done)
+	}()
+
+	close(stopCh)
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after stopCh was closed")
+	}
+}
+
+func TestWorker_ExitsOnContextCancel(t *testing.T) {
+	c := &ActionsClient{}
+	ch := make(chan watch.Event, 10)
+	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+
+	done := make(chan struct{})
+	go func() {
+		c.worker(ctx, ch, stopCh)
+		close(done)
+	}()
+
+	cancel()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not exit after context was cancelled")
+	}
 }

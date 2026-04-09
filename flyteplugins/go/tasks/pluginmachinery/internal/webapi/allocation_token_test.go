@@ -25,7 +25,7 @@ func init() {
 
 func newPluginWithProperties(properties webapi.PluginConfig) *mocks.AsyncPlugin {
 	m := &mocks.AsyncPlugin{}
-	m.OnGetConfig().Return(properties)
+	m.EXPECT().GetConfig().Return(properties)
 	return m
 }
 
@@ -71,7 +71,7 @@ func Test_allocateToken(t *testing.T) {
 	})
 
 	t.Run("Allocation Successful", func(t *testing.T) {
-		p.OnResourceRequirementsMatch(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
+		p.EXPECT().ResourceRequirements(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
@@ -97,7 +97,7 @@ func Test_allocateToken(t *testing.T) {
 		tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 		tCtx.EXPECT().ResourceManager().Return(rm)
 
-		p.OnResourceRequirementsMatch(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
+		p.EXPECT().ResourceRequirements(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
@@ -134,7 +134,7 @@ func Test_releaseToken(t *testing.T) {
 			"ns": 1,
 		},
 	})
-	p.OnResourceRequirementsMatch(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
+	p.EXPECT().ResourceRequirements(mock.Anything, mock.Anything).Return("ns", core.ResourceConstraintsSpec{}, nil)
 
 	a := newTokenAllocator(clck)
 	assert.NoError(t, a.releaseToken(ctx, p, tCtx, metrics))

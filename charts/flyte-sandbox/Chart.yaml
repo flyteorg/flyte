@@ -32,10 +32,6 @@ dependencies:
     version: v0.2.0
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
-  - name: kubernetes-dashboard
-    version: 6.0.0
-    repository: https://kubernetes-retired.github.io/dashboard/
-    condition: kubernetes-dashboard.enabled
   - name: postgresql
     version: 12.8.1
     repository: https://charts.bitnami.com/bitnami

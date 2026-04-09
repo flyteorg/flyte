@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"connectrpc.com/connect"
 
@@ -24,7 +25,7 @@ func (s *TriggerService) DeployTrigger(
 	ctx context.Context,
 	req *connect.Request[trigger.DeployTriggerRequest],
 ) (*connect.Response[trigger.DeployTriggerResponse], error) {
-	return connect.NewResponse(&trigger.DeployTriggerResponse{}), nil
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("Trigger Service is not implemented"))
 }
 
 func (s *TriggerService) GetTriggerDetails(

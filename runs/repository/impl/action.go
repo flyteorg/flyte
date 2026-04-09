@@ -13,9 +13,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 
 	"google.golang.org/protobuf/proto"
 
@@ -28,12 +27,11 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// actionRepo implements actionRepo interface using PostgreSQL/SQLite
+// actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
-	db         *gorm.DB
-	isPostgres bool
-	pgConfig   database.PostgresConfig
-	listener   *pq.Listener
+	db       *sqlx.DB
+	dsn      string // stored for pq.Listener
+	listener *pq.Listener
 
 	// Subscriber management for LISTEN/NOTIFY
 	runSubscribers    map[chan string]bool
@@ -47,31 +45,24 @@ type actionRepo struct {
 
 const rootActionName = "a0"
 
-// NewActionRepo creates a new PostgreSQL/SQLite repository
-func NewActionRepo(db *gorm.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
-	// Detect database type
-	dbName := db.Name()
-	isPostgres := dbName == "postgres"
-
+// NewActionRepo creates a new PostgreSQL repository
+func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
+	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
 	repo := &actionRepo{
 		db:                db,
-		isPostgres:        isPostgres,
-		pgConfig:          dbConfig.Postgres,
+		dsn:               dsn,
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	// Start LISTEN/NOTIFY for PostgreSQL
-	if isPostgres {
-		repo.actionNotifyCh = make(chan string, 256)
-		repo.runNotifyCh = make(chan string, 256)
+	repo.actionNotifyCh = make(chan string, 256)
+	repo.runNotifyCh = make(chan string, 256)
 
-		if err := repo.startPostgresListener(); err != nil {
-			return nil, fmt.Errorf("failed to start postgres listener: %w", err)
-		}
-		if err := repo.startNotifyLoop(); err != nil {
-			return nil, fmt.Errorf("failed to start notify loop: %w", err)
-		}
+	if err := repo.startPostgresListener(); err != nil {
+		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
+	}
+	if err := repo.startNotifyLoop(); err != nil {
+		return nil, fmt.Errorf("failed to start notify loop: %w", err)
 	}
 
 	return repo, nil
@@ -134,10 +125,11 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 			return nil, fmt.Errorf("failed to create task spec model: %w", err)
 		}
 		if taskSpecModel != nil {
-			if err := r.db.WithContext(ctx).
-				Clauses(clause.OnConflict{DoNothing: true}).
-				Create(taskSpecModel).Error; err != nil {
-				logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", err)
+			_, insertErr := r.db.ExecContext(ctx,
+				`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
+				taskSpecModel.Digest, taskSpecModel.Spec)
+			if insertErr != nil {
+				logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", insertErr)
 			} else {
 				info.TaskSpecDigest = taskSpecModel.Digest
 			}
@@ -163,7 +155,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 
 	// Create root action (represents the run)
 	run := &models.Run{
-		Org:              runID.Org,
 		Project:          runID.Project,
 		Domain:           runID.Domain,
 		RunName:          runID.Name,
@@ -171,7 +162,6 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		ParentActionName: newNullString(""), // NULL for root actions/runs
 		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 		ActionType:       meta.ActionType,
-		TaskOrg:          meta.TaskOrg,
 		TaskProject:      meta.TaskProject,
 		TaskDomain:       meta.TaskDomain,
 		TaskName:         meta.TaskName,
@@ -187,12 +177,20 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 		Attempts:         1,
 	}
 
-	if err := r.db.WithContext(ctx).Create(run).Error; err != nil {
+	err = r.db.QueryRowxContext(ctx,
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+		 RETURNING created_at, updated_at`,
+		run.Project, run.Domain, run.RunName, run.Name, run.ParentActionName, run.Phase, run.RunSource, run.ActionType, run.ActionGroup,
+		run.TaskProject, run.TaskDomain, run.TaskName, run.TaskVersion, run.TaskType, run.TaskShortName, run.FunctionName, run.EnvironmentName,
+		run.ActionSpec, run.ActionDetails, run.DetailedInfo, run.RunSpec, run.Attempts, run.CacheStatus,
+	).Scan(&run.CreatedAt, &run.UpdatedAt)
+	if err != nil {
 		return nil, fmt.Errorf("failed to create run: %w", err)
 	}
 
-	logger.Infof(ctx, "Created run: %s/%s/%s/%s (ID: %d)",
-		run.Org, run.Project, run.Domain, run.Name, run.ID)
+	logger.Infof(ctx, "Created run: %s/%s/%s",
+		run.Project, run.Domain, run.RunName)
 
 	// Notify subscribers of run creation
 	r.notifyRunUpdate(ctx, runID)
@@ -203,17 +201,16 @@ func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunReque
 // GetRun retrieves a run by identifier
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
-	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
-			runID.Org, runID.Project, runID.Domain, runID.Name).
-		First(&run)
+	err := sqlx.GetContext(ctx, r.db, &run,
+		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND parent_action_name IS NULL",
+		runID.Project, runID.Domain, runID.Name)
 
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("run not found: %s/%s/%s/%s",
-				runID.Org, runID.Project, runID.Domain, runID.Name)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("run not found: %s/%s/%s",
+				runID.Project, runID.Domain, runID.Name)
 		}
-		return nil, fmt.Errorf("failed to get run: %w", result.Error)
+		return nil, fmt.Errorf("failed to get run: %w", err)
 	}
 
 	return &run, nil
@@ -221,27 +218,30 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 
 // ListRuns lists runs with pagination
 func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
-	query := r.db.WithContext(ctx).Model(&models.Run{}).
-		Where("parent_action_name IS NULL") // Only root actions (runs)
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
+
+	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
 
 	// Apply scope filters
 	switch scope := req.ScopeBy.(type) {
-	case *workflow.ListRunsRequest_Org:
-		query = query.Where("org = ?", scope.Org)
 	case *workflow.ListRunsRequest_ProjectId:
-		query = query.Where("org = ? AND project = ? AND domain = ?",
-			scope.ProjectId.Organization, scope.ProjectId.Name, scope.ProjectId.Domain)
+		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d AND domain = $%d", argIdx, argIdx+1))
+		args = append(args, scope.ProjectId.Name, scope.ProjectId.Domain)
+		argIdx += 2
 	}
 
 	// Apply pagination according to token and limit from requests.
 	limit := 50
+	offset := 0
 	if req.Request != nil {
 		if req.Request.Token != "" {
-			tokenID, err := strconv.ParseUint(req.Request.Token, 10, 64)
+			parsedOffset, err := strconv.Atoi(req.Request.Token)
 			if err != nil {
 				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
 			}
-			query = query.Where("id < ?", tokenID)
+			offset = parsedOffset
 		}
 
 		if req.Request.Limit > 0 {
@@ -249,21 +249,20 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 		}
 	}
 
-	var runs []*models.Run
-	result := query.
-		Order("created_at DESC").
-		Limit(limit + 1). // Fetch one extra to determine if there are more
-		Find(&runs)
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
+	args = append(args, limit+1, offset) // Fetch one extra to determine if there are more
+	argIdx += 2
 
-	if result.Error != nil {
-		return nil, "", fmt.Errorf("failed to list runs: %w", result.Error)
+	var runs []*models.Run
+	if err := sqlx.SelectContext(ctx, r.db, &runs, queryBuilder.String(), args...); err != nil {
+		return nil, "", fmt.Errorf("failed to list runs: %w", err)
 	}
 
 	// Determine next token
 	var nextToken string
 	if len(runs) > limit {
 		runs = runs[:limit]
-		nextToken = fmt.Sprintf("%d", runs[len(runs)-1].ID)
+		nextToken = fmt.Sprintf("%d", offset+limit)
 	}
 
 	return runs, nextToken, nil
@@ -272,28 +271,21 @@ func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest
 // AbortRun aborts a run and all its actions
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
-	updates := map[string]interface{}{
-		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at":          now,
-		"abort_requested_at":  now,
-		"abort_attempt_count": 0,
-		"abort_reason":        reason,
-	}
 
-	result := r.db.WithContext(ctx).
-		Model(&models.Run{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND parent_action_name IS NULL",
-			runID.Org, runID.Project, runID.Domain, runID.Name).
-		Updates(updates)
+	_, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5
+		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL`,
+		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
+		runID.Project, runID.Domain, runID.Name)
 
-	if result.Error != nil {
-		return fmt.Errorf("failed to abort run: %w", result.Error)
+	if err != nil {
+		return fmt.Errorf("failed to abort run: %w", err)
 	}
 
 	// Notify run subscribers.
 	r.notifyRunUpdate(ctx, runID)
 
-	logger.Infof(ctx, "Aborted run: %s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
+	logger.Infof(ctx, "Aborted run: %s/%s/%s", runID.Project, runID.Domain, runID.Name)
 	return nil
 }
 
@@ -302,10 +294,16 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	if len(events) == 0 {
 		return nil
 	}
-	if err := r.db.WithContext(ctx).
-		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(&events).Error; err != nil {
-		return err
+
+	for _, e := range events {
+		_, err := r.db.ExecContext(ctx,
+			`INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			 ON CONFLICT DO NOTHING`,
+			e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Notify subscribers so watchers see new events (e.g. log context becoming available).
@@ -313,14 +311,13 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 	for _, e := range events {
 		actionID := &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     e.Org,
 				Project: e.Project,
 				Domain:  e.Domain,
 				Name:    e.RunName,
 			},
 			Name: e.Name,
 		}
-		key := e.Org + "/" + e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
+		key := e.Project + "/" + e.Domain + "/" + e.RunName + "/" + e.Name
 		if !notified[key] {
 			r.notifyActionUpdate(ctx, actionID)
 			notified[key] = true
@@ -332,14 +329,36 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 // ListEvents lists action events for a given action identifier.
 func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
 	var events []*models.ActionEvent
-	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		Order("attempt ASC, phase ASC, version ASC").
-		Limit(limit).
-		Find(&events)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to list action events: %w", result.Error)
+	err := sqlx.SelectContext(ctx, r.db, &events,
+		`SELECT * FROM action_events
+		 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4
+		 ORDER BY attempt ASC, phase ASC, version ASC
+		 LIMIT $5`,
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list action events: %w", err)
+	}
+	return events, nil
+}
+
+// ListEventsSince lists action events for a given action identifier updated at or after the provided checkpoint.
+func (r *actionRepo) ListEventsSince(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	attempt uint32,
+	since time.Time,
+	offset, limit int,
+) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
+	err := sqlx.SelectContext(ctx, r.db, &events,
+		`SELECT * FROM action_events
+		 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4 AND attempt = $5 AND updated_at > $6
+		 ORDER BY updated_at ASC, attempt ASC, phase ASC, version ASC
+		 OFFSET $7 LIMIT $8`,
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt, since,
+		offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list action events since %s: %w", since.Format(time.RFC3339Nano), err)
 	}
 	return events, nil
 }
@@ -348,99 +367,79 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 // ordered by version descending, without deserializing all events.
 func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
 	var event models.ActionEvent
-	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND attempt = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt).
-		Order("phase DESC, version DESC").
-		First(&event)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("event not found for attempt %d: %w", attempt, gorm.ErrRecordNotFound)
+	err := sqlx.GetContext(ctx, r.db, &event,
+		`SELECT * FROM action_events
+		 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4 AND attempt = $5
+		 ORDER BY phase DESC, version DESC
+		 LIMIT 1`,
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, attempt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("event not found for attempt %d: %w", attempt, sql.ErrNoRows)
 		}
-		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, result.Error)
+		return nil, fmt.Errorf("failed to get latest event for attempt %d: %w", attempt, err)
 	}
 	return &event, nil
 }
 
-// CreateAction creates a new action
-func (r *actionRepo) CreateAction(ctx context.Context, actionSpec *workflow.ActionSpec, detailedInfo []byte) (*models.Action, error) {
-	// Serialize action spec
-	actionSpecBytes, err := proto.Marshal(actionSpec)
+// CreateAction inserts an Action model into the database.
+func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
+	result, err := r.db.ExecContext(ctx,
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+		 ON CONFLICT DO NOTHING`,
+		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
+		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
+		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
+		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
 
-	// Determine parent action name
-	var parentActionName string
-	if actionSpec.ParentActionName != nil {
-		parentActionName = *actionSpec.ParentActionName
-	}
-
-	// Extract metadata columns from action spec
-	meta := extractActionMetadata(actionSpec)
-
-	action := &models.Action{
-		Org:              actionSpec.ActionId.Run.Org,
-		Project:          actionSpec.ActionId.Run.Project,
-		Domain:           actionSpec.ActionId.Run.Domain,
-		RunName:          actionSpec.ActionId.Run.Name,
-		Name:             actionSpec.ActionId.Name,
-		ParentActionName: newNullString(parentActionName),
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:       meta.ActionType,
-		ActionGroup:      newNullString(actionSpec.GetGroup()),
-		TaskOrg:          meta.TaskOrg,
-		TaskProject:      meta.TaskProject,
-		TaskDomain:       meta.TaskDomain,
-		TaskName:         meta.TaskName,
-		TaskVersion:      meta.TaskVersion,
-		TaskType:         meta.TaskType,
-		TaskShortName:    meta.TaskShortName,
-		FunctionName:     meta.FunctionName,
-		EnvironmentName:  meta.EnvironmentName,
-		ActionSpec:       actionSpecBytes,
-		ActionDetails:    []byte("{}"), // Empty details initially
-		DetailedInfo:     detailedInfo,
-		Attempts:         1,
-	}
-
-	result := r.db.WithContext(ctx).
-		Clauses(clause.OnConflict{DoNothing: true}).
-		Create(action)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to create action: %w", result.Error)
+	actionID := &common.ActionIdentifier{
+		Name: action.Name,
+		Run: &common.RunIdentifier{
+			Project: action.Project,
+			Domain:  action.Domain,
+			Name:    action.RunName,
+		},
 	}
 
 	// If no rows were affected, the action already exists — fetch and return it.
-	if result.RowsAffected == 0 {
-		existing, err := r.GetAction(ctx, actionSpec.ActionId)
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		existing, err := r.GetAction(ctx, actionID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get existing action: %w", err)
 		}
 		return existing, nil
 	}
 
-	logger.Infof(ctx, "Created action: %s (ID: %d)", action.Name, action.ID)
+	// Fetch the created action to get DB-generated fields (id, created_at, updated_at)
+	created, err := r.GetAction(ctx, actionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch created action: %w", err)
+	}
+
+	logger.Infof(ctx, "Created action: %s", created.Name)
 
 	// Notify subscribers of action creation
-	r.notifyActionUpdate(ctx, actionSpec.ActionId)
+	r.notifyActionUpdate(ctx, actionID)
 
-	return action, nil
+	return created, nil
 }
 
 // GetAction retrieves an action by identifier
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	var action models.Action
-	result := r.db.WithContext(ctx).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		First(&action)
+	err := sqlx.GetContext(ctx, r.db, &action,
+		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("action not found")
 		}
-		return nil, fmt.Errorf("failed to get action: %w", result.Error)
+		return nil, fmt.Errorf("failed to get action: %w", err)
 	}
 
 	return &action, nil
@@ -452,30 +451,36 @@ func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifie
 		limit = 100
 	}
 
-	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ?",
-			runID.Org, runID.Project, runID.Domain, runID.Name)
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
 
-	// Apply pagination token
+	queryBuilder.WriteString(fmt.Sprintf("SELECT * FROM actions WHERE project = $%d AND domain = $%d AND run_name = $%d", argIdx, argIdx+1, argIdx+2))
+	args = append(args, runID.Project, runID.Domain, runID.Name)
+	argIdx += 3
+
+	// Apply pagination token (encoded as RFC3339Nano created_at cursor)
 	if token != "" {
-		query = query.Where("id > ?", token)
+		if t, err := time.Parse(time.RFC3339Nano, token); err == nil {
+			queryBuilder.WriteString(fmt.Sprintf(" AND created_at > $%d", argIdx))
+			args = append(args, t)
+			argIdx++
+		}
 	}
 
-	var actions []*models.Action
-	result := query.
-		Order("id ASC").
-		Limit(limit + 1).
-		Find(&actions)
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at ASC LIMIT $%d", argIdx))
+	args = append(args, limit+1)
 
-	if result.Error != nil {
-		return nil, "", fmt.Errorf("failed to list actions: %w", result.Error)
+	var actions []*models.Action
+	if err := sqlx.SelectContext(ctx, r.db, &actions, queryBuilder.String(), args...); err != nil {
+		return nil, "", fmt.Errorf("failed to list actions: %w", err)
 	}
 
 	// Determine next token
 	var nextToken string
 	if len(actions) > limit {
 		actions = actions[:limit]
-		nextToken = fmt.Sprintf("%d", actions[len(actions)-1].ID)
+		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
 	}
 
 	return actions, nextToken, nil
@@ -491,45 +496,53 @@ func (r *actionRepo) UpdateActionPhase(
 	cacheStatus core.CatalogCacheStatus,
 	endTime *time.Time,
 ) error {
-	updates := map[string]interface{}{
-		"phase":        phase,
-		"attempts":     attempts,
-		"cache_status": cacheStatus,
-		"updated_at":   time.Now(),
-	}
-
-	if endTime != nil {
-		if r.isPostgres {
-			// Only set ended_at if not already set, clamped to at least created_at.
-			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, GREATEST(?, created_at))", *endTime)
-			updates["duration_ms"] = gorm.Expr(
-				"EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST(?, created_at)) - created_at)) * 1000", *endTime)
-		} else {
-			// SQLite: only set ended_at if not already set.
-			updates["ended_at"] = gorm.Expr("COALESCE(ended_at, MAX(?, created_at))", *endTime)
-			updates["duration_ms"] = gorm.Expr(
-				"CAST((julianday(COALESCE(ended_at, MAX(?, created_at))) - julianday(created_at)) * 86400000 AS INTEGER)", *endTime)
-		}
-	}
-
-	// Allow forward phase transitions (phase <= new) and retries from
-	// retryable terminal states (FAILED, TIMED_OUT) back to earlier phases.
+	now := time.Now()
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
 	}
-	result := r.db.WithContext(ctx).
-		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ? AND (phase <= ? OR phase IN ?)",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, retryablePhases).
-		Updates(updates)
 
-	if result.Error != nil {
-		return result.Error
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
+
+	queryBuilder.WriteString("UPDATE actions SET ")
+	queryBuilder.WriteString(fmt.Sprintf("phase = $%d, attempts = $%d, cache_status = $%d, updated_at = $%d", argIdx, argIdx+1, argIdx+2, argIdx+3))
+	args = append(args, phase, attempts, cacheStatus, now)
+	argIdx += 4
+
+	if endTime != nil {
+		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx))
+		args = append(args, *endTime)
+		argIdx++
+		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx))
+		args = append(args, *endTime)
+		argIdx++
 	}
 
-	// Notify subscribers of the action update
-	r.notifyActionUpdate(ctx, actionID)
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))",
+		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
+	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
+
+	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected > 0 {
+		// Notify subscribers of the action update
+		r.notifyActionUpdate(ctx, actionID)
+	}
+
+	// If this is the root action (the run itself), also notify run subscribers
+	// so that WatchRuns streams reflect phase transitions (e.g. RUNNING → SUCCEEDED).
+	if actionID.Name == rootActionName {
+		r.notifyRunUpdate(ctx, actionID.Run)
+	}
 
 	return nil
 }
@@ -537,22 +550,15 @@ func (r *actionRepo) UpdateActionPhase(
 // AbortAction aborts a specific action
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
-	updates := map[string]interface{}{
-		"phase":               int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		"updated_at":          now,
-		"abort_requested_at":  now,
-		"abort_attempt_count": 0,
-		"abort_reason":        reason,
-	}
 
-	result := r.db.WithContext(ctx).
-		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		Updates(updates)
+	_, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5
+		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9`,
+		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	if result.Error != nil {
-		return fmt.Errorf("failed to abort action: %w", result.Error)
+	if err != nil {
+		return fmt.Errorf("failed to abort action: %w", err)
 	}
 
 	// Notify action subscribers.
@@ -565,11 +571,10 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 // ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).
 func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
 	var actions []*models.Action
-	result := r.db.WithContext(ctx).
-		Where("abort_requested_at IS NOT NULL").
-		Find(&actions)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to list pending aborts: %w", result.Error)
+	err := sqlx.SelectContext(ctx, r.db, &actions,
+		"SELECT * FROM actions WHERE abort_requested_at IS NOT NULL")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list pending aborts: %w", err)
 	}
 	return actions, nil
 }
@@ -577,36 +582,27 @@ func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, e
 // MarkAbortAttempt increments abort_attempt_count and returns the new value.
 // Called by the reconciler before each actionsClient.Abort call.
 func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
-	var action models.Action
-	result := r.db.WithContext(ctx).
-		Model(&action).
-		Clauses(clause.Returning{Columns: []clause.Column{{Name: "abort_attempt_count"}}}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		Updates(map[string]interface{}{
-			"abort_attempt_count": gorm.Expr("abort_attempt_count + 1"),
-			"updated_at":          time.Now(),
-		})
-	if result.Error != nil {
-		return 0, fmt.Errorf("failed to mark abort attempt: %w", result.Error)
+	var abortAttemptCount int
+	err := r.db.QueryRowxContext(ctx,
+		`UPDATE actions SET abort_attempt_count = abort_attempt_count + 1, updated_at = $1
+		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5
+		 RETURNING abort_attempt_count`,
+		time.Now(), actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
+	).Scan(&abortAttemptCount)
+	if err != nil {
+		return 0, fmt.Errorf("failed to mark abort attempt: %w", err)
 	}
-	return action.AbortAttemptCount, nil
+	return abortAttemptCount, nil
 }
 
 // ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
-	result := r.db.WithContext(ctx).
-		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		Updates(map[string]interface{}{
-			"abort_requested_at":  nil,
-			"abort_attempt_count": 0,
-			"abort_reason":        nil,
-			"updated_at":          time.Now(),
-		})
-	if result.Error != nil {
-		return fmt.Errorf("failed to clear abort request: %w", result.Error)
+	_, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET abort_requested_at = NULL, abort_attempt_count = 0, abort_reason = NULL, updated_at = $1
+		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5`,
+		time.Now(), actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	if err != nil {
+		return fmt.Errorf("failed to clear abort request: %w", err)
 	}
 	return nil
 }
@@ -619,34 +615,39 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 		return fmt.Errorf("failed to unmarshal state JSON: %w", err)
 	}
 
-	updates := map[string]interface{}{
-		"updated_at": time.Now(),
-	}
+	now := time.Now()
 
 	// Extract phase if present
-	if phase, ok := stateObj["phase"].(string); ok {
-		updates["phase"] = phase
-		logger.Infof(ctx, "Updating action %s phase to %s", actionID.Name, phase)
+	var phase interface{}
+	if p, ok := stateObj["phase"].(string); ok {
+		phase = p
+		logger.Infof(ctx, "Updating action %s phase to %s", actionID.Name, p)
 	}
 
-	// Store state in ActionDetails JSON
-	// For now, we'll replace the entire ActionDetails with the state
-	// In a full implementation, we'd merge it with existing ActionDetails
-	updates["action_details"] = []byte(state)
-
-	result := r.db.WithContext(ctx).
-		Model(&models.Action{}).
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		Updates(updates)
-
-	if result.Error != nil {
-		return fmt.Errorf("failed to update action state: %w", result.Error)
+	var result sql.Result
+	var err error
+	if phase != nil {
+		result, err = r.db.ExecContext(ctx,
+			`UPDATE actions SET phase = $1, action_details = $2, updated_at = $3
+			 WHERE project = $4 AND domain = $5 AND run_name = $6 AND name = $7`,
+			phase, []byte(state), now,
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	} else {
+		result, err = r.db.ExecContext(ctx,
+			`UPDATE actions SET action_details = $1, updated_at = $2
+			 WHERE project = $3 AND domain = $4 AND run_name = $5 AND name = $6`,
+			[]byte(state), now,
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	}
 
-	if result.RowsAffected == 0 {
+	if err != nil {
+		return fmt.Errorf("failed to update action state: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
 		return fmt.Errorf("action not found: %s/%s/%s/%s",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Name)
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	}
 
 	// Notify subscribers of the update
@@ -657,20 +658,16 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 // GetActionState retrieves the state of an action
 func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
-	var action models.Action
-	result := r.db.WithContext(ctx).
-		Select("action_details").
-		Where("org = ? AND project = ? AND domain = ? AND run_name = ? AND name = ?",
-			actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name).
-		First(&action)
-
-	if result.Error != nil {
-		return "", fmt.Errorf("failed to get action state: %w", result.Error)
+	var actionDetails []byte
+	err := r.db.QueryRowContext(ctx,
+		"SELECT action_details FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
+	).Scan(&actionDetails)
+	if err != nil {
+		return "", fmt.Errorf("failed to get action state: %w", err)
 	}
 
-	// Extract state from ActionDetails JSON
-	// For now, return the whole ActionDetails JSON
-	return string(action.ActionDetails), nil
+	return string(actionDetails), nil
 }
 
 // NotifyStateUpdate sends a notification about a state update
@@ -687,124 +684,35 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 	<-ctx.Done()
 }
 
-// WatchRunUpdates watches for run updates (simplified polling implementation)
+// WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runKey := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 100)
+	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
+	notifCh := make(chan string, 100)
 
-		// Register as subscriber
+	r.mu.Lock()
+	r.runSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
 		r.mu.Lock()
-		r.runSubscribers[notifCh] = true
+		delete(r.runSubscribers, notifCh)
+		close(notifCh)
 		r.mu.Unlock()
+	}()
 
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.runSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Check if this notification is for the run we're watching
-				if notifPayload == runKey {
-					run, err := r.GetRun(ctx, runID)
-					if err != nil {
-						if ctx.Err() != nil {
-							return
-						}
-						errs <- err
-						return
-					}
-					select {
-					case updates <- run:
-					case <-ctx.Done():
-						return
-					}
-				}
-			}
-		}
-	} else {
-		// SQLite: Use polling
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-
-		var lastUpdated time.Time
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				run, err := r.GetRun(ctx, runID)
-				if err != nil {
-					errs <- err
-					return
-				}
-
-				if run.UpdatedAt.After(lastUpdated) {
-					lastUpdated = run.UpdatedAt
-					updates <- run
-				}
-			}
-		}
-	}
-}
-
-// WatchAllRunUpdates watches for all run updates (not filtered by runID)
-func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		notifCh := make(chan string, 100)
-
-		// Register as subscriber
-		r.mu.Lock()
-		r.runSubscribers[notifCh] = true
-		r.mu.Unlock()
-
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.runSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Parse notification payload: org/project/domain/run
-				parts := strings.Split(notifPayload, "/")
-				if len(parts) != 4 {
-					logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
-					continue
-				}
-
-				runID := &common.RunIdentifier{
-					Org:     parts[0],
-					Project: parts[1],
-					Domain:  parts[2],
-					Name:    parts[3],
-				}
-
-				if ctx.Err() != nil {
-					return
-				}
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			if notifPayload == runKey {
 				run, err := r.GetRun(ctx, runID)
 				if err != nil {
 					if ctx.Err() != nil {
 						return
 					}
-					logger.Errorf(ctx, "Failed to get run from notification: %v", err)
-					continue
+					errs <- err
+					return
 				}
 				select {
 				case updates <- run:
@@ -813,133 +721,180 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 				}
 			}
 		}
-	} else {
-		// SQLite: Use polling for all runs
-		ticker := time.NewTicker(2 * time.Second)
-		defer ticker.Stop()
+	}
+}
 
-		lastCheck := time.Now()
+// WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
+func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
+	notifCh := make(chan string, 100)
 
-		for {
-			select {
-			case <-ctx.Done():
+	r.mu.Lock()
+	r.runSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
+		r.mu.Lock()
+		delete(r.runSubscribers, notifCh)
+		close(notifCh)
+		r.mu.Unlock()
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			parts := strings.Split(notifPayload, "/")
+			if len(parts) != 3 {
+				logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
+				continue
+			}
+
+			runID := &common.RunIdentifier{
+				Project: parts[0],
+				Domain:  parts[1],
+				Name:    parts[2],
+			}
+
+			if ctx.Err() != nil {
 				return
-			case <-ticker.C:
-				// Query runs updated since last check
-				var runs []*models.Run
-				if err := r.db.WithContext(ctx).
-					Where("updated_at > ? AND parent_action_name IS NULL", lastCheck).
-					Find(&runs).Error; err != nil {
-					errs <- err
+			}
+			run, err := r.GetRun(ctx, runID)
+			if err != nil {
+				if ctx.Err() != nil {
 					return
 				}
-
-				for _, run := range runs {
-					updates <- run
-				}
-
-				lastCheck = time.Now()
+				logger.Errorf(ctx, "Failed to get run from notification: %v", err)
+				continue
+			}
+			select {
+			case updates <- run:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}
 }
 
-// WatchActionUpdates watches for action updates
-func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
-	if r.isPostgres {
-		// PostgreSQL: Use LISTEN/NOTIFY with dedicated channel for this watcher
-		runPrefix := fmt.Sprintf("%s/%s/%s/%s/", runID.Org, runID.Project, runID.Domain, runID.Name)
-		notifCh := make(chan string, 100)
+// WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
+func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
+	notifCh := make(chan string, 100)
 
-		// Register as subscriber
+	r.mu.Lock()
+	r.actionSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
 		r.mu.Lock()
-		r.actionSubscribers[notifCh] = true
+		delete(r.actionSubscribers, notifCh)
+		close(notifCh)
 		r.mu.Unlock()
+	}()
 
-		// Unregister on exit
-		defer func() {
-			r.mu.Lock()
-			delete(r.actionSubscribers, notifCh)
-			close(notifCh)
-			r.mu.Unlock()
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case notifPayload := <-notifCh:
-				// Collect this notification plus any others already queued,
-				// deduplicating by action name so we only query the DB once
-				// per action during a burst of updates.
-				pending := make(map[string]bool)
-				if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
-					pending[notifPayload[len(runPrefix):]] = true
-				}
-				// Drain buffered notifications without blocking.
-			drain:
-				for {
-					select {
-					case extra := <-notifCh:
-						if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
-							pending[extra[len(runPrefix):]] = true
-						}
-					default:
-						break drain
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			// Collect this notification plus any others already queued,
+			// deduplicating by action name so we only query the DB once
+			// per action during a burst of updates.
+			pending := make(map[string]bool)
+			if len(notifPayload) > len(runPrefix) && notifPayload[:len(runPrefix)] == runPrefix {
+				pending[notifPayload[len(runPrefix):]] = true
+			}
+			// Drain buffered notifications without blocking.
+		drain:
+			for {
+				select {
+				case extra := <-notifCh:
+					if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
+						pending[extra[len(runPrefix):]] = true
 					}
+				default:
+					break drain
 				}
+			}
 
-				for actionName := range pending {
-					actionID := &common.ActionIdentifier{
-						Run:  runID,
-						Name: actionName,
-					}
+			for actionName := range pending {
+				actionID := &common.ActionIdentifier{
+					Run:  runID,
+					Name: actionName,
+				}
+				if ctx.Err() != nil {
+					return
+				}
+				action, err := r.GetAction(ctx, actionID)
+				if err != nil {
 					if ctx.Err() != nil {
 						return
 					}
-					action, err := r.GetAction(ctx, actionID)
-					if err != nil {
-						if ctx.Err() != nil {
-							return
-						}
-						logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-						continue
-					}
-					select {
-					case updates <- action:
-					case <-ctx.Done():
-						return
-					}
+					logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+					continue
+				}
+				select {
+				case updates <- action:
+				case <-ctx.Done():
+					return
 				}
 			}
 		}
-	} else {
-		// SQLite: Use polling
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
+	}
+}
 
-		lastCheck := time.Now()
+// WatchActionUpdates watches the current action update via LISTEN/NOTIFY
+func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	notifCh := make(chan string, 100)
 
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				// Query actions updated since last check
-				var actions []*models.Action
-				if err := r.db.WithContext(ctx).
-					Where("org = ? AND project = ? AND domain = ? AND updated_at > ?",
-						runID.Org, runID.Project, runID.Domain, lastCheck).
-					Find(&actions).Error; err != nil {
-					errs <- err
+	r.mu.Lock()
+	r.actionSubscribers[notifCh] = true
+	r.mu.Unlock()
+
+	defer func() {
+		r.mu.Lock()
+		delete(r.actionSubscribers, notifCh)
+		close(notifCh)
+		r.mu.Unlock()
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case notifPayload := <-notifCh:
+			if notifPayload != targetPayload {
+				continue
+			}
+
+		drain:
+			for {
+				// Prevent continuous update from the action
+				select {
+				case extra := <-notifCh:
+					if extra != targetPayload {
+						continue
+					}
+				default:
+					break drain
+				}
+			}
+
+			action, err := r.GetAction(ctx, actionID)
+			if err != nil {
+				if ctx.Err() != nil {
 					return
 				}
+				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+				continue
+			}
 
-				for _, action := range actions {
-					updates <- action
-				}
-
-				lastCheck = time.Now()
+			select {
+			case updates <- action:
+			case <-ctx.Done():
+				return
 			}
 		}
 	}
@@ -948,23 +903,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, runID *common.RunId
 // startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener.
 // Returns an error if the connection or LISTEN setup fails.
 func (r *actionRepo) startPostgresListener() error {
-	// Get the underlying SQL DB
-	sqlDB, err := r.db.DB()
-	if err != nil {
-		return fmt.Errorf("get SQL DB: %w", err)
-	}
-
-	// Get the connection string
-	row := sqlDB.QueryRow("SELECT current_database()")
-	var dbName string
-	if err := row.Scan(&dbName); err != nil {
-		return fmt.Errorf("get database name: %w", err)
-	}
-
-	// Build connection string from the database config
-	pgCfg := r.pgConfig
-	pgCfg.DbName = dbName
-	connStr := database.GetPostgresDsn(context.Background(), pgCfg)
+	connStr := r.dsn
 
 	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
@@ -1038,13 +977,9 @@ func (r *actionRepo) processNotifications() {
 }
 
 // notifyRunUpdate sends a notification about a run update via the
-// dedicated notify channel, avoiding GORM connection pool contention.
+// dedicated notify channel, avoiding connection pool contention.
 func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
-	if !r.isPostgres {
-		return
-	}
-
-	payload := fmt.Sprintf("%s/%s/%s/%s", runID.Org, runID.Project, runID.Domain, runID.Name)
+	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 
 	select {
 	case r.runNotifyCh <- payload:
@@ -1054,33 +989,43 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
-func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
-	query := r.db.WithContext(ctx).Model(&models.Action{}).
-		Where("parent_action_name IS NULL")
+func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	var queryBuilder strings.Builder
+	var args []interface{}
+	argIdx := 1
 
-	if org != "" {
-		query = query.Where("org = ?", org)
-	}
+	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
+
 	if project != "" {
-		query = query.Where("project = ?", project)
+		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d", argIdx))
+		args = append(args, project)
+		argIdx++
 	}
 	if domain != "" {
-		query = query.Where("domain = ?", domain)
+		queryBuilder.WriteString(fmt.Sprintf(" AND domain = $%d", argIdx))
+		args = append(args, domain)
+		argIdx++
 	}
 	if startDate != nil {
-		query = query.Where("created_at >= ?", *startDate)
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at >= $%d", argIdx))
+		args = append(args, *startDate)
+		argIdx++
 	}
 	if endDate != nil {
-		query = query.Where("created_at <= ?", *endDate)
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at <= $%d", argIdx))
+		args = append(args, *endDate)
+		argIdx++
 	}
 	if limit <= 0 {
 		limit = 1000
 	}
 
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d", argIdx))
+	args = append(args, limit)
+
 	var actions []*models.Action
-	result := query.Order("created_at DESC").Limit(limit).Find(&actions)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to list root actions: %w", result.Error)
+	if err := sqlx.SelectContext(ctx, r.db, &actions, queryBuilder.String(), args...); err != nil {
+		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
 	return actions, nil
 }
@@ -1089,10 +1034,7 @@ func (r *actionRepo) ListRootActions(ctx context.Context, org, project, domain s
 // starts processing in the background. Returns an error if the initial
 // connection cannot be established.
 func (r *actionRepo) startNotifyLoop() error {
-	sqlDB, err := r.db.DB()
-	if err != nil {
-		return fmt.Errorf("get SQL DB: %w", err)
-	}
+	sqlDB := r.db.DB
 
 	conn, err := sqlDB.Conn(context.Background())
 	if err != nil {
@@ -1194,14 +1136,10 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 }
 
 // notifyActionUpdate sends a notification about an action update via the
-// dedicated notify channel, avoiding GORM connection pool contention.
+// dedicated notify channel, avoiding connection pool contention.
 func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
-	if !r.isPostgres {
-		return
-	}
-
-	payload := fmt.Sprintf("%s/%s/%s/%s/%s",
-		actionID.Run.Org, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	payload := fmt.Sprintf("%s/%s/%s/%s",
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
 	select {
 	case r.actionNotifyCh <- payload:
@@ -1213,7 +1151,6 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 // actionMeta holds metadata columns extracted from an ActionSpec.
 type actionMeta struct {
 	ActionType      int32
-	TaskOrg         sql.NullString
 	TaskProject     sql.NullString
 	TaskDomain      sql.NullString
 	TaskName        sql.NullString
@@ -1239,7 +1176,6 @@ func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
 		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
 		// TaskAction.Id takes precedence; fall back to TaskTemplate.Id
 		if id := s.Task.GetId(); id != nil {
-			m.TaskOrg = newNullString(id.GetOrg())
 			m.TaskProject = newNullString(id.GetProject())
 			m.TaskDomain = newNullString(id.GetDomain())
 			m.TaskName = newNullString(id.GetName())
@@ -1247,7 +1183,6 @@ func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
 			m.FunctionName = id.GetName()
 			m.TaskShortName = newNullString(id.GetName())
 		} else if tmplID := s.Task.GetSpec().GetTaskTemplate().GetId(); tmplID != nil {
-			m.TaskOrg = newNullString(tmplID.GetOrg())
 			m.TaskProject = newNullString(tmplID.GetProject())
 			m.TaskDomain = newNullString(tmplID.GetDomain())
 			m.TaskName = newNullString(tmplID.GetName())

@@ -3,7 +3,9 @@ module github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap
 go 1.24.0
 
 require (
-	github.com/stretchr/testify v1.8.0
+	github.com/fergusstrange/embedded-postgres v1.34.0
+	github.com/lib/pq v1.12.1
+	github.com/stretchr/testify v1.10.0
 	k8s.io/api v0.26.1
 	k8s.io/apimachinery v0.26.1
 	sigs.k8s.io/kustomize/api v0.12.1
@@ -36,6 +38,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	golang.org/x/net v0.38.0 // indirect

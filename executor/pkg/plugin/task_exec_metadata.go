@@ -7,6 +7,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -80,8 +81,8 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	envVars := map[string]string{
 		"ACTION_NAME": ta.Spec.ActionName,
 		"RUN_NAME":    ta.Spec.RunName,
-		"_U_ORG_NAME": ta.Spec.Org,
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
+		"_U_ORG_NAME": "local",
 	}
 	for key, value := range ta.Spec.EnvVars {
 		if _, exists := envVars[key]; !exists {
@@ -105,7 +106,6 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 						Project: ta.Spec.Project,
 						Domain:  ta.Spec.Domain,
 						Name:    ta.Spec.RunName,
-						Org:     ta.Spec.Org,
 					},
 					NodeId: ta.Spec.ActionName,
 				},
@@ -118,6 +118,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 			Kind:       "TaskAction",
 			Name:       ta.Name,
 			UID:        ta.UID,
+			Controller: ptr.To(true),
 		},
 		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
 		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
