@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	DataProxyService_CreateUploadLocation_FullMethodName = "/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation"
+	DataProxyService_UploadInputs_FullMethodName         = "/flyteidl2.dataproxy.DataProxyService/UploadInputs"
 	DataProxyService_GetActionData_FullMethodName        = "/flyteidl2.dataproxy.DataProxyService/GetActionData"
 )
 
@@ -29,6 +30,7 @@ const (
 type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(ctx context.Context, in *CreateUploadLocationRequest, opts ...grpc.CallOption) (*CreateUploadLocationResponse, error)
+	UploadInputs(ctx context.Context, in *UploadInputsRequest, opts ...grpc.CallOption) (*UploadInputsResponse, error)
 	// Get input and output data for an action.
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 }
@@ -50,6 +52,15 @@ func (c *dataProxyServiceClient) CreateUploadLocation(ctx context.Context, in *C
 	return out, nil
 }
 
+func (c *dataProxyServiceClient) UploadInputs(ctx context.Context, in *UploadInputsRequest, opts ...grpc.CallOption) (*UploadInputsResponse, error) {
+	out := new(UploadInputsResponse)
+	err := c.cc.Invoke(ctx, DataProxyService_UploadInputs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
 	out := new(GetActionDataResponse)
 	err := c.cc.Invoke(ctx, DataProxyService_GetActionData_FullMethodName, in, out, opts...)
@@ -65,6 +76,7 @@ func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *GetActio
 type DataProxyServiceServer interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error)
+	UploadInputs(context.Context, *UploadInputsRequest) (*UploadInputsResponse, error)
 	// Get input and output data for an action.
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 }
@@ -75,6 +87,9 @@ type UnimplementedDataProxyServiceServer struct {
 
 func (UnimplementedDataProxyServiceServer) CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUploadLocation not implemented")
+}
+func (UnimplementedDataProxyServiceServer) UploadInputs(context.Context, *UploadInputsRequest) (*UploadInputsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadInputs not implemented")
 }
 func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActionData not implemented")
@@ -109,6 +124,24 @@ func _DataProxyService_CreateUploadLocation_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataProxyService_UploadInputs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadInputsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProxyServiceServer).UploadInputs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataProxyService_UploadInputs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProxyServiceServer).UploadInputs(ctx, req.(*UploadInputsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DataProxyService_GetActionData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetActionDataRequest)
 	if err := dec(in); err != nil {
@@ -137,6 +170,10 @@ var DataProxyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUploadLocation",
 			Handler:    _DataProxyService_CreateUploadLocation_Handler,
+		},
+		{
+			MethodName: "UploadInputs",
+			Handler:    _DataProxyService_UploadInputs_Handler,
 		},
 		{
 			MethodName: "GetActionData",

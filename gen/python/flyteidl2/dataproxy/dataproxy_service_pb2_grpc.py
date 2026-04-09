@@ -20,6 +20,11 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
                 )
+        self.UploadInputs = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/UploadInputs',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.FromString,
+                )
         self.GetActionData = channel.unary_unary(
                 '/flyteidl2.dataproxy.DataProxyService/GetActionData',
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
@@ -38,6 +43,12 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UploadInputs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetActionData(self, request, context):
         """Get input and output data for an action.
         """
@@ -52,6 +63,11 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     servicer.CreateUploadLocation,
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.SerializeToString,
+            ),
+            'UploadInputs': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadInputs,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.SerializeToString,
             ),
             'GetActionData': grpc.unary_unary_rpc_method_handler(
                     servicer.GetActionData,
@@ -83,6 +99,23 @@ class DataProxyService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation',
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.SerializeToString,
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UploadInputs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/UploadInputs',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
