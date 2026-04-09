@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"connectrpc.com/connect"
@@ -71,7 +73,10 @@ func (s *triggerService) GetTriggerDetails(
 	n := req.Msg.GetName()
 	m, err := s.db.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(n))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	details, err := transformers.TriggerModelToTriggerDetails(ctx, m)
 	if err != nil {
@@ -88,7 +93,10 @@ func (s *triggerService) GetTriggerRevisionDetails(
 	n := id.GetName()
 	m, err := s.db.TriggerRepo().GetTriggerRevision(ctx, n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName(), id.GetRevision())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	details, err := transformers.TriggerRevisionModelToTriggerDetails(ctx, m)
 	if err != nil {

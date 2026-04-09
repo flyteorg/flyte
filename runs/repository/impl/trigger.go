@@ -121,7 +121,7 @@ func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerName
 	}
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s", key.Project, key.Domain, key.TaskName, key.Name)
+			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s: %w", key.Project, key.Domain, key.TaskName, key.Name, err)
 		}
 		return nil, fmt.Errorf("failed to get trigger: %w", err)
 	}
@@ -136,7 +136,7 @@ func (r *triggerRepo) GetTriggerRevision(ctx context.Context, project, domain, t
 		project, domain, taskName, name, revision)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("trigger revision not found: %s/%s/%s/%s@%d", project, domain, taskName, name, revision)
+			return nil, fmt.Errorf("trigger revision not found: %s/%s/%s/%s@%d: %w", project, domain, taskName, name, revision, err)
 		}
 		return nil, fmt.Errorf("failed to get trigger revision: %w", err)
 	}
