@@ -51,6 +51,41 @@
         ]
       }
     },
+    "/api/v1/dataproxy/artifact_urn/download": {
+      "post": {
+        "summary": "CreateDownloadLink generates signed URL(s) for downloading a given artifact.",
+        "description": "Creates signed URL(s) for downloading an artifact associated with a run action.",
+        "operationId": "DataProxyService_CreateDownloadLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateDownloadLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateDownloadLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
     "/api/v1/dataproxy/inputs": {
       "post": {
         "description": "Uploads inputs for a given run or project and returns a URI and cache key that can be used to reference these inputs at runtime.",
@@ -111,6 +146,41 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/dataproxyCreateUploadLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
+    "/api/v1/org/dataproxy/artifact_urn/download": {
+      "post": {
+        "summary": "CreateDownloadLink generates signed URL(s) for downloading a given artifact.",
+        "description": "Creates signed URL(s) for downloading an artifact associated with a run action.",
+        "operationId": "DataProxyService_CreateDownloadLink2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateDownloadLinkResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/dataproxyCreateDownloadLinkRequest"
             }
           }
         ],
@@ -323,6 +393,33 @@
         "JSON"
       ],
       "default": "UNKNOWN"
+    },
+    "commonActionAttemptIdentifier": {
+      "type": "object",
+      "properties": {
+        "action_id": {
+          "$ref": "#/definitions/commonActionIdentifier"
+        },
+        "attempt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "Unique identifier of a single action attempt"
+    },
+    "commonActionIdentifier": {
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "#/definitions/commonRunIdentifier",
+          "description": "Identifier for the run."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the action. Must be unique within the run."
+        }
+      },
+      "description": "Unique identifier of an action."
     },
     "commonOffloadedInputData": {
       "type": "object",
@@ -1448,6 +1545,43 @@
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
     },
+    "dataproxyArtifactType": {
+      "type": "string",
+      "enum": [
+        "ARTIFACT_TYPE_UNSPECIFIED",
+        "ARTIFACT_TYPE_REPORT"
+      ],
+      "default": "ARTIFACT_TYPE_UNSPECIFIED",
+      "description": "ArtifactType defines the type of artifact to be downloaded.\n\n - ARTIFACT_TYPE_REPORT: ARTIFACT_TYPE_REPORT refers to the HTML report file optionally generated after a task finishes executing."
+    },
+    "dataproxyCreateDownloadLinkRequest": {
+      "type": "object",
+      "properties": {
+        "artifact_type": {
+          "$ref": "#/definitions/dataproxyArtifactType",
+          "title": "ArtifactType is the type of artifact to download.\n+required"
+        },
+        "action_attempt_id": {
+          "$ref": "#/definitions/commonActionAttemptIdentifier",
+          "description": "ActionAttemptId identifies the specific attempt of a run action that produced the artifact."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines the requested expiration duration for the generated URLs. The request will be\nrejected if this exceeds the platform's configured maximum.\n+optional. The default value comes from the global config."
+        }
+      },
+      "description": "CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API."
+    },
+    "dataproxyCreateDownloadLinkResponse": {
+      "type": "object",
+      "properties": {
+        "pre_signed_urls": {
+          "$ref": "#/definitions/dataproxyPreSignedURLs",
+          "description": "PreSignedUrls contains the signed URLs and their expiration time."
+        }
+      },
+      "description": "CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API."
+    },
     "dataproxyCreateUploadLocationRequest": {
       "type": "object",
       "properties": {
@@ -1517,6 +1651,24 @@
         }
       },
       "description": "CreateUploadLocationResponse specifies the response for the CreateUploadLocation API."
+    },
+    "dataproxyPreSignedURLs": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SignedUrl are the pre-signed URLs for downloading the artifact."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when the signed URLs will expire."
+        }
+      },
+      "description": "PreSignedURLs contains a list of signed URLs for downloading artifacts."
     },
     "dataproxyUploadInputsRequest": {
       "type": "object",

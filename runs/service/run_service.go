@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -155,9 +156,10 @@ func (s *RunService) CreateRun(
 	// Get the task template and taskID
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
+	var triggerName, triggerTaskName, triggerType string
+	var triggerRevision int64
 	var err error
 	runSpec := request.GetRunSpec()
-	// TODO: Add trigger
 	switch request.GetTask().(type) {
 	case *workflow.CreateRunRequest_TaskId:
 		taskID = request.GetTaskId()
@@ -168,6 +170,26 @@ func (s *RunService) CreateRun(
 	case *workflow.CreateRunRequest_TaskSpec:
 		taskSpec = request.GetTaskSpec()
 		taskID = taskIdFromTaskSpec(taskSpec)
+	case *workflow.CreateRunRequest_TriggerName:
+		tn := request.GetTriggerName()
+		triggerModel, triggerErr := s.repo.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(tn))
+		if triggerErr != nil {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
+		}
+		triggerName = tn.GetName()
+		triggerTaskName = triggerModel.TaskName
+		triggerRevision = int64(triggerModel.LatestRevision)
+		triggerType = triggerModel.AutomationType
+		taskID = &task.TaskIdentifier{
+			Project: triggerModel.Project,
+			Domain:  triggerModel.Domain,
+			Name:    triggerModel.TaskName,
+			Version: triggerModel.TaskVersion,
+		}
+		taskSpec, err = fetchTaskSpecByID(ctx, s.repo.TaskRepo(), taskID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if runSpec == nil {
@@ -219,8 +241,8 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Create a run in a database with storage URIs
-	run, err := s.repo.ActionRepo().CreateRun(ctx, request, inputPrefix, runOutputBase)
+	// Persist task spec and create run model
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -250,6 +272,100 @@ func (s *RunService) CreateRun(
 	return connect.NewResponse(&workflow.CreateRunResponse{
 		Run: s.convertRunToProto(run),
 	}), nil
+}
+
+// persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
+// triggerName should be non-empty when the run originates from a scheduled trigger; it is stored on
+// the run model and triggers a triggered_at update on the trigger row.
+func (s *RunService) persistRunModel(
+	ctx context.Context,
+	runId *common.RunIdentifier,
+	taskID *task.TaskIdentifier,
+	taskSpec *task.TaskSpec,
+	inputPrefix, runOutputBase string,
+	runSpec *task.RunSpec,
+	source workflow.RunSource,
+	triggerName, triggerTaskName string,
+	triggerRevision int64,
+	triggerType string,
+) (*models.Run, error) {
+	// Store task spec and compute digest
+	info := &workflow.RunInfo{InputsUri: inputPrefix}
+	taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create task spec model: %w", err)
+	}
+	if taskSpecModel != nil {
+		if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
+			logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", err)
+		} else {
+			info.TaskSpecDigest = taskSpecModel.Digest
+		}
+	}
+	detailedInfo, err := proto.Marshal(info)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal run info: %w", err)
+	}
+
+	// Build ActionSpec
+	actionSpec := &workflow.ActionSpec{
+		ActionId:         &common.ActionIdentifier{Run: runId, Name: RootActionName},
+		ParentActionName: nil,
+		RunSpec:          runSpec,
+		InputUri:         inputPrefix + "/inputs.pb",
+		RunOutputBase:    runOutputBase,
+		Spec: &workflow.ActionSpec_Task{
+			Task: &workflow.TaskAction{
+				Id:   taskID,
+				Spec: taskSpec,
+			},
+		},
+	}
+	actionSpecBytes, err := proto.Marshal(actionSpec)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
+	}
+
+	var runSpecBytes []byte
+	if runSpec != nil {
+		runSpecBytes, err = proto.Marshal(runSpec)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal run spec: %w", err)
+		}
+	}
+
+	nullStr := func(s string) sql.NullString {
+		return sql.NullString{String: s, Valid: s != ""}
+	}
+
+	runModel := &models.Run{
+		Project:         runId.GetProject(),
+		Domain:          runId.GetDomain(),
+		RunName:         runId.GetName(),
+		Name:            RootActionName,
+		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:      int32(workflow.ActionType_ACTION_TYPE_TASK),
+		TaskProject:     nullStr(taskID.GetProject()),
+		TaskDomain:      nullStr(taskID.GetDomain()),
+		TaskName:        nullStr(taskID.GetName()),
+		TaskVersion:     nullStr(taskID.GetVersion()),
+		TaskType:        taskSpec.GetTaskTemplate().GetType(),
+		TaskShortName:   nullStr(taskSpec.GetShortName()),
+		FunctionName:    taskID.GetName(),
+		EnvironmentName: nullStr(taskSpec.GetEnvironment().GetName()),
+		ActionSpec:      actionSpecBytes,
+		ActionDetails:   []byte("{}"),
+		DetailedInfo:    detailedInfo,
+		RunSpec:         runSpecBytes,
+		Attempts:        1,
+		RunSource:       source.String(),
+		TriggerTaskName: nullStr(triggerTaskName),
+		TriggerName:     nullStr(triggerName),
+		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
+		TriggerType:     nullStr(triggerType),
+	}
+
+	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
 }
 
 // AbortRun aborts a run
@@ -719,7 +835,7 @@ func (s *RunService) ListRuns(
 	ctx context.Context,
 	req *connect.Request[workflow.ListRunsRequest],
 ) (*connect.Response[workflow.ListRunsResponse], error) {
-	logger.Infof(ctx, "Received ListRuns request")
+	logger.Debugf(ctx, "Received ListRuns request")
 
 	// Validate request
 	if err := req.Msg.Validate(); err != nil {
@@ -744,7 +860,7 @@ func (s *RunService) ListRuns(
 		Token: nextToken,
 	}
 
-	logger.Infof(ctx, "Listed %d runs", len(runs))
+	logger.Debugf(ctx, "Listed %d runs", len(runs))
 	return connect.NewResponse(resp), nil
 }
 
@@ -1253,6 +1369,27 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		metadata.EnvironmentName = action.EnvironmentName.String
 	}
 
+	if action.RunSource != "" {
+		if v, ok := workflow.RunSource_value[action.RunSource]; ok {
+			metadata.Source = workflow.RunSource(v)
+		}
+	}
+
+	if action.TriggerName.Valid {
+		metadata.TriggerName = action.TriggerName.String
+		metadata.TriggerId = &common.TriggerIdentifier{
+			Name: &common.TriggerName{
+				Project:  action.Project,
+				Domain:   action.Domain,
+				Name:     action.TriggerName.String,
+				TaskName: action.TriggerTaskName.String,
+			},
+		}
+		if action.TriggerRevision.Valid {
+			metadata.TriggerId.Revision = uint64(action.TriggerRevision.Int64)
+		}
+	}
+
 	switch workflow.ActionType(action.ActionType) {
 	case workflow.ActionType_ACTION_TYPE_TASK:
 		taskMeta := &workflow.TaskActionMetadata{
@@ -1569,9 +1706,22 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 	}
 
 	metadata.FuntionName = action.FunctionName
-	// TODO: Add ExecutedBy, TriggerTaskName, TriggerId
-
 	metadata.Source = workflow.RunSource(workflow.RunSource_value[action.RunSource])
+
+	if action.TriggerName.Valid {
+		metadata.TriggerName = action.TriggerName.String
+		metadata.TriggerId = &common.TriggerIdentifier{
+			Name: &common.TriggerName{
+				Project:  action.Project,
+				Domain:   action.Domain,
+				Name:     action.TriggerName.String,
+				TaskName: action.TriggerTaskName.String,
+			},
+		}
+		if action.TriggerRevision.Valid {
+			metadata.TriggerId.Revision = uint64(action.TriggerRevision.Int64)
+		}
+	}
 
 	childrenPhaseCounts := make(map[int32]int32, len(update.Node.ChildPhaseCounts))
 	for phase, count := range update.Node.ChildPhaseCounts {
@@ -1739,6 +1889,7 @@ func extractShortName(name string) string {
 	}
 	return name
 }
+
 
 func fetchTaskSpecByID(ctx context.Context, taskRepo interfaces.TaskRepo, taskID *task.TaskIdentifier) (*task.TaskSpec, error) {
 	taskModel, err := taskRepo.GetTask(ctx, transformers.ToTaskKey(taskID))
