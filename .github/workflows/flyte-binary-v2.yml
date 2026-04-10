@@ -208,7 +208,7 @@ jobs:
         with:
           context: docker/sandbox-bundled
           file: docker/sandbox-bundled/Dockerfile.gpu
-          platforms: linux/amd64
+          platforms: linux/amd64, linux/arm64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: |
             BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2:${{ steps.base-image.outputs.tag }}
