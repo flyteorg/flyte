@@ -84,7 +84,6 @@ pub mod cluster_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        ///
         pub async fn select_cluster(
             &mut self,
             request: impl tonic::IntoRequest<super::SelectClusterRequest>,
@@ -121,7 +120,6 @@ pub mod cluster_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with ClusterServiceServer.
     #[async_trait]
     pub trait ClusterService: Send + Sync + 'static {
-        ///
         async fn select_cluster(
             &self,
             request: tonic::Request<super::SelectClusterRequest>,
