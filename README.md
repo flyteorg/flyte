@@ -111,6 +111,7 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 - [Fine-tune Code Llama on the Flyte codebase](https://github.com/unionai-oss/llm-fine-tuning/tree/main/flyte_llama#readme)
 - [Forecast sales with Horovod and Spark](https://docs.flyte.org/en/latest/flytesnacks/examples/forecasting_sales/index.html)
 - [Nucleotide Sequence Querying with BLASTX](https://docs.flyte.org/en/latest/flytesnacks/examples/blast/index.html)
+- [RAG / LLM pipeline failure mode checklist](https://github.com/onestardao/WFGY/blob/main/ProblemMap/README.md)
 
 ## Features
 🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types.<br>
