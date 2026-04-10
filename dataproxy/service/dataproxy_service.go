@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
@@ -33,26 +34,31 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
+// LogStreamer abstracts log fetching from different backends.
+type LogStreamer interface {
+	TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[workflow.TailLogsResponse]) error
+}
+
 type Service struct {
 	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
-	cfg            config.DataProxyConfig
-	dataStore      *storage.DataStore
-	taskClient     taskconnect.TaskServiceClient
-	triggerClient  triggerconnect.TriggerServiceClient
-	runClient      workflowconnect.RunServiceClient
-	runLogsClient  workflowconnect.RunLogsServiceClient
+	cfg           config.DataProxyConfig
+	dataStore     *storage.DataStore
+	taskClient    taskconnect.TaskServiceClient
+	triggerClient triggerconnect.TriggerServiceClient
+	runClient     workflowconnect.RunServiceClient
+	logStreamer   LogStreamer
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, runLogsClient workflowconnect.RunLogsServiceClient) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, logStreamer LogStreamer) *Service {
 	return &Service{
-		cfg:            cfg,
-		dataStore:      dataStore,
-		taskClient:     taskClient,
-		triggerClient:  triggerClient,
-		runClient:      runClient,
-		runLogsClient:  runLogsClient,
+		cfg:           cfg,
+		dataStore:     dataStore,
+		taskClient:    taskClient,
+		triggerClient: triggerClient,
+		runClient:     runClient,
+		logStreamer:   logStreamer,
 	}
 }
 
@@ -438,18 +444,23 @@ func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
 	return &task.Inputs{Literals: filtered}
 }
 
-// TailLogs streams logs for an action attempt by proxying to the RunLogsService.
+// TailLogs streams logs for an action attempt.
 func (s *Service) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest], stream *connect.ServerStream[workflow.TailLogsResponse]) error {
-	clientStream, err := s.runLogsClient.TailLogs(ctx, req)
+	// Get log context from RunService
+	logCtxResp, err := s.runClient.GetActionLogContext(ctx, connect.NewRequest(&workflow.GetActionLogContextRequest{
+		ActionId: req.Msg.GetActionId(),
+		Attempt:  req.Msg.GetAttempt(),
+	}))
 	if err != nil {
 		return err
 	}
-	for clientStream.Receive() {
-		if err := stream.Send(clientStream.Msg()); err != nil {
-			return err
-		}
+
+	logContext := logCtxResp.Msg.GetLogContext()
+	if logContext == nil {
+		return connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found"))
 	}
-	return clientStream.Err()
+
+	return s.logStreamer.TailLogs(ctx, logContext, stream)
 }
 
 // hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.
