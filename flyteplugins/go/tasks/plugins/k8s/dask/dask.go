@@ -304,7 +304,11 @@ func createJobSpec(workerSpec daskAPI.WorkerSpec, schedulerSpec daskAPI.Schedule
 }
 
 func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
-	logPlugin, err := logs.InitializeLogPlugins(&GetConfig().Logs)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+	logPlugin, err := logs.InitializeLogPlugins(&GetConfig().Logs, taskTemplate)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

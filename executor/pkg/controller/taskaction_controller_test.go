@@ -18,11 +18,13 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -71,7 +73,7 @@ func buildTaskTemplateBytes(taskType, image string) []byte {
 type emptyPluginRegistry struct{}
 
 func (emptyPluginRegistry) GetCorePlugins() []pluginsCore.PluginEntry { return nil }
-func (emptyPluginRegistry) GetK8sPlugins() []k8sPlugin.PluginEntry   { return nil }
+func (emptyPluginRegistry) GetK8sPlugins() []k8sPlugin.PluginEntry    { return nil }
 
 var _ = Describe("TaskAction Controller", func() {
 	Context("When reconciling a resource", func() {
@@ -96,7 +98,6 @@ var _ = Describe("TaskAction Controller", func() {
 					},
 					Spec: flyteorgv1.TaskActionSpec{
 						RunName:       "test-run",
-						Org:           "test-org",
 						Project:       "test-project",
 						Domain:        "test-domain",
 						ActionName:    "test-action",
@@ -175,7 +176,6 @@ var _ = Describe("TaskAction Controller", func() {
 				},
 				Spec: flyteorgv1.TaskActionSpec{
 					RunName:       "test-run",
-					Org:           "test-org",
 					Project:       "test-project",
 					Domain:        "test-domain",
 					ActionName:    "test-action",
@@ -227,6 +227,91 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(updatedTaskAction.GetLabels()).To(HaveKeyWithValue(LabelTerminationStatus, LabelValueTerminated))
 			Expect(updatedTaskAction.GetLabels()).To(HaveKey(LabelCompletedTime))
+		})
+	})
+
+	Context("mapPhaseToConditions", func() {
+		It("should keep PhaseHistory using controller time, not pod time", func() {
+			ta := &flyteorgv1.TaskAction{}
+			podTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC) // far in the past
+			info := pluginsCore.PhaseInfoRunning(0, &pluginsCore.TaskInfo{
+				OccurredAt: &podTime,
+			})
+			before := time.Now().Add(-time.Second)
+			mapPhaseToConditions(ta, info)
+			after := time.Now().Add(time.Second)
+
+			Expect(ta.Status.PhaseHistory).To(HaveLen(1))
+			phTime := ta.Status.PhaseHistory[0].OccurredAt.Time
+			Expect(phTime.After(before)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+			Expect(phTime.Before(after)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+		})
+	})
+
+	Context("taskActionStatusChanged", func() {
+		It("should detect PhaseHistory changes", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+					{Phase: "Executing", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+
+		It("should return false when nothing changed", func() {
+			now := metav1.Now()
+			status := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: now},
+				},
+			}
+			Expect(taskActionStatusChanged(status, status)).To(BeFalse())
+		})
+
+		It("should detect PhaseHistory addition from empty", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+	})
+
+	Context("toClusterEvents", func() {
+		It("should include both phase reason and additional reasons", func() {
+			phaseOccurredAt := time.Date(2026, 4, 2, 10, 0, 0, 0, time.UTC)
+			eventOccurredAt := phaseOccurredAt.Add(2 * time.Minute)
+			fallbackTime := metav1.NewTime(phaseOccurredAt.Add(5 * time.Minute))
+
+			phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+				phaseOccurredAt,
+				pluginsCore.DefaultPhaseVersion,
+				"cluster is creating",
+				&pluginsCore.TaskInfo{
+					OccurredAt: &phaseOccurredAt,
+					AdditionalReasons: []pluginsCore.ReasonInfo{
+						{
+							Reason:     "Head pod pending",
+							OccurredAt: &eventOccurredAt,
+						},
+					},
+				},
+			)
+
+			events := toClusterEvents(phaseInfo, timestamppb.New(fallbackTime.Time))
+			Expect(events).To(HaveLen(2))
+			Expect(events[0].GetMessage()).To(Equal("cluster is creating"))
+			Expect(events[0].GetOccurredAt().AsTime()).To(Equal(phaseOccurredAt))
+			Expect(events[1].GetMessage()).To(Equal("Head pod pending"))
+			Expect(events[1].GetOccurredAt().AsTime()).To(Equal(eventOccurredAt))
 		})
 	})
 })

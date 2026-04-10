@@ -5,42 +5,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func setupTestDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
+func setupDB(t *testing.T) *sqlx.DB {
+	t.Helper()
+	return testDB
+}
 
-	err = db.Exec(`CREATE TABLE tasks (
-		org TEXT NOT NULL,
-		project TEXT NOT NULL,
-		domain TEXT NOT NULL,
-		name TEXT NOT NULL,
-		version TEXT NOT NULL,
-		environment TEXT,
-		function_name TEXT,
-		deployed_by TEXT,
-		trigger_name TEXT,
-		total_triggers INTEGER DEFAULT 0,
-		active_triggers INTEGER DEFAULT 0,
-		trigger_automation_spec BLOB,
-		trigger_types INTEGER,
-		task_spec BLOB,
-		env_description TEXT,
-		short_description TEXT,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		PRIMARY KEY (org, project, domain, name, version)
-	)`).Error
-	require.NoError(t, err)
-
+func setupTestDB(t *testing.T) *sqlx.DB {
+	db := setupDB(t)
+	t.Cleanup(func() {
+		db.Exec("DELETE FROM task_specs")
+		db.Exec("DELETE FROM tasks")
+	})
 	return db
 }
 
@@ -51,7 +34,6 @@ func TestCreateTask(t *testing.T) {
 
 	task := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",
@@ -64,7 +46,7 @@ func TestCreateTask(t *testing.T) {
 	}
 
 	startTime := time.Now()
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	assert.NoError(t, err)
 
 	retrieved, err := repo.GetTask(ctx, task.TaskKey)
@@ -81,7 +63,6 @@ func TestGetTask_NotFound(t *testing.T) {
 	ctx := context.Background()
 
 	key := models.TaskKey{
-		Org:     "non-existent",
 		Project: "test",
 		Domain:  "test",
 		Name:    "test",
@@ -100,7 +81,6 @@ func TestListTasks(t *testing.T) {
 
 	task1 := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "org1",
 			Project: "proj1",
 			Domain:  "domain1",
 			Name:    "task1",
@@ -112,7 +92,6 @@ func TestListTasks(t *testing.T) {
 
 	task2 := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "org1",
 			Project: "proj1",
 			Domain:  "domain1",
 			Name:    "task2",
@@ -122,8 +101,8 @@ func TestListTasks(t *testing.T) {
 		TaskSpec:    []byte("{}"),
 	}
 
-	require.NoError(t, repo.CreateTask(ctx, task1))
-	require.NoError(t, repo.CreateTask(ctx, task2))
+	require.NoError(t, repo.CreateTask(ctx, task1, nil))
+	require.NoError(t, repo.CreateTask(ctx, task2, nil))
 
 	result, err := repo.ListTasks(ctx, interfaces.ListResourceInput{
 		Limit:  10,
@@ -137,13 +116,6 @@ func TestListTasks(t *testing.T) {
 
 func TestCreateTaskSpec(t *testing.T) {
 	db := setupTestDB(t)
-
-	err := db.Exec(`CREATE TABLE task_specs (
-		digest TEXT PRIMARY KEY,
-		spec BLOB NOT NULL
-	)`).Error
-	require.NoError(t, err)
-
 	repo := NewTaskRepo(db)
 	ctx := context.Background()
 
@@ -152,7 +124,7 @@ func TestCreateTaskSpec(t *testing.T) {
 		Spec:   []byte(`{"task": "spec"}`),
 	}
 
-	err = repo.CreateTaskSpec(ctx, spec)
+	err := repo.CreateTaskSpec(ctx, spec)
 	assert.NoError(t, err)
 
 	retrieved, err := repo.GetTaskSpec(ctx, "abc123")
@@ -168,7 +140,6 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 
 	task := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",
@@ -179,7 +150,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 		TaskSpec:     []byte(`{}`),
 	}
 
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	original, err := repo.GetTask(ctx, task.TaskKey)
@@ -188,7 +159,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	task.FunctionName = "updated_function"
-	err = repo.CreateTask(ctx, task)
+	err = repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	updated, err := repo.GetTask(ctx, task.TaskKey)

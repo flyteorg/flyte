@@ -110,14 +110,17 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 	return srv.ListenAndServe()
 }
 
-func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {
+func configureGlobalHTTPHandler(cfg *Config, handlers map[string]http.Handler) error {
 	if handlers == nil {
 		handlers = map[string]http.Handler{}
 	}
+
 	handlers[metricsPath] = promhttp.Handler()
 	handlers[healthcheck] = http.HandlerFunc(healtcheckHandler)
 	handlers[versionPath] = http.HandlerFunc(versionHandler)
-	handlers[configPath] = http.HandlerFunc(configHandler)
+	if !cfg.DisableConfigEndpoint {
+		handlers[configPath] = http.HandlerFunc(configHandler)
+	}
 
 	for p, h := range handlers {
 		http.Handle(p, h)
@@ -126,14 +129,15 @@ func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {
 	return nil
 }
 
-// Forwards the call to StartProfilingServer
+// StartProfilingServerWithDefaultHandlers forwards the call to StartProfilingServer
 // Also registers:
 // 1. the prometheus HTTP handler on '/metrics' path shared with the profiling server.
 // 2. A healthcheck (L7) handler on '/healthcheck'.
 // 3. A version handler on '/version' provides information about the specific build.
 // 4. A config handler on '/config' provides a dump of the currently loaded config.
 func StartProfilingServerWithDefaultHandlers(ctx context.Context, pprofPort int, handlers map[string]http.Handler) error {
-	if err := configureGlobalHTTPHandler(handlers); err != nil {
+	cfg := GetConfig()
+	if err := configureGlobalHTTPHandler(cfg, handlers); err != nil {
 		return err
 	}
 

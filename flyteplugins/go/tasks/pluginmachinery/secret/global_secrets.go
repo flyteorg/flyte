@@ -12,7 +12,6 @@ import (
 	coreIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-//go:generate mockery --output=./mocks --case=underscore --name=GlobalSecretProvider
 type GlobalSecretProvider interface {
 	GetForSecret(ctx context.Context, secret *coreIdl.Secret) (string, error)
 }

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.webhook.serviceName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: webhook
+      port: 443
+      targetPort: 9443
+      protocol: TCP

@@ -497,8 +497,6 @@ func NewEmbeddedSecretManagerInjector(
 	}
 }
 
-//go:generate mockery -name=MockableControllerRuntimeClient -output=./mocks -case=underscore
-
 type MockableControllerRuntimeClient interface {
 	client.Client
 }

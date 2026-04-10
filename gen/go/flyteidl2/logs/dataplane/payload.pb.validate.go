@@ -458,6 +458,8 @@ func (m *ContainerSelector) validate(all bool) error {
 
 	// no validation rules for KubernetesPodLabelSelector
 
+	// no validation rules for NodeName
+
 	if len(errors) > 0 {
 		return ContainerSelectorMultiError(errors)
 	}

@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
@@ -48,6 +49,7 @@ func (s *ProjectService) CreateProject(
 
 	if err := s.projectRepo.CreateProject(ctx, model); err != nil {
 		if errors.Is(err, interfaces.ErrProjectAlreadyExists) {
+			logger.Warnf(ctx, "Project already exists, identifier: %s, name: %s", model.Identifier, model.Name)
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)

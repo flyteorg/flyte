@@ -5,11 +5,13 @@
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { ActionPhase } from "../common/phase_pb.ts";
+import { file_flyteidl2_common_phase } from "../common/phase_pb.ts";
 import type { KeyValuePair } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
 import type { SecurityContext } from "../core/security_pb.ts";
 import { file_flyteidl2_core_security } from "../core/security_pb.ts";
-import type { DeliveryConfigId, DeliveryConfigTemplate, RuleId } from "../notification/definition_pb.ts";
+import type { DeliveryConfigTemplate } from "../notification/definition_pb.ts";
 import { file_flyteidl2_notification_definition } from "../notification/definition_pb.ts";
 import { file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -18,7 +20,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSKIBAoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSMQoHcnVsZV9pZBgKIAEoCzIeLmZseXRlaWRsMi5ub3RpZmljYXRpb24uUnVsZUlkSAASKgoEcnVsZRgLIAEoCzIaLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVIAEIXChVub3RpZmljYXRpb25fc2V0dGluZ3MiggEKCklubGluZVJ1bGUSQgoQZGVsaXZlcnlfb3B0aW9ucxgBIAMoCzIeLmZseXRlaWRsMi50YXNrLkRlbGl2ZXJ5T3B0aW9uQgi6SAWSAQIIARIwCgZjaGVja3MYAiABKAsyIC5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlQ2hlY2tzIqQBCg5EZWxpdmVyeU9wdGlvbhI9Cgljb25maWdfaWQYASABKAsyKC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnSWRIABJCCgh0ZW1wbGF0ZRgCIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdUZW1wbGF0ZUgAQg8KBm9wdGlvbhIFukgCCAEiJwoQSW5saW5lUnVsZUNoZWNrcxITCgtwaGFzZV9yZWdleBgBIAEoCSp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAkKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSKJBAoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSIAoWbm90aWZpY2F0aW9uX3J1bGVfbmFtZRgKIAEoCUgAEjwKEm5vdGlmaWNhdGlvbl9ydWxlcxgLIAEoCzIeLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVMaXN0SABCFwoVbm90aWZpY2F0aW9uX3NldHRpbmdzIkUKDklubGluZVJ1bGVMaXN0EjMKBXJ1bGVzGAEgAygLMhouZmx5dGVpZGwyLnRhc2suSW5saW5lUnVsZUIIukgFkgECCAEi1wEKCklubGluZVJ1bGUSSQoJb25fcGhhc2VzGAEgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZUIXukgUkgERCAEYASILggEIGAUYBhgHGAgSHgoUZGVsaXZlcnlfY29uZmlnX25hbWUYAiABKAlIABJLChFkZWxpdmVyeV90ZW1wbGF0ZRgDIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdUZW1wbGF0ZUgAQhEKCGRlbGl2ZXJ5EgW6SAIIASp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAkKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -217,18 +219,18 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
     /**
      * either refer to a previously stored notification rule
      *
-     * @generated from field: flyteidl2.notification.RuleId rule_id = 10;
+     * @generated from field: string notification_rule_name = 10;
      */
-    value: RuleId;
-    case: "ruleId";
+    value: string;
+    case: "notificationRuleName";
   } | {
     /**
      * either define an inline one-off rule
      *
-     * @generated from field: flyteidl2.task.InlineRule rule = 11;
+     * @generated from field: flyteidl2.task.InlineRuleList notification_rules = 11;
      */
-    value: InlineRule;
-    case: "rule";
+    value: InlineRuleList;
+    case: "notificationRules";
   } | { case: undefined; value?: undefined };
 };
 
@@ -240,18 +242,51 @@ export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 5);
 
 /**
+ * @generated from message flyteidl2.task.InlineRuleList
+ */
+export type InlineRuleList = Message<"flyteidl2.task.InlineRuleList"> & {
+  /**
+   * @generated from field: repeated flyteidl2.task.InlineRule rules = 1;
+   */
+  rules: InlineRule[];
+};
+
+/**
+ * Describes the message flyteidl2.task.InlineRuleList.
+ * Use `create(InlineRuleListSchema)` to create a new message.
+ */
+export const InlineRuleListSchema: GenMessage<InlineRuleList> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_run, 6);
+
+/**
  * @generated from message flyteidl2.task.InlineRule
  */
 export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
   /**
-   * @generated from field: repeated flyteidl2.task.DeliveryOption delivery_options = 1;
+   * @generated from field: repeated flyteidl2.common.ActionPhase on_phases = 1;
    */
-  deliveryOptions: DeliveryOption[];
+  onPhases: ActionPhase[];
 
   /**
-   * @generated from field: flyteidl2.task.InlineRuleChecks checks = 2;
+   * @generated from oneof flyteidl2.task.InlineRule.delivery
    */
-  checks?: InlineRuleChecks;
+  delivery: {
+    /**
+     * (run org + delivery_config_name) will be used as a delivery config id
+     *
+     * @generated from field: string delivery_config_name = 2;
+     */
+    value: string;
+    case: "deliveryConfigName";
+  } | {
+    /**
+     * template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+     *
+     * @generated from field: flyteidl2.notification.DeliveryConfigTemplate delivery_template = 3;
+     */
+    value: DeliveryConfigTemplate;
+    case: "deliveryTemplate";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
@@ -259,58 +294,7 @@ export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
  * Use `create(InlineRuleSchema)` to create a new message.
  */
 export const InlineRuleSchema: GenMessage<InlineRule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 6);
-
-/**
- * @generated from message flyteidl2.task.DeliveryOption
- */
-export type DeliveryOption = Message<"flyteidl2.task.DeliveryOption"> & {
-  /**
-   * @generated from oneof flyteidl2.task.DeliveryOption.option
-   */
-  option: {
-    /**
-     * @generated from field: flyteidl2.notification.DeliveryConfigId config_id = 1;
-     */
-    value: DeliveryConfigId;
-    case: "configId";
-  } | {
-    /**
-     * template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
-     *
-     * @generated from field: flyteidl2.notification.DeliveryConfigTemplate template = 2;
-     */
-    value: DeliveryConfigTemplate;
-    case: "template";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message flyteidl2.task.DeliveryOption.
- * Use `create(DeliveryOptionSchema)` to create a new message.
- */
-export const DeliveryOptionSchema: GenMessage<DeliveryOption> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 7);
-
-/**
- * @generated from message flyteidl2.task.InlineRuleChecks
- */
-export type InlineRuleChecks = Message<"flyteidl2.task.InlineRuleChecks"> & {
-  /**
-   * Regex for matching completed run phase.
-   * if not supplied, rule applies to any terminal phase.
-   *
-   * @generated from field: string phase_regex = 1;
-   */
-  phaseRegex: string;
-};
-
-/**
- * Describes the message flyteidl2.task.InlineRuleChecks.
- * Use `create(InlineRuleChecksSchema)` to create a new message.
- */
-export const InlineRuleChecksSchema: GenMessage<InlineRuleChecks> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 8);
 
 /**
  * @generated from enum flyteidl2.task.CacheLookupScope

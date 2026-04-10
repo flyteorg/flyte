@@ -2,13 +2,16 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"io"
 	"time"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -60,34 +63,125 @@ func (s *RunService) recordAction(ctx context.Context, req *workflow.RecordActio
 func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.RecordActionRequest) error {
 	actionID := req.GetActionId()
 
-	// Build an ActionSpec from the RecordActionRequest to persist via CreateAction.
+	// Build the base action model with fields common to all action types.
+	action := models.NewActionModel(actionID)
+	if req.GetParent() != "" {
+		action.ParentActionName = sql.NullString{String: req.GetParent(), Valid: true}
+	}
+
+	action.ActionGroup = sql.NullString{String: req.GetGroup(), Valid: req.GetGroup() != ""}
+	action.ActionDetails = []byte("{}")
+	action.Attempts = 1
+
+	// Build the ActionSpec proto (stored as bytes for later deserialization).
 	spec := &workflow.ActionSpec{
-		ActionId:  actionID,
-		InputUri:  req.GetInputUri(),
-		Group:     req.GetGroup(),
+		ActionId: actionID,
+		InputUri: req.GetInputUri(),
+		Group:    req.GetGroup(),
 	}
 	if req.GetParent() != "" {
 		parent := req.GetParent()
 		spec.ParentActionName = &parent
 	}
+
+	// Build RunInfo for storage URIs and task spec digest.
+	info := &workflow.RunInfo{
+		InputsUri: req.GetInputUri(),
+	}
+
 	switch v := req.GetSpec().(type) {
 	case *workflow.RecordActionRequest_Task:
-		spec.Spec = &workflow.ActionSpec_Task{Task: v.Task}
+		taskAction := v.Task
+		spec.Spec = &workflow.ActionSpec_Task{Task: taskAction}
+
+		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
+
+		taskID := taskAction.GetId()
+		if taskID != nil {
+			action.TaskProject = sql.NullString{String: taskID.GetProject(), Valid: taskID.GetProject() != ""}
+			action.TaskDomain = sql.NullString{String: taskID.GetDomain(), Valid: taskID.GetDomain() != ""}
+			action.TaskName = sql.NullString{String: taskID.GetName(), Valid: taskID.GetName() != ""}
+			action.TaskVersion = sql.NullString{String: taskID.GetVersion(), Valid: taskID.GetVersion() != ""}
+			action.FunctionName = taskID.GetName()
+			action.TaskShortName = sql.NullString{String: taskID.GetName(), Valid: taskID.GetName() != ""}
+		}
+		if taskSpec := taskAction.GetSpec(); taskSpec != nil {
+			action.TaskType = taskSpec.GetTaskTemplate().GetType()
+			if taskSpec.GetShortName() != "" {
+				action.TaskShortName = sql.NullString{String: taskSpec.GetShortName(), Valid: true}
+			}
+			if env := taskSpec.GetEnvironment(); env != nil && env.GetName() != "" {
+				action.EnvironmentName = sql.NullString{String: env.GetName(), Valid: true}
+			}
+
+			taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
+			if err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to create task spec model: %v", err)
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to store task spec: %v", err)
+				// Non-fatal: continue without digest
+			} else {
+				info.TaskSpecDigest = taskSpecModel.Digest
+			}
+		}
+
 	case *workflow.RecordActionRequest_Trace:
 		spec.Spec = &workflow.ActionSpec_Trace{Trace: v.Trace}
+
+		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
+		action.TaskName = sql.NullString{String: v.Trace.GetName(), Valid: v.Trace.GetName() != ""}
+		action.FunctionName = v.Trace.GetName()
+		action.Phase = int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED)
+
+		// Use the trace's start_time as created_at so that parent traces
+		// (which start earlier but are written to DB later) sort before their
+		// children when ordered by created_at ASC.
+		if st := v.Trace.GetStartTime(); st != nil {
+			action.CreatedAt = st.AsTime()
+		}
+		if et := v.Trace.GetEndTime(); et != nil {
+			action.EndedAt = sql.NullTime{Time: et.AsTime(), Valid: true}
+		}
+
+		if traceSpec := v.Trace.GetSpec(); traceSpec != nil {
+			traceSpecModel, err := models.NewTaskSpecModelFromTraceSpec(ctx, traceSpec)
+			if err != nil {
+				logger.Warnf(ctx, "RecordAction: failed to create trace spec model: %v", err)
+			} else if traceSpecModel != nil {
+				if err := s.repo.TaskRepo().CreateTaskSpec(ctx, traceSpecModel); err != nil {
+					logger.Warnf(ctx, "RecordAction: failed to store trace spec: %v", err)
+				} else {
+					info.TaskSpecDigest = traceSpecModel.Digest
+				}
+			}
+		}
+		if v.Trace.GetOutputs().GetOutputUri() != "" {
+			info.OutputsUri = v.Trace.GetOutputs().GetOutputUri()
+		}
+
 	default:
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
 	}
 
-	// Look up the run to get its DB primary key.
-	run, err := s.repo.ActionRepo().GetRun(ctx, actionID.GetRun())
+	// Marshal ActionSpec proto into bytes for storage.
+	actionSpecBytes, err := proto.Marshal(spec)
 	if err != nil {
-		logger.Warnf(ctx, "RecordAction: run not found for action %s: %v", actionID.GetName(), err)
-		return connect.NewError(connect.CodeNotFound, err)
+		logger.Warnf(ctx, "RecordAction: failed to marshal action spec: %v", err)
+		return connect.NewError(connect.CodeInternal, err)
 	}
+	action.ActionSpec = actionSpecBytes
 
-	_, err = s.repo.ActionRepo().CreateAction(ctx, run.ID, spec)
+	// Marshal RunInfo proto into bytes for storage.
+	detailedInfo, err := proto.Marshal(info)
 	if err != nil {
+		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
+		return connect.NewError(connect.CodeInternal, err)
+	}
+	action.DetailedInfo = detailedInfo
+
+	if _, err := s.repo.ActionRepo().CreateAction(ctx, action, false); err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
@@ -141,15 +235,25 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	if actionStatus.GetEndTime() != nil {
 		t := actionStatus.GetEndTime().AsTime()
 		endTime = &t
+	} else if IsTerminalPhase(actionStatus.GetPhase()) {
+		// If no end time is provided but the phase is terminal, use now.
+		t := time.Now()
+		endTime = &t
 	}
 
-	if err := s.repo.ActionRepo().UpdateActionPhase(ctx, req.GetActionId(), actionStatus.GetPhase(), endTime); err != nil {
+	if err := s.repo.ActionRepo().UpdateActionPhase(
+		ctx,
+		req.GetActionId(),
+		actionStatus.GetPhase(),
+		actionStatus.GetAttempts(),
+		actionStatus.GetCacheStatus(),
+		endTime,
+	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	return nil
 }
-
 
 // RecordActionEvents records a batch of action events.
 func (s *RunService) RecordActionEvents(

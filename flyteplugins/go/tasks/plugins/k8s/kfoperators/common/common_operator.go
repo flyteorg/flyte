@@ -98,7 +98,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	taskLogs := make([]*core.TaskLog, 0, 10)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
-	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig(), taskTemplate)
 
 	if err != nil {
 		return nil, err

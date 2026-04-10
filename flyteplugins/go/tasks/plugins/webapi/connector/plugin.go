@@ -285,7 +285,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 }
 
 func (p *Plugin) getEventInfoForConnectorApp(taskCtx webapi.StatusContext, resource ResourceWrapper) ([]*flyteIdl.TaskLog, error) {
-	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins with error: %v", err)
 	}
@@ -331,18 +331,17 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
+		var literalMap *flyteIdl.LiteralMap
 		if resource.Outputs != nil {
-			var literalMap *flyteIdl.LiteralMap
 			literalMap = &flyteIdl.LiteralMap{Literals: make(map[string]*flyteIdl.Literal)}
 			for _, val := range resource.Outputs.Literals {
 				literalMap.Literals[val.Name] = val.Value
 			}
-			// TODO: Add support writing outputs proto.
-			err = writeOutput(ctx, taskCtx, literalMap)
-			if err != nil {
-				logger.Errorf(ctx, "failed to write output with err %s", err.Error())
-				return core.PhaseInfoUndefined, err
-			}
+		}
+		err = writeOutput(ctx, taskCtx, literalMap)
+		if err != nil {
+			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
+			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
@@ -444,27 +443,25 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 }
 
 func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
-	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-
-	clientSet := getConnectorClientSets(ctx)
-	connectorRegistry := getConnectorRegistry(ctx, clientSet)
-	supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
-	connectorService.SetSupportedTaskType(supportedTaskTypes)
-
-	plugin := &Plugin{
-		metricScope: promutils.NewScope("connector_plugin"),
-		cfg:         GetConfig(),
-		cs:          clientSet,
-		registry:    connectorRegistry,
-	}
-	plugin.watchConnectors(ctx, connectorService)
+	cfg := GetConfig()
 
 	return webapi.PluginEntry{
 		ID:                 ID,
-		SupportedTaskTypes: supportedTaskTypes,
+		SupportedTaskTypes: cfg.SupportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			clientSet := getConnectorClientSets(ctx)
+			connectorRegistry := getConnectorRegistry(ctx, clientSet)
+			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
+			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			plugin := &Plugin{
+				metricScope: promutils.NewScope("connector_plugin"),
+				cfg:         cfg,
+				cs:          clientSet,
+				registry:    connectorRegistry,
+			}
+			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil
 		},
 	}

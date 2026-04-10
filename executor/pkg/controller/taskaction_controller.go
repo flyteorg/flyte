@@ -50,7 +50,7 @@ import (
 )
 
 const (
-	TaskActionDefaultRequeueDuration = 5 * time.Second
+	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
@@ -82,6 +82,7 @@ type TaskActionReconciler struct {
 	SecretManager   pluginsCore.SecretManager
 	ResourceManager pluginsCore.ResourceManager
 	CatalogClient   catalog.AsyncClient
+	Catalog         catalog.Client
 	eventsClient    workflowconnect.EventsProxyServiceClient
 	cluster         string
 }
@@ -184,17 +185,70 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
-	// Invoke plugin.Handle
-	transition, err := p.Handle(ctx, tCtx)
+	// cacheShortCircuited is true when cache handling already decided the outcome,
+	// either via cache hit or waiting on the reservation owner.
+	var cacheShortCircuited bool
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
 	if err != nil {
-		logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
-			"Plugin %q Handle failed: %v", p.GetID(), err)
+		logger.Error(err, "cache pre-execution handling failed")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+	// Even when cache handling short-circuits execution, we still continue through the
+	// shared reconcile tail below so the derived transition updates conditions, status,
+	// and emitted action events in the same way as the normal plugin path.
+
+	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	if !cacheShortCircuited {
+		transition, err = p.Handle(ctx, tCtx)
+		if err != nil {
+			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
+			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+				"Plugin %q Handle failed: %v", p.GetID(), err)
+			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		}
+	}
+
+	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
+		logger.Error(err, "cache post-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
+
+	// In-place task restart: when a recoverable failure occurs, restart the pod within the
+	// same TaskAction rather than relying on the runs service to create a new TaskAction.
+	var restartAttempts uint32
+	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
+		currentAttempts := observedAttempts(taskAction)
+		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+
+		if currentAttempts < maxAttempts {
+			// Abort (delete) the current pod before incrementing attempts.
+			// tCtx was built with the current attempt number so Abort targets the right pod.
+			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+				logger.Error(abortErr, "failed to abort pod during in-place restart")
+			}
+			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
+			restartAttempts = currentAttempts + 1
+			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
+			// Override the transition to Queued so the TaskAction stays non-terminal.
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			phaseInfo = transition.Info()
+		} else {
+			// All retries exhausted — convert to a permanent (terminal) failure.
+			execErr := phaseInfo.Err()
+			if execErr == nil {
+				execErr = &core.ExecutionError{
+					Kind:    core.ExecutionError_USER,
+					Code:    "MaxRetriesExceeded",
+					Message: fmt.Sprintf("task failed after %d attempt(s)", currentAttempts),
+				}
+			}
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, phaseInfo.Info()))
+			phaseInfo = transition.Info()
+		}
+	}
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -209,8 +263,18 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		taskAction.Status.PluginStateVersion = newVersion
 	}
 
+	// If an in-place restart was triggered, increment attempts and clear plugin state so the
+	// next reconcile starts fresh with PluginPhaseNotStarted and creates a new pod.
+	if restartAttempts > 0 {
+		taskAction.Status.Attempts = restartAttempts
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
+	}
+
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
 	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	taskAction.Status.Attempts = observedAttempts(taskAction)
+	taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
@@ -290,6 +354,14 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
+	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to build cache config for finalization cleanup")
+	} else if ok {
+		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
+			logger.Error(err, "failed to release cache reservation during finalization cleanup")
+		}
+	}
+
 	return r.removeFinalizer(ctx, taskAction)
 }
 
@@ -314,7 +386,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return nil
 	}
 
-	actionEvent := r.buildActionEvent(newTaskAction, phaseInfo)
+	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
 	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{actionEvent},
 	})); err != nil {
@@ -330,7 +402,6 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	logger.Info("updateTaskActionStatus", "name", oldTaskAction.Name, "old status", oldTaskAction.Status, "new status", newTaskAction.Status)
 	if err := r.Status().Update(ctx, newTaskAction); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
@@ -340,12 +411,12 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 }
 
 func (r *TaskActionReconciler) buildActionEvent(
+	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	phaseInfo pluginsCore.PhaseInfo,
 ) *workflow.ActionEvent {
 	actionID := &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     taskAction.Spec.Org,
 			Project: taskAction.Spec.Project,
 			Domain:  taskAction.Spec.Domain,
 			Name:    taskAction.Spec.RunName,
@@ -354,54 +425,63 @@ func (r *TaskActionReconciler) buildActionEvent(
 	}
 
 	info := phaseInfo.Info()
-	updatedTime := updatedTimestamp(info, taskAction.Status.PhaseHistory)
-	reportedTime := reportedTimestamp(info)
+	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
 
 	event := &workflow.ActionEvent{
 		Id:            actionID,
-		Attempt:       1, // TODO(nary): wire retry attempt once retry state is available in executor status.
+		Attempt:       observedAttempts(taskAction),
 		Phase:         phaseToActionPhase(phaseInfo.Phase()),
 		Version:       phaseInfo.Version(),
 		UpdatedTime:   updatedTime,
 		ErrorInfo:     toActionErrorInfo(phaseInfo.Err()),
 		Cluster:       r.cluster,
-		Outputs:       outputRefs(taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName),
-		ClusterEvents: toClusterEvents(info, updatedTime),
-		ReportedTime:  reportedTime,
+		Outputs:       outputRefs(ctx, taskAction),
+		ClusterEvents: toClusterEvents(phaseInfo, updatedTime),
+		ReportedTime:  timestamppb.New(time.Now()),
 	}
 
 	if info != nil {
 		event.LogInfo = info.Logs
 		event.LogContext = info.LogContext
-		event.CacheStatus = cacheStatusFromExternalResources(info.ExternalResources)
 	}
+	event.CacheStatus = observedCacheStatus(info)
 
 	return event
 }
 
-func updatedTimestamp(info *pluginsCore.TaskInfo, history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
-	if info != nil && info.OccurredAt != nil {
-		return timestamppb.New(*info.OccurredAt)
+func observedAttempts(taskAction *flyteorgv1.TaskAction) uint32 {
+	if taskAction.Status.Attempts > 0 {
+		return taskAction.Status.Attempts
 	}
-	if n := len(history); n > 0 {
-		return timestamppb.New(history[n-1].OccurredAt.Time)
-	}
-	return nil
+	// if attempts is not set, default to 1
+	return 1
 }
 
-func reportedTimestamp(info *pluginsCore.TaskInfo) *timestamppb.Timestamp {
-	if info != nil && info.ReportedAt != nil {
-		return timestamppb.New(*info.ReportedAt)
+func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
+	if info == nil {
+		return core.CatalogCacheStatus_CACHE_DISABLED
+	}
+	return cacheStatusFromExternalResources(info.ExternalResources)
+}
+
+func updatedTimestamp(history []flyteorgv1.PhaseTransition) *timestamppb.Timestamp {
+	if n := len(history); n > 0 {
+		return timestamppb.New(history[n-1].OccurredAt.Time)
 	}
 	return timestamppb.Now()
 }
 
-func outputRefs(runOutputBase, actionName string) *task.OutputReferences {
-	if runOutputBase == "" {
+func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.OutputReferences {
+	if taskAction.Spec.RunOutputBase == "" {
+		return nil
+	}
+	attempt := observedAttempts(taskAction)
+	prefix, err := plugin.ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt)
+	if err != nil {
 		return nil
 	}
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(runOutputBase, "/") + "/" + actionName,
+		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
 	}
 }
 
@@ -443,11 +523,29 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	return out
 }
 
-func toClusterEvents(info *pluginsCore.TaskInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
-	if info == nil || len(info.AdditionalReasons) == 0 {
+func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
+	info := phaseInfo.Info()
+	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
 		return nil
 	}
-	out := make([]*workflow.ClusterEvent, 0, len(info.AdditionalReasons))
+
+	out := []*workflow.ClusterEvent{}
+	if phaseInfo.Reason() != "" {
+		e := &workflow.ClusterEvent{
+			Message: phaseInfo.Reason(),
+		}
+		if info != nil && info.OccurredAt != nil {
+			e.OccurredAt = timestamppb.New(*info.OccurredAt)
+		} else {
+			e.OccurredAt = fallbackTime
+		}
+		out = append(out, e)
+	}
+
+	if info == nil {
+		return out
+	}
+
 	for _, reason := range info.AdditionalReasons {
 		e := &workflow.ClusterEvent{
 			Message: reason.Reason,
@@ -476,16 +574,22 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, and conditions.
+// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
 	if oldStatus.StateJSON != newStatus.StateJSON ||
 		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
-		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion {
+		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
+		oldStatus.Attempts != newStatus.Attempts ||
+		oldStatus.CacheStatus != newStatus.CacheStatus {
 		return true
 	}
 
 	if !bytes.Equal(oldStatus.PluginState, newStatus.PluginState) {
+		return true
+	}
+
+	if len(oldStatus.PhaseHistory) != len(newStatus.PhaseHistory) {
 		return true
 	}
 
@@ -553,7 +657,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry)
+	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
 	if phaseName != "" {
 		n := len(ta.Status.PhaseHistory)
 		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
@@ -632,9 +736,6 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	var missing []string
 	if taskAction.Spec.RunName == "" {
 		missing = append(missing, "runName")
-	}
-	if taskAction.Spec.Org == "" {
-		missing = append(missing, "org")
 	}
 	if taskAction.Spec.Project == "" {
 		missing = append(missing, "project")

@@ -22,7 +22,6 @@ func TestParseDatabaseConfig(t *testing.T) {
 
 	assert.NoError(t, accessor.UpdateConfig(context.Background()))
 
-	assert.Equal(t, false, GetConfig().EnableForeignKeyConstraintWhenMigrating)
 	assert.Equal(t, 100, GetConfig().MaxOpenConnections)
 	assert.Equal(t, 10, GetConfig().MaxIdleConnections)
 	assert.Equal(t, config.Duration{Duration: 3600000000000}, GetConfig().ConnMaxLifeTime)
@@ -37,6 +36,4 @@ func TestParseDatabaseConfig(t *testing.T) {
 	assert.Equal(t, "/etc/secret", GetConfig().Postgres.PasswordPath)
 	assert.Equal(t, true, GetConfig().Postgres.Debug)
 
-	assert.Equal(t, false, GetConfig().SQLite.IsEmpty())
-	assert.Equal(t, "admin.db", GetConfig().SQLite.File)
 }

@@ -193,7 +193,6 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 	return &workflow.ActionUpdate{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
-				Org:     action.Spec.Org,
 				Project: action.Spec.Project,
 				Domain:  action.Spec.Domain,
 				Name:    action.Spec.RunName,

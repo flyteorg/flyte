@@ -3,6 +3,7 @@ package catalog
 import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -10,9 +11,10 @@ import (
 var cfgSection = config.MustRegisterSubSection("catalogCache", defaultConfig)
 
 type Config struct {
-	ReaderWorkqueueConfig workqueue.Config `json:"reader" pflag:",Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
-	WriterWorkqueueConfig workqueue.Config `json:"writer" pflag:",Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
-	CacheKey              CacheKeyConfig   `json:"cacheKey" pflag:",Cache key configuration."`
+	ReaderWorkqueueConfig workqueue.Config   `json:"reader" pflag:",Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
+	WriterWorkqueueConfig workqueue.Config   `json:"writer" pflag:",Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
+	CacheKey              CacheKeyConfig     `json:"cacheKey" pflag:",Cache key configuration."`
+	MaxCacheAge           stdconfig.Duration `json:"maxCacheAge" pflag:",Cache entries past this age will incur cache miss. 0 means cache never expires."`
 }
 
 type CacheKeyConfig struct {

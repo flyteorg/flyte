@@ -8,66 +8,21 @@ import "flyteidl2/common/phase.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/notification";
 
-message RuleId {
-  // Org this rule belongs to.
-  string org = 1 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Project this rule belongs to.
-  string project = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Domain this rule belongs to.
-  string domain = 3 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Unique name of the rule.
-  string name = 4 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
-}
-
-message DeliveryConfigId {
-  // Org this rule belongs to.
-  string org = 1 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Project this rule belongs to.
-  string project = 2 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Domain this rule belongs to.
-  string domain = 3 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
-
-  // Unique name of the rule.
-  string name = 4 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
-  ];
-}
-
 message DeliveryConfigTemplate {
-  oneof config {
-    option (buf.validate.oneof).required = true;
+  option (buf.validate.message).cel = {
+    id: "at_least_one_required"
+    message: "at least one of the delivery options must be set"
+    expression: "has(this.webhook) || has(this.email)"
+  };
 
-    WebhookDeliveryTemplate webhook = 1;
+  WebhookDeliveryTemplate webhook = 1;
 
-    EmailDeliveryTemplate email = 2;
-  }
+  EmailDeliveryTemplate email = 2;
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_RUN_COMPLETED = 1;
 }
 
 message RunCompletedNotificationTemplateData {
@@ -120,16 +75,61 @@ message WebhookDeliveryTemplate {
   string body_template = 4; // this is a Go template that may contain placeholders
 }
 
-message EmailDeliveryTemplate {
+message EmailRecipient {
+  string name = 1;
+
+  string address = 2;
+}
+
+// InlineEmailTemplate contains subject and body content rendered by the
+// notification system using Go templates.
+message InlineEmailTemplate {
   string subject = 1 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated string to = 2;
+  string html_template = 2 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
 
-  repeated string cc = 3;
+  string text_template = 3; // this is a Go template that may contain placeholders
+}
 
-  repeated string bcc = 4;
+// ProviderEmailTemplate references an externally managed email template owned
+// by an email provider.
+message ProviderEmailTemplate {
+  // Template ID is interpreted by the configured email provider.
+  string template_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
 
-  string html_template = 5 [(buf.validate.field).string.min_len = 1]; // this is a Go template that may contain placeholders
+  // Template data contains provider-defined key/value pairs used when rendering
+  // an externally managed email template, for example dynamic template
+  // variables referenced by the provider template's subject or body.
+  map<string, string> template_data = 2 [(buf.validate.field).map = {
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 100
+      }
+    }
+    values: {
+      string: {max_len: 4000}
+    }
+    max_pairs: 100
+  }];
+}
 
-  string text_template = 6; // this is a Go template that may contain placeholders
+message EmailDeliveryTemplate {
+  repeated EmailRecipient to = 1 [(buf.validate.field).repeated.min_items = 1];
+
+  repeated EmailRecipient cc = 2;
+
+  repeated EmailRecipient bcc = 3;
+
+  // Content may be provided either inline or via an external provider template.
+  oneof content {
+    option (buf.validate.oneof).required = true;
+
+    InlineEmailTemplate inline = 4;
+
+    ProviderEmailTemplate provider_template = 5;
+  }
 }

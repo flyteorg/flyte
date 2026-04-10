@@ -20,7 +20,6 @@ import (
 var (
 	testActionID = &common.ActionIdentifier{
 		Run: &common.RunIdentifier{
-			Org:     "org",
 			Project: "project",
 			Domain:  "domain",
 			Name:    "run",

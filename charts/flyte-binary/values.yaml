@@ -56,6 +56,15 @@ flyte-core-components:
     download:
       maxExpiresIn: 1h
 
+  secret:
+    kubernetes:
+      namespace: "flyte"
+      clusterName: "flyte-demo"
+      kubeconfig: ""
+      qps: 100
+      burst: 200
+      timeout: "30s"
+
 # configuration Specify configuration for Flyte
 configuration:
   # database Specify configuration for Flyte's database connection
@@ -75,9 +84,6 @@ configuration:
     dbname: flyte
     # options Additional client options for connecting to database
     options: sslmode=disable
-    # sqlite.file Path to SQLite database file. If set, SQLite is used instead of PostgreSQL.
-    sqlite:
-      file: "/var/lib/flyte/flyte.db"
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata

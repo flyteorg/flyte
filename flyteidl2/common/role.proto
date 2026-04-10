@@ -38,6 +38,10 @@ enum RoleType {
 
   // The support role would have contributor permissions plus the access to support endpoints
   ROLE_TYPE_SUPPORT = 9;
+
+  // Internal system-provisioned role assigned to all identities by default.
+  // Grants baseline access required for platform functionality (e.g. image builder).
+  ROLE_TYPE_SYSTEM_PROVISIONED_ACCESS = 10;
 }
 
 message Role {

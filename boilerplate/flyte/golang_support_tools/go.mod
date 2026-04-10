@@ -7,7 +7,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v1.11.0
 	github.com/golangci/golangci-lint v1.61.0
 	github.com/pseudomuto/protoc-gen-doc v1.4.1
-	github.com/vektra/mockery/v2 v2.52.1
+	github.com/vektra/mockery/v3 v3.7.0
 )
 
 require (
@@ -279,6 +279,7 @@ require (
 )
 
 replace (
+	github.com/flyteorg/flyte/flytestdlib => ../../../flytestdlib
 	github.com/pseudomuto/protoc-gen-doc => github.com/flyteorg/protoc-gen-doc v1.4.2
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )

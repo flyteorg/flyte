@@ -68,4 +68,5 @@ type TemplateLogPlugin struct {
 	ShowWhilePending bool           `json:"showWhilePending" pflag:",If true, the log link will be shown even if the task is in a pending state."`
 	HideOnceFinished bool           `json:"hideOnceFinished" pflag:",If true, the log link will be hidden once the task has finished."`
 	LinkType         string         `json:"linkType" pflag:",Type of the log. (external, dashboard, or ide). This is used to distinguish between different log links."`
+	IconUri          string         `json:"iconUri" pflag:",Icon URI for the log link."`
 }

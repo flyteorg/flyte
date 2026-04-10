@@ -45,7 +45,7 @@ message GetOAuth2MetadataResponse {
 
 message GetPublicClientConfigRequest {}
 
-// FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
+// GetPublicClientConfigResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
 message GetPublicClientConfigResponse {
   // client_id to use when initiating OAuth2 authorization requests.
   string client_id = 1;
@@ -62,6 +62,8 @@ message GetPublicClientConfigResponse {
   string service_http_endpoint = 5;
   // audience to use when initiating OAuth2 authorization requests.
   string audience = 6;
+  // Returns the endpoint to use for dataplane specific operations.
+  string dataplane_domain = 7;
 }
 
 // The following defines an RPC service that is also served over HTTP via grpc-gateway.

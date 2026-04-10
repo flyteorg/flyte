@@ -7,14 +7,13 @@ import (
 )
 
 type Project struct {
-	Identifier  string `gorm:"primary_key"`
-	Name        string `valid:"length(0|255)"` // Human-readable name, not a unique identifier.
-	Description string `gorm:"type:varchar(300)"`
-	Labels      []byte
-	// GORM doesn't save the zero value for ints, so we use a pointer for the State field.
-	State *int32 `gorm:"default:0;index"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Identifier  string    `db:"identifier"`
+	Name        string    `db:"name"`
+	Description string    `db:"description"`
+	Labels      []byte    `db:"labels"`
+	State       *int32    `db:"state"`
+	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 var ProjectColumns = sets.New[string](

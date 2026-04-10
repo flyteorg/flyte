@@ -70,6 +70,10 @@ message ContainerSelector {
   // The label selector to filter pods. This will only apply to live pods' logs because Listing by prefix
   // isn't supported.
   string kubernetes_pod_label_selector = 5;
+
+  // NodeName is the name of the Kubernetes node to filter pods for. Only pods running on this node will be included.
+  // +optional
+  string node_name = 6;
 }
 
 message LiveLogsOptions {

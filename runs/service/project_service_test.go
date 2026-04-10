@@ -7,19 +7,14 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
-	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 func setupProjectService(t *testing.T) *ProjectService {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
-	require.NoError(t, db.AutoMigrate(&models.Project{}))
-	return NewProjectService(impl.NewProjectRepo(db), []*project.Domain{
+	t.Cleanup(func() { testDB.Exec("DELETE FROM projects") })
+	return NewProjectService(impl.NewProjectRepo(testDB), []*project.Domain{
 		{Id: "development", Name: "Development"},
 		{Id: "production", Name: "Production"},
 	})
