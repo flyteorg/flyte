@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"path"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -17,11 +18,17 @@ type DownloadOptions struct {
 	*RootOptions
 	remoteInputsPath    string
 	remoteOutputsPrefix string
-	localDirectoryPath  string
-	inputInterface      []byte
-	metadataFormat      string
-	downloadMode        string
-	timeout             time.Duration
+	// Local directory path where the sidecar should look for outputs. Use downloadConfigFilePath to override this for individual outputs.
+	localDirectoryPath string
+	// Path to a JSON file mapping variable names to FileDownloadConfig.
+	// Local directory path, used with downloadConfigFilePath.
+	downloadConfigDir string
+	// Path to a JSON file configuring downloads. It maps an input to the path the sidecar should look for its download.
+	downloadConfigFilePath string
+	inputInterface         []byte
+	metadataFormat         string
+	downloadMode           string
+	timeout                time.Duration
 }
 
 func GetFormatVals() []string {
@@ -48,6 +55,25 @@ func GetUploadModeVals() []string {
 	return vals
 }
 
+func hydrateDownloadConfigs(configs map[string]data.FileIOConfig, vars *core.VariableMap, localDirectoryPath string) map[string]data.FileIOConfig {
+	for varName, variable := range vars.GetVariables() {
+		if _, ok := configs[varName]; !ok {
+			filename := varName
+			if blobType := variable.GetType().GetBlob(); blobType != nil {
+				ext := blobType.GetFileExtension()
+				if ext != "" && data.ValidFileExtensionRe.MatchString(ext) {
+					filename = varName + "." + ext
+				}
+			}
+			configs[varName] = data.FileIOConfig{
+				Path:         path.Join(localDirectoryPath, filename),
+				VariableName: varName,
+			}
+		}
+	}
+	return configs
+}
+
 func (d *DownloadOptions) Download(ctx context.Context) error {
 	if d.remoteOutputsPrefix == "" {
 		return fmt.Errorf("to-output-prefix is required")
@@ -70,6 +96,20 @@ func (d *DownloadOptions) Download(ctx context.Context) error {
 		if !ok {
 			return fmt.Errorf("incorrect input download mode specified, given [%s], possible values [%+v]", d.downloadMode, GetDownloadModeVals())
 		}
+
+		logger.Infof(ctx, "Loading download configs from %s", d.downloadConfigFilePath)
+		var downloadConfigs map[string]data.FileIOConfig
+		if d.downloadConfigFilePath != "" {
+			var err error
+			downloadConfigs, err = data.LoadFileIOConfigs(d.downloadConfigFilePath, d.downloadConfigDir)
+			if err != nil {
+				return fmt.Errorf("failed to load download configs: %w", err)
+			}
+		} else {
+			downloadConfigs = make(map[string]data.FileIOConfig)
+		}
+		hydrateDownloadConfigs(downloadConfigs, variableMap, d.localDirectoryPath)
+
 		dl := data.NewDownloader(ctx, d.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_DownloadMode(m))
 		childCtx := ctx
 		cancelFn := func() {}
@@ -77,7 +117,7 @@ func (d *DownloadOptions) Download(ctx context.Context) error {
 			childCtx, cancelFn = context.WithTimeout(ctx, d.timeout)
 		}
 		defer cancelFn()
-		err := dl.DownloadInputs(childCtx, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath)
+		err := dl.DownloadInputs(childCtx, storage.DataReference(d.remoteInputsPath), d.localDirectoryPath, downloadConfigs)
 		if err != nil {
 			logger.Errorf(ctx, "Downloading failed, err %s", err)
 			return err
@@ -113,6 +153,8 @@ func NewDownloadCommand(opts *RootOptions) *cobra.Command {
 	downloadCmd.Flags().StringVarP(&downloadOpts.remoteInputsPath, "from-remote", "f", "", "The remote path/key for inputs in stow store.")
 	downloadCmd.Flags().StringVarP(&downloadOpts.remoteOutputsPrefix, "to-output-prefix", "", "", "The remote path/key prefix for outputs in stow store. this is mostly used to write errors.pb.")
 	downloadCmd.Flags().StringVarP(&downloadOpts.localDirectoryPath, "to-local-dir", "o", "", "The local directory on disk where data should be downloaded.")
+	downloadCmd.Flags().StringVarP(&downloadOpts.downloadConfigDir, "download-config-dir", "", "", "The local directory on disk where the sidecar should look for download configs.")
+	downloadCmd.Flags().StringVarP(&downloadOpts.downloadConfigFilePath, "download-config-file-path", "", "", "Path to a JSON file configuring downloads. It maps input variable names to their local file paths for downloads.")
 	downloadCmd.Flags().StringVarP(&downloadOpts.metadataFormat, "format", "m", core.DataLoadingConfig_JSON.String(), fmt.Sprintf("What should be the output format for the primitive and structured types. Options [%v]", GetFormatVals()))
 	downloadCmd.Flags().StringVarP(&downloadOpts.downloadMode, "download-mode", "d", core.IOStrategy_DOWNLOAD_EAGER.String(), fmt.Sprintf("Download mode to use. Options [%v]", GetDownloadModeVals()))
 	downloadCmd.Flags().DurationVarP(&downloadOpts.timeout, "timeout", "t", time.Hour*1, "Max time to allow for downloads to complete, default is 1H")

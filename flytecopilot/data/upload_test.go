@@ -44,8 +44,12 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 
 		outputRef := storage.DataReference("output")
 		rawRef := storage.DataReference("raw")
+		uploadConfigs := map[string]FileIOConfig{
+			"x": {Path: path.Join(tmpDir, "x")},
+		}
+		errorFilePath := path.Join(tmpDir, "error")
 		u := NewUploader(context.TODO(), store, core.DataLoadingConfig_JSON, core.IOStrategy_UPLOAD_ON_EXIT, "error")
-		assert.NoError(t, u.RecursiveUpload(context.TODO(), vmap, tmpDir, outputRef, rawRef))
+		assert.NoError(t, u.RecursiveUpload(context.TODO(), vmap, uploadConfigs, errorFilePath, outputRef, rawRef))
 
 		outputs := &core.LiteralMap{}
 		assert.NoError(t, store.ReadProtobuf(context.TODO(), outputRef, outputs))

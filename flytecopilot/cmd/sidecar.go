@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"path"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -30,8 +31,12 @@ type UploadOptions struct {
 	metaOutputName string
 	// The remote prefix where all the raw outputs should be uploaded of the form s3://bucket/prefix/
 	remoteOutputsRawPrefix string
-	// Local directory path where the sidecar should look for outputs.
+	// Local directory path where the sidecar should look for outputs. Use uploadConfigFilePath to override this for individual outputs.
 	localDirectoryPath string
+	// Local directory path, used with uploadConfigFilePath.
+	uploadConfigDir string
+	// Path to a JSON file configuring uploads. It maps an output to the path the sidecar should look for its upload.
+	uploadConfigFilePath string
 	// Non primitive types will be dumped in this output format
 	metadataFormat   string
 	uploadMode       string
@@ -49,6 +54,18 @@ func (u *UploadOptions) createWatcher(_ context.Context, w containerwatcher.Watc
 		return containerwatcher.NoopWatcher{}, nil
 	}
 	return nil, fmt.Errorf("unsupported watcher type")
+}
+
+func hydrateUploadConfigs(configs map[string]data.FileIOConfig, vars *core.VariableMap, localDirectoryPath string) map[string]data.FileIOConfig {
+	for varName := range vars.GetVariables() {
+		if _, ok := configs[varName]; !ok {
+			configs[varName] = data.FileIOConfig{
+				Path:         path.Join(localDirectoryPath, varName),
+				VariableName: varName,
+			}
+		}
+	}
+	return configs
 }
 
 func (u *UploadOptions) uploader(ctx context.Context) error {
@@ -99,11 +116,25 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 		return err
 	}
 
+	logger.Infof(ctx, "Loading upload configs from %s", u.uploadConfigFilePath)
+	var uploadConfigs map[string]data.FileIOConfig
+	if u.uploadConfigFilePath != "" {
+		var err error
+		uploadConfigs, err = data.LoadFileIOConfigs(u.uploadConfigFilePath, u.uploadConfigDir)
+		if err != nil {
+			return fmt.Errorf("failed to load upload configs: %w", err)
+		}
+	} else {
+		uploadConfigs = make(map[string]data.FileIOConfig)
+	}
+	hydrateUploadConfigs(uploadConfigs, outputInterface, u.localDirectoryPath)
+
+	errorFilePath := path.Join(u.localDirectoryPath, ErrorFile)
 	dl := data.NewUploader(ctx, u.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_UploadMode(m), ErrorFile)
 
 	childCtx, cancelFn := context.WithTimeout(ctx, u.timeout)
 	defer cancelFn()
-	if err := dl.RecursiveUpload(childCtx, outputInterface, u.localDirectoryPath, toOutputPath, storage.DataReference(u.remoteOutputsRawPrefix)); err != nil {
+	if err := dl.RecursiveUpload(childCtx, outputInterface, uploadConfigs, errorFilePath, toOutputPath, storage.DataReference(u.remoteOutputsRawPrefix)); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
 		return err
 	}
@@ -142,7 +173,9 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 
 	uploadCmd.Flags().StringVarP(&uploadOptions.remoteOutputsPrefix, "to-output-prefix", "o", "", "The remote path/key prefix for output metadata in stow store.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.remoteOutputsRawPrefix, "to-raw-output", "x", "", "The remote path/key prefix for outputs in remote store. This is a sandbox directory and all data will be uploaded here.")
-	uploadCmd.Flags().StringVarP(&uploadOptions.localDirectoryPath, "from-local-dir", "f", "", "The local directory on disk where data will be available for upload.")
+	uploadCmd.Flags().StringVarP(&uploadOptions.localDirectoryPath, "from-local-dir", "f", "", "The local directory on disk where data will be available for upload. Use the upload-config-* flags to override this for individual outputs.")
+	uploadCmd.Flags().StringVarP(&uploadOptions.uploadConfigDir, "upload-config-dir", "", "", "The local directory on disk where the sidecar should look for upload configs.")
+	uploadCmd.Flags().StringVarP(&uploadOptions.uploadConfigFilePath, "upload-config-file-path", "", "", "Path to a JSON file configuring uploads. It maps output variable names to their local file paths for uploads.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.metadataFormat, "format", "m", core.DataLoadingConfig_JSON.String(), fmt.Sprintf("What should be the output format for the primitive and structured types. Options [%v]", GetFormatVals()))
 	uploadCmd.Flags().StringVarP(&uploadOptions.uploadMode, "upload-mode", "u", core.IOStrategy_UPLOAD_ON_EXIT.String(), fmt.Sprintf("When should upload start/upload mode. Options [%v]", GetUploadModeVals()))
 	uploadCmd.Flags().StringVarP(&uploadOptions.metaOutputName, "meta-output-name", "", "outputs.pb", "The key name under the remoteOutputPrefix that should be return to provide meta information about the outputs on successful execution")

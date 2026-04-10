@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 
@@ -114,12 +113,11 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 	return coreutils.MakeLiteralForBlob(toPath, false, ""), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
 }
 
-func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, fromPath string, metaOutputPath, dataRawPath storage.DataReference) error {
+func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, uploadConfigs map[string]FileIOConfig, errorFilePath string, metaOutputPath, dataRawPath storage.DataReference) error {
 	childCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errFile := path.Join(fromPath, u.errorFileName)
-	if info, err := os.Stat(errFile); err != nil {
+	if info, err := os.Stat(errorFilePath); err != nil {
 		if !os.IsNotExist(err) {
 			return err
 		}
@@ -128,7 +126,7 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	} else if info.IsDir() {
 		return fmt.Errorf("error file is a directory")
 	} else {
-		b, err := ioutil.ReadFile(errFile)
+		b, err := ioutil.ReadFile(errorFilePath)
 		if err != nil {
 			return err
 		}
@@ -137,7 +135,11 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 
 	varFutures := make(map[string]futures.Future, len(vars.GetVariables()))
 	for varName, variable := range vars.GetVariables() {
-		varPath := path.Join(fromPath, varName)
+		cfg, ok := uploadConfigs[varName]
+		if !ok {
+			return fmt.Errorf("no upload config found for variable %q", varName)
+		}
+		varPath := cfg.Path
 		varType := variable.GetType()
 		switch varType.GetType().(type) {
 		case *core.LiteralType_Blob:
