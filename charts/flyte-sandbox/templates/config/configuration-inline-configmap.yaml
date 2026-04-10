@@ -1,7 +1,0 @@
-{{- if ( index .Values "flyte-binary" "enabled" ) }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "flyte-sandbox.configuration.inlineConfigMap" . }}
-  namespace: {{ .Release.Namespace | quote }}
-{{- end }}

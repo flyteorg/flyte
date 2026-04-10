@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-demo-rustfs
+  namespace: flyte
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: volume-permissions
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          chown -R 10001:10001 /data
+          mkdir -p /data/flyte-data
+          chown 10001:10001 /data/flyte-data
+      containers:
+      - name: rustfs
+        env:
+        - name: RUSTFS_ADDRESS
+          value: "0.0.0.0:9000"
+        - name: RUSTFS_VOLUMES
+          value: "/data"
