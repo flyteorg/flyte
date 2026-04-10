@@ -31,12 +31,12 @@ markupsafe==3.0.2
     # via jinja2
 packaging==24.1
     # via sphinx
-pygments==2.18.0
+pygments==2.20.0
     # via
     #   furo
     #   sphinx
     #   sphinx-prompt
-requests==2.32.4
+requests==2.33.0
     # via
     #   sphinx
     #   sphinxcontrib-youtube
