@@ -239,6 +239,30 @@ type OAuth2Options struct {
 	// different claim for the client identity. Example:
 	//   subjectClaimNames: ["sub", "client_id"]
 	SubjectClaimNames []string `json:"subjectClaimNames" pflag:",Ordered list of JWT claim names to try for subject identity resolution from access tokens. When empty the standard sub claim is used."`
+
+	// IdentityTypeClaimsForApps maps JWT claim names to the set of values that identify an
+	// app (machine/service) token. When any configured claim is present in the JWT and its
+	// value is in the configured set, the token is classified as an app identity and
+	// "identitytype" is normalized to "app". Any token that does not match is normalized to
+	// "user" (the default). When empty, no normalization is performed.
+	//
+	// This handles IdPs that use a non-standard claim for identity type, or that use
+	// different values than "app" to distinguish service accounts from users. Example for
+	// Entra ID (idtyp="app" for client-credentials tokens):
+	//
+	//   identityTypeClaimsForApps:
+	//     idtyp:
+	//       - app
+	//     identitytype:
+	//       - app
+	//
+	// A customer using a custom claim with multiple app-indicating values:
+	//
+	//   identityTypeClaimsForApps:
+	//     token_type:
+	//       - service_account
+	//       - daemon
+	IdentityTypeClaimsForApps map[string][]string `json:"identityTypeClaimsForApps" pflag:"-,Map of JWT claim names to sets of values that identify app (machine) tokens. Configure in the config file; cannot be set via flags."`
 }
 
 type UserAuthConfig struct {

@@ -81,7 +81,7 @@ func newMockResourceServer(t testing.TB, publicKey rsa.PublicKey) (resourceServe
 	r, err := NewOAuth2ResourceServer(ctx, authConfig.ExternalAuthorizationServer{
 		BaseURL:         stdlibConfig.URL{URL: *config.MustParseURL(s.URL)},
 		AllowedAudience: []string{"https://localhost"},
-	}, stdlibConfig.URL{}, []string{"sub"})
+	}, stdlibConfig.URL{}, []string{"sub"}, nil)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}

@@ -12,7 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}, subjectClaimNames []string) (interfaces.IdentityContext, error) {
+func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}, subjectClaimNames []string, identityTypeClaimsForApps map[string][]string) (interfaces.IdentityContext, error) {
 	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
 
 	foundAudIndex := -1
@@ -47,6 +47,34 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		if len(subject) > 0 {
 			claimsRaw["sub"] = subject
 		}
+	}
+
+	// Resolve identity type from configurable claim mappings.
+	// When identityTypeClaimsForApps is configured, each entry maps a JWT claim name to the
+	// set of values that identify an app (machine/service) token. If any configured claim is
+	// present in the JWT and its value appears in the configured set, the token is classified
+	// as "app". Any token that does not match is normalized to "user" (the default), which
+	// handles IdPs like Entra ID where user tokens omit the identity type claim entirely.
+	//
+	// When identityTypeClaimsForApps is empty, no normalization is performed (default behavior).
+	if len(identityTypeClaimsForApps) > 0 {
+		resolvedIdentityType := "user"
+		for claim, appValues := range identityTypeClaimsForApps {
+			if v, ok := claimsRaw[claim]; ok {
+				if s, ok := v.(string); ok {
+					for _, appValue := range appValues {
+						if s == appValue {
+							resolvedIdentityType = "app"
+							break
+						}
+					}
+				}
+			}
+			if resolvedIdentityType == "app" {
+				break
+			}
+		}
+		claimsRaw[IdentityTypeClaim] = resolvedIdentityType
 	}
 
 	userInfo := &service.UserInfoResponse{}
