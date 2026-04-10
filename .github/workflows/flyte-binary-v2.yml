@@ -24,13 +24,13 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          working-directory: docker/sandbox-bundled/bootstrap
+          working-directory: docker/demo-bundled/bootstrap
       - name: Check formatting
-        working-directory: docker/sandbox-bundled/bootstrap
+        working-directory: docker/demo-bundled/bootstrap
         run: |
           make check-fmt
       - name: Test
-        working-directory: docker/sandbox-bundled/bootstrap
+        working-directory: docker/demo-bundled/bootstrap
         run: |
           make test
 
@@ -70,7 +70,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Setup destination directories for image tarballs
         run: |
-          mkdir -p docker/sandbox-bundled/images/tar/{arm64,amd64}
+          mkdir -p docker/demo-bundled/images/tar/{arm64,amd64}
       - name: Export ARM64 Image
         uses: docker/build-push-action@v6
         with:
@@ -81,7 +81,7 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
+          outputs: type=docker,dest=docker/demo-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
         uses: docker/build-push-action@v6
         with:
@@ -92,12 +92,12 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
+          outputs: type=docker,dest=docker/demo-bundled/images/tar/amd64/flyte-binary.tar
       - name: Upload single binary image
         uses: actions/upload-artifact@v4
         with:
           name: single-binary-image
-          path: docker/sandbox-bundled/images/tar
+          path: docker/demo-bundled/images/tar
       - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/login-action@v2
@@ -118,7 +118,7 @@ jobs:
           file: Dockerfile
           push: true
 
-  build-and-push-sandbox-bundled-image:
+  build-and-push-demo-bundled-image:
     runs-on: ubuntu-latest
     needs: [build-and-push-single-binary-image]
     steps:
@@ -127,7 +127,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
-          path: docker/sandbox-bundled/images/tar
+          path: docker/demo-bundled/images/tar
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -138,12 +138,15 @@ jobs:
       - name: Set version
         id: set_version
         run: |
-          echo "FLYTE_SANDBOX_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "FLYTE_DEMO_VERSION=${{ github.sha }}" >> $GITHUB_ENV
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
         with:
+          # Push to both flyte-demo and flyte-sandbox-v2 (legacy name)
+          #  so existing users pulling the old image continue to work.
           images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-demo
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
@@ -156,18 +159,18 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Save console image tarballs
         run: |
-          mkdir -p docker/sandbox-bundled/images/tar/amd64 docker/sandbox-bundled/images/tar/arm64
+          mkdir -p docker/demo-bundled/images/tar/amd64 docker/demo-bundled/images/tar/arm64
           docker pull --platform linux/amd64 ghcr.io/flyteorg/flyte-client-v2:latest
-          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/sandbox-bundled/images/tar/amd64/flyte-client-v2.tar
+          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/demo-bundled/images/tar/amd64/flyte-client-v2.tar
           docker pull --platform linux/arm64 ghcr.io/flyteorg/flyte-client-v2:latest
-          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/sandbox-bundled/images/tar/arm64/flyte-client-v2.tar
+          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/demo-bundled/images/tar/arm64/flyte-client-v2.tar
       - name: Build and push multi-arch image
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
-          context: docker/sandbox-bundled
+          context: docker/demo-bundled
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
+          build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
           push: true
