@@ -29,27 +29,30 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	workflowpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 type Service struct {
 	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
-	cfg           config.DataProxyConfig
-	dataStore     *storage.DataStore
-	taskClient    taskconnect.TaskServiceClient
-	triggerClient triggerconnect.TriggerServiceClient
-	runClient     workflowconnect.RunServiceClient
+	cfg            config.DataProxyConfig
+	dataStore      *storage.DataStore
+	taskClient     taskconnect.TaskServiceClient
+	triggerClient  triggerconnect.TriggerServiceClient
+	runClient      workflowconnect.RunServiceClient
+	runLogsClient  workflowconnect.RunLogsServiceClient
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, runLogsClient workflowconnect.RunLogsServiceClient) *Service {
 	return &Service{
-		cfg:           cfg,
-		dataStore:     dataStore,
-		taskClient:    taskClient,
-		triggerClient: triggerClient,
-		runClient:     runClient,
+		cfg:            cfg,
+		dataStore:      dataStore,
+		taskClient:     taskClient,
+		triggerClient:  triggerClient,
+		runClient:      runClient,
+		runLogsClient:  runLogsClient,
 	}
 }
 
@@ -433,6 +436,20 @@ func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
 		}
 	}
 	return &task.Inputs{Literals: filtered}
+}
+
+// TailLogs streams logs for an action attempt by proxying to the RunLogsService.
+func (s *Service) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest], stream *connect.ServerStream[workflow.TailLogsResponse]) error {
+	clientStream, err := s.runLogsClient.TailLogs(ctx, req)
+	if err != nil {
+		return err
+	}
+	for clientStream.Receive() {
+		if err := stream.Send(clientStream.Msg()); err != nil {
+			return err
+		}
+	}
+	return clientStream.Err()
 }
 
 // hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.

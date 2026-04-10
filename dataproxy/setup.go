@@ -25,8 +25,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL)
 	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
 	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL)
+	runLogsClient := workflowconnect.NewRunLogsServiceClient(http.DefaultClient, baseURL)
 
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient)
+	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, runLogsClient)
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
 	sc.Mux.Handle(path, handler)
