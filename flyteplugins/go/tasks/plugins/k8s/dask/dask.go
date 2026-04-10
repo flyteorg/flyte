@@ -297,6 +297,11 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		OccurredAt: &occurredAt,
 	}
 
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	o, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
@@ -304,6 +309,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 			PodName:         job.Status.JobRunnerPodName,
 			LogName:         "(Dask Runner Logs)",
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		},
 	)
 	if err != nil {
