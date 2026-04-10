@@ -23,7 +23,7 @@ func TestDeployTask(t *testing.T) {
 	mockTaskRepo := mocks.NewTaskRepo(t)
 
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
-	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task")).Return(nil)
+	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task"), mock.Anything).Return(nil)
 
 	service := NewTaskService(mockRepo)
 

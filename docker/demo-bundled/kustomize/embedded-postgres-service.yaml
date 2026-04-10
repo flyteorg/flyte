@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+spec:
+  type: NodePort
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: 5432
+      nodePort: 30001
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: postgresql
+  namespace: flyte
+  labels:
+    app.kubernetes.io/name: embedded-postgresql
+subsets:
+  - addresses:
+      - ip: "%{NODE_IP}%"
+    ports:
+      - name: tcp-postgresql
+        port: 5432
