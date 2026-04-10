@@ -19,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -81,92 +80,6 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 	}
 
 	return &run, nil
-}
-
-// ListRuns lists runs with pagination and optional filters.
-func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
-	// Build scope filter: always restrict to root actions (runs).
-	scopeFilter := interfaces.Filter(NewIsRootActionFilter())
-
-	switch scope := req.ScopeBy.(type) {
-	case *workflow.ListRunsRequest_ProjectId:
-		scopeFilter = scopeFilter.And(NewProjectIdFilter(scope.ProjectId))
-	case *workflow.ListRunsRequest_TaskName:
-		scopeFilter = scopeFilter.And(NewRunTaskNameFilter(scope.TaskName))
-	case *workflow.ListRunsRequest_TaskId:
-		scopeFilter = scopeFilter.And(NewRunTaskIdFilter(scope.TaskId))
-	}
-
-	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
-	listInput, err := NewListResourceInputFromProto(req.Request, models.ActionColumnsSet)
-	if err != nil {
-		return nil, "", fmt.Errorf("invalid list request: %w", err)
-	}
-
-	// Merge: scope filter always takes precedence, user filters are ANDed on top.
-	if listInput.Filter == nil {
-		listInput.Filter = scopeFilter
-	} else {
-		listInput.Filter = scopeFilter.And(listInput.Filter)
-	}
-
-	return r.listRunsByInput(ctx, listInput)
-}
-
-// listRunsByInput executes the query described by listInput against the actions table.
-func (r *actionRepo) listRunsByInput(ctx context.Context, listInput interfaces.ListResourceInput) ([]*models.Run, string, error) {
-	var queryBuilder strings.Builder
-	var args []interface{}
-
-	queryBuilder.WriteString("SELECT * FROM actions")
-
-	// Apply filters — QueryExpression emits ? placeholders; Rebind converts to $N for PostgreSQL.
-	if listInput.Filter != nil {
-		expr, err := listInput.Filter.QueryExpression("")
-		if err != nil {
-			return nil, "", fmt.Errorf("failed to build filter expression: %w", err)
-		}
-		queryBuilder.WriteString(" WHERE ")
-		queryBuilder.WriteString(expr.Query)
-		args = append(args, expr.Args...)
-	}
-
-	// Apply sort parameters; default to created_at DESC.
-	if len(listInput.SortParameters) > 0 {
-		queryBuilder.WriteString(" ORDER BY ")
-		for i, sp := range listInput.SortParameters {
-			if i > 0 {
-				queryBuilder.WriteString(", ")
-			}
-			queryBuilder.WriteString(sp.GetOrderExpr())
-		}
-	} else {
-		queryBuilder.WriteString(" ORDER BY created_at DESC")
-	}
-
-	// Append LIMIT/OFFSET as ? placeholders, then rebind the entire query at once.
-	limit := listInput.Limit
-	if limit <= 0 {
-		limit = 50
-	}
-	queryBuilder.WriteString(" LIMIT ? OFFSET ?")
-	args = append(args, limit+1, listInput.Offset) // fetch one extra to detect next page
-
-	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
-
-	var runs []*models.Run
-	if err := sqlx.SelectContext(ctx, r.db, &runs, query, args...); err != nil {
-		return nil, "", fmt.Errorf("failed to list runs: %w", err)
-	}
-
-	// Determine next token
-	var nextToken string
-	if len(runs) > limit {
-		runs = runs[:limit]
-		nextToken = fmt.Sprintf("%d", listInput.Offset+limit)
-	}
-
-	return runs, nextToken, nil
 }
 
 // AbortRun aborts a run and all its actions
@@ -368,45 +281,46 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 	return &action, nil
 }
 
-// ListActions lists actions for a run
-func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
-	if limit == 0 {
-		limit = 100
-	}
-
+// ListActions lists actions matching the given input filter, sort, and pagination.
+func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	var queryBuilder strings.Builder
 	var args []interface{}
-	argIdx := 1
 
-	queryBuilder.WriteString(fmt.Sprintf("SELECT * FROM actions WHERE project = $%d AND domain = $%d AND run_name = $%d", argIdx, argIdx+1, argIdx+2))
-	args = append(args, runID.Project, runID.Domain, runID.Name)
-	argIdx += 3
+	queryBuilder.WriteString("SELECT * FROM actions")
 
-	// Apply pagination token (encoded as RFC3339Nano created_at cursor)
-	if token != "" {
-		if t, err := time.Parse(time.RFC3339Nano, token); err == nil {
-			queryBuilder.WriteString(fmt.Sprintf(" AND created_at > $%d", argIdx))
-			args = append(args, t)
-			argIdx++
+	if input.Filter != nil {
+		expr, err := input.Filter.QueryExpression("")
+		if err != nil {
+			return nil, fmt.Errorf("failed to build filter expression: %w", err)
 		}
+		queryBuilder.WriteString(" WHERE ")
+		queryBuilder.WriteString(expr.Query)
+		args = append(args, expr.Args...)
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at ASC LIMIT $%d", argIdx))
-	args = append(args, limit+1)
+	if len(input.SortParameters) > 0 {
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range input.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
+			}
+			queryBuilder.WriteString(sp.GetOrderExpr())
+		}
+	} else {
+		queryBuilder.WriteString(" ORDER BY created_at ASC")
+	}
+
+	queryBuilder.WriteString(" LIMIT ? OFFSET ?")
+	args = append(args, input.Limit, input.Offset)
+
+	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 
 	var actions []*models.Action
-	if err := sqlx.SelectContext(ctx, r.db, &actions, queryBuilder.String(), args...); err != nil {
-		return nil, "", fmt.Errorf("failed to list actions: %w", err)
+	if err := sqlx.SelectContext(ctx, r.db, &actions, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to list actions: %w", err)
 	}
 
-	// Determine next token
-	var nextToken string
-	if len(actions) > limit {
-		actions = actions[:limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
-	}
-
-	return actions, nextToken, nil
+	return actions, nil
 }
 
 // UpdateActionPhase updates the phase of an action.

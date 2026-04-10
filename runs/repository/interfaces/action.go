@@ -6,7 +6,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -14,7 +13,6 @@ import (
 type ActionRepo interface {
 	// Run operations
 	GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error)
-	ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error)
 	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Action operations
@@ -24,7 +22,7 @@ type ActionRepo interface {
 	ListEventsSince(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, since time.Time, offset, limit int) ([]*models.ActionEvent, error)
 	GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
-	ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)
+	ListActions(ctx context.Context, input ListResourceInput) ([]*models.Action, error)
 	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 

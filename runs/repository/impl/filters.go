@@ -16,6 +16,13 @@ func NewIsRootActionFilter() interfaces.Filter {
 	return &nullFilter{field: "parent_action_name", isNull: true}
 }
 
+// NewRunActionsFilter creates a filter for all actions belonging to a specific run.
+func NewRunActionsFilter(runID *common.RunIdentifier) interfaces.Filter {
+	return NewEqualFilter("project", runID.GetProject()).
+		And(NewEqualFilter("domain", runID.GetDomain())).
+		And(NewEqualFilter("run_name", runID.GetName()))
+}
+
 // basicFilter implements the Filter interface for simple field comparisons
 type basicFilter struct {
 	field      string
@@ -203,6 +210,14 @@ func NewRunTaskIdFilter(taskId *task.TaskIdentifier) interfaces.Filter {
 		And(NewEqualFilter("task_domain", taskId.GetDomain())).
 		And(NewEqualFilter("task_name", taskId.GetName())).
 		And(NewEqualFilter("task_version", taskId.GetVersion()))
+}
+
+// NewTriggerNameFilter creates a filter matching runs by trigger_name on the actions table.
+func NewTriggerNameFilter(triggerName *common.TriggerName) interfaces.Filter {
+	return NewEqualFilter("project", triggerName.GetProject()).
+		And(NewEqualFilter("domain", triggerName.GetDomain())).
+		And(NewEqualFilter("trigger_task_name", triggerName.GetTaskName())).
+		And(NewEqualFilter("trigger_name", triggerName.GetName()))
 }
 
 // NewDeployedByFilter creates a filter for deployed_by = value
