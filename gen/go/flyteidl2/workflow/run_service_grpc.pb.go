@@ -19,20 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RunService_CreateRun_FullMethodName          = "/flyteidl2.workflow.RunService/CreateRun"
-	RunService_AbortRun_FullMethodName           = "/flyteidl2.workflow.RunService/AbortRun"
-	RunService_GetRunDetails_FullMethodName      = "/flyteidl2.workflow.RunService/GetRunDetails"
-	RunService_WatchRunDetails_FullMethodName    = "/flyteidl2.workflow.RunService/WatchRunDetails"
-	RunService_GetActionDetails_FullMethodName   = "/flyteidl2.workflow.RunService/GetActionDetails"
-	RunService_WatchActionDetails_FullMethodName = "/flyteidl2.workflow.RunService/WatchActionDetails"
-	RunService_GetActionData_FullMethodName      = "/flyteidl2.workflow.RunService/GetActionData"
-	RunService_ListRuns_FullMethodName           = "/flyteidl2.workflow.RunService/ListRuns"
-	RunService_WatchRuns_FullMethodName          = "/flyteidl2.workflow.RunService/WatchRuns"
-	RunService_ListActions_FullMethodName        = "/flyteidl2.workflow.RunService/ListActions"
-	RunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.RunService/WatchActions"
-	RunService_WatchClusterEvents_FullMethodName = "/flyteidl2.workflow.RunService/WatchClusterEvents"
-	RunService_AbortAction_FullMethodName        = "/flyteidl2.workflow.RunService/AbortAction"
-	RunService_WatchGroups_FullMethodName        = "/flyteidl2.workflow.RunService/WatchGroups"
+	RunService_CreateRun_FullMethodName           = "/flyteidl2.workflow.RunService/CreateRun"
+	RunService_AbortRun_FullMethodName            = "/flyteidl2.workflow.RunService/AbortRun"
+	RunService_GetRunDetails_FullMethodName       = "/flyteidl2.workflow.RunService/GetRunDetails"
+	RunService_WatchRunDetails_FullMethodName     = "/flyteidl2.workflow.RunService/WatchRunDetails"
+	RunService_GetActionDetails_FullMethodName    = "/flyteidl2.workflow.RunService/GetActionDetails"
+	RunService_WatchActionDetails_FullMethodName  = "/flyteidl2.workflow.RunService/WatchActionDetails"
+	RunService_GetActionData_FullMethodName       = "/flyteidl2.workflow.RunService/GetActionData"
+	RunService_ListRuns_FullMethodName            = "/flyteidl2.workflow.RunService/ListRuns"
+	RunService_WatchRuns_FullMethodName           = "/flyteidl2.workflow.RunService/WatchRuns"
+	RunService_ListActions_FullMethodName         = "/flyteidl2.workflow.RunService/ListActions"
+	RunService_WatchActions_FullMethodName        = "/flyteidl2.workflow.RunService/WatchActions"
+	RunService_WatchClusterEvents_FullMethodName  = "/flyteidl2.workflow.RunService/WatchClusterEvents"
+	RunService_AbortAction_FullMethodName         = "/flyteidl2.workflow.RunService/AbortAction"
+	RunService_WatchGroups_FullMethodName         = "/flyteidl2.workflow.RunService/WatchGroups"
+	RunService_GetActionLogContext_FullMethodName = "/flyteidl2.workflow.RunService/GetActionLogContext"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -69,6 +70,8 @@ type RunServiceClient interface {
 	AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error)
+	// Get the logging context (pod name, namespace, cluster) for an action attempt.
+	GetActionLogContext(ctx context.Context, in *GetActionLogContextRequest, opts ...grpc.CallOption) (*GetActionLogContextResponse, error)
 }
 
 type runServiceClient struct {
@@ -343,6 +346,15 @@ func (x *runServiceWatchGroupsClient) Recv() (*WatchGroupsResponse, error) {
 	return m, nil
 }
 
+func (c *runServiceClient) GetActionLogContext(ctx context.Context, in *GetActionLogContextRequest, opts ...grpc.CallOption) (*GetActionLogContextResponse, error) {
+	out := new(GetActionLogContextResponse)
+	err := c.cc.Invoke(ctx, RunService_GetActionLogContext_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RunServiceServer is the server API for RunService service.
 // All implementations should embed UnimplementedRunServiceServer
 // for forward compatibility
@@ -377,6 +389,8 @@ type RunServiceServer interface {
 	AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error
+	// Get the logging context (pod name, namespace, cluster) for an action attempt.
+	GetActionLogContext(context.Context, *GetActionLogContextRequest) (*GetActionLogContextResponse, error)
 }
 
 // UnimplementedRunServiceServer should be embedded to have forward compatible implementations.
@@ -424,6 +438,9 @@ func (UnimplementedRunServiceServer) AbortAction(context.Context, *AbortActionRe
 }
 func (UnimplementedRunServiceServer) WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchGroups not implemented")
+}
+func (UnimplementedRunServiceServer) GetActionLogContext(context.Context, *GetActionLogContextRequest) (*GetActionLogContextResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActionLogContext not implemented")
 }
 
 // UnsafeRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -707,6 +724,24 @@ func (x *runServiceWatchGroupsServer) Send(m *WatchGroupsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _RunService_GetActionLogContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetActionLogContextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunServiceServer).GetActionLogContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RunService_GetActionLogContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunServiceServer).GetActionLogContext(ctx, req.(*GetActionLogContextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RunService_ServiceDesc is the grpc.ServiceDesc for RunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -745,6 +780,10 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AbortAction",
 			Handler:    _RunService_AbortAction_Handler,
+		},
+		{
+			MethodName: "GetActionLogContext",
+			Handler:    _RunService_GetActionLogContext_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

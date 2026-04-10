@@ -9,6 +9,7 @@ import (
 	context "context"
 	errors "errors"
 	dataproxy "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -42,6 +43,9 @@ const (
 	// DataProxyServiceCreateDownloadLinkProcedure is the fully-qualified name of the DataProxyService's
 	// CreateDownloadLink RPC.
 	DataProxyServiceCreateDownloadLinkProcedure = "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink"
+	// DataProxyServiceTailLogsProcedure is the fully-qualified name of the DataProxyService's TailLogs
+	// RPC.
+	DataProxyServiceTailLogsProcedure = "/flyteidl2.dataproxy.DataProxyService/TailLogs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -50,6 +54,7 @@ var (
 	dataProxyServiceCreateUploadLocationMethodDescriptor = dataProxyServiceServiceDescriptor.Methods().ByName("CreateUploadLocation")
 	dataProxyServiceUploadInputsMethodDescriptor         = dataProxyServiceServiceDescriptor.Methods().ByName("UploadInputs")
 	dataProxyServiceCreateDownloadLinkMethodDescriptor   = dataProxyServiceServiceDescriptor.Methods().ByName("CreateDownloadLink")
+	dataProxyServiceTailLogsMethodDescriptor             = dataProxyServiceServiceDescriptor.Methods().ByName("TailLogs")
 )
 
 // DataProxyServiceClient is a client for the flyteidl2.dataproxy.DataProxyService service.
@@ -59,6 +64,8 @@ type DataProxyServiceClient interface {
 	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
 	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
 	CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error)
+	// Stream logs for an action attempt.
+	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -89,6 +96,12 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		tailLogs: connect.NewClient[workflow.TailLogsRequest, workflow.TailLogsResponse](
+			httpClient,
+			baseURL+DataProxyServiceTailLogsProcedure,
+			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -97,6 +110,7 @@ type dataProxyServiceClient struct {
 	createUploadLocation *connect.Client[dataproxy.CreateUploadLocationRequest, dataproxy.CreateUploadLocationResponse]
 	uploadInputs         *connect.Client[dataproxy.UploadInputsRequest, dataproxy.UploadInputsResponse]
 	createDownloadLink   *connect.Client[dataproxy.CreateDownloadLinkRequest, dataproxy.CreateDownloadLinkResponse]
+	tailLogs             *connect.Client[workflow.TailLogsRequest, workflow.TailLogsResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -114,6 +128,11 @@ func (c *dataProxyServiceClient) CreateDownloadLink(ctx context.Context, req *co
 	return c.createDownloadLink.CallUnary(ctx, req)
 }
 
+// TailLogs calls flyteidl2.dataproxy.DataProxyService.TailLogs.
+func (c *dataProxyServiceClient) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error) {
+	return c.tailLogs.CallServerStream(ctx, req)
+}
+
 // DataProxyServiceHandler is an implementation of the flyteidl2.dataproxy.DataProxyService service.
 type DataProxyServiceHandler interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
@@ -121,6 +140,8 @@ type DataProxyServiceHandler interface {
 	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
 	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
 	CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error)
+	// Stream logs for an action attempt.
+	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -147,6 +168,12 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	dataProxyServiceTailLogsHandler := connect.NewServerStreamHandler(
+		DataProxyServiceTailLogsProcedure,
+		svc.TailLogs,
+		connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.dataproxy.DataProxyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DataProxyServiceCreateUploadLocationProcedure:
@@ -155,6 +182,8 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 			dataProxyServiceUploadInputsHandler.ServeHTTP(w, r)
 		case DataProxyServiceCreateDownloadLinkProcedure:
 			dataProxyServiceCreateDownloadLinkHandler.ServeHTTP(w, r)
+		case DataProxyServiceTailLogsProcedure:
+			dataProxyServiceTailLogsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -174,4 +203,8 @@ func (UnimplementedDataProxyServiceHandler) UploadInputs(context.Context, *conne
 
 func (UnimplementedDataProxyServiceHandler) CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.CreateDownloadLink is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.TailLogs is not implemented"))
 }

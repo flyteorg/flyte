@@ -85,6 +85,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
                 )
+        self.GetActionLogContext = channel.unary_unary(
+                '/flyteidl2.workflow.RunService/GetActionLogContext',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.FromString,
+                )
 
 
 class RunServiceServicer(object):
@@ -191,6 +196,13 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetActionLogContext(self, request, context):
+        """Get the logging context (pod name, namespace, cluster) for an action attempt.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -263,6 +275,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.WatchGroups,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.SerializeToString,
+            ),
+            'GetActionLogContext': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetActionLogContext,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -510,5 +527,22 @@ class RunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchGroups',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetActionLogContext(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionLogContext',
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

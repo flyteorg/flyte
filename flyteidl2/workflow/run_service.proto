@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/common/run.proto";
+import "flyteidl2/core/execution.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -69,6 +70,11 @@ service RunService {
 
   // Stream updates for task groups based on the provided filter criteria.
   rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
+
+  // Get the logging context (pod name, namespace, cluster) for an action attempt.
+  rpc GetActionLogContext(GetActionLogContextRequest) returns (GetActionLogContextResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // Request message for creating a run.
@@ -191,6 +197,24 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+}
+
+// Request message for getting action log context.
+message GetActionLogContextRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Response message for getting action log context.
+message GetActionLogContextResponse {
+  // The logging context for the action attempt.
+  flyteidl2.core.LogContext log_context = 1;
+
+  // The cluster where the action attempt is running.
+  string cluster = 2;
 }
 
 // Request message for listing runs.

@@ -83,6 +83,28 @@ func getLogContextForAttempt(ctx context.Context, repo interfaces.Repository, ac
 	return event.GetLogContext(), nil
 }
 
+// getLogContextAndClusterForAttempt is like getLogContextForAttempt but also returns the cluster name.
+func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, string, error) {
+	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
+		}
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
+	}
+
+	event, err := m.ToActionEvent()
+	if err != nil {
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
+	}
+
+	if event.GetLogContext() == nil {
+		return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	}
+
+	return event.GetLogContext(), event.GetCluster(), nil
+}
+
 // getPrimaryPodAndContainer finds the primary pod and container from a LogContext.
 func getPrimaryPodAndContainer(logContext *core.LogContext) (*core.PodLogContext, *core.ContainerContext, error) {
 	if logContext.GetPrimaryPodName() == "" {

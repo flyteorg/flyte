@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
+from flyteidl2.core import execution_pb2 as _execution_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2_1
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
@@ -115,6 +116,22 @@ class GetActionDataResponse(_message.Message):
     inputs: _common_pb2.Inputs
     outputs: _common_pb2.Outputs
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
+
+class GetActionLogContextRequest(_message.Message):
+    __slots__ = ["action_id", "attempt"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    attempt: int
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
+
+class GetActionLogContextResponse(_message.Message):
+    __slots__ = ["log_context", "cluster"]
+    LOG_CONTEXT_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    log_context: _execution_pb2.LogContext
+    cluster: str
+    def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]

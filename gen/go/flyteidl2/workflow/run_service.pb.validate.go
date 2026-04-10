@@ -2173,6 +2173,273 @@ var _ interface {
 	ErrorName() string
 } = GetActionDataResponseValidationError{}
 
+// Validate checks the field values on GetActionLogContextRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetActionLogContextRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetActionLogContextRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetActionLogContextRequestMultiError, or nil if none found.
+func (m *GetActionLogContextRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetActionLogContextRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionLogContextRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionLogContextRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionLogContextRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Attempt
+
+	if len(errors) > 0 {
+		return GetActionLogContextRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetActionLogContextRequestMultiError is an error wrapping multiple
+// validation errors returned by GetActionLogContextRequest.ValidateAll() if
+// the designated constraints aren't met.
+type GetActionLogContextRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetActionLogContextRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetActionLogContextRequestMultiError) AllErrors() []error { return m }
+
+// GetActionLogContextRequestValidationError is the validation error returned
+// by GetActionLogContextRequest.Validate if the designated constraints aren't met.
+type GetActionLogContextRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetActionLogContextRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetActionLogContextRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetActionLogContextRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetActionLogContextRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetActionLogContextRequestValidationError) ErrorName() string {
+	return "GetActionLogContextRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetActionLogContextRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetActionLogContextRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetActionLogContextRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetActionLogContextRequestValidationError{}
+
+// Validate checks the field values on GetActionLogContextResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetActionLogContextResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetActionLogContextResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetActionLogContextResponseMultiError, or nil if none found.
+func (m *GetActionLogContextResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetActionLogContextResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLogContext()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionLogContextResponseValidationError{
+					field:  "LogContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionLogContextResponseValidationError{
+					field:  "LogContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLogContext()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionLogContextResponseValidationError{
+				field:  "LogContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Cluster
+
+	if len(errors) > 0 {
+		return GetActionLogContextResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetActionLogContextResponseMultiError is an error wrapping multiple
+// validation errors returned by GetActionLogContextResponse.ValidateAll() if
+// the designated constraints aren't met.
+type GetActionLogContextResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetActionLogContextResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetActionLogContextResponseMultiError) AllErrors() []error { return m }
+
+// GetActionLogContextResponseValidationError is the validation error returned
+// by GetActionLogContextResponse.Validate if the designated constraints
+// aren't met.
+type GetActionLogContextResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetActionLogContextResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetActionLogContextResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetActionLogContextResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetActionLogContextResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetActionLogContextResponseValidationError) ErrorName() string {
+	return "GetActionLogContextResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetActionLogContextResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetActionLogContextResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetActionLogContextResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetActionLogContextResponseValidationError{}
+
 // Validate checks the field values on ListRunsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

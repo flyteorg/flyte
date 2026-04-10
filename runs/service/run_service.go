@@ -904,6 +904,20 @@ func (s *RunService) ListActions(
 	return connect.NewResponse(resp), nil
 }
 
+func (s *RunService) GetActionLogContext(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionLogContextRequest],
+) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	logContext, cluster, err := getLogContextAndClusterForAttempt(ctx, s.repo, req.Msg.GetActionId(), req.Msg.GetAttempt())
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&workflow.GetActionLogContextResponse{
+		LogContext: logContext,
+		Cluster:   cluster,
+	}), nil
+}
+
 // AbortAction aborts a specific action
 func (s *RunService) AbortAction(
 	ctx context.Context,
