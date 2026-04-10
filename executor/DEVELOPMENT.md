@@ -43,7 +43,7 @@ cd executor
 1. Create a kind cluster
 
 ```sh
-kind create cluster --image=kindest/node:v1.26.0 --name flytev2
+kind create cluster --image=kindest/node:v1.34.0 --name flytev2
 ```
 
 2. Build the image
@@ -81,7 +81,7 @@ kind delete cluster --name flytev2
 1. Create a kind cluster
 
 ```sh
-kind create cluster --image=kindest/node:v1.26.0 --name flytev2
+kind create cluster --image=kindest/node:v1.34.0 --name flytev2
 ```
 
 2. Install CRD into the cluster
