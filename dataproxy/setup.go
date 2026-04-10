@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/dataproxy/service"
-	runsService "github.com/flyteorg/flyte/v2/runs/service"
+	"github.com/flyteorg/flyte/v2/logs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
@@ -27,10 +27,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
 	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL)
 
-	var logStreamer service.LogStreamer
+	var logStreamer logs.LogStreamer
 	if sc.K8sConfig != nil {
 		var err error
-		logStreamer, err = runsService.NewK8sLogStreamer(sc.K8sConfig)
+		logStreamer, err = logs.NewK8sLogStreamer(sc.K8sConfig)
 		if err != nil {
 			return fmt.Errorf("failed to create k8s log streamer: %w", err)
 		}
