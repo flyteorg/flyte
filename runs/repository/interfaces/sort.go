@@ -9,5 +9,5 @@ const (
 )
 
 type SortParameter interface {
-	GetGormOrderExpr() string
+	GetOrderExpr() string
 }

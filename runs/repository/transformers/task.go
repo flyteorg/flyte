@@ -33,14 +33,8 @@ func ToTaskName(taskName *task.TaskName) models.TaskName {
 }
 
 func NewTaskModel(ctx context.Context, taskId *task.TaskIdentifier, spec *task.TaskSpec) (*models.Task, error) {
+	// TODO(nary): populate with real caller identity after adding auth
 	var deployedBy string
-	// TODO(nary): Get real identity subject after adding auth
-	deployedBy = "mock-subject"
-	// if subject, err := authorization.GetCallerIdentitySubject(ctx); err != nil {
-	// 	logger.Warnf(ctx, "Failed to get caller identity subject. Error: %v", err)
-	// } else {
-	// 	deployedBy = subject
-	// }
 
 	specBytes, err := proto.Marshal(spec)
 	if err != nil {
@@ -171,20 +165,19 @@ func taskTriggersSummaryFromModel(taskModel *models.Task) *task.TaskTriggersSumm
 		return nil
 	}
 
-	// TODO(nary): Add back trigger automation spec unmarshaling after adding trigger support
 	if taskModel.TotalTriggers == 1 {
-		// automationSpec, err := UnmarshalAutomationSpec(taskModel.TriggerAutomationSpec, "")
-		// if err != nil {
-		// 	logger.Errorf(context.Background(), "failed to unmarshal trigger automation spec: %v", err)
-		// 	return nil
-		// }
+		automationSpec, err := UnmarshalAutomationSpec(taskModel.TriggerAutomationSpec, "")
+		if err != nil {
+			logger.Errorf(context.Background(), "failed to unmarshal trigger automation spec: %v", err)
+			return nil
+		}
 
 		return &task.TaskTriggersSummary{
 			Summary: &task.TaskTriggersSummary_Details{
 				Details: &task.TaskTriggersSummary_TriggerDetails{
-					Name:   taskModel.TriggerName.String,
-					Active: taskModel.ActiveTriggers > 0,
-					// AutomationSpec: automationSpec,
+					Name:           taskModel.TriggerName.String,
+					Active:         taskModel.ActiveTriggers > 0,
+					AutomationSpec: automationSpec,
 				},
 			},
 		}

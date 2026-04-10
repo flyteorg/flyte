@@ -13,12 +13,12 @@ import (
 
 func TestNewSortParameter(t *testing.T) {
 	sp := NewSortParameter("created_at", interfaces.SortOrderDescending)
-	assert.Equal(t, "created_at DESC", sp.GetGormOrderExpr())
+	assert.Equal(t, "created_at DESC", sp.GetOrderExpr())
 }
 
 func TestSortParameter_Ascending(t *testing.T) {
 	sp := NewSortParameter("name", interfaces.SortOrderAscending)
-	assert.Equal(t, "name ASC", sp.GetGormOrderExpr())
+	assert.Equal(t, "name ASC", sp.GetOrderExpr())
 }
 
 func TestGetSortByFieldsV2_SingleField(t *testing.T) {
@@ -35,7 +35,7 @@ func TestGetSortByFieldsV2_SingleField(t *testing.T) {
 	sortParams, err := GetSortByFieldsV2(request, allowedColumns)
 	require.NoError(t, err)
 	require.Len(t, sortParams, 1)
-	assert.Equal(t, "created_at DESC", sortParams[0].GetGormOrderExpr())
+	assert.Equal(t, "created_at DESC", sortParams[0].GetOrderExpr())
 }
 
 func TestGetSortByFieldsV2_MultipleFields(t *testing.T) {
@@ -56,8 +56,8 @@ func TestGetSortByFieldsV2_MultipleFields(t *testing.T) {
 	sortParams, err := GetSortByFieldsV2(request, allowedColumns)
 	require.NoError(t, err)
 	require.Len(t, sortParams, 2)
-	assert.Equal(t, "name ASC", sortParams[0].GetGormOrderExpr())
-	assert.Equal(t, "version DESC", sortParams[1].GetGormOrderExpr())
+	assert.Equal(t, "name ASC", sortParams[0].GetOrderExpr())
+	assert.Equal(t, "version DESC", sortParams[1].GetOrderExpr())
 }
 
 func TestGetSortByFieldsV2_InvalidField(t *testing.T) {

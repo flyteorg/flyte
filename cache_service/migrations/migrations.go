@@ -1,38 +1,18 @@
 package migrations
 
 import (
-	"fmt"
+	"context"
+	"embed"
 
-	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
-	"github.com/flyteorg/flyte/v2/cache_service/repository/models"
+	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 )
 
-var allModels = []interface{}{
-	&models.CachedOutput{},
-	&models.Reservation{},
-}
+//go:embed sql/*.sql
+var migrationFS embed.FS
 
-const MigrationIDInitSchema = "20260327_cache_service_init_schema"
-
-var CacheServiceMigrations = []*gormigrate.Migration{
-	{
-		ID: MigrationIDInitSchema,
-		Migrate: func(tx *gorm.DB) error {
-			return migrateInitSchema(tx)
-		},
-		Rollback: func(tx *gorm.DB) error {
-			// Intentionally no-op for now; this migration can contain destructive steps.
-			return nil
-		},
-	},
-}
-
-// migrateInitSchema initializes the cache service database schema.
-func migrateInitSchema(db *gorm.DB) error {
-	if err := db.AutoMigrate(allModels...); err != nil {
-		return fmt.Errorf("failed to initialize cache service schema: %w", err)
-	}
-	return nil
+// RunMigrations applies all pending cache service migrations.
+func RunMigrations(ctx context.Context, db *sqlx.DB) error {
+	return database.Migrate(ctx, db, "cache_service", migrationFS)
 }

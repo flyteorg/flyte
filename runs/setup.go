@@ -7,9 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-gormigrate/gormigrate/v2"
-
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -24,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -34,8 +33,7 @@ import (
 // RunLogsService is also mounted to enable pod log streaming.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
-	m := gormigrate.New(sc.DB, gormigrate.DefaultOptions, migrations.RunsMigrations)
-	if err := m.Migrate(); err != nil {
+	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
@@ -100,7 +98,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(appPath, appHandler)
 	logger.Infof(ctx, "Mounted AppService at %s", appPath)
 
-	triggerSvc := service.NewTriggerService()
+	triggerSvc := service.NewTriggerService(repo)
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
@@ -132,12 +130,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
 
-	sc.AddReadyCheck(func(r *http.Request) error {
-		sqlDB, err := sc.DB.DB()
-		if err != nil {
-			return fmt.Errorf("database connection error: %w", err)
+	if cfg.TriggerScheduler.Enabled {
+		runsURL := cfg.ActionsServiceURL
+		if sc.BaseURL != "" {
+			runsURL = sc.BaseURL
 		}
-		if err := sqlDB.Ping(); err != nil {
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL)
+		sc.AddWorker("trigger-scheduler", worker)
+		logger.Infof(ctx, "Registered trigger-scheduler worker")
+	}
+
+	sc.AddReadyCheck(func(r *http.Request) error {
+		if err := sc.DB.PingContext(r.Context()); err != nil {
 			return fmt.Errorf("database ping failed: %w", err)
 		}
 		return nil

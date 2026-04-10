@@ -11,14 +11,14 @@ import (
 	"github.com/flyteorg/flyte/v2/cache_service/repository"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	cacheservicev2 "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 )
 
 type CacheService struct {
 	manager *manager.Manager
 }
 
-func NewCacheService(cfg *cacheconfig.Config, db *gorm.DB) *CacheService {
+func NewCacheService(cfg *cacheconfig.Config, db *sqlx.DB) *CacheService {
 	repos := repository.NewRepository(db)
 	return &CacheService{
 		manager: manager.New(

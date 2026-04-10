@@ -7,7 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/actions"
 	actionsconfig "github.com/flyteorg/flyte/v2/actions/config"
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 )
 
 func main() {

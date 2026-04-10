@@ -2,10 +2,10 @@ package impl
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
+	"github.com/jmoiron/sqlx"
 
 	repositoryerrors "github.com/flyteorg/flyte/v2/cache_service/repository/errors"
 	"github.com/flyteorg/flyte/v2/cache_service/repository/interfaces"
@@ -15,58 +15,66 @@ import (
 var _ interfaces.ReservationRepo = (*ReservationRepo)(nil)
 
 type ReservationRepo struct {
-	db *gorm.DB
+	db *sqlx.DB
 }
 
-func NewReservationRepo(db *gorm.DB) *ReservationRepo {
+func NewReservationRepo(db *sqlx.DB) *ReservationRepo {
 	return &ReservationRepo{db: db}
 }
 
 func (r *ReservationRepo) Get(ctx context.Context, key string) (*models.Reservation, error) {
 	var reservation models.Reservation
-	if err := r.db.WithContext(ctx).Where("key = ?", key).Take(&reservation).Error; err != nil {
+	err := sqlx.GetContext(ctx, r.db, &reservation,
+		"SELECT * FROM cache_service_reservations WHERE key = $1", key)
+	if err != nil {
 		return nil, err
 	}
 	return &reservation, nil
 }
 
 func (r *ReservationRepo) Create(ctx context.Context, reservation *models.Reservation) error {
-	result := r.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(reservation)
-	if result.Error != nil {
-		return result.Error
+	result, err := r.db.ExecContext(ctx,
+		`INSERT INTO cache_service_reservations (key, owner_id, heartbeat_seconds, expires_at, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		 ON CONFLICT (key) DO NOTHING`,
+		reservation.Key, reservation.OwnerID, reservation.HeartbeatSeconds, reservation.ExpiresAt)
+	if err != nil {
+		return err
 	}
-	if result.RowsAffected == 0 {
-		return gorm.ErrDuplicatedKey
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return repositoryerrors.ErrAlreadyExists
 	}
 	return nil
 }
 
 func (r *ReservationRepo) UpdateIfExpiredOrOwned(ctx context.Context, reservation *models.Reservation, now time.Time) error {
-	result := r.db.WithContext(ctx).
-		Model(&models.Reservation{}).
-		Where("key = ? AND (expires_at <= ? OR owner_id = ?)", reservation.Key, now, reservation.OwnerID).
-		Updates(map[string]any{
-			"owner_id":          reservation.OwnerID,
-			"heartbeat_seconds": reservation.HeartbeatSeconds,
-			"expires_at":        reservation.ExpiresAt,
-			"updated_at":        now,
-		})
-	if result.Error != nil {
-		return result.Error
+	result, err := r.db.ExecContext(ctx,
+		`UPDATE cache_service_reservations
+		 SET owner_id = $1, heartbeat_seconds = $2, expires_at = $3, updated_at = $4
+		 WHERE key = $5 AND (expires_at <= $6 OR owner_id = $7)`,
+		reservation.OwnerID, reservation.HeartbeatSeconds, reservation.ExpiresAt, now,
+		reservation.Key, now, reservation.OwnerID)
+	if err != nil {
+		return err
 	}
-	if result.RowsAffected == 0 {
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
 		return repositoryerrors.ErrReservationNotClaimable
 	}
 	return nil
 }
 
 func (r *ReservationRepo) DeleteByKeyAndOwner(ctx context.Context, key, ownerID string) error {
-	result := r.db.WithContext(ctx).Delete(&models.Reservation{}, "key = ? AND owner_id = ?", key, ownerID)
-	if result.Error != nil {
-		return result.Error
+	result, err := r.db.ExecContext(ctx,
+		"DELETE FROM cache_service_reservations WHERE key = $1 AND owner_id = $2",
+		key, ownerID)
+	if err != nil {
+		return err
 	}
-	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return sql.ErrNoRows
 	}
 	return nil
 }

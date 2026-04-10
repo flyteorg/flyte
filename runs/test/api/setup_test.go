@@ -6,18 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"reflect"
 	"testing"
 
 	"time"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -33,10 +31,10 @@ const (
 var (
 	endpoint   string
 	testServer *http.Server
-	testDB     *gorm.DB // Expose DB for cleanup
+	testDB     *sqlx.DB // Expose DB for cleanup
 )
 
-// TestMain sets up the test environment with SQLite database and runs service
+// TestMain sets up the test environment with PostgreSQL database and runs service
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 	var exitCode int
@@ -88,9 +86,8 @@ func TestMain(m *testing.M) {
 		MaxIdleConnections: 10,
 		MaxOpenConnections: 100,
 	}
-	logCfg := logger.GetConfig()
 	var err error
-	testDB, err = database.GetDB(ctx, dbConfig, logCfg)
+	testDB, err = database.GetDB(ctx, dbConfig)
 	if err != nil {
 		log.Printf("Failed to initialize database: %v", err)
 		exitCode = 1
@@ -99,7 +96,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database initialized")
 
 	// Run migrations
-	if err := database.Migrate(ctx, dbConfig, migrations.RunsMigrations); err != nil {
+	if err := migrations.RunMigrations(ctx, testDB); err != nil {
 		log.Printf("Failed to run migrations: %v", err)
 		exitCode = 1
 		return
@@ -205,12 +202,13 @@ func cleanupTestDB(t *testing.T) {
 		return
 	}
 
-	// Loop through all models defined in migrations
-	for _, model := range migrations.AllModels {
-		tableName := testDB.NamingStrategy.TableName(reflect.TypeOf(model).Elem().Name())
-
-		if err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", tableName)).Error; err != nil {
-			t.Logf("Warning: Failed to cleanup table %s: %v", tableName, err)
+	// Truncate known tables
+	tables := []string{
+		"action_events", "actions", "runs", "tasks", "projects",
+	}
+	for _, table := range tables {
+		if _, err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)); err != nil {
+			t.Logf("Warning: Failed to cleanup table %s: %v", table, err)
 		}
 	}
 

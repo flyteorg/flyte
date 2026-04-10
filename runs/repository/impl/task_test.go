@@ -5,20 +5,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-func setupDB(t *testing.T) *gorm.DB {
+func setupDB(t *testing.T) *sqlx.DB {
 	t.Helper()
 	return testDB
 }
 
-func setupTestDB(t *testing.T) *gorm.DB {
+func setupTestDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
 	t.Cleanup(func() {
 		db.Exec("DELETE FROM task_specs")
@@ -46,7 +46,7 @@ func TestCreateTask(t *testing.T) {
 	}
 
 	startTime := time.Now()
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	assert.NoError(t, err)
 
 	retrieved, err := repo.GetTask(ctx, task.TaskKey)
@@ -101,8 +101,8 @@ func TestListTasks(t *testing.T) {
 		TaskSpec:    []byte("{}"),
 	}
 
-	require.NoError(t, repo.CreateTask(ctx, task1))
-	require.NoError(t, repo.CreateTask(ctx, task2))
+	require.NoError(t, repo.CreateTask(ctx, task1, nil))
+	require.NoError(t, repo.CreateTask(ctx, task2, nil))
 
 	result, err := repo.ListTasks(ctx, interfaces.ListResourceInput{
 		Limit:  10,
@@ -150,7 +150,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 		TaskSpec:     []byte(`{}`),
 	}
 
-	err := repo.CreateTask(ctx, task)
+	err := repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	original, err := repo.GetTask(ctx, task.TaskKey)
@@ -159,7 +159,7 @@ func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	task.FunctionName = "updated_function"
-	err = repo.CreateTask(ctx, task)
+	err = repo.CreateTask(ctx, task, nil)
 	require.NoError(t, err)
 
 	updated, err := repo.GetTask(ctx, task.TaskKey)

@@ -7,14 +7,17 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	flyteTask "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
+
 
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
@@ -30,7 +33,6 @@ func NewTaskService(repo interfaces.Repository) taskconnect.TaskServiceHandler {
 func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
 	request := c.Msg
 
-	// Validate request using proto validation
 	if err := request.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid DeployTask request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -38,37 +40,78 @@ func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.De
 
 	taskSpec := request.GetSpec()
 
-	// TODO(nary): Add semantic validation to validate that default input types match the task interface
-
-	// Truncate fields that exceed maximum length
+	// Truncate fields that exceed maximum length.
 	if env := taskSpec.GetEnvironment(); env != nil {
 		env.Description = truncateShortDescription(env.GetDescription())
 	}
-
 	if doc := taskSpec.GetDocumentation(); doc != nil {
 		doc.ShortDescription = truncateShortDescription(doc.GetShortDescription())
 		doc.LongDescription = truncateLongDescription(doc.GetLongDescription())
 	}
 
 	taskId := request.GetTaskId()
+
+	// Build trigger models before writing anything, so validation failures are
+	// caught before we touch the DB (mirrors close-source TaskService.DeployTask).
+	triggerModels, err := buildTriggerModels(ctx, taskId, request.GetTriggers())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
 	taskModel, err := transformers.NewTaskModel(ctx, taskId, taskSpec)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-
-	// TODO(nary): Add triggers when the trigger service is ready
-	if len(request.GetTriggers()) > 0 {
-		logger.Infof(ctx, "Triggers currently not supported")
-	}
-
 	taskModel.TotalTriggers = uint32(len(request.GetTriggers()))
 
-	err = s.db.TaskRepo().CreateTask(ctx, taskModel)
-	if err != nil {
+	// Single transaction: upsert task + insert trigger revisions + refresh task meta.
+	if err := s.db.TaskRepo().CreateTask(ctx, taskModel, triggerModels); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	return connect.NewResponse(&task.DeployTaskResponse{}), nil
+}
+
+// buildTriggerModels converts the embedded TaskTrigger list into Trigger revision models
+// ready for persistence. Validation (e.g. cron expression) is performed here so errors
+// surface before any DB write occurs.
+func buildTriggerModels(
+	ctx context.Context,
+	taskId *task.TaskIdentifier,
+	taskTriggers []*task.TaskTrigger,
+) ([]*models.Trigger, error) {
+	triggerModels := make([]*models.Trigger, 0, len(taskTriggers))
+	for _, tt := range taskTriggers {
+		// Validate cron expression up-front.
+		if err := validateCronExpression(tt.GetName(), tt.GetAutomationSpec()); err != nil {
+			return nil, err
+		}
+
+		spec := &triggerpb.TriggerSpec{
+			Active:      tt.GetSpec().GetActive(),
+			TaskVersion: taskId.GetVersion(),
+			Description: truncateShortDescription(tt.GetSpec().GetDescription()),
+			Inputs:      tt.GetSpec().GetInputs(),
+			RunSpec:     tt.GetSpec().GetRunSpec(),
+		}
+		id := &commonpb.TriggerIdentifier{
+			Name: &commonpb.TriggerName{
+				Project:  taskId.GetProject(),
+				Domain:   taskId.GetDomain(),
+				TaskName: taskId.GetName(),
+				Name:     tt.GetName(),
+			},
+			// Revision 0: repo will compute the next revision inside the transaction.
+			Revision: 0,
+		}
+		m, err := transformers.NewTriggerModel(ctx, id, spec, tt.GetAutomationSpec())
+		if err != nil {
+			logger.Errorf(ctx, "failed to build trigger model for %q: %v", tt.GetName(), err)
+			return nil, fmt.Errorf("failed to build trigger model for %q: %w", tt.GetName(), err)
+		}
+		triggerModels = append(triggerModels, m)
+	}
+	return triggerModels, nil
 }
 
 func (s *taskService) GetTaskDetails(ctx context.Context, c *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error) {

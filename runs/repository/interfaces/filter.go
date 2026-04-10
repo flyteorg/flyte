@@ -17,14 +17,14 @@ const (
 	FilterExpressionContainsCaseInsensitive
 )
 
-// GormQueryExpr is a container for arguments necessary to issue a GORM query.
-type GormQueryExpr struct {
+// QueryExpr is a container for arguments necessary to issue a query.
+type QueryExpr struct {
 	Query string
 	Args  []interface{}
 }
 
 type Filter interface {
-	GormQueryExpression(table string) (GormQueryExpr, error)
+	QueryExpression(table string) (QueryExpr, error)
 	And(filter Filter) Filter
 	Or(filter Filter) Filter
 }

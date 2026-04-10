@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
@@ -12,17 +13,27 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/gorm"
 )
 
-func setupActionDB(t *testing.T) *gorm.DB {
+var testDbConfig = database.DbConfig{
+	Postgres: database.PostgresConfig{
+		Host:         "localhost",
+		Port:         15432,
+		DbName:       "flyte_runs_test",
+		User:         "postgres",
+		Password:     "postgres",
+		ExtraOptions: "sslmode=disable",
+	},
+}
+
+func setupActionDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
 	t.Cleanup(func() {
 		db.Exec("DELETE FROM action_events")
@@ -33,8 +44,8 @@ func setupActionDB(t *testing.T) *gorm.DB {
 
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -44,13 +55,15 @@ func TestCreateRun(t *testing.T) {
 		Domain:  "domain1",
 		Name:    "run1",
 	}
-	req := &workflow.CreateRunRequest{
-		Id:      &workflow.CreateRunRequest_RunId{RunId: runID},
-		RunSpec: nil,
-		Task:    &workflow.CreateRunRequest_TaskId{TaskId: &task.TaskIdentifier{Name: "task1"}},
+	runModel := &models.Run{
+		Project: runID.Project,
+		Domain:  runID.Domain,
+		RunName: runID.Name,
+		Name:    rootActionName,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
 	}
 
-	run, err := actionRepo.CreateRun(ctx, req, "s3://input", "s3://output")
+	run, err := actionRepo.CreateAction(ctx, runModel, false)
 	require.NoError(t, err)
 	require.NotNil(t, run)
 	assert.Equal(t, runID.Project, run.Project)
@@ -58,18 +71,17 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, runID.Name, run.RunName)
 	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
-	require.NotZero(t, run.ID)
-	require.NotEmpty(t, run.ActionSpec)
 
-	// Attempt duplicate run create with same run name should fail unique constraint
-	_, err = actionRepo.CreateRun(ctx, req, "s3://input2", "s3://output2")
-	require.Error(t, err)
+	// Attempt duplicate run create with same run name should return existing (idempotent)
+	run2, err := actionRepo.CreateAction(ctx, runModel, false)
+	require.NoError(t, err)
+	assert.Equal(t, run.Name, run2.Name)
 }
 
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -83,7 +95,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	endTime := time.Now()
@@ -107,8 +119,8 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 
 	runID := &common.RunIdentifier{
@@ -121,9 +133,9 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
 
 	ctx := context.Background()
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
 	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
 	require.NoError(t, err)
 
 	watchCtx, cancel := context.WithCancel(context.Background())
@@ -161,8 +173,8 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -176,7 +188,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 		Name: "action1",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to FAILED (terminal state)
@@ -205,8 +217,8 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -220,7 +232,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		Name: "action-no-backward",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to RUNNING
@@ -243,8 +255,8 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 
 func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -258,7 +270,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		Name: "action-no-backward-succeeded",
 	}
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID))
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
 	// Move to SUCCEEDED (terminal, non-retryable)
@@ -282,23 +294,20 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
-	defer func() { _ = db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, database.DbConfig{})
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
 	runsToCreate := []string{"run-1", "run-2", "run-3"}
 	for _, runName := range runsToCreate {
-		req := &workflow.CreateRunRequest{
-			Id: &workflow.CreateRunRequest_RunId{RunId: &common.RunIdentifier{
-				Org:     "org1",
-				Project: "proj1",
-				Domain:  "domain1",
-				Name:    runName,
-			}},
-			RunSpec: nil,
-		}
-		_, err := actionRepo.CreateRun(ctx, req, "in://uri", "out://base")
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: runName,
+			Name:    rootActionName,
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, false)
 		require.NoError(t, err)
 	}
 
@@ -363,14 +372,13 @@ func TestListRuns(t *testing.T) {
 	assert.Empty(t, token2)
 
 	// Test project scope filtering doesn't include other org/project/domain
-	_, err = actionRepo.CreateRun(ctx, &workflow.CreateRunRequest{
-		Id: &workflow.CreateRunRequest_RunId{RunId: &common.RunIdentifier{
-			Org:     "other-org",
-			Project: "other-proj",
-			Domain:  "domain1",
-			Name:    "run-other",
-		}},
-	}, "in://x", "out://x")
+	_, err = actionRepo.CreateAction(ctx, &models.Run{
+		Project: "other-proj",
+		Domain:  "domain1",
+		RunName: "run-other",
+		Name:    rootActionName,
+		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}, false)
 	require.NoError(t, err)
 
 	runsFiltered, _, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{
@@ -388,9 +396,9 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
-func setupActionEventDB(t *testing.T) (*gorm.DB, *actionRepo) {
+func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
-	r, err := NewActionRepo(db, database.DbConfig{})
+	r, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
 	return db, repo
@@ -440,7 +448,7 @@ func TestGetLatestEventByAttempt_NotFound(t *testing.T) {
 
 	_, err := repo.GetLatestEventByAttempt(ctx, testActionID, 99)
 	require.Error(t, err)
-	assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 func TestGetLatestEventByAttempt_DifferentAttempts(t *testing.T) {
