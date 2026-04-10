@@ -75,6 +75,25 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 	logger.Infof(ctx, "Upserted task: %s/%s/%s version %s",
 		newTask.Project, newTask.Domain, newTask.Name, newTask.Version)
 
+	// Prune triggers that are no longer attached to this task.
+	if len(triggers) > 0 {
+		newTriggerNames := make(map[string]struct{}, len(triggers))
+		for _, t := range triggers {
+			newTriggerNames[t.Name] = struct{}{}
+		}
+		oldTriggers, err := listTaskTriggers(ctx, tx, triggers[0].Project, triggers[0].Domain, triggers[0].TaskName)
+		if err != nil {
+			return fmt.Errorf("failed to list existing task triggers: %w", err)
+		}
+		for _, oldName := range oldTriggers {
+			if _, keep := newTriggerNames[oldName]; !keep {
+				if err := softDeleteTrigger(ctx, tx, triggers[0].Project, triggers[0].Domain, triggers[0].TaskName, oldName); err != nil {
+					return fmt.Errorf("failed to delete stale trigger %q: %w", oldName, err)
+				}
+			}
+		}
+	}
+
 	// Upsert each trigger and append a revision snapshot within the same transaction.
 	for _, t := range triggers {
 		if err := upsertTrigger(ctx, tx, t, 0); err != nil {

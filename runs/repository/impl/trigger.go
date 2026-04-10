@@ -320,6 +320,42 @@ func insertTriggerRevision(ctx context.Context, tx *sqlx.Tx, t *models.Trigger, 
 	return nil
 }
 
+// listTaskTriggers returns the names of all non-deleted triggers for a given task (across all task versions).
+func listTaskTriggers(ctx context.Context, tx *sqlx.Tx, project, domain, taskName string) ([]string, error) {
+	var names []string
+	err := sqlx.SelectContext(ctx, tx, &names,
+		`SELECT name FROM triggers
+		 WHERE project = $1 AND domain = $2 AND task_name = $3
+		   AND deleted_at IS NULL`,
+		project, domain, taskName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list task triggers: %w", err)
+	}
+	return names, nil
+}
+
+// softDeleteTrigger soft-deletes a trigger by name and appends a DELETE revision snapshot.
+func softDeleteTrigger(ctx context.Context, tx *sqlx.Tx, project, domain, taskName, name string) error {
+	var t models.Trigger
+	err := tx.QueryRowxContext(ctx, `
+		UPDATE triggers SET
+			deleted_at      = NOW(),
+			active          = FALSE,
+			latest_revision = latest_revision + 1
+		WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4
+		  AND deleted_at IS NULL
+		RETURNING *`,
+		project, domain, taskName, name,
+	).StructScan(&t)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil // already deleted
+	}
+	if err != nil {
+		return fmt.Errorf("failed to soft-delete trigger %q: %w", name, err)
+	}
+	return insertTriggerRevision(ctx, tx, &t, triggerpb.TriggerRevisionAction_TRIGGER_REVISION_ACTION_DELETE)
+}
+
 // refreshTaskTriggerMeta is the single source of truth for the denormalized
 // trigger summary columns on the tasks row. It recomputes them from the current
 // set of (non-deleted) rows in the triggers table and writes:
