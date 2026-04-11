@@ -654,7 +654,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspending", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
-		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
+		phaseInfo, err = pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info), nil
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.

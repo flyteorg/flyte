@@ -123,6 +123,25 @@ func (b *branchHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExe
 	return executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), nil
 }
 
+// setupBranchTakenNodePaths sets the DataDir and OutputDir on the branch-taken node's
+// status using the branch node's OutputDir as the base, and returns the computed OutputDir.
+// This must be called before recursing into the branch-taken node so that any nested handler
+// (e.g. a dynamic node) finds the correct paths.
+func (b *branchHandler) setupBranchTakenNodePaths(ctx context.Context, nCtx interfaces.NodeExecutionContext, branchTakenNode v1alpha1.ExecutableNode) (storage.DataReference, error) {
+	childNodeStatus := nCtx.ContextualNodeLookup().GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
+	childDataDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), branchTakenNode.GetID())
+	if err != nil {
+		return "", err
+	}
+	childOutputDir, err := nCtx.DataStore().ConstructReference(ctx, childDataDir, strconv.Itoa(int(childNodeStatus.GetAttempts())))
+	if err != nil {
+		return "", err
+	}
+	childNodeStatus.SetDataDir(childDataDir)
+	childNodeStatus.SetOutputDir(childOutputDir)
+	return childOutputDir, nil
+}
+
 func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.NodeExecutionContext, branchTakenNode v1alpha1.ExecutableNode) (handler.Transition, error) {
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
@@ -133,17 +152,10 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 			errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "nodeLookup must be supplied.")
 	}
 
-	childNodeStatus := nl.GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
-	childDataDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), branchTakenNode.GetID())
+	childOutputDir, err := b.setupBranchTakenNodePaths(ctx, nCtx, branchTakenNode)
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
-	childOutputDir, err := nCtx.DataStore().ConstructReference(ctx, childDataDir, strconv.Itoa(int(childNodeStatus.GetAttempts())))
-	if err != nil {
-		return handler.UnknownTransition, err
-	}
-	childNodeStatus.SetDataDir(childDataDir)
-	childNodeStatus.SetOutputDir(childOutputDir)
 	upstreamNodeIds, err := nCtx.ContextualNodeLookup().ToNode(branchTakenNode.GetID())
 	if err != nil {
 		return handler.UnknownTransition, err
@@ -213,6 +225,9 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecution
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
 	// The parent of the BranchTaken Node is the actual Branch Node and all the data is just forwarded from the Branch to the executed node.
+	if _, err := b.setupBranchTakenNodePaths(ctx, nCtx, branchTakenNode); err != nil {
+		return err
+	}
 	upstreamNodeIds, err := nCtx.ContextualNodeLookup().ToNode(branchTakenNode.GetID())
 	if err != nil {
 		return err
@@ -257,6 +272,9 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecut
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
 	// The parent of the BranchTaken Node is the actual Branch Node and all the data is just forwarded from the Branch to the executed node.
+	if _, err := b.setupBranchTakenNodePaths(ctx, nCtx, branchTakenNode); err != nil {
+		return err
+	}
 	upstreamNodeIds, err := nCtx.ContextualNodeLookup().ToNode(branchTakenNode.GetID())
 	if err != nil {
 		return err
