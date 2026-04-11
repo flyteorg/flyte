@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"net"
 	"net/http"
 	"strings"
 
@@ -32,6 +33,25 @@ func IsPublicPath(path string) bool {
 	return false
 }
 
+// isLoopbackRequest returns true when the request originated from the local
+// loopback interface. The unified Flyte binary makes intra-process connect-rpc
+// calls to its own HTTP mux via http://localhost:<port> (e.g. RunService ->
+// ActionsService). Those calls have no Authorization header and must not be
+// forced through the external auth gate, or every run creation will fail with
+// 401. External traffic (ALB, port-forward from outside the pod) never has a
+// loopback RemoteAddr.
+func isLoopbackRequest(req *http.Request) bool {
+	host, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		host = req.RemoteAddr
+	}
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return false
+	}
+	return ip.IsLoopback()
+}
+
 // GetAuthenticationHTTPInterceptor returns middleware that validates a bearer
 // token or auth cookies on incoming HTTP requests and injects the resulting
 // IdentityContext into the request context. Public paths (see IsPublicPath)
@@ -41,6 +61,11 @@ func GetAuthenticationHTTPInterceptor(h *AuthHandlerConfig) func(http.Handler) h
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if IsPublicPath(req.URL.Path) {
+				next.ServeHTTP(w, req)
+				return
+			}
+
+			if isLoopbackRequest(req) {
 				next.ServeHTTP(w, req)
 				return
 			}

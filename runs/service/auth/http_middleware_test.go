@@ -71,6 +71,69 @@ func TestMiddleware_DisabledForHTTPBypassesAuth(t *testing.T) {
 	assert.True(t, sb.called)
 }
 
+func TestMiddleware_LoopbackIPv4BypassesAuth(t *testing.T) {
+	// Intra-process connect-rpc calls (e.g. runs -> actions on localhost:8090)
+	// must pass through the middleware without an Authorization header.
+	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
+	mw := GetAuthenticationHTTPInterceptor(h)
+
+	var sb servedBy
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req.RemoteAddr = "127.0.0.1:54321"
+	w := httptest.NewRecorder()
+	mw(sb.handler()).ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, sb.called, "loopback call must reach next handler")
+}
+
+func TestMiddleware_LoopbackIPv6BypassesAuth(t *testing.T) {
+	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
+	mw := GetAuthenticationHTTPInterceptor(h)
+
+	var sb servedBy
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req.RemoteAddr = "[::1]:54321"
+	w := httptest.NewRecorder()
+	mw(sb.handler()).ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, sb.called)
+}
+
+func TestMiddleware_NonLoopbackStillBlocks(t *testing.T) {
+	// A caller from a real pod IP must still hit the 401 path when no auth
+	// is present — the loopback bypass is strictly for in-process calls.
+	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
+	mw := GetAuthenticationHTTPInterceptor(h)
+
+	var sb servedBy
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req.RemoteAddr = "10.1.42.7:48221"
+	w := httptest.NewRecorder()
+	mw(sb.handler()).ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+	assert.False(t, sb.called)
+}
+
+func TestIsLoopbackRequest(t *testing.T) {
+	cases := map[string]bool{
+		"127.0.0.1:1234": true,
+		"127.1.2.3:80":   true,
+		"[::1]:8080":     true,
+		"10.0.0.1:8080":  false,
+		"192.168.1.1:80": false,
+		"":               false,
+		"bogus":          false,
+	}
+	for addr, want := range cases {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.RemoteAddr = addr
+		assert.Equalf(t, want, isLoopbackRequest(req), "isLoopbackRequest(%q)", addr)
+	}
+}
+
 func TestMiddleware_NoAuthReturns401(t *testing.T) {
 	// AuthHandlerConfig missing a CookieManager will cause IdentityContextFromRequest
 	// to fail when no bearer header is present. The middleware must convert that to 401.
