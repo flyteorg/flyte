@@ -54,6 +54,7 @@ spec:
         path: /v2/*
         pathType: ImplementationSpecific
       {{- end }}
+      {{- if not .Values.ingress.minimalPaths }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -68,6 +69,8 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /console/*
         pathType: ImplementationSpecific
+      {{- end }}
+      {{- if not .Values.ingress.minimalPaths }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -82,6 +85,7 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /api/*
         pathType: ImplementationSpecific
+      {{- end }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -89,6 +93,7 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /healthcheck
         pathType: ImplementationSpecific
+      {{- if not .Values.ingress.minimalPaths }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -110,6 +115,7 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /.well-known/*
         pathType: ImplementationSpecific
+      {{- end }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -152,6 +158,7 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /callback/*
         pathType: ImplementationSpecific
+      {{- if not .Values.ingress.minimalPaths }}
       - backend:
           service:
             name: {{ include "flyte-binary.service.http.name" . }}
@@ -187,6 +194,7 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /oauth2/*
         pathType: ImplementationSpecific
+      {{- end }}
       {{- if not .Values.ingress.separateGrpcIngress }}
       {{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
       {{- range $path := $paths }}

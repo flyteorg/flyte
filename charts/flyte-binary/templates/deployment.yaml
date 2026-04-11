@@ -38,7 +38,9 @@ spec:
         checksum/configuration-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
         {{- end }}
         {{- if .Values.configuration.auth.enabled }}
-        checksum/runservice-auth-secret: {{ include (print $.Template.BasePath "/runservice-auth-secret.yaml") . | sha256sum }}
+        {{- if not .Values.configuration.auth.runServiceAuthSecretRef }}
+        checksum/runservice-auth-secret: {{ include (print $.Template.BasePath "/run-service-auth-secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- if not .Values.configuration.auth.clientSecretsExternalSecretRef }}
         checksum/auth-client-secret: {{ include (print $.Template.BasePath "/auth-client-secret.yaml") . | sha256sum }}
         {{- end }}
@@ -235,6 +237,10 @@ spec:
             {{- if .Values.configuration.inlineSecretRef }}
             - secret:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
+            {{- end }}
+            {{- range .Values.configuration.extraInlineSecretRefs }}
+            - secret:
+                name: {{ tpl . $ }}
             {{- end }}
           {{- end }}
         - name: webhook-certs

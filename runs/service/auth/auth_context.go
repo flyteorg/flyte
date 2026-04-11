@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -64,8 +65,10 @@ func (c *AuthenticationContext) OAuth2MetadataURL() *url.URL          { return c
 func (c *AuthenticationContext) OIDCMetadataURL() *url.URL            { return c.oidcMetadataURL }
 
 // NewAuthContext creates a new AuthContext with all the components needed for authentication.
+// oidcClientSecret is the IdP-issued confidential client secret used during the OAuth2 code
+// exchange; it may be empty if the client is registered as public at the IdP.
 func NewAuthContext(ctx context.Context, cfg config.Config, resourceServer OAuth2ResourceServer,
-	hashKeyBase64, blockKeyBase64 string) (*AuthenticationContext, error) {
+	hashKeyBase64, blockKeyBase64, oidcClientSecret string) (*AuthenticationContext, error) {
 
 	cookieManager, err := NewCookieManager(ctx, hashKeyBase64, blockKeyBase64, cfg.UserAuth.CookieSetting)
 	if err != nil {
@@ -90,10 +93,11 @@ func NewAuthContext(ctx context.Context, cfg config.Config, resourceServer OAuth
 	}
 
 	oauth2Config := &oauth2.Config{
-		RedirectURL: "callback",
-		ClientID:    cfg.UserAuth.OpenID.ClientID,
-		Scopes:      cfg.UserAuth.OpenID.Scopes,
-		Endpoint:    provider.Endpoint(),
+		RedirectURL:  computeOIDCRedirectURL(cfg),
+		ClientID:     cfg.UserAuth.OpenID.ClientID,
+		ClientSecret: oidcClientSecret,
+		Scopes:       cfg.UserAuth.OpenID.Scopes,
+		Endpoint:     provider.Endpoint(),
 	}
 
 	oauth2MetadataURL, err := url.Parse(OAuth2MetadataEndpoint)
@@ -116,6 +120,19 @@ func NewAuthContext(ctx context.Context, cfg config.Config, resourceServer OAuth
 		oauth2MetadataURL: oauth2MetadataURL,
 		oidcMetadataURL:   oidcMetadataURL,
 	}, nil
+}
+
+// computeOIDCRedirectURL returns the absolute redirect URL to use during the OAuth2 authorization
+// code flow. IdPs like Okta require an absolute URL registered in their allowed-callbacks list.
+// The URL is derived from the first authorizedUri with "/callback" appended. If no authorizedUris
+// are configured, the legacy relative "callback" value is returned as a fallback.
+func computeOIDCRedirectURL(cfg config.Config) string {
+	if len(cfg.AuthorizedURIs) == 0 {
+		return "callback"
+	}
+	base := cfg.AuthorizedURIs[0].URL
+	base.Path = strings.TrimSuffix(base.Path, "/") + "/callback"
+	return base.String()
 }
 
 // HandlerConfig returns an AuthHandlerConfig suitable for use with RegisterHandlers.

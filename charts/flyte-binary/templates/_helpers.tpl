@@ -122,10 +122,17 @@ app.kubernetes.io/component: console
 {{- end }}
 
 {{/*
-Get the Secret name for Run service authentication secrets.
+Get the Secret name for Run service authentication secrets. When a user
+supplies `configuration.auth.runServiceAuthSecretRef`, that existing Secret is
+referenced directly (no template is rendered); otherwise a new Secret named
+`<fullname>-admin-auth` is used.
 */}}
 {{ define "flyte-binary.configuration.auth.runServiceAuthSecretName" -}}
+{{- if .Values.configuration.auth.runServiceAuthSecretRef -}}
+{{ tpl .Values.configuration.auth.runServiceAuthSecretRef . }}
+{{- else -}}
 {{ printf "%s-admin-auth" (include "flyte-binary.fullname" .) }}
+{{- end -}}
 {{ end -}}
 
 {{/*
@@ -176,6 +183,8 @@ Get the Flyte API paths for ingress.
 {{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
+- /flyteidl2.workflow.InternalRunService
+- /flyteidl2.workflow.InternalRunService/*
 - /flyteidl2.task.TaskService
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
@@ -186,6 +195,16 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.dataproxy.DataProxyService/*
 - /flyteidl2.secret.SecretService
 - /flyteidl2.secret.SecretService/*
+- /flyteidl2.project.ProjectService
+- /flyteidl2.project.ProjectService/*
+- /flyteidl2.app.AppService
+- /flyteidl2.app.AppService/*
+- /flyteidl2.trigger.TriggerService
+- /flyteidl2.trigger.TriggerService/*
+- /flyteidl2.auth.AuthMetadataService
+- /flyteidl2.auth.AuthMetadataService/*
+- /flyteidl2.auth.IdentityService
+- /flyteidl2.auth.IdentityService/*
 {{- end -}}
 
 {{/*

@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
@@ -26,11 +29,15 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 	authservice "github.com/flyteorg/flyte/v2/runs/service/auth"
-	authConfig "github.com/flyteorg/flyte/v2/runs/service/auth/config"
 	"github.com/flyteorg/flyte/v2/runs/service/auth/authzserver"
+	authConfig "github.com/flyteorg/flyte/v2/runs/service/auth/config"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
+
+// authSecretsDir is the directory where cookie hash/block keys and other auth
+// secrets are mounted (matches the flyte-binary chart volume mount path).
+const authSecretsDir = "/etc/secrets"
 
 // Setup registers Run and Task service handlers on the SetupContext mux.
 // Requires sc.DB and sc.DataStore to be set. When sc.K8sConfig is provided,
@@ -88,22 +95,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
 
 	if cfg.Security.UseAuth {
-		authCfg := authConfig.GetConfig()
-		authSvc := authzserver.NewAuthMetadataService(*authCfg)
-		authPath, authHandler := authconnect.NewAuthMetadataServiceHandler(authSvc)
-		sc.Mux.Handle(authPath, authHandler)
-		logger.Infof(ctx, "Mounted AuthMetadataService at %s", authPath)
-
-		identitySvc := authservice.NewIdentityService()
-		identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
-		sc.Mux.Handle(identityPath, identityHandler)
-		logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+		if err := setupAuth(ctx, sc); err != nil {
+			return fmt.Errorf("runs: failed to set up auth: %w", err)
+		}
+	} else {
+		// When auth is disabled, still mount a stub AuthMetadataService so
+		// clients performing metadata discovery get a coherent response.
+		authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL)
+		authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
+		sc.Mux.Handle(authMetadataPath, authMetadataHandler)
+		logger.Infof(ctx, "Mounted stub AuthMetadataService at %s", authMetadataPath)
 	}
-
-	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL)
-	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
-	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
-	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
 	appSvc := service.NewAppService()
 	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
@@ -160,6 +162,93 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	})
 
 	return nil
+}
+
+// setupAuth wires up the external-mode OAuth2 resource server, OIDC browser
+// handlers, AuthMetadataService / IdentityService, and a bearer-token
+// validating HTTP middleware on the shared mux. It requires that the auth
+// config section is populated and that cookie hash/block keys are present as
+// files under authSecretsDir.
+func setupAuth(ctx context.Context, sc *app.SetupContext) error {
+	authCfg := authConfig.GetConfig()
+
+	// Mount the real AuthMetadataService backed by the configured issuer.
+	authMetadataSvc := authzserver.NewAuthMetadataService(*authCfg)
+	authPath, authHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
+	sc.Mux.Handle(authPath, authHandler)
+	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authPath)
+
+	identitySvc := authservice.NewIdentityService()
+	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
+	sc.Mux.Handle(identityPath, identityHandler)
+	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
+
+	hashKey, err := readSecretFile(authConfig.SecretNameCookieHashKey)
+	if err != nil {
+		return err
+	}
+	blockKey, err := readSecretFile(authConfig.SecretNameCookieBlockKey)
+	if err != nil {
+		return err
+	}
+
+	// Load the OIDC client secret used during the OAuth2 code exchange. The
+	// filename is configurable so that a deployment can swap the secret name
+	// without redeploying the binary.
+	oidcClientSecretName := authCfg.UserAuth.OpenID.ClientSecretName
+	if oidcClientSecretName == "" {
+		oidcClientSecretName = authConfig.SecretNameOIdCClientSecret
+	}
+	oidcClientSecret, err := readSecretFile(oidcClientSecretName)
+	if err != nil {
+		return err
+	}
+
+	// Validate tokens issued by the configured external authorization server.
+	// If BaseURL is empty, the resource server falls back to the first authorizedUri.
+	var fallbackURL authConfig.URL
+	if len(authCfg.AuthorizedURIs) > 0 {
+		fallbackURL = authCfg.AuthorizedURIs[0]
+	}
+	resourceServer, err := authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, fallbackURL)
+	if err != nil {
+		return fmt.Errorf("failed to create OAuth2 resource server: %w", err)
+	}
+
+	authCtx, err := authservice.NewAuthContext(ctx, *authCfg, resourceServer, hashKey, blockKey, oidcClientSecret)
+	if err != nil {
+		return fmt.Errorf("failed to create auth context: %w", err)
+	}
+
+	// Register /login, /callback, /logout, /.well-known/openid-configuration.
+	authservice.RegisterHandlers(ctx, sc.Mux, authCtx.HandlerConfig())
+	logger.Infof(ctx, "Registered OIDC browser handlers (/login, /callback, /logout)")
+
+	// Chain the bearer/cookie auth middleware with any existing middleware
+	// (e.g. CORS). Ordering: request -> CORS -> auth -> mux.
+	prev := sc.Middleware
+	authMw := authservice.GetAuthenticationHTTPInterceptor(authCtx.HandlerConfig())
+	sc.Middleware = func(next http.Handler) http.Handler {
+		wrapped := authMw(next)
+		if prev != nil {
+			wrapped = prev(wrapped)
+		}
+		return wrapped
+	}
+	logger.Infof(ctx, "Auth middleware installed; audience=%s", authCfg.AppAuth.ExternalAuthServer.BaseURL.String())
+
+	return nil
+}
+
+// readSecretFile reads a base64-encoded key file from authSecretsDir and
+// returns the trimmed string contents.
+func readSecretFile(name string) (string, error) {
+	path := filepath.Join(authSecretsDir, name)
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to read auth secret %s: %w", path, err)
+	}
+	return strings.TrimSpace(string(b)), nil
 }
 
 func seedProjects(ctx context.Context, projectRepo interfaces.ProjectRepo, projects []string) error {

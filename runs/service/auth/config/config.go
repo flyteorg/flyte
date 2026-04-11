@@ -7,6 +7,8 @@ import (
 )
 
 //go:generate pflags Config --default-var=DefaultConfig
+//go:generate enumer --type=AuthorizationServerType --trimprefix=AuthorizationServerType -json
+//go:generate enumer --type=SameSite --trimprefix=SameSite -json
 
 type SecretName = string
 
