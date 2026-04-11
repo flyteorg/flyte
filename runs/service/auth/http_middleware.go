@@ -9,9 +9,15 @@ import (
 )
 
 // publicPathPrefixes lists request paths that never require authentication.
-// These must cover health probes, the browser OAuth2/OIDC flow, metadata
-// discovery, and the AuthMetadataService (which clients call *before* they
-// have a token).
+// These cover:
+//   - health probes
+//   - the browser OAuth2/OIDC flow
+//   - metadata discovery (AuthMetadataService is called pre-auth)
+//   - intra-cluster services that task pods call via the ClusterIP service
+//     without credentials (ActionsService, InternalRunService). These are
+//     deliberately excluded from the external ALB ingress in
+//     charts/flyte-binary/templates/_helpers.tpl so they cannot be reached
+//     from the public internet; only in-cluster pods can hit them.
 var publicPathPrefixes = []string{
 	"/healthz",
 	"/readyz",
@@ -21,6 +27,8 @@ var publicPathPrefixes = []string{
 	"/logout",
 	"/.well-known/",
 	"/flyteidl2.auth.AuthMetadataService/",
+	"/flyteidl2.actions.ActionsService/",
+	"/flyteidl2.workflow.InternalRunService/",
 }
 
 // IsPublicPath reports whether an HTTP request path bypasses authentication.

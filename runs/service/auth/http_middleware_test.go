@@ -12,20 +12,22 @@ import (
 
 func TestIsPublicPath(t *testing.T) {
 	cases := map[string]bool{
-		"/healthz":                                        true,
-		"/readyz":                                         true,
-		"/healthcheck":                                    true,
-		"/login":                                          true,
-		"/login?redirect_url=/console":                    true,
-		"/callback":                                       true,
-		"/logout":                                         true,
-		"/.well-known/openid-configuration":               true,
-		"/.well-known/oauth-authorization-server":         true,
+		"/healthz":                                              true,
+		"/readyz":                                               true,
+		"/healthcheck":                                          true,
+		"/login":                                                true,
+		"/login?redirect_url=/console":                          true,
+		"/callback":                                             true,
+		"/logout":                                               true,
+		"/.well-known/openid-configuration":                     true,
+		"/.well-known/oauth-authorization-server":               true,
 		"/flyteidl2.auth.AuthMetadataService/GetOAuth2Metadata": true,
-		"/flyteidl2.workflow.RunService/CreateRun":        false,
-		"/flyteidl2.auth.IdentityService/UserInfo":        false,
-		"/":                                               false,
-		"/api/v1/projects":                                false,
+		"/flyteidl2.actions.ActionsService/CreateAction":        true,
+		"/flyteidl2.workflow.InternalRunService/UpdateRun":      true,
+		"/flyteidl2.workflow.RunService/CreateRun":              false,
+		"/flyteidl2.auth.IdentityService/UserInfo":              false,
+		"/":                                                     false,
+		"/api/v1/projects":                                      false,
 	}
 	for path, want := range cases {
 		got := IsPublicPath(path)
@@ -72,13 +74,13 @@ func TestMiddleware_DisabledForHTTPBypassesAuth(t *testing.T) {
 }
 
 func TestMiddleware_LoopbackIPv4BypassesAuth(t *testing.T) {
-	// Intra-process connect-rpc calls (e.g. runs -> actions on localhost:8090)
+	// Intra-process connect-rpc calls (e.g. runs -> RunService on localhost)
 	// must pass through the middleware without an Authorization header.
 	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
 	mw := GetAuthenticationHTTPInterceptor(h)
 
 	var sb servedBy
-	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.workflow.RunService/CreateRun", nil)
 	req.RemoteAddr = "127.0.0.1:54321"
 	w := httptest.NewRecorder()
 	mw(sb.handler()).ServeHTTP(w, req)
@@ -92,7 +94,7 @@ func TestMiddleware_LoopbackIPv6BypassesAuth(t *testing.T) {
 	mw := GetAuthenticationHTTPInterceptor(h)
 
 	var sb servedBy
-	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.workflow.RunService/CreateRun", nil)
 	req.RemoteAddr = "[::1]:54321"
 	w := httptest.NewRecorder()
 	mw(sb.handler()).ServeHTTP(w, req)
@@ -101,14 +103,33 @@ func TestMiddleware_LoopbackIPv6BypassesAuth(t *testing.T) {
 	assert.True(t, sb.called)
 }
 
-func TestMiddleware_NonLoopbackStillBlocks(t *testing.T) {
-	// A caller from a real pod IP must still hit the 401 path when no auth
-	// is present — the loopback bypass is strictly for in-process calls.
+func TestMiddleware_ActionsServicePublicFromPodIP(t *testing.T) {
+	// Task pods call ActionsService from their pod IP (non-loopback) over
+	// the ClusterIP service. The path must be allowlisted so the SDK can
+	// launch actions without carrying credentials.
 	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
 	mw := GetAuthenticationHTTPInterceptor(h)
 
 	var sb servedBy
 	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.actions.ActionsService/CreateAction", nil)
+	req.RemoteAddr = "10.1.193.72:33100"
+	w := httptest.NewRecorder()
+	mw(sb.handler()).ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, sb.called, "ActionsService must be reachable from task pods without auth")
+}
+
+func TestMiddleware_NonLoopbackStillBlocks(t *testing.T) {
+	// A caller from a real pod IP must still hit the 401 path when no auth
+	// is present — the loopback bypass is strictly for in-process calls.
+	// Use RunService (user-facing) rather than ActionsService (in-cluster-only
+	// public path) so we're exercising the actual gate.
+	h := &AuthHandlerConfig{AuthConfig: config.Config{}, CookieManager: CookieManager{}}
+	mw := GetAuthenticationHTTPInterceptor(h)
+
+	var sb servedBy
+	req := httptest.NewRequest(http.MethodPost, "/flyteidl2.workflow.RunService/CreateRun", nil)
 	req.RemoteAddr = "10.1.42.7:48221"
 	w := httptest.NewRecorder()
 	mw(sb.handler()).ServeHTTP(w, req)

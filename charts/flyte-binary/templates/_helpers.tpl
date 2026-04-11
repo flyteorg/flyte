@@ -178,19 +178,19 @@ Get the Flyte service gRPC port.
 {{- end -}}
 
 {{/*
-Get the Flyte API paths for ingress.
+Get the Flyte API paths for ingress. Services whose names start with
+"Internal" (e.g. InternalRunService) plus ActionsService are intended for
+intra-cluster traffic from task pods only; they are deliberately NOT exposed
+via the external ALB ingress here. The Go auth middleware allowlists them so
+cluster-internal ClusterIP calls reach them without credentials.
 */}}
 {{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
-- /flyteidl2.workflow.InternalRunService
-- /flyteidl2.workflow.InternalRunService/*
 - /flyteidl2.task.TaskService
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
 - /flyteidl2.workflow.TranslatorService/*
-- /flyteidl2.actions.ActionsService
-- /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
 - /flyteidl2.secret.SecretService
