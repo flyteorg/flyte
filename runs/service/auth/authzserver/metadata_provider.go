@@ -2,7 +2,6 @@ package authzserver
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime"
@@ -12,6 +11,8 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -161,9 +162,14 @@ func (s *authMetadataService) GetPublicClientConfig(
 	}), nil
 }
 
-// unmarshalResp unmarshals a JSON response body, providing a detailed error if the Content-Type is unexpected.
-func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
-	err := json.Unmarshal(body, &v)
+// unmarshalResp unmarshals a JSON response body into a protobuf message. It
+// uses protojson.Unmarshal which accepts both the camelCase form used by
+// proto3 JSON serialization and the snake_case form matching proto field
+// names. This is important because external authorization servers (including
+// flyteadmin) emit camelCase keys while the Go proto struct tags are
+// snake_case.
+func unmarshalResp(r *http.Response, body []byte, v proto.Message) error {
+	err := protojson.Unmarshal(body, v)
 	if err == nil {
 		return nil
 	}
