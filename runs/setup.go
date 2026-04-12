@@ -178,7 +178,7 @@ func setupAuth(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(authPath, authHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authPath)
 
-	identitySvc := authservice.NewIdentityService()
+	identitySvc := authservice.NewUserInfoProvider()
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
