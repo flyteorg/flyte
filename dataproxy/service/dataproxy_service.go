@@ -29,6 +29,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 type Service struct {
@@ -38,15 +40,17 @@ type Service struct {
 	dataStore     *storage.DataStore
 	taskClient    taskconnect.TaskServiceClient
 	triggerClient triggerconnect.TriggerServiceClient
+	runClient     workflowconnect.RunServiceClient
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient) *Service {
 	return &Service{
 		cfg:           cfg,
 		dataStore:     dataStore,
 		taskClient:    taskClient,
 		triggerClient: triggerClient,
+		runClient:     runClient,
 	}
 }
 
@@ -336,7 +340,7 @@ func (s *Service) GetActionData(
 ) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	actionId := req.Msg.GetActionId()
 
-	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflowpb.GetActionDataURIsRequest{
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
 		ActionId: actionId,
 	}))
 	if err != nil {
