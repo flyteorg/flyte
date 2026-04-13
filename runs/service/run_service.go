@@ -904,6 +904,50 @@ func (s *RunService) ListActions(
 	return connect.NewResponse(resp), nil
 }
 
+func (s *RunService) GetActionDataURIs(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionDataURIsRequest],
+) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.GetActionId())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+	}
+
+	if len(action.DetailedInfo) == 0 {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run data not available"))
+	}
+
+	info := &workflow.RunInfo{}
+	if err := proto.Unmarshal(action.DetailedInfo, info); err != nil {
+		return nil, err
+	}
+
+	resp := &workflow.GetActionDataURIsResponse{
+		InputsUri: info.GetInputsUri(),
+	}
+
+	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
+		if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
+			resp.OutputsUri = info.GetOutputsUri()
+		} else {
+			attempts, err := s.getAttempts(ctx, req.Msg.GetActionId())
+			if err != nil {
+				return nil, err
+			}
+			if len(attempts) == 0 {
+				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available, no attempts for action"))
+			}
+			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
+			if outputUri == "" {
+				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available"))
+			}
+			resp.OutputsUri = outputUri
+		}
+	}
+
+	return connect.NewResponse(resp), nil
+}
+
 // AbortAction aborts a specific action
 func (s *RunService) AbortAction(
 	ctx context.Context,

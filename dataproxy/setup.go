@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/dataproxy/service"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -24,8 +25,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	baseURL := sc.BaseURL
 	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL)
 	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
+	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL)
 
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient)
+	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient)
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
 	sc.Mux.Handle(path, handler)
