@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"net/http"
+	"net/http/httptest"
+
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -21,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	workflowMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
@@ -620,7 +624,7 @@ func TestGetActionData(t *testing.T) {
 				ComposedProtobufStore: mockComposedStore,
 				ReferenceConstructor:  &simpleRefConstructor{},
 			}
-			svc := NewService(cfg, ds, nil, nil, runClient)
+			svc := NewService(cfg, ds, nil, nil, runClient, nil)
 
 			resp, err := svc.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
 				ActionId: actionID,
@@ -665,4 +669,159 @@ func setupMockDataStoreWithExistingFile(t *testing.T, contentMD5 string) *storag
 		ComposedProtobufStore: mockComposedStore,
 		ReferenceConstructor:  &simpleRefConstructor{},
 	}
+}
+
+// mockLogStreamer implements logs.LogStreamer for tests.
+type mockLogStreamer struct {
+	mock.Mock
+}
+
+func (m *mockLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[workflow.TailLogsResponse]) error {
+	args := m.Called(ctx, logContext, stream)
+	return args.Error(0)
+}
+
+func newTailLogsTestClient(t *testing.T, svc *Service) dataproxyconnect.DataProxyServiceClient {
+	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+	return dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, server.URL)
+}
+
+func TestTailLogs(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	logContext := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	t.Run("happy path streams a message", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{
+				LogContext: logContext,
+				Cluster:    "c1",
+			}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Run(func(args mock.Arguments) {
+			stream := args.Get(2).(*connect.ServerStream[workflow.TailLogsResponse])
+			_ = stream.Send(&workflow.TailLogsResponse{})
+		}).Return(nil)
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+
+		assert.True(t, stream.Receive())
+		assert.NotNil(t, stream.Msg())
+		assert.False(t, stream.Receive())
+		assert.NoError(t, stream.Err())
+
+		streamer.AssertExpectations(t)
+	})
+
+	t.Run("GetActionLogContext error propagates", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			nil, connect.NewError(connect.CodeNotFound, assertErr("action missing")))
+
+		streamer := &mockLogStreamer{}
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(stream.Err()))
+
+		streamer.AssertNotCalled(t, "TailLogs", mock.Anything, mock.Anything, mock.Anything)
+	})
+
+	t.Run("nil log context returns NotFound", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{
+				LogContext: nil,
+			}), nil)
+
+		streamer := &mockLogStreamer{}
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(stream.Err()))
+
+		streamer.AssertNotCalled(t, "TailLogs", mock.Anything, mock.Anything, mock.Anything)
+	})
+
+	t.Run("streamer error propagates", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{LogContext: logContext}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(
+			connect.NewError(connect.CodeInternal, assertErr("streamer boom")))
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(stream.Err()))
+
+		streamer.AssertExpectations(t)
+	})
+
+	t.Run("passes action_id and attempt to RunService", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.GetActionLogContextRequest]) bool {
+			return proto.Equal(r.Msg.GetActionId(), actionID) && r.Msg.GetAttempt() == 3
+		})).Return(connect.NewResponse(&workflow.GetActionLogContextResponse{LogContext: logContext}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(nil)
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  3,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.NoError(t, stream.Err())
+	})
 }
