@@ -19,6 +19,7 @@ COPY gen/go gen/go
 COPY actions actions
 COPY events events
 COPY runs runs
+COPY logs logs
 COPY cache_service cache_service
 COPY secret secret
 
