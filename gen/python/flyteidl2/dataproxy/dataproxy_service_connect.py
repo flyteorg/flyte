@@ -24,7 +24,7 @@ class DataProxyService(Protocol):
     async def upload_inputs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def create_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+    async def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
     def tail_logs(self, request: flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse]:
@@ -56,15 +56,15 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                     ),
                     function=svc.upload_inputs,
                 ),
-                "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink": Endpoint.unary(
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": Endpoint.unary(
                     method=MethodInfo(
-                        name="CreateDownloadLink",
+                        name="GetActionData",
                         service_name="flyteidl2.dataproxy.DataProxyService",
-                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
-                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
-                    function=svc.create_download_link,
+                    function=svc.get_action_data,
                 ),
                 "/flyteidl2.dataproxy.DataProxyService/TailLogs": Endpoint.server_stream(
                     method=MethodInfo(
@@ -129,24 +129,26 @@ class DataProxyServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
-    async def create_download_link(
+    async def get_action_data(
         self,
-        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         return await self.execute_unary(
             request=request,
             method=MethodInfo(
-                name="CreateDownloadLink",
+                name="GetActionData",
                 service_name="flyteidl2.dataproxy.DataProxyService",
-                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
-                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def tail_logs(
@@ -175,7 +177,7 @@ class DataProxyServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def upload_inputs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-    def create_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+    def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def tail_logs(self, request: flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__logs__service__pb2.TailLogsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -205,15 +207,15 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                     ),
                     function=service.upload_inputs,
                 ),
-                "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink": EndpointSync.unary(
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": EndpointSync.unary(
                     method=MethodInfo(
-                        name="CreateDownloadLink",
+                        name="GetActionData",
                         service_name="flyteidl2.dataproxy.DataProxyService",
-                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
-                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
-                    function=service.create_download_link,
+                    function=service.get_action_data,
                 ),
                 "/flyteidl2.dataproxy.DataProxyService/TailLogs": EndpointSync.server_stream(
                     method=MethodInfo(
@@ -278,24 +280,26 @@ class DataProxyServiceClientSync(ConnectClientSync):
             timeout_ms=timeout_ms,
         )
 
-    def create_download_link(
+    def get_action_data(
         self,
-        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         return self.execute_unary(
             request=request,
             method=MethodInfo(
-                name="CreateDownloadLink",
+                name="GetActionData",
                 service_name="flyteidl2.dataproxy.DataProxyService",
-                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
-                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def tail_logs(

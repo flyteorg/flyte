@@ -797,248 +797,71 @@ var _ interface {
 	ErrorName() string
 } = UploadInputsResponseValidationError{}
 
-// Validate checks the field values on PreSignedURLs with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *PreSignedURLs) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on PreSignedURLs with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in PreSignedURLsMultiError, or
-// nil if none found.
-func (m *PreSignedURLs) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *PreSignedURLs) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetExpiresAt()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PreSignedURLsValidationError{
-					field:  "ExpiresAt",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, PreSignedURLsValidationError{
-					field:  "ExpiresAt",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetExpiresAt()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PreSignedURLsValidationError{
-				field:  "ExpiresAt",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return PreSignedURLsMultiError(errors)
-	}
-
-	return nil
-}
-
-// PreSignedURLsMultiError is an error wrapping multiple validation errors
-// returned by PreSignedURLs.ValidateAll() if the designated constraints
-// aren't met.
-type PreSignedURLsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PreSignedURLsMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PreSignedURLsMultiError) AllErrors() []error { return m }
-
-// PreSignedURLsValidationError is the validation error returned by
-// PreSignedURLs.Validate if the designated constraints aren't met.
-type PreSignedURLsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PreSignedURLsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PreSignedURLsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PreSignedURLsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PreSignedURLsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PreSignedURLsValidationError) ErrorName() string { return "PreSignedURLsValidationError" }
-
-// Error satisfies the builtin error interface
-func (e PreSignedURLsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPreSignedURLs.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PreSignedURLsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PreSignedURLsValidationError{}
-
-// Validate checks the field values on CreateDownloadLinkRequest with the rules
+// Validate checks the field values on GetActionDataRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *CreateDownloadLinkRequest) Validate() error {
+func (m *GetActionDataRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on CreateDownloadLinkRequest with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on GetActionDataRequest with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// CreateDownloadLinkRequestMultiError, or nil if none found.
-func (m *CreateDownloadLinkRequest) ValidateAll() error {
+// GetActionDataRequestMultiError, or nil if none found.
+func (m *GetActionDataRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *CreateDownloadLinkRequest) validate(all bool) error {
+func (m *GetActionDataRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for ArtifactType
-
 	if all {
-		switch v := interface{}(m.GetExpiresIn()).(type) {
+		switch v := interface{}(m.GetActionId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, CreateDownloadLinkRequestValidationError{
-					field:  "ExpiresIn",
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, CreateDownloadLinkRequestValidationError{
-					field:  "ExpiresIn",
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetExpiresIn()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return CreateDownloadLinkRequestValidationError{
-				field:  "ExpiresIn",
+			return GetActionDataRequestValidationError{
+				field:  "ActionId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	switch v := m.Source.(type) {
-	case *CreateDownloadLinkRequest_ActionAttemptId:
-		if v == nil {
-			err := CreateDownloadLinkRequestValidationError{
-				field:  "Source",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetActionAttemptId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, CreateDownloadLinkRequestValidationError{
-						field:  "ActionAttemptId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, CreateDownloadLinkRequestValidationError{
-						field:  "ActionAttemptId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetActionAttemptId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CreateDownloadLinkRequestValidationError{
-					field:  "ActionAttemptId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
 	if len(errors) > 0 {
-		return CreateDownloadLinkRequestMultiError(errors)
+		return GetActionDataRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// CreateDownloadLinkRequestMultiError is an error wrapping multiple validation
-// errors returned by CreateDownloadLinkRequest.ValidateAll() if the
-// designated constraints aren't met.
-type CreateDownloadLinkRequestMultiError []error
+// GetActionDataRequestMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetActionDataRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m CreateDownloadLinkRequestMultiError) Error() string {
+func (m GetActionDataRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1047,11 +870,11 @@ func (m CreateDownloadLinkRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m CreateDownloadLinkRequestMultiError) AllErrors() []error { return m }
+func (m GetActionDataRequestMultiError) AllErrors() []error { return m }
 
-// CreateDownloadLinkRequestValidationError is the validation error returned by
-// CreateDownloadLinkRequest.Validate if the designated constraints aren't met.
-type CreateDownloadLinkRequestValidationError struct {
+// GetActionDataRequestValidationError is the validation error returned by
+// GetActionDataRequest.Validate if the designated constraints aren't met.
+type GetActionDataRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1059,24 +882,24 @@ type CreateDownloadLinkRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e CreateDownloadLinkRequestValidationError) Field() string { return e.field }
+func (e GetActionDataRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e CreateDownloadLinkRequestValidationError) Reason() string { return e.reason }
+func (e GetActionDataRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e CreateDownloadLinkRequestValidationError) Cause() error { return e.cause }
+func (e GetActionDataRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e CreateDownloadLinkRequestValidationError) Key() bool { return e.key }
+func (e GetActionDataRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e CreateDownloadLinkRequestValidationError) ErrorName() string {
-	return "CreateDownloadLinkRequestValidationError"
+func (e GetActionDataRequestValidationError) ErrorName() string {
+	return "GetActionDataRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e CreateDownloadLinkRequestValidationError) Error() string {
+func (e GetActionDataRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1088,14 +911,14 @@ func (e CreateDownloadLinkRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCreateDownloadLinkRequest.%s: %s%s",
+		"invalid %sGetActionDataRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = CreateDownloadLinkRequestValidationError{}
+var _ error = GetActionDataRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1103,24 +926,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = CreateDownloadLinkRequestValidationError{}
+} = GetActionDataRequestValidationError{}
 
-// Validate checks the field values on CreateDownloadLinkResponse with the
-// rules defined in the proto definition for this message. If any rules are
+// Validate checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *CreateDownloadLinkResponse) Validate() error {
+func (m *GetActionDataResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on CreateDownloadLinkResponse with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// CreateDownloadLinkResponseMultiError, or nil if none found.
-func (m *CreateDownloadLinkResponse) ValidateAll() error {
+// GetActionDataResponseMultiError, or nil if none found.
+func (m *GetActionDataResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *CreateDownloadLinkResponse) validate(all bool) error {
+func (m *GetActionDataResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1128,28 +951,57 @@ func (m *CreateDownloadLinkResponse) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetPreSignedUrls()).(type) {
+		switch v := interface{}(m.GetInputs()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, CreateDownloadLinkResponseValidationError{
-					field:  "PreSignedUrls",
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Inputs",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, CreateDownloadLinkResponseValidationError{
-					field:  "PreSignedUrls",
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Inputs",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetPreSignedUrls()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return CreateDownloadLinkResponseValidationError{
-				field:  "PreSignedUrls",
+			return GetActionDataResponseValidationError{
+				field:  "Inputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutputs()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionDataResponseValidationError{
+				field:  "Outputs",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1157,19 +1009,19 @@ func (m *CreateDownloadLinkResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return CreateDownloadLinkResponseMultiError(errors)
+		return GetActionDataResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// CreateDownloadLinkResponseMultiError is an error wrapping multiple
-// validation errors returned by CreateDownloadLinkResponse.ValidateAll() if
-// the designated constraints aren't met.
-type CreateDownloadLinkResponseMultiError []error
+// GetActionDataResponseMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetActionDataResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m CreateDownloadLinkResponseMultiError) Error() string {
+func (m GetActionDataResponseMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1178,11 +1030,11 @@ func (m CreateDownloadLinkResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m CreateDownloadLinkResponseMultiError) AllErrors() []error { return m }
+func (m GetActionDataResponseMultiError) AllErrors() []error { return m }
 
-// CreateDownloadLinkResponseValidationError is the validation error returned
-// by CreateDownloadLinkResponse.Validate if the designated constraints aren't met.
-type CreateDownloadLinkResponseValidationError struct {
+// GetActionDataResponseValidationError is the validation error returned by
+// GetActionDataResponse.Validate if the designated constraints aren't met.
+type GetActionDataResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1190,24 +1042,24 @@ type CreateDownloadLinkResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e CreateDownloadLinkResponseValidationError) Field() string { return e.field }
+func (e GetActionDataResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e CreateDownloadLinkResponseValidationError) Reason() string { return e.reason }
+func (e GetActionDataResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e CreateDownloadLinkResponseValidationError) Cause() error { return e.cause }
+func (e GetActionDataResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e CreateDownloadLinkResponseValidationError) Key() bool { return e.key }
+func (e GetActionDataResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e CreateDownloadLinkResponseValidationError) ErrorName() string {
-	return "CreateDownloadLinkResponseValidationError"
+func (e GetActionDataResponseValidationError) ErrorName() string {
+	return "GetActionDataResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e CreateDownloadLinkResponseValidationError) Error() string {
+func (e GetActionDataResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1219,14 +1071,14 @@ func (e CreateDownloadLinkResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCreateDownloadLinkResponse.%s: %s%s",
+		"invalid %sGetActionDataResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = CreateDownloadLinkResponseValidationError{}
+var _ error = GetActionDataResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -1234,4 +1086,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = CreateDownloadLinkResponseValidationError{}
+} = GetActionDataResponseValidationError{}

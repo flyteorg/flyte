@@ -10,6 +10,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -21,6 +22,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	workflowMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
 
 func TestCreateUploadLocation(t *testing.T) {
@@ -389,7 +392,7 @@ func TestUploadInputs(t *testing.T) {
 						Name:    "test-run",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
@@ -414,7 +417,7 @@ func TestUploadInputs(t *testing.T) {
 						Domain:       "test-domain",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}},
@@ -435,7 +438,7 @@ func TestUploadInputs(t *testing.T) {
 						Org: "org", Project: "proj", Domain: "dom", Name: "run1",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
@@ -489,6 +492,162 @@ func setupMockDataStoreWithWriteProtobuf(t *testing.T) *storage.DataStore {
 		ReferenceConstructor:  &simpleRefConstructor{},
 	}
 }
+
+func TestGetActionData(t *testing.T) {
+	ctx := context.Background()
+	cfg := config.DataProxyConfig{}
+
+	actionID := &common.ActionIdentifier{
+		Name: "a0",
+		Run: &common.RunIdentifier{
+			Org: "org", Project: "proj", Domain: "dom", Name: "run1",
+		},
+	}
+
+	storedInputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
+		},
+	}
+	storedOutputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{Name: "o", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "result"}}}}}}},
+		},
+	}
+
+	tests := []struct {
+		name             string
+		inputsURI        string
+		outputsURI       string
+		runClientErr     error
+		readInputsErr    error
+		readOutputsErr   error
+		wantErr          bool
+		expectInputsLen  int
+		expectOutputsLen int
+	}{
+		{
+			name:             "success with both inputs and outputs",
+			inputsURI:        "s3://test-bucket/inputs-dir",
+			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
+			expectInputsLen:  1,
+			expectOutputsLen: 1,
+		},
+		{
+			name:             "success with only inputs",
+			inputsURI:        "s3://test-bucket/inputs-dir",
+			outputsURI:       "",
+			expectInputsLen:  1,
+			expectOutputsLen: 0,
+		},
+		{
+			name:             "success with only outputs",
+			inputsURI:        "",
+			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
+			expectInputsLen:  0,
+			expectOutputsLen: 1,
+		},
+		{
+			name:             "success with neither inputs nor outputs",
+			inputsURI:        "",
+			outputsURI:       "",
+			expectInputsLen:  0,
+			expectOutputsLen: 0,
+		},
+		{
+			name:         "RunService error propagates",
+			runClientErr: connect.NewError(connect.CodeNotFound, assertErr("not found")),
+			wantErr:      true,
+		},
+		{
+			name:          "read inputs error propagates",
+			inputsURI:     "s3://test-bucket/inputs-dir",
+			readInputsErr: assertErr("read failed"),
+			wantErr:       true,
+		},
+		{
+			name:           "read outputs error propagates",
+			outputsURI:     "s3://test-bucket/outputs/outputs.pb",
+			readOutputsErr: assertErr("read failed"),
+			wantErr:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runClient := workflowMocks.NewRunServiceClient(t)
+			if tt.runClientErr != nil {
+				runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(nil, tt.runClientErr)
+			} else {
+				runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(
+					connect.NewResponse(&workflow.GetActionDataURIsResponse{
+						InputsUri:  tt.inputsURI,
+						OutputsUri: tt.outputsURI,
+					}), nil)
+			}
+
+			mockComposedStore := storageMocks.NewComposedProtobufStore(t)
+
+			if tt.inputsURI != "" {
+				expectedInputRef := storage.DataReference(tt.inputsURI + "/inputs.pb")
+				call := mockComposedStore.On("ReadProtobuf", mock.Anything, expectedInputRef, mock.Anything)
+				if tt.readInputsErr != nil {
+					call.Return(tt.readInputsErr).Maybe()
+				} else {
+					call.Run(func(args mock.Arguments) {
+						msg := args.Get(2).(proto.Message)
+						proto.Reset(msg)
+						proto.Merge(msg, storedInputs)
+					}).Return(nil).Maybe()
+				}
+			}
+
+			if tt.outputsURI != "" {
+				expectedOutputRef := storage.DataReference(tt.outputsURI)
+				call := mockComposedStore.On("ReadProtobuf", mock.Anything, expectedOutputRef, mock.Anything)
+				if tt.readOutputsErr != nil {
+					call.Return(tt.readOutputsErr).Maybe()
+				} else {
+					call.Run(func(args mock.Arguments) {
+						msg := args.Get(2).(proto.Message)
+						proto.Reset(msg)
+						proto.Merge(msg, storedOutputs)
+					}).Return(nil).Maybe()
+				}
+			}
+
+			ds := &storage.DataStore{
+				ComposedProtobufStore: mockComposedStore,
+				ReferenceConstructor:  &simpleRefConstructor{},
+			}
+			svc := NewService(cfg, ds, nil, nil, runClient)
+
+			resp, err := svc.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
+				ActionId: actionID,
+			}))
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				return
+			}
+			assert.NoError(t, err)
+			assert.NotNil(t, resp)
+			assert.Len(t, resp.Msg.GetInputs().GetLiterals(), tt.expectInputsLen)
+			assert.Len(t, resp.Msg.GetOutputs().GetLiterals(), tt.expectOutputsLen)
+			if tt.expectInputsLen > 0 {
+				assert.Equal(t, "x", resp.Msg.GetInputs().GetLiterals()[0].GetName())
+			}
+			if tt.expectOutputsLen > 0 {
+				assert.Equal(t, "o", resp.Msg.GetOutputs().GetLiterals()[0].GetName())
+			}
+		})
+	}
+}
+
+type assertErr string
+
+func (e assertErr) Error() string { return string(e) }
 
 func setupMockDataStoreWithExistingFile(t *testing.T, contentMD5 string) *storage.DataStore {
 	mockComposedStore := storageMocks.NewComposedProtobufStore(t)

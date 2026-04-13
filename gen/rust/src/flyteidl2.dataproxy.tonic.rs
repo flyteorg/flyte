@@ -144,11 +144,11 @@ pub mod data_proxy_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn create_download_link(
+        pub async fn get_action_data(
             &mut self,
-            request: impl tonic::IntoRequest<super::CreateDownloadLinkRequest>,
+            request: impl tonic::IntoRequest<super::GetActionDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateDownloadLinkResponse>,
+            tonic::Response<super::GetActionDataResponse>,
             tonic::Status,
         > {
             self.inner
@@ -162,14 +162,14 @@ pub mod data_proxy_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink",
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl2.dataproxy.DataProxyService",
-                        "CreateDownloadLink",
+                        "GetActionData",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -226,11 +226,11 @@ pub mod data_proxy_service_server {
             tonic::Response<super::UploadInputsResponse>,
             tonic::Status,
         >;
-        async fn create_download_link(
+        async fn get_action_data(
             &self,
-            request: tonic::Request<super::CreateDownloadLinkRequest>,
+            request: tonic::Request<super::GetActionDataRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateDownloadLinkResponse>,
+            tonic::Response<super::GetActionDataResponse>,
             tonic::Status,
         >;
         /// Server streaming response type for the TailLogs method.
@@ -418,28 +418,25 @@ pub mod data_proxy_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink" => {
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateDownloadLinkSvc<T: DataProxyService>(pub Arc<T>);
+                    struct GetActionDataSvc<T: DataProxyService>(pub Arc<T>);
                     impl<
                         T: DataProxyService,
-                    > tonic::server::UnaryService<super::CreateDownloadLinkRequest>
-                    for CreateDownloadLinkSvc<T> {
-                        type Response = super::CreateDownloadLinkResponse;
+                    > tonic::server::UnaryService<super::GetActionDataRequest>
+                    for GetActionDataSvc<T> {
+                        type Response = super::GetActionDataResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CreateDownloadLinkRequest>,
+                            request: tonic::Request<super::GetActionDataRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DataProxyService>::create_download_link(
-                                        &inner,
-                                        request,
-                                    )
+                                <T as DataProxyService>::get_action_data(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -451,7 +448,7 @@ pub mod data_proxy_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = CreateDownloadLinkSvc(inner);
+                        let method = GetActionDataSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

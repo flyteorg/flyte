@@ -13,6 +13,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/flyteorg/stow"
 	"github.com/samber/lo"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -29,7 +30,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
-	workflowpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
@@ -278,110 +278,6 @@ func (s *Service) UploadInputs(
 	}), nil
 }
 
-// CreateDownloadLink generates signed URL(s) for downloading an artifact associated with a run action.
-func (s *Service) CreateDownloadLink(
-	ctx context.Context,
-	req *connect.Request[dataproxy.CreateDownloadLinkRequest],
-) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error) {
-	logger.Infof(ctx, "CreateDownloadLink request received")
-
-	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid CreateDownloadLink request: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-
-	if req.Msg.GetArtifactType() == dataproxy.ArtifactType_ARTIFACT_TYPE_UNSPECIFIED {
-		return nil, connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("artifact_type is required"))
-	}
-
-	// Set expires_in to default if not provided in request
-	if req.Msg.GetExpiresIn() == nil {
-		req.Msg.ExpiresIn = durationpb.New(s.cfg.Download.MaxExpiresIn.Duration)
-	}
-	expiresIn := req.Msg.GetExpiresIn().AsDuration()
-
-	nativeURL, err := s.resolveArtifactURL(ctx, req.Msg)
-	if err != nil {
-		return nil, err
-	}
-
-	ref := storage.DataReference(nativeURL)
-	meta, err := s.dataStore.Head(ctx, ref)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to head artifact at [%s]: %v", nativeURL, err)
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("failed to check artifact existence: %w", err))
-	}
-	if !meta.Exists() {
-		return nil, connect.NewError(connect.CodeNotFound,
-			fmt.Errorf("artifact not found at [%s]", nativeURL))
-	}
-
-	signedResp, err := s.dataStore.CreateSignedURL(ctx, ref, storage.SignedURLProperties{
-		Scope:     stow.ClientMethodGet,
-		ExpiresIn: expiresIn,
-	})
-	if err != nil {
-		logger.Errorf(ctx, "Failed to create signed URL for [%s]: %v", nativeURL, err)
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("failed to create signed URL: %w", err))
-	}
-
-	expiresAt := timestamppb.New(time.Now().Add(expiresIn))
-	return connect.NewResponse(&dataproxy.CreateDownloadLinkResponse{
-		PreSignedUrls: &dataproxy.PreSignedURLs{
-			SignedUrl: []string{signedResp.URL.String()},
-			ExpiresAt: expiresAt,
-		},
-	}), nil
-}
-
-// resolveArtifactURL resolves the native storage URL for the requested artifact type and source.
-func (s *Service) resolveArtifactURL(ctx context.Context, req *dataproxy.CreateDownloadLinkRequest) (string, error) {
-	attemptIDEnvelope, ok := req.GetSource().(*dataproxy.CreateDownloadLinkRequest_ActionAttemptId)
-	if !ok {
-		return "", connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("unsupported source type"))
-	}
-
-	attemptID := attemptIDEnvelope.ActionAttemptId
-	actionResp, err := s.runClient.GetActionDetails(ctx, connect.NewRequest(&workflowpb.GetActionDetailsRequest{
-		ActionId: attemptID.GetActionId(),
-	}))
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get action details for %v: %v", attemptID.GetActionId(), err)
-		return "", connect.NewError(connect.CodeNotFound,
-			fmt.Errorf("failed to get action details: %w", err))
-	}
-
-	// Find the matching attempt by attempt number.
-	var matchedAttempt *workflowpb.ActionAttempt
-	for _, attempt := range actionResp.Msg.GetDetails().GetAttempts() {
-		if attempt.GetAttempt() == attemptID.GetAttempt() {
-			matchedAttempt = attempt
-			break
-		}
-	}
-	if matchedAttempt == nil {
-		return "", connect.NewError(connect.CodeNotFound,
-			fmt.Errorf("attempt %d not found for action [%v]", attemptID.GetAttempt(), attemptID.GetActionId()))
-	}
-
-	switch req.GetArtifactType() {
-	case dataproxy.ArtifactType_ARTIFACT_TYPE_REPORT:
-		reportURI := matchedAttempt.GetOutputs().GetReportUri()
-		if reportURI == "" {
-			return "", connect.NewError(connect.CodeNotFound,
-				fmt.Errorf("no report URI found for action [%v] attempt %d", attemptID.GetActionId(), attemptID.GetAttempt()))
-		}
-		return reportURI, nil
-	default:
-		return "", connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("unsupported artifact type: %v", req.GetArtifactType()))
-	}
-}
-
 // resolveTaskTemplate resolves the task template from the request's task oneof.
 func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.UploadInputsRequest) (*flyteIdlCore.TaskTemplate, error) {
 	switch t := req.Task.(type) {
@@ -437,6 +333,67 @@ func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
 		}
 	}
 	return &task.Inputs{Literals: filtered}
+}
+
+// GetActionData gets input and output data for an action by calling RunService for URIs
+// and reading the data from storage.
+func (s *Service) GetActionData(
+	ctx context.Context,
+	req *connect.Request[dataproxy.GetActionDataRequest],
+) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	actionId := req.Msg.GetActionId()
+
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		ActionId: actionId,
+	}))
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &dataproxy.GetActionDataResponse{
+		Inputs:  &task.Inputs{},
+		Outputs: &task.Outputs{},
+	}
+
+	group, groupCtx := errgroup.WithContext(ctx)
+
+	if urisResp.Msg.GetInputsUri() != "" {
+		group.Go(func() error {
+			baseRef := storage.DataReference(urisResp.Msg.GetInputsUri())
+			inputRef, err := s.dataStore.ConstructReference(groupCtx, baseRef, "inputs.pb")
+			if err != nil {
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
+			}
+			logger.Infof(groupCtx, "GetActionData: reading inputs from %s", inputRef)
+			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
+				logger.Errorf(groupCtx, "GetActionData: failed to read inputs from %s: %v", inputRef, err)
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
+			}
+			return nil
+		})
+	}
+
+	if urisResp.Msg.GetOutputsUri() != "" {
+		group.Go(func() error {
+			outputRef := storage.DataReference(urisResp.Msg.GetOutputsUri())
+			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
+			var inputsOrOutputs task.Inputs
+			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
+				logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
+			}
+			resp.Outputs = &task.Outputs{
+				Literals: inputsOrOutputs.GetLiterals(),
+			}
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(resp), nil
 }
 
 // TailLogs streams logs for an action attempt.

@@ -39,8 +39,9 @@ service RunService {
   // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
   rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
 
-  // Get input and output for an action.
+  // Deprecated: Use DataProxyService.GetActionData instead.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option deprecated = true;
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
@@ -70,6 +71,11 @@ service RunService {
 
   // Stream updates for task groups based on the provided filter criteria.
   rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
+
+  // Get the storage URIs for an action's input and output data.
+  rpc GetActionDataURIs(GetActionDataURIsRequest) returns (GetActionDataURIsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get the logging context (pod name, namespace, cluster) for an action attempt.
   rpc GetActionLogContext(GetActionLogContextRequest) returns (GetActionLogContextResponse) {
@@ -197,6 +203,21 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+}
+
+// Request message for getting action data URIs.
+message GetActionDataURIsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting action data URIs.
+message GetActionDataURIsResponse {
+  // URI for the action's input data.
+  string inputs_uri = 1;
+
+  // URI for the action's output data. Empty if action hasn't succeeded or has no outputs.
+  string outputs_uri = 2;
 }
 
 // Request message for getting action log context.

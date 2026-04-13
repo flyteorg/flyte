@@ -26,10 +26,10 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.FromString,
                 )
-        self.CreateDownloadLink = channel.unary_unary(
-                '/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink',
-                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
+        self.GetActionData = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/GetActionData',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
                 )
         self.TailLogs = channel.unary_stream(
                 '/flyteidl2.dataproxy.DataProxyService/TailLogs',
@@ -55,8 +55,8 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreateDownloadLink(self, request, context):
-        """CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+    def GetActionData(self, request, context):
+        """Get input and output data for an action.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -82,10 +82,10 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.SerializeToString,
             ),
-            'CreateDownloadLink': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateDownloadLink,
-                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.FromString,
-                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.SerializeToString,
+            'GetActionData': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetActionData,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.SerializeToString,
             ),
             'TailLogs': grpc.unary_stream_rpc_method_handler(
                     servicer.TailLogs,
@@ -138,7 +138,7 @@ class DataProxyService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def CreateDownloadLink(request,
+    def GetActionData(request,
             target,
             options=(),
             channel_credentials=None,
@@ -148,9 +148,9 @@ class DataProxyService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink',
-            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.SerializeToString,
-            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetActionData',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

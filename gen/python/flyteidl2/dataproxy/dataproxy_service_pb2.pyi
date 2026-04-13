@@ -9,19 +9,11 @@ from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from protoc_gen_openapiv2.options import annotations_pb2 as _annotations_pb2_1
 from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
-
-class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
-    ARTIFACT_TYPE_UNSPECIFIED: _ClassVar[ArtifactType]
-    ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
-ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
-ARTIFACT_TYPE_REPORT: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
@@ -86,26 +78,16 @@ class UploadInputsResponse(_message.Message):
     offloaded_input_data: _run_pb2.OffloadedInputData
     def __init__(self, offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ...) -> None: ...
 
-class PreSignedURLs(_message.Message):
-    __slots__ = ["signed_url", "expires_at"]
-    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
-    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
-    signed_url: _containers.RepeatedScalarFieldContainer[str]
-    expires_at: _timestamp_pb2.Timestamp
-    def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+class GetActionDataRequest(_message.Message):
+    __slots__ = ["action_id"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
-class CreateDownloadLinkRequest(_message.Message):
-    __slots__ = ["artifact_type", "action_attempt_id", "expires_in"]
-    ARTIFACT_TYPE_FIELD_NUMBER: _ClassVar[int]
-    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
-    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
-    artifact_type: ArtifactType
-    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
-    expires_in: _duration_pb2.Duration
-    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
-
-class CreateDownloadLinkResponse(_message.Message):
-    __slots__ = ["pre_signed_urls"]
-    PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
-    pre_signed_urls: PreSignedURLs
-    def __init__(self, pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
+class GetActionDataResponse(_message.Message):
+    __slots__ = ["inputs", "outputs"]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    inputs: _common_pb2.Inputs
+    outputs: _common_pb2.Outputs
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...

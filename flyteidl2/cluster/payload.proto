@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package flyteidl2.cluster;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/task/task_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster";
+
+message SelectClusterRequest {
+  oneof resource {
+    option (buf.validate.oneof).required = true;
+    flyteidl2.common.OrgIdentifier org_id = 1;
+    flyteidl2.common.ProjectIdentifier project_id = 2;
+    flyteidl2.task.TaskIdentifier task_id = 3;
+    flyteidl2.common.ActionIdentifier action_id = 4;
+    flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 5;
+    flyteidl2.app.Identifier app_id = 6;
+  }
+
+  enum Operation {
+    OPERATION_UNSPECIFIED = 0;
+    OPERATION_CREATE_UPLOAD_LOCATION = 1;
+    OPERATION_UPLOAD_INPUTS = 2;
+    OPERATION_GET_ACTION_DATA = 3;
+    OPERATION_QUERY_RANGE_METRICS = 4;
+    OPERATION_CREATE_DOWNLOAD_LINK = 5;
+    OPERATION_TAIL_LOGS = 6;
+    OPERATION_GET_ACTION_ATTEMPT_METRICS = 7;
+  }
+
+  Operation operation = 8 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+}
+
+message SelectClusterResponse {
+  string cluster_endpoint = 1;
+}

@@ -85,6 +85,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
                 )
+        self.GetActionDataURIs = channel.unary_unary(
+                '/flyteidl2.workflow.RunService/GetActionDataURIs',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse.FromString,
+                )
         self.GetActionLogContext = channel.unary_unary(
                 '/flyteidl2.workflow.RunService/GetActionLogContext',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.SerializeToString,
@@ -139,7 +144,7 @@ class RunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetActionData(self, request, context):
-        """Get input and output for an action.
+        """Deprecated: Use DataProxyService.GetActionData instead.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -191,6 +196,13 @@ class RunServiceServicer(object):
 
     def WatchGroups(self, request, context):
         """Stream updates for task groups based on the provided filter criteria.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetActionDataURIs(self, request, context):
+        """Get the storage URIs for an action's input and output data.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -275,6 +287,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.WatchGroups,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.SerializeToString,
+            ),
+            'GetActionDataURIs': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetActionDataURIs,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse.SerializeToString,
             ),
             'GetActionLogContext': grpc.unary_unary_rpc_method_handler(
                     servicer.GetActionLogContext,
@@ -527,6 +544,23 @@ class RunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchGroups',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetActionDataURIs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionDataURIs',
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

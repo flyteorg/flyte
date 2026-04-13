@@ -1940,6 +1940,74 @@ func (_c *RunServiceClient_GetActionData_Call) RunAndReturn(run func(context1 co
 	return _c
 }
 
+// GetActionDataURIs provides a mock function for the type RunServiceClient
+func (_mock *RunServiceClient) GetActionDataURIs(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActionDataURIs")
+	}
+
+	var r0 *connect.Response[workflow.GetActionDataURIsResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) *connect.Response[workflow.GetActionDataURIsResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.GetActionDataURIsResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceClient_GetActionDataURIs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionDataURIs'
+type RunServiceClient_GetActionDataURIs_Call struct {
+	*mock.Call
+}
+
+// GetActionDataURIs is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.GetActionDataURIsRequest]
+func (_e *RunServiceClient_Expecter) GetActionDataURIs(context1 interface{}, request interface{}) *RunServiceClient_GetActionDataURIs_Call {
+	return &RunServiceClient_GetActionDataURIs_Call{Call: _e.mock.On("GetActionDataURIs", context1, request)}
+}
+
+func (_c *RunServiceClient_GetActionDataURIs_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest])) *RunServiceClient_GetActionDataURIs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.GetActionDataURIsRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.GetActionDataURIsRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceClient_GetActionDataURIs_Call) Return(response *connect.Response[workflow.GetActionDataURIsResponse], err error) *RunServiceClient_GetActionDataURIs_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceClient_GetActionDataURIs_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)) *RunServiceClient_GetActionDataURIs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetActionDetails provides a mock function for the type RunServiceClient
 func (_mock *RunServiceClient) GetActionDetails(context1 context.Context, request *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -2983,6 +3051,74 @@ func (_c *RunServiceHandler_GetActionData_Call) Return(response *connect.Respons
 }
 
 func (_c *RunServiceHandler_GetActionData_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)) *RunServiceHandler_GetActionData_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetActionDataURIs provides a mock function for the type RunServiceHandler
+func (_mock *RunServiceHandler) GetActionDataURIs(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActionDataURIs")
+	}
+
+	var r0 *connect.Response[workflow.GetActionDataURIsResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) *connect.Response[workflow.GetActionDataURIsResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.GetActionDataURIsResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceHandler_GetActionDataURIs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionDataURIs'
+type RunServiceHandler_GetActionDataURIs_Call struct {
+	*mock.Call
+}
+
+// GetActionDataURIs is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.GetActionDataURIsRequest]
+func (_e *RunServiceHandler_Expecter) GetActionDataURIs(context1 interface{}, request interface{}) *RunServiceHandler_GetActionDataURIs_Call {
+	return &RunServiceHandler_GetActionDataURIs_Call{Call: _e.mock.On("GetActionDataURIs", context1, request)}
+}
+
+func (_c *RunServiceHandler_GetActionDataURIs_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest])) *RunServiceHandler_GetActionDataURIs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.GetActionDataURIsRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.GetActionDataURIsRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceHandler_GetActionDataURIs_Call) Return(response *connect.Response[workflow.GetActionDataURIsResponse], err error) *RunServiceHandler_GetActionDataURIs_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceHandler_GetActionDataURIs_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)) *RunServiceHandler_GetActionDataURIs_Call {
 	_c.Call.Return(run)
 	return _c
 }

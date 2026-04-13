@@ -2664,6 +2664,33 @@ pub mod run_service_client {
                 .insert(GrpcMethod::new("flyteidl2.workflow.RunService", "WatchGroups"));
             self.inner.server_streaming(req, path, codec).await
         }
+        pub async fn get_action_data_ur_is(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetActionDataUrIsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetActionDataUrIsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunService/GetActionDataURIs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.RunService", "GetActionDataURIs"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn get_action_log_context(
             &mut self,
             request: impl tonic::IntoRequest<super::GetActionLogContextRequest>,
@@ -2838,6 +2865,13 @@ pub mod run_service_server {
             request: tonic::Request<super::WatchGroupsRequest>,
         ) -> std::result::Result<
             tonic::Response<Self::WatchGroupsStream>,
+            tonic::Status,
+        >;
+        async fn get_action_data_ur_is(
+            &self,
+            request: tonic::Request<super::GetActionDataUrIsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetActionDataUrIsResponse>,
             tonic::Status,
         >;
         async fn get_action_log_context(
@@ -3561,6 +3595,52 @@ pub mod run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.RunService/GetActionDataURIs" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetActionDataURIsSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::UnaryService<super::GetActionDataUrIsRequest>
+                    for GetActionDataURIsSvc<T> {
+                        type Response = super::GetActionDataUrIsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetActionDataUrIsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::get_action_data_ur_is(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = GetActionDataURIsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
