@@ -43,7 +43,7 @@ We’re excited that you’re interested in contributing code to Flyte! Before y
 
 #### Recommendation Order (For Beginners)
 
-- Finish reading the [Core Concepts](https://www.union.ai/docs/v2/flyte/user-guide/core-concepts/)
+- Finish reading [Core Concepts](https://www.union.ai/docs/v2/flyte/user-guide/core-concepts/)
 - Finish reading [Connecting a Cluster](https://www.union.ai/docs/v2/flyte/user-guide/connecting-to-a-cluster/)
 - Finish reading [Projects and Domain](https://www.union.ai/docs/v2/flyte/user-guide/projects-and-domains/) 
 - Finish reading [From Flyte 1 to Flyte 2](https://www.union.ai/docs/v2/flyte/user-guide/flyte-2/) 
@@ -52,7 +52,7 @@ We’re excited that you’re interested in contributing code to Flyte! Before y
 
 Please use our issues templates that provide hints on what information we need to help you.
 
-> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to [email](mailto:email) or use the Report a security vulnerability issue template.
+> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to [email](mailto:email) or use the Report a security vulnerability issue template. 
 
 ### Feature Requests
 
