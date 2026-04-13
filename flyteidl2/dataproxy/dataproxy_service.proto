@@ -14,13 +14,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy";
 
-// ArtifactType defines the type of artifact to be downloaded.
-enum ArtifactType {
-  ARTIFACT_TYPE_UNSPECIFIED = 0;
-  // ARTIFACT_TYPE_REPORT refers to the HTML report file optionally generated after a task finishes executing.
-  ARTIFACT_TYPE_REPORT = 1;
-}
-
 // DataProxyService provides an interface for managing data uploads and downloads.
 service DataProxyService {
   // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
@@ -46,24 +39,6 @@ service DataProxyService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Uploads inputs for a given run or project and returns a URI and cache key that can be used to reference these inputs at runtime."};
-  }
-
-  // CreateDownloadLink generates signed URL(s) for downloading a given artifact.
-  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/artifact_urn/download"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/artifact_urn/download"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates signed URL(s) for downloading an artifact associated with a run action."};
-  }
-
-  // Get input and output data for an action.
-  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
@@ -164,56 +139,4 @@ message UploadInputsRequest {
 
 message UploadInputsResponse {
   common.OffloadedInputData offloaded_input_data = 1;
-}
-
-// PreSignedURLs contains a list of signed URLs for downloading artifacts.
-message PreSignedURLs {
-  // SignedUrl are the pre-signed URLs for downloading the artifact.
-  repeated string signed_url = 1;
-
-  // ExpiresAt defines when the signed URLs will expire.
-  google.protobuf.Timestamp expires_at = 2;
-}
-
-// CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API.
-message CreateDownloadLinkRequest {
-  // ArtifactType is the type of artifact to download.
-  // +required
-  ArtifactType artifact_type = 1 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
-
-  // Source identifies the action attempt whose artifact is to be downloaded.
-  oneof source {
-    option (buf.validate.oneof).required = true;
-
-    // ActionAttemptId identifies the specific attempt of a run action that produced the artifact.
-    common.ActionAttemptIdentifier action_attempt_id = 2;
-  }
-
-  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
-  // rejected if this exceeds the platform's configured maximum.
-  // +optional. The default value comes from the global config.
-  google.protobuf.Duration expires_in = 3;
-}
-
-// CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
-message CreateDownloadLinkResponse {
-  // PreSignedUrls contains the signed URLs and their expiration time.
-  PreSignedURLs pre_signed_urls = 1;
-}
-
-// Request message for querying action data.
-message GetActionDataRequest {
-  // Action to query.
-  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
-}
-
-// Response message for querying action data.
-message GetActionDataResponse {
-  // Inputs for the action.
-  task.Inputs inputs = 1;
-
-  // Outputs for the action.
-  task.Outputs outputs = 2;
 }

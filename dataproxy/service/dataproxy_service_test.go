@@ -97,7 +97,7 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -218,7 +218,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -296,7 +296,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -453,7 +453,7 @@ func TestUploadInputs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStoreWithWriteProtobuf(t)
-			svc := NewService(cfg, mockStore, nil, nil, nil)
+			svc := NewService(cfg, mockStore, nil, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,

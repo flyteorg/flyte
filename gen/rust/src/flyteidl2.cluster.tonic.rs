@@ -1,14 +1,14 @@
 // @generated
 /// Generated client implementations.
-pub mod data_proxy_service_client {
+pub mod cluster_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct DataProxyServiceClient<T> {
+    pub struct ClusterServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl DataProxyServiceClient<tonic::transport::Channel> {
+    impl ClusterServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -19,7 +19,7 @@ pub mod data_proxy_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> DataProxyServiceClient<T>
+    impl<T> ClusterServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -37,7 +37,7 @@ pub mod data_proxy_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> DataProxyServiceClient<InterceptedService<T, F>>
+        ) -> ClusterServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -51,7 +51,7 @@ pub mod data_proxy_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            DataProxyServiceClient::new(InterceptedService::new(inner, interceptor))
+            ClusterServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -84,11 +84,11 @@ pub mod data_proxy_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn create_upload_location(
+        pub async fn select_cluster(
             &mut self,
-            request: impl tonic::IntoRequest<super::CreateUploadLocationRequest>,
+            request: impl tonic::IntoRequest<super::SelectClusterRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateUploadLocationResponse>,
+            tonic::Response<super::SelectClusterResponse>,
             tonic::Status,
         > {
             self.inner
@@ -102,81 +102,41 @@ pub mod data_proxy_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation",
+                "/flyteidl2.cluster.ClusterService/SelectCluster",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.dataproxy.DataProxyService",
-                        "CreateUploadLocation",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn upload_inputs(
-            &mut self,
-            request: impl tonic::IntoRequest<super::UploadInputsRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UploadInputsResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.dataproxy.DataProxyService",
-                        "UploadInputs",
-                    ),
+                    GrpcMethod::new("flyteidl2.cluster.ClusterService", "SelectCluster"),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod data_proxy_service_server {
+pub mod cluster_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with DataProxyServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with ClusterServiceServer.
     #[async_trait]
-    pub trait DataProxyService: Send + Sync + 'static {
-        async fn create_upload_location(
+    pub trait ClusterService: Send + Sync + 'static {
+        async fn select_cluster(
             &self,
-            request: tonic::Request<super::CreateUploadLocationRequest>,
+            request: tonic::Request<super::SelectClusterRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateUploadLocationResponse>,
-            tonic::Status,
-        >;
-        async fn upload_inputs(
-            &self,
-            request: tonic::Request<super::UploadInputsRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::UploadInputsResponse>,
+            tonic::Response<super::SelectClusterResponse>,
             tonic::Status,
         >;
     }
     #[derive(Debug)]
-    pub struct DataProxyServiceServer<T: DataProxyService> {
+    pub struct ClusterServiceServer<T: ClusterService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: DataProxyService> DataProxyServiceServer<T> {
+    impl<T: ClusterService> ClusterServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -227,9 +187,9 @@ pub mod data_proxy_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for DataProxyServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ClusterServiceServer<T>
     where
-        T: DataProxyService,
+        T: ClusterService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -244,29 +204,25 @@ pub mod data_proxy_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation" => {
+                "/flyteidl2.cluster.ClusterService/SelectCluster" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateUploadLocationSvc<T: DataProxyService>(pub Arc<T>);
+                    struct SelectClusterSvc<T: ClusterService>(pub Arc<T>);
                     impl<
-                        T: DataProxyService,
-                    > tonic::server::UnaryService<super::CreateUploadLocationRequest>
-                    for CreateUploadLocationSvc<T> {
-                        type Response = super::CreateUploadLocationResponse;
+                        T: ClusterService,
+                    > tonic::server::UnaryService<super::SelectClusterRequest>
+                    for SelectClusterSvc<T> {
+                        type Response = super::SelectClusterResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CreateUploadLocationRequest>,
+                            request: tonic::Request<super::SelectClusterRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DataProxyService>::create_upload_location(
-                                        &inner,
-                                        request,
-                                    )
-                                    .await
+                                <T as ClusterService>::select_cluster(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -277,53 +233,7 @@ pub mod data_proxy_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = CreateUploadLocationSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.dataproxy.DataProxyService/UploadInputs" => {
-                    #[allow(non_camel_case_types)]
-                    struct UploadInputsSvc<T: DataProxyService>(pub Arc<T>);
-                    impl<
-                        T: DataProxyService,
-                    > tonic::server::UnaryService<super::UploadInputsRequest>
-                    for UploadInputsSvc<T> {
-                        type Response = super::UploadInputsResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::UploadInputsRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as DataProxyService>::upload_inputs(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = UploadInputsSvc(inner);
+                        let method = SelectClusterSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -357,7 +267,7 @@ pub mod data_proxy_service_server {
             }
         }
     }
-    impl<T: DataProxyService> Clone for DataProxyServiceServer<T> {
+    impl<T: ClusterService> Clone for ClusterServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -369,7 +279,7 @@ pub mod data_proxy_service_server {
             }
         }
     }
-    impl<T: DataProxyService> tonic::server::NamedService for DataProxyServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.dataproxy.DataProxyService";
+    impl<T: ClusterService> tonic::server::NamedService for ClusterServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.cluster.ClusterService";
     }
 }
