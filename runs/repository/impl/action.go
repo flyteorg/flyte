@@ -16,8 +16,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -26,6 +24,8 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+const rootActionName = "a0"
 
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
@@ -42,8 +42,6 @@ type actionRepo struct {
 	actionNotifyCh chan string
 	runNotifyCh    chan string
 }
-
-const rootActionName = "a0"
 
 // NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
@@ -66,136 +64,6 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 	}
 
 	return repo, nil
-}
-
-// CreateRun creates a new run (root action with parent_action_name = null)
-func (r *actionRepo) CreateRun(ctx context.Context, req *workflow.CreateRunRequest, inputUri, runOutputBase string) (*models.Run, error) {
-	// Determine run ID
-	var runID *common.RunIdentifier
-	switch id := req.Id.(type) {
-	case *workflow.CreateRunRequest_RunId:
-		runID = id.RunId
-	default:
-		return nil, fmt.Errorf("invalid run ID type")
-	}
-
-	// Build ActionSpec from CreateRunRequest
-	actionSpec := &workflow.ActionSpec{
-		ActionId: &common.ActionIdentifier{
-			Run:  runID,
-			Name: rootActionName,
-		},
-		ParentActionName: nil, // NULL for root actions
-		RunSpec:          req.RunSpec,
-		InputUri:         inputUri + "/inputs.pb",
-		RunOutputBase:    runOutputBase,
-	}
-
-	// Set the task spec based on the request
-	switch taskSpec := req.Task.(type) {
-	case *workflow.CreateRunRequest_TaskSpec:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Spec: taskSpec.TaskSpec,
-			},
-		}
-	case *workflow.CreateRunRequest_TaskId:
-		actionSpec.Spec = &workflow.ActionSpec_Task{
-			Task: &workflow.TaskAction{
-				Id: taskSpec.TaskId,
-			},
-		}
-	}
-
-	// Serialize the ActionSpec to binary protobuf
-	actionSpecBytes, err := proto.Marshal(actionSpec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal action spec: %w", err)
-	}
-
-	// Build RunInfo with storage URIs and task spec digest
-	info := &workflow.RunInfo{
-		InputsUri: inputUri,
-	}
-
-	// Store task spec separately and record its digest
-	if taskSpec := actionSpec.GetTask().GetSpec(); taskSpec != nil {
-		taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create task spec model: %w", err)
-		}
-		if taskSpecModel != nil {
-			_, insertErr := r.db.ExecContext(ctx,
-				`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
-				taskSpecModel.Digest, taskSpecModel.Spec)
-			if insertErr != nil {
-				logger.Warnf(ctx, "CreateRun: failed to store task spec: %v", insertErr)
-			} else {
-				info.TaskSpecDigest = taskSpecModel.Digest
-			}
-		}
-	}
-
-	detailedInfo, err := proto.Marshal(info)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal run info: %w", err)
-	}
-
-	// Marshal RunSpec if present
-	var runSpecBytes []byte
-	if req.RunSpec != nil {
-		runSpecBytes, err = proto.Marshal(req.RunSpec)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal run spec: %w", err)
-		}
-	}
-
-	// Extract metadata columns from action spec
-	meta := extractActionMetadata(actionSpec)
-
-	// Create root action (represents the run)
-	run := &models.Run{
-		Project:          runID.Project,
-		Domain:           runID.Domain,
-		RunName:          runID.Name,
-		Name:             rootActionName,
-		ParentActionName: newNullString(""), // NULL for root actions/runs
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:       meta.ActionType,
-		TaskProject:      meta.TaskProject,
-		TaskDomain:       meta.TaskDomain,
-		TaskName:         meta.TaskName,
-		TaskVersion:      meta.TaskVersion,
-		TaskType:         meta.TaskType,
-		TaskShortName:    meta.TaskShortName,
-		FunctionName:     meta.FunctionName,
-		EnvironmentName:  meta.EnvironmentName,
-		ActionSpec:       actionSpecBytes,
-		ActionDetails:    []byte("{}"), // Empty details initially
-		DetailedInfo:     detailedInfo,
-		RunSpec:          runSpecBytes,
-		Attempts:         1,
-	}
-
-	err = r.db.QueryRowxContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
-		 RETURNING created_at, updated_at`,
-		run.Project, run.Domain, run.RunName, run.Name, run.ParentActionName, run.Phase, run.RunSource, run.ActionType, run.ActionGroup,
-		run.TaskProject, run.TaskDomain, run.TaskName, run.TaskVersion, run.TaskType, run.TaskShortName, run.FunctionName, run.EnvironmentName,
-		run.ActionSpec, run.ActionDetails, run.DetailedInfo, run.RunSpec, run.Attempts, run.CacheStatus,
-	).Scan(&run.CreatedAt, &run.UpdatedAt)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create run: %w", err)
-	}
-
-	logger.Infof(ctx, "Created run: %s/%s/%s",
-		run.Project, run.Domain, run.RunName)
-
-	// Notify subscribers of run creation
-	r.notifyRunUpdate(ctx, runID)
-
-	return run, nil
 }
 
 // GetRun retrieves a run by identifier
@@ -383,7 +251,15 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 }
 
 // CreateAction inserts an Action model into the database.
-func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*models.Action, error) {
+// When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
+// corresponding trigger row is updated to now() in the same transaction.
+func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
 	// Use the model's CreatedAt if set (e.g. trace actions use start_time so parents
 	// sort before children), otherwise fall back to the current time.
 	createdAt := action.CreatedAt
@@ -391,15 +267,30 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*
 		createdAt = time.Now()
 	}
 
-	result, err := r.db.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, created_at, ended_at, duration_ms)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, CASE WHEN $25::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($25::timestamptz, $24) - $24)) * 1000 ELSE NULL END)
+	result, err := tx.ExecContext(ctx,
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, duration_ms)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
-		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus, createdAt, action.EndedAt)
+		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus,
+		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected > 0 && updateTriggeredAt && action.TriggerName.Valid {
+		if _, err := tx.ExecContext(ctx,
+			`UPDATE triggers SET triggered_at = NOW() WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4`,
+			action.Project, action.Domain, action.TriggerTaskName.String, action.TriggerName.String,
+		); err != nil {
+			return nil, fmt.Errorf("failed to update triggered_at: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit tx: %w", err)
 	}
 
 	actionID := &common.ActionIdentifier{
@@ -412,7 +303,6 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*
 	}
 
 	// If no rows were affected, the action already exists — fetch and return it.
-	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		existing, err := r.GetAction(ctx, actionID)
 		if err != nil {
@@ -421,7 +311,7 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action) (*
 		return existing, nil
 	}
 
-	// Fetch the created action to get DB-generated fields (id, created_at, updated_at)
+	// Fetch the created action to get DB-generated fields (created_at, updated_at)
 	created, err := r.GetAction(ctx, actionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch created action: %w", err)
@@ -1153,62 +1043,4 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	case <-ctx.Done():
 		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
 	}
-}
-
-// actionMeta holds metadata columns extracted from an ActionSpec.
-type actionMeta struct {
-	ActionType      int32
-	TaskProject     sql.NullString
-	TaskDomain      sql.NullString
-	TaskName        sql.NullString
-	TaskVersion     sql.NullString
-	TaskType        string
-	TaskShortName   sql.NullString
-	FunctionName    string
-	EnvironmentName sql.NullString
-}
-
-func newNullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
-
-// extractActionMetadata extracts metadata columns from an ActionSpec proto.
-func extractActionMetadata(spec *workflow.ActionSpec) actionMeta {
-	var m actionMeta
-	switch s := spec.GetSpec().(type) {
-	case *workflow.ActionSpec_Task:
-		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TASK)
-		// TaskAction.Id takes precedence; fall back to TaskTemplate.Id
-		if id := s.Task.GetId(); id != nil {
-			m.TaskProject = newNullString(id.GetProject())
-			m.TaskDomain = newNullString(id.GetDomain())
-			m.TaskName = newNullString(id.GetName())
-			m.TaskVersion = newNullString(id.GetVersion())
-			m.FunctionName = id.GetName()
-			m.TaskShortName = newNullString(id.GetName())
-		} else if tmplID := s.Task.GetSpec().GetTaskTemplate().GetId(); tmplID != nil {
-			m.TaskProject = newNullString(tmplID.GetProject())
-			m.TaskDomain = newNullString(tmplID.GetDomain())
-			m.TaskName = newNullString(tmplID.GetName())
-			m.TaskVersion = newNullString(tmplID.GetVersion())
-			m.FunctionName = tmplID.GetName()
-			m.TaskShortName = newNullString(tmplID.GetName())
-		}
-		if taskSpec := s.Task.GetSpec(); taskSpec != nil {
-			m.TaskType = taskSpec.GetTaskTemplate().GetType()
-			if taskSpec.GetShortName() != "" {
-				m.TaskShortName = newNullString(taskSpec.GetShortName())
-			}
-			if env := taskSpec.GetEnvironment(); env != nil && env.GetName() != "" {
-				m.EnvironmentName = newNullString(env.GetName())
-			}
-		}
-	case *workflow.ActionSpec_Trace:
-		m.ActionType = int32(workflow.ActionType_ACTION_TYPE_TRACE)
-		m.FunctionName = s.Trace.GetName()
-	}
-	return m
 }

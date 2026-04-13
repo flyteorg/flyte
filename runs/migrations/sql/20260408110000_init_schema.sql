@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS actions (
     duration_ms         BIGINT,
     attempts            INTEGER NOT NULL DEFAULT 0,
     cache_status        INTEGER NOT NULL DEFAULT 0,
+    trigger_name        TEXT,
+    trigger_task_name   TEXT,
+    trigger_revision    BIGINT,
     PRIMARY KEY (project, domain, run_name, name)
 );
 CREATE INDEX IF NOT EXISTS idx_actions_run_lookup ON actions (project, domain, run_name);
@@ -93,4 +96,51 @@ CREATE TABLE IF NOT EXISTS task_specs (
     spec        BYTEA NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Triggers: mutable latest-state row, one per (project, domain, task_name, name).
+CREATE TABLE IF NOT EXISTS triggers (
+    id               BIGSERIAL PRIMARY KEY,
+    project          TEXT NOT NULL,
+    domain           TEXT NOT NULL,
+    task_name        TEXT NOT NULL,
+    name             TEXT NOT NULL,
+    latest_revision  BIGINT NOT NULL DEFAULT 1,
+    spec             BYTEA NOT NULL,
+    automation_spec  BYTEA,
+    task_version     TEXT NOT NULL,
+    active           BOOLEAN NOT NULL,
+    automation_type  TEXT NOT NULL DEFAULT 'TYPE_NONE',
+    deployed_by      TEXT,
+    updated_by       TEXT,
+    deployed_at      TIMESTAMPTZ NOT NULL,
+    updated_at       TIMESTAMPTZ NOT NULL,
+    triggered_at     TIMESTAMPTZ,
+    deleted_at       TIMESTAMPTZ,
+    description      TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_triggers_name ON triggers (project, domain, task_name, name);
+CREATE INDEX IF NOT EXISTS idx_triggers_schedule_lookup ON triggers (active, automation_type);
+
+-- Trigger revisions: immutable append-only snapshot of every trigger state change.
+CREATE TABLE IF NOT EXISTS trigger_revisions (
+    project          TEXT NOT NULL,
+    domain           TEXT NOT NULL,
+    task_name        TEXT NOT NULL,
+    name             TEXT NOT NULL,
+    revision         BIGINT NOT NULL,
+    spec             BYTEA NOT NULL,
+    automation_spec  BYTEA,
+    task_version     TEXT NOT NULL,
+    active           BOOLEAN NOT NULL,
+    automation_type  TEXT NOT NULL DEFAULT 'TYPE_NONE',
+    deployed_by      TEXT,
+    updated_by       TEXT,
+    deployed_at      TIMESTAMPTZ NOT NULL,
+    updated_at       TIMESTAMPTZ NOT NULL,
+    triggered_at     TIMESTAMPTZ,
+    deleted_at       TIMESTAMPTZ,
+    action           TEXT NOT NULL,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (project, domain, task_name, name, revision)
 );
