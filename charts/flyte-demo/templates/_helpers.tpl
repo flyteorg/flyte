@@ -85,7 +85,7 @@ Name of PersistentVolume and PersistentVolumeClaim for PostgreSQL database
 {{/*
 Name of PersistentVolume and PersistentVolumeClaim for RustFS
 */}}
-{{- define "flyte-sandbox.persistence.rustfsVolumeName" -}}
+{{- define "flyte-demo.persistence.rustfsVolumeName" -}}
 {{- printf "%s-rustfs-storage" .Release.Name -}}
 {{- end }}
 

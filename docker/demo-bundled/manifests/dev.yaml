@@ -353,7 +353,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 type: Opaque
 ---
@@ -462,12 +462,27 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: postgresql
+  namespace: flyte
+spec:
+  ports:
+  - name: tcp-postgresql
+    nodePort: 30001
+    port: 5432
+    targetPort: 5432
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 spec:
   ports:
@@ -478,21 +493,6 @@ spec:
   selector:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/name: rustfs
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/name: embedded-postgresql
-  name: postgresql
-  namespace: flyte
-spec:
-  ports:
-  - name: tcp-postgresql
-    nodePort: 30001
-    port: 5432
-    targetPort: 5432
   type: NodePort
 ---
 apiVersion: v1
@@ -658,7 +658,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 spec:
   selector:
@@ -683,14 +683,14 @@ spec:
           valueFrom:
             secretKeyRef:
               key: access-key
-              name: flyte-demo-rustfs
+              name: rustfs
         - name: RUSTFS_SECRET_KEY
           valueFrom:
             secretKeyRef:
               key: secret-key
-              name: flyte-demo-rustfs
-        image: rustfs/rustfs:latest
-        imagePullPolicy: IfNotPresent
+              name: rustfs
+        image: rustfs/rustfs:sandbox
+        imagePullPolicy: Never
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 10

@@ -532,14 +532,14 @@ data:
           region: us-east-1
           disable_ssl: true
           v2_signing: true
-          endpoint: http://flyte-demo-rustfs.flyte:9000
+          endpoint: http://rustfs.flyte:9000
           auth_type: accesskey
       container: flyte-data
   100-inline-config.yaml: |
     plugins:
       k8s:
         default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://flyte-demo-rustfs.flyte:9000
+        - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
         - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
         - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
@@ -641,7 +641,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 type: Opaque
 ---
@@ -750,12 +750,27 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/name: embedded-postgresql
+  name: postgresql
+  namespace: flyte
+spec:
+  ports:
+  - name: tcp-postgresql
+    nodePort: 30001
+    port: 5432
+    targetPort: 5432
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 spec:
   ports:
@@ -766,21 +781,6 @@ spec:
   selector:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/name: rustfs
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/name: embedded-postgresql
-  name: postgresql
-  namespace: flyte
-spec:
-  ports:
-  - name: tcp-postgresql
-    nodePort: 30001
-    port: 5432
-    targetPort: 5432
   type: NodePort
 ---
 apiVersion: v1
@@ -913,7 +913,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 16d72d6e526692df8dfa92847761d8decc93c4b4f755f545ec387e15df36a5f3
+        checksum/configuration: 7086d439a183c1c3cf2549a609143ac5e81a9f4dddd67c7059b969f8c6615a7e
         checksum/configuration-secret: 4bd6625ca25de370120c59fb11b5f6d5fb70b1314b13d18f3850d76d2e452869
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1044,7 +1044,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs
+  name: rustfs
   namespace: flyte
 spec:
   selector:
@@ -1069,14 +1069,14 @@ spec:
           valueFrom:
             secretKeyRef:
               key: access-key
-              name: flyte-demo-rustfs
+              name: rustfs
         - name: RUSTFS_SECRET_KEY
           valueFrom:
             secretKeyRef:
               key: secret-key
-              name: flyte-demo-rustfs
-        image: rustfs/rustfs:latest
-        imagePullPolicy: IfNotPresent
+              name: rustfs
+        image: rustfs/rustfs:sandbox
+        imagePullPolicy: Never
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 10

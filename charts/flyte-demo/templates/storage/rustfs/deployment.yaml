@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-rustfs
+  name: rustfs
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "flyte-demo.labels" . | nindent 4 }}
@@ -37,8 +37,8 @@ spec:
           name: data
       containers:
       - name: rustfs
-        image: rustfs/rustfs:latest
-        imagePullPolicy: IfNotPresent
+        image: rustfs/rustfs:sandbox
+        imagePullPolicy: Never
         env:
         - name: RUSTFS_ADDRESS
           value: "0.0.0.0:9000"
@@ -47,12 +47,12 @@ spec:
         - name: RUSTFS_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-rustfs
+              name: rustfs
               key: access-key
         - name: RUSTFS_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-rustfs
+              name: rustfs
               key: secret-key
         ports:
         - containerPort: 9000
@@ -81,5 +81,5 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: {{ include "flyte-sandbox.persistence.rustfsVolumeName" . }}
+          claimName: {{ include "flyte-demo.persistence.rustfsVolumeName" . }}
 {{- end }}
