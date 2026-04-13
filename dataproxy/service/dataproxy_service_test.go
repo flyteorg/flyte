@@ -97,7 +97,7 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -218,7 +218,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -296,7 +296,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -389,7 +389,7 @@ func TestUploadInputs(t *testing.T) {
 						Name:    "test-run",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
@@ -414,7 +414,7 @@ func TestUploadInputs(t *testing.T) {
 						Domain:       "test-domain",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}},
@@ -435,7 +435,7 @@ func TestUploadInputs(t *testing.T) {
 						Org: "org", Project: "proj", Domain: "dom", Name: "run1",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
@@ -453,7 +453,7 @@ func TestUploadInputs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStoreWithWriteProtobuf(t)
-			svc := NewService(cfg, mockStore, nil, nil)
+			svc := NewService(cfg, mockStore, nil, nil, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,
