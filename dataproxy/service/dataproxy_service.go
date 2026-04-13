@@ -444,7 +444,7 @@ func (s *Service) GetActionData(
 ) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	actionId := req.Msg.GetActionId()
 
-	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflowpb.GetActionDataURIsRequest{
 		ActionId: actionId,
 	}))
 	if err != nil {
