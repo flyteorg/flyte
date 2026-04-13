@@ -44,7 +44,7 @@ We’re excited that you’re interested in contributing code to Flyte! Before y
 #### Recommendation Order (For Beginners)
 
 - Finish reading the [Core Concepts](https://www.union.ai/docs/v2/flyte/user-guide/core-concepts/)
-- Finish reading [Conncting a Cluster](https://www.union.ai/docs/v2/flyte/user-guide/connecting-to-a-cluster/)
+- Finish reading [Connecting a Cluster](https://www.union.ai/docs/v2/flyte/user-guide/connecting-to-a-cluster/)
 - Finish reading [Projects and Domain](https://www.union.ai/docs/v2/flyte/user-guide/projects-and-domains/) 
 - Finish reading [From Flyte 1 to Flyte 2](https://www.union.ai/docs/v2/flyte/user-guide/flyte-2/) 
 
@@ -62,7 +62,7 @@ Unsure if your contribution is “small”, “large” or whether it fits into 
 
 ### Improving The Documentation
 
-If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout the [Conributing to documentation](https://www.union.ai/docs/v2/flyte/community/#contributing-to-documentation).
+If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout the [Contributing to documentation](https://www.union.ai/docs/v2/flyte/community/#contributing-to-documentation).
 
 ### Improving The Design
 
