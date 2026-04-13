@@ -76,3 +76,17 @@ class UploadInputsResponse(_message.Message):
     OFFLOADED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     offloaded_input_data: _run_pb2.OffloadedInputData
     def __init__(self, offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ...) -> None: ...
+
+class GetActionDataRequest(_message.Message):
+    __slots__ = ["action_id"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+
+class GetActionDataResponse(_message.Message):
+    __slots__ = ["inputs", "outputs"]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    inputs: _common_pb2.Inputs
+    outputs: _common_pb2.Outputs
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...

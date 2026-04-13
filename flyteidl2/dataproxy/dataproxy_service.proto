@@ -40,6 +40,11 @@ service DataProxyService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Uploads inputs for a given run or project and returns a URI and cache key that can be used to reference these inputs at runtime."};
   }
+
+  // Get input and output data for an action.
+  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -139,4 +144,19 @@ message UploadInputsRequest {
 
 message UploadInputsResponse {
   common.OffloadedInputData offloaded_input_data = 1;
+}
+
+// Request message for querying action data.
+message GetActionDataRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for querying action data.
+message GetActionDataResponse {
+  // Inputs for the action.
+  task.Inputs inputs = 1;
+
+  // Outputs for the action.
+  task.Outputs outputs = 2;
 }
