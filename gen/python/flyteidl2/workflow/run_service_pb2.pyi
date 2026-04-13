@@ -116,6 +116,20 @@ class GetActionDataResponse(_message.Message):
     outputs: _common_pb2.Outputs
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
+class GetActionDataURIsRequest(_message.Message):
+    __slots__ = ["action_id"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+
+class GetActionDataURIsResponse(_message.Message):
+    __slots__ = ["inputs_uri", "outputs_uri"]
+    INPUTS_URI_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_URI_FIELD_NUMBER: _ClassVar[int]
+    inputs_uri: str
+    outputs_uri: str
+    def __init__(self, inputs_uri: _Optional[str] = ..., outputs_uri: _Optional[str] = ...) -> None: ...
+
 class ListRunsRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]

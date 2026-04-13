@@ -60,6 +60,11 @@ service DataProxyService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates signed URL(s) for downloading an artifact associated with a run action."};
   }
+
+  // Get input and output data for an action.
+  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -196,4 +201,19 @@ message CreateDownloadLinkRequest {
 message CreateDownloadLinkResponse {
   // PreSignedUrls contains the signed URLs and their expiration time.
   PreSignedURLs pre_signed_urls = 1;
+}
+
+// Request message for querying action data.
+message GetActionDataRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for querying action data.
+message GetActionDataResponse {
+  // Inputs for the action.
+  task.Inputs inputs = 1;
+
+  // Outputs for the action.
+  task.Outputs outputs = 2;
 }

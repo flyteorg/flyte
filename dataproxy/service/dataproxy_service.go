@@ -5,7 +5,6 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"hash/fnv"
 	"slices"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/flyteorg/stow"
 	"github.com/samber/lo"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	workflowpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
 type Service struct {
@@ -433,6 +434,67 @@ func filterInputs(inputs *task.Inputs, ignoreVars []string) *task.Inputs {
 		}
 	}
 	return &task.Inputs{Literals: filtered}
+}
+
+// GetActionData gets input and output data for an action by calling RunService for URIs
+// and reading the data from storage.
+func (s *Service) GetActionData(
+	ctx context.Context,
+	req *connect.Request[dataproxy.GetActionDataRequest],
+) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	actionId := req.Msg.GetActionId()
+
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		ActionId: actionId,
+	}))
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &dataproxy.GetActionDataResponse{
+		Inputs:  &task.Inputs{},
+		Outputs: &task.Outputs{},
+	}
+
+	group, groupCtx := errgroup.WithContext(ctx)
+
+	if urisResp.Msg.GetInputsUri() != "" {
+		group.Go(func() error {
+			baseRef := storage.DataReference(urisResp.Msg.GetInputsUri())
+			inputRef, err := s.dataStore.ConstructReference(groupCtx, baseRef, "inputs.pb")
+			if err != nil {
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
+			}
+			logger.Infof(groupCtx, "GetActionData: reading inputs from %s", inputRef)
+			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
+				logger.Errorf(groupCtx, "GetActionData: failed to read inputs from %s: %v", inputRef, err)
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
+			}
+			return nil
+		})
+	}
+
+	if urisResp.Msg.GetOutputsUri() != "" {
+		group.Go(func() error {
+			outputRef := storage.DataReference(urisResp.Msg.GetOutputsUri())
+			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
+			var inputsOrOutputs task.Inputs
+			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
+				logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
+				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
+			}
+			resp.Outputs = &task.Outputs{
+				Literals: inputsOrOutputs.GetLiterals(),
+			}
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(resp), nil
 }
 
 // hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.

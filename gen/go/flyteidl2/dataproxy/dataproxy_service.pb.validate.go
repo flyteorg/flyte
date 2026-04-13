@@ -1235,3 +1235,294 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateDownloadLinkResponseValidationError{}
+
+// Validate checks the field values on GetActionDataRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetActionDataRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetActionDataRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetActionDataRequestMultiError, or nil if none found.
+func (m *GetActionDataRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetActionDataRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionDataRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionDataRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetActionDataRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetActionDataRequestMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetActionDataRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetActionDataRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetActionDataRequestMultiError) AllErrors() []error { return m }
+
+// GetActionDataRequestValidationError is the validation error returned by
+// GetActionDataRequest.Validate if the designated constraints aren't met.
+type GetActionDataRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetActionDataRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetActionDataRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetActionDataRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetActionDataRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetActionDataRequestValidationError) ErrorName() string {
+	return "GetActionDataRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetActionDataRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetActionDataRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetActionDataRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetActionDataRequestValidationError{}
+
+// Validate checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetActionDataResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetActionDataResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetActionDataResponseMultiError, or nil if none found.
+func (m *GetActionDataResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetActionDataResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInputs()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionDataResponseValidationError{
+				field:  "Inputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutputs()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetActionDataResponseValidationError{
+					field:  "Outputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetActionDataResponseValidationError{
+				field:  "Outputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetActionDataResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetActionDataResponseMultiError is an error wrapping multiple validation
+// errors returned by GetActionDataResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetActionDataResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetActionDataResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetActionDataResponseMultiError) AllErrors() []error { return m }
+
+// GetActionDataResponseValidationError is the validation error returned by
+// GetActionDataResponse.Validate if the designated constraints aren't met.
+type GetActionDataResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetActionDataResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetActionDataResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetActionDataResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetActionDataResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetActionDataResponseValidationError) ErrorName() string {
+	return "GetActionDataResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetActionDataResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetActionDataResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetActionDataResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetActionDataResponseValidationError{}

@@ -26,6 +26,9 @@ class DataProxyService(Protocol):
     async def create_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
     def __init__(self, service: DataProxyService | AsyncGenerator[DataProxyService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -61,6 +64,16 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.create_download_link,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetActionData",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_action_data,
                 ),
             },
             interceptors=interceptors,
@@ -135,6 +148,28 @@ class DataProxyServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def get_action_data(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionData",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
 
 class DataProxyServiceSync(Protocol):
     def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
@@ -142,6 +177,8 @@ class DataProxyServiceSync(Protocol):
     def upload_inputs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -178,6 +215,16 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.create_download_link,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetActionData": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetActionData",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_action_data,
                 ),
             },
             interceptors=interceptors,
@@ -250,4 +297,26 @@ class DataProxyServiceClientSync(ConnectClientSync):
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+        )
+
+    def get_action_data(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionData",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
         )
