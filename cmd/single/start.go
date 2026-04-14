@@ -14,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
@@ -125,8 +126,9 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache:  executors.NewCache,
-		NewClient: executors.BuildNewClientFunc(propellerScope),
+		NewCache:                executors.NewCache,
+		NewClient:               executors.BuildNewClientFunc(propellerScope),
+		MaxConcurrentReconciles: propellerCfg.MaxConcurrentReconciles,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
