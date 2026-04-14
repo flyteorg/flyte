@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -217,6 +220,12 @@ func (r *AbortReconciler) runWorker(ctx context.Context) {
 func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 	attemptCount, err := r.repo.ActionRepo().MarkAbortAttempt(ctx, task.actionID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// Action no longer exists in the DB — nothing to abort, drop it.
+			r.queue.remove(task.key)
+			logger.Warnf(ctx, "AbortReconciler: action %s not found in DB, dropping abort task", task.key)
+			return
+		}
 		logger.Errorf(ctx, "AbortReconciler: failed to mark attempt for %s: %v", task.key, err)
 		// Re-enqueue without counting — the DB row is authoritative; try again later.
 		r.queue.scheduleRequeue(ctx, task, r.cfg.InitialDelay)
@@ -264,6 +273,8 @@ func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 }
 
 // isAlreadyTerminated returns true for errors that indicate the action is already gone.
+// The actions service may wrap a Kubernetes "not found" error as CodeInternal rather
+// than CodeNotFound, so we also check for that case by inspecting the message.
 func isAlreadyTerminated(err error) bool {
 	if err == nil {
 		return false
@@ -272,5 +283,14 @@ func isAlreadyTerminated(err error) bool {
 	if !ok {
 		return false
 	}
-	return connectErr.Code() == connect.CodeNotFound
+	if connectErr.Code() == connect.CodeNotFound {
+		return true
+	}
+	// The actions service forwards Kubernetes API "not found" errors with CodeInternal.
+	// Treat those as "already gone" so the reconciler clears the DB entry instead of
+	// retrying indefinitely.
+	if connectErr.Code() == connect.CodeInternal && strings.Contains(connectErr.Message(), "not found") {
+		return true
+	}
+	return false
 }
