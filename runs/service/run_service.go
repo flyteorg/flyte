@@ -388,13 +388,26 @@ func (s *RunService) AbortRun(
 	}
 
 	// Abort in database, then push to reconciler for background pod termination.
-	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+	// AbortRun marks the root action aborted and returns identifiers for any
+	// non-terminal child actions so we can push them to the reconciler too.
+	childActions, err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
+		}
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	if s.abortReconciler != nil {
-		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: req.Msg.RunId.Name}, reason)
+		// Push child actions first — they own the TaskAction CRDs and pods.
+		for _, actionID := range childActions {
+			s.abortReconciler.Push(ctx, actionID, reason)
+		}
+		// Also push the root action ("a0"). Its TaskAction CRD may not exist (it is
+		// a workflow-level composite action), but the reconciler handles that case
+		// gracefully via isAlreadyTerminated.
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: "a0"}, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
@@ -553,7 +566,13 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			}
 		}
 	case common.ActionPhase_ACTION_PHASE_ABORTED:
-		// TODO: set AbortInfo
+		abortInfo := &workflow.AbortInfo{}
+		if model.AbortReason != nil {
+			abortInfo.Reason = *model.AbortReason
+		}
+		action.Result = &workflow.ActionDetails_AbortInfo{
+			AbortInfo: abortInfo,
+		}
 	}
 
 	return action, nil
@@ -982,6 +1001,9 @@ func (s *RunService) AbortAction(
 
 	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
+		}
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}

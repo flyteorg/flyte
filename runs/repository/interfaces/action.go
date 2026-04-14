@@ -15,7 +15,10 @@ type ActionRepo interface {
 	// Run operations
 	GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error)
 	ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error)
-	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
+	// AbortRun marks the root action as aborted and sets abort_requested_at on all
+	// non-terminal child actions. Returns the identifiers of those child actions so
+	// the caller can push them to the AbortReconciler for pod termination.
+	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) ([]*common.ActionIdentifier, error)
 
 	// Action operations
 	CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error)

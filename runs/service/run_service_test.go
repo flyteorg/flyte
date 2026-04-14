@@ -653,7 +653,7 @@ func TestAbortRun(t *testing.T) {
 	t.Run("success with default reason", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
-		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
+		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(([]*common.ActionIdentifier)(nil), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.NoError(t, err)
@@ -664,7 +664,7 @@ func TestAbortRun(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 		reason := "timeout exceeded"
 
-		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
+		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(([]*common.ActionIdentifier)(nil), nil)
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID, Reason: &reason}))
 		assert.NoError(t, err)
@@ -674,7 +674,7 @@ func TestAbortRun(t *testing.T) {
 	t.Run("db error returns error", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
 
-		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
+		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(([]*common.ActionIdentifier)(nil), errors.New("db unavailable"))
 
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
 		assert.Error(t, err)

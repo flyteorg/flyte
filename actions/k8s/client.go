@@ -422,6 +422,18 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 			}
 			c.dispatchEvent(taskAction, watch.Modified)
 		},
+		DeleteFunc: func(obj interface{}) {
+			// The informer may deliver a DeletedFinalStateUnknown tombstone
+			// when a delete event was missed; unwrap it first.
+			if tombstone, ok := obj.(toolscache.DeletedFinalStateUnknown); ok {
+				obj = tombstone.Obj
+			}
+			taskAction, ok := obj.(*executorv1.TaskAction)
+			if !ok {
+				return
+			}
+			c.dispatchEvent(taskAction, watch.Deleted)
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("failed to add TaskAction informer handler: %w", err)
@@ -494,6 +506,14 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
 	}
 
+	phase := GetPhaseFromConditions(taskAction)
+	// A TaskAction deleted without a terminal condition was cascade-deleted by K8s
+	// (e.g. its parent was aborted). Treat it as aborted so the DB and UI reflect
+	// the real outcome instead of leaving the phase as UNSPECIFIED.
+	if eventType == watch.Deleted && phase == common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+		phase = common.ActionPhase_ACTION_PHASE_ABORTED
+	}
+
 	return &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
@@ -505,7 +525,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		},
 		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
-		Phase:            GetPhaseFromConditions(taskAction),
+		Phase:            phase,
 		OutputUri:        buildOutputUri(ctx, taskAction),
 		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
@@ -618,7 +638,9 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
-		} else if isTerminalPhase(update.Phase) {
+		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
+			// Skip label patching for deleted CRs — the patch would always fail
+			// with "not found" since the object is already gone.
 			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
 				logger.Warnf(ctx, "Failed to mark terminal status recorded for %s: %v", update.ActionID.Name, err)
 			}
