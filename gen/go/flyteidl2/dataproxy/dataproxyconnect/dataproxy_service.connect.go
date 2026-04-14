@@ -39,6 +39,9 @@ const (
 	// DataProxyServiceUploadInputsProcedure is the fully-qualified name of the DataProxyService's
 	// UploadInputs RPC.
 	DataProxyServiceUploadInputsProcedure = "/flyteidl2.dataproxy.DataProxyService/UploadInputs"
+	// DataProxyServiceGetActionDataProcedure is the fully-qualified name of the DataProxyService's
+	// GetActionData RPC.
+	DataProxyServiceGetActionDataProcedure = "/flyteidl2.dataproxy.DataProxyService/GetActionData"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -46,6 +49,7 @@ var (
 	dataProxyServiceServiceDescriptor                    = dataproxy.File_flyteidl2_dataproxy_dataproxy_service_proto.Services().ByName("DataProxyService")
 	dataProxyServiceCreateUploadLocationMethodDescriptor = dataProxyServiceServiceDescriptor.Methods().ByName("CreateUploadLocation")
 	dataProxyServiceUploadInputsMethodDescriptor         = dataProxyServiceServiceDescriptor.Methods().ByName("UploadInputs")
+	dataProxyServiceGetActionDataMethodDescriptor        = dataProxyServiceServiceDescriptor.Methods().ByName("GetActionData")
 )
 
 // DataProxyServiceClient is a client for the flyteidl2.dataproxy.DataProxyService service.
@@ -53,6 +57,8 @@ type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
 	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
+	// Get input and output data for an action.
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -77,6 +83,13 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dataProxyServiceUploadInputsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getActionData: connect.NewClient[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse](
+			httpClient,
+			baseURL+DataProxyServiceGetActionDataProcedure,
+			connect.WithSchema(dataProxyServiceGetActionDataMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -84,6 +97,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 type dataProxyServiceClient struct {
 	createUploadLocation *connect.Client[dataproxy.CreateUploadLocationRequest, dataproxy.CreateUploadLocationResponse]
 	uploadInputs         *connect.Client[dataproxy.UploadInputsRequest, dataproxy.UploadInputsResponse]
+	getActionData        *connect.Client[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -96,11 +110,18 @@ func (c *dataProxyServiceClient) UploadInputs(ctx context.Context, req *connect.
 	return c.uploadInputs.CallUnary(ctx, req)
 }
 
+// GetActionData calls flyteidl2.dataproxy.DataProxyService.GetActionData.
+func (c *dataProxyServiceClient) GetActionData(ctx context.Context, req *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	return c.getActionData.CallUnary(ctx, req)
+}
+
 // DataProxyServiceHandler is an implementation of the flyteidl2.dataproxy.DataProxyService service.
 type DataProxyServiceHandler interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
 	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
+	// Get input and output data for an action.
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -121,12 +142,21 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		connect.WithSchema(dataProxyServiceUploadInputsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	dataProxyServiceGetActionDataHandler := connect.NewUnaryHandler(
+		DataProxyServiceGetActionDataProcedure,
+		svc.GetActionData,
+		connect.WithSchema(dataProxyServiceGetActionDataMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.dataproxy.DataProxyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DataProxyServiceCreateUploadLocationProcedure:
 			dataProxyServiceCreateUploadLocationHandler.ServeHTTP(w, r)
 		case DataProxyServiceUploadInputsProcedure:
 			dataProxyServiceUploadInputsHandler.ServeHTTP(w, r)
+		case DataProxyServiceGetActionDataProcedure:
+			dataProxyServiceGetActionDataHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -142,4 +172,8 @@ func (UnimplementedDataProxyServiceHandler) CreateUploadLocation(context.Context
 
 func (UnimplementedDataProxyServiceHandler) UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.UploadInputs is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.GetActionData is not implemented"))
 }

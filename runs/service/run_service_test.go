@@ -594,7 +594,8 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, storage.Options{}, mock.Anything).Return(nil).Once()
 
-	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{
 			Project:     runID.Project,
 			Domain:      runID.Domain,
@@ -1041,12 +1042,14 @@ func TestInputsProtoCompat(t *testing.T) {
 
 func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
 
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
 
 	svc := &RunService{
 		repo:          repo,
@@ -1079,8 +1082,8 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 		return ok && len(inputs.Literals) == 0 && len(inputs.Context) == 0
 	})).Return(nil).Once()
 
-	actionRepo.On("CreateRun", mock.Anything, mock.AnythingOfType("*workflow.CreateRunRequest"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-		Return(expectedRun, nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
@@ -1096,12 +1099,14 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 
 func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
 
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
 
 	svc := &RunService{
 		repo:          repo,
@@ -1133,7 +1138,8 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	}
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
 	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
@@ -1150,12 +1156,14 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
 
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
 
 	svc := &RunService{
 		repo:          repo,
@@ -1179,7 +1187,8 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	}
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
-	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
 	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
@@ -1196,12 +1205,14 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
 
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
 
 	svc := &RunService{
 		repo:          repo,
@@ -1242,9 +1253,12 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 			inputs.Context[0].GetValue() == "root-abc"
 	})).Return(nil).Once()
 
-	actionRepo.On("CreateRun", mock.Anything, mock.MatchedBy(func(actual *workflow.CreateRunRequest) bool {
-		return actual.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
-	}), "s3://flyte-data/proj/dev/rctx-123/inputs", "s3://flyte-data/proj/dev/rctx-123/").Return(&models.Run{
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var rs task.RunSpec
+		_ = proto.Unmarshal(m.RunSpec, &rs)
+		return rs.GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	}), mock.Anything).Return(&models.Run{
 		Project: "proj",
 		Domain:  "dev",
 		Name:    "rctx-123",
@@ -1405,12 +1419,14 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
 	actionsClient := &mockActionsClient{}
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
 
 	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
 
 	svc := &RunService{
 		repo:          repo,
@@ -1450,9 +1466,12 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	}
 
 	// No ReadProtobuf or WriteProtobuf expected — offloaded inputs are used directly.
-	actionRepo.On("CreateRun", mock.Anything, mock.Anything, mock.MatchedBy(func(inputPrefix string) bool {
-		return inputPrefix == offloadedURI
-	}), mock.AnythingOfType("string")).Return(expectedRun, nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var info workflow.RunInfo
+		_ = proto.Unmarshal(m.DetailedInfo, &info)
+		return info.InputsUri == offloadedURI
+	}), mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
 		return req.Msg.Action.InputUri == offloadedURI
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
@@ -1469,3 +1488,207 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 0)
 	store.AssertNumberOfCalls(t, "WriteProtobuf", 0)
 }
+
+func TestGetActionDataURIs(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	mustMarshalRunInfo := func(info *workflow.RunInfo) []byte {
+		b, err := proto.Marshal(info)
+		require.NoError(t, err)
+		return b
+	}
+
+	mustMarshalEvent := func(event *workflow.ActionEvent) []byte {
+		b, err := proto.Marshal(event)
+		require.NoError(t, err)
+		return b
+	}
+
+	t.Run("action not found returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(nil, errors.New("missing"))
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("missing detailed_info returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			DetailedInfo: nil,
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("non-terminal phase returns inputs only", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Empty(t, resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("trace action returns outputs uri from RunInfo", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TRACE),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/trace-outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("succeeded task returns outputs from latest attempt", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Outputs: &task.OutputReferences{
+				OutputUri: "s3://bucket/outputs/0/outputs.pb",
+			},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("succeeded task with no attempts returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("succeeded task with empty output_uri returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("succeeded task uses last attempt outputs when multiple attempts", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{InputsUri: "s3://bucket/inputs"}),
+		}, nil)
+
+		now := time.Now()
+		event0 := mustMarshalEvent(&workflow.ActionEvent{
+			Id: actionID, Attempt: 0,
+			Phase:        common.ActionPhase_ACTION_PHASE_FAILED,
+			ReportedTime: timestamppb.New(now),
+			Outputs:      &task.OutputReferences{OutputUri: "s3://bucket/outputs/0/outputs.pb"},
+		})
+		event1 := mustMarshalEvent(&workflow.ActionEvent{
+			Id: actionID, Attempt: 1,
+			Phase:        common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			ReportedTime: timestamppb.New(now.Add(time.Second)),
+			Outputs:      &task.OutputReferences{OutputUri: "s3://bucket/outputs/1/outputs.pb"},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Info: event0},
+			{Attempt: 1, Info: event1},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+}
+

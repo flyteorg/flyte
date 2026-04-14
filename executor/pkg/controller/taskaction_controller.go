@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"k8s.io/client-go/util/retry"
 	"reflect"
 	"strings"
 	"time"
@@ -402,7 +403,16 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	if err := r.Status().Update(ctx, newTaskAction); err != nil {
+	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
+	// This will resovle the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
+	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+			return getErr
+		}
+		latest.Status = newTaskAction.Status
+		return r.Status().Update(ctx, latest)
+	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}

@@ -181,7 +181,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 	}
 	action.DetailedInfo = detailedInfo
 
-	if _, err := s.repo.ActionRepo().CreateAction(ctx, action); err != nil {
+	if _, err := s.repo.ActionRepo().CreateAction(ctx, action, false); err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
