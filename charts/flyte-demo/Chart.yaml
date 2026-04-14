@@ -32,7 +32,3 @@ dependencies:
     version: v0.2.0
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
-  - name: minio
-    version: 12.6.7
-    repository: https://charts.bitnami.com/bitnami
-    condition: minio.enabled
