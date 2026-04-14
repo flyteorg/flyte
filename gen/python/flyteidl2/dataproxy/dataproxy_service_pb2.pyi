@@ -94,14 +94,14 @@ class PreSignedURLs(_message.Message):
     def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkRequest(_message.Message):
-    __slots__ = ["artifact_type", "action_attempt_id", "expires_in"]
+    __slots__ = ["artifact_type", "expires_in", "action_attempt_id"]
     ARTIFACT_TYPE_FIELD_NUMBER: _ClassVar[int]
-    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
     EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
     artifact_type: ArtifactType
-    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
     expires_in: _duration_pb2.Duration
-    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
+    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkResponse(_message.Message):
     __slots__ = ["pre_signed_urls"]
