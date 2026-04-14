@@ -18,5 +18,3 @@ resources:
 - ../namespace.yaml
 - ../../../../charts/flyte-binary/templates/crds/flyte.org_taskactions.yaml
 - ../embedded-postgres-service.yaml
-patches:
-- path: ../minio-patch.yaml
