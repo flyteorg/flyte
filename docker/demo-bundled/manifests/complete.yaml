@@ -301,6 +301,20 @@ metadata:
   name: flyte-binary
   namespace: flyte
 ---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-demo-minio
+  namespace: flyte
+secrets:
+- name: flyte-demo-minio
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -631,6 +645,21 @@ type: Opaque
 ---
 apiVersion: v1
 data:
+  root-password: b0U0R29sRm1yUg==
+  root-user: YWRtaW4=
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-demo-minio
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+data:
   access-key: cnVzdGZz
   secret-key: cnVzdGZzc3RvcmFnZQ==
 kind: Secret
@@ -750,6 +779,31 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-demo-minio
+  namespace: flyte
+spec:
+  ports:
+  - name: minio-api
+    nodePort: null
+    port: 9000
+    targetPort: minio-api
+  - name: minio-console
+    nodePort: null
+    port: 9001
+    targetPort: minio-console
+  selector:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/name: minio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
   namespace: flyte
@@ -802,6 +856,23 @@ spec:
   hostPath:
     path: /var/lib/flyte/storage/rustfs
   storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-demo-minio
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -1034,6 +1105,115 @@ spec:
             port: http
           initialDelaySeconds: 5
           periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: minio
+    helm.sh/chart: minio-12.6.7
+  name: flyte-demo-minio
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flyte-demo
+      app.kubernetes.io/name: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/credentials-secret: 1f1d72520f42ae52bd5a5a6f18413ab9204caef2263df3d6892194bfdbd9ef17
+      labels:
+        app.kubernetes.io/instance: flyte-demo
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: minio
+        helm.sh/chart: minio-12.6.7
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: flyte-demo
+                  app.kubernetes.io/name: minio
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: MINIO_SCHEME
+          value: http
+        - name: MINIO_FORCE_NEW_KEYS
+          value: "no"
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: root-user
+              name: flyte-demo-minio
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: root-password
+              name: flyte-demo-minio
+        - name: MINIO_BROWSER
+          value: "on"
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: public
+        - name: MINIO_CONSOLE_PORT_NUMBER
+          value: "9001"
+        envFrom: null
+        image: docker.io/bitnami/minio:2023.7.11-debian-11-r0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /minio/health/live
+            port: minio-api
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: minio-api
+          protocol: TCP
+        - containerPort: 9001
+          name: minio-console
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: minio-api
+          timeoutSeconds: 1
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: flyte-demo-minio
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: flyte-demo-minio
 ---
 apiVersion: apps/v1
 kind: Deployment

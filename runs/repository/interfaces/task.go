@@ -7,8 +7,9 @@ import (
 )
 
 type TaskRepo interface {
-	// TODO: add triggers back
-	CreateTask(ctx context.Context, task *models.Task) error
+	// CreateTask upserts a task and its associated triggers in one transaction.
+	// Trigger models are optional; pass nil or an empty slice if there are no triggers.
+	CreateTask(ctx context.Context, task *models.Task, triggers []*models.Trigger) error
 	GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error)
 	ListTasks(ctx context.Context, input ListResourceInput) (*models.TaskListResult, error)
 	ListVersions(ctx context.Context, input ListResourceInput) ([]*models.TaskVersion, error)
