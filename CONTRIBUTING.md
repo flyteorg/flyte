@@ -29,7 +29,7 @@ If you don't have time to contribute, that's fine. There are other easy ways to 
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/flyteorg/flyte/blob/master/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior
-to [email](mailto:email).
+to [security@union.ai](mailto:security@union.ai).
 
 ## I Have a Question
 
@@ -52,7 +52,7 @@ We’re excited that you’re interested in contributing code to Flyte! Before y
 
 Please use our issues templates that provide hints on what information we need to help you.
 
-> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to [email](mailto:email) or use the Report a security vulnerability issue template. 
+> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to [security@union.ai](mailto:security@union.ai) or use the Report a security vulnerability issue template. 
 
 ### Feature Requests
 
@@ -62,7 +62,7 @@ Unsure if your contribution is “small”, “large” or whether it fits into 
 
 ### Improving The Documentation
 
-If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout the [Contributing to documentation](https://www.union.ai/docs/v2/flyte/community/#contributing-to-documentation).
+If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout [Contributing to documentation](https://www.union.ai/docs/v2/flyte/community/#contributing-to-documentation).
 
 ### Improving The Design
 
@@ -108,7 +108,7 @@ When you’re ready to contribute your changes, follow these steps to create a c
 
     - Testing steps or screenshots (if applicable)
 
-    - Notes for reviewers, if special attention is needed
+    - Notes for reviewers, if special attention is needed.
 
 For more context, kindly read the official [Before Submitting Your PR](https://www.union.ai/docs/v1/flyte/community/contributing-code/#before-submitting-your-pr) docs.
 
