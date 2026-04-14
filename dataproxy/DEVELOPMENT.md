@@ -32,7 +32,7 @@ cd dataproxy
 1. Create a kind cluster
 
 ```sh
-kind create cluster --image=kindest/node:v1.26.0 --name flytev2
+kind create cluster --image=kindest/node:v1.34.0 --name flytev2
 ```
 
 2. Deploy MinIO storage backend
