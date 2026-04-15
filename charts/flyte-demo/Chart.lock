@@ -8,8 +8,5 @@ dependencies:
 - name: minio
   repository: https://charts.bitnami.com/bitnami
   version: 12.6.7
-- name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 12.8.1
-digest: sha256:0e1b539359cb8edbc8be650462d31a896712183935781cc46be3b5a3596f2fae
-generated: "2026-04-01T15:01:31.417773-07:00"
+digest: sha256:efdaa4b57bfdb91479c94b7a6281879df8cab34b523e8b3bf35f1ed8bb1ec5c8
+generated: "2026-04-15T12:38:42.998177+08:00"

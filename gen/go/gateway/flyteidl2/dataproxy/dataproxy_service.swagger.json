@@ -1561,13 +1561,13 @@
           "$ref": "#/definitions/dataproxyArtifactType",
           "title": "ArtifactType is the type of artifact to download.\n+required"
         },
-        "expires_in": {
-          "type": "string",
-          "description": "ExpiresIn defines the requested expiration duration for the generated URLs. The request will be\nrejected if this exceeds the platform's configured maximum.\n+optional. The default value comes from the global config."
-        },
         "action_attempt_id": {
           "$ref": "#/definitions/commonActionAttemptIdentifier",
           "description": "ActionAttemptId identifies the specific attempt of a run action that produced the artifact."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines the requested expiration duration for the generated URLs. The request will be\nrejected if this exceeds the platform's configured maximum.\n+optional. The default value comes from the global config."
         }
       },
       "description": "CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API."
