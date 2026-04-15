@@ -1077,6 +1077,12 @@ func (s *RunService) WatchActionDetails(
 	actionID := req.Msg.ActionId
 	logger.Infof(ctx, "Received WatchActionDetails request for: %s/%s", actionID.Run.Name, actionID.Name)
 
+	// Subscribe FIRST to avoid missing notifications that fire between the DB
+	// read and the subscription setup (same pattern as WatchActions).
+	updates := make(chan *models.Action, 50)
+	errs := make(chan error, 1)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
+
 	// Step 1: Send initial state from DB
 	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
 	if err != nil {
@@ -1093,11 +1099,6 @@ func (s *RunService) WatchActionDetails(
 	if IsTerminalPhase(details.GetStatus().GetPhase()) {
 		return nil
 	}
-
-	// Step 2: Watch DB for updates
-	updates := make(chan *models.Action, 50)
-	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	for {
 		select {

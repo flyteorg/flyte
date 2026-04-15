@@ -596,6 +596,7 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 	}
 	defer rows.Close()
 
+	var descendantCount int
 	for rows.Next() {
 		var childName string
 		var childAttempts uint32
@@ -603,17 +604,19 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 			logger.Warnf(ctx, "AbortAction: failed to scan descendant row: %v", scanErr)
 			continue
 		}
+		descendantCount++
 		childID := &common.ActionIdentifier{Run: actionID.Run, Name: childName}
 		if err := r.insertAbortEvent(ctx, childID, childAttempts, reason, now); err != nil {
 			logger.Warnf(ctx, "AbortAction: failed to insert abort event for descendant %s: %v", childName, err)
 		}
 		r.notifyActionUpdate(ctx, childID)
+		logger.Infof(ctx, "AbortAction: cascade-aborted descendant %s of %s", childName, actionID.Name)
 	}
 	if err := rows.Err(); err != nil {
 		logger.Warnf(ctx, "AbortAction: error iterating descendant rows for %s: %v", actionID.Name, err)
 	}
 
-	logger.Infof(ctx, "Aborted action %s and its descendants", actionID.Name)
+	logger.Infof(ctx, "AbortAction: aborted %s and %d descendant(s)", actionID.Name, descendantCount)
 	return nil
 }
 
