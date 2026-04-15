@@ -302,7 +302,7 @@ func kserviceName(id *flyteapp.Identifier) string {
 
 // specSHA computes a SHA256 digest of the serialized App Spec proto.
 func specSHA(spec *flyteapp.Spec) (string, error) {
-	b, err := proto.Marshal(spec)
+	b, err := proto.MarshalOptions{Deterministic: true}.Marshal(spec)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal spec: %w", err)
 	}
@@ -358,6 +358,10 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: templateAnnotations,
+						Labels: map[string]string{
+							labelAppManaged: "true",
+							labelAppName:    appID.GetName(),
+						},
 					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec:        podSpec,
@@ -463,8 +467,8 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
 		case ksvc.IsFailed():
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
-			if c := ksvc.Status.GetCondition(servingv1.ServiceConditionReady); c != nil {
-				message = c.Message
+			if condition := ksvc.Status.GetCondition(servingv1.ServiceConditionReady); condition != nil {
+				message = condition.Message
 			}
 		case ksvc.Status.LatestCreatedRevisionName != ksvc.Status.LatestReadyRevisionName:
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
