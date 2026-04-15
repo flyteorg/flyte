@@ -61,9 +61,9 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://minio.flyte.svc.cluster.local:9000"
-      - FLYTE_AWS_ACCESS_KEY_ID: "minio"
-      - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
       - _U_EP_OVERRIDE: "flyte-demo-local.flyte.svc.cluster.local:8090"
       - _U_INSECURE: "true"
       - _U_USE_ACTIONS: "1"
@@ -79,8 +79,8 @@ storage:
     kind: "s3"
     config:
       auth_type: "accesskey"
-      access_key_id: "minio"
-      secret_key: "miniostorage"
+      access_key_id: "rustfs"
+      secret_key: "rustfsstorage"
       region: "us-east-1"
       endpoint: "http://localhost:30002"
       disable_ssl: "true"
