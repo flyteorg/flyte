@@ -167,8 +167,9 @@ message CreateDownloadLinkRequest {
 
 // CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
 message CreateDownloadLinkResponse {
+  reserved 1, 2;
   // PreSignedUrls contains the signed URLs and their expiration time.
-  PreSignedURLs pre_signed_urls = 1;
+  PreSignedURLs pre_signed_urls = 3;
 }
 
 // Request message for querying action data.
