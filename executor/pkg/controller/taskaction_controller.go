@@ -490,8 +490,10 @@ func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.Ou
 	if err != nil {
 		return nil
 	}
+	base := strings.TrimRight(string(prefix), "/")
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
+		OutputUri: base + "/outputs.pb",
+		ReportUri: base + "/report.html",
 	}
 }
 
