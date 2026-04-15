@@ -3,16 +3,22 @@ from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
-from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from protoc_gen_openapiv2.options import annotations_pb2 as _annotations_pb2_1
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    ARTIFACT_TYPE_UNSPECIFIED: _ClassVar[ArtifactType]
+    ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
+ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
+ARTIFACT_TYPE_REPORT: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
@@ -76,6 +82,30 @@ class UploadInputsResponse(_message.Message):
     OFFLOADED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     offloaded_input_data: _run_pb2.OffloadedInputData
     def __init__(self, offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ...) -> None: ...
+
+class PreSignedURLs(_message.Message):
+    __slots__ = ["signed_url", "expires_at"]
+    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    signed_url: _containers.RepeatedScalarFieldContainer[str]
+    expires_at: _timestamp_pb2.Timestamp
+    def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class CreateDownloadLinkRequest(_message.Message):
+    __slots__ = ["artifact_type", "expires_in", "action_attempt_id"]
+    ARTIFACT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
+    artifact_type: ArtifactType
+    expires_in: _duration_pb2.Duration
+    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
+    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ...) -> None: ...
+
+class CreateDownloadLinkResponse(_message.Message):
+    __slots__ = ["pre_signed_urls"]
+    PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
+    pre_signed_urls: PreSignedURLs
+    def __init__(self, pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
 
 class GetActionDataRequest(_message.Message):
     __slots__ = ["action_id"]
