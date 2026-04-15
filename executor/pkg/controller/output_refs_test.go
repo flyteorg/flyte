@@ -70,6 +70,18 @@ func TestOutputRefs(t *testing.T) {
 		assert.Equal(t, "1", parts[len(parts)-1])
 	})
 
+	t.Run("report URI ends with report.html and shares prefix with output URI", func(t *testing.T) {
+		ta := taskActionForOutputRefs("flyte", "ta-abc", "s3://my-bucket/org/proj/dev/run123", "action-0", 1)
+		refs := outputRefs(ctx, ta)
+		require.NotNil(t, refs)
+		assert.True(t, strings.HasSuffix(refs.GetReportUri(), "/report.html"),
+			"expected report URI to end with /report.html, got: %s", refs.GetReportUri())
+		assert.Equal(t,
+			strings.TrimSuffix(refs.GetOutputUri(), "/outputs.pb"),
+			strings.TrimSuffix(refs.GetReportUri(), "/report.html"),
+			"report URI and output URI should share the same prefix")
+	})
+
 	t.Run("output URI is consistent with ComputeActionOutputPath", func(t *testing.T) {
 		// outputRefs and NewTaskExecutionContext must agree on the output path.
 		// Verify outputRefs produces a URI whose directory matches the plugin's output prefix.
