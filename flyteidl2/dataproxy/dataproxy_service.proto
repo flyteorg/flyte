@@ -183,18 +183,18 @@ message CreateDownloadLinkRequest {
     not_in: [0]
   }];
 
+  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
+  // rejected if this exceeds the platform's configured maximum.
+  // +optional. The default value comes from the global config.
+  google.protobuf.Duration expires_in = 2;
+
   // Source identifies the action attempt whose artifact is to be downloaded.
   oneof source {
     option (buf.validate.oneof).required = true;
 
     // ActionAttemptId identifies the specific attempt of a run action that produced the artifact.
-    common.ActionAttemptIdentifier action_attempt_id = 2;
+    common.ActionAttemptIdentifier action_attempt_id = 3;
   }
-
-  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
-  // rejected if this exceeds the platform's configured maximum.
-  // +optional. The default value comes from the global config.
-  google.protobuf.Duration expires_in = 3;
 }
 
 // CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
