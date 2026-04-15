@@ -7,10 +7,8 @@ import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
-import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy";
 
@@ -24,42 +22,12 @@ enum ArtifactType {
 // DataProxyService provides an interface for managing data uploads and downloads.
 service DataProxyService {
   // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
-  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/artifact_urn"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/artifact_urn"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates a write-only http location that is accessible for tasks at runtime."};
-  }
+  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {}
 
-  rpc UploadInputs(UploadInputsRequest) returns (UploadInputsResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/inputs"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/inputs"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Uploads inputs for a given run or project and returns a URI and cache key that can be used to reference these inputs at runtime."};
-  }
+  rpc UploadInputs(UploadInputsRequest) returns (UploadInputsResponse) {}
 
   // CreateDownloadLink generates signed URL(s) for downloading a given artifact.
-  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/artifact_urn/download"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/artifact_urn/download"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates signed URL(s) for downloading an artifact associated with a run action."};
-  }
+  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {}
 
   // Get input and output data for an action.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {

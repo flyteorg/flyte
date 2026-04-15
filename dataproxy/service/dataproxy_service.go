@@ -29,7 +29,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
-	workflowpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
@@ -287,7 +287,7 @@ func (s *Service) CreateDownloadLink(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	if req.Msg.GetArtifactType() == dataproxy.ArtifactType_ARTIFACT_TYPE_UNSPECIFIED {
+	if req.Msg.GetArtifactType() != dataproxy.ArtifactType_ARTIFACT_TYPE_REPORT {
 		return nil, connect.NewError(connect.CodeInvalidArgument,
 			fmt.Errorf("artifact_type is required"))
 	}
@@ -343,7 +343,7 @@ func (s *Service) resolveArtifactURL(ctx context.Context, req *dataproxy.CreateD
 	}
 
 	attemptID := attemptIDEnvelope.ActionAttemptId
-	actionResp, err := s.runClient.GetActionDetails(ctx, connect.NewRequest(&workflowpb.GetActionDetailsRequest{
+	actionResp, err := s.runClient.GetActionDetails(ctx, connect.NewRequest(&workflow.GetActionDetailsRequest{
 		ActionId: attemptID.GetActionId(),
 	}))
 	if err != nil {
@@ -353,7 +353,7 @@ func (s *Service) resolveArtifactURL(ctx context.Context, req *dataproxy.CreateD
 	}
 
 	// Find the matching attempt by attempt number.
-	var matchedAttempt *workflowpb.ActionAttempt
+	var matchedAttempt *workflow.ActionAttempt
 	for _, attempt := range actionResp.Msg.GetDetails().GetAttempts() {
 		if attempt.GetAttempt() == attemptID.GetAttempt() {
 			matchedAttempt = attempt
@@ -444,7 +444,7 @@ func (s *Service) GetActionData(
 ) (*connect.Response[dataproxy.GetActionDataResponse], error) {
 	actionId := req.Msg.GetActionId()
 
-	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflowpb.GetActionDataURIsRequest{
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
 		ActionId: actionId,
 	}))
 	if err != nil {

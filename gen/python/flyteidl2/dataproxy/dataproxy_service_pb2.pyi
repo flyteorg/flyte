@@ -3,10 +3,8 @@ from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
-from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from protoc_gen_openapiv2.options import annotations_pb2 as _annotations_pb2_1
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
