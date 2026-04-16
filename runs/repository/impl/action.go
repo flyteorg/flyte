@@ -145,17 +145,15 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 	now := time.Now()
 
 	var rootName string
-	var rootAttempts uint32
 	err := r.db.QueryRowxContext(ctx,
 		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5,
 		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
 		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
 		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL
-		 RETURNING name, COALESCE((SELECT MAX(attempt) FROM action_events
-		                            WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = actions.name), attempts)`,
+		 RETURNING name`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
 		runID.Project, runID.Domain, runID.Name,
-	).Scan(&rootName, &rootAttempts)
+	).Scan(&rootName)
 	if errors.Is(err, sql.ErrNoRows) {
 		return fmt.Errorf("run not found: %w", sql.ErrNoRows)
 	}
@@ -164,10 +162,6 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 	}
 
 	rootID := &common.ActionIdentifier{Run: runID, Name: rootName}
-	if err := r.insertAbortEvent(ctx, rootID, rootAttempts, reason, now); err != nil {
-		logger.Warnf(ctx, "AbortRun: failed to insert abort event for root %s: %v", rootName, err)
-	}
-
 	r.notifyRunUpdate(ctx, runID)
 	r.notifyActionUpdate(ctx, rootID)
 
@@ -476,25 +470,18 @@ func (r *actionRepo) UpdateActionPhase(
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
 
-	var attempts uint32
-	err := r.db.QueryRowxContext(ctx,
+	result, err := r.db.ExecContext(ctx,
 		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5,
 		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
 		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
-		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9
-		 RETURNING attempts`,
+		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
-		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
-	).Scan(&attempts)
-	if errors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("action not found: %w", sql.ErrNoRows)
-	}
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	if err != nil {
 		return fmt.Errorf("failed to abort action: %w", err)
 	}
-
-	if err := r.insertAbortEvent(ctx, actionID, attempts, reason, now); err != nil {
-		logger.Warnf(ctx, "AbortAction: failed to insert abort event for %s: %v", actionID.Name, err)
+	if n, _ := result.RowsAffected(); n == 0 {
+		return fmt.Errorf("action not found: %w", sql.ErrNoRows)
 	}
 
 	r.notifyActionUpdate(ctx, actionID)
