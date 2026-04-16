@@ -84,10 +84,9 @@ message RunSpec {
   // Deprecated, please use CacheConfig.OverwriteCache instead
   bool overwrite_cache = 5 [deprecated = true];
 
-  // the specific cluster that this action should be executed on. this value will be used as the
+  // the specific queue that this action should be executed on. this value will be used as the
   // default for all actions in the run unless overridden.
-  // Deprecated, use 'queue' instead.
-  string cluster = 6 [deprecated = true];
+  string queue = 6;
 
   // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
   RawDataStorage raw_data_storage = 7;
@@ -104,10 +103,6 @@ message RunSpec {
 
     InlineRuleList notification_rules = 11; // either define an inline one-off rule
   }
-
-  // Queue to which run should be scheduled.
-  // This value will be used as the default for all actions in the run unless overridden.
-  string queue = 12;
 }
 
 message InlineRuleList {
