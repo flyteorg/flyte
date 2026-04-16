@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // External auth server implementation
@@ -32,21 +33,37 @@ type ResourceServer struct {
 }
 
 func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudience, tokenStr string) (interfaces.IdentityContext, error) {
+	// TODO: Remove temporary debug logging after Entra ID access token issue is resolved.
+	// Log token prefix to identify token type (JWT starts with "eyJ", opaque tokens don't).
+	tokenPrefix := tokenStr
+	if len(tokenPrefix) > 20 {
+		tokenPrefix = tokenPrefix[:20] + "..."
+	}
+	logger.Infof(ctx, "[ValidateAccessToken debug] tokenPrefix=%s, expectedAudience=%s, allowedAudience=%v",
+		tokenPrefix, expectedAudience, r.allowedAudience)
+
 	_, err := r.signatureVerifier.VerifySignature(ctx, tokenStr)
 	if err != nil {
+		logger.Infof(ctx, "[ValidateAccessToken debug] signature verification failed: %v", err)
 		return nil, err
 	}
 
 	t, _, err := jwtgo.NewParser().ParseUnverified(tokenStr, jwtgo.MapClaims{})
 	if err != nil {
+		logger.Infof(ctx, "[ValidateAccessToken debug] JWT parse failed: %v", err)
 		return nil, fmt.Errorf("failed to parse token: %v", err)
 	}
 
+	claims := t.Claims.(jwtgo.MapClaims)
+	logger.Infof(ctx, "[ValidateAccessToken debug] parsed JWT aud=%v, sub=%v, iss=%v, idtyp=%v",
+		claims["aud"], claims["sub"], claims["iss"], claims["idtyp"])
+
 	if err = t.Claims.Valid(); err != nil {
+		logger.Infof(ctx, "[ValidateAccessToken debug] claims validation failed: %v", err)
 		return nil, fmt.Errorf("failed to validate token: %v", err)
 	}
 
-	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), t.Claims.(jwtgo.MapClaims), r.subjectClaimNames, r.identityTypeClaimsForApps)
+	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), claims, r.subjectClaimNames, r.identityTypeClaimsForApps)
 }
 
 func doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
