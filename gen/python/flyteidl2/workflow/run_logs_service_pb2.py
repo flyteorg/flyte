@@ -16,7 +16,7 @@ from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifi
 from flyteidl2.logs.dataplane import payload_pb2 as flyteidl2_dot_logs_dot_dataplane_dot_payload__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/workflow/run_logs_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a&flyteidl2/logs/dataplane/payload.proto\"}\n\x0fTailLogsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"\x92\x01\n\x10TailLogsResponse\x12=\n\x04logs\x18\x01 \x03(\x0b\x32).flyteidl2.workflow.TailLogsResponse.LogsR\x04logs\x1a?\n\x04Logs\x12\x37\n\x05lines\x18\x01 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x05lines2n\n\x0eRunLogsService\x12\\\n\x08TailLogs\x12#.flyteidl2.workflow.TailLogsRequest\x1a$.flyteidl2.workflow.TailLogsResponse\"\x03\x90\x02\x01\x30\x01\x42\xd0\x01\n\x16\x63om.flyteidl2.workflowB\x13RunLogsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/workflow/run_logs_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a&flyteidl2/logs/dataplane/payload.proto\"\xa1\x01\n\x0fTailLogsRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12\"\n\x08pod_name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07podName\"\x92\x01\n\x10TailLogsResponse\x12=\n\x04logs\x18\x01 \x03(\x0b\x32).flyteidl2.workflow.TailLogsResponse.LogsR\x04logs\x1a?\n\x04Logs\x12\x37\n\x05lines\x18\x01 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x05lines2n\n\x0eRunLogsService\x12\\\n\x08TailLogs\x12#.flyteidl2.workflow.TailLogsRequest\x1a$.flyteidl2.workflow.TailLogsResponse\"\x03\x90\x02\x01\x30\x01\x42\xd0\x01\n\x16\x63om.flyteidl2.workflowB\x13RunLogsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,14 +28,16 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TAILLOGSREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
   _TAILLOGSREQUEST.fields_by_name['attempt']._options = None
   _TAILLOGSREQUEST.fields_by_name['attempt']._serialized_options = b'\272H\004*\002 \000'
+  _TAILLOGSREQUEST.fields_by_name['pod_name']._options = None
+  _TAILLOGSREQUEST.fields_by_name['pod_name']._serialized_options = b'\272H\004r\002\020\001'
   _RUNLOGSSERVICE.methods_by_name['TailLogs']._options = None
   _RUNLOGSSERVICE.methods_by_name['TailLogs']._serialized_options = b'\220\002\001'
-  _globals['_TAILLOGSREQUEST']._serialized_start=169
-  _globals['_TAILLOGSREQUEST']._serialized_end=294
-  _globals['_TAILLOGSRESPONSE']._serialized_start=297
-  _globals['_TAILLOGSRESPONSE']._serialized_end=443
-  _globals['_TAILLOGSRESPONSE_LOGS']._serialized_start=380
-  _globals['_TAILLOGSRESPONSE_LOGS']._serialized_end=443
-  _globals['_RUNLOGSSERVICE']._serialized_start=445
-  _globals['_RUNLOGSSERVICE']._serialized_end=555
+  _globals['_TAILLOGSREQUEST']._serialized_start=170
+  _globals['_TAILLOGSREQUEST']._serialized_end=331
+  _globals['_TAILLOGSRESPONSE']._serialized_start=334
+  _globals['_TAILLOGSRESPONSE']._serialized_end=480
+  _globals['_TAILLOGSRESPONSE_LOGS']._serialized_start=417
+  _globals['_TAILLOGSRESPONSE_LOGS']._serialized_end=480
+  _globals['_RUNLOGSSERVICE']._serialized_start=482
+  _globals['_RUNLOGSSERVICE']._serialized_end=592
 # @@protoc_insertion_point(module_scope)

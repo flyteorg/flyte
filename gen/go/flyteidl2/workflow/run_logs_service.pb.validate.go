@@ -88,6 +88,8 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	// no validation rules for Attempt
 
+	// no validation rules for PodName
+
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
 	}
