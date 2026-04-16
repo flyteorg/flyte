@@ -62,8 +62,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 
 	var masterReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
-	switch taskTemplate.TaskTypeVersion {
-	case 0:
+	if taskTemplate.TaskTypeVersion == 0 {
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs)
@@ -87,7 +86,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
 		}
-	case 1:
+	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfPytorchTaskExtraArgs := kfplugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs)
@@ -113,7 +112,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
 		}
-	default:
+	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}

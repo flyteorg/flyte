@@ -59,8 +59,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	var launcherReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
-	switch taskTemplate.TaskTypeVersion {
-	case 0:
+	if taskTemplate.TaskTypeVersion == 0 {
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
 		if err != nil {
@@ -98,7 +97,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			}
 		}
 
-	case 1:
+	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
@@ -120,7 +119,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			runPolicy = common.ParseRunPolicy(kfMPITaskExtraArgs.GetRunPolicy())
 		}
 
-	default:
+	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}

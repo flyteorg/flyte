@@ -71,7 +71,7 @@ func (i VaultSecretManagerInjector) Inject(ctx context.Context, secret *coreIdl.
 
 		secretVaultAnnotations := CreateVaultAnnotationsForSecret(secret, i.cfg.KVVersion)
 
-		p.Annotations = utils.UnionMaps(secretVaultAnnotations, commonVaultAnnotations, i.cfg.Annotations, p.Annotations)
+		p.ObjectMeta.Annotations = utils.UnionMaps(secretVaultAnnotations, commonVaultAnnotations, i.cfg.Annotations, p.ObjectMeta.Annotations)
 
 	case coreIdl.Secret_ENV_VAR:
 		return p, false, fmt.Errorf("Env_Var is not a supported mount requirement for Vault Secret Manager")

@@ -1,4 +1,4 @@
-package logs
+package service
 
 import (
 	"context"
@@ -68,7 +68,7 @@ func TestGetPrimaryPodAndContainer_HappyPath(t *testing.T) {
 		},
 	}
 
-	pod, container, err := GetPrimaryPodAndContainer(logCtx)
+	pod, container, err := getPrimaryPodAndContainer(logCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, "my-pod", pod.GetPodName())
 	assert.Equal(t, "default", pod.GetNamespace())
@@ -80,7 +80,7 @@ func TestGetPrimaryPodAndContainer_EmptyPodName(t *testing.T) {
 		PrimaryPodName: "",
 	}
 
-	_, _, err := GetPrimaryPodAndContainer(logCtx)
+	_, _, err := getPrimaryPodAndContainer(logCtx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "primary pod name is empty")
 }
@@ -93,7 +93,7 @@ func TestGetPrimaryPodAndContainer_PodNotFound(t *testing.T) {
 		},
 	}
 
-	_, _, err := GetPrimaryPodAndContainer(logCtx)
+	_, _, err := getPrimaryPodAndContainer(logCtx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "not found in log context")
 }
@@ -112,7 +112,7 @@ func TestGetPrimaryPodAndContainer_ContainerNotFound(t *testing.T) {
 		},
 	}
 
-	_, _, err := GetPrimaryPodAndContainer(logCtx)
+	_, _, err := getPrimaryPodAndContainer(logCtx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "primary container")
 }
@@ -147,8 +147,8 @@ func TestTailLogs_PodNotFound(t *testing.T) {
 
 func TestTailLogs_FollowSetBasedOnPodPhase(t *testing.T) {
 	tests := []struct {
-		name       string
-		phase      corev1.PodPhase
+		name     string
+		phase    corev1.PodPhase
 		wantFollow bool
 	}{
 		{"running pod should follow", corev1.PodRunning, true},

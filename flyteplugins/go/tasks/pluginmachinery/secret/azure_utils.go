@@ -78,12 +78,11 @@ func DecodeAzureSecretName(encodedSecretName string) (string, error) {
 		var result strings.Builder
 		for i := 0; i < len(s); i++ {
 			if s[i] == '0' && i+1 < len(s) {
-				switch s[i+1] {
-				case '0':
+				if s[i+1] == '0' {
 					result.WriteByte('0')
-				case azureHyphenMarker:
+				} else if s[i+1] == azureHyphenMarker {
 					result.WriteByte('-')
-				default:
+				} else {
 					return nil, fmt.Errorf("unexpected escape sequence: %c%c", s[i], s[i+1])
 				}
 				i++

@@ -22,7 +22,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
-	"github.com/flyteorg/flyte/v2/logs"
 	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
@@ -117,7 +116,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
 	if sc.K8sConfig != nil {
-		logStreamer, err := logs.NewK8sLogStreamer(sc.K8sConfig)
+		logStreamer, err := service.NewK8sLogStreamer(sc.K8sConfig)
 		if err != nil {
 			return fmt.Errorf("runs: failed to create k8s log streamer: %w", err)
 		}

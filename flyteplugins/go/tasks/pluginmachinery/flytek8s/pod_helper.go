@@ -806,7 +806,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge PodTemplate PodSpec with podSpec
-	var mergedObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
+	var mergedObjectMeta *metav1.ObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
 	if err := mergo.Merge(mergedObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, nil, err
 	}
@@ -827,10 +827,9 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract default container template
 	for i := 0; i < len(templatePodSpec.Containers); i++ {
-		switch templatePodSpec.Containers[i].Name {
-		case defaultContainerTemplateName:
+		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
 			defaultContainerTemplate = &templatePodSpec.Containers[i]
-		case primaryContainerTemplateName:
+		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
 			primaryContainerTemplate = &templatePodSpec.Containers[i]
 		}
 	}
@@ -840,10 +839,9 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract defaultInitContainerTemplate
 	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
-		switch templatePodSpec.InitContainers[i].Name {
-		case defaultInitContainerTemplateName:
+		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
 			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-		case primaryInitContainerTemplateName:
+		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
 			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}

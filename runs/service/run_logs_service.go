@@ -13,21 +13,27 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/logs"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+
+	"github.com/samber/lo"
 )
 
 const defaultMaxConcurrentStreams = 100
 
+// LogStreamer abstracts log fetching from different backends.
+type LogStreamer interface {
+	TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[workflow.TailLogsResponse]) error
+}
+
 // RunLogsService implements the RunLogsServiceHandler interface.
 type RunLogsService struct {
 	repo     interfaces.Repository
-	streamer logs.LogStreamer
+	streamer LogStreamer
 	sem      *semaphore.Weighted
 }
 
 // NewRunLogsService creates a new RunLogsService.
-func NewRunLogsService(repo interfaces.Repository, streamer logs.LogStreamer) *RunLogsService {
+func NewRunLogsService(repo interfaces.Repository, streamer LogStreamer) *RunLogsService {
 	return &RunLogsService{
 		repo:     repo,
 		streamer: streamer,
@@ -77,24 +83,25 @@ func getLogContextForAttempt(ctx context.Context, repo interfaces.Repository, ac
 	return event.GetLogContext(), nil
 }
 
-// getLogContextAndClusterForAttempt is like getLogContextForAttempt but also returns the cluster name.
-func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, string, error) {
-	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
-		}
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
+// getPrimaryPodAndContainer finds the primary pod and container from a LogContext.
+func getPrimaryPodAndContainer(logContext *core.LogContext) (*core.PodLogContext, *core.ContainerContext, error) {
+	if logContext.GetPrimaryPodName() == "" {
+		return nil, nil, fmt.Errorf("primary pod name is empty in log context")
 	}
 
-	event, err := m.ToActionEvent()
-	if err != nil {
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
+	pod, found := lo.Find(logContext.GetPods(), func(pod *core.PodLogContext) bool {
+		return pod.GetPodName() == logContext.GetPrimaryPodName()
+	})
+	if !found {
+		return nil, nil, fmt.Errorf("primary pod %s not found in log context", logContext.GetPrimaryPodName())
 	}
 
-	if event.GetLogContext() == nil {
-		return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	container, found := lo.Find(pod.GetContainers(), func(c *core.ContainerContext) bool {
+		return c.GetContainerName() == pod.GetPrimaryContainerName()
+	})
+	if !found {
+		return nil, nil, fmt.Errorf("primary container %s not found in pod %s", pod.GetPrimaryContainerName(), pod.GetPodName())
 	}
 
-	return event.GetLogContext(), event.GetCluster(), nil
+	return pod, container, nil
 }
