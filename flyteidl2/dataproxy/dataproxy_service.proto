@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/app/app_definition.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/duration.proto";
@@ -38,7 +39,7 @@ service DataProxyService {
   }
 
   // Stream logs for an action attempt.
-  rpc TailLogs(flyteidl2.workflow.TailLogsRequest) returns (stream flyteidl2.workflow.TailLogsResponse) {}
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.

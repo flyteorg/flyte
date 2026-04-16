@@ -9,7 +9,6 @@ import (
 	context "context"
 	errors "errors"
 	dataproxy "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	http "net/http"
 	strings "strings"
 )
@@ -71,7 +70,7 @@ type DataProxyServiceClient interface {
 	// Get input and output data for an action.
 	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 	// Stream logs for an action attempt.
-	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error)
+	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest]) (*connect.ServerStreamForClient[dataproxy.TailLogsResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -109,7 +108,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
-		tailLogs: connect.NewClient[workflow.TailLogsRequest, workflow.TailLogsResponse](
+		tailLogs: connect.NewClient[dataproxy.TailLogsRequest, dataproxy.TailLogsResponse](
 			httpClient,
 			baseURL+DataProxyServiceTailLogsProcedure,
 			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
@@ -124,7 +123,7 @@ type dataProxyServiceClient struct {
 	uploadInputs         *connect.Client[dataproxy.UploadInputsRequest, dataproxy.UploadInputsResponse]
 	createDownloadLink   *connect.Client[dataproxy.CreateDownloadLinkRequest, dataproxy.CreateDownloadLinkResponse]
 	getActionData        *connect.Client[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse]
-	tailLogs             *connect.Client[workflow.TailLogsRequest, workflow.TailLogsResponse]
+	tailLogs             *connect.Client[dataproxy.TailLogsRequest, dataproxy.TailLogsResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -148,7 +147,7 @@ func (c *dataProxyServiceClient) GetActionData(ctx context.Context, req *connect
 }
 
 // TailLogs calls flyteidl2.dataproxy.DataProxyService.TailLogs.
-func (c *dataProxyServiceClient) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error) {
+func (c *dataProxyServiceClient) TailLogs(ctx context.Context, req *connect.Request[dataproxy.TailLogsRequest]) (*connect.ServerStreamForClient[dataproxy.TailLogsResponse], error) {
 	return c.tailLogs.CallServerStream(ctx, req)
 }
 
@@ -162,7 +161,7 @@ type DataProxyServiceHandler interface {
 	// Get input and output data for an action.
 	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 	// Stream logs for an action attempt.
-	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error
+	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -239,6 +238,6 @@ func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *conn
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.GetActionData is not implemented"))
 }
 
-func (UnimplementedDataProxyServiceHandler) TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error {
+func (UnimplementedDataProxyServiceHandler) TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.TailLogs is not implemented"))
 }

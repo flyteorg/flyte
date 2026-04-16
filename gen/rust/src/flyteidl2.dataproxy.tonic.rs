@@ -206,11 +206,9 @@ pub mod data_proxy_service_client {
         }
         pub async fn tail_logs(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::workflow::TailLogsRequest>,
+            request: impl tonic::IntoRequest<super::TailLogsRequest>,
         ) -> std::result::Result<
-            tonic::Response<
-                tonic::codec::Streaming<super::super::workflow::TailLogsResponse>,
-            >,
+            tonic::Response<tonic::codec::Streaming<super::TailLogsResponse>>,
             tonic::Status,
         > {
             self.inner
@@ -272,16 +270,13 @@ pub mod data_proxy_service_server {
         >;
         /// Server streaming response type for the TailLogs method.
         type TailLogsStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<
-                    super::super::workflow::TailLogsResponse,
-                    tonic::Status,
-                >,
+                Item = std::result::Result<super::TailLogsResponse, tonic::Status>,
             >
             + Send
             + 'static;
         async fn tail_logs(
             &self,
-            request: tonic::Request<super::super::workflow::TailLogsRequest>,
+            request: tonic::Request<super::TailLogsRequest>,
         ) -> std::result::Result<tonic::Response<Self::TailLogsStream>, tonic::Status>;
     }
     #[derive(Debug)]
@@ -555,10 +550,9 @@ pub mod data_proxy_service_server {
                     struct TailLogsSvc<T: DataProxyService>(pub Arc<T>);
                     impl<
                         T: DataProxyService,
-                    > tonic::server::ServerStreamingService<
-                        super::super::workflow::TailLogsRequest,
-                    > for TailLogsSvc<T> {
-                        type Response = super::super::workflow::TailLogsResponse;
+                    > tonic::server::ServerStreamingService<super::TailLogsRequest>
+                    for TailLogsSvc<T> {
+                        type Response = super::TailLogsResponse;
                         type ResponseStream = T::TailLogsStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
@@ -566,9 +560,7 @@ pub mod data_proxy_service_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                super::super::workflow::TailLogsRequest,
-                            >,
+                            request: tonic::Request<super::TailLogsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {

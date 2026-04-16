@@ -8,7 +8,6 @@ package dataproxy
 
 import (
 	context "context"
-	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -39,7 +38,7 @@ type DataProxyServiceClient interface {
 	// Get input and output data for an action.
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// Stream logs for an action attempt.
-	TailLogs(ctx context.Context, in *workflow.TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error)
+	TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error)
 }
 
 type dataProxyServiceClient struct {
@@ -86,7 +85,7 @@ func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *GetActio
 	return out, nil
 }
 
-func (c *dataProxyServiceClient) TailLogs(ctx context.Context, in *workflow.TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error) {
+func (c *dataProxyServiceClient) TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &DataProxyService_ServiceDesc.Streams[0], DataProxyService_TailLogs_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -102,7 +101,7 @@ func (c *dataProxyServiceClient) TailLogs(ctx context.Context, in *workflow.Tail
 }
 
 type DataProxyService_TailLogsClient interface {
-	Recv() (*workflow.TailLogsResponse, error)
+	Recv() (*TailLogsResponse, error)
 	grpc.ClientStream
 }
 
@@ -110,8 +109,8 @@ type dataProxyServiceTailLogsClient struct {
 	grpc.ClientStream
 }
 
-func (x *dataProxyServiceTailLogsClient) Recv() (*workflow.TailLogsResponse, error) {
-	m := new(workflow.TailLogsResponse)
+func (x *dataProxyServiceTailLogsClient) Recv() (*TailLogsResponse, error) {
+	m := new(TailLogsResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -130,7 +129,7 @@ type DataProxyServiceServer interface {
 	// Get input and output data for an action.
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// Stream logs for an action attempt.
-	TailLogs(*workflow.TailLogsRequest, DataProxyService_TailLogsServer) error
+	TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error
 }
 
 // UnimplementedDataProxyServiceServer should be embedded to have forward compatible implementations.
@@ -149,7 +148,7 @@ func (UnimplementedDataProxyServiceServer) CreateDownloadLink(context.Context, *
 func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActionData not implemented")
 }
-func (UnimplementedDataProxyServiceServer) TailLogs(*workflow.TailLogsRequest, DataProxyService_TailLogsServer) error {
+func (UnimplementedDataProxyServiceServer) TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error {
 	return status.Errorf(codes.Unimplemented, "method TailLogs not implemented")
 }
 
@@ -237,7 +236,7 @@ func _DataProxyService_GetActionData_Handler(srv interface{}, ctx context.Contex
 }
 
 func _DataProxyService_TailLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(workflow.TailLogsRequest)
+	m := new(TailLogsRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -245,7 +244,7 @@ func _DataProxyService_TailLogs_Handler(srv interface{}, stream grpc.ServerStrea
 }
 
 type DataProxyService_TailLogsServer interface {
-	Send(*workflow.TailLogsResponse) error
+	Send(*TailLogsResponse) error
 	grpc.ServerStream
 }
 
@@ -253,7 +252,7 @@ type dataProxyServiceTailLogsServer struct {
 	grpc.ServerStream
 }
 
-func (x *dataProxyServiceTailLogsServer) Send(m *workflow.TailLogsResponse) error {
+func (x *dataProxyServiceTailLogsServer) Send(m *TailLogsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
