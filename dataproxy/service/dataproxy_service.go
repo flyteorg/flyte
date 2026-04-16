@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -41,16 +42,18 @@ type Service struct {
 	taskClient    taskconnect.TaskServiceClient
 	triggerClient triggerconnect.TriggerServiceClient
 	runClient     workflowconnect.RunServiceClient
+	logStreamer   logs.LogStreamer
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, logStreamer logs.LogStreamer) *Service {
 	return &Service{
 		cfg:           cfg,
 		dataStore:     dataStore,
 		taskClient:    taskClient,
 		triggerClient: triggerClient,
 		runClient:     runClient,
+		logStreamer:   logStreamer,
 	}
 }
 
@@ -495,6 +498,25 @@ func (s *Service) GetActionData(
 	}
 
 	return connect.NewResponse(resp), nil
+}
+
+// TailLogs streams logs for an action attempt.
+func (s *Service) TailLogs(ctx context.Context, req *connect.Request[dataproxy.TailLogsRequest], stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+	// Get log context from RunService
+	logCtxResp, err := s.runClient.GetActionLogContext(ctx, connect.NewRequest(&workflow.GetActionLogContextRequest{
+		ActionId: req.Msg.GetActionId(),
+		Attempt:  req.Msg.GetAttempt(),
+	}))
+	if err != nil {
+		return err
+	}
+
+	logContext := logCtxResp.Msg.GetLogContext()
+	if logContext == nil {
+		return connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found"))
+	}
+
+	return s.logStreamer.TailLogs(ctx, logContext, stream)
 }
 
 // hashInputsProto computes a deterministic FNV-64a hash of the serialized inputs.

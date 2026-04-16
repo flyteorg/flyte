@@ -10,7 +10,9 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
 // RunLogsService provides an interface for streaming logs.
 service RunLogsService {
+  // Deprecated: Use DataProxyService.TailLogs instead.
   rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option deprecated = true;
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }

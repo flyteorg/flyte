@@ -204,6 +204,33 @@ pub mod data_proxy_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn tail_logs(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TailLogsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::TailLogsResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.dataproxy.DataProxyService/TailLogs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.dataproxy.DataProxyService", "TailLogs"),
+                );
+            self.inner.server_streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -241,6 +268,16 @@ pub mod data_proxy_service_server {
             tonic::Response<super::GetActionDataResponse>,
             tonic::Status,
         >;
+        /// Server streaming response type for the TailLogs method.
+        type TailLogsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::TailLogsResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn tail_logs(
+            &self,
+            request: tonic::Request<super::TailLogsRequest>,
+        ) -> std::result::Result<tonic::Response<Self::TailLogsStream>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct DataProxyServiceServer<T: DataProxyService> {
@@ -504,6 +541,52 @@ pub mod data_proxy_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.dataproxy.DataProxyService/TailLogs" => {
+                    #[allow(non_camel_case_types)]
+                    struct TailLogsSvc<T: DataProxyService>(pub Arc<T>);
+                    impl<
+                        T: DataProxyService,
+                    > tonic::server::ServerStreamingService<super::TailLogsRequest>
+                    for TailLogsSvc<T> {
+                        type Response = super::TailLogsResponse;
+                        type ResponseStream = T::TailLogsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TailLogsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as DataProxyService>::tail_logs(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = TailLogsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
