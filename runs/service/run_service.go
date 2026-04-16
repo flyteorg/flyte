@@ -387,11 +387,10 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database, then push to reconciler for background pod termination.
-	// AbortRun marks the root action aborted and returns identifiers for any
-	// non-terminal child actions so we can push them to the reconciler too.
-	childActions, err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil)
-	if err != nil {
+	// Mark only the root action ABORTED in DB, then push it to the reconciler.
+	// The reconciler deletes "a0"'s CRD; K8s cascades deletion to all child CRDs
+	// via OwnerReferences, and the action service informer marks them ABORTED in DB.
+	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
 		}
@@ -400,13 +399,6 @@ func (s *RunService) AbortRun(
 	}
 
 	if s.abortReconciler != nil {
-		// Push child actions first — they own the TaskAction CRDs and pods.
-		for _, actionID := range childActions {
-			s.abortReconciler.Push(ctx, actionID, reason)
-		}
-		// Also push the root action ("a0"). Its TaskAction CRD may not exist (it is
-		// a workflow-level composite action), but the reconciler handles that case
-		// gracefully via isAlreadyTerminated.
 		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: "a0"}, reason)
 	}
 

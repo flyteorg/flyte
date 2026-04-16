@@ -113,24 +113,20 @@ func (_c *ActionRepo_AbortAction_Call) RunAndReturn(run func(ctx context.Context
 }
 
 // AbortRun provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) ([]*common.ActionIdentifier, error) {
+func (_mock *ActionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	ret := _mock.Called(ctx, runID, reason, abortedBy)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AbortRun")
 	}
 
-	var r0 []*common.ActionIdentifier
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier, string, *common.EnrichedIdentity) ([]*common.ActionIdentifier, error)); ok {
-		r0, r1 = returnFunc(ctx, runID, reason, abortedBy)
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier, string, *common.EnrichedIdentity) error); ok {
+		r0 = returnFunc(ctx, runID, reason, abortedBy)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*common.ActionIdentifier)
-		}
-		r1 = ret.Error(1)
+		r0 = ret.Error(0)
 	}
-	return r0, r1
+	return r0
 }
 
 // ActionRepo_AbortRun_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AbortRun'
@@ -170,12 +166,12 @@ func (_c *ActionRepo_AbortRun_Call) Run(run func(ctx context.Context, runID *com
 	return _c
 }
 
-func (_c *ActionRepo_AbortRun_Call) Return(childActions []*common.ActionIdentifier, err error) *ActionRepo_AbortRun_Call {
-	_c.Call.Return(childActions, err)
+func (_c *ActionRepo_AbortRun_Call) Return(err error) *ActionRepo_AbortRun_Call {
+	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *ActionRepo_AbortRun_Call) RunAndReturn(run func(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) ([]*common.ActionIdentifier, error)) *ActionRepo_AbortRun_Call {
+func (_c *ActionRepo_AbortRun_Call) RunAndReturn(run func(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error) *ActionRepo_AbortRun_Call {
 	_c.Call.Return(run)
 	return _c
 }
