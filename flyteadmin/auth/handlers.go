@@ -404,6 +404,10 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			scheme = BearerScheme
 		}
 
+		// TODO: Remove temporary debug logging after Entra ID identity resolution is verified.
+		logger.Infof(ctx, "[/me debug] idToken present: %v, accessToken present: %v, using scheme: %s, requestURI: %s",
+			len(idToken) > 0, len(accessToken) > 0, scheme, request.RequestURI)
+
 		if len(token) == 0 {
 			// If no token was found in the cookies, look for an authorization header, starting with a potentially
 			// custom header set in the Config object
@@ -697,6 +701,13 @@ func GetUserInfoForwardResponseHandler() ForwardResponseHandler {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			if info.AdditionalClaims != nil {
+				// TODO: Remove temporary debug logging after Entra ID identity resolution is verified.
+				claimNames := make([]string, 0, len(info.AdditionalClaims.GetFields()))
+				for k := range info.AdditionalClaims.GetFields() {
+					claimNames = append(claimNames, k)
+				}
+				logger.Infof(ctx, "[/me debug] UserInfoResponse claims present: %v, subject: %s", claimNames, info.Subject)
+
 				for k, v := range info.AdditionalClaims.GetFields() {
 					jsonBytes, err := v.MarshalJSON()
 					if err != nil {
