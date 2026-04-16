@@ -161,7 +161,12 @@ func (_c *ActionRepo_AbortRun_Call) Run(run func(ctx context.Context, runID *com
 		if args[3] != nil {
 			arg3 = args[3].(*common.EnrichedIdentity)
 		}
-		run(arg0, arg1, arg2, arg3)
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
 	})
 	return _c
 }
