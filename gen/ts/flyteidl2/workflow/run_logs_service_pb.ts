@@ -101,6 +101,8 @@ export const TailLogsResponse_LogsSchema: GenMessage<TailLogsResponse_Logs> = /*
  */
 export const RunLogsService: GenService<{
   /**
+   * Deprecated: Use DataProxyService.TailLogs instead.
+   *
    * @generated from rpc flyteidl2.workflow.RunLogsService.TailLogs
    * @deprecated
    */

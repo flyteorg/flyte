@@ -45,6 +45,8 @@ var (
 
 // RunLogsServiceClient is a client for the flyteidl2.workflow.RunLogsService service.
 type RunLogsServiceClient interface {
+	// Deprecated: Use DataProxyService.TailLogs instead.
+	//
 	// Deprecated: do not use.
 	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest]) (*connect.ServerStreamForClient[workflow.TailLogsResponse], error)
 }
@@ -83,6 +85,8 @@ func (c *runLogsServiceClient) TailLogs(ctx context.Context, req *connect.Reques
 
 // RunLogsServiceHandler is an implementation of the flyteidl2.workflow.RunLogsService service.
 type RunLogsServiceHandler interface {
+	// Deprecated: Use DataProxyService.TailLogs instead.
+	//
 	// Deprecated: do not use.
 	TailLogs(context.Context, *connect.Request[workflow.TailLogsRequest], *connect.ServerStream[workflow.TailLogsResponse]) error
 }

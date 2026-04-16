@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -948,6 +949,20 @@ func (s *RunService) GetActionDataURIs(
 	return connect.NewResponse(resp), nil
 }
 
+func (s *RunService) GetActionLogContext(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionLogContextRequest],
+) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	logContext, cluster, err := getLogContextAndClusterForAttempt(ctx, s.repo, req.Msg.GetActionId(), req.Msg.GetAttempt())
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&workflow.GetActionLogContextResponse{
+		LogContext: logContext,
+		Cluster:    cluster,
+	}), nil
+}
+
 // AbortAction aborts a specific action
 func (s *RunService) AbortAction(
 	ctx context.Context,
@@ -1377,6 +1392,28 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 		Metadata: metadata,
 		Status:   status,
 	}
+}
+
+// getLogContextAndClusterForAttempt is like getLogContextForAttempt but also returns the cluster name.
+func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, string, error) {
+	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
+		}
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
+	}
+
+	event, err := m.ToActionEvent()
+	if err != nil {
+		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
+	}
+
+	if event.GetLogContext() == nil {
+		return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	}
+
+	return event.GetLogContext(), event.GetCluster(), nil
 }
 
 func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionSpecBytes []byte) {
@@ -1933,7 +1970,6 @@ func extractShortName(name string) string {
 	}
 	return name
 }
-
 
 func fetchTaskSpecByID(ctx context.Context, taskRepo interfaces.TaskRepo, taskID *task.TaskIdentifier) (*task.TaskSpec, error) {
 	taskModel, err := taskRepo.GetTask(ctx, transformers.ToTaskKey(taskID))

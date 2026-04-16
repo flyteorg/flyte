@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/common/run.proto";
+import "flyteidl2/core/execution.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -73,6 +74,11 @@ service RunService {
 
   // Get the storage URIs for an action's input and output data.
   rpc GetActionDataURIs(GetActionDataURIsRequest) returns (GetActionDataURIsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Get the logging context (pod name, namespace, cluster) for an action attempt.
+  rpc GetActionLogContext(GetActionLogContextRequest) returns (GetActionLogContextResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -212,6 +218,24 @@ message GetActionDataURIsResponse {
 
   // URI for the action's output data. Empty if action hasn't succeeded or has no outputs.
   string outputs_uri = 2;
+}
+
+// Request message for getting action log context.
+message GetActionLogContextRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Response message for getting action log context.
+message GetActionLogContextResponse {
+  // The logging context for the action attempt.
+  flyteidl2.core.LogContext log_context = 1;
+
+  // The cluster where the action attempt is running.
+  string cluster = 2;
 }
 
 // Request message for listing runs.

@@ -70,26 +70,30 @@ const (
 	// RunServiceGetActionDataURIsProcedure is the fully-qualified name of the RunService's
 	// GetActionDataURIs RPC.
 	RunServiceGetActionDataURIsProcedure = "/flyteidl2.workflow.RunService/GetActionDataURIs"
+	// RunServiceGetActionLogContextProcedure is the fully-qualified name of the RunService's
+	// GetActionLogContext RPC.
+	RunServiceGetActionLogContextProcedure = "/flyteidl2.workflow.RunService/GetActionLogContext"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	runServiceServiceDescriptor                  = workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService")
-	runServiceCreateRunMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("CreateRun")
-	runServiceAbortRunMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("AbortRun")
-	runServiceGetRunDetailsMethodDescriptor      = runServiceServiceDescriptor.Methods().ByName("GetRunDetails")
-	runServiceWatchRunDetailsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
-	runServiceGetActionDetailsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
-	runServiceWatchActionDetailsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
-	runServiceGetActionDataMethodDescriptor      = runServiceServiceDescriptor.Methods().ByName("GetActionData")
-	runServiceListRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("ListRuns")
-	runServiceWatchRunsMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
-	runServiceListActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("ListActions")
-	runServiceWatchActionsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("WatchActions")
-	runServiceWatchClusterEventsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
-	runServiceAbortActionMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("AbortAction")
-	runServiceWatchGroupsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
-	runServiceGetActionDataURIsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
+	runServiceServiceDescriptor                   = workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService")
+	runServiceCreateRunMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("CreateRun")
+	runServiceAbortRunMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("AbortRun")
+	runServiceGetRunDetailsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetRunDetails")
+	runServiceWatchRunDetailsMethodDescriptor     = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
+	runServiceGetActionDetailsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
+	runServiceWatchActionDetailsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
+	runServiceGetActionDataMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetActionData")
+	runServiceListRunsMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("ListRuns")
+	runServiceWatchRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
+	runServiceListActionsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("ListActions")
+	runServiceWatchActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchActions")
+	runServiceWatchClusterEventsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
+	runServiceAbortActionMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("AbortAction")
+	runServiceWatchGroupsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
+	runServiceGetActionDataURIsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
+	runServiceGetActionLogContextMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
@@ -128,6 +132,8 @@ type RunServiceClient interface {
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
 	// Get the storage URIs for an action's input and output data.
 	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
+	// Get the logging context (pod name, namespace, cluster) for an action attempt.
+	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
 }
 
 // NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. By
@@ -236,26 +242,34 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getActionLogContext: connect.NewClient[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse](
+			httpClient,
+			baseURL+RunServiceGetActionLogContextProcedure,
+			connect.WithSchema(runServiceGetActionLogContextMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // runServiceClient implements RunServiceClient.
 type runServiceClient struct {
-	createRun          *connect.Client[workflow.CreateRunRequest, workflow.CreateRunResponse]
-	abortRun           *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
-	getRunDetails      *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
-	watchRunDetails    *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
-	getActionDetails   *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
-	watchActionDetails *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
-	getActionData      *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
-	listRuns           *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
-	watchRuns          *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
-	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
-	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
-	watchClusterEvents *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
-	abortAction        *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
-	watchGroups        *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
-	getActionDataURIs  *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
+	createRun           *connect.Client[workflow.CreateRunRequest, workflow.CreateRunResponse]
+	abortRun            *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
+	getRunDetails       *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
+	watchRunDetails     *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
+	getActionDetails    *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
+	watchActionDetails  *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
+	getActionData       *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
+	listRuns            *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
+	watchRuns           *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
+	listActions         *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
+	watchActions        *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
+	watchClusterEvents  *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
+	abortAction         *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
+	watchGroups         *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
+	getActionDataURIs   *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
+	getActionLogContext *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.RunService.CreateRun.
@@ -335,6 +349,11 @@ func (c *runServiceClient) GetActionDataURIs(ctx context.Context, req *connect.R
 	return c.getActionDataURIs.CallUnary(ctx, req)
 }
 
+// GetActionLogContext calls flyteidl2.workflow.RunService.GetActionLogContext.
+func (c *runServiceClient) GetActionLogContext(ctx context.Context, req *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	return c.getActionLogContext.CallUnary(ctx, req)
+}
+
 // RunServiceHandler is an implementation of the flyteidl2.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
@@ -371,6 +390,8 @@ type RunServiceHandler interface {
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
 	// Get the storage URIs for an action's input and output data.
 	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
+	// Get the logging context (pod name, namespace, cluster) for an action attempt.
+	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
 }
 
 // NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -475,6 +496,13 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceGetActionLogContextHandler := connect.NewUnaryHandler(
+		RunServiceGetActionLogContextProcedure,
+		svc.GetActionLogContext,
+		connect.WithSchema(runServiceGetActionLogContextMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunServiceCreateRunProcedure:
@@ -507,6 +535,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceWatchGroupsHandler.ServeHTTP(w, r)
 		case RunServiceGetActionDataURIsProcedure:
 			runServiceGetActionDataURIsHandler.ServeHTTP(w, r)
+		case RunServiceGetActionLogContextProcedure:
+			runServiceGetActionLogContextHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -574,4 +604,8 @@ func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Requ
 
 func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionDataURIs is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionLogContext is not implemented"))
 }

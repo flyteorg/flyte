@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/app/app_definition.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/duration.proto";
@@ -36,6 +37,9 @@ service DataProxyService {
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Stream logs for an action attempt.
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -189,4 +193,25 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+}
+
+// Request message for tailing logs.
+message TailLogsRequest {
+  // The action id.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Reponse message for tailing logs.
+message TailLogsResponse {
+  // A batch of logs.
+  message Logs {
+    // Structured log lines.
+    repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+  }
+
+  // One or more batches of logs.
+  repeated Logs logs = 1;
 }

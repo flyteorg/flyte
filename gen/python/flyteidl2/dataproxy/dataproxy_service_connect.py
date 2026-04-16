@@ -29,6 +29,9 @@ class DataProxyService(Protocol):
     async def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
     def __init__(self, service: DataProxyService | AsyncGenerator[DataProxyService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -74,6 +77,16 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_action_data,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/TailLogs": Endpoint.server_stream(
+                    method=MethodInfo(
+                        name="TailLogs",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.tail_logs,
                 ),
             },
             interceptors=interceptors,
@@ -170,6 +183,26 @@ class DataProxyServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    def tail_logs(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> AsyncIterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
+        return self.execute_server_stream(
+            request=request,
+            method=MethodInfo(
+                name="TailLogs",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class DataProxyServiceSync(Protocol):
     def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
@@ -179,6 +212,8 @@ class DataProxyServiceSync(Protocol):
     def create_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -225,6 +260,16 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_action_data,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/TailLogs": EndpointSync.server_stream(
+                    method=MethodInfo(
+                        name="TailLogs",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.tail_logs,
                 ),
             },
             interceptors=interceptors,
@@ -319,4 +364,24 @@ class DataProxyServiceClientSync(ConnectClientSync):
             headers=headers,
             timeout_ms=timeout_ms,
             use_get=use_get,
+        )
+
+    def tail_logs(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> Iterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
+        return self.execute_server_stream(
+            request=request,
+            method=MethodInfo(
+                name="TailLogs",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
         )

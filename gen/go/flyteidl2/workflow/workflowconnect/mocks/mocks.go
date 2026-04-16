@@ -2076,6 +2076,74 @@ func (_c *RunServiceClient_GetActionDetails_Call) RunAndReturn(run func(context1
 	return _c
 }
 
+// GetActionLogContext provides a mock function for the type RunServiceClient
+func (_mock *RunServiceClient) GetActionLogContext(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActionLogContext")
+	}
+
+	var r0 *connect.Response[workflow.GetActionLogContextResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) *connect.Response[workflow.GetActionLogContextResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.GetActionLogContextResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceClient_GetActionLogContext_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionLogContext'
+type RunServiceClient_GetActionLogContext_Call struct {
+	*mock.Call
+}
+
+// GetActionLogContext is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.GetActionLogContextRequest]
+func (_e *RunServiceClient_Expecter) GetActionLogContext(context1 interface{}, request interface{}) *RunServiceClient_GetActionLogContext_Call {
+	return &RunServiceClient_GetActionLogContext_Call{Call: _e.mock.On("GetActionLogContext", context1, request)}
+}
+
+func (_c *RunServiceClient_GetActionLogContext_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest])) *RunServiceClient_GetActionLogContext_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.GetActionLogContextRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.GetActionLogContextRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceClient_GetActionLogContext_Call) Return(response *connect.Response[workflow.GetActionLogContextResponse], err error) *RunServiceClient_GetActionLogContext_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceClient_GetActionLogContext_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)) *RunServiceClient_GetActionLogContext_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRunDetails provides a mock function for the type RunServiceClient
 func (_mock *RunServiceClient) GetRunDetails(context1 context.Context, request *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -3119,6 +3187,74 @@ func (_c *RunServiceHandler_GetActionDetails_Call) Return(response *connect.Resp
 }
 
 func (_c *RunServiceHandler_GetActionDetails_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)) *RunServiceHandler_GetActionDetails_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetActionLogContext provides a mock function for the type RunServiceHandler
+func (_mock *RunServiceHandler) GetActionLogContext(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActionLogContext")
+	}
+
+	var r0 *connect.Response[workflow.GetActionLogContextResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) *connect.Response[workflow.GetActionLogContextResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.GetActionLogContextResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceHandler_GetActionLogContext_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActionLogContext'
+type RunServiceHandler_GetActionLogContext_Call struct {
+	*mock.Call
+}
+
+// GetActionLogContext is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.GetActionLogContextRequest]
+func (_e *RunServiceHandler_Expecter) GetActionLogContext(context1 interface{}, request interface{}) *RunServiceHandler_GetActionLogContext_Call {
+	return &RunServiceHandler_GetActionLogContext_Call{Call: _e.mock.On("GetActionLogContext", context1, request)}
+}
+
+func (_c *RunServiceHandler_GetActionLogContext_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest])) *RunServiceHandler_GetActionLogContext_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.GetActionLogContextRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.GetActionLogContextRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceHandler_GetActionLogContext_Call) Return(response *connect.Response[workflow.GetActionLogContextResponse], err error) *RunServiceHandler_GetActionLogContext_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceHandler_GetActionLogContext_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)) *RunServiceHandler_GetActionLogContext_Call {
 	_c.Call.Return(run)
 	return _c
 }

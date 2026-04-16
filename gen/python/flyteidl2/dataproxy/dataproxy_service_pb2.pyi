@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.app import app_definition_pb2 as _app_definition_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
+from flyteidl2.logs.dataplane import payload_pb2 as _payload_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
@@ -127,3 +128,22 @@ class GetActionDataResponse(_message.Message):
     inputs: _common_pb2.Inputs
     outputs: _common_pb2.Outputs
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
+
+class TailLogsRequest(_message.Message):
+    __slots__ = ["action_id", "attempt"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    attempt: int
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
+
+class TailLogsResponse(_message.Message):
+    __slots__ = ["logs"]
+    class Logs(_message.Message):
+        __slots__ = ["lines"]
+        LINES_FIELD_NUMBER: _ClassVar[int]
+        lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
+        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
+    LOGS_FIELD_NUMBER: _ClassVar[int]
+    logs: _containers.RepeatedCompositeFieldContainer[TailLogsResponse.Logs]
+    def __init__(self, logs: _Optional[_Iterable[_Union[TailLogsResponse.Logs, _Mapping]]] = ...) -> None: ...

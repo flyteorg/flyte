@@ -1692,3 +1692,109 @@ func TestGetActionDataURIs(t *testing.T) {
 	})
 }
 
+func TestGetActionLogContext(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	logContext := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	mustMarshalEvent := func(event *workflow.ActionEvent) []byte {
+		b, err := proto.Marshal(event)
+		require.NoError(t, err)
+		return b
+	}
+
+	t.Run("success returns log context and cluster", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: mustMarshalEvent(&workflow.ActionEvent{
+				Id:         actionID,
+				Attempt:    1,
+				LogContext: logContext,
+				Cluster:    "c1",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "c1", resp.Msg.GetCluster())
+		assert.Equal(t, "my-pod", resp.Msg.GetLogContext().GetPrimaryPodName())
+	})
+
+	t.Run("no event found returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, sql.ErrNoRows)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("repo error returns Internal", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, errors.New("db blew up"))
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	})
+
+	t.Run("event without log context returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: mustMarshalEvent(&workflow.ActionEvent{
+				Id:      actionID,
+				Attempt: 1,
+				Cluster: "c1",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("undeserializable event returns Internal", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: []byte("not-a-proto"),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	})
+}

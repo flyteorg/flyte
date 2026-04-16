@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/dataproxy/service"
+	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
@@ -26,7 +27,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
 	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL)
 
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient)
+	var logStreamer logs.LogStreamer
+	if sc.K8sConfig != nil {
+		var err error
+		logStreamer, err = logs.NewK8sLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("failed to create k8s log streamer: %w", err)
+		}
+	}
+
+	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, logStreamer)
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
 	sc.Mux.Handle(path, handler)

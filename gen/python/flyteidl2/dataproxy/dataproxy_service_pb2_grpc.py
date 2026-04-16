@@ -35,6 +35,11 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
                 )
+        self.TailLogs = channel.unary_stream(
+                '/flyteidl2.dataproxy.DataProxyService/TailLogs',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
+                )
 
 
 class DataProxyServiceServicer(object):
@@ -68,6 +73,13 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def TailLogs(self, request, context):
+        """Stream logs for an action attempt.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -90,6 +102,11 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     servicer.GetActionData,
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.SerializeToString,
+            ),
+            'TailLogs': grpc.unary_stream_rpc_method_handler(
+                    servicer.TailLogs,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -167,5 +184,22 @@ class DataProxyService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetActionData',
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def TailLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.dataproxy.DataProxyService/TailLogs',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
