@@ -507,10 +507,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	}
 
 	phase := GetPhaseFromConditions(taskAction)
-	// A TaskAction deleted without a terminal condition was cascade-deleted by K8s
-	// (e.g. its parent was aborted). Treat it as aborted so the DB and UI reflect
-	// the real outcome instead of leaving the phase as UNSPECIFIED.
-	if eventType == watch.Deleted && phase == common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+	if eventType == watch.Deleted {
 		phase = common.ActionPhase_ACTION_PHASE_ABORTED
 	}
 

@@ -154,7 +154,8 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
 		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
 		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL
-		 RETURNING name, attempts`,
+		 RETURNING name, COALESCE((SELECT MAX(attempt) FROM action_events
+		                            WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = actions.name), attempts)`,
 		abortedPhase, now, now, 0, reason,
 		runID.Project, runID.Domain, runID.Name,
 	).Scan(&rootName, &rootAttempts)
@@ -174,7 +175,8 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		 WHERE project = $5 AND domain = $6 AND run_name = $7
 		   AND parent_action_name IS NOT NULL
 		   AND phase != $8 AND phase != $1
-		 RETURNING name, attempts`,
+		 RETURNING name, COALESCE((SELECT MAX(attempt) FROM action_events
+		                            WHERE project = $5 AND domain = $6 AND run_name = $7 AND name = actions.name), attempts)`,
 		abortedPhase, now, now, reason,
 		runID.Project, runID.Domain, runID.Name,
 		succeededPhase,
@@ -1037,7 +1039,7 @@ func (r *actionRepo) processNotifications() {
 					select {
 					case ch <- notif.Extra:
 					default:
-						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification")
+						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
 					}
 				}
 				r.mu.RUnlock()
