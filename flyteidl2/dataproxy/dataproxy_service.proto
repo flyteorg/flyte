@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
@@ -164,6 +165,8 @@ message CreateDownloadLinkRequest {
 
     // ActionAttemptId identifies the specific attempt of a run action that produced the artifact.
     common.ActionAttemptIdentifier action_attempt_id = 3;
+    flyteidl2.app.Identifier app_id = 4;
+    flyteidl2.task.TaskIdentifier task_id = 5;
   }
 }
 
