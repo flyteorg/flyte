@@ -364,6 +364,33 @@ func TestGetLogoutHandler(t *testing.T) {
 		hook.AssertExpectations(t)
 	})
 
+	t.Run("with_hook_with_trusted_external_redirect", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		err := r.Register(plugins.PluginIDLogoutHook, LogoutHookFunc(func(
+			ctx context.Context,
+			authCtx interfaces.AuthenticationContext,
+			request *http.Request,
+			w http.ResponseWriter) error {
+			SetTrustedLogoutRedirectURL(request, "https://issuer.example.com/v1/logout?state=abc")
+			return nil
+		}))
+		require.NoError(t, err)
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=https://evil.com/phishing", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		assert.Equal(t, "https://issuer.example.com/v1/logout?state=abc", w.Header().Get("Location"))
+		require.Len(t, w.Result().Cookies(), 5)
+		authCtx.AssertExpectations(t)
+	})
+
 	t.Run("hook_error", func(t *testing.T) {
 		ctx := context.Background()
 		authCtx := mocks.AuthenticationContext{}

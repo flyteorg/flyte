@@ -37,6 +37,8 @@ const (
 
 var XRequestID = textproto.CanonicalMIMEHeaderKey(contextutils.RequestIDKey.String())
 
+type trustedLogoutRedirectURLKey struct{}
+
 type PreRedirectHookError struct {
 	Message string
 	Code    int
@@ -44,6 +46,27 @@ type PreRedirectHookError struct {
 
 func (e *PreRedirectHookError) Error() string {
 	return e.Message
+}
+
+// SetTrustedLogoutRedirectURL stores a backend-generated logout redirect on the request.
+// This lets logout hooks send users to an external IdP logout endpoint without that URL
+// being revalidated as though it came directly from the browser.
+func SetTrustedLogoutRedirectURL(request *http.Request, redirectURL string) {
+	if request == nil || redirectURL == "" {
+		return
+	}
+
+	*request = *request.WithContext(context.WithValue(request.Context(), trustedLogoutRedirectURLKey{}, redirectURL))
+}
+
+// GetTrustedLogoutRedirectURL returns a backend-generated logout redirect stored on the request.
+func GetTrustedLogoutRedirectURL(request *http.Request) string {
+	if request == nil {
+		return ""
+	}
+
+	redirectURL, _ := request.Context().Value(trustedLogoutRedirectURLKey{}).(string)
+	return redirectURL
 }
 
 // PreRedirectHookFunc Interface used for running custom code before the redirect happens during a successful auth flow.
@@ -604,13 +627,18 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 		logger.Debugf(ctx, "deleting auth cookies")
 		authCtx.CookieManager().DeleteCookies(ctx, writer)
 
-		// Redirect if one was given
-		queryParams := request.URL.Query()
-		if redirectURL := queryParams.Get(RedirectURLParameter); redirectURL != "" {
-			if !GetRedirectURLAllowed(ctx, redirectURL, authCtx.Options()) {
+		redirectURL := GetTrustedLogoutRedirectURL(request)
+		if redirectURL == "" {
+			queryParams := request.URL.Query()
+			redirectURL = queryParams.Get(RedirectURLParameter)
+			if redirectURL != "" && !GetRedirectURLAllowed(ctx, redirectURL, authCtx.Options()) {
 				logger.Warnf(ctx, "Rejecting unauthorized redirect_url in logout: %s", redirectURL)
 				redirectURL = authCtx.Options().UserAuth.RedirectURL.String()
 			}
+		}
+
+		// Redirect if one was given
+		if redirectURL != "" {
 			http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 		}
 	}
