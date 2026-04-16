@@ -1,4 +1,4 @@
-# Example configuration for Data Proxy with MinIO storage backend
+# Example configuration for Data Proxy with RustFS storage backend
 # This configuration is for local development and testing purposes.
 
 # Data Proxy Configuration
@@ -36,8 +36,8 @@ storage:
     kind: "s3"
     config:
       auth_type: "accesskey"
-      access_key_id: "minioadmin"
-      secret_key: "minioadmin"
+      access_key_id: "rustfs"
+      secret_key: "rustfsstorage"
       region: "us-east-1"
       endpoint: "http://localhost:9000"
       disable_ssl: "true"
