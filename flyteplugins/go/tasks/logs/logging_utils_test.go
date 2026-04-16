@@ -360,7 +360,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 }
 
 func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string) {
-	logPlugin, err := InitializeLogPlugins(config, nil)
+	logPlugin, err := InitializeLogPlugins(config, taskTemplate)
 	assert.NoError(tb, err)
 
 	pod := &v1.Pod{
@@ -450,6 +450,89 @@ func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
 			Ready:         true,
 		},
 	}, "my-hostname")
+}
+
+func TestGetLogsForContainerInPod_TaskTemplateLogLinks(t *testing.T) {
+	t.Run("LogLinks with LinkType and MessageFormat", func(t *testing.T) {
+		assertTestSucceeded(t, &LogConfig{}, &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				LogLinks: []*core.TaskLog{
+					{
+						Name:          "Spark UI",
+						Uri:           "https://spark.example.com/{{ .executionName }}",
+						MessageFormat: core.TaskLog_JSON,
+					},
+				},
+			},
+		}, []*core.TaskLog{
+			{
+				Uri:           "https://spark.example.com/my-execution-name",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Spark UI my-Suffix",
+				LinkType:      core.TaskLog_DASHBOARD,
+				Ready:         true,
+			},
+		}, "")
+	})
+
+	t.Run("Multiple LogLinks all get DASHBOARD LinkType", func(t *testing.T) {
+		assertTestSucceeded(t, &LogConfig{}, &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				LogLinks: []*core.TaskLog{
+					{
+						Name: "Spark UI",
+						Uri:  "https://spark.example.com/{{ .executionName }}",
+					},
+					{
+						Name: "Ray Dashboard",
+						Uri:  "https://ray.example.com/{{ .executionName }}",
+					},
+				},
+			},
+		}, []*core.TaskLog{
+			{
+				Uri:      "https://spark.example.com/my-execution-name",
+				Name:     "Spark UI my-Suffix",
+				LinkType: core.TaskLog_DASHBOARD,
+				Ready:    true,
+			},
+			{
+				Uri:      "https://ray.example.com/my-execution-name",
+				Name:     "Ray Dashboard my-Suffix",
+				LinkType: core.TaskLog_DASHBOARD,
+				Ready:    true,
+			},
+		}, "")
+	})
+
+	t.Run("LogLinks combined with K8s logs", func(t *testing.T) {
+		assertTestSucceeded(t, &LogConfig{
+			IsKubernetesEnabled:   true,
+			KubernetesTemplateURI: "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+		}, &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				LogLinks: []*core.TaskLog{
+					{
+						Name: "Spark UI",
+						Uri:  "https://spark.example.com/{{ .executionName }}",
+					},
+				},
+			},
+		}, []*core.TaskLog{
+			{
+				Uri:      "https://spark.example.com/my-execution-name",
+				Name:     "Spark UI my-Suffix",
+				LinkType: core.TaskLog_DASHBOARD,
+				Ready:    true,
+			},
+			{
+				Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Kubernetes Logs my-Suffix",
+				Ready:         true,
+			},
+		}, "")
+	})
 }
 
 func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
