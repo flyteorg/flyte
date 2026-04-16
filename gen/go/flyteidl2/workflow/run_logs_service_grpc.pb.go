@@ -26,6 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RunLogsServiceClient interface {
+	// Deprecated: Do not use.
 	TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (RunLogsService_TailLogsClient, error)
 }
 
@@ -37,6 +38,7 @@ func NewRunLogsServiceClient(cc grpc.ClientConnInterface) RunLogsServiceClient {
 	return &runLogsServiceClient{cc}
 }
 
+// Deprecated: Do not use.
 func (c *runLogsServiceClient) TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (RunLogsService_TailLogsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &RunLogsService_ServiceDesc.Streams[0], RunLogsService_TailLogs_FullMethodName, opts...)
 	if err != nil {
@@ -73,6 +75,7 @@ func (x *runLogsServiceTailLogsClient) Recv() (*TailLogsResponse, error) {
 // All implementations should embed UnimplementedRunLogsServiceServer
 // for forward compatibility
 type RunLogsServiceServer interface {
+	// Deprecated: Do not use.
 	TailLogs(*TailLogsRequest, RunLogsService_TailLogsServer) error
 }
 
