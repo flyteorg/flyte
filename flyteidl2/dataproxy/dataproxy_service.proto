@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
@@ -17,6 +18,8 @@ enum ArtifactType {
   ARTIFACT_TYPE_UNSPECIFIED = 0;
   // ARTIFACT_TYPE_REPORT refers to the HTML report file optionally generated after a task finishes executing.
   ARTIFACT_TYPE_REPORT = 1;
+  // ARTIFACT_TYPE_CODE_BUNDLE refers to the code bundle (tarball) generated for an action.
+  ARTIFACT_TYPE_CODE_BUNDLE = 2;
 }
 
 // DataProxyService provides an interface for managing data uploads and downloads.
@@ -162,14 +165,15 @@ message CreateDownloadLinkRequest {
 
     // ActionAttemptId identifies the specific attempt of a run action that produced the artifact.
     common.ActionAttemptIdentifier action_attempt_id = 3;
+    flyteidl2.app.Identifier app_id = 4;
+    flyteidl2.task.TaskIdentifier task_id = 5;
   }
 }
 
 // CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
 message CreateDownloadLinkResponse {
-  reserved 1, 2;
   // PreSignedUrls contains the signed URLs and their expiration time.
-  PreSignedURLs pre_signed_urls = 3;
+  PreSignedURLs pre_signed_urls = 1;
 }
 
 // Request message for querying action data.
