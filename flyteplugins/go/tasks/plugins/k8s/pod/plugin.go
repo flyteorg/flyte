@@ -348,7 +348,7 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 func latestTime(times []metav1.Time) time.Time {
 	var latest time.Time
 	for _, t := range times {
-		if !t.IsZero() && t.Time.After(latest) {
+		if !t.IsZero() && t.After(latest) {
 			latest = t.Time
 		}
 	}

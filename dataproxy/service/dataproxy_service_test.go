@@ -676,7 +676,7 @@ type mockLogStreamer struct {
 	mock.Mock
 }
 
-func (m *mockLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[workflow.TailLogsResponse]) error {
+func (m *mockLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
 	args := m.Called(ctx, logContext, stream)
 	return args.Error(0)
 }
@@ -715,14 +715,14 @@ func TestTailLogs(t *testing.T) {
 
 		streamer := &mockLogStreamer{}
 		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Run(func(args mock.Arguments) {
-			stream := args.Get(2).(*connect.ServerStream[workflow.TailLogsResponse])
-			_ = stream.Send(&workflow.TailLogsResponse{})
+			stream := args.Get(2).(*connect.ServerStream[dataproxy.TailLogsResponse])
+			_ = stream.Send(&dataproxy.TailLogsResponse{})
 		}).Return(nil)
 
 		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
 		client := newTailLogsTestClient(t, svc)
 
-		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
 			ActionId: actionID,
 			Attempt:  1,
 		}))
@@ -745,7 +745,7 @@ func TestTailLogs(t *testing.T) {
 		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
 		client := newTailLogsTestClient(t, svc)
 
-		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
 			ActionId: actionID,
 			Attempt:  1,
 		}))
@@ -768,7 +768,7 @@ func TestTailLogs(t *testing.T) {
 		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
 		client := newTailLogsTestClient(t, svc)
 
-		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
 			ActionId: actionID,
 			Attempt:  1,
 		}))
@@ -792,7 +792,7 @@ func TestTailLogs(t *testing.T) {
 		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
 		client := newTailLogsTestClient(t, svc)
 
-		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
 			ActionId: actionID,
 			Attempt:  1,
 		}))
@@ -816,7 +816,7 @@ func TestTailLogs(t *testing.T) {
 		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
 		client := newTailLogsTestClient(t, svc)
 
-		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&workflow.TailLogsRequest{
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
 			ActionId: actionID,
 			Attempt:  3,
 		}))

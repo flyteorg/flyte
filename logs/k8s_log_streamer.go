@@ -18,8 +18,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
 const (
@@ -45,7 +45,7 @@ func NewK8sLogStreamer(k8sConfig *rest.Config) (*K8sLogStreamer, error) {
 }
 
 // TailLogs streams log lines for the given LogContext from a Kubernetes pod.
-func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[workflow.TailLogsResponse]) error {
 	pod, container, err := GetPrimaryPodAndContainer(logContext)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
@@ -107,8 +107,8 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 			lines = append(lines, logLine)
 
 			if len(lines) >= logBatchSize {
-				if sendErr := stream.Send(&dataproxy.TailLogsResponse{
-					Logs: []*dataproxy.TailLogsResponse_Logs{
+				if sendErr := stream.Send(&workflow.TailLogsResponse{
+					Logs: []*workflow.TailLogsResponse_Logs{
 						{Lines: lines},
 					},
 				}); sendErr != nil {
@@ -128,8 +128,8 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		// Without this, lines sit in the buffer while ReadString blocks
 		// waiting for the next newline (e.g. pod is sleeping).
 		if len(lines) > 0 && reader.Buffered() == 0 {
-			if sendErr := stream.Send(&dataproxy.TailLogsResponse{
-				Logs: []*dataproxy.TailLogsResponse_Logs{
+			if sendErr := stream.Send(&workflow.TailLogsResponse{
+				Logs: []*workflow.TailLogsResponse_Logs{
 					{Lines: lines},
 				},
 			}); sendErr != nil {
@@ -141,8 +141,8 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 
 	// Send remaining lines.
 	if len(lines) > 0 {
-		if err := stream.Send(&dataproxy.TailLogsResponse{
-			Logs: []*dataproxy.TailLogsResponse_Logs{
+		if err := stream.Send(&workflow.TailLogsResponse{
+			Logs: []*workflow.TailLogsResponse_Logs{
 				{Lines: lines},
 			},
 		}); err != nil {

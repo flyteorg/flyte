@@ -501,7 +501,7 @@ func (s *Service) GetActionData(
 }
 
 // TailLogs streams logs for an action attempt.
-func (s *Service) TailLogs(ctx context.Context, req *connect.Request[workflow.TailLogsRequest], stream *connect.ServerStream[workflow.TailLogsResponse]) error {
+func (s *Service) TailLogs(ctx context.Context, req *connect.Request[dataproxy.TailLogsRequest], stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
 	// Get log context from RunService
 	logCtxResp, err := s.runClient.GetActionLogContext(ctx, connect.NewRequest(&workflow.GetActionLogContextRequest{
 		ActionId: req.Msg.GetActionId(),

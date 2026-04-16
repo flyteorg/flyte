@@ -330,7 +330,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		enableVscode = flytek8s.IsVscodeEnabled(ctx, job.Spec.Cluster.Spec.Scheduler.Spec.Containers[0].Env)
 	}
 	input := tasklog.Input{
-		Namespace:       job.ObjectMeta.Namespace,
+		Namespace:       job.Namespace,
 		PodName:         job.Status.JobRunnerPodName,
 		TaskExecutionID: taskExecID,
 		EnableVscode:    enableVscode,
@@ -352,7 +352,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		PrimaryPodName: job.Status.JobRunnerPodName,
 		Pods: []*core.PodLogContext{
 			{
-				Namespace:            job.ObjectMeta.Namespace,
+				Namespace:            job.Namespace,
 				PodName:              job.Status.JobRunnerPodName,
 				PrimaryContainerName: defaultDaskJobRunnerPrimaryContainerName,
 				Containers: []*core.ContainerContext{
@@ -362,7 +362,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		},
 	}
 
-	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, info, job.ObjectMeta.Namespace, job.Status.JobRunnerPodName, defaultDaskJobRunnerPrimaryContainerName)
+	phaseInfo, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, info, job.Namespace, job.Status.JobRunnerPodName, defaultDaskJobRunnerPrimaryContainerName)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to demystify pod status for dask job-runner. Error: %v", err)
 	}

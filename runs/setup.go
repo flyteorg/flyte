@@ -22,8 +22,8 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/logs"
 	"github.com/flyteorg/flyte/v2/runs/scheduler"
-	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/runs/service"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
