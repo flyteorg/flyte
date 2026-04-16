@@ -390,29 +390,16 @@ func WithAuditFields(ctx context.Context, subject string, clientIds []string, to
 func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationContext) HTTPRequestToMetadataAnnotator {
 	return func(ctx context.Context, request *http.Request) metadata.MD {
 		// TODO: Improve error handling
-		idToken, accessToken, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
-
-		// Prefer access token when available. The downstream auth interceptor tries
-		// Bearer first via ValidateAccessToken → verifyClaims, which resolves
-		// identitytype from identityTypeClaimsForApps. This is required for the /me
-		// auth subrequest to return X-User-Claim-Identitytype to nginx.
-		// Falls back to ID token if no access token.
-		token := idToken
-		scheme := IDTokenScheme
-		if len(accessToken) > 0 {
-			token = accessToken
-			scheme = BearerScheme
-		}
-
-		// TODO: Remove temporary debug logging after Entra ID identity resolution is verified.
-		logger.Infof(ctx, "[/me debug] idToken present: %v, accessToken present: %v, using scheme: %s, requestURI: %s",
-			len(idToken) > 0, len(accessToken) > 0, scheme, request.RequestURI)
-
-		if len(token) == 0 {
+		idToken, _, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+		if len(idToken) == 0 {
 			// If no token was found in the cookies, look for an authorization header, starting with a potentially
 			// custom header set in the Config object
 			if len(authCtx.Options().HTTPAuthorizationHeader) > 0 {
 				header := authCtx.Options().HTTPAuthorizationHeader
+				// TODO: There may be a potential issue here when running behind a service mesh that uses the default Authorization
+				//       header. The grpc-gateway code will automatically translate the 'Authorization' header into the appropriate
+				//       metadata object so if two different tokens are presented, one with the default name and one with the
+				//       custom name, AuthFromMD will find the wrong one.
 				return metadata.MD{
 					DefaultAuthorizationHeader: []string{request.Header.Get(header)},
 				}
@@ -422,8 +409,9 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			return nil
 		}
 
+		// IDtoken is injected into grpc authorization metadata
 		meta := metadata.MD{
-			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", scheme, token)},
+			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", IDTokenScheme, idToken)},
 		}
 
 		userInfo, err := authCtx.CookieManager().RetrieveUserInfo(ctx, request)
@@ -434,11 +422,13 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 		raw, err := json.Marshal(userInfo)
 		if err != nil {
 			logger.Infof(ctx, "Failed to marshal user info. Ignoring. Error: %v", err)
+
 		}
 
 		if len(raw) > 0 {
 			logger.Debugf(ctx, "Setting user info cookie [%s]", string(raw))
 			meta.Set(UserInfoMDKey, string(raw))
+
 		}
 
 		return meta
@@ -513,7 +503,6 @@ func GetHTTPRefreshedRequestCookieToMetadataHandler(authCtx interfaces.Authentic
 			rawUserInfoStr = string(rawUserInfo)
 		}
 
-		// IDtoken is injected into grpc authorization metadata
 		// IDtoken is injected into grpc authorization metadata
 		meta.Set(DefaultAuthorizationHeader, fmt.Sprintf("%s %s", IDTokenScheme, idToken))
 
@@ -701,13 +690,6 @@ func GetUserInfoForwardResponseHandler() ForwardResponseHandler {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			if info.AdditionalClaims != nil {
-				// TODO: Remove temporary debug logging after Entra ID identity resolution is verified.
-				claimNames := make([]string, 0, len(info.AdditionalClaims.GetFields()))
-				for k := range info.AdditionalClaims.GetFields() {
-					claimNames = append(claimNames, k)
-				}
-				logger.Infof(ctx, "[/me debug] UserInfoResponse claims present: %v, subject: %s", claimNames, info.Subject)
-
 				for k, v := range info.AdditionalClaims.GetFields() {
 					jsonBytes, err := v.MarshalJSON()
 					if err != nil {
@@ -720,14 +702,6 @@ func GetUserInfoForwardResponseHandler() ForwardResponseHandler {
 			}
 			w.Header().Set("X-User-Subject", info.Subject)
 		}
-
-		// Forward the bearer token for external authorization. The grpc-gateway
-		// client path (RegisterHandlerFromEndpoint) stores annotator metadata
-		// as outgoing context via AnnotateContext → NewOutgoingContext.
-		if token := metautils.ExtractOutgoing(ctx).Get(DefaultAuthorizationHeader); token != "" {
-			w.Header().Set(UserTokenHeader, token)
-		}
-
 		return nil
 	}
 }
