@@ -390,8 +390,21 @@ func WithAuditFields(ctx context.Context, subject string, clientIds []string, to
 func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationContext) HTTPRequestToMetadataAnnotator {
 	return func(ctx context.Context, request *http.Request) metadata.MD {
 		// TODO: Improve error handling
-		idToken, _, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
-		if len(idToken) == 0 {
+		idToken, accessToken, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+
+		// Prefer access token when available. The downstream auth interceptor tries
+		// Bearer first via ValidateAccessToken → verifyClaims, which resolves
+		// identitytype from identityTypeClaimsForApps. This is required for the /me
+		// auth subrequest to return X-User-Claim-Identitytype to nginx.
+		// Falls back to ID token if no access token.
+		token := idToken
+		scheme := IDTokenScheme
+		if len(accessToken) > 0 {
+			token = accessToken
+			scheme = BearerScheme
+		}
+
+		if len(token) == 0 {
 			// If no token was found in the cookies, look for an authorization header, starting with a potentially
 			// custom header set in the Config object
 			if len(authCtx.Options().HTTPAuthorizationHeader) > 0 {
@@ -405,9 +418,8 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			return nil
 		}
 
-		// IDtoken is injected into grpc authorization metadata
 		meta := metadata.MD{
-			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", IDTokenScheme, idToken)},
+			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", scheme, token)},
 		}
 
 		userInfo, err := authCtx.CookieManager().RetrieveUserInfo(ctx, request)
