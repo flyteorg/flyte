@@ -17,8 +17,10 @@ class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     ARTIFACT_TYPE_UNSPECIFIED: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
+    ARTIFACT_TYPE_CODE_BUNDLE: _ClassVar[ArtifactType]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
+ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
