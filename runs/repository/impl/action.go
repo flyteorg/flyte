@@ -513,7 +513,12 @@ func (r *actionRepo) insertAbortEvent(ctx context.Context, actionID *common.Acti
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
 		attempts, int32(common.ActionPhase_ACTION_PHASE_ABORTED), info, now,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	// Notify after the event is written so WatchActionDetails sees it when it re-fetches.
+	r.notifyActionUpdate(ctx, actionID)
+	return nil
 }
 
 // ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).

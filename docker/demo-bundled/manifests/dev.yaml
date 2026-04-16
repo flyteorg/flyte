@@ -357,7 +357,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  root-password: eDlxRWpkVUh1TA==
+  root-password: UE5CVFV3NFlWaA==
   root-user: YWRtaW4=
 kind: Secret
 metadata:
@@ -740,7 +740,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/credentials-secret: 3a3d603fbe8175a402767b322dd849f1cd7768ab92b1a995877db1731889ce28
+        checksum/credentials-secret: 461ff2fb69f8a3fe29a90caf76a71cb0e0c5fb57b7e11b74b88c8e9efb4624df
       labels:
         app.kubernetes.io/instance: flyte-demo
         app.kubernetes.io/managed-by: Helm

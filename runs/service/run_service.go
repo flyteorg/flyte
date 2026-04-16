@@ -722,6 +722,22 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_ABORTED
 }
 
+// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
+// terminal phase. Used by WatchActionDetails to close the stream only after action_events
+// reflects the terminal transition, not just the actions table.
+func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+	if len(attempts) == 0 {
+		return false
+	}
+	var last *workflow.ActionAttempt
+	for _, a := range attempts {
+		if last == nil || a.GetAttempt() > last.GetAttempt() {
+			last = a
+		}
+	}
+	return IsTerminalPhase(last.GetPhase())
+}
+
 // GetActionData gets input and output data for an action by reading from storage.
 func (s *RunService) GetActionData(
 	ctx context.Context,
@@ -1087,8 +1103,8 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// If the action is already in a terminal phase, no further updates are expected.
-	if IsTerminalPhase(details.GetStatus().GetPhase()) {
+	// Close only once action_events reflects the terminal phase, not just actions table.
+	if lastAttemptIsTerminal(details.GetAttempts()) {
 		return nil
 	}
 
@@ -1116,8 +1132,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close the stream once the action reaches a terminal phase.
-			if IsTerminalPhase(details.GetStatus().GetPhase()) {
+			// Close once action_events reflects the terminal phase.
+			if lastAttemptIsTerminal(details.GetAttempts()) {
 				return nil
 			}
 		}
