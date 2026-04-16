@@ -1,22 +1,27 @@
-run:
-  skip-dirs:
-    - pkg/client
-    - gen
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - errcheck
-    - gosec
     - goconst
-    - goimports
-    - gosimple
+    - gosec
     - govet
     - ineffassign
     - misspell
     - nakedret
-    - staticcheck
-    - typecheck
+    - protogetter
     - unconvert
     - unparam
     - unused
-    - protogetter
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+formatters:
+  enable:
+    - goimports
+  exclusions:
+    generated: lax

@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 // Shared test code values.
 package tests
