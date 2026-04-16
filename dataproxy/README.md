@@ -10,11 +10,9 @@ to request URLs for uploading/downloading data to any data storage you have.
 
 ## Quick Start
 
-For local development, see [DEVELOPMENT.md](DEVELOPMENT.md) for detailed steps on setting up MinIO and running the service locally.
-
 For production deployment:
 
-1. Configure your storage backend (S3, MinIO, GCS, etc.)
+1. Configure your storage backend (S3, RustFS, GCS, etc.)
 2. Create a configuration file based on `config/config.example.yaml`
 3. Run the service:
 
@@ -42,7 +40,7 @@ The data proxy service uses a YAML configuration file. See [config.example.yaml]
 
 | Field | Description | Options |
 |-------|-------------|---------|
-| `storage.type` | Storage backend type | `s3`, `minio`, `local`, `mem`, `stow` |
+| `storage.type` | Storage backend type | `s3`, `stow`, `local`, `mem` |
 | `storage.container` | Initial bucket/container name | - |
 | `storage.enable-multicontainer` | Allow access to multiple buckets | `true`/`false` |
 | `storage.connection.endpoint` | Storage endpoint URL | - |
@@ -52,21 +50,23 @@ The data proxy service uses a YAML configuration file. See [config.example.yaml]
 | `storage.connection.region` | Storage region | `us-east-1` |
 | `storage.connection.disable-ssl` | Disable SSL (for local dev only) | `true`/`false` |
 
-### MinIO-Specific Configuration
+### RustFS Configuration
 
-For MinIO, use the following configuration:
+For RustFS (used in local development and sandbox):
 
 ```yaml
 storage:
-  type: minio
+  type: stow
   container: "flyte-data"
-  connection:
-    endpoint: "http://minio.flyte-dataproxy.svc.cluster.local:9000"
-    auth-type: accesskey
-    access-key: "minioadmin"
-    secret-key: "minioadmin"
-    region: "us-east-1"
-    disable-ssl: true
+  stow:
+    kind: s3
+    config:
+      auth_type: accesskey
+      access_key_id: "rustfs"
+      secret_key: "rustfsstorage"
+      endpoint: "http://rustfs.flyte-dataproxy.svc.cluster.local:9000"
+      region: "us-east-1"
+      disable_ssl: "true"
 ```
 
 ### S3-Compatible Storage
@@ -75,60 +75,33 @@ For AWS S3 or S3-compatible storage:
 
 ```yaml
 storage:
-  type: s3
+  type: stow
   container: "my-flyte-bucket"
-  connection:
-    auth-type: iam  # Use IAM roles
-    region: "us-west-2"
-    disable-ssl: false
+  stow:
+    kind: s3
+    config:
+      auth_type: iam
+      region: "us-west-2"
 ```
-
-## Architecture
-
-```
-┌─────────────────┐
-│   Flyte Client  │
-└────────┬────────┘
-         │ Request signed URL
-         │
-         ▼
-┌─────────────────┐      ┌──────────────────┐
-│   Data Proxy    │─────▶│  MinIO/S3 API    │
-│   (Control      │      │  (Data Plane)    │
-│    Plane)       │◀─────│                  │
-└─────────────────┘      └──────────────────┘
-         │                        ▲
-         │ Return signed URL      │
-         │                        │
-         ▼                        │
-┌─────────────────┐               │
-│   Flyte Client  │───────────────┘
-└─────────────────┘    Upload/Download
-                       using signed URL
-```
-
-## Development
-
-For local development and testing, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Troubleshooting
 
-### MinIO Connection Issues
+### RustFS Connection Issues
 
-1. **Check MinIO is running:**
+1. **Check RustFS is running:**
    ```bash
-   kubectl get pods -n flyte-dataproxy
+   kubectl get pods -n <your_namespace>
    ```
 
-2. **Check MinIO logs:**
+2. **Check RustFS logs:**
    ```bash
-   kubectl logs -n flyte-dataproxy -l app=minio
+   kubectl logs -n <your_namespace> -l app=rustfs
    ```
 
 3. **Verify network connectivity:**
    ```bash
    kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
-     curl http://minio.flyte-dataproxy.svc.cluster.local:9000/minio/health/live
+     curl http://rustfs.flyte-dataproxy.svc.cluster.local:9000
    ```
 
 ### Data Proxy Service Issues
@@ -146,7 +119,7 @@ For local development and testing, see [DEVELOPMENT.md](DEVELOPMENT.md).
    ```
 
 3. **Common errors:**
-   - `connection refused`: MinIO service not reachable
+   - `connection refused`: RustFS service not reachable
    - `access denied`: Invalid credentials
    - `bucket not found`: Container doesn't exist (enable auto-creation or create manually)
 
@@ -154,7 +127,7 @@ For local development and testing, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 For production use:
 
-1. **Use a production-grade storage backend** (AWS S3, GCS, Azure Blob Storage, or MinIO in distributed mode)
+1. **Use a production-grade storage backend** (AWS S3, GCS, Azure Blob Storage, or RustFS in distributed mode)
 2. **Enable TLS/SSL** for all connections
 3. **Use IAM roles** instead of static credentials when possible
 4. **Configure resource limits** and proper scaling
