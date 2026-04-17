@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl2.org;
+package flyteidl2.settings;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
@@ -149,35 +149,35 @@ message QuantitySetting {
 
 // RunSettings controls workflow execution behavior.
 message RunSettings {
-  StringSetting default_queue = 1 [(flyteidl2.org.desc) = "Default queue for task runs"];
-  Int64Setting run_concurrency = 2 [(flyteidl2.org.desc) = "Maximum number of concurrent runs. 0 means unlimited."];
-  Int64Setting action_concurrency = 3 [(flyteidl2.org.desc) = "Maximum number of concurrent actions per run. 0 means unlimited."];
+  StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
+  Int64Setting run_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of concurrent runs. 0 means unlimited."];
+  Int64Setting action_concurrency = 3 [(flyteidl2.settings.desc) = "Maximum number of concurrent actions per run. 0 means unlimited."];
 }
 
 // SecuritySettings controls security-related configuration.
 message SecuritySettings {
-  StringSetting service_account = 1 [(flyteidl2.org.desc) = "Kubernetes service account for task pods"];
+  StringSetting service_account = 1 [(flyteidl2.settings.desc) = "Kubernetes service account for task pods"];
 }
 
 // StorageSettings controls data storage configuration.
 message StorageSettings {
-  StringSetting raw_data_path = 1 [(flyteidl2.org.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
+  StringSetting raw_data_path = 1 [(flyteidl2.settings.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
 }
 
 // TaskResourceDefaults holds resource quantity settings for a single bound
 // (min or max) across all supported resource dimensions.
 message TaskResourceDefaults {
-  QuantitySetting cpu = 1 [(flyteidl2.org.desc) = "CPU resource quantity (e.g. \"500m\", \"2\")"];
-  QuantitySetting gpu = 2 [(flyteidl2.org.desc) = "GPU resource quantity (e.g. \"1\")"];
-  QuantitySetting memory = 3 [(flyteidl2.org.desc) = "Memory resource quantity (e.g. \"256Mi\", \"4Gi\")"];
-  QuantitySetting storage = 4 [(flyteidl2.org.desc) = "Ephemeral storage quantity (e.g. \"10Gi\")"];
+  QuantitySetting cpu = 1 [(flyteidl2.settings.desc) = "CPU resource quantity (e.g. \"500m\", \"2\")"];
+  QuantitySetting gpu = 2 [(flyteidl2.settings.desc) = "GPU resource quantity (e.g. \"1\")"];
+  QuantitySetting memory = 3 [(flyteidl2.settings.desc) = "Memory resource quantity (e.g. \"256Mi\", \"4Gi\")"];
+  QuantitySetting storage = 4 [(flyteidl2.settings.desc) = "Ephemeral storage quantity (e.g. \"10Gi\")"];
 }
 
 // TaskResourceSettings controls task resource configuration.
 message TaskResourceSettings {
-  TaskResourceDefaults min = 1 [(flyteidl2.org.desc) = "Minimum resource requests applied to task pods"];
-  TaskResourceDefaults max = 2 [(flyteidl2.org.desc) = "Maximum resource limits applied to task pods"];
-  BoolSetting mirror_limits_request = 3 [(flyteidl2.org.desc) = "When true, resource limits mirror requests"];
+  TaskResourceDefaults min = 1 [(flyteidl2.settings.desc) = "Minimum resource requests applied to task pods"];
+  TaskResourceDefaults max = 2 [(flyteidl2.settings.desc) = "Maximum resource limits applied to task pods"];
+  BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
 }
 
 // Settings holds all configurable settings for a scope.
@@ -186,7 +186,7 @@ message Settings {
   SecuritySettings security = 2;
   StorageSettings storage = 3;
   TaskResourceSettings task_resource = 4;
-  StringListSetting labels = 5 [(flyteidl2.org.desc) = "Kubernetes labels applied to task pods. Additive across scopes."];
-  StringMapSetting annotations = 6 [(flyteidl2.org.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
-  StringMapSetting environment_variables = 7 [(flyteidl2.org.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
+  StringListSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Additive across scopes."];
+  StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
+  StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
 }

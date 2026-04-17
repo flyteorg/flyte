@@ -4,7 +4,6 @@ package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
-import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/workflow/run_definition.proto";
 

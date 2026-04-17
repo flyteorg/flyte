@@ -12,10 +12,9 @@ _sym_db = _symbol_database.Default()
 
 
 from flyteidl2.cluster import payload_pb2 as flyteidl2_dot_cluster_dot_payload__pb2
-from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1f\x66lyteidl2/cluster/service.proto\x12\x11\x66lyteidl2.cluster\x1a\x1f\x66lyteidl2/cluster/payload.proto\x1a\x1cgoogle/api/annotations.proto2v\n\x0e\x43lusterService\x12\x64\n\rSelectCluster\x12\'.flyteidl2.cluster.SelectClusterRequest\x1a(.flyteidl2.cluster.SelectClusterResponse\"\x00\x42\xc3\x01\n\x15\x63om.flyteidl2.clusterB\x0cServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster\xa2\x02\x03\x46\x43X\xaa\x02\x11\x46lyteidl2.Cluster\xca\x02\x11\x46lyteidl2\\Cluster\xe2\x02\x1d\x46lyteidl2\\Cluster\\GPBMetadata\xea\x02\x12\x46lyteidl2::Clusterb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1f\x66lyteidl2/cluster/service.proto\x12\x11\x66lyteidl2.cluster\x1a\x1f\x66lyteidl2/cluster/payload.proto2v\n\x0e\x43lusterService\x12\x64\n\rSelectCluster\x12\'.flyteidl2.cluster.SelectClusterRequest\x1a(.flyteidl2.cluster.SelectClusterResponse\"\x00\x42\xc3\x01\n\x15\x63om.flyteidl2.clusterB\x0cServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster\xa2\x02\x03\x46\x43X\xaa\x02\x11\x46lyteidl2.Cluster\xca\x02\x11\x46lyteidl2\\Cluster\xe2\x02\x1d\x46lyteidl2\\Cluster\\GPBMetadata\xea\x02\x12\x46lyteidl2::Clusterb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,6 +22,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.cluster.service_p
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\025com.flyteidl2.clusterB\014ServiceProtoH\002P\001Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster\242\002\003FCX\252\002\021Flyteidl2.Cluster\312\002\021Flyteidl2\\Cluster\342\002\035Flyteidl2\\Cluster\\GPBMetadata\352\002\022Flyteidl2::Cluster'
-  _globals['_CLUSTERSERVICE']._serialized_start=117
-  _globals['_CLUSTERSERVICE']._serialized_end=235
+  _globals['_CLUSTERSERVICE']._serialized_start=87
+  _globals['_CLUSTERSERVICE']._serialized_end=205
 # @@protoc_insertion_point(module_scope)

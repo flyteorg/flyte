@@ -1,14 +1,15 @@
 // @generated
 /// Generated client implementations.
-pub mod domain_service_client {
+pub mod settings_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    ///
     #[derive(Debug, Clone)]
-    pub struct DomainServiceClient<T> {
+    pub struct SettingsServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl DomainServiceClient<tonic::transport::Channel> {
+    impl SettingsServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -19,7 +20,7 @@ pub mod domain_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> DomainServiceClient<T>
+    impl<T> SettingsServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -37,7 +38,7 @@ pub mod domain_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> DomainServiceClient<InterceptedService<T, F>>
+        ) -> SettingsServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -51,7 +52,7 @@ pub mod domain_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            DomainServiceClient::new(InterceptedService::new(inner, interceptor))
+            SettingsServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -84,11 +85,14 @@ pub mod domain_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn list_domains(
+        /** GetSettings returns resolved effective settings at the scope implied by
+ the key, incorporating inherited values from parent scopes.
+*/
+        pub async fn get_settings(
             &mut self,
-            request: impl tonic::IntoRequest<super::ListDomainsRequest>,
+            request: impl tonic::IntoRequest<super::GetSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ListDomainsResponse>,
+            tonic::Response<super::GetSettingsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -102,18 +106,24 @@ pub mod domain_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.DomainService/ListDomains",
+                "/flyteidl2.settings.SettingsService/GetSettings",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.org.DomainService", "ListDomains"));
+                .insert(
+                    GrpcMethod::new("flyteidl2.settings.SettingsService", "GetSettings"),
+                );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn create_domain(
+        /** GetSettingsForEdit returns unmerged settings at all scope levels,
+ for use in an edit form. One SettingsRecord per level, ordered broadest
+ to most specific.
+*/
+        pub async fn get_settings_for_edit(
             &mut self,
-            request: impl tonic::IntoRequest<super::CreateDomainRequest>,
+            request: impl tonic::IntoRequest<super::GetSettingsForEditRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateDomainResponse>,
+            tonic::Response<super::GetSettingsForEditResponse>,
             tonic::Status,
         > {
             self.inner
@@ -127,18 +137,26 @@ pub mod domain_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.DomainService/CreateDomain",
+                "/flyteidl2.settings.SettingsService/GetSettingsForEdit",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.org.DomainService", "CreateDomain"));
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.settings.SettingsService",
+                        "GetSettingsForEdit",
+                    ),
+                );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_domain(
+        /** CreateSettings creates a new settings record at the scope implied by the key.
+ Fails if a record already exists at that scope.
+*/
+        pub async fn create_settings(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetDomainRequest>,
+            request: impl tonic::IntoRequest<super::CreateSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetDomainResponse>,
+            tonic::Response<super::CreateSettingsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -152,18 +170,26 @@ pub mod domain_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.DomainService/GetDomain",
+                "/flyteidl2.settings.SettingsService/CreateSettings",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.org.DomainService", "GetDomain"));
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.settings.SettingsService",
+                        "CreateSettings",
+                    ),
+                );
             self.inner.unary(req, path, codec).await
         }
-        pub async fn update_domain(
+        /** UpdateSettings upserts strongly-typed settings at the scope implied by
+ the key. Uses optimistic locking via the version field.
+*/
+        pub async fn update_settings(
             &mut self,
-            request: impl tonic::IntoRequest<super::UpdateDomainRequest>,
+            request: impl tonic::IntoRequest<super::UpdateSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::UpdateDomainResponse>,
+            tonic::Response<super::UpdateSettingsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -177,92 +203,79 @@ pub mod domain_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.DomainService/UpdateDomain",
+                "/flyteidl2.settings.SettingsService/UpdateSettings",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.org.DomainService", "UpdateDomain"));
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn delete_domain(
-            &mut self,
-            request: impl tonic::IntoRequest<super::DeleteDomainRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::DeleteDomainResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.org.DomainService/DeleteDomain",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl2.org.DomainService", "DeleteDomain"));
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.settings.SettingsService",
+                        "UpdateSettings",
+                    ),
+                );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod domain_service_server {
+pub mod settings_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with DomainServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with SettingsServiceServer.
     #[async_trait]
-    pub trait DomainService: Send + Sync + 'static {
-        async fn list_domains(
+    pub trait SettingsService: Send + Sync + 'static {
+        /** GetSettings returns resolved effective settings at the scope implied by
+ the key, incorporating inherited values from parent scopes.
+*/
+        async fn get_settings(
             &self,
-            request: tonic::Request<super::ListDomainsRequest>,
+            request: tonic::Request<super::GetSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ListDomainsResponse>,
+            tonic::Response<super::GetSettingsResponse>,
             tonic::Status,
         >;
-        async fn create_domain(
+        /** GetSettingsForEdit returns unmerged settings at all scope levels,
+ for use in an edit form. One SettingsRecord per level, ordered broadest
+ to most specific.
+*/
+        async fn get_settings_for_edit(
             &self,
-            request: tonic::Request<super::CreateDomainRequest>,
+            request: tonic::Request<super::GetSettingsForEditRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::CreateDomainResponse>,
+            tonic::Response<super::GetSettingsForEditResponse>,
             tonic::Status,
         >;
-        async fn get_domain(
+        /** CreateSettings creates a new settings record at the scope implied by the key.
+ Fails if a record already exists at that scope.
+*/
+        async fn create_settings(
             &self,
-            request: tonic::Request<super::GetDomainRequest>,
+            request: tonic::Request<super::CreateSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::GetDomainResponse>,
+            tonic::Response<super::CreateSettingsResponse>,
             tonic::Status,
         >;
-        async fn update_domain(
+        /** UpdateSettings upserts strongly-typed settings at the scope implied by
+ the key. Uses optimistic locking via the version field.
+*/
+        async fn update_settings(
             &self,
-            request: tonic::Request<super::UpdateDomainRequest>,
+            request: tonic::Request<super::UpdateSettingsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::UpdateDomainResponse>,
-            tonic::Status,
-        >;
-        async fn delete_domain(
-            &self,
-            request: tonic::Request<super::DeleteDomainRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::DeleteDomainResponse>,
+            tonic::Response<super::UpdateSettingsResponse>,
             tonic::Status,
         >;
     }
+    ///
     #[derive(Debug)]
-    pub struct DomainServiceServer<T: DomainService> {
+    pub struct SettingsServiceServer<T: SettingsService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: DomainService> DomainServiceServer<T> {
+    impl<T: SettingsService> SettingsServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -313,9 +326,9 @@ pub mod domain_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for DomainServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for SettingsServiceServer<T>
     where
-        T: DomainService,
+        T: SettingsService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -330,25 +343,25 @@ pub mod domain_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.org.DomainService/ListDomains" => {
+                "/flyteidl2.settings.SettingsService/GetSettings" => {
                     #[allow(non_camel_case_types)]
-                    struct ListDomainsSvc<T: DomainService>(pub Arc<T>);
+                    struct GetSettingsSvc<T: SettingsService>(pub Arc<T>);
                     impl<
-                        T: DomainService,
-                    > tonic::server::UnaryService<super::ListDomainsRequest>
-                    for ListDomainsSvc<T> {
-                        type Response = super::ListDomainsResponse;
+                        T: SettingsService,
+                    > tonic::server::UnaryService<super::GetSettingsRequest>
+                    for GetSettingsSvc<T> {
+                        type Response = super::GetSettingsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ListDomainsRequest>,
+                            request: tonic::Request<super::GetSettingsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DomainService>::list_domains(&inner, request).await
+                                <T as SettingsService>::get_settings(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -359,7 +372,7 @@ pub mod domain_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = ListDomainsSvc(inner);
+                        let method = GetSettingsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -375,25 +388,29 @@ pub mod domain_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.org.DomainService/CreateDomain" => {
+                "/flyteidl2.settings.SettingsService/GetSettingsForEdit" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateDomainSvc<T: DomainService>(pub Arc<T>);
+                    struct GetSettingsForEditSvc<T: SettingsService>(pub Arc<T>);
                     impl<
-                        T: DomainService,
-                    > tonic::server::UnaryService<super::CreateDomainRequest>
-                    for CreateDomainSvc<T> {
-                        type Response = super::CreateDomainResponse;
+                        T: SettingsService,
+                    > tonic::server::UnaryService<super::GetSettingsForEditRequest>
+                    for GetSettingsForEditSvc<T> {
+                        type Response = super::GetSettingsForEditResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CreateDomainRequest>,
+                            request: tonic::Request<super::GetSettingsForEditRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DomainService>::create_domain(&inner, request).await
+                                <T as SettingsService>::get_settings_for_edit(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -404,7 +421,7 @@ pub mod domain_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = CreateDomainSvc(inner);
+                        let method = GetSettingsForEditSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -420,25 +437,26 @@ pub mod domain_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.org.DomainService/GetDomain" => {
+                "/flyteidl2.settings.SettingsService/CreateSettings" => {
                     #[allow(non_camel_case_types)]
-                    struct GetDomainSvc<T: DomainService>(pub Arc<T>);
+                    struct CreateSettingsSvc<T: SettingsService>(pub Arc<T>);
                     impl<
-                        T: DomainService,
-                    > tonic::server::UnaryService<super::GetDomainRequest>
-                    for GetDomainSvc<T> {
-                        type Response = super::GetDomainResponse;
+                        T: SettingsService,
+                    > tonic::server::UnaryService<super::CreateSettingsRequest>
+                    for CreateSettingsSvc<T> {
+                        type Response = super::CreateSettingsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetDomainRequest>,
+                            request: tonic::Request<super::CreateSettingsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DomainService>::get_domain(&inner, request).await
+                                <T as SettingsService>::create_settings(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -449,7 +467,7 @@ pub mod domain_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = GetDomainSvc(inner);
+                        let method = CreateSettingsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -465,25 +483,26 @@ pub mod domain_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.org.DomainService/UpdateDomain" => {
+                "/flyteidl2.settings.SettingsService/UpdateSettings" => {
                     #[allow(non_camel_case_types)]
-                    struct UpdateDomainSvc<T: DomainService>(pub Arc<T>);
+                    struct UpdateSettingsSvc<T: SettingsService>(pub Arc<T>);
                     impl<
-                        T: DomainService,
-                    > tonic::server::UnaryService<super::UpdateDomainRequest>
-                    for UpdateDomainSvc<T> {
-                        type Response = super::UpdateDomainResponse;
+                        T: SettingsService,
+                    > tonic::server::UnaryService<super::UpdateSettingsRequest>
+                    for UpdateSettingsSvc<T> {
+                        type Response = super::UpdateSettingsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::UpdateDomainRequest>,
+                            request: tonic::Request<super::UpdateSettingsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as DomainService>::update_domain(&inner, request).await
+                                <T as SettingsService>::update_settings(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -494,52 +513,7 @@ pub mod domain_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = UpdateDomainSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.org.DomainService/DeleteDomain" => {
-                    #[allow(non_camel_case_types)]
-                    struct DeleteDomainSvc<T: DomainService>(pub Arc<T>);
-                    impl<
-                        T: DomainService,
-                    > tonic::server::UnaryService<super::DeleteDomainRequest>
-                    for DeleteDomainSvc<T> {
-                        type Response = super::DeleteDomainResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::DeleteDomainRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as DomainService>::delete_domain(&inner, request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = DeleteDomainSvc(inner);
+                        let method = UpdateSettingsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -573,7 +547,7 @@ pub mod domain_service_server {
             }
         }
     }
-    impl<T: DomainService> Clone for DomainServiceServer<T> {
+    impl<T: SettingsService> Clone for SettingsServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -585,7 +559,7 @@ pub mod domain_service_server {
             }
         }
     }
-    impl<T: DomainService> tonic::server::NamedService for DomainServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.org.DomainService";
+    impl<T: SettingsService> tonic::server::NamedService for SettingsServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.settings.SettingsService";
     }
 }

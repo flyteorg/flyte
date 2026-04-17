@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -34,6 +35,7 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
@@ -43,6 +45,27 @@ type fakeEventsClient struct{}
 
 func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
 	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+// recordingEventsClient captures all recorded ActionEvents for assertion in tests.
+type recordingEventsClient struct {
+	mu     sync.Mutex
+	events []*workflow.ActionEvent
+}
+
+func (r *recordingEventsClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.events = append(r.events, req.Msg.GetEvents()...)
+	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]*workflow.ActionEvent, len(r.events))
+	copy(out, r.events)
+	return out
 }
 
 // buildTaskTemplateBytes creates a minimal protobuf-serialized TaskTemplate
@@ -282,6 +305,77 @@ var _ = Describe("TaskAction Controller", func() {
 				},
 			}
 			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+	})
+
+	Context("When a TaskAction is deleted (abort flow)", func() {
+		const abortResourceName = "abort-test-resource"
+
+		ctx := context.Background()
+
+		typeNamespacedName := types.NamespacedName{
+			Name:      abortResourceName,
+			Namespace: "default",
+		}
+
+		BeforeEach(func() {
+			resource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       abortResourceName,
+					Namespace:  "default",
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "abort-run",
+					Project:       "abort-project",
+					Domain:        "abort-domain",
+					ActionName:    "abort-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "python-task",
+					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
+		})
+
+		AfterEach(func() {
+			resource := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, typeNamespacedName, resource)
+			if err == nil {
+				resource.Finalizers = nil
+				Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+			}
+		})
+
+		It("should emit an ACTION_PHASE_ABORTED event before removing the finalizer", func() {
+			recorder := &recordingEventsClient{}
+			reconciler := &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       record.NewFakeRecorder(10),
+				PluginRegistry: pluginRegistry,
+				DataStore:      dataStore,
+				eventsClient:   recorder,
+			}
+
+			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: typeNamespacedName})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(BeZero())
+
+			// Finalizer should have been removed — object is gone.
+			deleted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, typeNamespacedName, deleted)).NotTo(Succeed())
+
+			// An ABORTED event must have been emitted.
+			recorded := recorder.RecordedEvents()
+			Expect(recorded).NotTo(BeEmpty())
+			phases := make([]interface{}, len(recorded))
+			for i, e := range recorded {
+				phases[i] = e.GetPhase()
+			}
+			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
 		})
 	})
 

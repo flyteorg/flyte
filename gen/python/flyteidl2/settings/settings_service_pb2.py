@@ -15,14 +15,14 @@ from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.settings import settings_definition_pb2 as flyteidl2_dot_settings_dot_settings__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/settings/settings_service.proto\x12\rflyteidl2.org\x1a\x1b\x62uf/validate/validate.proto\x1a,flyteidl2/settings/settings_definition.proto\"\x8d\x01\n\x0eSettingsRecord\x12,\n\x03key\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyR\x03key\x12\x33\n\x08settings\x18\x02 \x01(\x0b\x32\x17.flyteidl2.org.SettingsR\x08settings\x12\x18\n\x07version\x18\x03 \x01(\x04R\x07version\"J\n\x12GetSettingsRequest\x12\x34\n\x03key\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\"\\\n\x13GetSettingsResponse\x12\x45\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.org.SettingsRecordR\x0esettingsRecord\"Q\n\x19GetSettingsForEditRequest\x12\x34\n\x03key\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\"\x93\x01\n\x1aGetSettingsForEditResponse\x12>\n\x0crequestedKey\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyR\x0crequestedKey\x12\x35\n\x06levels\x18\x02 \x03(\x0b\x32\x1d.flyteidl2.org.SettingsRecordR\x06levels\"\x8a\x01\n\x15\x43reateSettingsRequest\x12\x34\n\x03key\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12;\n\x08settings\x18\x02 \x01(\x0b\x32\x17.flyteidl2.org.SettingsB\x06\xbaH\x03\xc8\x01\x01R\x08settings\"_\n\x16\x43reateSettingsResponse\x12\x45\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.org.SettingsRecordR\x0esettingsRecord\"\xa4\x01\n\x15UpdateSettingsRequest\x12\x34\n\x03key\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.org.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12;\n\x08settings\x18\x02 \x01(\x0b\x32\x17.flyteidl2.org.SettingsB\x06\xbaH\x03\xc8\x01\x01R\x08settings\x12\x18\n\x07version\x18\x03 \x01(\x04R\x07version\"_\n\x16UpdateSettingsResponse\x12\x45\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.org.SettingsRecordR\x0esettingsRecord2\x9e\x03\n\x0fSettingsService\x12Y\n\x0bGetSettings\x12!.flyteidl2.org.GetSettingsRequest\x1a\".flyteidl2.org.GetSettingsResponse\"\x03\x90\x02\x01\x12n\n\x12GetSettingsForEdit\x12(.flyteidl2.org.GetSettingsForEditRequest\x1a).flyteidl2.org.GetSettingsForEditResponse\"\x03\x90\x02\x01\x12_\n\x0e\x43reateSettings\x12$.flyteidl2.org.CreateSettingsRequest\x1a%.flyteidl2.org.CreateSettingsResponse\"\x00\x12_\n\x0eUpdateSettings\x12$.flyteidl2.org.UpdateSettingsRequest\x1a%.flyteidl2.org.UpdateSettingsResponse\"\x00\x42\xb8\x01\n\x11\x63om.flyteidl2.orgB\x14SettingsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings\xa2\x02\x03\x46OX\xaa\x02\rFlyteidl2.Org\xca\x02\rFlyteidl2\\Org\xe2\x02\x19\x46lyteidl2\\Org\\GPBMetadata\xea\x02\x0e\x46lyteidl2::Orgb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/settings/settings_service.proto\x12\x12\x66lyteidl2.settings\x1a\x1b\x62uf/validate/validate.proto\x1a,flyteidl2/settings/settings_definition.proto\"\x97\x01\n\x0eSettingsRecord\x12\x31\n\x03key\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyR\x03key\x12\x38\n\x08settings\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.settings.SettingsR\x08settings\x12\x18\n\x07version\x18\x03 \x01(\x04R\x07version\"O\n\x12GetSettingsRequest\x12\x39\n\x03key\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\"a\n\x13GetSettingsResponse\x12J\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\".flyteidl2.settings.SettingsRecordR\x0esettingsRecord\"V\n\x19GetSettingsForEditRequest\x12\x39\n\x03key\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\"\x9d\x01\n\x1aGetSettingsForEditResponse\x12\x43\n\x0crequestedKey\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyR\x0crequestedKey\x12:\n\x06levels\x18\x02 \x03(\x0b\x32\".flyteidl2.settings.SettingsRecordR\x06levels\"\x94\x01\n\x15\x43reateSettingsRequest\x12\x39\n\x03key\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12@\n\x08settings\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.settings.SettingsB\x06\xbaH\x03\xc8\x01\x01R\x08settings\"d\n\x16\x43reateSettingsResponse\x12J\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\".flyteidl2.settings.SettingsRecordR\x0esettingsRecord\"\xae\x01\n\x15UpdateSettingsRequest\x12\x39\n\x03key\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.settings.SettingsKeyB\x06\xbaH\x03\xc8\x01\x01R\x03key\x12@\n\x08settings\x18\x02 \x01(\x0b\x32\x1c.flyteidl2.settings.SettingsB\x06\xbaH\x03\xc8\x01\x01R\x08settings\x12\x18\n\x07version\x18\x03 \x01(\x04R\x07version\"d\n\x16UpdateSettingsResponse\x12J\n\x0esettingsRecord\x18\x01 \x01(\x0b\x32\".flyteidl2.settings.SettingsRecordR\x0esettingsRecord2\xc6\x03\n\x0fSettingsService\x12\x63\n\x0bGetSettings\x12&.flyteidl2.settings.GetSettingsRequest\x1a\'.flyteidl2.settings.GetSettingsResponse\"\x03\x90\x02\x01\x12x\n\x12GetSettingsForEdit\x12-.flyteidl2.settings.GetSettingsForEditRequest\x1a..flyteidl2.settings.GetSettingsForEditResponse\"\x03\x90\x02\x01\x12i\n\x0e\x43reateSettings\x12).flyteidl2.settings.CreateSettingsRequest\x1a*.flyteidl2.settings.CreateSettingsResponse\"\x00\x12i\n\x0eUpdateSettings\x12).flyteidl2.settings.UpdateSettingsRequest\x1a*.flyteidl2.settings.UpdateSettingsResponse\"\x00\x42\xd1\x01\n\x16\x63om.flyteidl2.settingsB\x14SettingsServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings\xa2\x02\x03\x46SX\xaa\x02\x12\x46lyteidl2.Settings\xca\x02\x12\x46lyteidl2\\Settings\xe2\x02\x1e\x46lyteidl2\\Settings\\GPBMetadata\xea\x02\x13\x46lyteidl2::Settingsb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.settings.settings_service_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\021com.flyteidl2.orgB\024SettingsServiceProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings\242\002\003FOX\252\002\rFlyteidl2.Org\312\002\rFlyteidl2\\Org\342\002\031Flyteidl2\\Org\\GPBMetadata\352\002\016Flyteidl2::Org'
+  DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.settingsB\024SettingsServiceProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings\242\002\003FSX\252\002\022Flyteidl2.Settings\312\002\022Flyteidl2\\Settings\342\002\036Flyteidl2\\Settings\\GPBMetadata\352\002\023Flyteidl2::Settings'
   _GETSETTINGSREQUEST.fields_by_name['key']._options = None
   _GETSETTINGSREQUEST.fields_by_name['key']._serialized_options = b'\272H\003\310\001\001'
   _GETSETTINGSFOREDITREQUEST.fields_by_name['key']._options = None
@@ -39,24 +39,24 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SETTINGSSERVICE.methods_by_name['GetSettings']._serialized_options = b'\220\002\001'
   _SETTINGSSERVICE.methods_by_name['GetSettingsForEdit']._options = None
   _SETTINGSSERVICE.methods_by_name['GetSettingsForEdit']._serialized_options = b'\220\002\001'
-  _globals['_SETTINGSRECORD']._serialized_start=136
-  _globals['_SETTINGSRECORD']._serialized_end=277
-  _globals['_GETSETTINGSREQUEST']._serialized_start=279
-  _globals['_GETSETTINGSREQUEST']._serialized_end=353
-  _globals['_GETSETTINGSRESPONSE']._serialized_start=355
-  _globals['_GETSETTINGSRESPONSE']._serialized_end=447
-  _globals['_GETSETTINGSFOREDITREQUEST']._serialized_start=449
-  _globals['_GETSETTINGSFOREDITREQUEST']._serialized_end=530
-  _globals['_GETSETTINGSFOREDITRESPONSE']._serialized_start=533
-  _globals['_GETSETTINGSFOREDITRESPONSE']._serialized_end=680
-  _globals['_CREATESETTINGSREQUEST']._serialized_start=683
-  _globals['_CREATESETTINGSREQUEST']._serialized_end=821
-  _globals['_CREATESETTINGSRESPONSE']._serialized_start=823
-  _globals['_CREATESETTINGSRESPONSE']._serialized_end=918
-  _globals['_UPDATESETTINGSREQUEST']._serialized_start=921
-  _globals['_UPDATESETTINGSREQUEST']._serialized_end=1085
-  _globals['_UPDATESETTINGSRESPONSE']._serialized_start=1087
-  _globals['_UPDATESETTINGSRESPONSE']._serialized_end=1182
-  _globals['_SETTINGSSERVICE']._serialized_start=1185
-  _globals['_SETTINGSSERVICE']._serialized_end=1599
+  _globals['_SETTINGSRECORD']._serialized_start=141
+  _globals['_SETTINGSRECORD']._serialized_end=292
+  _globals['_GETSETTINGSREQUEST']._serialized_start=294
+  _globals['_GETSETTINGSREQUEST']._serialized_end=373
+  _globals['_GETSETTINGSRESPONSE']._serialized_start=375
+  _globals['_GETSETTINGSRESPONSE']._serialized_end=472
+  _globals['_GETSETTINGSFOREDITREQUEST']._serialized_start=474
+  _globals['_GETSETTINGSFOREDITREQUEST']._serialized_end=560
+  _globals['_GETSETTINGSFOREDITRESPONSE']._serialized_start=563
+  _globals['_GETSETTINGSFOREDITRESPONSE']._serialized_end=720
+  _globals['_CREATESETTINGSREQUEST']._serialized_start=723
+  _globals['_CREATESETTINGSREQUEST']._serialized_end=871
+  _globals['_CREATESETTINGSRESPONSE']._serialized_start=873
+  _globals['_CREATESETTINGSRESPONSE']._serialized_end=973
+  _globals['_UPDATESETTINGSREQUEST']._serialized_start=976
+  _globals['_UPDATESETTINGSREQUEST']._serialized_end=1150
+  _globals['_UPDATESETTINGSRESPONSE']._serialized_start=1152
+  _globals['_UPDATESETTINGSRESPONSE']._serialized_end=1252
+  _globals['_SETTINGSSERVICE']._serialized_start=1255
+  _globals['_SETTINGSSERVICE']._serialized_end=1709
 # @@protoc_insertion_point(module_scope)
