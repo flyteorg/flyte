@@ -4,6 +4,7 @@ pub mod cluster_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    ///
     #[derive(Debug, Clone)]
     pub struct ClusterServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -84,6 +85,7 @@ pub mod cluster_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
+        ///
         pub async fn select_cluster(
             &mut self,
             request: impl tonic::IntoRequest<super::SelectClusterRequest>,
@@ -120,6 +122,7 @@ pub mod cluster_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with ClusterServiceServer.
     #[async_trait]
     pub trait ClusterService: Send + Sync + 'static {
+        ///
         async fn select_cluster(
             &self,
             request: tonic::Request<super::SelectClusterRequest>,
@@ -128,6 +131,7 @@ pub mod cluster_service_server {
             tonic::Status,
         >;
     }
+    ///
     #[derive(Debug)]
     pub struct ClusterServiceServer<T: ClusterService> {
         inner: Arc<T>,

@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SettingsService_GetSettings_FullMethodName        = "/flyteidl2.org.SettingsService/GetSettings"
-	SettingsService_GetSettingsForEdit_FullMethodName = "/flyteidl2.org.SettingsService/GetSettingsForEdit"
-	SettingsService_CreateSettings_FullMethodName     = "/flyteidl2.org.SettingsService/CreateSettings"
-	SettingsService_UpdateSettings_FullMethodName     = "/flyteidl2.org.SettingsService/UpdateSettings"
+	SettingsService_GetSettings_FullMethodName        = "/flyteidl2.settings.SettingsService/GetSettings"
+	SettingsService_GetSettingsForEdit_FullMethodName = "/flyteidl2.settings.SettingsService/GetSettingsForEdit"
+	SettingsService_CreateSettings_FullMethodName     = "/flyteidl2.settings.SettingsService/CreateSettings"
+	SettingsService_UpdateSettings_FullMethodName     = "/flyteidl2.settings.SettingsService/UpdateSettings"
 )
 
 // SettingsServiceClient is the client API for SettingsService service.
@@ -211,7 +211,7 @@ func _SettingsService_UpdateSettings_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var SettingsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "flyteidl2.org.SettingsService",
+	ServiceName: "flyteidl2.settings.SettingsService",
 	HandlerType: (*SettingsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
