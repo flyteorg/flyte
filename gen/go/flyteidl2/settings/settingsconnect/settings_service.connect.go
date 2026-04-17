@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// SettingsServiceName is the fully-qualified name of the SettingsService service.
-	SettingsServiceName = "flyteidl2.org.SettingsService"
+	SettingsServiceName = "flyteidl2.settings.SettingsService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -35,16 +35,16 @@ const (
 const (
 	// SettingsServiceGetSettingsProcedure is the fully-qualified name of the SettingsService's
 	// GetSettings RPC.
-	SettingsServiceGetSettingsProcedure = "/flyteidl2.org.SettingsService/GetSettings"
+	SettingsServiceGetSettingsProcedure = "/flyteidl2.settings.SettingsService/GetSettings"
 	// SettingsServiceGetSettingsForEditProcedure is the fully-qualified name of the SettingsService's
 	// GetSettingsForEdit RPC.
-	SettingsServiceGetSettingsForEditProcedure = "/flyteidl2.org.SettingsService/GetSettingsForEdit"
+	SettingsServiceGetSettingsForEditProcedure = "/flyteidl2.settings.SettingsService/GetSettingsForEdit"
 	// SettingsServiceCreateSettingsProcedure is the fully-qualified name of the SettingsService's
 	// CreateSettings RPC.
-	SettingsServiceCreateSettingsProcedure = "/flyteidl2.org.SettingsService/CreateSettings"
+	SettingsServiceCreateSettingsProcedure = "/flyteidl2.settings.SettingsService/CreateSettings"
 	// SettingsServiceUpdateSettingsProcedure is the fully-qualified name of the SettingsService's
 	// UpdateSettings RPC.
-	SettingsServiceUpdateSettingsProcedure = "/flyteidl2.org.SettingsService/UpdateSettings"
+	SettingsServiceUpdateSettingsProcedure = "/flyteidl2.settings.SettingsService/UpdateSettings"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -56,7 +56,7 @@ var (
 	settingsServiceUpdateSettingsMethodDescriptor     = settingsServiceServiceDescriptor.Methods().ByName("UpdateSettings")
 )
 
-// SettingsServiceClient is a client for the flyteidl2.org.SettingsService service.
+// SettingsServiceClient is a client for the flyteidl2.settings.SettingsService service.
 type SettingsServiceClient interface {
 	// GetSettings returns resolved effective settings at the scope implied by
 	// the key, incorporating inherited values from parent scopes.
@@ -73,9 +73,9 @@ type SettingsServiceClient interface {
 	UpdateSettings(context.Context, *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error)
 }
 
-// NewSettingsServiceClient constructs a client for the flyteidl2.org.SettingsService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// NewSettingsServiceClient constructs a client for the flyteidl2.settings.SettingsService service.
+// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
+// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
@@ -120,27 +120,27 @@ type settingsServiceClient struct {
 	updateSettings     *connect.Client[settings.UpdateSettingsRequest, settings.UpdateSettingsResponse]
 }
 
-// GetSettings calls flyteidl2.org.SettingsService.GetSettings.
+// GetSettings calls flyteidl2.settings.SettingsService.GetSettings.
 func (c *settingsServiceClient) GetSettings(ctx context.Context, req *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error) {
 	return c.getSettings.CallUnary(ctx, req)
 }
 
-// GetSettingsForEdit calls flyteidl2.org.SettingsService.GetSettingsForEdit.
+// GetSettingsForEdit calls flyteidl2.settings.SettingsService.GetSettingsForEdit.
 func (c *settingsServiceClient) GetSettingsForEdit(ctx context.Context, req *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error) {
 	return c.getSettingsForEdit.CallUnary(ctx, req)
 }
 
-// CreateSettings calls flyteidl2.org.SettingsService.CreateSettings.
+// CreateSettings calls flyteidl2.settings.SettingsService.CreateSettings.
 func (c *settingsServiceClient) CreateSettings(ctx context.Context, req *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error) {
 	return c.createSettings.CallUnary(ctx, req)
 }
 
-// UpdateSettings calls flyteidl2.org.SettingsService.UpdateSettings.
+// UpdateSettings calls flyteidl2.settings.SettingsService.UpdateSettings.
 func (c *settingsServiceClient) UpdateSettings(ctx context.Context, req *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error) {
 	return c.updateSettings.CallUnary(ctx, req)
 }
 
-// SettingsServiceHandler is an implementation of the flyteidl2.org.SettingsService service.
+// SettingsServiceHandler is an implementation of the flyteidl2.settings.SettingsService service.
 type SettingsServiceHandler interface {
 	// GetSettings returns resolved effective settings at the scope implied by
 	// the key, incorporating inherited values from parent scopes.
@@ -189,7 +189,7 @@ func NewSettingsServiceHandler(svc SettingsServiceHandler, opts ...connect.Handl
 		connect.WithSchema(settingsServiceUpdateSettingsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/flyteidl2.org.SettingsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/flyteidl2.settings.SettingsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SettingsServiceGetSettingsProcedure:
 			settingsServiceGetSettingsHandler.ServeHTTP(w, r)
@@ -209,17 +209,17 @@ func NewSettingsServiceHandler(svc SettingsServiceHandler, opts ...connect.Handl
 type UnimplementedSettingsServiceHandler struct{}
 
 func (UnimplementedSettingsServiceHandler) GetSettings(context.Context, *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.SettingsService.GetSettings is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.settings.SettingsService.GetSettings is not implemented"))
 }
 
 func (UnimplementedSettingsServiceHandler) GetSettingsForEdit(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.SettingsService.GetSettingsForEdit is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.settings.SettingsService.GetSettingsForEdit is not implemented"))
 }
 
 func (UnimplementedSettingsServiceHandler) CreateSettings(context.Context, *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.SettingsService.CreateSettings is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.settings.SettingsService.CreateSettings is not implemented"))
 }
 
 func (UnimplementedSettingsServiceHandler) UpdateSettings(context.Context, *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.SettingsService.UpdateSettings is not implemented"))
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.settings.SettingsService.UpdateSettings is not implemented"))
 }

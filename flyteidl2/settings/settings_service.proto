@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package flyteidl2.org;
+package flyteidl2.settings;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/settings/settings_definition.proto";
