@@ -120,8 +120,9 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	repo, err := NewActionRepo(db, testDbConfig)
 	require.NoError(t, err)
+	repoImpl := repo.(*actionRepo)
 
 	runID := &common.RunIdentifier{
 		Org:     "org1",
@@ -142,13 +143,17 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 
 	updates := make(chan *models.Action, 2)
 	errs := make(chan error, 1)
-	go actionRepo.WatchActionUpdates(watchCtx, targetActionID, updates, errs)
+	go repo.WatchActionUpdates(watchCtx, targetActionID, updates, errs)
 
-	time.Sleep(100 * time.Millisecond) // let the subscriber register
+	require.Eventually(t, func() bool {
+		repoImpl.mu.RLock()
+		defer repoImpl.mu.RUnlock()
+		return len(repoImpl.actionSubscribers) > 0
+	}, 2*time.Second, 10*time.Millisecond, "timed out waiting for watcher registration")
 
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
+	_, err = repo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
 	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
+	_, err = repo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
 	require.NoError(t, err)
 
 	// Drain the creation notification for the target action.
@@ -159,7 +164,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "other" — should NOT produce an update for "target".
-	err = actionRepo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	select {
@@ -171,7 +176,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "target" — should produce an update.
-	err = actionRepo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
 	select {
