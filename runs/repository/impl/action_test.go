@@ -133,11 +133,10 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	otherActionID := &common.ActionIdentifier{Run: runID, Name: "other"}
 
 	ctx := context.Background()
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
-	require.NoError(t, err)
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
-	require.NoError(t, err)
 
+	// Start watcher before creating actions so we can deterministically
+	// drain the creation notification and avoid a race where the async
+	// NOTIFY arrives after the subscriber registers.
 	watchCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -145,8 +144,21 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	errs := make(chan error, 1)
 	go actionRepo.WatchActionUpdates(watchCtx, targetActionID, updates, errs)
 
-	time.Sleep(1100 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond) // let the subscriber register
 
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(targetActionID), false)
+	require.NoError(t, err)
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(otherActionID), false)
+	require.NoError(t, err)
+
+	// Drain the creation notification for the target action.
+	select {
+	case <-updates:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for creation notification")
+	}
+
+	// Update "other" — should NOT produce an update for "target".
 	err = actionRepo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
@@ -158,6 +170,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	case <-time.After(1200 * time.Millisecond):
 	}
 
+	// Update "target" — should produce an update.
 	err = actionRepo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
 	require.NoError(t, err)
 
