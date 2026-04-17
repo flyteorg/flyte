@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
@@ -93,6 +94,9 @@ func (s *InternalAppService) Get(
 
 	status, err := s.k8s.GetStatus(ctx, appID.AppId)
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -182,7 +186,7 @@ func (s *InternalAppService) List(
 		token = r.GetToken()
 	}
 
-	apps, nextToken, err := s.k8s.List(ctx, project, domain, limit, token)
+	apps, nextToken, err := s.k8s.List(ctx, project, domain, "", limit, token)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -211,15 +215,18 @@ func (s *InternalAppService) Watch(
 		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("org and cluster_id watch targets are not supported by the data plane"))
 	}
 
-	// Send initial snapshot so the client has current state before watching for changes.
-	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
+	// Start watch before listing so no events are lost between the two calls.
+	ch, err := s.k8s.Watch(ctx, project, domain, appName)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Send initial snapshot so the client has current state before streaming changes.
+	snapshot, _, err := s.k8s.List(ctx, project, domain, appName, 0, "")
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	for _, app := range snapshot {
-		if appName != "" && app.GetMetadata().GetId().GetName() != appName {
-			continue
-		}
 		if err := stream.Send(&flyteapp.WatchResponse{
 			Event: &flyteapp.WatchResponse_CreateEvent{
 				CreateEvent: &flyteapp.CreateEvent{App: app},
@@ -227,11 +234,6 @@ func (s *InternalAppService) Watch(
 		}); err != nil {
 			return err
 		}
-	}
-
-	ch, err := s.k8s.Watch(ctx, project, domain, appName)
-	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	for {

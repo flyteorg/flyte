@@ -12,7 +12,6 @@ import (
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
-	knativeapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 )
 
 // Setup registers the InternalAppService handler on the SetupContext mux.
@@ -24,7 +23,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.AppCo
 		return nil
 	}
 
-	if err := knativeapp.InitAppScheme(); err != nil {
+	if err := stdlibapp.InitAppScheme(); err != nil {
 		return fmt.Errorf("internalapp: failed to register Knative scheme: %w", err)
 	}
 

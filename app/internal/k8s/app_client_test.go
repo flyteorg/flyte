@@ -283,11 +283,48 @@ func TestList(t *testing.T) {
 		},
 	}
 
-	apps, nextToken, err := c.List(context.Background(), "proj", "dev", 0, "")
+	apps, nextToken, err := c.List(context.Background(), "proj", "dev", "", 0, "")
 	require.NoError(t, err)
 	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
+	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
+}
+
+func TestList_ByAppName(t *testing.T) {
+	s := testScheme(t)
+	ksvc1 := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "app1",
+			Namespace: "proj-dev",
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    "app1",
+			},
+			Annotations: map[string]string{annotationAppID: "proj/dev/app1"},
+		},
+	}
+	ksvc2 := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "app2",
+			Namespace: "proj-dev",
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    "app2",
+			},
+			Annotations: map[string]string{annotationAppID: "proj/dev/app2"},
+		},
+	}
+	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc1, ksvc2).Build()
+	c := &AppK8sClient{k8sClient: fc, cfg: &config.AppConfig{}}
+
+	apps, _, err := c.List(context.Background(), "proj", "dev", "app1", 0, "")
+	require.NoError(t, err)
+	require.Len(t, apps, 1)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
 }
 

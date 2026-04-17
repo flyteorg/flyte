@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -44,8 +47,8 @@ func (m *mockAppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identi
 	return args.Get(0).(*flyteapp.Status), args.Error(1)
 }
 
-func (m *mockAppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
-	args := m.Called(ctx, project, domain, limit, token)
+func (m *mockAppK8sClient) List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error) {
+	args := m.Called(ctx, project, domain, appName, limit, token)
 	if args.Get(0) == nil {
 		return nil, "", args.Error(2)
 	}
@@ -197,6 +200,22 @@ func TestGet_Success(t *testing.T) {
 	k8s.AssertExpectations(t)
 }
 
+func TestGet_NotFound(t *testing.T) {
+	k8s := &mockAppK8sClient{}
+	svc := NewInternalAppService(k8s, testCfg())
+
+	appID := testAppID()
+	notFoundErr := fmt.Errorf("KService myapp not found: %w", kerrors.NewNotFound(schema.GroupResource{}, "myapp"))
+	k8s.On("GetStatus", mock.Anything, appID).Return(nil, notFoundErr)
+
+	_, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
+		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
+	}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	k8s.AssertExpectations(t)
+}
+
 func TestGet_MissingAppID(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{}, testCfg())
 
@@ -275,7 +294,7 @@ func TestList_ByProject(t *testing.T) {
 	svc := NewInternalAppService(k8s, testCfg())
 
 	apps := []*flyteapp.App{testApp()}
-	k8s.On("List", mock.Anything, "proj", "dev", uint32(10), "tok").Return(apps, "nexttok", nil)
+	k8s.On("List", mock.Anything, "proj", "dev", "", uint32(10), "tok").Return(apps, "nexttok", nil)
 
 	resp, err := svc.List(context.Background(), connect.NewRequest(&flyteapp.ListRequest{
 		FilterBy: &flyteapp.ListRequest_Project{
@@ -293,7 +312,7 @@ func TestList_NoFilter(t *testing.T) {
 	k8s := &mockAppK8sClient{}
 	svc := NewInternalAppService(k8s, testCfg())
 
-	k8s.On("List", mock.Anything, "", "", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
+	k8s.On("List", mock.Anything, "", "", "", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
 
 	resp, err := svc.List(context.Background(), connect.NewRequest(&flyteapp.ListRequest{}))
 	require.NoError(t, err)
@@ -310,8 +329,8 @@ func TestWatch_InitialSnapshot(t *testing.T) {
 	ch := make(chan *flyteapp.WatchResponse)
 	close(ch)
 
-	k8s.On("List", mock.Anything, "proj", "dev", uint32(0), "").Return(apps, "", nil)
 	k8s.On("Watch", mock.Anything, "proj", "dev", "").Return((<-chan *flyteapp.WatchResponse)(ch), nil)
+	k8s.On("List", mock.Anything, "proj", "dev", "", uint32(0), "").Return(apps, "", nil)
 
 	client := newTestClient(t, k8s)
 	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{
@@ -339,8 +358,8 @@ func TestWatch_AppIDTarget(t *testing.T) {
 	ch := make(chan *flyteapp.WatchResponse)
 	close(ch)
 
-	k8s.On("List", mock.Anything, "proj", "dev", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
 	k8s.On("Watch", mock.Anything, "proj", "dev", "myapp").Return((<-chan *flyteapp.WatchResponse)(ch), nil)
+	k8s.On("List", mock.Anything, "proj", "dev", "myapp", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
 
 	client := newTestClient(t, k8s)
 	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{
