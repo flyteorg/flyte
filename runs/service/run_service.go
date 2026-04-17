@@ -387,14 +387,19 @@ func (s *RunService) AbortRun(
 		reason = *req.Msg.Reason
 	}
 
-	// Abort in database, then push to reconciler for background pod termination.
+	// Mark only the root action ABORTED in DB, then push it to the reconciler.
+	// The reconciler deletes "a0"'s CRD; K8s cascades deletion to all child CRDs
+	// via OwnerReferences, and the action service informer marks them ABORTED in DB.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
+		}
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	if s.abortReconciler != nil {
-		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: req.Msg.RunId.Name}, reason)
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: "a0"}, reason)
 	}
 
 	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
@@ -553,7 +558,13 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			}
 		}
 	case common.ActionPhase_ACTION_PHASE_ABORTED:
-		// TODO: set AbortInfo
+		abortInfo := &workflow.AbortInfo{}
+		if model.AbortReason != nil {
+			abortInfo.Reason = *model.AbortReason
+		}
+		action.Result = &workflow.ActionDetails_AbortInfo{
+			AbortInfo: abortInfo,
+		}
 	}
 
 	return action, nil
@@ -709,6 +720,22 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT ||
 		phase == common.ActionPhase_ACTION_PHASE_ABORTED
+}
+
+// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
+// terminal phase. Used by WatchActionDetails to close the stream only after action_events
+// reflects the terminal transition, not just the actions table.
+func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+	if len(attempts) == 0 {
+		return false
+	}
+	var last *workflow.ActionAttempt
+	for _, a := range attempts {
+		if last == nil || a.GetAttempt() > last.GetAttempt() {
+			last = a
+		}
+	}
+	return IsTerminalPhase(last.GetPhase())
 }
 
 // GetActionData gets input and output data for an action by reading from storage.
@@ -982,6 +1009,9 @@ func (s *RunService) AbortAction(
 
 	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
+		}
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -1055,6 +1085,12 @@ func (s *RunService) WatchActionDetails(
 	actionID := req.Msg.ActionId
 	logger.Infof(ctx, "Received WatchActionDetails request for: %s/%s", actionID.Run.Name, actionID.Name)
 
+	// Subscribe FIRST to avoid missing notifications that fire between the DB
+	// read and the subscription setup (same pattern as WatchActions).
+	updates := make(chan *models.Action, 50)
+	errs := make(chan error, 1)
+	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
+
 	// Step 1: Send initial state from DB
 	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
 	if err != nil {
@@ -1067,15 +1103,10 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// If the action is already in a terminal phase, no further updates are expected.
-	if IsTerminalPhase(details.GetStatus().GetPhase()) {
+	// Close only once action_events reflects the terminal phase, not just actions table.
+	if lastAttemptIsTerminal(details.GetAttempts()) {
 		return nil
 	}
-
-	// Step 2: Watch DB for updates
-	updates := make(chan *models.Action, 50)
-	errs := make(chan error, 1)
-	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	for {
 		select {
@@ -1101,8 +1132,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close the stream once the action reaches a terminal phase.
-			if IsTerminalPhase(details.GetStatus().GetPhase()) {
+			// Close once action_events reflects the terminal phase.
+			if lastAttemptIsTerminal(details.GetAttempts()) {
 				return nil
 			}
 		}

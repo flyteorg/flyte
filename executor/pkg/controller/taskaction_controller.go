@@ -363,6 +363,19 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		}
 	}
 
+	abortTime := time.Now()
+	abortPhaseInfo := pluginsCore.PhaseInfoAborted(abortTime, pluginsCore.DefaultPhaseVersion, "aborted")
+	actionEvent := r.buildActionEvent(ctx, taskAction, abortPhaseInfo)
+	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
+	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
+	actionEvent.UpdatedTime = timestamppb.New(abortTime)
+	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{actionEvent},
+	})); err != nil {
+		logger.Error(err, "failed to emit abort event, will retry")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+
 	return r.removeFinalizer(ctx, taskAction)
 }
 
