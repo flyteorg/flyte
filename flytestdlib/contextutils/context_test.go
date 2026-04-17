@@ -112,10 +112,19 @@ func TestWithSignalID(t *testing.T) {
 func TestGetFields(t *testing.T) {
 	ctx := context.Background()
 	ctx = WithRequestID(WithJobID(WithNamespace(ctx, "ns123"), "job123"), "req123")
+	ctx = WithProjectDomain(ctx, "proj1", "dev")
+	ctx = context.WithValue(ctx, OrganizationKey, "org1")
+	ctx = context.WithValue(ctx, ServiceNameKey, "svc1")
+	ctx = context.WithValue(ctx, ClusterNameKey, "cluster1")
 	m := GetLogFields(ctx)
 	assert.Equal(t, "ns123", m[NamespaceKey.String()])
 	assert.Equal(t, "job123", m[JobIDKey.String()])
 	assert.Equal(t, "req123", m[RequestIDKey.String()])
+	assert.Equal(t, "proj1", m[ProjectKey.String()])
+	assert.Equal(t, "dev", m[DomainKey.String()])
+	assert.Equal(t, "org1", m[OrganizationKey.String()])
+	assert.Equal(t, "svc1", m[ServiceNameKey.String()])
+	assert.Equal(t, "cluster1", m[ClusterNameKey.String()])
 }
 
 func TestValues(t *testing.T) {

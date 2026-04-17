@@ -29,6 +29,9 @@ const (
 	ResourceVersionKey Key = "res_ver"
 	SignalIDKey        Key = "signal"
 	RequestIDKey       Key = "x-request-id"
+	OrganizationKey    Key = "org"
+	ServiceNameKey     Key = "service_name"
+	ClusterNameKey     Key = "cluster_id"
 )
 
 func (k Key) String() string {
@@ -39,6 +42,7 @@ var logKeys = []Key{
 	AppNameKey,
 	JobIDKey,
 	NamespaceKey,
+	OrganizationKey,
 	ExecIDKey,
 	NodeIDKey,
 	WorkflowIDKey,
@@ -48,6 +52,10 @@ var logKeys = []Key{
 	LaunchPlanIDKey,
 	ResourceVersionKey,
 	RequestIDKey,
+	ProjectKey,
+	DomainKey,
+	ServiceNameKey,
+	ClusterNameKey,
 }
 
 // MetricKeysFromStrings is a convenience method to convert a slice of strings into a slice of Keys
