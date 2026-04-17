@@ -15,8 +15,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -443,15 +441,6 @@ func (r *actionRepo) UpdateActionPhase(
 		return err
 	}
 	if rowsAffected > 0 {
-		// Insert an abort event so WatchActionDetails phaseTransitions include ABORTED.
-		// This must happen before notifyActionUpdate so the event is visible when the
-		// subscriber re-fetches action events in response to the notification.
-		if phase == common.ActionPhase_ACTION_PHASE_ABORTED {
-			if err := r.insertAbortEvent(ctx, actionID, attempts, "", now); err != nil {
-				logger.Warnf(ctx, "UpdateActionPhase: failed to insert abort event for %s: %v", actionID.Name, err)
-			}
-		}
-		// Notify subscribers of the action update
 		r.notifyActionUpdate(ctx, actionID)
 	}
 
@@ -487,37 +476,6 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 	r.notifyActionUpdate(ctx, actionID)
 
 	logger.Infof(ctx, "AbortAction: aborted %s", actionID.Name)
-	return nil
-}
-
-// insertAbortEvent writes a single ABORTED phase-transition event into action_events so that
-// WatchActionDetails returns a phaseTransitions entry with phase = ABORTED for the action.
-// Failures are non-fatal — the caller should log and continue.
-func (r *actionRepo) insertAbortEvent(ctx context.Context, actionID *common.ActionIdentifier, attempts uint32, reason string, now time.Time) error {
-	// Build the minimal ActionEvent proto that mergeEvents will pick up.
-	event := &workflow.ActionEvent{
-		Id:          actionID,
-		Phase:       common.ActionPhase_ACTION_PHASE_ABORTED,
-		Attempt:     attempts,
-		UpdatedTime: timestamppb.New(now),
-	}
-	info, err := proto.Marshal(event)
-	if err != nil {
-		return fmt.Errorf("marshal abort event: %w", err)
-	}
-
-	_, err = r.db.ExecContext(ctx,
-		`INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, 0, $7, NULL, $8, $8)
-		 ON CONFLICT DO NOTHING`,
-		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
-		attempts, int32(common.ActionPhase_ACTION_PHASE_ABORTED), info, now,
-	)
-	if err != nil {
-		return err
-	}
-	// Notify after the event is written so WatchActionDetails sees it when it re-fetches.
-	r.notifyActionUpdate(ctx, actionID)
 	return nil
 }
 

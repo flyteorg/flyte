@@ -663,3 +663,39 @@ func TestInsertEvents_WithLogContext(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "my-pod", deserialized.GetLogContext().GetPrimaryPodName())
 }
+
+// TestUpdateActionPhase_AbortedDoesNotInsertEvent verifies that transitioning an
+// action to ABORTED updates the phase column but does NOT insert a synthetic row
+// into action_events. The abort event is now emitted by the controller via
+// RecordActionEvents before the TaskAction finalizer is removed.
+func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-abort"},
+		Name: "abort-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	endTime := time.Now()
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+	require.NoError(t, err)
+
+	// Phase column must be updated.
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_ABORTED), action.Phase)
+
+	// No synthetic event row should have been inserted — the controller now emits the event.
+	var count int
+	err = db.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM action_events WHERE project=$1 AND domain=$2 AND run_name=$3 AND name=$4`,
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name,
+	).Scan(&count)
+	require.NoError(t, err)
+	assert.Equal(t, 0, count, "UpdateActionPhase(ABORTED) must not insert a synthetic action_events row")
+}

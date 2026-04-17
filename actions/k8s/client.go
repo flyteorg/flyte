@@ -553,7 +553,7 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 
 // notifyRunService forwards a watch event to the internal run service.
 // On ADDED events it calls RecordAction to create the DB record.
-// On all events it calls UpdateActionStatus (when phase is meaningful) and RecordActionEvents.
+// On all events it calls UpdateActionStatus (when phase is meaningful) to update the actions table.
 func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate, eventType watch.EventType) {
 	if c.runClient == nil {
 		return
