@@ -112,7 +112,16 @@ configuration:
       # cloudwatch Configure logging plugin to have logs visible in CloudWatch
       cloudwatch:
         enabled: false
+        # templateUri Provide a fully custom CloudWatch URL template. Supports Go template variables
+        # such as {{ .podName }}, {{ .namespace }}, {{ .containerName }}, {{ .containerId }}.
+        # When set, takes precedence over region and logGroup.
         templateUri: ""
+        # region AWS region where CloudWatch logs are stored (e.g. us-east-1).
+        # Used to construct the CloudWatch URL when templateUri is not set.
+        region: ""
+        # logGroup CloudWatch log group name (e.g. /aws/eks/my-cluster/cluster).
+        # Used to construct the CloudWatch URL when templateUri is not set.
+        logGroup: ""
       # stackdriver Configure logging plugin to have logs visible in StackDriver
       stackdriver:
         enabled: false

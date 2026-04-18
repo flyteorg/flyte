@@ -115,7 +115,12 @@ kubernetes-template-uri: {{ required "Template URI required for Kubernetes loggi
 {{- end }}
 cloudwatch-enabled: {{ .cloudwatch.enabled }}
 {{- if .cloudwatch.enabled }}
-cloudwatch-template-uri: {{ required "Template URI required for CloudWatch logging plugin" .cloudwatch.templateUri }}
+{{- if .cloudwatch.templateUri }}
+cloudwatch-template-uri: {{ .cloudwatch.templateUri }}
+{{- else }}
+cloudwatch-region: {{ required "Either cloudwatch.templateUri or cloudwatch.region is required when CloudWatch logging is enabled" .cloudwatch.region }}
+cloudwatch-log-group: {{ required "cloudwatch.logGroup is required when cloudwatch.region is set" .cloudwatch.logGroup }}
+{{- end }}
 {{- end }}
 stackdriver-enabled: {{ .stackdriver.enabled }}
 {{- if .stackdriver.enabled }}

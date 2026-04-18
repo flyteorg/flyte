@@ -13,15 +13,15 @@ configuration:
       s3:
         region: "<AWS-REGION-CODE>"
         authType: "iam"
-  #For logging to work, you need to setup an agent. 
+  #For logging to work, you need to setup an agent.
   # Learn more: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-EKS-logs.html
   logging:
     level: 5
     plugins:
       cloudwatch:
         enabled: true
-        templateUri: |-
-          https://console.aws.amazon.com/cloudwatch/home?region=<AWS_REGION>#logEventViewer:group=/aws/eks/<EKS_CLUSTER_NAME>/cluster;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log
+        region: "<AWS_REGION>"        # replace with your AWS region, e.g. us-east-1
+        logGroup: "/aws/eks/<EKS_CLUSTER_NAME>/cluster"  # replace <EKS_CLUSTER_NAME> with your cluster name
   # To configure auth, refer to https://docs.flyte.org/en/latest/deployment/configuration/auth_setup.html
   auth:
     enabled: false
