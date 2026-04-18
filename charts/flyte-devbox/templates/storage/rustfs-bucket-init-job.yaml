@@ -1,0 +1,39 @@
+{{- if and .Values.rustfs.enabled .Values.rustfs.bucketInit.enabled }}
+{{- $accessKey := .Values.rustfsUpstream.secret.rustfs.access_key }}
+{{- $secretKey := .Values.rustfsUpstream.secret.rustfs.secret_key }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-rustfs-bucket-init" .Release.Name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-demo.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        {{- include "flyte-demo.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: rustfs-bucket-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: bucket-init
+        image: "{{ .Values.rustfs.bucketInit.image.repository }}:{{ .Values.rustfs.bucketInit.image.tag }}"
+        imagePullPolicy: {{ .Values.rustfs.bucketInit.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          until mc alias set local '{{ .Values.rustfs.bucketInit.endpoint }}' '{{ $accessKey }}' '{{ $secretKey }}'; do
+            echo "waiting for rustfs endpoint..."
+            sleep 2
+          done
+          {{- range $bucket := .Values.rustfs.defaultBuckets }}
+          mc mb --ignore-existing local/{{ $bucket }}
+          {{- end }}
+{{- end }}
