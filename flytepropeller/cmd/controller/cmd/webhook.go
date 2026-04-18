@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -108,8 +109,9 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache:  executors.NewCache,
-		NewClient: executors.BuildNewClientFunc(webhookScope),
+		NewCache:                executors.NewCache,
+		NewClient:               executors.BuildNewClientFunc(webhookScope),
+		MaxConcurrentReconciles: propellerCfg.MaxConcurrentReconciles,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",

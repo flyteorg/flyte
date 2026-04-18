@@ -136,6 +136,7 @@ var (
 			MinSizeInMBForOffloading: 10,   // 10 MB is the default size for offloading
 			MaxSizeInMBForOffloading: 1000, // 1 GB is the default size before failing fast.
 		},
+		MaxConcurrentReconciles: 1,
 	}
 
 	// This regex is used to sanitize semver versions passed to IsSupportedSDK checks for literal offloading feature.
@@ -182,6 +183,7 @@ type Config struct {
 	NodeExecutionWorkerCount int                     `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
 	ArrayNode                ArrayNodeConfig         `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
 	LiteralOffloadingConfig  LiteralOffloadingConfig `json:"literal-offloading-config" pflag:",config used for literal offloading."`
+	MaxConcurrentReconciles  int                     `json:"max-concurrent-reconciles" pflag:",Max concurrent reconciles for controller-runtime controllers"`
 }
 
 type LiteralOffloadingConfig struct {

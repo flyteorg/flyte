@@ -14,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -143,8 +144,9 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache:  executors.NewCache,
-		NewClient: executors.BuildNewClientFunc(propellerScope),
+		NewCache:                executors.NewCache,
+		NewClient:               executors.BuildNewClientFunc(propellerScope),
+		MaxConcurrentReconciles: cfg.MaxConcurrentReconciles,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
