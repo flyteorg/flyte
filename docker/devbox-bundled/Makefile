@@ -86,6 +86,7 @@ helm-repos:
 	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add knative-serving https://deeploy-knative-serving-charts.storage.googleapis.com/
+	helm repo add rustfs https://rustfs.github.io/helm
 	helm repo update
 
 .PHONY: dep_build
