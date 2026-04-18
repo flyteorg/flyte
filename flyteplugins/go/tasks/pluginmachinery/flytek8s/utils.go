@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginmachinery_core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
@@ -38,7 +39,7 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {
-				k8sResources[ResourceNvidiaGPU] = v
+				k8sResources[config.GetK8sPluginConfig().GpuResourceName] = v
 			}
 		case core.Resources_EPHEMERAL_STORAGE:
 			if !v.IsZero() {

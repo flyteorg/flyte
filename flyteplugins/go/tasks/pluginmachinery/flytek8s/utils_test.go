@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func TestToK8sEnvVar(t *testing.T) {
@@ -40,7 +41,7 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.NotEmpty(t, r)
 		assert.NotNil(t, r[v1.ResourceCPU])
 		assert.Equal(t, resource.MustParse("250m"), r[v1.ResourceCPU])
-		assert.Equal(t, resource.MustParse("1"), r[ResourceNvidiaGPU])
+		assert.Equal(t, resource.MustParse("1"), r[config.GetK8sPluginConfig().GpuResourceName])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceMemory])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
 	}

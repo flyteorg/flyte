@@ -18,6 +18,7 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -28,7 +29,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -388,18 +388,19 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			GPU:              resource.MustParse("50"),
 		},
 	})
+	gpuResourceName := flytek8sConfig.GetK8sPluginConfig().GpuResourceName
 	assert.EqualValues(t, &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
 			corev1.ResourceCPU:              resource.MustParse("1"),
 			corev1.ResourceMemory:           resource.MustParse("2"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("3"),
-			utils.ResourceNvidiaGPU:         resource.MustParse("5"),
+			gpuResourceName:                 resource.MustParse("5"),
 		},
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:              resource.MustParse("10"),
 			corev1.ResourceMemory:           resource.MustParse("20"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("30"),
-			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
+			gpuResourceName:                 resource.MustParse("50"),
 		},
 	}, resourceRequirements)
 }
