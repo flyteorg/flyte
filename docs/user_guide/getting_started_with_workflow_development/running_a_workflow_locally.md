@@ -132,13 +132,22 @@ flytectl create project \
       --description "My Flyte project" \
       --name "My project"
 ```
-3. On the command line, navigate to the workflows directory of your Flyte project:
+5. On the command line, navigate to the workflows directory of your Flyte project:
 ```{prompt} bash $
 cd my_project/workflows
 ```
-4. Run the workflow on the Flyte cluster with `pyflyte run` using the `--remote` flag and additional parameters for the project name and domain. In this example, you can also optionally pass a `name` parameter to the workflow:
+6. Export the `FLYTE_IMAGE_REGISTRY` environment variable to point to the demo cluster's local image registry:
 ```{prompt} bash $
-pyflyte run --remote -p my-project -d development example.py wf --name Ada
+export FLYTE_IMAGE_REGISTRY=localhost:30000
+```
+
+:::{note}
+The demo cluster ships with a local Docker registry on `localhost:30000`. When your workflow uses [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html) to build and push a container image, Flytekit reads `FLYTE_IMAGE_REGISTRY` to determine where to push the image. Setting this variable in your shell ensures the image is pushed to the demo cluster's registry so that task pods can pull it.
+:::
+
+7. Run the workflow on the Flyte cluster with `pyflyte run` using the `--remote` flag and additional parameters for the project name and domain. In this example, you can also optionally pass a `name` parameter to the workflow:
+```{prompt} bash $
+pyflyte run --remote --env FLYTE_IMAGE_REGISTRY=localhost:30000 -p my-project -d development example.py wf --name Ada
 ```
 
 You should see a URL to the workflow execution on your demo Flyte cluster, where `<execution_name>` is a unique identifier for the workflow execution:
