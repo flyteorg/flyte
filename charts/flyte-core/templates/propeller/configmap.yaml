@@ -9,8 +9,14 @@ data:
 {{- with .Values.configmap.admin }}
   admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- if .Values.datacatalog.enabled }}
 {{- with .Values.configmap.catalog }}
   catalog.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- else }}
+  catalog.yaml: |
+    catalog-cache:
+      type: noop
 {{- end }}
 {{- with .Values.configmap.catalog_cache }}
   catalog_cache.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
