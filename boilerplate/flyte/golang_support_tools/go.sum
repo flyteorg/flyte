@@ -228,8 +228,8 @@ github.com/ghostiam/protogetter v0.3.17 h1:sjGPErP9o7i2Ym+z3LsQzBdLCNaqbYy2iJQPx
 github.com/ghostiam/protogetter v0.3.17/go.mod h1:AivIX1eKA/TcUmzZdzbl+Tb8tjIe8FcyG6JFyemQAH4=
 github.com/go-critic/go-critic v0.14.2 h1:PMvP5f+LdR8p6B29npvChUXbD1vrNlKDf60NJtgMBOo=
 github.com/go-critic/go-critic v0.14.2/go.mod h1:xwntfW6SYAd7h1OqDzmN6hBX/JxsEKl5up/Y2bsxgVQ=
-github.com/go-jose/go-jose/v4 v4.1.3 h1:CVLmWDhDVRa6Mi/IgCgaopNosCaHz7zrMeF9MlZRkrs=
-github.com/go-jose/go-jose/v4 v4.1.3/go.mod h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=
+github.com/go-jose/go-jose/v4 v4.1.4 h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
+github.com/go-jose/go-jose/v4 v4.1.4/go.mod h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
