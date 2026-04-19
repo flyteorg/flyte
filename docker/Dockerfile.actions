@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+
+# Build stage
+ARG GO_VERSION
+FROM golang:${GO_VERSION:-1.24}-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . ./
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o actions-service actions/cmd/main.go
+
+# Final stage
+FROM gcr.io/distroless/static-debian12
+
+COPY --from=builder /src/actions-service /
+# Copy default config
+COPY --from=builder /src/actions/config.yaml /
+
+ENTRYPOINT ["/actions-service"]
