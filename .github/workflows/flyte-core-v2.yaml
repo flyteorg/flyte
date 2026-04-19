@@ -43,8 +43,28 @@ on:
       - "go.sum"
 
 jobs:
-  build-and-push:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: docker
+      - name: Generate matrix
+        id: generate
+        uses: docker/bake-action/subaction/matrix@v7
+        with:
+          files: docker/docker-bake.hcl
+          target: default
+  build-and-push:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -74,7 +94,7 @@ jobs:
           files: docker/docker-bake.hcl
           targets: default
           set: |
-            *.args.IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
+            *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
 
       - name: Build and push images
         if: github.event_name == 'push'
@@ -85,4 +105,4 @@ jobs:
           push: true
           targets: default
           set: |
-            *.args.IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
+             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
