@@ -73,8 +73,8 @@ jobs:
           source: .
           files: docker/docker-bake.hcl
           targets: default
-          vars: |
-            IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
+          set: |
+            *.args.IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
 
       - name: Build and push images
         if: github.event_name == 'push'
@@ -84,5 +84,5 @@ jobs:
           files: docker/docker-bake.hcl
           push: true
           targets: default
-          vars: |
+          set: |
             IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
