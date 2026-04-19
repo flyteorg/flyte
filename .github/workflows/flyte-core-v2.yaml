@@ -66,21 +66,23 @@ jobs:
       - name: Set short Git SHA as tag
         run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Build images (PR)
+      - name: Build multi-arch image (PR)
         if: github.event_name == 'pull_request'
         uses: docker/bake-action@v7
         with:
-          workdir: docker
-          files: docker-bake.hcl
+          source: .
+          files: docker/docker-bake.hcl
           targets: default
-          vars:
-            IMAGE_SHA_SHORT_TAG=${env.SHORT_SHA}
+          vars: |
+            IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
 
-      # - name: Build and push images
-      #   if: github.event_name == 'push'
-      #   uses: docker/bake-action@v7
-      #   with:
-      #     workdir: docker
-      #     files: docker-bake.hcl
-      #     push: false
-      #     targets: default
+      - name: Build and push images
+        if: github.event_name == 'push'
+        uses: docker/bake-action@v7
+        with:
+          source: .
+          files: docker/docker-bake.hcl
+          push: true
+          targets: default
+          vars: |
+            IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
