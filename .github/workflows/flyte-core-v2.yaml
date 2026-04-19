@@ -85,4 +85,4 @@ jobs:
           push: true
           targets: default
           set: |
-            IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
+            *.args.IMAGE_SHA_SHORT_TAG=${{ env.SHORT_SHA }}
