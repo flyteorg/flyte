@@ -564,7 +564,7 @@ type rayPodAssertions struct {
 }
 
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
-	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{GpuResourceName: "nvidia.com/gpu"}))
 
 	headResourceEntries := []*core.Resources_ResourceEntry{
 		{Name: core.Resources_CPU, Value: "10"},
