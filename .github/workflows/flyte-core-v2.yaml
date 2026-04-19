@@ -56,7 +56,7 @@ jobs:
         id: generate
         uses: docker/bake-action/subaction/matrix@v7
         with:
-          files: docker/docker-bake.hcl
+          files: docker-bake.hcl
           target: default
   build-and-push:
     needs: prepare

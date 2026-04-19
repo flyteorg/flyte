@@ -100,11 +100,11 @@ jobs:
           path: docker/demo-bundled/images/tar
       - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          username: ${{ secrets.FLYTE_BOT_USERNAME }}
+          password: ${{ secrets.FLYTE_BOT_PAT }}
       - name: Build and push Image
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
@@ -152,11 +152,11 @@ jobs:
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          username: ${{ secrets.FLYTE_BOT_USERNAME }}
+          password: ${{ secrets.FLYTE_BOT_PAT }}
       - name: Save console image tarballs
         run: |
           mkdir -p docker/demo-bundled/images/tar/amd64 docker/demo-bundled/images/tar/arm64
