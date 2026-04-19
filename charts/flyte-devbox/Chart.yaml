@@ -37,7 +37,7 @@ dependencies:
     repository: https://deeploy-knative-serving-charts.storage.googleapis.com/
     condition: knative-serving.enabled
   - name: rustfs
-    alias: rustfsUpstream
+    alias: rustfsupstream
     version: 0.0.94
     repository: https://rustfs.github.io/helm
     condition: rustfs.enabled

@@ -1,6 +1,6 @@
 {{- if and .Values.rustfs.enabled .Values.rustfs.bucketInit.enabled }}
-{{- $accessKey := .Values.rustfsUpstream.secret.rustfs.access_key }}
-{{- $secretKey := .Values.rustfsUpstream.secret.rustfs.secret_key }}
+{{- $accessKey := .Values.rustfsupstream.secret.rustfs.access_key }}
+{{- $secretKey := .Values.rustfsupstream.secret.rustfs.secret_key }}
 apiVersion: batch/v1
 kind: Job
 metadata:
