@@ -2,14 +2,15 @@
 
 # Build stage
 ARG GO_VERSION
-FROM golang:${GO_VERSION}-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
 
 WORKDIR /src
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY executor/ executor/
 COPY flyteplugins/ flyteplugins/
@@ -17,7 +18,10 @@ COPY flytestdlib/ flytestdlib/
 COPY flyteidl2/ flyteidl2/
 COPY gen/ gen/
 
-RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o executor executor/cmd/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} \
+    go build -trimpath -o executor executor/cmd/main.go
 
 # Final stage
 FROM gcr.io/distroless/static-debian12
