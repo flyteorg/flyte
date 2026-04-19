@@ -93,7 +93,7 @@ jobs:
         with:
           source: .
           files: docker/docker-bake.hcl
-          targets: default
+          targets: ${{ matrix.target }}
           set: |
             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
 
@@ -104,6 +104,6 @@ jobs:
           source: .
           files: docker/docker-bake.hcl
           push: true
-          targets: default
+          targets: ${{ matrix.target }}
           set: |
              *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
