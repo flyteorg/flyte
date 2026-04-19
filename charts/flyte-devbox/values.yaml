@@ -54,7 +54,7 @@ flyte-binary:
       storage:
         signedURL:
           stowConfigOverride:
-            endpoint: http://localhost:32000
+            endpoint: http://localhost:30002
       plugins:
         k8s:
           default-env-vars:
