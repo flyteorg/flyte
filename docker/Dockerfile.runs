@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+
+# Build stage
+ARG GO_VERSION
+FROM golang:${GO_VERSION}-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY runs/ runs/
+COPY flytestdlib/ flytestdlib/
+COPY gen/ gen/
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o runs-service runs/cmd/main.go
+
+# Final stage
+FROM gcr.io/distroless/static-debian12
+
+COPY --from=builder /src/runs-service /
+COPY --from=builder /src/runs/config.yaml /
+
+ENTRYPOINT ["/runs-service"]

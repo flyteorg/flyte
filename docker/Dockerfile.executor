@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+
+# Build stage
+ARG GO_VERSION
+FROM golang:${GO_VERSION}-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY executor/ executor/
+COPY flyteplugins/ flyteplugins/
+COPY flytestdlib/ flytestdlib/
+COPY flyteidl2/ flyteidl2/
+COPY gen/ gen/
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o executor executor/cmd/main.go
+
+# Final stage
+FROM gcr.io/distroless/static-debian12
+
+COPY --from=builder /src/executor /
+
+ENTRYPOINT ["/executor"]

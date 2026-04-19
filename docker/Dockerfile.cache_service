@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+
+# Build stage
+ARG GO_VERSION
+FROM golang:${GO_VERSION}-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY cache_service/ cache_service/
+COPY flytestdlib/ flytestdlib/
+COPY gen/ gen/
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o cache-service cache_service/cmd/main.go
+
+# Final stage
+FROM gcr.io/distroless/static-debian12
+
+COPY --from=builder /src/cache-service /
+
+ENTRYPOINT ["/cache-service"]
