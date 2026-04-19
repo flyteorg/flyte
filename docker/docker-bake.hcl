@@ -23,7 +23,7 @@ group "default" {
 
 target "_common" {
   context = "."
-  platforms = ["linux/arm64"]
+  platforms = ["linux/arm64", "linux/amd64"]
   args = {
     GO_VERSION = "${GO_VERSION}"
   }

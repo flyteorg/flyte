@@ -44,7 +44,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.generate.outputs.matrix }}
     steps:
@@ -59,9 +59,10 @@ jobs:
         with:
           files: docker/docker-bake.hcl
           target: default
+          fields: platforms
   build-and-push:
     needs: prepare
-    runs-on: ubuntu-latest
+    runs-on: ${{ startsWith(matrix.platforms, 'linux/arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -95,7 +96,9 @@ jobs:
           files: docker/docker-bake.hcl
           targets: ${{ matrix.target }}
           set: |
+            *.platform=${{ matrix.platforms }}
             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
+            
 
       - name: Build and push images
         if: github.event_name == 'push'
@@ -106,4 +109,6 @@ jobs:
           push: true
           targets: ${{ matrix.target }}
           set: |
+             *.platform=${{ matrix.platforms }}
              *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
+             
