@@ -1,0 +1,86 @@
+name: Build & Push Flyte Core v2 Images
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - v2
+    paths:
+      - "docker/Dockerfile.*"
+      - "docker/docker-bake.hcl"
+      - "actions/**"
+      - "cache_service/**"
+      - "dataproxy/**"
+      - "events/**"
+      - "executor/**"
+      - "runs/**"
+      - "flytestdlib/**"
+      - "flyteplugins/**"
+      - "flyteidl2/**"
+      - "gen/**"
+      - "go.mod"
+      - "go.sum"
+  pull_request:
+    branches:
+      - v2
+    paths:
+      - "docker/Dockerfile.*"
+      - "docker/docker-bake.hcl"
+      - "actions/**"
+      - "cache_service/**"
+      - "dataproxy/**"
+      - "events/**"
+      - "executor/**"
+      - "runs/**"
+      - "flytestdlib/**"
+      - "flyteplugins/**"
+      - "flyteidl2/**"
+      - "gen/**"
+      - "go.mod"
+      - "go.sum"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.FLYTE_BOT_USERNAME }}
+          password: ${{ secrets.FLYTE_BOT_PAT }}
+
+      - name: Set short Git SHA as tag
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build images (PR)
+        if: github.event_name == 'pull_request'
+        uses: docker/bake-action@v7
+        with:
+          workdir: docker
+          files: docker-bake.hcl
+          targets: default
+          vars:
+            IMAGE_SHA_SHORT_TAG=${env.SHORT_SHA}
+
+      # - name: Build and push images
+      #   if: github.event_name == 'push'
+      #   uses: docker/bake-action@v7
+      #   with:
+      #     workdir: docker
+      #     files: docker-bake.hcl
+      #     push: false
+      #     targets: default
