@@ -158,7 +158,8 @@ rustfsupstream:
     tag: sandbox
   service:
     type: NodePort
-    nodePort: 30002
+    endpoint:
+      nodePort: 30002
   secret:
     rustfs:
       access_key: rustfs

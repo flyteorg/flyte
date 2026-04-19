@@ -7909,7 +7909,7 @@ metadata:
 spec:
   ports:
   - name: endpoint
-    nodePort: 32000
+    nodePort: 30002
     port: 9000
     targetPort: 9000
   - name: console
