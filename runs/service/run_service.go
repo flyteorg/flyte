@@ -1278,20 +1278,32 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
-		Filter: impl.NewRunActionsFilter(runID),
-		Limit:  10000,
-	})
-	if err != nil {
-		return err
-	}
+	const pageSize = 100
+	offset := 0
+	for {
+		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
+			Filter: impl.NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
+		})
+		if err != nil {
+			return err
+		}
 
-	updates, err := rsm.upsertActions(ctx, batch)
-	if err != nil {
-		return err
-	}
+		updates, err := rsm.upsertActions(ctx, batch)
+		if err != nil {
+			return err
+		}
 
-	return s.sendChangedActions(runID, updates, stream)
+		if err := s.sendChangedActions(runID, updates, stream); err != nil {
+			return err
+		}
+
+		if len(batch) < pageSize {
+			return nil
+		}
+		offset += pageSize
+	}
 }
 
 func (s *RunService) sendChangedActions(
